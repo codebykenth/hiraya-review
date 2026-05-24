@@ -10,6 +10,7 @@ import { Label } from '@/components/ui/label';
 import { edit } from '@/routes/profile';
 import { send } from '@/routes/verification';
 import type { Auth } from '@/types';
+import { cn } from '@/lib/utils';
 
 type PageProps = {
     auth: Auth;
@@ -71,12 +72,18 @@ export default function Profile({
                                 <Input
                                     id="email"
                                     type="email"
-                                    className="mt-1 block w-full"
+                                    className={cn(
+                                        'mt-1 block w-full',
+                                        auth.user.email_verified_at !== null &&
+                                            'bg-muted/50 text-muted-foreground select-none cursor-not-allowed',
+                                    )}
                                     defaultValue={auth.user.email}
                                     name="email"
                                     required
                                     autoComplete="username"
                                     placeholder="Email address"
+                                    // Prevent changing already verified email to maintain authentication consistency.
+                                    readOnly={auth.user.email_verified_at !== null}
                                 />
 
                                 <InputError

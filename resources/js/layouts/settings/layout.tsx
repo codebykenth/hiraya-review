@@ -39,7 +39,7 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
             />
 
             <div className="flex flex-col lg:flex-row lg:space-x-12">
-                <aside className="w-full max-w-xl lg:w-48">
+                <aside className="w-full max-w-2xl lg:w-48">
                     <nav
                         className="flex flex-col space-y-1 space-x-0"
                         aria-label="Settings"
@@ -50,9 +50,12 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
                                 size="sm"
                                 variant="ghost"
                                 asChild
-                                className={cn('w-full justify-start', {
-                                    'bg-muted': isCurrentOrParentUrl(item.href),
-                                })}
+                                className={cn(
+                                    'w-full justify-start transition-all duration-200',
+                                    isCurrentOrParentUrl(item.href)
+                                        ? 'bg-accent text-accent-foreground font-semibold dark:bg-neutral-800 dark:text-neutral-100'
+                                        : 'text-neutral-500 hover:bg-neutral-200/60 hover:text-black dark:text-neutral-400 dark:hover:bg-neutral-800/60',
+                                )}
                             >
                                 <Link href={item.href}>
                                     {item.icon && (
@@ -67,8 +70,8 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
 
                 <Separator className="my-6 lg:hidden" />
 
-                <div className="flex-1 md:max-w-2xl">
-                    <section className="max-w-xl space-y-12">
+                <div className="flex-1 md:max-w-3xl">
+                    <section className="max-w-2xl space-y-12">
                         {children}
                     </section>
                 </div>

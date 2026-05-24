@@ -99,10 +99,12 @@
 }
 
 :root {
-    --background: #eff4ff; /* Light blueish tint for the app background seen in image */
+    --background: #f8fafc;
+    /* Light blueish tint for the app background seen in image */
     --foreground: #0b1c30;
 
-    --card: #ffffff; /* White cards for contrast */
+    --card: #ffffff;
+    /* White cards for contrast */
     --card-foreground: #0b1c30;
 
     --popover: #ffffff;
@@ -111,11 +113,13 @@
     --primary: #2563eb;
     --primary-foreground: #ffffff;
 
-    --secondary: #10b981; /* Secondary (Emerald) */
+    --secondary: #10b981;
+    /* Secondary (Emerald) */
     --secondary-foreground: #ffffff;
 
     --muted: #f1f5f9;
-    --muted-foreground: #64748b; /* Neutral color for secondary text */
+    --muted-foreground: #64748b;
+    /* Neutral color for secondary text */
 
     --accent: #e5eeff;
     --accent-foreground: #0b1c30;
@@ -127,15 +131,20 @@
     --input: #e2e8f0;
     --ring: #2563eb;
 
-    --chart-1: #2563eb; /* Primary */
-    --chart-2: #10b981; /* Secondary (Emerald) */
-    --chart-3: #059669; /* Tertiary (Darker Emerald) */
-    --chart-4: #64748b; /* Neutral */
-    --chart-5: #004ac6; /* Dark Blue */
+    --chart-1: #2563eb;
+    /* Primary */
+    --chart-2: #10b981;
+    /* Secondary (Emerald) */
+    --chart-3: #059669;
+    /* Tertiary (Darker Emerald) */
+    --chart-4: #64748b;
+    /* Neutral */
+    --chart-5: #004ac6;
+    /* Dark Blue */
 
     --radius: 0.5rem;
 
-    --sidebar: #f8f9ff;
+    --sidebar: #eff4ff;
     --sidebar-foreground: #0b1c30;
     --sidebar-primary: #2563eb;
     --sidebar-primary-foreground: #ffffff;
@@ -155,10 +164,12 @@
     --popover: #0f172a;
     --popover-foreground: #f8fafc;
 
-    --primary: #3b82f6; /* Lighter primary for dark mode */
+    --primary: #3b82f6;
+    /* Lighter primary for dark mode */
     --primary-foreground: #ffffff;
 
-    --secondary: #10b981; /* Secondary (Emerald) */
+    --secondary: #10b981;
+    /* Secondary (Emerald) */
     --secondary-foreground: #ffffff;
 
     --muted: #1e293b;
@@ -175,8 +186,10 @@
     --ring: #3b82f6;
 
     --chart-1: #3b82f6;
-    --chart-2: #34d399; /* Emerald-400 */
-    --chart-3: #10b981; /* Emerald-500 */
+    --chart-2: #34d399;
+    /* Emerald-400 */
+    --chart-3: #10b981;
+    /* Emerald-500 */
     --chart-4: #94a3b8;
     --chart-5: #60a5fa;
 
