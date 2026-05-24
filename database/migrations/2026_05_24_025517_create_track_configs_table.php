@@ -12,7 +12,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('track_configs', function (Blueprint $table) {
-            //
+            $table->id();
+            $table->string('track');
+            $table->foreignId('category_id')->constrained('categories')->cascadeOnDelete();
+            $table->integer('item_count');
+            $table->integer('time_limit_secs');
+            $table->timestamps();
         });
     }
 

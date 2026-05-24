@@ -27,7 +27,7 @@ const mainNavItems: NavItem[] = [
         title: 'Exams',
         href: examsIndex(),
         icon: FileText,
-    }
+    },
 ];
 
 const footerNavItems: NavItem[] = [

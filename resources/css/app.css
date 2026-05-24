@@ -20,22 +20,22 @@
     --color-surface-container: #e5eeff;
     --color-surface-container-high: #dce9ff;
     --color-surface-container-highest: #d3e4fe;
-    
+
     --color-on-surface: #0b1c30;
     --color-on-surface-variant: #434655;
-    
+
     /* Brand Colors */
     --color-primary-brand: #2563eb;
     --color-on-primary-brand: #ffffff;
-    
+
     --color-secondary-brand: #10b981;
     --color-on-secondary-brand: #ffffff;
-    
+
     --color-tertiary-brand: #059669;
     --color-on-tertiary-brand: #ffffff;
-    
+
     --color-neutral: #64748b;
-    
+
     --color-error: #ba1a1a;
     --color-on-error: #ffffff;
 
@@ -101,40 +101,40 @@
 :root {
     --background: #eff4ff; /* Light blueish tint for the app background seen in image */
     --foreground: #0b1c30;
-    
+
     --card: #ffffff; /* White cards for contrast */
     --card-foreground: #0b1c30;
-    
+
     --popover: #ffffff;
     --popover-foreground: #0b1c30;
-    
+
     --primary: #2563eb;
     --primary-foreground: #ffffff;
-    
+
     --secondary: #10b981; /* Secondary (Emerald) */
     --secondary-foreground: #ffffff;
-    
+
     --muted: #f1f5f9;
     --muted-foreground: #64748b; /* Neutral color for secondary text */
-    
+
     --accent: #e5eeff;
     --accent-foreground: #0b1c30;
-    
+
     --destructive: #ba1a1a;
     --destructive-foreground: #ffffff;
-    
+
     --border: #e2e8f0;
     --input: #e2e8f0;
     --ring: #2563eb;
-    
+
     --chart-1: #2563eb; /* Primary */
     --chart-2: #10b981; /* Secondary (Emerald) */
     --chart-3: #059669; /* Tertiary (Darker Emerald) */
     --chart-4: #64748b; /* Neutral */
     --chart-5: #004ac6; /* Dark Blue */
-    
+
     --radius: 0.5rem;
-    
+
     --sidebar: #f8f9ff;
     --sidebar-foreground: #0b1c30;
     --sidebar-primary: #2563eb;
@@ -148,38 +148,38 @@
 .dark {
     --background: #020617;
     --foreground: #f8fafc;
-    
+
     --card: #0f172a;
     --card-foreground: #f8fafc;
-    
+
     --popover: #0f172a;
     --popover-foreground: #f8fafc;
-    
+
     --primary: #3b82f6; /* Lighter primary for dark mode */
     --primary-foreground: #ffffff;
-    
+
     --secondary: #10b981; /* Secondary (Emerald) */
     --secondary-foreground: #ffffff;
-    
+
     --muted: #1e293b;
     --muted-foreground: #94a3b8;
-    
+
     --accent: #1e293b;
     --accent-foreground: #f8fafc;
-    
+
     --destructive: #f87171;
     --destructive-foreground: #020617;
-    
+
     --border: #1e293b;
     --input: #1e293b;
     --ring: #3b82f6;
-    
+
     --chart-1: #3b82f6;
     --chart-2: #34d399; /* Emerald-400 */
     --chart-3: #10b981; /* Emerald-500 */
     --chart-4: #94a3b8;
     --chart-5: #60a5fa;
-    
+
     --sidebar: #020617;
     --sidebar-foreground: #f8fafc;
     --sidebar-primary: #3b82f6;
@@ -196,10 +196,19 @@
     }
 
     body {
-        @apply bg-background text-foreground font-sans;
+        @apply bg-background font-sans text-foreground;
     }
-    
-    h1, h2, h3, h4, h5, h6 {
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
         @apply font-heading tracking-tight;
     }
+}
+
+html {
+    scroll-behavior: smooth;
 }
