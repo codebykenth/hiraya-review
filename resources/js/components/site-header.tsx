@@ -98,34 +98,39 @@ export default function SiteHeader({
                         </Link>
                     </div>
 
-                    <div className="hidden md:block">
-                        <ul className="flex gap-8 font-medium">
-                            {navLinks.map((link) => {
-                                const isLinkActive = activeNav === link.id;
-                                const isHomeActive =
-                                    typeof window !== 'undefined' &&
-                                    window.location.pathname === '/' &&
-                                    isLinkActive;
-                                return (
-                                    <li key={link.id}>
-                                        <a
-                                            href={getHref(link.id, link.href)}
-                                            onClick={() =>
-                                                handleLinkClick(link.id)
-                                            }
-                                            className={`border-b-2 pb-1 transition-all ${
-                                                isHomeActive
-                                                    ? 'border-primary font-bold text-primary'
-                                                    : 'border-transparent text-muted-foreground hover:border-border hover:text-foreground'
-                                            }`}
-                                        >
-                                            {link.label}
-                                        </a>
-                                    </li>
-                                );
-                            })}
-                        </ul>
-                    </div>
+                    {!auth.user && (
+                        <div className="hidden md:block">
+                            <ul className="flex gap-8 font-medium">
+                                {navLinks.map((link) => {
+                                    const isLinkActive = activeNav === link.id;
+                                    const isHomeActive =
+                                        typeof window !== 'undefined' &&
+                                        window.location.pathname === '/' &&
+                                        isLinkActive;
+                                    return (
+                                        <li key={link.id}>
+                                            <a
+                                                href={getHref(
+                                                    link.id,
+                                                    link.href,
+                                                )}
+                                                onClick={() =>
+                                                    handleLinkClick(link.id)
+                                                }
+                                                className={`border-b-2 pb-1 transition-all ${
+                                                    isHomeActive
+                                                        ? 'border-primary font-bold text-primary'
+                                                        : 'border-transparent text-muted-foreground hover:border-border hover:text-foreground'
+                                                }`}
+                                            >
+                                                {link.label}
+                                            </a>
+                                        </li>
+                                    );
+                                })}
+                            </ul>
+                        </div>
+                    )}
 
                     <div className="hidden items-center gap-4 md:flex">
                         {auth.user ? (
@@ -178,34 +183,42 @@ export default function SiteHeader({
                     }`}
                 >
                     <div className="container mx-auto flex flex-col gap-6 px-6 py-6">
-                        <ul className="flex flex-col gap-4 text-base font-semibold">
-                            {navLinks.map((link) => {
-                                const isLinkActive = activeNav === link.id;
-                                const isHomeActive =
-                                    typeof window !== 'undefined' &&
-                                    window.location.pathname === '/' &&
-                                    isLinkActive;
-                                return (
-                                    <li key={link.id}>
-                                        <a
-                                            href={getHref(link.id, link.href)}
-                                            onClick={() =>
-                                                handleLinkClick(link.id)
-                                            }
-                                            className={`block py-1 transition-all ${
-                                                isHomeActive
-                                                    ? 'font-bold text-primary'
-                                                    : 'text-muted-foreground hover:text-foreground'
-                                            }`}
-                                        >
-                                            {link.label}
-                                        </a>
-                                    </li>
-                                );
-                            })}
-                        </ul>
+                        {!auth.user && (
+                            <>
+                                <ul className="flex flex-col gap-4 text-base font-semibold">
+                                    {navLinks.map((link) => {
+                                        const isLinkActive =
+                                            activeNav === link.id;
+                                        const isHomeActive =
+                                            typeof window !== 'undefined' &&
+                                            window.location.pathname === '/' &&
+                                            isLinkActive;
+                                        return (
+                                            <li key={link.id}>
+                                                <a
+                                                    href={getHref(
+                                                        link.id,
+                                                        link.href,
+                                                    )}
+                                                    onClick={() =>
+                                                        handleLinkClick(link.id)
+                                                    }
+                                                    className={`block py-1 transition-all ${
+                                                        isHomeActive
+                                                            ? 'font-bold text-primary'
+                                                            : 'text-muted-foreground hover:text-foreground'
+                                                    }`}
+                                                >
+                                                    {link.label}
+                                                </a>
+                                            </li>
+                                        );
+                                    })}
+                                </ul>
 
-                        <div className="bg-slate-150 h-[1px] w-full dark:bg-slate-800" />
+                                <div className="bg-slate-150 h-[1px] w-full dark:bg-slate-800" />
+                            </>
+                        )}
 
                         <div className="flex flex-col gap-3">
                             {auth.user ? (

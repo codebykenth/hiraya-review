@@ -1,5 +1,6 @@
 // Components
 import { Form, Head } from '@inertiajs/react';
+import { useState, useEffect } from 'react';
 import TextLink from '@/components/text-link';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
@@ -7,6 +8,74 @@ import { logout } from '@/routes';
 import { send } from '@/routes/verification';
 
 export default function VerifyEmail({ status }: { status?: string }) {
+    const [resendCount, setResendCount] = useState<number>(0);
+    const [timeLeft, setTimeLeft] = useState<number>(0);
+
+    // Hydrate state from sessionStorage on mount
+    useEffect(() => {
+        const storedCount = sessionStorage.getItem('verifyEmailResendCount');
+        const storedNextTime = sessionStorage.getItem(
+            'verifyEmailNextAllowedTime',
+        );
+
+        if (storedCount) {
+            setResendCount(parseInt(storedCount, 10));
+        }
+
+        if (storedNextTime) {
+            const nextTime = parseInt(storedNextTime, 10);
+            const remaining = Math.ceil((nextTime - Date.now()) / 1000);
+            if (remaining > 0) {
+                setTimeLeft(remaining);
+            }
+        }
+    }, []);
+
+    // Countdown timer
+    useEffect(() => {
+        if (timeLeft <= 0) return;
+
+        const interval = setInterval(() => {
+            const storedNextTime = sessionStorage.getItem(
+                'verifyEmailNextAllowedTime',
+            );
+            if (storedNextTime) {
+                const nextTime = parseInt(storedNextTime, 10);
+                const remaining = Math.ceil((nextTime - Date.now()) / 1000);
+                if (remaining <= 0) {
+                    setTimeLeft(0);
+                } else {
+                    setTimeLeft(remaining);
+                }
+            } else {
+                setTimeLeft(0);
+            }
+        }, 1000);
+
+        return () => clearInterval(interval);
+    }, [timeLeft]);
+
+    const handleFormSubmit = () => {
+        const newCount = resendCount + 1;
+        const delaySeconds = 60 * Math.pow(2, resendCount); // 60s, 120s, 240s, 480s, etc.
+        const nextTime = Date.now() + delaySeconds * 1000;
+
+        sessionStorage.setItem('verifyEmailResendCount', String(newCount));
+        sessionStorage.setItem('verifyEmailNextAllowedTime', String(nextTime));
+
+        setResendCount(newCount);
+        setTimeLeft(delaySeconds);
+    };
+
+    const formatTimeLeft = (seconds: number): string => {
+        if (seconds < 60) {
+            return `${seconds}s`;
+        }
+        const mins = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        return `${mins}m ${secs < 10 ? '0' : ''}${secs}s`;
+    };
+
     return (
         <>
             <Head title="Email verification" />
@@ -18,12 +87,23 @@ export default function VerifyEmail({ status }: { status?: string }) {
                 </div>
             )}
 
-            <Form {...send.form()} className="space-y-6 text-center">
+            <Form
+                {...send.form()}
+                onStart={() => {
+                    handleFormSubmit();
+                }}
+                className="space-y-6 text-center"
+            >
                 {({ processing }) => (
                     <>
-                        <Button disabled={processing} variant="secondary">
+                        <Button
+                            disabled={processing || timeLeft > 0}
+                            variant="secondary"
+                        >
                             {processing && <Spinner />}
-                            Resend verification email
+                            {timeLeft > 0
+                                ? `Resend in ${formatTimeLeft(timeLeft)}`
+                                : 'Resend verification email'}
                         </Button>
 
                         <TextLink
