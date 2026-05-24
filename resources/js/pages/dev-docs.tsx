@@ -184,20 +184,457 @@ export default function DevDocs() {
 | is_demographic   |          | language          |          | options (JSONB)   |
 | sort_order       |          | sort_order        |          | correct_option    |
 +------------------+          +-------------------+          | explanation       |
-         |                             ^                     | created_by (FK)   |
-         |                             |                     +-------------------+
-         v                             |
-+------------------+                   |                     +-------------------+
-|  track_configs   |                   |                     |   exam_attempts   |
-+------------------+                   |                     +-------------------+
-| id (PK)          |                   +---------------------+ category_id (FK)  |
-| track (Enum)     |                                         | user_id (FK)      |
-| category_id (FK) |                                         | question_ids(JSONB|
-| item_count       |                                         | answers (JSONB)   |
-| time_limit_secs  |                                         | cat_scores (JSONB)|
-+------------------+                                         +-------------------+`}
+         |                             ^                     | created_by (FK)---|----+
+         |                             |                     +-------------------+    |
+         v                             |                                              |
++------------------+                   |                     +-------------------+    |
+|  track_configs   |                   |                     |   exam_attempts   |    |
++------------------+                   |                     +-------------------+    |
+| id (PK)          |                   +---------------------+ category_id (FK)  |    |
+| track (Enum)     |                                         | user_id (FK)------+    |
+| category_id (FK) |                                         | question_ids(JSONB|    |
+| item_count       |                                         | answers (JSONB)   |    |
+| time_limit_secs  |                                         | cat_scores (JSONB)|    |
++------------------+                                         +-------------------+    |
+                                                                       |              |
+                                                                       v              v
+                                                             +----------------------- +   
+                                                             |         users          |
+                                                             +------------------------+   
+                                                             | id (PK)                |
+                                                             | name                   |
+                                                             | email (UQ)             |
+                                                             | email_verified_at      |
+                                                             | password (nullable)    |
+                                                             | provider (nullable)    |
+                                                             | provider_id (nullable) |
+                                                             | role (Enum)            |
+                                                             | remember_token         |
+                                                             +------------------------+`}
                             </code>
                         </pre>
+
+                        <h3 className="text-gray-700 mt-8 mb-4 text-xl font-bold">Database Schema Reference</h3>
+
+                        {/* 1. users */}
+                        <h4 className="text-gray-700 mt-6 mb-2 text-lg font-bold flex items-center gap-2">
+                            <span>Table:</span>
+                            <code className="font-mono bg-slate-200 text-blue-600 px-1.5 py-0.5 rounded text-[0.9em] font-medium">users</code>
+                        </h4>
+                        <div className="my-4 rounded-lg overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.1)] bg-white border border-gray-100">
+                            <table className="w-full border-collapse text-left text-sm">
+                                <thead className="bg-slate-50">
+                                    <tr>
+                                        <th className="p-3 border-b border-gray-200 font-semibold text-slate-700 uppercase text-[0.85em] tracking-wider w-[15%]">Column</th>
+                                        <th className="p-3 border-b border-gray-200 font-semibold text-slate-700 uppercase text-[0.85em] tracking-wider w-[8%]">Key</th>
+                                        <th className="p-3 border-b border-gray-200 font-semibold text-slate-700 uppercase text-[0.85em] tracking-wider w-[12%]">Type</th>
+                                        <th className="p-3 border-b border-gray-200 font-semibold text-slate-700 uppercase text-[0.85em] tracking-wider w-[25%]">Description</th>
+                                        <th className="p-3 border-b border-gray-200 font-semibold text-slate-700 uppercase text-[0.85em] tracking-wider w-[15%]">Sample Value</th>
+                                        <th className="p-3 border-b border-gray-200 font-semibold text-slate-700 uppercase text-[0.85em] tracking-wider w-[25%]">Purpose</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr className="hover:bg-slate-50">
+                                        <td className="p-3 border-b border-gray-200 font-medium"><code className="font-mono bg-slate-200 text-blue-600 px-1.5 py-0.5 rounded text-[0.9em] font-medium">id</code></td>
+                                        <td className="p-3 border-b border-gray-200 font-semibold text-slate-500">PK</td>
+                                        <td className="p-3 border-b border-gray-200"><code className="font-mono bg-slate-100 text-slate-700 px-1 py-0.5 rounded text-[0.85em]">BigInteger</code></td>
+                                        <td className="p-3 border-b border-gray-200 text-gray-600">Auto-incrementing unique identifier.</td>
+                                        <td className="p-3 border-b border-gray-200"><code className="font-mono bg-slate-100 text-emerald-600 px-1 py-0.5 rounded text-[0.85em]">1</code></td>
+                                        <td className="p-3 border-b border-gray-200 text-gray-600">Unique database key to identify and establish relationships for examinees.</td>
+                                    </tr>
+                                    <tr className="hover:bg-slate-50">
+                                        <td className="p-3 border-b border-gray-200 font-medium"><code className="font-mono bg-slate-200 text-blue-600 px-1.5 py-0.5 rounded text-[0.9em] font-medium">name</code></td>
+                                        <td className="p-3 border-b border-gray-200 text-gray-400 font-normal">N/A</td>
+                                        <td className="p-3 border-b border-gray-200"><code className="font-mono bg-slate-100 text-slate-700 px-1 py-0.5 rounded text-[0.85em]">String</code></td>
+                                        <td className="p-3 border-b border-gray-200 text-gray-600">The full name of the user.</td>
+                                        <td className="p-3 border-b border-gray-200"><code className="font-mono bg-slate-100 text-emerald-600 px-1 py-0.5 rounded text-[0.85em]">"Jane Doe"</code></td>
+                                        <td className="p-3 border-b border-gray-200 text-gray-600">Displayed in greetings, headers, profile views, and results certificates.</td>
+                                    </tr>
+                                    <tr className="hover:bg-slate-50">
+                                        <td className="p-3 border-b border-gray-200 font-medium"><code className="font-mono bg-slate-200 text-blue-600 px-1.5 py-0.5 rounded text-[0.9em] font-medium">email</code></td>
+                                        <td className="p-3 border-b border-gray-200 font-semibold text-slate-500">UQ</td>
+                                        <td className="p-3 border-b border-gray-200"><code className="font-mono bg-slate-100 text-slate-700 px-1 py-0.5 rounded text-[0.85em]">String</code></td>
+                                        <td className="p-3 border-b border-gray-200 text-gray-600">Unique email address of the user.</td>
+                                        <td className="p-3 border-b border-gray-200"><code className="font-mono bg-slate-100 text-emerald-600 px-1 py-0.5 rounded text-[0.85em]">"jane.doe@example.com"</code></td>
+                                        <td className="p-3 border-b border-gray-200 text-gray-600">Primary login credential and target for security and verification emails.</td>
+                                    </tr>
+                                    <tr className="hover:bg-slate-50">
+                                        <td className="p-3 border-b border-gray-200 font-medium"><code className="font-mono bg-slate-200 text-blue-600 px-1.5 py-0.5 rounded text-[0.9em] font-medium">email_verified_at</code></td>
+                                        <td className="p-3 border-b border-gray-200 text-gray-400 font-normal">N/A</td>
+                                        <td className="p-3 border-b border-gray-200"><code className="font-mono bg-slate-100 text-slate-700 px-1 py-0.5 rounded text-[0.85em]">Timestamp (Nullable)</code></td>
+                                        <td className="p-3 border-b border-gray-200 text-gray-600">Timestamp when email verification completed.</td>
+                                        <td className="p-3 border-b border-gray-200"><code className="font-mono bg-slate-100 text-emerald-600 px-1 py-0.5 rounded text-[0.85em]">"2026-05-24 03:00:00"</code></td>
+                                        <td className="p-3 border-b border-gray-200 text-gray-600">Validates if the user is authorized to bypass email verification guards.</td>
+                                    </tr>
+                                    <tr className="hover:bg-slate-50">
+                                        <td className="p-3 border-b border-gray-200 font-medium"><code className="font-mono bg-slate-200 text-blue-600 px-1.5 py-0.5 rounded text-[0.9em] font-medium">password</code></td>
+                                        <td className="p-3 border-b border-gray-200 text-gray-400 font-normal">N/A</td>
+                                        <td className="p-3 border-b border-gray-200"><code className="font-mono bg-slate-100 text-slate-700 px-1 py-0.5 rounded text-[0.85em]">String (Nullable)</code></td>
+                                        <td className="p-3 border-b border-gray-200 text-gray-600">Hashed password credential. Nullable to support social login accounts.</td>
+                                        <td className="p-3 border-b border-gray-200"><code className="font-mono bg-slate-100 text-emerald-600 px-1 py-0.5 rounded text-[0.85em] font-mono">"$2y$12$e..."</code></td>
+                                        <td className="p-3 border-b border-gray-200 text-gray-600">Secures local accounts against credential compromise.</td>
+                                    </tr>
+                                    <tr className="hover:bg-slate-50">
+                                        <td className="p-3 border-b border-gray-200 font-medium"><code className="font-mono bg-slate-200 text-blue-600 px-1.5 py-0.5 rounded text-[0.9em] font-medium">provider</code></td>
+                                        <td className="p-3 border-b border-gray-200 text-gray-400 font-normal">N/A</td>
+                                        <td className="p-3 border-b border-gray-200"><code className="font-mono bg-slate-100 text-slate-700 px-1 py-0.5 rounded text-[0.85em]">String (Nullable)</code></td>
+                                        <td className="p-3 border-b border-gray-200 text-gray-600">Social login provider identification.</td>
+                                        <td className="p-3 border-b border-gray-200"><code className="font-mono bg-slate-100 text-emerald-600 px-1 py-0.5 rounded text-[0.85em]">"google"</code></td>
+                                        <td className="p-3 border-b border-gray-200 text-gray-600">Allows authentication routing and callbacks from third-party OAuth flows.</td>
+                                    </tr>
+                                    <tr className="hover:bg-slate-50">
+                                        <td className="p-3 border-b border-gray-200 font-medium"><code className="font-mono bg-slate-200 text-blue-600 px-1.5 py-0.5 rounded text-[0.9em] font-medium">provider_id</code></td>
+                                        <td className="p-3 border-b border-gray-200 text-gray-400 font-normal">N/A</td>
+                                        <td className="p-3 border-b border-gray-200"><code className="font-mono bg-slate-100 text-slate-700 px-1 py-0.5 rounded text-[0.85em]">String (Nullable)</code></td>
+                                        <td className="p-3 border-b border-gray-200 text-gray-600">Unique user identification from social provider.</td>
+                                        <td className="p-3 border-b border-gray-200"><code className="font-mono bg-slate-100 text-emerald-600 px-1 py-0.5 rounded text-[0.85em]">"1092839284"</code></td>
+                                        <td className="p-3 border-b border-gray-200 text-gray-600">Uniquely associates the third-party account credential with the local database user record.</td>
+                                    </tr>
+                                    <tr className="hover:bg-slate-50">
+                                        <td className="p-3 border-b border-gray-200 font-medium"><code className="font-mono bg-slate-200 text-blue-600 px-1.5 py-0.5 rounded text-[0.9em] font-medium">role</code></td>
+                                        <td className="p-3 border-b border-gray-200 text-gray-400 font-normal">N/A</td>
+                                        <td className="p-3 border-b border-gray-200"><code className="font-mono bg-slate-100 text-slate-700 px-1 py-0.5 rounded text-[0.85em]">Enum ("admin" | "user")</code></td>
+                                        <td className="p-3 border-b border-gray-200 text-gray-600">Authorization access group.</td>
+                                        <td className="p-3 border-b border-gray-200"><code className="font-mono bg-slate-100 text-emerald-600 px-1 py-0.5 rounded text-[0.85em]">"user"</code></td>
+                                        <td className="p-3 border-b border-gray-200 text-gray-600">Restricts administrative control panels to administrators.</td>
+                                    </tr>
+                                    <tr className="hover:bg-slate-50">
+                                        <td className="p-3 border-b border-gray-200 font-medium"><code className="font-mono bg-slate-200 text-blue-600 px-1.5 py-0.5 rounded text-[0.9em] font-medium">remember_token</code></td>
+                                        <td className="p-3 border-b border-gray-200 text-gray-400 font-normal">N/A</td>
+                                        <td className="p-3 border-b border-gray-200"><code className="font-mono bg-slate-100 text-slate-700 px-1 py-0.5 rounded text-[0.85em]">String (Nullable)</code></td>
+                                        <td className="p-3 border-b border-gray-200 text-gray-600">Token for persisting the login session.</td>
+                                        <td className="p-3 border-b border-gray-200"><code className="font-mono bg-slate-100 text-emerald-600 px-1 py-0.5 rounded text-[0.85em]">"f4Ea2s1..."</code></td>
+                                        <td className="p-3 border-b border-gray-200 text-gray-600">Keeps user logged in securely across browser sessions.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        {/* 2. categories */}
+                        <h4 className="text-gray-700 mt-6 mb-2 text-lg font-bold flex items-center gap-2">
+                            <span>Table:</span>
+                            <code className="font-mono bg-slate-200 text-blue-600 px-1.5 py-0.5 rounded text-[0.9em] font-medium">categories</code>
+                        </h4>
+                        <div className="my-4 rounded-lg overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.1)] bg-white border border-gray-100">
+                            <table className="w-full border-collapse text-left text-sm">
+                                <thead className="bg-slate-50">
+                                    <tr>
+                                        <th className="p-3 border-b border-gray-200 font-semibold text-slate-700 uppercase text-[0.85em] tracking-wider w-[15%]">Column</th>
+                                        <th className="p-3 border-b border-gray-200 font-semibold text-slate-700 uppercase text-[0.85em] tracking-wider w-[8%]">Key</th>
+                                        <th className="p-3 border-b border-gray-200 font-semibold text-slate-700 uppercase text-[0.85em] tracking-wider w-[12%]">Type</th>
+                                        <th className="p-3 border-b border-gray-200 font-semibold text-slate-700 uppercase text-[0.85em] tracking-wider w-[25%]">Description</th>
+                                        <th className="p-3 border-b border-gray-200 font-semibold text-slate-700 uppercase text-[0.85em] tracking-wider w-[15%]">Sample Value</th>
+                                        <th className="p-3 border-b border-gray-200 font-semibold text-slate-700 uppercase text-[0.85em] tracking-wider w-[25%]">Purpose</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr className="hover:bg-slate-50">
+                                        <td className="p-3 border-b border-gray-200 font-medium"><code className="font-mono bg-slate-200 text-blue-600 px-1.5 py-0.5 rounded text-[0.9em] font-medium">id</code></td>
+                                        <td className="p-3 border-b border-gray-200 font-semibold text-slate-500">PK</td>
+                                        <td className="p-3 border-b border-gray-200"><code className="font-mono bg-slate-100 text-slate-700 px-1 py-0.5 rounded text-[0.85em]">BigInteger</code></td>
+                                        <td className="p-3 border-b border-gray-200 text-gray-600">Auto-incrementing unique identifier.</td>
+                                        <td className="p-3 border-b border-gray-200"><code className="font-mono bg-slate-100 text-emerald-600 px-1 py-0.5 rounded text-[0.85em]">1</code></td>
+                                        <td className="p-3 border-b border-gray-200 text-gray-600">Unique identifier for database indexing, relationships, and queries.</td>
+                                    </tr>
+                                    <tr className="hover:bg-slate-50">
+                                        <td className="p-3 border-b border-gray-200 font-medium"><code className="font-mono bg-slate-200 text-blue-600 px-1.5 py-0.5 rounded text-[0.9em] font-medium">name</code></td>
+                                        <td className="p-3 border-b border-gray-200 text-gray-400 font-normal">N/A</td>
+                                        <td className="p-3 border-b border-gray-200"><code className="font-mono bg-slate-100 text-slate-700 px-1 py-0.5 rounded text-[0.85em]">String</code></td>
+                                        <td className="p-3 border-b border-gray-200 text-gray-600">Human-readable name of the category.</td>
+                                        <td className="p-3 border-b border-gray-200"><code className="font-mono bg-slate-100 text-emerald-600 px-1 py-0.5 rounded text-[0.85em]">"Verbal Ability"</code></td>
+                                        <td className="p-3 border-b border-gray-200 text-gray-600">Displayed to examinees on the sidebar, dashboards, and score reports.</td>
+                                    </tr>
+                                    <tr className="hover:bg-slate-50">
+                                        <td className="p-3 border-b border-gray-200 font-medium"><code className="font-mono bg-slate-200 text-blue-600 px-1.5 py-0.5 rounded text-[0.9em] font-medium">slug</code></td>
+                                        <td className="p-3 border-b border-gray-200 font-semibold text-slate-500">UQ</td>
+                                        <td className="p-3 border-b border-gray-200"><code className="font-mono bg-slate-100 text-slate-700 px-1 py-0.5 rounded text-[0.85em]">String</code></td>
+                                        <td className="p-3 border-b border-gray-200 text-gray-600">Unique URL-friendly slug used for identification.</td>
+                                        <td className="p-3 border-b border-gray-200"><code className="font-mono bg-slate-100 text-emerald-600 px-1 py-0.5 rounded text-[0.85em]">"verbal-ability"</code></td>
+                                        <td className="p-3 border-b border-gray-200 text-gray-600">Used as route parameter binds (e.g. `/drills/verbal-ability`) and dictionary keys in telemetry.</td>
+                                    </tr>
+                                    <tr className="hover:bg-slate-50">
+                                        <td className="p-3 border-b border-gray-200 font-medium"><code className="font-mono bg-slate-200 text-blue-600 px-1.5 py-0.5 rounded text-[0.9em] font-medium">is_demographic</code></td>
+                                        <td className="p-3 border-b border-gray-200 text-gray-400 font-normal">N/A</td>
+                                        <td className="p-3 border-b border-gray-200"><code className="font-mono bg-slate-100 text-slate-700 px-1 py-0.5 rounded text-[0.85em]">Boolean</code></td>
+                                        <td className="p-3 border-b border-gray-200 text-gray-600">Indicates if the category belongs to the demographic survey (EDQ).</td>
+                                        <td className="p-3 border-b border-gray-200"><code className="font-mono bg-slate-100 text-emerald-600 px-1 py-0.5 rounded text-[0.85em]">false</code></td>
+                                        <td className="p-3 border-b border-gray-200 text-gray-600">Identifies survey-only sections that must be completed first and excluded from grading.</td>
+                                    </tr>
+                                    <tr className="hover:bg-slate-50">
+                                        <td className="p-3 border-b border-gray-200 font-medium"><code className="font-mono bg-slate-200 text-blue-600 px-1.5 py-0.5 rounded text-[0.9em] font-medium">sort_order</code></td>
+                                        <td className="p-3 border-b border-gray-200 text-gray-400 font-normal">N/A</td>
+                                        <td className="p-3 border-b border-gray-200"><code className="font-mono bg-slate-100 text-slate-700 px-1 py-0.5 rounded text-[0.85em]">Integer</code></td>
+                                        <td className="p-3 border-b border-gray-200 text-gray-600">Determines display sorting order.</td>
+                                        <td className="p-3 border-b border-gray-200"><code className="font-mono bg-slate-100 text-emerald-600 px-1 py-0.5 rounded text-[0.85em]">1</code></td>
+                                        <td className="p-3 border-b border-gray-200 text-gray-600">Enforces standard vertical ordering on dashboards and performance breakdowns.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        {/* 3. subcategories */}
+                        <h4 className="text-gray-700 mt-6 mb-2 text-lg font-bold flex items-center gap-2">
+                            <span>Table:</span>
+                            <code className="font-mono bg-slate-200 text-blue-600 px-1.5 py-0.5 rounded text-[0.9em] font-medium">subcategories</code>
+                        </h4>
+                        <div className="my-4 rounded-lg overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.1)] bg-white border border-gray-100">
+                            <table className="w-full border-collapse text-left text-sm">
+                                <thead className="bg-slate-50">
+                                    <tr>
+                                        <th className="p-3 border-b border-gray-200 font-semibold text-slate-700 uppercase text-[0.85em] tracking-wider w-[15%]">Column</th>
+                                        <th className="p-3 border-b border-gray-200 font-semibold text-slate-700 uppercase text-[0.85em] tracking-wider w-[8%]">Key</th>
+                                        <th className="p-3 border-b border-gray-200 font-semibold text-slate-700 uppercase text-[0.85em] tracking-wider w-[12%]">Type</th>
+                                        <th className="p-3 border-b border-gray-200 font-semibold text-slate-700 uppercase text-[0.85em] tracking-wider w-[25%]">Description</th>
+                                        <th className="p-3 border-b border-gray-200 font-semibold text-slate-700 uppercase text-[0.85em] tracking-wider w-[15%]">Sample Value</th>
+                                        <th className="p-3 border-b border-gray-200 font-semibold text-slate-700 uppercase text-[0.85em] tracking-wider w-[25%]">Purpose</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr className="hover:bg-slate-50">
+                                        <td className="p-3 border-b border-gray-200 font-medium"><code className="font-mono bg-slate-200 text-blue-600 px-1.5 py-0.5 rounded text-[0.9em] font-medium">category_id</code></td>
+                                        <td className="p-3 border-b border-gray-200 font-semibold text-slate-500">FK</td>
+                                        <td className="p-3 border-b border-gray-200"><code className="font-mono bg-slate-100 text-slate-700 px-1 py-0.5 rounded text-[0.85em]">BigInteger</code></td>
+                                        <td className="p-3 border-b border-gray-200 text-gray-600">References <code className="font-mono bg-slate-100 px-1 py-0.5 rounded text-[0.85em]">categories.id</code>.</td>
+                                        <td className="p-3 border-b border-gray-200"><code className="font-mono bg-slate-100 text-emerald-600 px-1 py-0.5 rounded text-[0.85em]">1</code></td>
+                                        <td className="p-3 border-b border-gray-200 text-gray-600">Establishes relationship linking the subcategory to its parent exam category.</td>
+                                    </tr>
+                                    <tr className="hover:bg-slate-50">
+                                        <td className="p-3 border-b border-gray-200 font-medium"><code className="font-mono bg-slate-200 text-blue-600 px-1.5 py-0.5 rounded text-[0.9em] font-medium">name</code></td>
+                                        <td className="p-3 border-b border-gray-200 text-gray-400 font-normal">N/A</td>
+                                        <td className="p-3 border-b border-gray-200"><code className="font-mono bg-slate-100 text-slate-700 px-1 py-0.5 rounded text-[0.85em]">String</code></td>
+                                        <td className="p-3 border-b border-gray-200 text-gray-600">Name of the subcategory.</td>
+                                        <td className="p-3 border-b border-gray-200"><code className="font-mono bg-slate-100 text-emerald-600 px-1 py-0.5 rounded text-[0.85em]">"Word Meaning"</code></td>
+                                        <td className="p-3 border-b border-gray-200 text-gray-600">Provides fine-grained labels for analytical graphs and detailed review sheets.</td>
+                                    </tr>
+                                    <tr className="hover:bg-slate-50">
+                                        <td className="p-3 border-b border-gray-200 font-medium"><code className="font-mono bg-slate-200 text-blue-600 px-1.5 py-0.5 rounded text-[0.9em] font-medium">slug</code></td>
+                                        <td className="p-3 border-b border-gray-200 text-gray-400 font-normal">N/A</td>
+                                        <td className="p-3 border-b border-gray-200"><code className="font-mono bg-slate-100 text-slate-700 px-1 py-0.5 rounded text-[0.85em]">String</code></td>
+                                        <td className="p-3 border-b border-gray-200 text-gray-600">URL-friendly slug.</td>
+                                        <td className="p-3 border-b border-gray-200"><code className="font-mono bg-slate-100 text-emerald-600 px-1 py-0.5 rounded text-[0.85em]">"word-meaning"</code></td>
+                                        <td className="p-3 border-b border-gray-200 text-gray-600">Internal code-level configuration and dynamic query parameters.</td>
+                                    </tr>
+                                    <tr className="hover:bg-slate-50">
+                                        <td className="p-3 border-b border-gray-200 font-medium"><code className="font-mono bg-slate-200 text-blue-600 px-1.5 py-0.5 rounded text-[0.9em] font-medium">language</code></td>
+                                        <td className="p-3 border-b border-gray-200 text-gray-400 font-normal">N/A</td>
+                                        <td className="p-3 border-b border-gray-200"><code className="font-mono bg-slate-100 text-slate-700 px-1 py-0.5 rounded text-[0.85em]">String</code></td>
+                                        <td className="p-3 border-b border-gray-200 text-gray-600">Language of instruction.</td>
+                                        <td className="p-3 border-b border-gray-200"><code className="font-mono bg-slate-100 text-emerald-600 px-1 py-0.5 rounded text-[0.85em]">"English"</code></td>
+                                        <td className="p-3 border-b border-gray-200 text-gray-600">Allows segregation of questions based on language settings.</td>
+                                    </tr>
+                                    <tr className="hover:bg-slate-50">
+                                        <td className="p-3 border-b border-gray-200 font-medium"><code className="font-mono bg-slate-200 text-blue-600 px-1.5 py-0.5 rounded text-[0.9em] font-medium">sort_order</code></td>
+                                        <td className="p-3 border-b border-gray-200 text-gray-400 font-normal">N/A</td>
+                                        <td className="p-3 border-b border-gray-200"><code className="font-mono bg-slate-100 text-slate-700 px-1 py-0.5 rounded text-[0.85em]">Integer</code></td>
+                                        <td className="p-3 border-b border-gray-200 text-gray-600">Determines display sorting order.</td>
+                                        <td className="p-3 border-b border-gray-200"><code className="font-mono bg-slate-100 text-emerald-600 px-1 py-0.5 rounded text-[0.85em]">1</code></td>
+                                        <td className="p-3 border-b border-gray-200 text-gray-600">Ensures subcategories are ordered predictably when presented in drop-downs or reports.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        {/* 4. questions */}
+                        <h4 className="text-gray-700 mt-6 mb-2 text-lg font-bold flex items-center gap-2">
+                            <span>Table:</span>
+                            <code className="font-mono bg-slate-200 text-blue-600 px-1.5 py-0.5 rounded text-[0.9em] font-medium">questions</code>
+                        </h4>
+                        <div className="my-4 rounded-lg overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.1)] bg-white border border-gray-100">
+                            <table className="w-full border-collapse text-left text-sm">
+                                <thead className="bg-slate-50">
+                                    <tr>
+                                        <th className="p-3 border-b border-gray-200 font-semibold text-slate-700 uppercase text-[0.85em] tracking-wider w-[15%]">Column</th>
+                                        <th className="p-3 border-b border-gray-200 font-semibold text-slate-700 uppercase text-[0.85em] tracking-wider w-[8%]">Key</th>
+                                        <th className="p-3 border-b border-gray-200 font-semibold text-slate-700 uppercase text-[0.85em] tracking-wider w-[12%]">Type</th>
+                                        <th className="p-3 border-b border-gray-200 font-semibold text-slate-700 uppercase text-[0.85em] tracking-wider w-[25%]">Description</th>
+                                        <th className="p-3 border-b border-gray-200 font-semibold text-slate-700 uppercase text-[0.85em] tracking-wider w-[15%]">Sample Value</th>
+                                        <th className="p-3 border-b border-gray-200 font-semibold text-slate-700 uppercase text-[0.85em] tracking-wider w-[25%]">Purpose</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr className="hover:bg-slate-50">
+                                        <td className="p-3 border-b border-gray-200 font-medium"><code className="font-mono bg-slate-200 text-blue-600 px-1.5 py-0.5 rounded text-[0.9em] font-medium">subcategory_id</code></td>
+                                        <td className="p-3 border-b border-gray-200 font-semibold text-slate-500">FK</td>
+                                        <td className="p-3 border-b border-gray-200"><code className="font-mono bg-slate-100 text-slate-700 px-1 py-0.5 rounded text-[0.85em]">BigInteger</code></td>
+                                        <td className="p-3 border-b border-gray-200 text-gray-600">References <code className="font-mono bg-slate-100 px-1 py-0.5 rounded text-[0.85em]">subcategories.id</code>.</td>
+                                        <td className="p-3 border-b border-gray-200"><code className="font-mono bg-slate-100 text-emerald-600 px-1 py-0.5 rounded text-[0.85em]">2</code></td>
+                                        <td className="p-3 border-b border-gray-200 text-gray-600">Categorizes the question for structured exam blueprints and telemetry analysis.</td>
+                                    </tr>
+                                    <tr className="hover:bg-slate-50">
+                                        <td className="p-3 border-b border-gray-200 font-medium"><code className="font-mono bg-slate-200 text-blue-600 px-1.5 py-0.5 rounded text-[0.9em] font-medium">language</code></td>
+                                        <td className="p-3 border-b border-gray-200 text-gray-400 font-normal">N/A</td>
+                                        <td className="p-3 border-b border-gray-200"><code className="font-mono bg-slate-100 text-slate-700 px-1 py-0.5 rounded text-[0.85em]">String</code></td>
+                                        <td className="p-3 border-b border-gray-200 text-gray-600">Language of the question.</td>
+                                        <td className="p-3 border-b border-gray-200"><code className="font-mono bg-slate-100 text-emerald-600 px-1 py-0.5 rounded text-[0.85em]">"English"</code></td>
+                                        <td className="p-3 border-b border-gray-200 text-gray-600">Ensures questions are selected matching the language request of the examinee.</td>
+                                    </tr>
+                                    <tr className="hover:bg-slate-50">
+                                        <td className="p-3 border-b border-gray-200 font-medium"><code className="font-mono bg-slate-200 text-blue-600 px-1.5 py-0.5 rounded text-[0.9em] font-medium">stem</code></td>
+                                        <td className="p-3 border-b border-gray-200 text-gray-400 font-normal">N/A</td>
+                                        <td className="p-3 border-b border-gray-200"><code className="font-mono bg-slate-100 text-slate-700 px-1 py-0.5 rounded text-[0.85em]">Text</code></td>
+                                        <td className="p-3 border-b border-gray-200 text-gray-600">The core question text or prompt.</td>
+                                        <td className="p-3 border-b border-gray-200"><code className="font-mono bg-slate-100 text-emerald-600 px-1 py-0.5 rounded text-[0.85em]">"What is the synonym of 'benevolent'?"</code></td>
+                                        <td className="p-3 border-b border-gray-200 text-gray-600">The primary question text rendered in the viewport to the examinee.</td>
+                                    </tr>
+                                    <tr className="hover:bg-slate-50">
+                                        <td className="p-3 border-b border-gray-200 font-medium"><code className="font-mono bg-slate-200 text-blue-600 px-1.5 py-0.5 rounded text-[0.9em] font-medium">options</code></td>
+                                        <td className="p-3 border-b border-gray-200 text-gray-400 font-normal">N/A</td>
+                                        <td className="p-3 border-b border-gray-200"><code className="font-mono bg-slate-100 text-slate-700 px-1 py-0.5 rounded text-[0.85em]">JSONB (Array)</code></td>
+                                        <td className="p-3 border-b border-gray-200 text-gray-600">Ordered choices array.</td>
+                                        <td className="p-3 border-b border-gray-200"><code className="font-mono bg-slate-100 text-emerald-600 px-1 py-0.5 rounded text-[0.85em]">["Kind", "Cruel", "Lazy", "Smart"]</code></td>
+                                        <td className="p-3 border-b border-gray-200 text-gray-600">Provides dynamic, indexable list of interactive choices for the interface.</td>
+                                    </tr>
+                                    <tr className="hover:bg-slate-50">
+                                        <td className="p-3 border-b border-gray-200 font-medium"><code className="font-mono bg-slate-200 text-blue-600 px-1.5 py-0.5 rounded text-[0.9em] font-medium">correct_option</code></td>
+                                        <td className="p-3 border-b border-gray-200 text-gray-400 font-normal">N/A</td>
+                                        <td className="p-3 border-b border-gray-200"><code className="font-mono bg-slate-100 text-slate-700 px-1 py-0.5 rounded text-[0.85em]">Integer</code></td>
+                                        <td className="p-3 border-b border-gray-200 text-gray-600">0-based index of correct option.</td>
+                                        <td className="p-3 border-b border-gray-200"><code className="font-mono bg-slate-100 text-emerald-600 px-1 py-0.5 rounded text-[0.85em]">0</code></td>
+                                        <td className="p-3 border-b border-gray-200 text-gray-600">Used as reference to programmatically grade user submissions.</td>
+                                    </tr>
+                                    <tr className="hover:bg-slate-50">
+                                        <td className="p-3 border-b border-gray-200 font-medium"><code className="font-mono bg-slate-200 text-blue-600 px-1.5 py-0.5 rounded text-[0.9em] font-medium">explanation</code></td>
+                                        <td className="p-3 border-b border-gray-200 text-gray-400 font-normal">N/A</td>
+                                        <td className="p-3 border-b border-gray-200"><code className="font-mono bg-slate-100 text-slate-700 px-1 py-0.5 rounded text-[0.85em]">Text</code></td>
+                                        <td className="p-3 border-b border-gray-200 text-gray-600">Explanation for the correct option.</td>
+                                        <td className="p-3 border-b border-gray-200"><code className="font-mono bg-slate-100 text-emerald-600 px-1 py-0.5 rounded text-[0.85em]">"'Benevolent' means kind and generous."</code></td>
+                                        <td className="p-3 border-b border-gray-200 text-gray-600">Provides formative feedback to users on the results and review views.</td>
+                                    </tr>
+                                    <tr className="hover:bg-slate-50">
+                                        <td className="p-3 border-b border-gray-200 font-medium"><code className="font-mono bg-slate-200 text-blue-600 px-1.5 py-0.5 rounded text-[0.9em] font-medium">created_by</code></td>
+                                        <td className="p-3 border-b border-gray-200 font-semibold text-slate-500">FK</td>
+                                        <td className="p-3 border-b border-gray-200"><code className="font-mono bg-slate-100 text-slate-700 px-1 py-0.5 rounded text-[0.85em]">BigInteger</code></td>
+                                        <td className="p-3 border-b border-gray-200 text-gray-600">References <code className="font-mono bg-slate-100 px-1 py-0.5 rounded text-[0.85em]">users.id</code>.</td>
+                                        <td className="p-3 border-b border-gray-200"><code className="font-mono bg-slate-100 text-emerald-600 px-1 py-0.5 rounded text-[0.85em]">1</code></td>
+                                        <td className="p-3 border-b border-gray-200 text-gray-600">Audits which administrator created the question for history and gaps.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        {/* 5. track_configs */}
+                        <h4 className="text-gray-700 mt-6 mb-2 text-lg font-bold flex items-center gap-2">
+                            <span>Table:</span>
+                            <code className="font-mono bg-slate-200 text-blue-600 px-1.5 py-0.5 rounded text-[0.9em] font-medium">track_configs</code>
+                        </h4>
+                        <div className="my-4 rounded-lg overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.1)] bg-white border border-gray-100">
+                            <table className="w-full border-collapse text-left text-sm">
+                                <thead className="bg-slate-50">
+                                    <tr>
+                                        <th className="p-3 border-b border-gray-200 font-semibold text-slate-700 uppercase text-[0.85em] tracking-wider w-[15%]">Column</th>
+                                        <th className="p-3 border-b border-gray-200 font-semibold text-slate-700 uppercase text-[0.85em] tracking-wider w-[8%]">Key</th>
+                                        <th className="p-3 border-b border-gray-200 font-semibold text-slate-700 uppercase text-[0.85em] tracking-wider w-[12%]">Type</th>
+                                        <th className="p-3 border-b border-gray-200 font-semibold text-slate-700 uppercase text-[0.85em] tracking-wider w-[25%]">Description</th>
+                                        <th className="p-3 border-b border-gray-200 font-semibold text-slate-700 uppercase text-[0.85em] tracking-wider w-[15%]">Sample Value</th>
+                                        <th className="p-3 border-b border-gray-200 font-semibold text-slate-700 uppercase text-[0.85em] tracking-wider w-[25%]">Purpose</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr className="hover:bg-slate-50">
+                                        <td className="p-3 border-b border-gray-200 font-medium"><code className="font-mono bg-slate-200 text-blue-600 px-1.5 py-0.5 rounded text-[0.9em] font-medium">id</code></td>
+                                        <td className="p-3 border-b border-gray-200 font-semibold text-slate-500">PK</td>
+                                        <td className="p-3 border-b border-gray-200"><code className="font-mono bg-slate-100 text-slate-700 px-1 py-0.5 rounded text-[0.85em]">BigInteger</code></td>
+                                        <td className="p-3 border-b border-gray-200 text-gray-600">Auto-incrementing unique identifier.</td>
+                                        <td className="p-3 border-b border-gray-200"><code className="font-mono bg-slate-100 text-emerald-600 px-1 py-0.5 rounded text-[0.85em]">1</code></td>
+                                        <td className="p-3 border-b border-gray-200 text-gray-600">Unique database ID for indexing and editing track settings.</td>
+                                    </tr>
+                                    <tr className="hover:bg-slate-50">
+                                        <td className="p-3 border-b border-gray-200 font-medium"><code className="font-mono bg-slate-200 text-blue-600 px-1.5 py-0.5 rounded text-[0.9em] font-medium">track</code></td>
+                                        <td className="p-3 border-b border-gray-200 font-semibold text-slate-500">Enum</td>
+                                        <td className="p-3 border-b border-gray-200"><code className="font-mono bg-slate-100 text-slate-700 px-1 py-0.5 rounded text-[0.85em]">String ("Professional" | "Subprofessional")</code></td>
+                                        <td className="p-3 border-b border-gray-200 text-gray-600">CSE track assigned to this configuration.</td>
+                                        <td className="p-3 border-b border-gray-200"><code className="font-mono bg-slate-100 text-emerald-600 px-1 py-0.5 rounded text-[0.85em]">"Professional"</code></td>
+                                        <td className="p-3 border-b border-gray-200 text-gray-600">Binds configuration entries to specific mock exam types.</td>
+                                    </tr>
+                                    <tr className="hover:bg-slate-50">
+                                        <td className="p-3 border-b border-gray-200 font-medium"><code className="font-mono bg-slate-200 text-blue-600 px-1.5 py-0.5 rounded text-[0.9em] font-medium">category_id</code></td>
+                                        <td className="p-3 border-b border-gray-200 font-semibold text-slate-500">FK</td>
+                                        <td className="p-3 border-b border-gray-200"><code className="font-mono bg-slate-100 text-slate-700 px-1 py-0.5 rounded text-[0.85em]">BigInteger</code></td>
+                                        <td className="p-3 border-b border-gray-200 text-gray-600">References <code className="font-mono bg-slate-100 px-1 py-0.5 rounded text-[0.85em]">categories.id</code>.</td>
+                                        <td className="p-3 border-b border-gray-200"><code className="font-mono bg-slate-100 text-emerald-600 px-1 py-0.5 rounded text-[0.85em]">1</code></td>
+                                        <td className="p-3 border-b border-gray-200 text-gray-600">Links the blueprint rule to a specific parent category.</td>
+                                    </tr>
+                                    <tr className="hover:bg-slate-50">
+                                        <td className="p-3 border-b border-gray-200 font-medium"><code className="font-mono bg-slate-200 text-blue-600 px-1.5 py-0.5 rounded text-[0.9em] font-medium">item_count</code></td>
+                                        <td className="p-3 border-b border-gray-200 text-gray-400 font-normal">N/A</td>
+                                        <td className="p-3 border-b border-gray-200"><code className="font-mono bg-slate-100 text-slate-700 px-1 py-0.5 rounded text-[0.85em]">Integer</code></td>
+                                        <td className="p-3 border-b border-gray-200 text-gray-600">Target number of questions.</td>
+                                        <td className="p-3 border-b border-gray-200"><code className="font-mono bg-slate-100 text-emerald-600 px-1 py-0.5 rounded text-[0.85em]">45</code></td>
+                                        <td className="p-3 border-b border-gray-200 text-gray-600">Defines how many questions the assembler must pull for this category.</td>
+                                    </tr>
+                                    <tr className="hover:bg-slate-50">
+                                        <td className="p-3 border-b border-gray-200 font-medium"><code className="font-mono bg-slate-200 text-blue-600 px-1.5 py-0.5 rounded text-[0.9em] font-medium">time_limit_secs</code></td>
+                                        <td className="p-3 border-b border-gray-200 text-gray-400 font-normal">N/A</td>
+                                        <td className="p-3 border-b border-gray-200"><code className="font-mono bg-slate-100 text-slate-700 px-1 py-0.5 rounded text-[0.85em]">Integer</code></td>
+                                        <td className="p-3 border-b border-gray-200 text-gray-600">Time limit in seconds.</td>
+                                        <td className="p-3 border-b border-gray-200"><code className="font-mono bg-slate-100 text-emerald-600 px-1 py-0.5 rounded text-[0.85em]">11400</code></td>
+                                        <td className="p-3 border-b border-gray-200 text-gray-600">Sets the countdown timer value for active attempts in this track.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        {/* 6. exam_attempts */}
+                        <h4 className="text-gray-700 mt-6 mb-2 text-lg font-bold flex items-center gap-2">
+                            <span>Table:</span>
+                            <code className="font-mono bg-slate-200 text-blue-600 px-1.5 py-0.5 rounded text-[0.9em] font-medium">exam_attempts</code>
+                        </h4>
+                        <div className="my-4 rounded-lg overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.1)] bg-white border border-gray-100">
+                            <table className="w-full border-collapse text-left text-sm">
+                                <thead className="bg-slate-50">
+                                    <tr>
+                                        <th className="p-3 border-b border-gray-200 font-semibold text-slate-700 uppercase text-[0.85em] tracking-wider w-[15%]">Column</th>
+                                        <th className="p-3 border-b border-gray-200 font-semibold text-slate-700 uppercase text-[0.85em] tracking-wider w-[8%]">Key</th>
+                                        <th className="p-3 border-b border-gray-200 font-semibold text-slate-700 uppercase text-[0.85em] tracking-wider w-[12%]">Type</th>
+                                        <th className="p-3 border-b border-gray-200 font-semibold text-slate-700 uppercase text-[0.85em] tracking-wider w-[25%]">Description</th>
+                                        <th className="p-3 border-b border-gray-200 font-semibold text-slate-700 uppercase text-[0.85em] tracking-wider w-[15%]">Sample Value</th>
+                                        <th className="p-3 border-b border-gray-200 font-semibold text-slate-700 uppercase text-[0.85em] tracking-wider w-[25%]">Purpose</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr className="hover:bg-slate-50">
+                                        <td className="p-3 border-b border-gray-200 font-medium"><code className="font-mono bg-slate-200 text-blue-600 px-1.5 py-0.5 rounded text-[0.9em] font-medium">category_id</code></td>
+                                        <td className="p-3 border-b border-gray-200 font-semibold text-slate-500">FK</td>
+                                        <td className="p-3 border-b border-gray-200"><code className="font-mono bg-slate-100 text-slate-700 px-1 py-0.5 rounded text-[0.85em]">BigInteger (Nullable)</code></td>
+                                        <td className="p-3 border-b border-gray-200 text-gray-600">References parent category if a drill; null for full mock exams.</td>
+                                        <td className="p-3 border-b border-gray-200"><code className="font-mono bg-slate-100 text-emerald-600 px-1 py-0.5 rounded text-[0.85em]">null</code></td>
+                                        <td className="p-3 border-b border-gray-200 text-gray-600">Determines if the attempt is single-category practice (drill) or standard full simulation.</td>
+                                    </tr>
+                                    <tr className="hover:bg-slate-50">
+                                        <td className="p-3 border-b border-gray-200 font-medium"><code className="font-mono bg-slate-200 text-blue-600 px-1.5 py-0.5 rounded text-[0.9em] font-medium">user_id</code></td>
+                                        <td className="p-3 border-b border-gray-200 font-semibold text-slate-500">FK</td>
+                                        <td className="p-3 border-b border-gray-200"><code className="font-mono bg-slate-100 text-slate-700 px-1 py-0.5 rounded text-[0.85em]">BigInteger</code></td>
+                                        <td className="p-3 border-b border-gray-200 text-gray-600">References user who took this exam.</td>
+                                        <td className="p-3 border-b border-gray-200"><code className="font-mono bg-slate-100 text-emerald-600 px-1 py-0.5 rounded text-[0.85em]">1</code></td>
+                                        <td className="p-3 border-b border-gray-200 text-gray-600">Asserts session ownership of the attempt for progress tracking.</td>
+                                    </tr>
+                                    <tr className="hover:bg-slate-50">
+                                        <td className="p-3 border-b border-gray-200 font-medium"><code className="font-mono bg-slate-200 text-blue-600 px-1.5 py-0.5 rounded text-[0.9em] font-medium">question_ids</code></td>
+                                        <td className="p-3 border-b border-gray-200 text-gray-400 font-normal">N/A</td>
+                                        <td className="p-3 border-b border-gray-200"><code className="font-mono bg-slate-100 text-slate-700 px-1 py-0.5 rounded text-[0.85em]">JSONB (Array)</code></td>
+                                        <td className="p-3 border-b border-gray-200 text-gray-600">Ordered array of question IDs in this attempt.</td>
+                                        <td className="p-3 border-b border-gray-200"><code className="font-mono bg-slate-100 text-emerald-600 px-1 py-0.5 rounded text-[0.85em]">[101, 102, 103]</code></td>
+                                        <td className="p-3 border-b border-gray-200 text-gray-600">Records the exact randomized sequence of questions to serve consistently on resume/review.</td>
+                                    </tr>
+                                    <tr className="hover:bg-slate-50">
+                                        <td className="p-3 border-b border-gray-200 font-medium"><code className="font-mono bg-slate-200 text-blue-600 px-1.5 py-0.5 rounded text-[0.9em] font-medium">answers</code></td>
+                                        <td className="p-3 border-b border-gray-200 text-gray-400 font-normal">N/A</td>
+                                        <td className="p-3 border-b border-gray-200"><code className="font-mono bg-slate-100 text-slate-700 px-1 py-0.5 rounded text-[0.85em]">JSONB (Object)</code></td>
+                                        <td className="p-3 border-b border-gray-200 text-gray-600">Sparse answers map, mapping question ID string to option index.</td>
+                                        <td className="p-3 border-b border-gray-200"><code className="font-mono bg-slate-100 text-emerald-600 px-1 py-0.5 rounded text-[0.85em]">{"{\"101\": 2, \"103\": 0}"}</code></td>
+                                        <td className="p-3 border-b border-gray-200 text-gray-600">Stores selected answers in-situ without needing response-level database writes.</td>
+                                    </tr>
+                                    <tr className="hover:bg-slate-50">
+                                        <td className="p-3 border-b border-gray-200 font-medium"><code className="font-mono bg-slate-200 text-blue-600 px-1.5 py-0.5 rounded text-[0.9em] font-medium">cat_scores</code></td>
+                                        <td className="p-3 border-b border-gray-200 text-gray-400 font-normal">N/A</td>
+                                        <td className="p-3 border-b border-gray-200"><code className="font-mono bg-slate-100 text-slate-700 px-1 py-0.5 rounded text-[0.85em]">JSONB (Object)</code></td>
+                                        <td className="p-3 border-b border-gray-200 text-gray-600">Detailed category and subcategory scoring breakdown.</td>
+                                        <td className="p-3 border-b border-gray-200"><code className="font-mono bg-slate-100 text-emerald-600 px-1 py-0.5 rounded text-[0.85em]">{"{\"verbal_ability\": {\"total\": 45, \"correct\": 38}}"}</code></td>
+                                        <td className="p-3 border-b border-gray-200 text-gray-600">Saves pre-calculated grades for instant rendering of the progress analytics accordion.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
 
                         <h3 className="text-gray-700 mt-7 mb-3 text-xl font-bold">JSONB Column Structures</h3>
 
@@ -373,38 +810,280 @@ export default function DevDocs() {
                             5. Backend Architecture
                         </h2>
                         <h3 className="text-gray-700 mt-7 mb-3 text-xl font-bold">Models & Relationships</h3>
-                        <div className="my-6 rounded-lg overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.1)] bg-white border border-gray-100">
-                            <table className="w-full border-collapse text-left">
+
+                        {/* 1. User Model */}
+                        <h4 className="text-gray-700 mt-6 mb-2 text-lg font-bold flex items-center gap-2">
+                            <span>Model:</span>
+                            <strong className="text-blue-600">User</strong>
+                        </h4>
+                        <div className="my-4 rounded-lg overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.1)] bg-white border border-gray-100">
+                            <table className="w-full border-collapse text-left text-sm">
                                 <thead className="bg-slate-50">
                                     <tr>
-                                        <th className="p-3.5 border-b border-gray-200 font-semibold text-slate-700 uppercase text-[0.85em] tracking-wider">Model</th>
-                                        <th className="p-3.5 border-b border-gray-200 font-semibold text-slate-700 uppercase text-[0.85em] tracking-wider">Key Relationships</th>
+                                        <th className="p-3 border-b border-gray-200 font-semibold text-slate-700 uppercase text-[0.85em] tracking-wider w-[25%]">Key Relationships</th>
+                                        <th className="p-3 border-b border-gray-200 font-semibold text-slate-700 uppercase text-[0.85em] tracking-wider w-[25%]">Fillable</th>
+                                        <th className="p-3 border-b border-gray-200 font-semibold text-slate-700 uppercase text-[0.85em] tracking-wider w-[25%]">Hidden</th>
+                                        <th className="p-3 border-b border-gray-200 font-semibold text-slate-700 uppercase text-[0.85em] tracking-wider w-[25%]">Casts</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <tr className="hover:bg-slate-50">
-                                        <td className="p-3.5 border-b border-gray-200"><strong>User</strong></td>
-                                        <td className="p-3.5 border-b border-gray-200"><code className="font-mono bg-slate-200 text-blue-600 px-1.5 py-0.5 rounded text-[0.9em] font-medium">hasMany(ExamAttempt)</code>, <code className="font-mono bg-slate-200 text-blue-600 px-1.5 py-0.5 rounded text-[0.9em] font-medium">hasMany(Question, 'created_by')</code></td>
+                                        <td className="p-3 border-b border-gray-200">
+                                            <div className="flex flex-col gap-1.5">
+                                                <code className="font-mono bg-slate-100 text-blue-600 px-1.5 py-0.5 rounded text-[0.85em] w-fit">hasMany(ExamAttempt)</code>
+                                                <code className="font-mono bg-slate-100 text-blue-600 px-1.5 py-0.5 rounded text-[0.85em] w-fit">hasMany(Question, 'created_by')</code>
+                                            </div>
+                                        </td>
+                                        <td className="p-3 border-b border-gray-200">
+                                            <div className="flex flex-wrap gap-1.5">
+                                                <code className="font-mono bg-slate-100 text-slate-700 px-1.5 py-0.5 rounded text-[0.85em]">name</code>
+                                                <code className="font-mono bg-slate-100 text-slate-700 px-1.5 py-0.5 rounded text-[0.85em]">email</code>
+                                                <code className="font-mono bg-slate-100 text-slate-700 px-1.5 py-0.5 rounded text-[0.85em]">password</code>
+                                                <code className="font-mono bg-slate-100 text-slate-700 px-1.5 py-0.5 rounded text-[0.85em]">role</code>
+                                                <code className="font-mono bg-slate-100 text-slate-700 px-1.5 py-0.5 rounded text-[0.85em]">provider</code>
+                                                <code className="font-mono bg-slate-100 text-slate-700 px-1.5 py-0.5 rounded text-[0.85em]">provider_id</code>
+                                            </div>
+                                        </td>
+                                        <td className="p-3 border-b border-gray-200">
+                                            <div className="flex flex-wrap gap-1.5">
+                                                <code className="font-mono bg-slate-100 text-slate-700 px-1.5 py-0.5 rounded text-[0.85em]">password</code>
+                                                <code className="font-mono bg-slate-100 text-slate-700 px-1.5 py-0.5 rounded text-[0.85em]">two_factor_secret</code>
+                                                <code className="font-mono bg-slate-100 text-slate-700 px-1.5 py-0.5 rounded text-[0.85em]">two_factor_recovery_codes</code>
+                                                <code className="font-mono bg-slate-100 text-slate-700 px-1.5 py-0.5 rounded text-[0.85em]">remember_token</code>
+                                            </div>
+                                        </td>
+                                        <td className="p-3 border-b border-gray-200">
+                                            <div className="flex flex-col gap-1.5">
+                                                <div className="text-xs text-gray-600"><code className="font-mono text-slate-700 bg-slate-100 px-1 rounded text-[0.9em]">email_verified_at</code> &rarr; <code className="font-mono text-emerald-600 bg-slate-100 px-1 rounded text-[0.9em]">datetime</code></div>
+                                                <div className="text-xs text-gray-600"><code className="font-mono text-slate-700 bg-slate-100 px-1 rounded text-[0.9em]">password</code> &rarr; <code className="font-mono text-emerald-600 bg-slate-100 px-1 rounded text-[0.9em]">hashed</code></div>
+                                                <div className="text-xs text-gray-600"><code className="font-mono text-slate-700 bg-slate-100 px-1 rounded text-[0.9em]">two_factor_confirmed_at</code> &rarr; <code className="font-mono text-emerald-600 bg-slate-100 px-1 rounded text-[0.9em]">datetime</code></div>
+                                            </div>
+                                        </td>
                                     </tr>
-                                    <tr className="hover:bg-slate-50">
-                                        <td className="p-3.5 border-b border-gray-200"><strong>Category</strong></td>
-                                        <td className="p-3.5 border-b border-gray-200"><code className="font-mono bg-slate-200 text-blue-600 px-1.5 py-0.5 rounded text-[0.9em] font-medium">hasMany(Subcategory)</code>, <code className="font-mono bg-slate-200 text-blue-600 px-1.5 py-0.5 rounded text-[0.9em] font-medium">hasMany(TrackConfig)</code></td>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        {/* 2. Category Model */}
+                        <h4 className="text-gray-700 mt-6 mb-2 text-lg font-bold flex items-center gap-2">
+                            <span>Model:</span>
+                            <strong className="text-blue-600">Category</strong>
+                        </h4>
+                        <div className="my-4 rounded-lg overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.1)] bg-white border border-gray-100">
+                            <table className="w-full border-collapse text-left text-sm">
+                                <thead className="bg-slate-50">
+                                    <tr>
+                                        <th className="p-3 border-b border-gray-200 font-semibold text-slate-700 uppercase text-[0.85em] tracking-wider w-[25%]">Key Relationships</th>
+                                        <th className="p-3 border-b border-gray-200 font-semibold text-slate-700 uppercase text-[0.85em] tracking-wider w-[25%]">Fillable</th>
+                                        <th className="p-3 border-b border-gray-200 font-semibold text-slate-700 uppercase text-[0.85em] tracking-wider w-[25%]">Hidden</th>
+                                        <th className="p-3 border-b border-gray-200 font-semibold text-slate-700 uppercase text-[0.85em] tracking-wider w-[25%]">Casts</th>
                                     </tr>
+                                </thead>
+                                <tbody>
                                     <tr className="hover:bg-slate-50">
-                                        <td className="p-3.5 border-b border-gray-200"><strong>Subcategory</strong></td>
-                                        <td className="p-3.5 border-b border-gray-200"><code className="font-mono bg-slate-200 text-blue-600 px-1.5 py-0.5 rounded text-[0.9em] font-medium">belongsTo(Category)</code>, <code className="font-mono bg-slate-200 text-blue-600 px-1.5 py-0.5 rounded text-[0.9em] font-medium">hasMany(Question)</code></td>
+                                        <td className="p-3 border-b border-gray-200">
+                                            <div className="flex flex-col gap-1.5">
+                                                <code className="font-mono bg-slate-100 text-blue-600 px-1.5 py-0.5 rounded text-[0.85em] w-fit">hasMany(Subcategory)</code>
+                                                <code className="font-mono bg-slate-100 text-blue-600 px-1.5 py-0.5 rounded text-[0.85em] w-fit">hasMany(TrackConfig)</code>
+                                            </div>
+                                        </td>
+                                        <td className="p-3 border-b border-gray-200">
+                                            <div className="flex flex-wrap gap-1.5">
+                                                <code className="font-mono bg-slate-100 text-slate-700 px-1.5 py-0.5 rounded text-[0.85em]">name</code>
+                                                <code className="font-mono bg-slate-100 text-slate-700 px-1.5 py-0.5 rounded text-[0.85em]">slug</code>
+                                                <code className="font-mono bg-slate-100 text-slate-700 px-1.5 py-0.5 rounded text-[0.85em]">is_demographic</code>
+                                                <code className="font-mono bg-slate-100 text-slate-700 px-1.5 py-0.5 rounded text-[0.85em]">sort_order</code>
+                                            </div>
+                                        </td>
+                                        <td className="p-3 border-b border-gray-200 text-gray-400 italic">None</td>
+                                        <td className="p-3 border-b border-gray-200">
+                                            <div className="flex flex-col gap-1.5">
+                                                <div className="text-xs text-gray-600"><code className="font-mono text-slate-700 bg-slate-100 px-1 rounded text-[0.9em]">is_demographic</code> &rarr; <code className="font-mono text-emerald-600 bg-slate-100 px-1 rounded text-[0.9em]">boolean</code></div>
+                                                <div className="text-xs text-gray-600"><code className="font-mono text-slate-700 bg-slate-100 px-1 rounded text-[0.9em]">sort_order</code> &rarr; <code className="font-mono text-emerald-600 bg-slate-100 px-1 rounded text-[0.9em]">integer</code></div>
+                                            </div>
+                                        </td>
                                     </tr>
-                                    <tr className="hover:bg-slate-50">
-                                        <td className="p-3.5 border-b border-gray-200"><strong>TrackConfig</strong></td>
-                                        <td className="p-3.5 border-b border-gray-200"><code className="font-mono bg-slate-200 text-blue-600 px-1.5 py-0.5 rounded text-[0.9em] font-medium">belongsTo(Category)</code></td>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        {/* 3. Subcategory Model */}
+                        <h4 className="text-gray-700 mt-6 mb-2 text-lg font-bold flex items-center gap-2">
+                            <span>Model:</span>
+                            <strong className="text-blue-600">Subcategory</strong>
+                        </h4>
+                        <div className="my-4 rounded-lg overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.1)] bg-white border border-gray-100">
+                            <table className="w-full border-collapse text-left text-sm">
+                                <thead className="bg-slate-50">
+                                    <tr>
+                                        <th className="p-3 border-b border-gray-200 font-semibold text-slate-700 uppercase text-[0.85em] tracking-wider w-[25%]">Key Relationships</th>
+                                        <th className="p-3 border-b border-gray-200 font-semibold text-slate-700 uppercase text-[0.85em] tracking-wider w-[25%]">Fillable</th>
+                                        <th className="p-3 border-b border-gray-200 font-semibold text-slate-700 uppercase text-[0.85em] tracking-wider w-[25%]">Hidden</th>
+                                        <th className="p-3 border-b border-gray-200 font-semibold text-slate-700 uppercase text-[0.85em] tracking-wider w-[25%]">Casts</th>
                                     </tr>
+                                </thead>
+                                <tbody>
                                     <tr className="hover:bg-slate-50">
-                                        <td className="p-3.5 border-b border-gray-200"><strong>Question</strong></td>
-                                        <td className="p-3.5 border-b border-gray-200"><code className="font-mono bg-slate-200 text-blue-600 px-1.5 py-0.5 rounded text-[0.9em] font-medium">belongsTo(Subcategory)</code>, <code className="font-mono bg-slate-200 text-blue-600 px-1.5 py-0.5 rounded text-[0.9em] font-medium">belongsTo(User, 'created_by')</code></td>
+                                        <td className="p-3 border-b border-gray-200">
+                                            <div className="flex flex-col gap-1.5">
+                                                <code className="font-mono bg-slate-100 text-blue-600 px-1.5 py-0.5 rounded text-[0.85em] w-fit">belongsTo(Category)</code>
+                                                <code className="font-mono bg-slate-100 text-blue-600 px-1.5 py-0.5 rounded text-[0.85em] w-fit">hasMany(Question)</code>
+                                            </div>
+                                        </td>
+                                        <td className="p-3 border-b border-gray-200">
+                                            <div className="flex flex-wrap gap-1.5">
+                                                <code className="font-mono bg-slate-100 text-slate-700 px-1.5 py-0.5 rounded text-[0.85em]">category_id</code>
+                                                <code className="font-mono bg-slate-100 text-slate-700 px-1.5 py-0.5 rounded text-[0.85em]">name</code>
+                                                <code className="font-mono bg-slate-100 text-slate-700 px-1.5 py-0.5 rounded text-[0.85em]">slug</code>
+                                                <code className="font-mono bg-slate-100 text-slate-700 px-1.5 py-0.5 rounded text-[0.85em]">language</code>
+                                                <code className="font-mono bg-slate-100 text-slate-700 px-1.5 py-0.5 rounded text-[0.85em]">sort_order</code>
+                                            </div>
+                                        </td>
+                                        <td className="p-3 border-b border-gray-200 text-gray-400 italic">None</td>
+                                        <td className="p-3 border-b border-gray-200">
+                                            <div className="flex flex-col gap-1.5">
+                                                <div className="text-xs text-gray-600"><code className="font-mono text-slate-700 bg-slate-100 px-1 rounded text-[0.9em]">category_id</code> &rarr; <code className="font-mono text-emerald-600 bg-slate-100 px-1 rounded text-[0.9em]">integer</code></div>
+                                                <div className="text-xs text-gray-600"><code className="font-mono text-slate-700 bg-slate-100 px-1 rounded text-[0.9em]">sort_order</code> &rarr; <code className="font-mono text-emerald-600 bg-slate-100 px-1 rounded text-[0.9em]">integer</code></div>
+                                            </div>
+                                        </td>
                                     </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        {/* 4. TrackConfig Model */}
+                        <h4 className="text-gray-700 mt-6 mb-2 text-lg font-bold flex items-center gap-2">
+                            <span>Model:</span>
+                            <strong className="text-blue-600">TrackConfig</strong>
+                        </h4>
+                        <div className="my-4 rounded-lg overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.1)] bg-white border border-gray-100">
+                            <table className="w-full border-collapse text-left text-sm">
+                                <thead className="bg-slate-50">
+                                    <tr>
+                                        <th className="p-3 border-b border-gray-200 font-semibold text-slate-700 uppercase text-[0.85em] tracking-wider w-[25%]">Key Relationships</th>
+                                        <th className="p-3 border-b border-gray-200 font-semibold text-slate-700 uppercase text-[0.85em] tracking-wider w-[25%]">Fillable</th>
+                                        <th className="p-3 border-b border-gray-200 font-semibold text-slate-700 uppercase text-[0.85em] tracking-wider w-[25%]">Hidden</th>
+                                        <th className="p-3 border-b border-gray-200 font-semibold text-slate-700 uppercase text-[0.85em] tracking-wider w-[25%]">Casts</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
                                     <tr className="hover:bg-slate-50">
-                                        <td className="p-3.5 border-b border-gray-200"><strong>ExamAttempt</strong></td>
-                                        <td className="p-3.5 border-b border-gray-200"><code className="font-mono bg-slate-200 text-blue-600 px-1.5 py-0.5 rounded text-[0.9em] font-medium">belongsTo(User)</code>, <code className="font-mono bg-slate-200 text-blue-600 px-1.5 py-0.5 rounded text-[0.9em] font-medium">belongsTo(Category)</code> (nullable)</td>
+                                        <td className="p-3 border-b border-gray-200">
+                                            <div className="flex flex-col gap-1.5">
+                                                <code className="font-mono bg-slate-100 text-blue-600 px-1.5 py-0.5 rounded text-[0.85em] w-fit">belongsTo(Category)</code>
+                                            </div>
+                                        </td>
+                                        <td className="p-3 border-b border-gray-200">
+                                            <div className="flex flex-wrap gap-1.5">
+                                                <code className="font-mono bg-slate-100 text-slate-700 px-1.5 py-0.5 rounded text-[0.85em]">track</code>
+                                                <code className="font-mono bg-slate-100 text-slate-700 px-1.5 py-0.5 rounded text-[0.85em]">category_id</code>
+                                                <code className="font-mono bg-slate-100 text-slate-700 px-1.5 py-0.5 rounded text-[0.85em]">item_count</code>
+                                                <code className="font-mono bg-slate-100 text-slate-700 px-1.5 py-0.5 rounded text-[0.85em]">time_limit_secs</code>
+                                            </div>
+                                        </td>
+                                        <td className="p-3 border-b border-gray-200 text-gray-400 italic">None</td>
+                                        <td className="p-3 border-b border-gray-200">
+                                            <div className="flex flex-col gap-1.5">
+                                                <div className="text-xs text-gray-600"><code className="font-mono text-slate-700 bg-slate-100 px-1 rounded text-[0.9em]">category_id</code> &rarr; <code className="font-mono text-emerald-600 bg-slate-100 px-1 rounded text-[0.9em]">integer</code></div>
+                                                <div className="text-xs text-gray-600"><code className="font-mono text-slate-700 bg-slate-100 px-1 rounded text-[0.9em]">item_count</code> &rarr; <code className="font-mono text-emerald-600 bg-slate-100 px-1 rounded text-[0.9em]">integer</code></div>
+                                                <div className="text-xs text-gray-600"><code className="font-mono text-slate-700 bg-slate-100 px-1 rounded text-[0.9em]">time_limit_secs</code> &rarr; <code className="font-mono text-emerald-600 bg-slate-100 px-1 rounded text-[0.9em]">integer</code></div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        {/* 5. Question Model */}
+                        <h4 className="text-gray-700 mt-6 mb-2 text-lg font-bold flex items-center gap-2">
+                            <span>Model:</span>
+                            <strong className="text-blue-600">Question</strong>
+                        </h4>
+                        <div className="my-4 rounded-lg overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.1)] bg-white border border-gray-100">
+                            <table className="w-full border-collapse text-left text-sm">
+                                <thead className="bg-slate-50">
+                                    <tr>
+                                        <th className="p-3 border-b border-gray-200 font-semibold text-slate-700 uppercase text-[0.85em] tracking-wider w-[25%]">Key Relationships</th>
+                                        <th className="p-3 border-b border-gray-200 font-semibold text-slate-700 uppercase text-[0.85em] tracking-wider w-[25%]">Fillable</th>
+                                        <th className="p-3 border-b border-gray-200 font-semibold text-slate-700 uppercase text-[0.85em] tracking-wider w-[25%]">Hidden</th>
+                                        <th className="p-3 border-b border-gray-200 font-semibold text-slate-700 uppercase text-[0.85em] tracking-wider w-[25%]">Casts</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr className="hover:bg-slate-50">
+                                        <td className="p-3 border-b border-gray-200">
+                                            <div className="flex flex-col gap-1.5">
+                                                <code className="font-mono bg-slate-100 text-blue-600 px-1.5 py-0.5 rounded text-[0.85em] w-fit">belongsTo(Subcategory)</code>
+                                                <code className="font-mono bg-slate-100 text-blue-600 px-1.5 py-0.5 rounded text-[0.85em] w-fit">belongsTo(User, 'created_by')</code>
+                                            </div>
+                                        </td>
+                                        <td className="p-3 border-b border-gray-200">
+                                            <div className="flex flex-wrap gap-1.5">
+                                                <code className="font-mono bg-slate-100 text-slate-700 px-1.5 py-0.5 rounded text-[0.85em]">subcategory_id</code>
+                                                <code className="font-mono bg-slate-100 text-slate-700 px-1.5 py-0.5 rounded text-[0.85em]">language</code>
+                                                <code className="font-mono bg-slate-100 text-slate-700 px-1.5 py-0.5 rounded text-[0.85em]">stem</code>
+                                                <code className="font-mono bg-slate-100 text-slate-700 px-1.5 py-0.5 rounded text-[0.85em]">options</code>
+                                                <code className="font-mono bg-slate-100 text-slate-700 px-1.5 py-0.5 rounded text-[0.85em]">correct_option</code>
+                                                <code className="font-mono bg-slate-100 text-slate-700 px-1.5 py-0.5 rounded text-[0.85em]">explanation</code>
+                                                <code className="font-mono bg-slate-100 text-slate-700 px-1.5 py-0.5 rounded text-[0.85em]">created_by</code>
+                                            </div>
+                                        </td>
+                                        <td className="p-3 border-b border-gray-200 text-gray-400 italic">None</td>
+                                        <td className="p-3 border-b border-gray-200">
+                                            <div className="flex flex-col gap-1.5">
+                                                <div className="text-xs text-gray-600"><code className="font-mono text-slate-700 bg-slate-100 px-1 rounded text-[0.9em]">subcategory_id</code> &rarr; <code className="font-mono text-emerald-600 bg-slate-100 px-1 rounded text-[0.9em]">integer</code></div>
+                                                <div className="text-xs text-gray-600"><code className="font-mono text-slate-700 bg-slate-100 px-1 rounded text-[0.9em]">options</code> &rarr; <code className="font-mono text-emerald-600 bg-slate-100 px-1 rounded text-[0.9em]">array</code></div>
+                                                <div className="text-xs text-gray-600"><code className="font-mono text-slate-700 bg-slate-100 px-1 rounded text-[0.9em]">correct_option</code> &rarr; <code className="font-mono text-emerald-600 bg-slate-100 px-1 rounded text-[0.9em]">integer</code></div>
+                                                <div className="text-xs text-gray-600"><code className="font-mono text-slate-700 bg-slate-100 px-1 rounded text-[0.9em]">created_by</code> &rarr; <code className="font-mono text-emerald-600 bg-slate-100 px-1 rounded text-[0.9em]">integer</code></div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        {/* 6. ExamAttempt Model */}
+                        <h4 className="text-gray-700 mt-6 mb-2 text-lg font-bold flex items-center gap-2">
+                            <span>Model:</span>
+                            <strong className="text-blue-600">ExamAttempt</strong>
+                        </h4>
+                        <div className="my-4 rounded-lg overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.1)] bg-white border border-gray-100">
+                            <table className="w-full border-collapse text-left text-sm">
+                                <thead className="bg-slate-50">
+                                    <tr>
+                                        <th className="p-3 border-b border-gray-200 font-semibold text-slate-700 uppercase text-[0.85em] tracking-wider w-[25%]">Key Relationships</th>
+                                        <th className="p-3 border-b border-gray-200 font-semibold text-slate-700 uppercase text-[0.85em] tracking-wider w-[25%]">Fillable</th>
+                                        <th className="p-3 border-b border-gray-200 font-semibold text-slate-700 uppercase text-[0.85em] tracking-wider w-[25%]">Hidden</th>
+                                        <th className="p-3 border-b border-gray-200 font-semibold text-slate-700 uppercase text-[0.85em] tracking-wider w-[25%]">Casts</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr className="hover:bg-slate-50">
+                                        <td className="p-3 border-b border-gray-200">
+                                            <div className="flex flex-col gap-1.5">
+                                                <code className="font-mono bg-slate-100 text-blue-600 px-1.5 py-0.5 rounded text-[0.85em] w-fit">belongsTo(User)</code>
+                                                <code className="font-mono bg-slate-100 text-blue-600 px-1.5 py-0.5 rounded text-[0.85em] w-fit">belongsTo(Category)</code>
+                                            </div>
+                                        </td>
+                                        <td className="p-3 border-b border-gray-200">
+                                            <div className="flex flex-wrap gap-1.5">
+                                                <code className="font-mono bg-slate-100 text-slate-700 px-1.5 py-0.5 rounded text-[0.85em]">category_id</code>
+                                                <code className="font-mono bg-slate-100 text-slate-700 px-1.5 py-0.5 rounded text-[0.85em]">user_id</code>
+                                                <code className="font-mono bg-slate-100 text-slate-700 px-1.5 py-0.5 rounded text-[0.85em]">question_ids</code>
+                                                <code className="font-mono bg-slate-100 text-slate-700 px-1.5 py-0.5 rounded text-[0.85em]">answers</code>
+                                                <code className="font-mono bg-slate-100 text-slate-700 px-1.5 py-0.5 rounded text-[0.85em]">cat_scores</code>
+                                            </div>
+                                        </td>
+                                        <td className="p-3 border-b border-gray-200 text-gray-400 italic">None</td>
+                                        <td className="p-3 border-b border-gray-200">
+                                            <div className="flex flex-col gap-1.5">
+                                                <div className="text-xs text-gray-600"><code className="font-mono text-slate-700 bg-slate-100 px-1 rounded text-[0.9em]">category_id</code> &rarr; <code className="font-mono text-emerald-600 bg-slate-100 px-1 rounded text-[0.9em]">integer</code></div>
+                                                <div className="text-xs text-gray-600"><code className="font-mono text-slate-700 bg-slate-100 px-1 rounded text-[0.9em]">user_id</code> &rarr; <code className="font-mono text-emerald-600 bg-slate-100 px-1 rounded text-[0.9em]">integer</code></div>
+                                                <div className="text-xs text-gray-600"><code className="font-mono text-slate-700 bg-slate-100 px-1 rounded text-[0.9em]">question_ids</code> &rarr; <code className="font-mono text-emerald-600 bg-slate-100 px-1 rounded text-[0.9em]">array</code></div>
+                                                <div className="text-xs text-gray-600"><code className="font-mono text-slate-700 bg-slate-100 px-1 rounded text-[0.9em]">answers</code> &rarr; <code className="font-mono text-emerald-600 bg-slate-100 px-1 rounded text-[0.9em]">array</code></div>
+                                                <div className="text-xs text-gray-600"><code className="font-mono text-slate-700 bg-slate-100 px-1 rounded text-[0.9em]">cat_scores</code> &rarr; <code className="font-mono text-emerald-600 bg-slate-100 px-1 rounded text-[0.9em]">array</code></div>
+                                            </div>
+                                        </td>
                                     </tr>
                                 </tbody>
                             </table>
