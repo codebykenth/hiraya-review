@@ -1,5 +1,5 @@
 import { Link } from '@inertiajs/react';
-import { BookOpen, FileText, FolderGit2, LayoutGrid } from 'lucide-react';
+import { BookOpen, ClipboardList, FileText, FolderGit2, History, LayoutGrid, Target } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
@@ -24,9 +24,19 @@ const mainNavItems: NavItem[] = [
         icon: LayoutGrid,
     },
     {
-        title: 'Exams',
+        title: 'Exam',
         href: examsIndex(),
-        icon: FileText,
+        icon: ClipboardList,
+    },
+    {
+        title: 'Drills',
+        href: '#',
+        icon: Target,
+    },
+    {
+        title: 'History',
+        href: '#',
+        icon: History,
     },
 ];
 
