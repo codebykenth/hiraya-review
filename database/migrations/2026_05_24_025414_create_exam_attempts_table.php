@@ -18,6 +18,7 @@ return new class extends Migration
             $table->jsonb('question_ids');
             $table->jsonb('answers');
             $table->jsonb('cat_scores');
+            $table->timestamps();
         });
     }
 

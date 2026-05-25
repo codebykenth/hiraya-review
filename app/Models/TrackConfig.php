@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 
 #[Fillable(['track', 'category_id', 'item_count', 'time_limit_secs'])]
 class TrackConfig extends Model

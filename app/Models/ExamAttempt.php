@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 
 #[Fillable(['category_id', 'user_id', 'question_ids', 'answers', 'cat_scores'])]
 class ExamAttempt extends Model

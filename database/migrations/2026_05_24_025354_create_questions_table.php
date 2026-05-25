@@ -19,6 +19,7 @@ return new class extends Migration
             $table->jsonb('options');
             $table->integer('correct_option');
             $table->text('explanation');
+            $table->enum('status', ['active', 'draft']);
             $table->foreignId('created_by')->constrained('users')->cascadeOnDelete();
             $table->timestamps();
         });

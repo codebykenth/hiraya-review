@@ -3,8 +3,9 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 
-#[Fillable(['subcategory_id', 'language', 'stem', 'options', 'correct_option', 'explanation', 'created_by'])]
+#[Fillable(['subcategory_id', 'language', 'stem', 'options', 'correct_option', 'explanation', 'created_by', 'status'])]
 class Question extends Model
 {
     protected function casts(): array

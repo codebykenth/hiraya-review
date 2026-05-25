@@ -35,7 +35,8 @@ export default function Security(props: Props) {
                 />
 
                 <Form
-                    {...SecurityController.update.form()}
+                    action={SecurityController.update().url}
+                    method={SecurityController.update().method}
                     options={{
                         preserveScroll: true,
                     }}

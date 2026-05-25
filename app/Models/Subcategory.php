@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 
 #[Fillable(['category_id', 'name', 'slug', 'language', 'sort_order'])]
 class Subcategory extends Model
