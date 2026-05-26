@@ -475,7 +475,21 @@ Language: {$validated['language']}
      */
     public function show(string $id)
     {
-        //
+        $question = Question::with(['subcategory.category'])->findOrFail($id);
+
+        return Inertia::render('questions/show', [
+            'question' => [
+                'id' => $question->id,
+                'stem' => $question->stem,
+                'category' => $question->subcategory?->category?->name ?? 'Analytical Ability',
+                'subcategory' => $question->subcategory?->name ?? 'Word analogy',
+                'options' => $question->options,
+                'correct_option' => (int) $question->correct_option,
+                'explanation' => $question->explanation,
+                'language' => $question->language ?? 'English',
+                'status' => strtoupper($question->status),
+            ]
+        ]);
     }
 
     /**
@@ -483,7 +497,28 @@ Language: {$validated['language']}
      */
     public function edit(string $id)
     {
-        //
+        $question = Question::with(['subcategory.category'])->findOrFail($id);
+
+        $categories = Cache::rememberForever('categories.tree', function () {
+            return Category::with(['subcategory' => function($query) {
+                $query->orderBy('sort_order');
+            }])->orderBy('sort_order')->get()->toArray();
+        });
+
+        return Inertia::render('questions/edit', [
+            'question' => [
+                'id' => $question->id,
+                'stem' => $question->stem,
+                'category' => $question->subcategory?->category?->name ?? 'Analytical Ability',
+                'subcategory' => $question->subcategory?->name ?? 'Word analogy',
+                'options' => $question->options,
+                'correct_option' => (int) $question->correct_option,
+                'explanation' => $question->explanation,
+                'language' => $question->language ?? 'English',
+                'status' => strtoupper($question->status),
+            ],
+            'categories' => $categories,
+        ]);
     }
 
     /**
@@ -491,7 +526,49 @@ Language: {$validated['language']}
      */
     public function update(Request $request, string $id)
     {
-        //
+        $question = Question::findOrFail($id);
+
+        $validated = $request->validate([
+            'category' => 'required|string',
+            'subcategory' => 'required|string',
+            'language' => 'required|string',
+            'stem' => 'required|string',
+            'options' => 'required|array|min:4',
+            'correct_option' => 'required|integer',
+            'explanation' => 'required|string',
+            'status' => 'required|string|in:active,draft',
+        ]);
+
+        // Find or create category/subcategory structure dynamically matching creation logic
+        $category = Category::firstOrCreate([
+            'name' => $validated['category']
+        ], [
+            'slug' => Str::slug($validated['category']),
+            'sort_order' => 1
+        ]);
+
+        $subcategory = Subcategory::firstOrCreate([
+            'category_id' => $category->id,
+            'name' => $validated['subcategory']
+        ], [
+            'slug' => Str::slug($validated['subcategory']),
+            'language' => $validated['language'],
+            'sort_order' => 1
+        ]);
+
+        $question->update([
+            'subcategory_id' => $subcategory->id,
+            'language' => $validated['language'],
+            'stem' => $validated['stem'],
+            'options' => $validated['options'],
+            'correct_option' => (int) $validated['correct_option'],
+            'explanation' => $validated['explanation'],
+            'status' => $validated['status'] === 'active' ? 'active' : 'draft',
+        ]);
+
+        $this->clearCache();
+
+        return redirect()->route('questions.index')->with('success', 'Question updated successfully!');
     }
 
     public function destroy(string $id)

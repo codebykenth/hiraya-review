@@ -17,7 +17,7 @@ import {
     ChevronLeft
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import { index as questionsIndex, store as questionsStore, drafts as questionsDrafts } from '@/routes/questions';
+import { index as questionsIndex, store as questionsStore, drafts as questionsDrafts, generate as questionsGenerate } from '@/routes/questions';
 
 // Dynamic Subcategory Lists mapped to the main CSE Categories
 const CSE_CATEGORIES: Record<string, string[]> = {
@@ -189,7 +189,7 @@ export default function CreateQuestion({ type = 'ai', categories = [] }: CreateP
 
         try {
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
-            const response = await fetch('/questions/generate', {
+            const response = await fetch(questionsGenerate().url, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -749,7 +749,7 @@ CreateQuestion.layout = {
     breadcrumbs: [
         {
             title: 'Question Management',
-            href: questionsIndex(),
+            href: questionsIndex().url,
         },
         {
             title: 'Create Question',

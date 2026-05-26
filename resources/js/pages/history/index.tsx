@@ -28,6 +28,7 @@ interface Attempt {
     score: number;
     correct: number;
     total: number;
+    category_scores?: CategoryScore[];
     status: string;
     duration: string;
     created_at: string;
@@ -36,6 +37,13 @@ interface Attempt {
     language?: 'English' | 'Filipino' | 'Both';
     question_count?: number | 'all';
     is_timed?: boolean;
+}
+
+interface CategoryScore {
+    name: string;
+    correct: number;
+    total: number;
+    percentage: number;
 }
 
 interface Pagination {
@@ -243,7 +251,7 @@ export default function HistoryPage({ attempts = [], pagination, filters }: Hist
                                     <th className="px-6 py-4">Date & Time</th>
                                     <th className="px-6 py-4">Track</th>
                                     <th className="px-6 py-4">Category</th>
-                                    <th className="px-6 py-4">Score</th>
+                                    <th className="px-6 py-4">Score & Categories</th>
                                     <th className="px-6 py-4">Status</th>
                                     <th className="px-6 py-4">Duration</th>
                                     <th className="px-6 py-4 text-right pr-8">Actions</th>
@@ -341,17 +349,32 @@ export default function HistoryPage({ attempts = [], pagination, filters }: Hist
                                                 </td>
 
                                                 {/* SCORE */}
-                                                <td className="px-6 py-4.5 whitespace-nowrap">
-                                                    <div className="flex items-center gap-3">
-                                                        <span className={`text-xs font-black w-8 shrink-0 ${scoreColor}`}>
-                                                            {att.score}%
-                                                        </span>
-                                                        <div className="h-1.5 w-24 rounded-full bg-slate-100 dark:bg-slate-900/50">
-                                                            <div 
-                                                                className={`h-full rounded-full transition-all duration-300 ${scoreBarColor}`}
-                                                                style={{ width: `${Math.max(3, att.score)}%` }}
-                                                            />
+                                                <td className="px-6 py-4.5">
+                                                    <div className="flex flex-col gap-2">
+                                                        <div className="flex items-center gap-3">
+                                                            <span className={`text-xs font-black w-8 shrink-0 ${scoreColor}`}>
+                                                                {att.score}%
+                                                            </span>
+                                                            <div className="h-1.5 w-24 rounded-full bg-slate-100 dark:bg-slate-900/50">
+                                                                <div 
+                                                                    className={`h-full rounded-full transition-all duration-300 ${scoreBarColor}`}
+                                                                    style={{ width: `${Math.max(3, att.score)}%` }}
+                                                                />
+                                                            </div>
                                                         </div>
+                                                        {att.category_scores && att.category_scores.length > 0 && (
+                                                            <div className="flex max-w-[24rem] flex-wrap gap-1.5">
+                                                                {att.category_scores.map((cat) => (
+                                                                    <span
+                                                                        key={cat.name}
+                                                                        className="inline-flex items-center gap-1 rounded-md border border-slate-200 bg-slate-50 px-1.5 py-0.5 text-[9px] font-bold text-slate-600 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300"
+                                                                        title={`${cat.correct}/${cat.total} correct`}
+                                                                    >
+                                                                        {cat.name}: <span className="text-slate-900 dark:text-white">{cat.percentage}%</span>
+                                                                    </span>
+                                                                ))}
+                                                            </div>
+                                                        )}
                                                     </div>
                                                 </td>
 

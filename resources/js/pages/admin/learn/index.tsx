@@ -1,54 +1,47 @@
+import React, { useState, useEffect } from 'react';
 import { Head, Link, router } from '@inertiajs/react';
 import { 
     Search, 
-    Bell, 
-    HelpCircle, 
+    BookOpen, 
+    Plus, 
+    Trash2, 
+    Edit2, 
+    Eye, 
     Sparkles, 
+    CheckCircle2, 
+    AlertTriangle, 
     FileText, 
-    Target, 
+    Database, 
     ChevronLeft, 
     ChevronRight, 
-    MoreVertical, 
-    Download, 
-    Database, 
-    ArrowRight,
-    PenLine,
-    FileQuestion,
-    Plus,
-    Trash2,
-    X,
+    X, 
     ChevronDown,
-    Eye,
-    Edit2
+    RotateCcw,
+    PenLine,
+    PlusCircle
 } from 'lucide-react';
-import { useState, useEffect } from 'react';
 import { 
-    index as questionsIndex, 
-    create as questionsCreate,
-    edit as questionsEdit,
-    destroy as questionsDestroy,
-    show as questionsShow
-} from '@/routes/questions';
+    index as adminLearnIndex,
+    create as adminLearnCreate,
+    edit as adminLearnEdit,
+    destroy as adminLearnDestroy
+} from '@/routes/admin/learn';
+import { show as learnShow } from '@/routes/learn';
 import { ConfirmModal } from '@/components/confirm-modal';
 import { ScopeSettingsModal } from '@/components/scope-settings-modal';
 import { AdminTable, TableColumn } from '@/components/admin-table';
 
-// Custom interface for question row items
-interface QuestionItem {
+interface LearnModule {
     id: number;
-    stem: string;
+    title: string;
+    slug: string;
+    topic: string;
+    summary: string;
+    estimated_minutes: number;
+    is_published: boolean;
     category: string;
     subcategory: string;
-    status: 'ACTIVE' | 'DRAFT';
-}
-
-interface CategoryItem {
-    id: number;
-    name: string;
-    slug: string;
-    is_demographic: boolean;
-    sort_order: number;
-    subcategory?: SubcategoryItem[];
+    updated_at: string;
 }
 
 interface SubcategoryItem {
@@ -60,12 +53,21 @@ interface SubcategoryItem {
     sort_order: number;
 }
 
-interface QuestionsIndexProps {
-    questions?: QuestionItem[];
+interface CategoryItem {
+    id: number;
+    name: string;
+    slug: string;
+    is_demographic: boolean;
+    sort_order: number;
+    subcategory?: SubcategoryItem[];
+}
+
+interface AdminLearnIndexProps {
+    modules: LearnModule[];
     categories?: CategoryItem[];
 }
 
-export default function QuestionsIndex({ questions = [], categories = [] }: QuestionsIndexProps) {
+export default function AdminLearnIndex({ modules = [], categories = [] }: AdminLearnIndexProps) {
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('All Categories');
     const [selectedSubcategory, setSelectedSubcategory] = useState('All Subcategories');
@@ -211,46 +213,46 @@ export default function QuestionsIndex({ questions = [], categories = [] }: Ques
         });
     };
 
-    const handleDeleteQuestion = (qId: number) => {
+    const handleDelete = (id: number, title: string) => {
         setConfirmModal({
             isOpen: true,
-            title: 'Delete Question?',
-            message: 'Are you sure you want to delete this question? This action cannot be undone and will permanently remove it from all database records.',
-            confirmLabel: 'Delete Question',
+            title: 'Delete Study Module?',
+            message: `Are you sure you want to permanently delete the learning module "${title}"? This action cannot be undone.`,
+            confirmLabel: 'Delete Module',
             variant: 'danger',
             onConfirm: () => {
-                router.delete(questionsDestroy(qId).url, {
-                    preserveScroll: true
-                });
+                router.delete(`/admin/learn/${id}`);
             }
         });
     };
 
-    const filteredQuestions = questions.filter((q) => {
+    const filteredModules = modules.filter((mod) => {
         const matchesSearch = 
-            q.stem.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            q.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            q.subcategory.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            String(q.id).includes(searchTerm);
+            mod.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            mod.topic.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            mod.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            mod.subcategory.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            String(mod.id).includes(searchTerm);
 
         const matchesCategory = 
             selectedCategory === 'All Categories' || 
-            q.category === selectedCategory;
+            mod.category === selectedCategory;
 
         const matchesSubcategory = 
             selectedSubcategory === 'All Subcategories' || 
-            q.subcategory === selectedSubcategory;
+            mod.subcategory === selectedSubcategory;
 
         const matchesStatus = 
             selectedStatus === 'All Statuses' || 
-            q.status === selectedStatus;
+            (selectedStatus === 'ACTIVE' && mod.is_published) || 
+            (selectedStatus === 'DRAFT' && !mod.is_published);
 
         return matchesSearch && matchesCategory && matchesSubcategory && matchesStatus;
     });
 
-    const totalPages = Math.ceil(filteredQuestions.length / pageSize);
+    const totalPages = Math.ceil(filteredModules.length / pageSize);
     const startIndex = (currentPage - 1) * pageSize;
-    const paginatedQuestions = filteredQuestions.slice(startIndex, startIndex + pageSize);
+    const paginatedModules = filteredModules.slice(startIndex, startIndex + pageSize);
 
     // Helper to render appropriate styling for categories
     const getCategoryStyles = (category: string) => {
@@ -270,74 +272,73 @@ export default function QuestionsIndex({ questions = [], categories = [] }: Ques
         }
     };
 
-    const columns: TableColumn<QuestionItem>[] = [
+    const columns: TableColumn<LearnModule>[] = [
         {
-            header: 'Question ID',
-            render: (q) => (
-                <span className="font-bold text-slate-550">#{q.id}</span>
-            )
+            header: 'Module ID',
+            render: (mod) => <span className="font-bold text-slate-550">#{mod.id}</span>
         },
         {
-            header: 'Question Details',
-            render: (q) => (
+            header: 'Lesson Details',
+            render: (mod) => (
                 <>
-                    <span className="block text-xs font-black text-slate-855 dark:text-white leading-snug line-clamp-1">{q.stem}</span>
-                    <span className="mt-1 block text-[10px] font-bold text-slate-400 line-clamp-1 leading-relaxed">CSE Practice Question</span>
+                    <span className="block text-xs font-black text-slate-855 dark:text-white leading-snug line-clamp-1">{mod.title}</span>
+                    <span className="mt-1 block text-[10px] font-bold text-slate-400 line-clamp-1 leading-relaxed">
+                        {mod.summary || 'CSE Syllabus Study Module'}
+                    </span>
                 </>
             )
         },
         {
             header: 'Category',
-            render: (q) => (
-                <span className={`inline-flex rounded-md border px-2 py-0.5 text-[9px] font-extrabold tracking-wide uppercase ${getCategoryStyles(q.category)}`}>
-                    {q.category}
+            render: (mod) => (
+                <span className={`inline-flex rounded-md border px-2 py-0.5 text-[9px] font-extrabold tracking-wide uppercase ${getCategoryStyles(mod.category)}`}>
+                    {mod.category}
                 </span>
             )
         },
         {
             header: 'Subcategory',
-            render: (q) => (
-                <span className="capitalize text-slate-550 dark:text-slate-450 font-bold">{q.subcategory}</span>
+            render: (mod) => (
+                <span className="text-[11px] font-bold text-slate-600 dark:text-slate-400 capitalize">
+                    {mod.subcategory}
+                </span>
             )
         },
         {
             header: 'Status',
-            render: (q) => (
-                q.status === 'ACTIVE' ? (
-                    <span className="inline-flex items-center gap-1 rounded-md bg-emerald-50 px-2 py-0.5 text-[9px] font-extrabold text-emerald-700 dark:bg-emerald-950/20 dark:text-emerald-400 dark:border-emerald-900/30 border border-emerald-100 uppercase">
-                        Active
-                    </span>
-                ) : (
-                    <span className="inline-flex items-center gap-1 rounded-md bg-blue-50 px-2 py-0.5 text-[9px] font-extrabold text-blue-600 dark:bg-blue-950/20 dark:text-blue-400 dark:border-blue-900/30 border border-blue-100 uppercase">
-                        Draft
-                    </span>
-                )
+            render: (mod) => mod.is_published ? (
+                <span className="inline-flex items-center gap-1 rounded-md bg-emerald-50 px-2 py-0.5 text-[9px] font-extrabold text-emerald-700 dark:bg-emerald-950/20 dark:text-emerald-400 dark:border-emerald-900/30 border border-emerald-100 uppercase">
+                    Active
+                </span>
+            ) : (
+                <span className="inline-flex items-center gap-1 rounded-md bg-blue-50 px-2 py-0.5 text-[9px] font-extrabold text-blue-600 dark:bg-blue-950/20 dark:text-blue-400 dark:border-blue-900/30 border border-blue-100 uppercase">
+                    Draft
+                </span>
             )
         },
         {
             header: 'Actions',
-            className: 'w-28 text-right pr-8',
-            render: (q) => (
+            className: 'w-28 text-right',
+            render: (mod) => (
                 <div className="flex items-center justify-end gap-1.5">
                     <Link
-                        href={questionsShow(q.id).url}
-                        className="rounded-lg p-1.5 text-slate-450 hover:bg-slate-50 hover:text-blue-600 dark:hover:bg-slate-900 transition cursor-pointer"
-                        title="View details"
+                        href={learnShow(mod.slug).url}
+                        className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-50 hover:text-slate-700 dark:hover:bg-slate-900 dark:hover:text-white transition"
+                        title="Student Preview"
                     >
                         <Eye className="size-4" />
                     </Link>
                     <Link
-                        href={questionsEdit(q.id).url}
-                        className="rounded-lg p-1.5 text-slate-455 hover:bg-slate-50 hover:text-blue-650 dark:hover:bg-slate-900 transition cursor-pointer"
-                        title="Edit question"
+                        href={adminLearnEdit(mod.id).url}
+                        className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-50 hover:text-blue-600 dark:hover:bg-slate-900 transition"
+                        title="Edit details"
                     >
                         <Edit2 className="size-4" />
                     </Link>
                     <button
-                        type="button"
-                        onClick={() => handleDeleteQuestion(q.id)}
-                        className="rounded-lg p-1.5 text-slate-450 hover:bg-slate-50 hover:text-red-650 dark:hover:bg-slate-900 transition cursor-pointer"
-                        title="Delete question"
+                        onClick={() => handleDelete(mod.id, mod.title)}
+                        className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-50 hover:text-red-655 dark:hover:bg-slate-900 transition cursor-pointer"
+                        title="Delete module"
                     >
                         <Trash2 className="size-4" />
                     </button>
@@ -348,60 +349,30 @@ export default function QuestionsIndex({ questions = [], categories = [] }: Ques
 
     return (
         <>
-            <Head title="Question Management" />
+            <Head title="Learn Curation" />
 
             <div className="flex h-full flex-1 flex-col gap-6 overflow-y-auto bg-slate-50/30 p-6">
-                
-                {/* 1. TOP HEADER SECTION */}
-                {/* <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                    <div className="relative w-full max-w-md">
-                        <Search className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-slate-400" />
-                        <input
-                            type="text"
-                            placeholder="Search questions, IDs, or topics..."
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full rounded-lg border border-slate-200 bg-white py-2.5 pr-4 pl-10 text-sm placeholder-slate-400 shadow-xs outline-none transition focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-                        />
-                    </div>
-
-                    <div className="flex items-center justify-between gap-6 md:justify-end">
-                        <div className="flex items-center gap-3">
-                            <button className="relative rounded-full p-2 text-slate-500 hover:bg-slate-100 transition focus:outline-none">
-                                <span className="absolute top-2 right-2 size-2 rounded-full bg-rose-500" />
-                                <Bell className="size-5" />
-                            </button>
-                            <button className="rounded-full p-2 text-slate-500 hover:bg-slate-100 transition focus:outline-none">
-                                <HelpCircle className="size-5" />
-                            </button>
-                        </div>
-                        
-                        <h1 className="text-xl font-bold tracking-tight text-slate-900 md:text-2xl">
-                            Question Management
-                        </h1>
-                    </div>
-                </div> */}
 
                 {/* 2. CREATION ACTIONS CARDS */}
                 <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-                    {/* AI Generator Card */}
-                    <div className="relative flex overflow-hidden rounded-2xl border border-indigo-50 bg-white p-6 shadow-xs transition hover:shadow-md">
+                    {/* AI Lesson Generator Card */}
+                    <div className="relative flex overflow-hidden rounded-2xl border border-indigo-50 bg-white p-6 shadow-xs transition hover:shadow-md dark:border-slate-800 dark:bg-slate-950">
                         {/* Sparkles background graphics */}
-                        <div className="absolute right-0 bottom-0 opacity-10">
-                            <Sparkles className="size-32 text-indigo-300" />
+                        <div className="absolute right-0 bottom-0 opacity-10 pointer-events-none">
+                            <Sparkles className="size-32 text-indigo-300 dark:text-indigo-900" />
                         </div>
                         <div className="flex gap-4 items-start z-10">
-                            <div className="flex size-14 shrink-0 items-center justify-center rounded-2xl bg-indigo-50 text-indigo-600">
+                            <div className="flex size-14 shrink-0 items-center justify-center rounded-2xl bg-indigo-50 text-indigo-650 dark:bg-indigo-950/20 dark:text-indigo-400">
                                 <Sparkles className="size-7" />
                             </div>
                             <div className="flex flex-col gap-2">
-                                <h3 className="text-lg font-bold text-slate-950">AI Question Generator</h3>
-                                <p className="text-sm text-slate-500 leading-relaxed">
-                                    Instantly create high-quality civil service questions from source documents or topics using our tuned LLM.
+                                <h3 className="text-lg font-bold text-slate-950 dark:text-white">AI Lesson Generator</h3>
+                                <p className="text-sm text-slate-500 leading-relaxed dark:text-slate-400">
+                                    Instantly create rich, syllabus-aligned study modules and interactive quick-checks using Gemini AI.
                                 </p>
-                                 <Link
-                                    href={questionsCreate({ query: { type: 'ai' } }).url}
-                                    className="mt-2 w-fit rounded-lg bg-blue-600 px-4 py-2.5 text-xs font-semibold text-white shadow-xs transition hover:bg-blue-700 focus:outline-none"
+                                <Link
+                                    href={adminLearnCreate({ query: { type: 'ai' } }).url}
+                                    className="mt-2 w-fit rounded-lg bg-blue-600 px-4 py-2.5 text-xs font-semibold text-white shadow-xs transition hover:bg-blue-700 focus:outline-none cursor-pointer"
                                 >
                                     Launch Generator
                                 </Link>
@@ -409,44 +380,44 @@ export default function QuestionsIndex({ questions = [], categories = [] }: Ques
                         </div>
                     </div>
 
-                    {/* Manual Entry Card */}
-                    <div className="relative flex overflow-hidden rounded-2xl border border-emerald-50 bg-white p-6 shadow-xs transition hover:shadow-md">
+                    {/* Manual Lesson Entry Card */}
+                    <div className="relative flex overflow-hidden rounded-2xl border border-emerald-50 bg-white p-6 shadow-xs transition hover:shadow-md dark:border-slate-800 dark:bg-slate-950">
                         {/* Graphical background lines */}
-                        <div className="absolute right-0 bottom-0 opacity-5">
-                            <FileText className="size-32 text-emerald-300" />
+                        <div className="absolute right-0 bottom-0 opacity-5 pointer-events-none">
+                            <FileText className="size-32 text-emerald-300 dark:text-emerald-900" />
                         </div>
                         <div className="flex gap-4 items-start z-10">
-                            <div className="flex size-14 shrink-0 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600">
+                            <div className="flex size-14 shrink-0 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-650 dark:bg-emerald-950/20 dark:text-emerald-400">
                                 <PenLine className="size-7" />
                             </div>
                             <div className="flex flex-col gap-2">
-                                <h3 className="text-lg font-bold text-slate-950">Manual Question Entry</h3>
-                                <p className="text-sm text-slate-500 leading-relaxed">
-                                    Precision-craft questions with custom distractors, detailed explanations, and specific syllabus mapping.
+                                <h3 className="text-lg font-bold text-slate-950 dark:text-white">Manual Lesson Entry</h3>
+                                <p className="text-sm text-slate-500 leading-relaxed dark:text-slate-400">
+                                    Precision-craft detailed tutorials, study guides, and review materials manually with standard Markdown support.
                                 </p>
                                 <Link
-                                    href={questionsCreate({ query: { type: 'manual' } }).url}
-                                    className="mt-2 w-fit rounded-lg bg-emerald-700 px-4 py-2.5 text-xs font-semibold text-white shadow-xs transition hover:bg-emerald-800 focus:outline-none"
+                                    href={adminLearnCreate({ query: { type: 'manual' } }).url}
+                                    className="mt-2 w-fit rounded-lg bg-emerald-700 px-4 py-2.5 text-xs font-semibold text-white shadow-xs transition hover:bg-emerald-800 focus:outline-none cursor-pointer"
                                 >
-                                    New Question
+                                    New Module
                                 </Link>
                             </div>
                         </div>
                     </div>
 
                     {/* Syllabus Scope Card */}
-                    <div className="relative flex overflow-hidden rounded-2xl border border-blue-50 bg-white p-6 shadow-xs transition hover:shadow-md">
+                    <div className="relative flex overflow-hidden rounded-2xl border border-blue-50 bg-white p-6 shadow-xs transition hover:shadow-md dark:border-slate-800 dark:bg-slate-950">
                         {/* Graphical background lines */}
-                        <div className="absolute right-0 bottom-0 opacity-10">
-                            <Database className="size-32 text-blue-300" />
+                        <div className="absolute right-0 bottom-0 opacity-10 pointer-events-none">
+                            <Database className="size-32 text-blue-300 dark:text-blue-900" />
                         </div>
                         <div className="flex gap-4 items-start z-10">
-                            <div className="flex size-14 shrink-0 items-center justify-center rounded-2xl bg-blue-50 text-blue-600">
+                            <div className="flex size-14 shrink-0 items-center justify-center rounded-2xl bg-blue-50 text-blue-650 dark:bg-blue-950/20 dark:text-blue-400">
                                 <Database className="size-7" />
                             </div>
                             <div className="flex flex-col gap-2">
-                                <h3 className="text-lg font-bold text-slate-950">Syllabus Scope Settings</h3>
-                                <p className="text-sm text-slate-500 leading-relaxed">
+                                <h3 className="text-lg font-bold text-slate-950 dark:text-white">Syllabus Scope Settings</h3>
+                                <p className="text-sm text-slate-500 leading-relaxed dark:text-slate-400">
                                     Configure exam categories & subcategories dynamically to instantly update AI prompting and filtering schemas.
                                 </p>
                                 <button
@@ -457,7 +428,7 @@ export default function QuestionsIndex({ questions = [], categories = [] }: Ques
                                         }
                                         setIsScopeModalOpen(true);
                                     }}
-                                    className="mt-2 w-fit rounded-lg bg-blue-600 px-4 py-2.5 text-xs font-semibold text-white shadow-xs transition hover:bg-blue-700 focus:outline-none"
+                                    className="mt-2 w-fit rounded-lg bg-blue-600 px-4 py-2.5 text-xs font-semibold text-white shadow-xs transition hover:bg-blue-700 focus:outline-none cursor-pointer"
                                 >
                                     Manage Scope
                                 </button>
@@ -466,8 +437,8 @@ export default function QuestionsIndex({ questions = [], categories = [] }: Ques
                     </div>
                 </div>
 
-                {/* 3. FILTERS & PAGINATION PANEL */}
-                <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between rounded-xl border border-slate-150 bg-white p-4 shadow-3xs">
+                {/* 3. FILTERS PANEL */}
+                <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between rounded-xl border border-slate-150 bg-white p-4 shadow-3xs dark:border-slate-850 dark:bg-slate-950">
                     <div className="flex flex-1 items-center gap-2 w-full md:max-w-2xl">
                         <div className="relative w-full">
                             <Search className="absolute top-1/2 left-3 size-3.5 -translate-y-1/2 text-slate-400" />
@@ -475,8 +446,8 @@ export default function QuestionsIndex({ questions = [], categories = [] }: Ques
                                 type="text"
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
-                                placeholder="Search questions (stem, ID, topic)..."
-                                className="w-full rounded-lg border border-slate-200 pl-9 pr-3 py-1.5 text-xs font-semibold text-slate-855 placeholder:text-slate-400 focus:border-blue-500 focus:outline-none transition bg-slate-50/50"
+                                placeholder="Search modules (title, summary, topic)..."
+                                className="w-full rounded-lg border border-slate-200 pl-9 pr-3 py-1.5 text-xs font-semibold text-slate-855 placeholder:text-slate-400 focus:border-blue-500 focus:outline-none transition bg-slate-50/50 dark:border-slate-800 dark:bg-slate-900 dark:text-white"
                             />
                         </div>
                     </div>
@@ -488,7 +459,7 @@ export default function QuestionsIndex({ questions = [], categories = [] }: Ques
                                 <select
                                     value={selectedCategory}
                                     onChange={(e) => setSelectedCategory(e.target.value)}
-                                    className="w-full rounded-lg border border-slate-200 bg-white pl-2.5 pr-8 py-1.5 text-xs font-bold text-slate-700 transition focus:border-blue-500 focus:outline-none appearance-none"
+                                    className="w-full rounded-lg border border-slate-200 bg-white pl-2.5 pr-8 py-1.5 text-xs font-bold text-slate-700 transition focus:border-blue-500 focus:outline-none appearance-none dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300"
                                 >
                                     <option value="All Categories">All Categories</option>
                                     {Object.keys(cseCategoriesTree).map(cat => (
@@ -503,7 +474,7 @@ export default function QuestionsIndex({ questions = [], categories = [] }: Ques
                                 <select
                                     value={selectedSubcategory}
                                     onChange={(e) => setSelectedSubcategory(e.target.value)}
-                                    className="w-full rounded-lg border border-slate-200 bg-white pl-2.5 pr-8 py-1.5 text-xs font-bold text-slate-700 transition focus:border-blue-500 focus:outline-none appearance-none"
+                                    className="w-full rounded-lg border border-slate-200 bg-white pl-2.5 pr-8 py-1.5 text-xs font-bold text-slate-700 transition focus:border-blue-500 focus:outline-none appearance-none dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300"
                                 >
                                     <option value="All Subcategories">All Subcategories</option>
                                     {selectedCategory !== 'All Categories' && cseCategoriesTree[selectedCategory]?.map(sub => (
@@ -521,7 +492,7 @@ export default function QuestionsIndex({ questions = [], categories = [] }: Ques
                                 <select
                                     value={selectedStatus}
                                     onChange={(e) => setSelectedStatus(e.target.value)}
-                                    className="w-full rounded-lg border border-slate-200 bg-white pl-2.5 pr-8 py-1.5 text-xs font-bold text-slate-700 transition focus:border-blue-500 focus:outline-none appearance-none"
+                                    className="w-full rounded-lg border border-slate-200 bg-white pl-2.5 pr-8 py-1.5 text-xs font-bold text-slate-700 transition focus:border-blue-500 focus:outline-none appearance-none dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300"
                                 >
                                     <option value="All Statuses">All Statuses</option>
                                     <option value="ACTIVE">ACTIVE</option>
@@ -531,32 +502,32 @@ export default function QuestionsIndex({ questions = [], categories = [] }: Ques
                             </div>
                         </div>
 
-                        <span className="text-xs font-bold text-slate-550 shrink-0 pl-1 text-right md:text-left block mt-1 md:mt-0">
-                            {filteredQuestions.length === 0 
+                        <span className="text-xs font-bold text-slate-550 shrink-0 pl-1 text-right md:text-left block mt-1 md:mt-0 dark:text-slate-400">
+                            {filteredModules.length === 0 
                                 ? 'No matches' 
-                                : `${filteredQuestions.length} question${filteredQuestions.length === 1 ? '' : 's'}`}
+                                : `${filteredModules.length} module${filteredModules.length === 1 ? '' : 's'}`}
                         </span>
                     </div>
                 </div>
 
                 {/* 4. MAIN DATATABLE */}
                 <AdminTable
-                    data={paginatedQuestions}
+                    data={paginatedModules}
                     columns={columns}
-                    title="CSE Practice Questions"
+                    title="CSE Learning Modules"
                     legend={[
-                        { icon: Eye, label: 'View Details', variant: 'slate' },
-                        { icon: Edit2, label: 'Edit Question', variant: 'blue' },
-                        { icon: Trash2, label: 'Delete Question', variant: 'rose' }
+                        { icon: Eye, label: 'Student Preview', variant: 'slate' },
+                        { icon: Edit2, label: 'Edit Module', variant: 'blue' },
+                        { icon: Trash2, label: 'Delete Module', variant: 'rose' }
                     ]}
                     emptyState={{
-                        icon: FileQuestion,
-                        title: 'No Questions Found',
-                        description: "We couldn't find any questions matching your active filters. Clear filters or launch the AI Generator to create fresh ones.",
+                        icon: FileText,
+                        title: 'No Modules Found',
+                        description: "We couldn't find any learning modules matching your active filters. Clear filters or launch the AI Generator to create fresh ones.",
                         action: (
                             <Link
-                                href={questionsCreate({ query: { type: 'ai' } }).url}
-                                className="mt-5 rounded-lg bg-blue-600 px-4 py-2 text-xs font-bold text-white shadow-3xs transition hover:bg-blue-700 inline-flex items-center gap-1.5 cursor-pointer"
+                                href={adminLearnCreate({ query: { type: 'ai' } }).url}
+                                className="rounded-lg bg-blue-600 px-4 py-2 text-xs font-bold text-white shadow-3xs transition hover:bg-blue-700 inline-flex items-center gap-1.5 cursor-pointer"
                             >
                                 <Sparkles className="size-3.5" />
                                 Launch AI Generator
@@ -565,11 +536,9 @@ export default function QuestionsIndex({ questions = [], categories = [] }: Ques
                     }}
                     pageSize={pageSize}
                     currentPage={currentPage}
-                    totalItems={filteredQuestions.length}
+                    totalItems={filteredModules.length}
                     onPageChange={setCurrentPage}
                 />
-
-                
             </div>
 
             {/* Premium Dynamic Syllabus Scope Modal */}
@@ -588,6 +557,7 @@ export default function QuestionsIndex({ questions = [], categories = [] }: Ques
                 handleAddSubcategory={handleAddSubcategory}
                 handleDeleteSubcategory={handleDeleteSubcategory}
             />
+
             {/* Custom confirmation dialog modal matching global visual standard */}
             <ConfirmModal
                 isOpen={confirmModal.isOpen}
@@ -602,11 +572,12 @@ export default function QuestionsIndex({ questions = [], categories = [] }: Ques
     );
 }
 
-QuestionsIndex.layout = {
+// Register layout configuration with standard layout and breadcrumbs
+AdminLearnIndex.layout = {
     breadcrumbs: [
         {
-            title: 'Question Management',
-            href: questionsIndex(),
+            title: 'Learn Management',
+            href: adminLearnIndex().url,
         },
     ],
 };

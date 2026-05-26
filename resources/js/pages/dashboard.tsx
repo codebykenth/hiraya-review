@@ -16,7 +16,6 @@ import {
     Target,
     HelpCircle,
     Info,
-    CheckSquare,
 } from 'lucide-react';
 
 interface ChartDataPoint {
@@ -25,6 +24,14 @@ interface ChartDataPoint {
     date: string;
     track: string;
     detail: string;
+    categoryScores?: CategoryScore[];
+}
+
+interface CategoryScore {
+    name: string;
+    correct: number;
+    total: number;
+    percentage: number;
 }
 
 interface DashboardProps {
@@ -37,6 +44,7 @@ interface DashboardProps {
         categories: { name: string; percentage: number; color: string; correct: number; total: number }[];
         passingRate: number;
         totalDuration: string;
+        avgDuration: string;
         totalQuestionsSolved: number;
     } | null;
 }
@@ -56,14 +64,15 @@ export default function Dashboard({ stats }: DashboardProps) {
         weakestArea: 'Numerical',
         passingRate: 75,
         totalDuration: '3h 15m',
+        avgDuration: '16m 15s',
         totalQuestionsSolved: 340,
         chartData: [
-            { score: 40, label: 'Run 1', date: 'May 20', track: 'Professional Exam', detail: '68/170 Correct' },
-            { score: 52, label: 'Run 2', date: 'May 21', track: 'Subprofessional Exam', detail: '78/150 Correct' },
-            { score: 45, label: 'Run 3', date: 'May 22', track: 'Analytical Drill', detail: '18/40 Correct' },
-            { score: 68, label: 'Run 4', date: 'May 23', track: 'Verbal Drill', detail: '27/40 Correct' },
-            { score: 60, label: 'Run 5', date: 'May 24', track: 'Numerical Drill', detail: '24/40 Correct' },
-            { score: 85, label: 'Run 6', date: 'May 25', track: 'Professional Exam', detail: '144/170 Correct' },
+            { score: 40, label: 'Run 1', date: 'May 20', track: 'Professional Exam', detail: '68/170 Correct', categoryScores: [] },
+            { score: 52, label: 'Run 2', date: 'May 21', track: 'Subprofessional Exam', detail: '78/150 Correct', categoryScores: [] },
+            { score: 45, label: 'Run 3', date: 'May 22', track: 'Analytical Drill', detail: '18/40 Correct', categoryScores: [] },
+            { score: 68, label: 'Run 4', date: 'May 23', track: 'Verbal Drill', detail: '27/40 Correct', categoryScores: [] },
+            { score: 60, label: 'Run 5', date: 'May 24', track: 'Numerical Drill', detail: '24/40 Correct', categoryScores: [] },
+            { score: 85, label: 'Run 6', date: 'May 25', track: 'Professional Exam', detail: '144/170 Correct', categoryScores: [] },
         ],
         categories: [
             {
@@ -122,14 +131,16 @@ export default function Dashboard({ stats }: DashboardProps) {
     })();
 
     const chartWidth = 500;
-    const chartHeight = 180;
+    const chartHeight = 210;
     const chartPadding = 24;
+    const chartPaddingLeft = 46;
+    const chartPaddingRight = 24;
 
     // Map stats points to coordinate space within the responsive SVG viewport
     const points = filteredChartData.map((dp, idx) => {
         const x =
-            chartPadding +
-            (idx * (chartWidth - chartPadding * 2)) /
+            chartPaddingLeft +
+            (idx * (chartWidth - chartPaddingLeft - chartPaddingRight)) /
                 (filteredChartData.length - 1 || 1);
         const y =
             chartHeight -
@@ -246,16 +257,16 @@ export default function Dashboard({ stats }: DashboardProps) {
                     <div className="relative overflow-hidden rounded-xl border border-purple-100 bg-white p-5 shadow-sm transition hover:shadow-md dark:border-purple-950/30 dark:bg-slate-950">
                         <div className="flex items-center justify-between">
                             <span className="text-[10px] font-bold tracking-wider text-purple-600 uppercase dark:text-purple-400">
-                                Solved Pool
+                                Avg Time
                             </span>
-                            <CheckSquare className="size-4 text-purple-400" />
+                            <Clock className="size-4 text-purple-400" />
                         </div>
                         <div className="mt-2">
                             <span className="font-heading text-2xl font-extrabold tracking-tight text-slate-900 dark:text-white">
-                                {activeStats.totalQuestionsSolved}
+                                {activeStats.avgDuration}
                             </span>
                             <p className="text-[9px] text-slate-400">
-                                Total questions
+                                Per attempt
                             </p>
                         </div>
                     </div>
@@ -294,19 +305,23 @@ export default function Dashboard({ stats }: DashboardProps) {
                 {/* Score Trends & Category breakdown container layout */}
                 <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
                     {/* Score Trends Section */}
-                    <div className="relative dark:border-slate-850 rounded-xl border border-slate-100 bg-white p-6 shadow-sm lg:col-span-2 dark:bg-slate-950">
-                        <div className="mb-4 flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                                <h2 className="font-heading text-lg font-bold tracking-tight text-slate-900 dark:text-white flex items-center gap-2">
-                                    Score History & Trend
+                    <div className="relative rounded-xl border border-slate-200 bg-white p-6 shadow-md shadow-slate-200/50 lg:col-span-2 dark:border-slate-800 dark:bg-slate-950 dark:shadow-none">
+                        <div className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                            <div className="flex flex-col gap-1">
+                                <h2 className="flex items-center gap-2 font-heading text-2xl font-black tracking-tight text-slate-950 dark:text-white">
+                                    Score History
                                     {isDemoMode && (
-                                        <span className="inline-flex items-center gap-1 rounded-full bg-amber-55 px-2 py-0.5 text-[9px] font-black text-amber-700 border border-amber-200/65 dark:bg-amber-950/20 dark:text-amber-400 dark:border-amber-900/50 uppercase tracking-wide">
+                                        <span className="inline-flex items-center gap-1 rounded-full border border-amber-200/65 bg-amber-55 px-2 py-0.5 text-[9px] font-black uppercase tracking-wide text-amber-700 dark:border-amber-900/50 dark:bg-amber-950/20 dark:text-amber-400">
                                             Demo Data
                                         </span>
                                     )}
                                 </h2>
-                                <div className="group relative">
-                                    <Info className="size-3.5 cursor-help text-slate-400" />
+                                <p className="text-sm font-semibold text-slate-500 dark:text-slate-400">
+                                    Track your score percentage across recent attempts.
+                                </p>
+                                <div className="group relative flex w-fit items-center gap-1 text-xs font-bold text-slate-400">
+                                    <Info className="size-3.5 cursor-help" />
+                                    Trend details
                                     <div className="pointer-events-none absolute bottom-full left-1/2 mb-2 z-20 w-48 -translate-x-1/2 rounded bg-slate-900 p-2 text-[10px] text-white opacity-0 shadow-lg transition-opacity group-hover:opacity-100 dark:bg-slate-800">
                                         Displays the scores of your last 6 attempts. Hover on any node to view details.
                                     </div>
@@ -315,7 +330,7 @@ export default function Dashboard({ stats }: DashboardProps) {
                             <div className="relative">
                                 <button 
                                     onClick={() => setIsOpen(!isOpen)}
-                                    className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-600 shadow-sm transition hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-300 dark:hover:bg-slate-900"
+                                    className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-bold text-slate-700 shadow-sm transition hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-300 dark:hover:bg-slate-900"
                                 >
                                     {selectedFilter === '6' && "Last 6 Runs"}
                                     {selectedFilter === '12' && "Last 12 Runs"}
@@ -359,7 +374,7 @@ export default function Dashboard({ stats }: DashboardProps) {
                         </div>
 
                         {/* Interactive SVG line chart visualization */}
-                        <div className="relative h-[200px] w-full rounded-lg border border-slate-100 bg-slate-50/50 p-2 dark:border-slate-800/40 dark:bg-slate-900/10">
+                        <div className="relative h-[260px] w-full rounded-xl border border-slate-200 bg-gradient-to-b from-slate-50 to-white p-3 dark:border-slate-800/70 dark:from-slate-900/30 dark:to-slate-950">
                             {/* Detailed HTML absolute glassmorphic tooltip card */}
                             {hoveredIdx !== null && filteredChartData[hoveredIdx] && filteredChartData[hoveredIdx].track !== 'No Data' && (
                                 <div 
@@ -444,17 +459,28 @@ export default function Dashboard({ stats }: DashboardProps) {
                                             (chartHeight - chartPadding * 2)) /
                                             100;
                                     return (
-                                        <line
-                                            key={level}
-                                            x1={chartPadding}
-                                            y1={y}
-                                            x2={chartWidth - chartPadding}
-                                            y2={y}
-                                            stroke="currentColor"
-                                            strokeWidth="0.5"
-                                            className="text-blue-100/30 dark:text-slate-800/30"
-                                            strokeDasharray="4 4"
-                                        />
+                                        <g key={level}>
+                                            <line
+                                                x1={chartPaddingLeft}
+                                                y1={y}
+                                                x2={chartWidth - chartPaddingRight}
+                                                y2={y}
+                                                stroke="currentColor"
+                                                strokeWidth="0.5"
+                                                className="text-blue-100/30 dark:text-slate-800/30"
+                                                strokeDasharray="4 4"
+                                            />
+                                            <text
+                                                x={chartPaddingLeft - 8}
+                                                y={y + 3}
+                                                textAnchor="end"
+                                                fontSize="9"
+                                                fontWeight="bold"
+                                                className="fill-slate-400 dark:fill-slate-500"
+                                            >
+                                                {level}%
+                                            </text>
+                                        </g>
                                     );
                                 })}
 
@@ -515,7 +541,7 @@ export default function Dashboard({ stats }: DashboardProps) {
                                             <text
                                                 x={p.x - 15}
                                                 y={p.y - 12}
-                                                fontSize="9"
+                                                fontSize="11"
                                                 fontWeight="bold"
                                                 fill="#2563eb"
                                                 className="dark:fill-blue-400"
@@ -529,8 +555,8 @@ export default function Dashboard({ stats }: DashboardProps) {
                                             x={p.x}
                                             y={chartHeight - 4}
                                             textAnchor="middle"
-                                            fontSize="8"
-                                            fontWeight="semibold"
+                                            fontSize="9"
+                                            fontWeight="bold"
                                             className="fill-slate-400 dark:fill-slate-500"
                                         >
                                             {filteredChartData[idx].date}
@@ -542,7 +568,7 @@ export default function Dashboard({ stats }: DashboardProps) {
 
                         {/* Recent Attempts Table/List filling the empty space */}
                         <div className="mt-6 border-t border-slate-100 pt-6 dark:border-slate-850">
-                            <h3 className="mb-3 text-[10px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+                            <h3 className="mb-4 flex items-center gap-1.5 text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
                                 Run Details ({filteredChartData.filter(d => d.track !== 'No Data').length} attempts matched)
                                 {isDemoMode && (
                                     <span className="lowercase text-amber-500 font-extrabold dark:text-amber-400">
@@ -556,13 +582,13 @@ export default function Dashboard({ stats }: DashboardProps) {
                                 </p>
                             ) : (
                                 <div className="overflow-x-auto rounded-lg border border-slate-100 dark:border-slate-800/80">
-                                    <table className="w-full text-left text-xs text-slate-500 dark:text-slate-400">
-                                        <thead className="bg-slate-50/80 text-[9px] font-extrabold uppercase tracking-wider text-slate-600 dark:bg-slate-900/60 dark:text-slate-400">
+                                    <table className="w-full text-left text-sm text-slate-600 dark:text-slate-300">
+                                        <thead className="bg-slate-50/80 text-[10px] font-extrabold uppercase tracking-wider text-slate-600 dark:bg-slate-900/60 dark:text-slate-400">
                                             <tr>
                                                 <th className="px-4 py-2.5">Attempt</th>
                                                 <th className="px-4 py-2.5">Date</th>
                                                 <th className="px-4 py-2.5">Type</th>
-                                                <th className="px-4 py-2.5">Score</th>
+                                                <th className="px-4 py-2.5">Score & Categories</th>
                                                 <th className="px-4 py-2.5 text-right">Result</th>
                                             </tr>
                                         </thead>
@@ -572,22 +598,37 @@ export default function Dashboard({ stats }: DashboardProps) {
                                                 const isPass = run.score >= 80;
                                                 return (
                                                     <tr key={i} className="hover:bg-slate-50/50 dark:hover:bg-slate-900/30">
-                                                        <td className="px-4 py-2.5 font-bold text-slate-900 dark:text-white">
+                                                        <td className="px-4 py-4 font-black text-slate-950 dark:text-white">
                                                             {run.label}
                                                         </td>
                                                         <td className="px-4 py-2.5 text-slate-500 dark:text-slate-400">
                                                             {run.date}
                                                         </td>
                                                         <td className="px-4 py-2.5">
-                                                            <span className="inline-flex items-center gap-1 rounded bg-slate-100 px-1.5 py-0.5 text-[9px] font-bold text-slate-700 dark:bg-slate-800 dark:text-slate-300">
+                                                            <span className="inline-flex items-center gap-1 rounded-md bg-slate-100 px-2 py-1 text-[10px] font-black text-slate-700 dark:bg-slate-800 dark:text-slate-300">
                                                                 {run.track}
                                                             </span>
                                                         </td>
-                                                        <td className="px-4 py-2.5 font-bold text-slate-900 dark:text-white">
-                                                            {run.score}% <span className="text-[9px] font-normal text-slate-400">({run.detail.split(' ')[0]})</span>
+                                                        <td className="px-4 py-2.5">
+                                                            <div className="text-base font-black text-slate-950 dark:text-white">
+                                                                {run.score}% <span className="text-xs font-semibold text-slate-400">({run.detail.split(' ')[0]})</span>
+                                                            </div>
+                                                            {run.categoryScores && run.categoryScores.length > 0 && (
+                                                                <div className="mt-2 flex max-w-[24rem] flex-wrap gap-1.5">
+                                                                    {run.categoryScores.map((cat) => (
+                                                                        <span
+                                                                            key={cat.name}
+                                                                            className="inline-flex items-center gap-1 rounded-full border border-blue-100 bg-blue-50 px-2 py-1 text-[10px] font-black text-slate-700 dark:border-blue-900/40 dark:bg-blue-950/20 dark:text-slate-200"
+                                                                            title={`${cat.correct}/${cat.total} correct`}
+                                                                        >
+                                                                            {cat.name}: <span className="text-slate-900 dark:text-white">{cat.percentage}%</span>
+                                                                        </span>
+                                                                    ))}
+                                                                </div>
+                                                            )}
                                                         </td>
                                                         <td className="px-4 py-2.5 text-right">
-                                                            <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[8px] font-extrabold tracking-wide uppercase ${
+                                                            <span className={`inline-flex items-center rounded-full px-2.5 py-1 text-[9px] font-extrabold tracking-wide uppercase ${
                                                                 isPass 
                                                                     ? 'bg-emerald-50 text-emerald-700 border border-emerald-250 dark:bg-emerald-950/30 dark:text-emerald-400 dark:border-emerald-900/50'
                                                                     : 'bg-amber-50 text-amber-700 border border-amber-250 dark:bg-amber-950/30 dark:text-amber-400 dark:border-amber-900/50'
@@ -607,17 +648,22 @@ export default function Dashboard({ stats }: DashboardProps) {
 
                     {/* Category Breakdown list */}
                     {/* Category Breakdown list */}
-                    <div className="dark:border-slate-850 rounded-xl border border-slate-100 bg-white p-6 shadow-sm dark:bg-slate-950">
-                        <div className="mb-5 flex items-center justify-between">
-                            <h2 className="font-heading text-lg font-bold tracking-tight text-slate-900 dark:text-white">
-                                Diagnostic Mastery
-                            </h2>
-                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                                Subject Mastery
+                    <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-md shadow-slate-200/50 dark:border-slate-800 dark:bg-slate-950 dark:shadow-none">
+                        <div className="mb-5 flex items-start justify-between gap-3">
+                            <div>
+                                <h2 className="font-heading text-2xl font-black tracking-tight text-slate-950 dark:text-white">
+                                    Diagnostic Mastery
+                                </h2>
+                                <p className="mt-1 text-sm font-semibold text-slate-500 dark:text-slate-400">
+                                    Subject accuracy at a glance.
+                                </p>
+                            </div>
+                            <span className="rounded-full bg-slate-100 px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-slate-500 dark:bg-slate-900 dark:text-slate-400">
+                                Mastery
                             </span>
                         </div>
 
-                        <div className="flex flex-col gap-5">
+                        <div className="flex flex-col gap-4">
                             {categories.map((cat) => {
                                 // Compute dynamic mastery descriptors & badge styles
                                 let label = 'Not Started';
@@ -638,26 +684,31 @@ export default function Dashboard({ stats }: DashboardProps) {
                                 return (
                                     <div
                                         key={cat.name}
-                                        className="flex flex-col gap-2 rounded-lg border border-slate-50 bg-slate-50/20 p-3.5 transition hover:bg-slate-50/50 dark:border-slate-900/50 dark:bg-slate-950/20 dark:hover:bg-slate-900/30"
+                                        className="flex flex-col gap-3 rounded-xl border border-slate-100 bg-gradient-to-br from-white to-slate-50/70 p-4 shadow-sm transition hover:border-blue-100 hover:shadow-md dark:border-slate-800 dark:from-slate-950 dark:to-slate-900/40"
                                     >
-                                        <div className="flex items-center justify-between">
-                                            <div className="flex flex-col">
-                                                <span className="text-xs font-bold text-slate-900 dark:text-white">
+                                        <div className="flex items-start justify-between gap-3">
+                                            <div className="min-w-0">
+                                                <span className="block truncate text-base font-black text-slate-950 dark:text-white">
                                                     {cat.name} Ability
                                                 </span>
-                                                <span className="text-[9px] font-semibold text-slate-400 dark:text-slate-500">
+                                                <span className="mt-0.5 block text-xs font-bold text-slate-500 dark:text-slate-400">
                                                     {cat.total && cat.total > 0 
-                                                        ? `${cat.correct}/${cat.total} Solved (${cat.percentage}%)`
-                                                        : '0/0 Solved (0%)'
+                                                        ? `${cat.correct}/${cat.total} solved`
+                                                        : '0/0 solved'
                                                     }
                                                 </span>
                                             </div>
-                                            <span className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[9px] font-extrabold tracking-wide uppercase ${badgeClass}`}>
-                                                {label}
-                                            </span>
+                                            <div className="flex shrink-0 flex-col items-end gap-1">
+                                                <span className="font-heading text-2xl font-black text-slate-950 dark:text-white">
+                                                    {cat.percentage}%
+                                                </span>
+                                                <span className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[9px] font-extrabold tracking-wide uppercase ${badgeClass}`}>
+                                                    {label}
+                                                </span>
+                                            </div>
                                         </div>
 
-                                        <div className="h-1.5 w-full rounded-full bg-slate-100 dark:bg-slate-800">
+                                        <div className="h-2.5 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
                                             <div
                                                 className={`h-full rounded-full transition-all duration-500 ${cat.color}`}
                                                 style={{
@@ -666,10 +717,10 @@ export default function Dashboard({ stats }: DashboardProps) {
                                             />
                                         </div>
 
-                                        <div className="flex items-center justify-end mt-1">
+                                        <div className="flex items-center justify-end">
                                             <Link
                                                 href={drillsIndex({ query: { category: cat.name === 'General' ? 'General Information' : cat.name + ' Ability' } }).url}
-                                                className="inline-flex items-center gap-1 text-[10px] font-bold text-blue-600 hover:text-blue-700 transition dark:text-blue-400 dark:hover:text-blue-300"
+                                                className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs font-black text-blue-600 transition hover:bg-blue-50 hover:text-blue-700 dark:text-blue-400 dark:hover:bg-blue-950/30 dark:hover:text-blue-300"
                                             >
                                                 Start {cat.name} Drill &rarr;
                                             </Link>

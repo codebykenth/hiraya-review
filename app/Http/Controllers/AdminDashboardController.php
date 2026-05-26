@@ -27,7 +27,9 @@ class AdminDashboardController extends Controller
             'total_categories' => Category::count(),
             'total_subcategories' => Subcategory::count(),
             'total_examinees' => User::where('role', '!=', 'admin')->count(),
-            'total_attempts' => ExamAttempt::count(),
+            'total_attempts' => ExamAttempt::whereHas('user', function ($q) {
+                $q->where('role', '!=', 'admin');
+            })->count(),
             'track_configs' => TrackConfig::count(),
         ];
 
@@ -44,7 +46,10 @@ class AdminDashboardController extends Controller
         });
 
         // 3. Recent examinee attempt activities with grade computations
-        $recentAttempts = ExamAttempt::with(['user', 'category'])
+        $recentAttempts = ExamAttempt::whereHas('user', function ($q) {
+                $q->where('role', '!=', 'admin');
+            })
+            ->with(['user', 'category'])
             ->latest()
             ->take(5)
             ->get()

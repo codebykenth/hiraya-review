@@ -11,6 +11,75 @@ use Illuminate\Support\Facades\Cache;
 
 class ExamController extends Controller
 {
+    private function formatAttemptCategoryScores(array $catScores): array
+    {
+        $scoreMap = $catScores['categoryScoreMap'] ?? $catScores ?? [];
+        $meta = $catScores['metadata'] ?? [];
+        $isDrill = ($meta['track'] ?? null) === 'Drill';
+        $selectedSubcategories = collect($meta['selected_subcategories'] ?? [])
+            ->filter()
+            ->map(fn ($name) => strtolower((string) $name))
+            ->values();
+        $formatted = [];
+
+        foreach ($scoreMap as $catName => $scoreData) {
+            if ($catName === 'metadata' || !is_array($scoreData)) {
+                continue;
+            }
+
+            if ($isDrill && isset($scoreData['subcats']) && is_array($scoreData['subcats'])) {
+                foreach ($scoreData['subcats'] as $subcatName => $subcatScore) {
+                    if (!is_array($subcatScore)) {
+                        continue;
+                    }
+
+                    if ($selectedSubcategories->isNotEmpty()) {
+                        $normalizedSubcatName = strtolower((string) $subcatName);
+                        $matchesSelection = $selectedSubcategories->contains(function ($selectedName) use ($normalizedSubcatName) {
+                            return str_contains($normalizedSubcatName, $selectedName) || str_contains($selectedName, $normalizedSubcatName);
+                        });
+
+                        if (!$matchesSelection) {
+                            continue;
+                        }
+                    }
+
+                    $correct = (int) ($subcatScore['correct'] ?? 0);
+                    $total = (int) ($subcatScore['total'] ?? 0);
+
+                    if ($total <= 0) {
+                        continue;
+                    }
+
+                    $formatted[] = [
+                        'name' => (string) $subcatName,
+                        'correct' => $correct,
+                        'total' => $total,
+                        'percentage' => round(($correct / $total) * 100),
+                    ];
+                }
+
+                continue;
+            }
+
+            $correct = (int) ($scoreData['correct'] ?? 0);
+            $total = (int) ($scoreData['total'] ?? 0);
+
+            if ($total <= 0) {
+                continue;
+            }
+
+            $formatted[] = [
+                'name' => str_replace(' Ability', '', str_replace(' Information', '', $catName)),
+                'correct' => $correct,
+                'total' => $total,
+                'percentage' => round(($correct / $total) * 100),
+            ];
+        }
+
+        return $formatted;
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -186,6 +255,7 @@ class ExamController extends Controller
                 'score' => $percentage,
                 'correct' => $correct,
                 'total' => $total,
+                'category_scores' => $this->formatAttemptCategoryScores($attempt->cat_scores ?? []),
                 'status' => $status,
                 'duration' => $durationText,
                 'created_at' => $attempt->created_at?->toIso8601String(),
@@ -250,6 +320,7 @@ class ExamController extends Controller
         $passingRate = 0;
         $totalQuestionsSolved = 0;
         $totalDurationSecs = 0;
+        $avgDurationText = '0 mins';
         
         $categoryTotals = [
             'Verbal Ability' => ['correct' => 0, 'total' => 0],
@@ -301,6 +372,18 @@ class ExamController extends Controller
             $minutes = floor(($totalDurationSecs % 3600) / 60);
             $totalDurationText = $hours > 0 ? "{$hours}h {$minutes}m" : "{$minutes} mins";
 
+            $avgDurationSecs = $totalExams > 0 ? (int) round($totalDurationSecs / $totalExams) : 0;
+            $avgHours = floor($avgDurationSecs / 3600);
+            $avgMinutes = floor(($avgDurationSecs % 3600) / 60);
+            $avgSeconds = $avgDurationSecs % 60;
+            if ($avgHours > 0) {
+                $avgDurationText = "{$avgHours}h {$avgMinutes}m";
+            } elseif ($avgMinutes > 0) {
+                $avgDurationText = "{$avgMinutes}m {$avgSeconds}s";
+            } else {
+                $avgDurationText = "{$avgSeconds}s";
+            }
+
             $lastAttempts = $attempts->take(6)->reverse();
             $chartData = [];
             $attemptIdx = 1;
@@ -318,6 +401,7 @@ class ExamController extends Controller
                     'date' => $date,
                     'track' => $track === 'Drill' ? 'Custom Drill' : $track . ' Exam',
                     'detail' => "{$correct}/{$total} Correct",
+                    'categoryScores' => $this->formatAttemptCategoryScores($attempt->cat_scores ?? []),
                 ];
             }
             while (count($chartData) < 2) {
@@ -327,19 +411,21 @@ class ExamController extends Controller
                     'date' => '-',
                     'track' => 'No Data',
                     'detail' => '0/0 Correct',
+                    'categoryScores' => [],
                 ]);
             }
         } else {
             $passingRate = 0;
             $totalDurationText = '0 mins';
+            $avgDurationText = '0 mins';
             $totalQuestionsSolved = 0;
             $chartData = [
-                ['score' => 40, 'label' => 'Run 1', 'date' => 'May 20', 'track' => 'Sample Exam', 'detail' => '20/50 Correct'],
-                ['score' => 52, 'label' => 'Run 2', 'date' => 'May 21', 'track' => 'Sample Drill', 'detail' => '26/50 Correct'],
-                ['score' => 45, 'label' => 'Run 3', 'date' => 'May 22', 'track' => 'Sample Exam', 'detail' => '22/50 Correct'],
-                ['score' => 68, 'label' => 'Run 4', 'date' => 'May 23', 'track' => 'Sample Drill', 'detail' => '34/50 Correct'],
-                ['score' => 60, 'label' => 'Run 5', 'date' => 'May 24', 'track' => 'Sample Exam', 'detail' => '30/50 Correct'],
-                ['score' => 85, 'label' => 'Run 6', 'date' => 'May 25', 'track' => 'Sample Drill', 'detail' => '42/50 Correct'],
+                ['score' => 40, 'label' => 'Run 1', 'date' => 'May 20', 'track' => 'Sample Exam', 'detail' => '20/50 Correct', 'categoryScores' => []],
+                ['score' => 52, 'label' => 'Run 2', 'date' => 'May 21', 'track' => 'Sample Drill', 'detail' => '26/50 Correct', 'categoryScores' => []],
+                ['score' => 45, 'label' => 'Run 3', 'date' => 'May 22', 'track' => 'Sample Exam', 'detail' => '22/50 Correct', 'categoryScores' => []],
+                ['score' => 68, 'label' => 'Run 4', 'date' => 'May 23', 'track' => 'Sample Drill', 'detail' => '34/50 Correct', 'categoryScores' => []],
+                ['score' => 60, 'label' => 'Run 5', 'date' => 'May 24', 'track' => 'Sample Exam', 'detail' => '30/50 Correct', 'categoryScores' => []],
+                ['score' => 85, 'label' => 'Run 6', 'date' => 'May 25', 'track' => 'Sample Drill', 'detail' => '42/50 Correct', 'categoryScores' => []],
             ];
         }
 
@@ -388,6 +474,7 @@ class ExamController extends Controller
                 'categories' => $formattedCategories,
                 'passingRate' => $passingRate,
                 'totalDuration' => $totalDurationText,
+                'avgDuration' => $avgDurationText,
                 'totalQuestionsSolved' => $totalQuestionsSolved,
             ]
         ]);

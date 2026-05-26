@@ -1,10 +1,10 @@
 import { Head, Link, useForm, router } from '@inertiajs/react';
-import { 
-    Check, 
-    X, 
-    Edit3, 
-    FileText, 
-    CheckCircle2, 
+import {
+    Check,
+    X,
+    Edit3,
+    FileText,
+    CheckCircle2,
     AlertCircle,
     ChevronDown,
     Save,
@@ -15,7 +15,7 @@ import {
     ChevronLeft
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import { index as questionsIndex, store as questionsStore, create as questionsCreate } from '@/routes/questions';
+import { index as questionsIndex, store as questionsStore, create as questionsCreate, destroy as questionsDestroy, drafts as questionsDrafts } from '@/routes/questions';
 
 // Dynamic Subcategory Lists mapped to the main CSE Categories
 const CSE_CATEGORIES: Record<string, string[]> = {
@@ -99,15 +99,15 @@ const renderFormattedText = (text: string) => {
 
         const lines = inputText.split(/\n/);
         const listRegex = /^\s*(\(\d+\)|\d+\.)\s+(.+)$/;
-        
+
         const listItems: { marker: string; text: string }[] = [];
         let introLines: string[] = [];
         let outroLines: string[] = [];
-        
+
         for (const line of lines) {
             const trimmed = line.trim();
             if (!trimmed) continue;
-            
+
             const match = trimmed.match(listRegex);
             if (match) {
                 listItems.push({ marker: match[1], text: match[2] });
@@ -126,12 +126,12 @@ const renderFormattedText = (text: string) => {
             // Strict 1-liner comment: Regex to match standard math expressions, logic arrow chains, negation states, parenthesized variables, and single letter variables
             const mathPattern = /(\b\d+(?:\.\d+)?%|\b\d+\/\d+\b|\[[^\]]+\]|\bProject\s+[A-Z]\b|\bQ[1-4]\b|(?:\b\d+(?:,\d{3})*(?:\.\d+)?\s*[\+\-\*\/=]\s*)+\d+(?:,\d{3})*(?:\.\d+)?%?|[~¬]?\s*\b[A-Z]\b\s*(?:->|=>)\s*[~¬]?\s*\b[A-Z]\b(?:\s*(?:->|=>)\s*[~¬]?\s*\b[A-Z]\b)*|[~¬]\s*\b[A-Z]\b|\(\s*[~¬]?\s*\b[A-Z]\b\s*\)|'\s*\b[A-Z]\b\s*'|"\s*\b[A-Z]\b\s*"|\b[B-H|J-N|P-Z]\b)/g;
             const boldParts = paraText.split(/(\*\*[^*]+\*\*)/g);
-            
+
             const renderSingleVariable = (v: string) => {
                 const cleaned = v.trim();
                 const isNegated = cleaned.startsWith('~') || cleaned.startsWith('¬');
                 const letter = cleaned.replace(/[~¬]\s*/, '');
-                
+
                 if (isNegated) {
                     return (
                         <span className="inline-flex items-center text-xs font-bold text-red-655 bg-red-50 border border-red-100 px-1.5 py-0.5 rounded-md font-mono select-all shadow-3xs">
@@ -211,14 +211,14 @@ const renderFormattedText = (text: string) => {
                     {boldParts.map((boldPart, bIdx) => {
                         const isBold = boldPart.startsWith('**') && boldPart.endsWith('**');
                         const innerText = isBold ? boldPart.slice(2, -2) : boldPart;
-                        
+
                         const tokens = innerText.split(mathPattern);
                         return (
                             <span key={bIdx}>
                                 {tokens.map((token, tIdx) => {
                                     const isMatch = mathPattern.test(token);
                                     mathPattern.lastIndex = 0;
-                                    
+
                                     if (isMatch && token.trim()) {
                                         return (
                                             <span key={tIdx} className="select-none">
@@ -323,8 +323,8 @@ const renderFormattedText = (text: string) => {
                                     </thead>
                                     <tbody className="divide-y divide-slate-150">
                                         {rows.map((row, rIdx) => (
-                                            <tr 
-                                                key={rIdx} 
+                                            <tr
+                                                key={rIdx}
                                                 className="transition duration-150 hover:bg-slate-100/30 odd:bg-white"
                                             >
                                                 {row.map((cell, cIdx) => (
@@ -413,22 +413,22 @@ export default function DraftsQuestionList({ initialDrafts = [], categories = []
 
     // Apply filters
     const filteredDrafts = draftQuestions.filter(q => {
-        const matchesSearch = 
+        const matchesSearch =
             q.stem.toLowerCase().includes(filterSearch.toLowerCase()) ||
             q.category.toLowerCase().includes(filterSearch.toLowerCase()) ||
             q.subcategory.toLowerCase().includes(filterSearch.toLowerCase());
 
-        const matchesStatus = 
+        const matchesStatus =
             filterStatus === 'all' ||
             (filterStatus === 'approved' && q.approved) ||
             (filterStatus === 'pending' && !q.approved);
 
-        const matchesCategory = 
-            filterCategory === 'all' || 
+        const matchesCategory =
+            filterCategory === 'all' ||
             q.category === filterCategory;
 
-        const matchesSubcategory = 
-            filterSubcategory === 'all' || 
+        const matchesSubcategory =
+            filterSubcategory === 'all' ||
             q.subcategory === filterSubcategory;
 
         return matchesSearch && matchesStatus && matchesCategory && matchesSubcategory;
@@ -455,7 +455,7 @@ export default function DraftsQuestionList({ initialDrafts = [], categories = []
 
         try {
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
-            await fetch(`/questions/${id}`, {
+            await fetch(questionsDestroy(id).url, {
                 method: 'DELETE',
                 headers: {
                     'X-CSRF-TOKEN': csrfToken,
@@ -508,12 +508,12 @@ export default function DraftsQuestionList({ initialDrafts = [], categories = []
             <Head title="Drafts Review Center" />
 
             <div className="flex h-full flex-1 flex-col gap-6 overflow-y-auto bg-slate-50/30 p-6">
-                
+
                 {/* 1. TOP HEADER */}
                 <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                     <div>
-                        <Link 
-                            href={questionsIndex().url} 
+                        <Link
+                            href={questionsIndex().url}
                             className="flex w-fit items-center gap-1 text-xs font-black text-slate-850 hover:text-blue-600 dark:text-white dark:hover:text-blue-400 transition cursor-pointer focus:outline-none"
                         >
                             <ChevronLeft className="size-4" />
@@ -611,10 +611,35 @@ export default function DraftsQuestionList({ initialDrafts = [], categories = []
                                 </select>
                                 <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 size-3.5 text-slate-500 pointer-events-none" />
                             </div>
-                            
+
                             <span className="text-xs text-slate-450 font-bold shrink-0 pl-1">
                                 {filteredDrafts.length} found
                             </span>
+                        </div>
+                    </div>
+                )}
+
+                {/* 2.5 DRAFT ACTIONS LEGEND */}
+                {draftQuestions.length > 0 && (
+                    <div className="flex flex-wrap items-center justify-end  gap-3 text-[10px] font-extrabold uppercase tracking-wider bg-slate-50/50 border border-slate-200/60 p-3 rounded-xl dark:bg-slate-950/20 dark:border-slate-850">
+                        <span className="text-slate-400/80">Legend:</span>
+                        <div className="flex items-center gap-1.5 bg-emerald-50/50 dark:bg-emerald-950/10 px-2 py-1 rounded-lg border border-emerald-100 dark:border-emerald-900/20">
+                            <span className="flex size-5.5 items-center justify-center rounded-md border border-emerald-250 bg-emerald-100 text-emerald-700 dark:border-emerald-900/30 dark:bg-emerald-950/20 dark:text-emerald-400">
+                                <Check className="size-3" />
+                            </span>
+                            <span className="text-emerald-800 dark:text-emerald-300">Approve / Unapprove Draft</span>
+                        </div>
+                        <div className="flex items-center gap-1.5 bg-blue-50/50 dark:bg-blue-950/10 px-2 py-1 rounded-lg border border-blue-100 dark:border-blue-900/20">
+                            <span className="flex size-5.5 items-center justify-center rounded-md border border-blue-250 bg-blue-100 text-blue-700 dark:border-blue-900/30 dark:bg-blue-950/20 dark:text-blue-400">
+                                <Edit3 className="size-3" />
+                            </span>
+                            <span className="text-blue-800 dark:text-blue-300">Edit Inline</span>
+                        </div>
+                        <div className="flex items-center gap-1.5 bg-rose-50/50 dark:bg-rose-950/10 px-2 py-1 rounded-lg border border-rose-100 dark:border-rose-900/20">
+                            <span className="flex size-5.5 items-center justify-center rounded-md border border-rose-250 bg-rose-100 text-rose-700 dark:border-rose-900/30 dark:bg-rose-950/20 dark:text-rose-400">
+                                <X className="size-3" />
+                            </span>
+                            <span className="text-rose-800 dark:text-rose-300">Delete Draft</span>
                         </div>
                     </div>
                 )}
@@ -649,7 +674,7 @@ export default function DraftsQuestionList({ initialDrafts = [], categories = []
                             <p className="mt-1 text-xs text-slate-500">
                                 No drafts match your current search terms or status filters.
                             </p>
-                            <button 
+                            <button
                                 type="button"
                                 onClick={() => { setFilterSearch(''); setFilterStatus('all'); setFilterCategory('all'); setFilterSubcategory('all'); }}
                                 className="mt-4 rounded-lg bg-blue-650 px-4 py-2 text-xs font-bold text-white transition hover:bg-blue-700"
@@ -661,13 +686,12 @@ export default function DraftsQuestionList({ initialDrafts = [], categories = []
                         /* LIST OF DRAFTS WITH PAGINATION */
                         <div className="flex flex-col gap-6">
                             {paginatedDrafts.map((q) => (
-                                <div 
-                                    key={q.id} 
-                                    className={`rounded-2xl border transition duration-200 bg-white p-6 shadow-xs ${
-                                        q.approved 
-                                            ? 'border-emerald-250 ring-1 ring-emerald-500/10 shadow-emerald-50/10' 
+                                <div
+                                    key={q.id}
+                                    className={`rounded-2xl border transition duration-200 bg-white p-6 shadow-xs ${q.approved
+                                            ? 'border-emerald-250 ring-1 ring-emerald-500/10 shadow-emerald-50/10'
                                             : 'border-slate-200 hover:border-slate-350'
-                                    }`}
+                                        }`}
                                 >
                                     {/* Card Header metadata */}
                                     <div className="flex items-center justify-between mb-4 border-b border-slate-100 pb-3">
@@ -691,31 +715,29 @@ export default function DraftsQuestionList({ initialDrafts = [], categories = []
 
                                         {/* Card Actions toolbar */}
                                         <div className="flex items-center gap-1.5">
-                                            <button 
+                                            <button
                                                 type="button"
                                                 onClick={() => toggleApproveDraft(q.id)}
-                                                className={`p-1.5 rounded-lg border transition ${
-                                                    q.approved 
-                                                        ? 'bg-emerald-50 border-emerald-200 text-emerald-700' 
+                                                className={`p-1.5 rounded-lg border transition ${q.approved
+                                                        ? 'bg-emerald-50 border-emerald-200 text-emerald-700'
                                                         : 'bg-white border-slate-200 text-slate-400 hover:text-slate-650'
-                                                }`}
+                                                    }`}
                                                 title={q.approved ? "Approved (Click to Unapprove)" : "Mark Approved"}
                                             >
                                                 <Check className="size-4" />
                                             </button>
-                                            <button 
+                                            <button
                                                 type="button"
                                                 onClick={() => toggleEditDraft(q.id)}
-                                                className={`p-1.5 rounded-lg border transition ${
-                                                    q.isEditing 
-                                                        ? 'bg-blue-50 border-blue-200 text-blue-700' 
+                                                className={`p-1.5 rounded-lg border transition ${q.isEditing
+                                                        ? 'bg-blue-50 border-blue-200 text-blue-700'
                                                         : 'bg-white border-slate-200 text-slate-400 hover:text-slate-650'
-                                                }`}
+                                                    }`}
                                                 title="Edit Draft Inline"
                                             >
                                                 <Edit3 className="size-4" />
                                             </button>
-                                            <button 
+                                            <button
                                                 type="button"
                                                 onClick={() => deleteDraft(q.id)}
                                                 className="p-1.5 rounded-lg border bg-white border-slate-200 text-slate-450 hover:text-red-650 hover:border-red-200 transition"
@@ -770,18 +792,16 @@ export default function DraftsQuestionList({ initialDrafts = [], categories = []
                                                         <button
                                                             type="button"
                                                             onClick={() => handleUpdateDraftCorrectOption(q.id, optIdx)}
-                                                            className={`flex w-full items-center justify-between rounded-xl border px-4 py-3 text-left transition ${
-                                                                isCorrect
+                                                            className={`flex w-full items-center justify-between rounded-xl border px-4 py-3 text-left transition ${isCorrect
                                                                     ? 'bg-emerald-50/70 border-emerald-250 text-emerald-950 font-bold'
                                                                     : 'bg-slate-50/40 border-slate-100 hover:border-slate-200 text-slate-700 font-semibold'
-                                                            }`}
+                                                                }`}
                                                         >
                                                             <div className="flex gap-2.5 items-center">
-                                                                <span className={`inline-flex size-6 shrink-0 items-center justify-center rounded-lg text-xs font-bold ${
-                                                                    isCorrect 
-                                                                        ? 'bg-emerald-600 text-white' 
+                                                                <span className={`inline-flex size-6 shrink-0 items-center justify-center rounded-lg text-xs font-bold ${isCorrect
+                                                                        ? 'bg-emerald-600 text-white'
                                                                         : 'bg-slate-200/60 text-slate-650'
-                                                                }`}>
+                                                                    }`}>
                                                                     {String.fromCharCode(65 + optIdx)}
                                                                 </span>
                                                                 <span className="text-sm leading-tight">{opt}</span>
@@ -817,7 +837,7 @@ export default function DraftsQuestionList({ initialDrafts = [], categories = []
                                     <span className="text-xs font-bold text-slate-500 dark:text-slate-400">
                                         Showing <strong className="text-slate-900 dark:text-white">{(currentPage - 1) * pageSize + 1}</strong> to <strong className="text-slate-900 dark:text-white">{Math.min(currentPage * pageSize, filteredDrafts.length)}</strong> of <strong className="text-slate-900 dark:text-white">{filteredDrafts.length}</strong> results
                                     </span>
-                                    
+
                                     {totalPages > 1 && (
                                         <div className="flex items-center gap-1.5">
                                             {/* Previous button */}
@@ -839,11 +859,10 @@ export default function DraftsQuestionList({ initialDrafts = [], categories = []
                                                         key={pageNum}
                                                         type="button"
                                                         onClick={() => setCurrentPage(pageNum)}
-                                                        className={`size-8 rounded-lg text-xs font-black shadow-3xs transition focus:outline-none cursor-pointer ${
-                                                            isActive
+                                                        className={`size-8 rounded-lg text-xs font-black shadow-3xs transition focus:outline-none cursor-pointer ${isActive
                                                                 ? 'bg-blue-600 text-white'
                                                                 : 'border border-slate-200 bg-white text-slate-750 hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-850'
-                                                        }`}
+                                                            }`}
                                                     >
                                                         {pageNum}
                                                     </button>
@@ -875,10 +894,10 @@ DraftsQuestionList.layout = {
     breadcrumbs: [
         {
             title: 'Question Management',
-            href: questionsIndex(),
+            href: questionsIndex().url,
         },
         {
-            title: 'Drafts Review',
+            title: 'Question Drafts Review',
         },
     ],
 };
