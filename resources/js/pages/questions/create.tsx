@@ -13,7 +13,8 @@ import {
     Cpu,
     BookOpen,
     HelpCircle,
-    CheckCircle2
+    CheckCircle2,
+    ChevronLeft
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { index as questionsIndex, store as questionsStore, drafts as questionsDrafts } from '@/routes/questions';
@@ -128,6 +129,7 @@ export default function CreateQuestion({ type = 'ai', categories = [] }: CreateP
     const [aiPrompt, setAiPrompt] = useState<string>('');
     const [isGenerating, setIsGenerating] = useState<boolean>(false);
     const [errorMsg, setErrorMsg] = useState<string | null>(null);
+    const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
     // Sync subcategory options when Category changes in AI view
     useEffect(() => {
@@ -183,6 +185,7 @@ export default function CreateQuestion({ type = 'ai', categories = [] }: CreateP
     const handleGenerateAI = async () => {
         setIsGenerating(true);
         setErrorMsg(null);
+        setSuccessMsg(null);
 
         try {
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
@@ -208,10 +211,7 @@ export default function CreateQuestion({ type = 'ai', categories = [] }: CreateP
                 throw new Error(resData.error || 'Failed to generate questions. Please try again.');
             }
 
-            // Immediately redirect user to drafts page where their questions are stored as drafts
-            router.visit(questionsDrafts().url, {
-                data: { success: 'Questions generated successfully!' }
-            });
+            setSuccessMsg('Questions generated successfully! They are saved as drafts and ready for review.');
 
         } catch (err: any) {
             setErrorMsg(err.message || 'An error occurred while generating questions.');
@@ -231,9 +231,9 @@ export default function CreateQuestion({ type = 'ai', categories = [] }: CreateP
                     <div>
                         <Link 
                             href={questionsIndex().url} 
-                            className="inline-flex items-center gap-1.5 text-sm font-medium text-slate-500 hover:text-blue-600 transition"
+                            className="flex w-fit items-center gap-1 text-xs font-black text-slate-850 hover:text-blue-600 dark:text-white dark:hover:text-blue-400 transition cursor-pointer focus:outline-none"
                         >
-                            <ArrowLeft className="size-4" />
+                            <ChevronLeft className="size-4" />
                             Back to Question Management
                         </Link>
                         <h1 className="mt-2 text-2xl font-black tracking-tight text-slate-900">
@@ -340,7 +340,7 @@ export default function CreateQuestion({ type = 'ai', categories = [] }: CreateP
                                                     onChange={(e) => setAiCount(Number(e.target.value))}
                                                     className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-4 py-2.5 text-sm font-semibold text-slate-800 transition focus:border-blue-500 focus:bg-white focus:outline-none appearance-none disabled:opacity-55"
                                                 >
-                                                    {[1, 3, 5, 10].map(c => (
+                                                    {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(c => (
                                                         <option key={c} value={c}>{c} Question{c > 1 ? 's' : ''}</option>
                                                     ))}
                                                 </select>
@@ -381,6 +381,24 @@ export default function CreateQuestion({ type = 'ai', categories = [] }: CreateP
                                             className="w-full rounded-xl border border-slate-200 p-4 text-sm font-medium text-slate-800 placeholder:text-slate-400 focus:bg-white focus:outline-none focus:border-blue-500 transition duration-150 disabled:opacity-55"
                                         />
                                     </div>
+
+                                    {successMsg && (
+                                         <div className="rounded-xl border border-emerald-200 bg-emerald-50/40 p-4 text-xs font-semibold text-emerald-800 flex items-start gap-3 shadow-3xs border-l-4 border-l-emerald-500">
+                                             <CheckCircle2 className="size-4.5 text-emerald-650 shrink-0 mt-0.5" />
+                                             <div className="flex flex-col gap-1.5 flex-1">
+                                                 <span className="font-extrabold text-emerald-950">Questions Generated!</span>
+                                                 <span className="text-slate-600 leading-relaxed font-semibold">
+                                                     Your questions have been successfully created and stored as drafts. You can review and publish them on the Drafts Review page.
+                                                 </span>
+                                                 <Link
+                                                     href={questionsDrafts().url}
+                                                     className="inline-flex items-center gap-1 mt-1 text-emerald-700 hover:text-emerald-900 font-extrabold underline transition"
+                                                 >
+                                                     Go to Drafts Review &rarr;
+                                                 </Link>
+                                             </div>
+                                         </div>
+                                     )}
 
                                     {errorMsg && (
                                         <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-xs font-semibold text-red-800 flex items-start gap-2.5">

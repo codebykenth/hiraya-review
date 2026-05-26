@@ -265,59 +265,6 @@ export default function AdminDashboard({ metrics, recentAttempts = [], categorie
                         )}
                     </div>
                 </div>
-
-                {/* 4. SYLLABUS DRILLS & TRACKS */}
-                <div className="rounded-xl border border-slate-100 bg-white p-6 shadow-xs dark:border-slate-850 dark:bg-slate-950">
-                    <div className="flex items-center justify-between mb-5">
-                        <div>
-                            <h2 className="text-md font-bold text-slate-900 dark:text-white">Active Syllabus Tracks</h2>
-                            <p className="text-xs text-slate-500 mt-0.5">Preset exam tracks loaded from the Track Configurations dashboard model.</p>
-                        </div>
-                        <span className="inline-flex items-center gap-1 rounded-full bg-slate-50 px-2.5 py-0.5 text-xs font-bold text-slate-650 dark:bg-slate-900 dark:text-slate-400">
-                            <Clock className="size-3.5" />
-                            {tracks.length} Presets Configured
-                        </span>
-                    </div>
-
-                    {tracks.length === 0 ? (
-                        <div className="flex flex-col items-center justify-center py-8 text-center bg-slate-50/20 dark:bg-slate-900/10 rounded-xl border border-dashed border-slate-200 dark:border-slate-850">
-                            <Clock className="size-6 text-slate-350 dark:text-slate-700 mb-2" />
-                            <h3 className="text-xs font-bold text-slate-700 dark:text-slate-350">No tracks initialized yet</h3>
-                            <p className="text-[10px] text-slate-500 mt-0.5">Please seed or set up tracks inside the database migrations or admin controls.</p>
-                        </div>
-                    ) : (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                            {tracks.map((track) => (
-                                <div key={track.id} className="relative overflow-hidden rounded-xl border border-slate-100 p-4 bg-slate-50/20 dark:border-slate-900 dark:bg-slate-950/20 hover:border-blue-150 transition group">
-                                    <div className="flex items-start justify-between">
-                                        <div>
-                                            <span className="text-[10px] font-extrabold tracking-wider text-blue-600 dark:text-blue-400 uppercase">
-                                                {track.track}
-                                            </span>
-                                            <h4 className="text-xs font-bold text-slate-950 dark:text-white mt-1">
-                                                {track.category}
-                                            </h4>
-                                        </div>
-                                        <div className="flex size-7 items-center justify-center rounded-lg bg-blue-50 dark:bg-blue-950/30 text-blue-600">
-                                            <CheckCircle2 className="size-3.5" />
-                                        </div>
-                                    </div>
-                                    <div className="mt-4 flex items-center justify-between text-[10px] font-bold text-slate-500 border-t border-slate-100/50 pt-2.5 dark:border-slate-900">
-                                        <span className="flex items-center gap-1">
-                                            <Database className="size-3 text-slate-400" />
-                                            {track.item_count} Items
-                                        </span>
-                                        <span className="flex items-center gap-1">
-                                            <Clock className="size-3 text-slate-400" />
-                                            {track.time_limit}
-                                        </span>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    )}
-                </div>
-
             </div>
         </>
     );

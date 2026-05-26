@@ -148,7 +148,7 @@
     --sidebar-foreground: #0b1c30;
     --sidebar-primary: #2563eb;
     --sidebar-primary-foreground: #ffffff;
-    --sidebar-accent: #e5eeff;
+    --sidebar-accent: #cbdcfd;
     --sidebar-accent-foreground: #0b1c30;
     --sidebar-border: #e2e8f0;
     --sidebar-ring: #2563eb;
@@ -223,5 +223,6 @@
 }
 
 html {
+    font-size: 18px; /* Strict 1-liner comment: Scale root rem so older users read everything effortlessly */
     scroll-behavior: smooth;
 }

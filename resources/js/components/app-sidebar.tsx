@@ -15,7 +15,10 @@ import {
     SidebarSeparator
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
+import { dashboard as adminDashboard } from '@/routes/admin';
 import { index as examsIndex } from '@/routes/exams';
+import { index as historyIndex } from '@/routes/history';
+import { index as drillsIndex } from '@/routes/drills';
 import { index as questionsIndex, drafts as questionsDrafts } from '@/routes/questions';
 
 import type { NavItem } from '@/types';
@@ -27,18 +30,18 @@ const generalNavItems: NavItem[] = [
         icon: LayoutGrid,
     },
     {
-        title: 'Exam',
+        title: 'Mock Exam',
         href: examsIndex(),
         icon: ClipboardList,
     },
     {
-        title: 'Drills',
-        href: '#',
+        title: 'Practice Drill',
+        href: drillsIndex(),
         icon: Target,
     },
     {
         title: 'History',
-        href: '#',
+        href: historyIndex(),
         icon: History,
     },
 ];
@@ -46,7 +49,7 @@ const generalNavItems: NavItem[] = [
 const adminNavItems: NavItem[] = [
     {
         title: 'Dashboard',
-        href: '/admin/dashboard',
+        href: adminDashboard(),
         icon: Shield,
     },
     {

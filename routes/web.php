@@ -12,20 +12,41 @@ Route::inertia('dev-docs', 'dev-docs')
     ->middleware(['auth', 'verified', 'can:access-dev-docs']);
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::inertia('dashboard', 'dashboard')->name('dashboard');
-    Route::get('admin/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
+    // View / Read Endpoints (Rate limited to 120 requests/minute to block scrapers & view flood DDoS)
+    Route::middleware('throttle:global-views')->group(function () {
+        Route::get('dashboard', [ExamController::class, 'dashboard'])->name('dashboard');
+        Route::get('admin/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
+        Route::get('exams', [ExamController::class, 'index'])->name('exams.index');
+        Route::get('drills', [ExamController::class, 'drills'])->name('drills.index');
+        Route::get('history', [ExamController::class, 'history'])->name('history.index');
+        Route::get('questions/drafts', [QuestionController::class, 'drafts'])->name('questions.drafts');
+        
+        // Question Resource Views
+        Route::get('questions', [QuestionController::class, 'index'])->name('questions.index');
+        Route::get('questions/create', [QuestionController::class, 'create'])->name('questions.create');
+        Route::get('questions/{question}', [QuestionController::class, 'show'])->name('questions.show');
+        Route::get('questions/{question}/edit', [QuestionController::class, 'edit'])->name('questions.edit');
+    });
 
-    Route::get('exams', [ExamController::class, 'index'])->name('exams.index');
-    Route::get('questions/drafts', [QuestionController::class, 'drafts'])->name('questions.drafts');
-    Route::post('questions/generate', [QuestionController::class, 'generate'])->name('questions.generate');
-    
-    // Dynamic Scope Management Routes
-    Route::post('questions/categories', [QuestionController::class, 'storeCategory'])->name('questions.categories.store');
-    Route::delete('questions/categories/{category}', [QuestionController::class, 'destroyCategory'])->name('questions.categories.destroy');
-    Route::post('questions/subcategories', [QuestionController::class, 'storeSubcategory'])->name('questions.subcategories.store');
-    Route::delete('questions/subcategories/{subcategory}', [QuestionController::class, 'destroySubcategory'])->name('questions.subcategories.destroy');
-    
-    Route::resource('questions', QuestionController::class);
+    // Mutation / Write Endpoints (Rate limited to 30 requests/minute to prevent SQL injection flood & form spam DDoS)
+    Route::middleware('throttle:global-mutations')->group(function () {
+        Route::post('exams/attempts', [ExamController::class, 'storeAttempt'])->name('exams.attempts.store');
+        Route::delete('exams/attempts/{attempt}', [ExamController::class, 'destroyAttempt'])->name('exams.attempts.destroy');
+        
+        // Dynamic Scope Management Routes
+        Route::post('questions/categories', [QuestionController::class, 'storeCategory'])->name('questions.categories.store');
+        Route::delete('questions/categories/{category}', [QuestionController::class, 'destroyCategory'])->name('questions.categories.destroy');
+        Route::post('questions/subcategories', [QuestionController::class, 'storeSubcategory'])->name('questions.subcategories.store');
+        Route::delete('questions/subcategories/{subcategory}', [QuestionController::class, 'destroySubcategory'])->name('questions.subcategories.destroy');
+
+        // Question Resource Mutations
+        Route::post('questions', [QuestionController::class, 'store'])->name('questions.store');
+        Route::put('questions/{question}', [QuestionController::class, 'update'])->name('questions.update');
+        Route::delete('questions/{question}', [QuestionController::class, 'destroy'])->name('questions.destroy');
+    });
+
+    // Heavy AI Generation Service Endpoint (Strictly rate limited to 5 requests/minute to protect third-party API quota)
+    Route::post('questions/generate', [QuestionController::class, 'generate'])->name('questions.generate')->middleware('throttle:ai-generation');
 });
 
 require __DIR__.'/settings.php';

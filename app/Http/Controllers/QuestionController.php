@@ -8,6 +8,7 @@ use App\Models\Subcategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Cache;
 
 class QuestionController extends Controller
 {
@@ -32,19 +33,23 @@ class QuestionController extends Controller
     {
         $this->ensureCategoriesSeeded();
 
-        $questions = Question::with(['subcategory.category'])->get()->map(function ($q) {
-            return [
-                'id' => $q->id,
-                'stem' => $q->stem,
-                'category' => $q->subcategory?->category?->name ?? 'Analytical Ability',
-                'subcategory' => $q->subcategory?->name ?? 'Word analogy',
-                'status' => strtoupper($q->status),
-            ];
+        $questions = Cache::rememberForever('questions.all', function () {
+            return Question::with(['subcategory.category'])->get()->map(function ($q) {
+                return [
+                    'id' => $q->id,
+                    'stem' => $q->stem,
+                    'category' => $q->subcategory?->category?->name ?? 'Analytical Ability',
+                    'subcategory' => $q->subcategory?->name ?? 'Word analogy',
+                    'status' => strtoupper($q->status),
+                ];
+            })->toArray();
         });
 
-        $categories = Category::with(['subcategory' => function($query) {
-            $query->orderBy('sort_order');
-        }])->orderBy('sort_order')->get();
+        $categories = Cache::rememberForever('categories.tree', function () {
+            return Category::with(['subcategory' => function($query) {
+                $query->orderBy('sort_order');
+            }])->orderBy('sort_order')->get()->toArray();
+        });
 
         return Inertia::render('questions/index', [
             'questions' => $questions,
@@ -77,9 +82,11 @@ class QuestionController extends Controller
                 ];
             });
 
-        $categories = Category::with(['subcategory' => function($query) {
-            $query->orderBy('sort_order');
-        }])->orderBy('sort_order')->get();
+        $categories = Cache::rememberForever('categories.tree', function () {
+            return Category::with(['subcategory' => function($query) {
+                $query->orderBy('sort_order');
+            }])->orderBy('sort_order')->get()->toArray();
+        });
 
         return Inertia::render('questions/drafts', [
             'initialDrafts' => $drafts,
@@ -94,9 +101,11 @@ class QuestionController extends Controller
     {
         $this->ensureCategoriesSeeded();
 
-        $categories = Category::with(['subcategory' => function($query) {
-            $query->orderBy('sort_order');
-        }])->orderBy('sort_order')->get();
+        $categories = Cache::rememberForever('categories.tree', function () {
+            return Category::with(['subcategory' => function($query) {
+                $query->orderBy('sort_order');
+            }])->orderBy('sort_order')->get()->toArray();
+        });
 
         return Inertia::render('questions/create', [
             'type' => $request->query('type', 'ai'),
@@ -134,7 +143,9 @@ Official Category & Subcategory Schema:
 - Numerical Ability: 'Basic operations', 'Number sequence', 'Word problems'
 - Clerical Ability: 'Filing', 'Spelling'
 
-For 'Symbolic logic / abstract reasoning' questions, formulate rigorous conditional logic scenarios. In the explanation block, represent formal deductive logic chains using clean symbolic letters and standard operators (e.g. 'T -> A -> O -> F' or '~F -> ~O -> ~A -> ~T') to describe Modus Tollens or contraposition rules, ensuring they are rendered visually as interactive logic chains by the UI parser.
+For 'Symbolic logic / abstract reasoning' questions, formulate rigorous conditional logic scenarios. In the question and explanation, always use sequential uppercase letters (A, B, C, D) for the logical propositions in sequence. In the explanation block, you MUST first explicitly define/tell what each variable represents (e.g., 'Let A = adhere to the Code of Conduct, B = avoid conflicts of interest, C = public trust is maintained, D = receive high integrity ratings') so the user can easily understand the symbols, and then represent formal deductive logic chains using standard operators (e.g. 'A -> B -> C -> D' or '~D -> ~C -> ~B -> ~A') to describe Modus Tollens or contraposition rules, ensuring they are rendered visually as interactive logic chains by the UI parser.
+
+For 'Numerical Ability' questions, you MUST include a dedicated section in the explanation starting with '🧠 Mental Math Shortcut:' or 'Mental Math Shortcut:' that details the fastest and most efficient way to solve the problem mentally or via rapid approximation, showing standard exam cognitive shortcuts to save valuable time.
 
 Return a valid JSON array of question objects. Do not include markdown wraps or block formatting (no ```json ... ```), return raw JSON text.
 Each object in the array must contain:
@@ -162,7 +173,7 @@ Category: {$validated['category']}
 Subcategory: {$validated['subcategory']}
 Language: {$validated['language']}
 " . ($validated['prompt'] ? "Additional Context/Directives: {$validated['prompt']}" : "");
-
+        set_time_limit(300);
         try {
             $response = \Illuminate\Support\Facades\Http::withHeaders([
                 'x-goog-api-key' => $apiKey,
@@ -232,8 +243,18 @@ Language: {$validated['language']}
             );
 
             if ($response->failed()) {
+                $status = $response->status();
+                $body = $response->body();
+                \Illuminate\Support\Facades\Log::error("Gemini API call failed with status {$status}: {$body}");
+
+                if ($status === 429) {
+                    return response()->json([
+                        'error' => 'The question generator is temporarily busy due to high API demand. Please wait a moment and try again.'
+                    ], 429);
+                }
+
                 return response()->json([
-                    'error' => 'Gemini API call failed: ' . $response->body()
+                    'error' => 'We encountered an issue generating your questions. Please wait a moment and try again.'
                 ], 500);
             }
 
@@ -249,8 +270,9 @@ Language: {$validated['language']}
 
             $questions = json_decode($text, true);
             if (!$questions || !is_array($questions)) {
+                \Illuminate\Support\Facades\Log::error("Invalid JSON structure returned by Gemini. Raw output: " . $text);
                 return response()->json([
-                    'error' => 'Invalid JSON structure returned by Gemini. Raw output: ' . $text
+                    'error' => 'The generator encountered an unexpected formatting issue. Please try again with a different prompt.'
                 ], 500);
             }
 
@@ -311,13 +333,16 @@ Language: {$validated['language']}
                 }
             }
 
+            $this->clearCache();
+
             return response()->json([
                 'questions' => $savedQuestions,
             ]);
 
         } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error("An exception occurred during question generation: " . $e->getMessage() . "\nTrace: " . $e->getTraceAsString());
             return response()->json([
-                'error' => 'An exception occurred during generation: ' . $e->getMessage()
+                'error' => 'A system error occurred while generating questions. Please try again later.'
             ], 500);
         }
     }
@@ -388,7 +413,9 @@ Language: {$validated['language']}
                 $savedCount = count($questionsData);
             }
 
-            return redirect()->route('questions.index')->with('success', "{$savedCount} AI-generated questions added successfully!");
+            $this->clearCache();
+
+            return redirect()->route('questions.drafts')->with('success', "{$savedCount} approved questions committed successfully!");
         }
 
         $validated = $request->validate([
@@ -430,11 +457,14 @@ Language: {$validated['language']}
                 'status' => $validated['status'] === 'active' ? 'active' : 'draft',
             ]);
 
+            $this->clearCache();
+
             if ($validated['status'] === 'draft') {
                 return redirect()->route('questions.drafts')->with('success', 'Draft question created successfully!');
             }
             return redirect()->route('questions.index')->with('success', 'Question created successfully!');
         } catch (\Exception $e) {
+            $this->clearCache();
             // Development fallback if database is not fully migrated
             return redirect()->route('questions.index')->with('success', 'Question simulation saved successfully!');
         }
@@ -470,6 +500,7 @@ Language: {$validated['language']}
         if ($question) {
             $question->delete();
         }
+        $this->clearCache();
 
         if (request()->wantsJson()) {
             return response()->json(['success' => true]);
@@ -493,6 +524,7 @@ Language: {$validated['language']}
             'is_demographic' => false,
             'sort_order' => Category::count() + 1,
         ]);
+        $this->clearCache();
 
         return redirect()->back()->with('success', "Category '{$category->name}' has been created successfully!");
     }
@@ -505,6 +537,7 @@ Language: {$validated['language']}
         // Delete related subcategories & questions first
         $category->subcategory()->delete();
         $category->delete();
+        $this->clearCache();
 
         return redirect()->back()->with('success', "Category and all its subcategories have been removed.");
     }
@@ -526,6 +559,7 @@ Language: {$validated['language']}
             'language' => 'English',
             'sort_order' => Subcategory::where('category_id', $validated['category_id'])->count() + 1,
         ]);
+        $this->clearCache();
 
         return redirect()->back()->with('success', "Subcategory '{$subcategory->name}' has been added successfully!");
     }
@@ -536,7 +570,18 @@ Language: {$validated['language']}
     public function destroySubcategory(Subcategory $subcategory)
     {
         $subcategory->delete();
+        $this->clearCache();
 
         return redirect()->back()->with('success', "Subcategory has been removed successfully.");
+    }
+
+    /**
+     * Clear all related categories and questions caches when data is modified.
+     */
+    private function clearCache(): void
+    {
+        Cache::forget('questions.all');
+        Cache::forget('questions.active');
+        Cache::forget('categories.tree');
     }
 }

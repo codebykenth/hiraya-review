@@ -11,7 +11,8 @@ import {
     RotateCcw,
     ListChecks,
     ArrowLeft,
-    Inbox
+    Inbox,
+    ChevronLeft
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { index as questionsIndex, store as questionsStore, create as questionsCreate } from '@/routes/questions';
@@ -87,8 +88,11 @@ interface DraftsProps {
 const renderFormattedText = (text: string) => {
     if (!text) return null;
 
+    // Strict 1-liner comment: Pre-format continuous single-line numbered lists to newlines
+    const cleanedText = text.replace(/(?:\s+|:|^)(\d+\.)\s+/g, '\n$1 ');
+
     const tableRegex = /((?:^|\n)\|[^\n]+\|[^\n]*(?:\n\|[^\n]+\|[^\n]*)+)/g;
-    const parts = text.split(tableRegex);
+    const parts = cleanedText.split(tableRegex);
 
     const formatNumberedLists = (inputText: string) => {
         if (!inputText) return null;
@@ -384,6 +388,11 @@ export default function DraftsQuestionList({ initialDrafts = [], categories = []
         ];
     }
 
+    // Sync local state when Inertia refreshes initialDrafts from backend
+    useEffect(() => {
+        setDraftQuestions(initialDrafts);
+    }, [initialDrafts]);
+
     // Filtering & Pagination States
     const [filterSearch, setFilterSearch] = useState('');
     const [filterStatus, setFilterStatus] = useState<'all' | 'approved' | 'pending'>('all');
@@ -505,9 +514,9 @@ export default function DraftsQuestionList({ initialDrafts = [], categories = []
                     <div>
                         <Link 
                             href={questionsIndex().url} 
-                            className="inline-flex items-center gap-1.5 text-sm font-medium text-slate-500 hover:text-blue-600 transition"
+                            className="flex w-fit items-center gap-1 text-xs font-black text-slate-850 hover:text-blue-600 dark:text-white dark:hover:text-blue-400 transition cursor-pointer focus:outline-none"
                         >
-                            <ArrowLeft className="size-4" />
+                            <ChevronLeft className="size-4" />
                             Back to Question Management
                         </Link>
                         <h1 className="mt-2 text-2xl font-black tracking-tight text-slate-900">
@@ -803,29 +812,55 @@ export default function DraftsQuestionList({ initialDrafts = [], categories = []
                             ))}
 
                             {/* Pagination bar */}
-                            {totalPages > 1 && (
-                                <div className="flex items-center justify-between border-t border-slate-200 pt-5 mt-2">
-                                    <button
-                                        type="button"
-                                        disabled={currentPage === 1}
-                                        onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                                        className="inline-flex items-center gap-1 rounded-lg border border-slate-250 bg-white px-3.5 py-2 text-xs font-bold text-slate-650 shadow-3xs transition hover:bg-slate-50 disabled:opacity-40"
-                                    >
-                                        Previous
-                                    </button>
-                                    
-                                    <span className="text-xs font-bold text-slate-650">
-                                        Page {currentPage} of {totalPages}
+                            {filteredDrafts.length > 0 && (
+                                <div className="flex flex-col sm:flex-row items-center justify-between border-t border-slate-100 bg-slate-50/20 px-6 py-4 dark:border-slate-900/60 dark:bg-slate-900/10 gap-3 rounded-b-xl mt-4">
+                                    <span className="text-xs font-bold text-slate-500 dark:text-slate-400">
+                                        Showing <strong className="text-slate-900 dark:text-white">{(currentPage - 1) * pageSize + 1}</strong> to <strong className="text-slate-900 dark:text-white">{Math.min(currentPage * pageSize, filteredDrafts.length)}</strong> of <strong className="text-slate-900 dark:text-white">{filteredDrafts.length}</strong> results
                                     </span>
+                                    
+                                    {totalPages > 1 && (
+                                        <div className="flex items-center gap-1.5">
+                                            {/* Previous button */}
+                                            <button
+                                                type="button"
+                                                disabled={currentPage === 1}
+                                                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                                                className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-slate-700 shadow-3xs transition hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed dark:border-slate-800 dark:bg-slate-900 dark:text-slate-350 dark:hover:bg-slate-850 cursor-pointer focus:outline-none"
+                                            >
+                                                Previous
+                                            </button>
 
-                                    <button
-                                        type="button"
-                                        disabled={currentPage === totalPages}
-                                        onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                                        className="inline-flex items-center gap-1 rounded-lg border border-slate-250 bg-white px-3.5 py-2 text-xs font-bold text-slate-650 shadow-3xs transition hover:bg-slate-50 disabled:opacity-40"
-                                    >
-                                        Next
-                                    </button>
+                                            {/* Page Numbers list */}
+                                            {Array.from({ length: totalPages }).map((_, idx) => {
+                                                const pageNum = idx + 1;
+                                                const isActive = pageNum === currentPage;
+                                                return (
+                                                    <button
+                                                        key={pageNum}
+                                                        type="button"
+                                                        onClick={() => setCurrentPage(pageNum)}
+                                                        className={`size-8 rounded-lg text-xs font-black shadow-3xs transition focus:outline-none cursor-pointer ${
+                                                            isActive
+                                                                ? 'bg-blue-600 text-white'
+                                                                : 'border border-slate-200 bg-white text-slate-750 hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-850'
+                                                        }`}
+                                                    >
+                                                        {pageNum}
+                                                    </button>
+                                                );
+                                            })}
+
+                                            {/* Next button */}
+                                            <button
+                                                type="button"
+                                                disabled={currentPage === totalPages}
+                                                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                                                className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-slate-700 shadow-3xs transition hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed dark:border-slate-800 dark:bg-slate-900 dark:text-slate-350 dark:hover:bg-slate-850 cursor-pointer focus:outline-none"
+                                            >
+                                                Next
+                                            </button>
+                                        </div>
+                                    )}
                                 </div>
                             )}
                         </div>

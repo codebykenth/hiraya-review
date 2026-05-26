@@ -22,8 +22,8 @@ class AdminDashboardController extends Controller
         // 1. Database model counters
         $metrics = [
             'total_questions' => Question::count(),
-            'active_questions' => Question::where('status', 'ACTIVE')->count(),
-            'draft_questions' => Question::where('status', 'DRAFT')->count(),
+            'active_questions' => Question::where('status', 'active')->count(),
+            'draft_questions' => Question::where('status', 'draft')->count(),
             'total_categories' => Category::count(),
             'total_subcategories' => Subcategory::count(),
             'total_examinees' => User::where('role', '!=', 'admin')->count(),
@@ -49,17 +49,24 @@ class AdminDashboardController extends Controller
             ->take(5)
             ->get()
             ->map(function ($attempt) {
-                $totalScore = 0;
-                $maxPossible = 0;
+                $meta = $attempt->cat_scores['metadata'] ?? [];
                 
-                if ($attempt->cat_scores && is_array($attempt->cat_scores)) {
-                    foreach ($attempt->cat_scores as $scores) {
-                        $totalScore += $scores['score'] ?? 0;
-                        $maxPossible += $scores['total'] ?? 0;
-                    }
+                // Get correct counts and totals from metadata or fallbacks
+                $correct = $meta['correct_count'] ?? 0;
+                $total = $meta['total_questions'] ?? count($attempt->question_ids ?? []);
+                $percentage = $total > 0 ? round(($correct / $total) * 100) : 0;
+
+                // Build a descriptive track or category name
+                $trackName = $meta['track'] ?? null;
+                $categoryName = 'Full Mock Exam';
+                
+                if ($attempt->category) {
+                    $categoryName = $attempt->category->name;
+                } elseif ($trackName) {
+                    $categoryName = $trackName . ' Level Reviewer';
+                } elseif (isset($meta['category_name'])) {
+                    $categoryName = $meta['category_name'];
                 }
-                
-                $percentage = $maxPossible > 0 ? round(($totalScore / $maxPossible) * 100) : 75;
 
                 return [
                     'id' => $attempt->id,
@@ -67,7 +74,7 @@ class AdminDashboardController extends Controller
                         'name' => $attempt->user?->name ?? 'Examinee',
                         'email' => $attempt->user?->email ?? '',
                     ],
-                    'category' => $attempt->category?->name ?? 'Full CSC Blueprint',
+                    'category' => $categoryName,
                     'percentage' => $percentage,
                     'created_at' => $attempt->created_at?->diffForHumans() ?? 'Just now',
                 ];

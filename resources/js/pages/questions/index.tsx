@@ -119,6 +119,23 @@ export default function QuestionsIndex({ questions = [], categories = [] }: Ques
     );
     const [newSubcategoryName, setNewSubcategoryName] = useState('');
 
+    // Custom confirm modal state
+    const [confirmModal, setConfirmModal] = useState<{
+        isOpen: boolean;
+        title: string;
+        message: string;
+        confirmLabel: string;
+        variant: 'danger' | 'success' | 'info';
+        onConfirm: () => void;
+    }>({
+        isOpen: false,
+        title: '',
+        message: '',
+        confirmLabel: '',
+        variant: 'success',
+        onConfirm: () => {},
+    });
+
     const handleAddCategory = (e: React.FormEvent) => {
         e.preventDefault();
         if (!newCategoryName.trim()) return;
@@ -134,14 +151,21 @@ export default function QuestionsIndex({ questions = [], categories = [] }: Ques
     };
 
     const handleDeleteCategory = (catId: number) => {
-        if (!confirm('Are you sure you want to delete this category? This will delete all its subcategories!')) return;
-
-        router.delete(`/questions/categories/${catId}`, {
-            preserveScroll: true,
-            onSuccess: () => {
-                if (selectedScopeCategory === catId) {
-                    setSelectedScopeCategory(categories.find(c => c.id !== catId)?.id || null);
-                }
+        setConfirmModal({
+            isOpen: true,
+            title: 'Delete Category?',
+            message: 'Are you sure you want to delete this category? This action cannot be undone and will permanently delete all of its mapped subcategories!',
+            confirmLabel: 'Delete Category',
+            variant: 'danger',
+            onConfirm: () => {
+                router.delete(`/questions/categories/${catId}`, {
+                    preserveScroll: true,
+                    onSuccess: () => {
+                        if (selectedScopeCategory === catId) {
+                            setSelectedScopeCategory(categories.find(c => c.id !== catId)?.id || null);
+                        }
+                    }
+                });
             }
         });
     };
@@ -162,10 +186,17 @@ export default function QuestionsIndex({ questions = [], categories = [] }: Ques
     };
 
     const handleDeleteSubcategory = (subId: number) => {
-        if (!confirm('Are you sure you want to delete this subcategory?')) return;
-
-        router.delete(`/questions/subcategories/${subId}`, {
-            preserveScroll: true
+        setConfirmModal({
+            isOpen: true,
+            title: 'Delete Subcategory?',
+            message: 'Are you sure you want to delete this subcategory? This action cannot be undone.',
+            confirmLabel: 'Delete Subcategory',
+            variant: 'danger',
+            onConfirm: () => {
+                router.delete(`/questions/subcategories/${subId}`, {
+                    preserveScroll: true
+                });
+            }
         });
     };
 
@@ -334,72 +365,74 @@ export default function QuestionsIndex({ questions = [], categories = [] }: Ques
                 </div>
 
                 {/* 3. FILTERS & PAGINATION PANEL */}
-                <div className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-slate-150 bg-white p-4 shadow-3xs">
-                    <div className="flex flex-1 min-w-[260px] items-center gap-2">
-                        <div className="relative w-full max-w-2xl">
+                <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between rounded-xl border border-slate-150 bg-white p-4 shadow-3xs">
+                    <div className="flex flex-1 items-center gap-2 w-full md:max-w-md">
+                        <div className="relative w-full">
                             <Search className="absolute top-1/2 left-3 size-3.5 -translate-y-1/2 text-slate-400" />
                             <input
                                 type="text"
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                                 placeholder="Search questions (stem, ID, topic)..."
-                                className="w-full rounded-lg border border-slate-200 pl-9 pr-3 py-1.5 text-xs font-semibold text-slate-805 placeholder:text-slate-400 focus:border-blue-500 focus:outline-none transition bg-slate-50/50"
+                                className="w-full rounded-lg border border-slate-200 pl-9 pr-3 py-1.5 text-xs font-semibold text-slate-855 placeholder:text-slate-400 focus:border-blue-500 focus:outline-none transition bg-slate-50/50"
                             />
                         </div>
                     </div>
 
-                    <div className="flex flex-wrap items-center gap-2.5">
-                        {/* Category Filter */}
-                        <div className="relative min-w-[145px]">
-                            <select
-                                value={selectedCategory}
-                                onChange={(e) => setSelectedCategory(e.target.value)}
-                                className="w-full rounded-lg border border-slate-200 bg-white pl-2.5 pr-8 py-1.5 text-xs font-bold text-slate-700 transition focus:border-blue-500 focus:outline-none appearance-none"
-                            >
-                                <option value="All Categories">All Categories</option>
-                                {Object.keys(cseCategoriesTree).map(cat => (
-                                    <option key={cat} value={cat}>{cat}</option>
-                                ))}
-                            </select>
-                            <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 size-3.5 text-slate-500 pointer-events-none" />
+                    <div className="flex flex-col gap-3 w-full md:flex-row md:items-center md:w-auto md:gap-2.5">
+                        <div className="grid grid-cols-2 gap-3 w-full sm:grid-cols-3 md:flex md:w-auto md:items-center md:gap-2.5">
+                            {/* Category Filter */}
+                            <div className="relative min-w-0 md:min-w-[145px]">
+                                <select
+                                    value={selectedCategory}
+                                    onChange={(e) => setSelectedCategory(e.target.value)}
+                                    className="w-full rounded-lg border border-slate-200 bg-white pl-2.5 pr-8 py-1.5 text-xs font-bold text-slate-700 transition focus:border-blue-500 focus:outline-none appearance-none"
+                                >
+                                    <option value="All Categories">All Categories</option>
+                                    {Object.keys(cseCategoriesTree).map(cat => (
+                                        <option key={cat} value={cat}>{cat}</option>
+                                    ))}
+                                </select>
+                                <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 size-3.5 text-slate-500 pointer-events-none" />
+                            </div>
+
+                            {/* Subcategory Filter */}
+                            <div className="relative min-w-0 md:min-w-[155px]">
+                                <select
+                                    value={selectedSubcategory}
+                                    onChange={(e) => setSelectedSubcategory(e.target.value)}
+                                    className="w-full rounded-lg border border-slate-200 bg-white pl-2.5 pr-8 py-1.5 text-xs font-bold text-slate-700 transition focus:border-blue-500 focus:outline-none appearance-none"
+                                >
+                                    <option value="All Subcategories">All Subcategories</option>
+                                    {selectedCategory !== 'All Categories' && cseCategoriesTree[selectedCategory]?.map(sub => (
+                                        <option key={sub} value={sub}>{sub}</option>
+                                    ))}
+                                    {selectedCategory === 'All Categories' && Object.values(cseCategoriesTree).flat().map((sub, idx) => (
+                                        <option key={idx} value={sub}>{sub}</option>
+                                    ))}
+                                </select>
+                                <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 size-3.5 text-slate-500 pointer-events-none" />
+                            </div>
+
+                            {/* Status Filter */}
+                            <div className="relative col-span-2 sm:col-span-1 min-w-0 md:min-w-[120px]">
+                                <select
+                                    value={selectedStatus}
+                                    onChange={(e) => setSelectedStatus(e.target.value)}
+                                    className="w-full rounded-lg border border-slate-200 bg-white pl-2.5 pr-8 py-1.5 text-xs font-bold text-slate-700 transition focus:border-blue-500 focus:outline-none appearance-none"
+                                >
+                                    <option value="All Statuses">All Statuses</option>
+                                    <option value="ACTIVE">ACTIVE</option>
+                                    <option value="DRAFT">DRAFT</option>
+                                </select>
+                                <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 size-3.5 text-slate-500 pointer-events-none" />
+                            </div>
                         </div>
 
-                        {/* Subcategory Filter */}
-                        <div className="relative min-w-[155px]">
-                            <select
-                                value={selectedSubcategory}
-                                onChange={(e) => setSelectedSubcategory(e.target.value)}
-                                className="w-full rounded-lg border border-slate-200 bg-white pl-2.5 pr-8 py-1.5 text-xs font-bold text-slate-700 transition focus:border-blue-500 focus:outline-none appearance-none"
-                            >
-                                <option value="All Subcategories">All Subcategories</option>
-                                {selectedCategory !== 'All Categories' && cseCategoriesTree[selectedCategory]?.map(sub => (
-                                    <option key={sub} value={sub}>{sub}</option>
-                                ))}
-                                {selectedCategory === 'All Categories' && Object.values(cseCategoriesTree).flat().map((sub, idx) => (
-                                    <option key={idx} value={sub}>{sub}</option>
-                                ))}
-                            </select>
-                            <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 size-3.5 text-slate-500 pointer-events-none" />
-                        </div>
-
-                        {/* Status Filter */}
-                        <div className="relative min-w-[120px]">
-                            <select
-                                value={selectedStatus}
-                                onChange={(e) => setSelectedStatus(e.target.value)}
-                                className="w-full rounded-lg border border-slate-200 bg-white pl-2.5 pr-8 py-1.5 text-xs font-bold text-slate-700 transition focus:border-blue-500 focus:outline-none appearance-none"
-                            >
-                                <option value="All Statuses">All Statuses</option>
-                                <option value="ACTIVE">ACTIVE</option>
-                                <option value="DRAFT">DRAFT</option>
-                            </select>
-                            <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 size-3.5 text-slate-500 pointer-events-none" />
-                        </div>
-
-                        <span className="text-xs font-bold text-slate-550 shrink-0 pl-1">
+                        <span className="text-xs font-bold text-slate-550 shrink-0 pl-1 text-right md:text-left block mt-1 md:mt-0">
                             {filteredQuestions.length === 0 
-                                ? 'Showing 0 questions' 
-                                : `Showing ${startIndex + 1}-${Math.min(startIndex + pageSize, filteredQuestions.length)} of ${filteredQuestions.length} questions`}
+                                ? 'No matches' 
+                                : `${filteredQuestions.length} question${filteredQuestions.length === 1 ? '' : 's'}`}
                         </span>
                     </div>
                 </div>
@@ -485,27 +518,55 @@ export default function QuestionsIndex({ questions = [], categories = [] }: Ques
                     </div>
 
                     {/* Table Footer actions & navigation */}
-                    {totalPages > 1 && (
-                        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-end border-t border-slate-100 bg-slate-50/20 px-6 py-4">
-                            {/* Prev / Next controls */}
-                            <div className="flex items-center justify-end gap-3">
-                                <button
-                                    type="button"
-                                    onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-                                    disabled={currentPage === 1}
-                                    className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-700 shadow-2xs hover:bg-slate-50 transition focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
-                                >
-                                    Previous
-                                </button>
-                                <button
-                                    type="button"
-                                    onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-                                    disabled={currentPage === totalPages}
-                                    className="rounded-lg bg-blue-600 px-4 py-2 text-xs font-semibold text-white shadow-xs hover:bg-blue-700 transition focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
-                                >
-                                    Next
-                                </button>
-                            </div>
+                    {filteredQuestions.length > 0 && (
+                        <div className="flex flex-col sm:flex-row items-center justify-between border-t border-slate-100 bg-slate-50/20 px-6 py-4 dark:border-slate-900/60 dark:bg-slate-900/10 gap-3">
+                            <span className="text-xs font-bold text-slate-500 dark:text-slate-400">
+                                Showing <strong className="text-slate-900 dark:text-white">{(currentPage - 1) * pageSize + 1}</strong> to <strong className="text-slate-900 dark:text-white">{Math.min(currentPage * pageSize, filteredQuestions.length)}</strong> of <strong className="text-slate-900 dark:text-white">{filteredQuestions.length}</strong> results
+                            </span>
+                            
+                            {totalPages > 1 && (
+                                <div className="flex items-center gap-1.5">
+                                    {/* Previous button */}
+                                    <button
+                                        type="button"
+                                        disabled={currentPage === 1}
+                                        onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                                        className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-slate-700 shadow-3xs transition hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed dark:border-slate-800 dark:bg-slate-900 dark:text-slate-350 dark:hover:bg-slate-850 cursor-pointer focus:outline-none"
+                                    >
+                                        Previous
+                                    </button>
+
+                                    {/* Page Numbers list */}
+                                    {Array.from({ length: totalPages }).map((_, idx) => {
+                                        const pageNum = idx + 1;
+                                        const isActive = pageNum === currentPage;
+                                        return (
+                                            <button
+                                                key={pageNum}
+                                                type="button"
+                                                onClick={() => setCurrentPage(pageNum)}
+                                                className={`size-8 rounded-lg text-xs font-black shadow-3xs transition focus:outline-none cursor-pointer ${
+                                                    isActive
+                                                        ? 'bg-blue-600 text-white'
+                                                        : 'border border-slate-200 bg-white text-slate-750 hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-850'
+                                                }`}
+                                            >
+                                                {pageNum}
+                                            </button>
+                                        );
+                                    })}
+
+                                    {/* Next button */}
+                                    <button
+                                        type="button"
+                                        disabled={currentPage === totalPages}
+                                        onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                                        className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-slate-700 shadow-3xs transition hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed dark:border-slate-800 dark:bg-slate-900 dark:text-slate-350 dark:hover:bg-slate-850 cursor-pointer focus:outline-none"
+                                    >
+                                        Next
+                                    </button>
+                                </div>
+                            )}
                         </div>
                     )}
                 </div>
@@ -650,6 +711,61 @@ export default function QuestionsIndex({ questions = [], categories = [] }: Ques
                                     </div>
                                 )}
                             </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+            {/* Custom confirmation dialog modal matching global visual standard */}
+            {confirmModal.isOpen && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4 animate-in fade-in duration-200">
+                    <div 
+                        className="relative w-full max-w-lg rounded-xl border border-slate-200 bg-white p-6 shadow-xl dark:border-slate-800 dark:bg-slate-950 animate-in zoom-in-95 duration-205"
+                        role="dialog"
+                        aria-modal="true"
+                    >
+                        {/* Close Button */}
+                        <button
+                            type="button"
+                            onClick={() => setConfirmModal(prev => ({ ...prev, isOpen: false }))}
+                            className="absolute top-4 right-4 rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-slate-900 dark:hover:text-slate-200 transition focus:outline-none"
+                            aria-label="Close dialog"
+                        >
+                            <X className="size-4.5" />
+                        </button>
+
+                        <div className="flex flex-col gap-1 pr-6">
+                            <h3 className="font-heading text-lg font-bold text-slate-900 dark:text-white">
+                                {confirmModal.title}
+                            </h3>
+                            <p className="mt-2.5 text-xs leading-relaxed text-slate-555 dark:text-slate-450 whitespace-pre-line">
+                                {confirmModal.message}
+                            </p>
+                        </div>
+
+                        <div className="mt-6 flex justify-end gap-3">
+                            <button
+                                type="button"
+                                onClick={() => setConfirmModal(prev => ({ ...prev, isOpen: false }))}
+                                className="cursor-pointer rounded-lg border border-slate-200 bg-white px-4.5 py-2 text-xs font-bold text-slate-655 hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-355 dark:hover:bg-slate-900 transition focus:outline-none"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    setConfirmModal(prev => ({ ...prev, isOpen: false }));
+                                    confirmModal.onConfirm();
+                                }}
+                                className={`cursor-pointer rounded-lg px-4.5 py-2 text-xs font-bold text-white shadow-3xs transition focus:outline-none ${
+                                    confirmModal.variant === 'danger'
+                                        ? 'bg-rose-600 hover:bg-rose-700 active:bg-rose-800'
+                                        : confirmModal.variant === 'success'
+                                        ? 'bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800'
+                                        : 'bg-blue-600 hover:bg-blue-700 active:bg-blue-800'
+                                }`}
+                            >
+                                {confirmModal.confirmLabel}
+                            </button>
                         </div>
                     </div>
                 </div>
