@@ -1,4 +1,6 @@
 import { Head, router, Link } from '@inertiajs/react';
+import { PageContainer } from '@/components/page-container';
+import { Card } from '@/components/ui/card';
 import React, { useState } from 'react';
 import { index as historyIndex } from '@/routes/history';
 import { 
@@ -148,20 +150,20 @@ export default function HistoryPage({ attempts = [], pagination, filters }: Hist
         <TooltipProvider>
             <Head title="Attempt History" />
 
-            <div className="flex h-full flex-1 flex-col gap-6 overflow-y-auto rounded-xl p-6">
+            <PageContainer>
                 
                 {/* 1. HEADER SECTION */}
                 <div className="flex flex-col gap-1">
-                    <h1 className="font-heading text-3xl font-bold tracking-tight text-slate-900 md:text-4xl dark:text-white">
+                    <h1 className="font-heading text-3xl font-bold tracking-tight text-foreground md:text-4xl">
                         Attempt History
                     </h1>
-                    <p className="text-sm text-slate-500 md:text-base dark:text-slate-400 max-w-3xl leading-relaxed">
+                    <p className="text-sm text-muted-foreground max-w-3xl leading-relaxed">
                         Review your past performance, analyze detailed score breakdowns, and identify specific areas for improvement across all your exam tracks.
                     </p>
                 </div>
 
                 {/* 2. FILTERS CONTAINER CARD */}
-                <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-3xs dark:border-slate-800 dark:bg-slate-950">
+                <div className="rounded-xl border border-border bg-card p-4 shadow-3xs">
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
                         
                         {/* Search bar form */}
@@ -171,9 +173,9 @@ export default function HistoryPage({ attempts = [], pagination, filters }: Hist
                                 value={searchVal}
                                 onChange={(e) => setSearchVal(e.target.value)}
                                 placeholder="Search exams by name or ID..."
-                                className="w-full rounded-lg border border-slate-200 bg-white pl-9 pr-4 py-2 text-xs font-bold text-slate-700 transition focus:border-blue-500 focus:outline-none dark:border-slate-800 dark:bg-slate-900 dark:text-slate-350"
+                                className="w-full rounded-lg border border-border bg-white pl-9 pr-4 py-2 text-xs font-bold text-foreground transition focus:border-blue-500 focus:outline-none dark:bg-slate-900"
                             />
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-slate-400" />
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
                         </form>
 
                         {/* Select Filters Row */}
@@ -183,14 +185,14 @@ export default function HistoryPage({ attempts = [], pagination, filters }: Hist
                                 <select
                                     value={selectedTrack}
                                     onChange={handleTrackChange}
-                                    className="appearance-none w-full sm:w-auto rounded-lg border border-slate-200 bg-white pl-4 pr-10 py-2 text-xs font-bold text-slate-700 transition focus:border-blue-500 focus:outline-none dark:border-slate-800 dark:bg-slate-900 dark:text-slate-355"
+                                    className="appearance-none w-full sm:w-auto rounded-lg border border-border bg-white pl-4 pr-10 py-2 text-xs font-bold text-foreground transition focus:border-blue-500 focus:outline-none dark:bg-slate-900"
                                 >
                                     <option value="All Tracks">All Tracks</option>
                                     <option value="Professional">Professional</option>
                                     <option value="Subprofessional">Subprofessional</option>
                                     <option value="Drill">Drill</option>
                                 </select>
-                                <ChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 size-3.5 text-slate-400 pointer-events-none" />
+                                <ChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground pointer-events-none" />
                             </div>
 
                             {/* Date Select */}
@@ -198,31 +200,31 @@ export default function HistoryPage({ attempts = [], pagination, filters }: Hist
                                 <select
                                     value={selectedDate}
                                     onChange={handleDateChange}
-                                    className="appearance-none w-full sm:w-auto rounded-lg border border-slate-200 bg-white pl-9 pr-10 py-2 text-xs font-bold text-slate-700 transition focus:border-blue-500 focus:outline-none dark:border-slate-800 dark:bg-slate-900 dark:text-slate-355"
+                                    className="appearance-none w-full sm:w-auto rounded-lg border border-border bg-white pl-9 pr-10 py-2 text-xs font-bold text-foreground transition focus:border-blue-500 focus:outline-none dark:bg-slate-900"
                                 >
                                     <option value="30">Last 30 Days</option>
                                     <option value="7">Last 7 Days</option>
                                     <option value="all">All Time</option>
                                 </select>
-                                <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 size-3.5 text-slate-400 pointer-events-none" />
-                                <ChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 size-3.5 text-slate-400 pointer-events-none" />
+                                <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground pointer-events-none" />
+                                <ChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground pointer-events-none" />
                             </div>
                         </div>
                     </div>
                 </div>
 
                 {/* 3. ATTEMPTS TABLE CONTAINER CARD */}
-                <div className="rounded-xl border border-slate-200 bg-white shadow-3xs dark:border-slate-800 dark:bg-slate-950 overflow-hidden flex flex-col justify-between min-h-[420px]">
+                <Card className="overflow-hidden flex flex-col justify-between min-h-[420px] p-0 gap-0">
                     
                     {/* Card Header with Legend */}
-                    <div className="flex flex-col gap-3 border-b border-slate-100 p-5 sm:flex-row sm:items-center sm:justify-between dark:border-slate-900">
-                        <span className="font-heading text-sm font-extrabold text-slate-800 dark:text-slate-200">
+                    <div className="flex flex-col gap-3 border-b border-border p-5 sm:flex-row sm:items-center sm:justify-between">
+                        <span className="font-heading text-sm font-extrabold text-foreground">
                             Attempt Records
                         </span>
                         
                         {/* Legend */}
                         <div className="flex flex-wrap items-center gap-4 text-[10px] font-extrabold uppercase tracking-wider">
-                            <span className="text-slate-400/80">Legend:</span>
+                            <span className="text-muted-foreground/80">Legend:</span>
                             <div className="flex items-center gap-1.5 bg-amber-50/50 dark:bg-amber-950/10 px-2 py-1 rounded-lg border border-amber-100 dark:border-amber-900/20">
                                 <span className="flex size-5.5 items-center justify-center rounded-md border border-amber-250 bg-amber-100 text-amber-700 dark:border-amber-900/30 dark:bg-amber-950/20 dark:text-amber-400">
                                     <RotateCcw className="size-3" />
@@ -247,7 +249,7 @@ export default function HistoryPage({ attempts = [], pagination, filters }: Hist
                     <div className="overflow-x-auto">
                         <table className="w-full text-left border-collapse">
                             <thead>
-                                <tr className="border-b border-slate-100 bg-slate-50/50 dark:border-slate-900 dark:bg-slate-900/30 text-[10px] font-black uppercase tracking-wider text-slate-400">
+                                <tr className="border-b border-border bg-slate-50/50 dark:bg-slate-900/30 text-[10px] font-black uppercase tracking-wider text-muted-foreground">
                                     <th className="px-6 py-4">Date & Time</th>
                                     <th className="px-6 py-4">Track</th>
                                     <th className="px-6 py-4">Category</th>
@@ -257,7 +259,7 @@ export default function HistoryPage({ attempts = [], pagination, filters }: Hist
                                     <th className="px-6 py-4 text-right pr-8">Actions</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-slate-100 dark:divide-slate-900/80">
+                            <tbody className="divide-y divide-border dark:divide-slate-900/80">
                                 {attempts.length === 0 ? (
                                     <tr>
                                         <td colSpan={7} className="px-6 py-20 text-center">
@@ -265,8 +267,8 @@ export default function HistoryPage({ attempts = [], pagination, filters }: Hist
                                                 <div className="flex size-14 items-center justify-center rounded-full bg-blue-50 text-blue-650 dark:bg-blue-950/20 dark:text-blue-400 mb-4">
                                                     <Clock className="size-6.5" />
                                                 </div>
-                                                <h3 className="text-sm font-black text-slate-900 dark:text-white">No attempts found</h3>
-                                                <p className="mt-1.5 text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                                                <h3 className="text-sm font-black text-foreground">No attempts found</h3>
+                                                <p className="mt-1.5 text-xs text-muted-foreground leading-relaxed">
                                                     We couldn't find any completed tests or practice drills matching your current filters. Spin up a new exam simulation to start tracking!
                                                 </p>
                                                 <Link
@@ -323,10 +325,10 @@ export default function HistoryPage({ attempts = [], pagination, filters }: Hist
                                                 
                                                 {/* DATE & TIME */}
                                                 <td className="px-6 py-4.5 whitespace-nowrap">
-                                                    <div className="text-xs font-black text-slate-850 dark:text-white leading-normal">
+                                                    <div className="text-xs font-black text-foreground leading-normal">
                                                         {att.date}
                                                     </div>
-                                                    <div className="text-[10px] font-bold text-slate-400 mt-0.5 leading-none">
+                                                    <div className="text-[10px] font-bold text-muted-foreground mt-0.5 leading-none">
                                                         {att.time}
                                                     </div>
                                                 </td>
@@ -341,7 +343,7 @@ export default function HistoryPage({ attempts = [], pagination, filters }: Hist
                                                 {/* CATEGORY */}
                                                 <td className="px-6 py-4.5">
                                                     <span 
-                                                        className="text-xs font-extrabold text-slate-800 dark:text-slate-200 block max-w-[280px] whitespace-normal break-words leading-relaxed"
+                                                        className="text-xs font-extrabold text-foreground block max-w-[280px] whitespace-normal break-words leading-relaxed"
                                                         title={att.category}
                                                     >
                                                         {att.category}
@@ -367,10 +369,10 @@ export default function HistoryPage({ attempts = [], pagination, filters }: Hist
                                                                 {att.category_scores.map((cat) => (
                                                                     <span
                                                                         key={cat.name}
-                                                                        className="inline-flex items-center gap-1 rounded-md border border-slate-200 bg-slate-50 px-1.5 py-0.5 text-[9px] font-bold text-slate-600 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300"
+                                                                        className="inline-flex items-center gap-1 rounded-md border border-border bg-slate-50 px-1.5 py-0.5 text-[9px] font-bold text-muted-foreground dark:bg-slate-900"
                                                                         title={`${cat.correct}/${cat.total} correct`}
                                                                     >
-                                                                        {cat.name}: <span className="text-slate-900 dark:text-white">{cat.percentage}%</span>
+                                                                        {cat.name}: <span className="text-foreground">{cat.percentage}%</span>
                                                                     </span>
                                                                 ))}
                                                             </div>
@@ -388,7 +390,7 @@ export default function HistoryPage({ attempts = [], pagination, filters }: Hist
 
                                                 {/* DURATION */}
                                                 <td className="px-6 py-4.5 whitespace-nowrap">
-                                                    <span className="text-xs font-bold text-slate-550 dark:text-slate-400">
+                                                    <span className="text-xs font-bold text-muted-foreground">
                                                         {att.duration}
                                                     </span>
                                                 </td>
@@ -398,10 +400,10 @@ export default function HistoryPage({ attempts = [], pagination, filters }: Hist
                                                     <div className="flex items-center justify-end gap-2">
                                                         <Tooltip>
                                                             <TooltipTrigger asChild>
-                                                                <button
+                                                                 <button
                                                                     type="button"
                                                                     onClick={() => handleRetakeClick(att)}
-                                                                    className="flex size-8 items-center justify-center rounded-lg border border-amber-200 bg-amber-50 text-amber-700 hover:bg-amber-105 hover:text-amber-800 transition dark:border-amber-900/30 dark:bg-amber-950/20 dark:text-amber-400 dark:hover:bg-amber-955/40 dark:hover:text-amber-300 shadow-2xs cursor-pointer focus:outline-none"
+                                                                    className="flex size-8 items-center justify-center rounded-lg border border-amber-200 bg-amber-50 text-amber-700 hover:bg-amber-100 hover:text-amber-800 transition dark:border-amber-900/30 dark:bg-amber-950/20 dark:text-amber-400 dark:hover:bg-amber-900/30 dark:hover:text-amber-305 shadow-2xs cursor-pointer focus:outline-none"
                                                                 >
                                                                     <RotateCcw className="size-3.5" />
                                                                     <span className="sr-only">Retake Test</span>
@@ -416,7 +418,7 @@ export default function HistoryPage({ attempts = [], pagination, filters }: Hist
                                                             <TooltipTrigger asChild>
                                                                 <Link
                                                                     href={`/exams?attempt_id=${att.id}`}
-                                                                    className="flex size-8 items-center justify-center rounded-lg border border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-105 hover:text-blue-800 transition dark:border-blue-900/30 dark:bg-blue-950/20 dark:text-blue-405 dark:hover:bg-blue-955/40 dark:hover:text-blue-300 shadow-2xs cursor-pointer focus:outline-none"
+                                                                    className="flex size-8 items-center justify-center rounded-lg border border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100 hover:text-blue-800 transition dark:border-blue-900/30 dark:bg-blue-950/20 dark:text-blue-400 dark:hover:bg-blue-900/30 dark:hover:text-blue-305 shadow-2xs cursor-pointer focus:outline-none"
                                                                 >
                                                                     <BookOpen className="size-3.5" />
                                                                     <span className="sr-only">Review Answers</span>
@@ -432,7 +434,7 @@ export default function HistoryPage({ attempts = [], pagination, filters }: Hist
                                                                 <button
                                                                     type="button"
                                                                     onClick={() => handleDeleteAttempt(att.id)}
-                                                                    className="flex size-8 items-center justify-center rounded-lg border border-red-200 bg-red-50 text-red-700 hover:bg-red-105 hover:text-red-800 transition dark:border-red-900/30 dark:bg-red-950/20 dark:text-red-400 dark:hover:bg-red-955/40 dark:hover:text-red-300 shadow-2xs cursor-pointer focus:outline-none"
+                                                                    className="flex size-8 items-center justify-center rounded-lg border border-red-200 bg-red-50 text-red-700 hover:bg-red-100 hover:text-red-800 transition dark:border-red-900/30 dark:bg-red-950/20 dark:text-red-400 dark:hover:bg-red-900/30 dark:hover:text-red-305 shadow-2xs cursor-pointer focus:outline-none"
                                                                 >
                                                                     <Trash2 className="size-3.5" />
                                                                     <span className="sr-only">Delete</span>
@@ -454,13 +456,13 @@ export default function HistoryPage({ attempts = [], pagination, filters }: Hist
 
                     {/* 4. FOOTER PAGINATION CONTROL */}
                     {attempts.length > 0 && (
-                        <div className="flex flex-col sm:flex-row items-center justify-between border-t border-slate-100 bg-slate-50/20 px-6 py-4 dark:border-slate-900/60 dark:bg-slate-900/10 gap-3">
-                            <span className="text-xs font-bold text-slate-455">
-                                Showing <strong className="text-slate-900 dark:text-white">{(pagination.current_page - 1) * pagination.per_page + 1}</strong> to <strong className="text-slate-900 dark:text-white">{Math.min(pagination.current_page * pagination.per_page, pagination.total)}</strong> of <strong className="text-slate-900 dark:text-white">{pagination.total}</strong> results
+                        <div className="flex flex-col sm:flex-row items-center justify-between border-t border-border  px-6 py-4 gap-3">
+                            <span className="text-xs font-bold text-muted-foreground">
+                                Showing <strong className="text-foreground">{(pagination.current_page - 1) * pagination.per_page + 1}</strong> to <strong className="text-foreground">{Math.min(pagination.current_page * pagination.per_page, pagination.total)}</strong> of <strong className="text-foreground">{pagination.total}</strong> results
                             </span>
                             
                             <div className="flex items-center gap-1.5">
-                                {/* Previous button */}
+                                 {/* Previous button */}
                                 <button
                                     disabled={pagination.current_page === 1}
                                     onClick={() => router.get('/history', { 
@@ -469,8 +471,8 @@ export default function HistoryPage({ attempts = [], pagination, filters }: Hist
                                         date: selectedDate, 
                                         page: pagination.current_page - 1 
                                     }, { preserveState: true })}
-                                    className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-slate-700 shadow-3xs transition hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed dark:border-slate-800 dark:bg-slate-900 dark:text-slate-350 dark:hover:bg-slate-850"
-                                >
+                                    className="rounded-lg border border-border bg-white px-3 py-1.5 text-xs font-bold text-muted-foreground shadow-3xs transition hover:bg-slate-50 dark:hover:bg-slate-800 dark:hover:text-white disabled:opacity-40 disabled:cursor-not-allowed dark:bg-slate-900"
+                                  >
                                     Previous
                                 </button>
 
@@ -490,7 +492,7 @@ export default function HistoryPage({ attempts = [], pagination, filters }: Hist
                                             className={`size-8 rounded-lg text-xs font-black shadow-3xs transition focus:outline-none ${
                                                 isActive
                                                     ? 'bg-blue-600 text-white'
-                                                    : 'border border-slate-200 bg-white text-slate-750 hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-850'
+                                                    : 'border border-border bg-white text-muted-foreground hover:bg-slate-50 dark:hover:bg-slate-800 dark:hover:text-white dark:bg-slate-900'
                                             }`}
                                         >
                                             {pageNum}
@@ -507,27 +509,27 @@ export default function HistoryPage({ attempts = [], pagination, filters }: Hist
                                         date: selectedDate, 
                                         page: pagination.current_page + 1 
                                     }, { preserveState: true })}
-                                    className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-slate-700 shadow-3xs transition hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed dark:border-slate-800 dark:bg-slate-900 dark:text-slate-350 dark:hover:bg-slate-850"
+                                    className="rounded-lg border border-border bg-white px-3 py-1.5 text-xs font-bold text-muted-foreground shadow-3xs transition hover:bg-slate-50 dark:hover:bg-slate-800 dark:hover:text-white disabled:opacity-40 disabled:cursor-not-allowed dark:bg-slate-900"
                                 >
                                     Next
                                 </button>
                             </div>
                         </div>
                     )}
-                </div>
+                </Card>
 
-            </div>
+            </PageContainer>
 
             {/* Retake Options Modal */}
             {retakeTarget && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-xs transition-opacity duration-300">
-                    <div className="w-full max-w-2xl rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl dark:border-slate-800 dark:bg-slate-950 animate-in fade-in zoom-in-95 duration-200">
+                    <div className="w-full max-w-2xl rounded-2xl border border-border bg-card p-6 shadow-2xl animate-in fade-in zoom-in-95 duration-200">
                         <div className="flex items-start justify-between mb-4">
                             <div>
-                                <h3 className="font-heading text-lg font-black text-slate-900 dark:text-white">
+                                <h3 className="font-heading text-lg font-black text-foreground">
                                     Retake Exam Options
                                 </h3>
-                                <p className="text-xs font-bold text-slate-400 mt-1">
+                                <p className="text-xs font-bold text-muted-foreground mt-1">
                                     Choose how you want to retake your {retakeTarget.track} attempt.
                                 </p>
                             </div>
@@ -550,7 +552,7 @@ export default function HistoryPage({ attempts = [], pagination, filters }: Hist
                                 <span className="text-sm font-extrabold text-blue-700 dark:text-blue-400">
                                     🔄 Retake Same Questions
                                 </span>
-                                <span className="text-xs font-medium text-slate-500 leading-normal dark:text-slate-400">
+                                <span className="text-xs font-medium text-muted-foreground leading-normal">
                                     Test your memory and mastery by answering the exact same set of {retakeTarget.total} questions.
                                 </span>
                             </button>
@@ -560,12 +562,12 @@ export default function HistoryPage({ attempts = [], pagination, filters }: Hist
                                     router.visit(`/exams?retake_fresh=${retakeTarget.id}`);
                                     setRetakeTarget(null);
                                 }}
-                                className="flex flex-col gap-1.5 rounded-xl border border-slate-250 bg-white p-4 text-left hover:bg-slate-50 hover:border-slate-350 dark:border-slate-800 dark:bg-slate-950 dark:hover:bg-slate-900/60 transition"
+                                className="flex flex-col gap-1.5 rounded-xl border border-border bg-card p-4 text-left hover:bg-slate-50 hover:border-blue-300 transition"
                             >
-                                <span className="text-sm font-extrabold text-slate-800 dark:text-slate-200">
+                                <span className="text-sm font-extrabold text-foreground">
                                     ✨ Retake Fresh Questions
                                 </span>
-                                <span className="text-xs font-medium text-slate-550 leading-normal dark:text-slate-400">
+                                <span className="text-xs font-medium text-muted-foreground leading-normal">
                                     Generate a brand-new, randomized set of questions for the {retakeTarget.track} track.
                                 </span>
                             </button>
@@ -586,7 +588,7 @@ export default function HistoryPage({ attempts = [], pagination, filters }: Hist
             {confirmModal.isOpen && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4 animate-in fade-in duration-200">
                     <div 
-                        className="relative w-full max-w-2xl rounded-xl border border-slate-200 bg-white p-6 shadow-xl dark:border-slate-800 dark:bg-slate-950 animate-in zoom-in-95 duration-205"
+                        className="relative w-full max-w-2xl rounded-xl border border-border bg-card p-6 shadow-xl animate-in zoom-in-95 duration-205"
                         role="dialog"
                         aria-modal="true"
                     >
@@ -601,10 +603,10 @@ export default function HistoryPage({ attempts = [], pagination, filters }: Hist
                         </button>
 
                         <div className="flex flex-col gap-1 pr-6">
-                            <h3 className="font-heading text-lg font-bold text-slate-900 dark:text-white">
+                            <h3 className="font-heading text-lg font-bold text-foreground">
                                 {confirmModal.title}
                             </h3>
-                            <p className="mt-2.5 text-xs leading-relaxed text-slate-550 dark:text-slate-450 whitespace-pre-line">
+                            <p className="mt-2.5 text-xs leading-relaxed text-muted-foreground whitespace-pre-line">
                                 {confirmModal.message}
                             </p>
                         </div>
@@ -613,7 +615,7 @@ export default function HistoryPage({ attempts = [], pagination, filters }: Hist
                             <button
                                 type="button"
                                 onClick={() => setConfirmModal(prev => ({ ...prev, isOpen: false }))}
-                                className="cursor-pointer rounded-lg border border-slate-200 bg-white px-4.5 py-2 text-xs font-bold text-slate-655 hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-355 dark:hover:bg-slate-900 transition focus:outline-none"
+                                className="cursor-pointer rounded-lg border border-border bg-white px-4.5 py-2 text-xs font-bold text-muted-foreground hover:bg-slate-50 dark:bg-slate-900 transition focus:outline-none"
                             >
                                 Cancel
                             </button>

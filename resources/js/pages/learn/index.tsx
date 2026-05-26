@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { PageContainer } from '@/components/page-container';
+import { Card } from '@/components/ui/card';
 import { Head, Link } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { Search, BookOpen, Clock, Tag, ArrowRight, Sparkles, AlertCircle } from 'lucide-react';
@@ -54,28 +56,28 @@ export default function LearnIndex({ modules, categories }: LearnIndexProps) {
     return (
         <>
             <Head title="Learning Tutorials" />
-            <div className="flex h-full flex-1 flex-col gap-6 overflow-y-auto rounded-xl p-6 bg-slate-50/30 dark:bg-slate-900/20">
+            <PageContainer>
                 
                 {/* Header Banner */}
                 <div>
-                    <h1 className="font-heading text-3xl font-bold tracking-tight text-slate-900 md:text-4xl dark:text-white">
+                    <h1 className="font-heading text-3xl font-bold tracking-tight text-foreground md:text-4xl">
                         CSE Study Hub
                     </h1>
-                    <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
+                    <p className="mt-2 text-sm text-muted-foreground">
                         Dive deep into core subjects, learn mental shortcuts, and master exam theories with our dedicated curated study guides.
                     </p>
                 </div>
 
                 {/* Search and Category Filter Row */}
-                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between rounded-2xl border border-slate-150 bg-white p-5 shadow-2xs dark:border-slate-800 dark:bg-slate-950">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between rounded-2xl border border-border bg-card p-5 shadow-2xs">
                     <div className="relative flex-1">
-                        <Search className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-slate-400" />
+                        <Search className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
                         <input
                             type="text"
                             placeholder="Search by topic, lesson name, or syllabus keywords..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full rounded-xl border border-slate-200 bg-slate-50/35 py-2.5 pl-10 pr-4 text-xs font-medium focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-slate-800 dark:bg-slate-900/50 dark:text-white"
+                            className="w-full rounded-xl border border-border bg-slate-50/35 py-2.5 pl-10 pr-4 text-xs font-medium focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:bg-slate-900/50 text-foreground"
                         />
                     </div>
                     
@@ -85,7 +87,7 @@ export default function LearnIndex({ modules, categories }: LearnIndexProps) {
                             className={`rounded-lg px-4 py-2 text-xs font-extrabold transition cursor-pointer ${
                                 selectedCategory === 'all'
                                     ? 'bg-blue-600 text-white shadow-xs'
-                                    : 'bg-slate-50 text-slate-650 hover:bg-slate-100 dark:bg-slate-900 dark:text-slate-400 dark:hover:bg-slate-850'
+                                    : 'bg-slate-50 text-muted-foreground hover:bg-slate-100 dark:bg-slate-900 dark:hover:bg-slate-800'
                             }`}
                         >
                             All Categories
@@ -99,7 +101,7 @@ export default function LearnIndex({ modules, categories }: LearnIndexProps) {
                                     className={`rounded-lg px-4 py-2 text-xs font-extrabold transition cursor-pointer ${
                                         isSelected
                                             ? 'bg-blue-600 text-white shadow-xs'
-                                            : 'bg-slate-50 text-slate-650 hover:bg-slate-100 dark:bg-slate-900 dark:text-slate-400 dark:hover:bg-slate-850'
+                                            : 'bg-slate-50 text-muted-foreground hover:bg-slate-100 dark:bg-slate-900 dark:hover:bg-slate-800'
                                     }`}
                                 >
                                     {cat.name}
@@ -115,8 +117,8 @@ export default function LearnIndex({ modules, categories }: LearnIndexProps) {
                         {filteredModules.map(mod => {
                             const colors = categoryColors[mod.category] || {
                                 bg: 'bg-slate-50 dark:bg-slate-800/40',
-                                text: 'text-slate-655 dark:text-slate-400',
-                                border: 'border-slate-200 dark:border-slate-800',
+                                text: 'text-muted-foreground',
+                                border: 'border-border',
                                 glow: '',
                             };
 
@@ -124,36 +126,37 @@ export default function LearnIndex({ modules, categories }: LearnIndexProps) {
                                 <Link
                                     key={mod.id}
                                     href={`/learn/${mod.slug}`}
-                                    className="group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-slate-150 bg-white p-6 shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1 dark:border-slate-800 dark:bg-slate-950"
+                                    className="block group"
                                 >
-                                    <div>
+                                    <Card className="flex flex-col justify-between overflow-hidden p-6 transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-md h-full">
+                                        <div>
                                         {/* Badges row */}
                                         <div className="flex flex-wrap items-center gap-2">
                                             <span className={`rounded-full px-2.5 py-0.5 text-[9px] font-extrabold tracking-wide uppercase border ${colors.bg} ${colors.text} ${colors.border}`}>
                                                 {mod.category}
                                             </span>
-                                            <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[9px] font-bold text-slate-500 dark:bg-slate-900 dark:text-slate-400">
+                                            <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[9px] font-bold text-muted-foreground dark:bg-slate-900">
                                                 {mod.subcategory}
                                             </span>
                                         </div>
 
-                                        <h3 className="mt-5 font-heading text-lg font-bold text-slate-850 leading-snug group-hover:text-blue-600 transition dark:text-white dark:group-hover:text-blue-400">
+                                        <h3 className="mt-5 font-heading text-lg font-bold text-foreground leading-snug group-hover:text-blue-600 transition dark:group-hover:text-blue-400">
                                             {mod.title}
                                         </h3>
                                         
-                                        <div className="mt-2.5 flex items-center gap-1.5 text-[10px] font-bold text-slate-400 uppercase">
+                                        <div className="mt-2.5 flex items-center gap-1.5 text-[10px] font-bold text-muted-foreground uppercase">
                                             <Tag className="size-3" />
                                             <span>Topic: {mod.topic}</span>
                                         </div>
 
-                                        <p className="mt-3 text-xs leading-relaxed text-slate-500 line-clamp-3 dark:text-slate-400">
+                                        <p className="mt-3 text-xs leading-relaxed text-muted-foreground line-clamp-3">
                                             {mod.summary}
                                         </p>
                                     </div>
 
                                     {/* Action Footing */}
-                                    <div className="mt-6 flex items-center justify-between border-t border-slate-100 pt-4 dark:border-slate-900">
-                                        <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
+                                    <div className="mt-6 flex items-center justify-between border-t border-border pt-4">
+                                        <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                                             <Clock className="size-3.5" />
                                             <span>{mod.estimated_minutes} min read</span>
                                         </div>
@@ -163,21 +166,40 @@ export default function LearnIndex({ modules, categories }: LearnIndexProps) {
                                             <ArrowRight className="size-3.5" />
                                         </span>
                                     </div>
+                                    </Card>
                                 </Link>
                             );
                         })}
                     </div>
                 ) : (
-                    /* Empty State */
-                    <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-slate-200 bg-white py-16 dark:border-slate-800 dark:bg-slate-950">
-                        <BookOpen className="size-12 text-slate-350 dark:text-slate-650" />
-                        <h3 className="mt-4 text-sm font-black text-slate-800 dark:text-white">No learning modules found</h3>
-                        <p className="mt-1 max-w-2xl text-center text-xs text-slate-400 leading-normal">
-                            Try checking other categories or adjust your keyword search. Admins will curate more review topics shortly!
-                        </p>
-                    </div>
+                    /* Empty State / Coming Soon State */
+                    searchQuery === '' ? (
+                        <div className="relative overflow-hidden rounded-2xl border-2 border-dashed border-border bg-card/70 p-12 text-center shadow-sm transition-all duration-300 hover:border-blue-300 dark:hover:border-blue-900/50">
+                            <div className="mx-auto flex size-14 items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-900 text-muted-foreground mb-5 ring-8 ring-slate-50">
+                                <BookOpen className="size-6 text-blue-600 dark:text-blue-400" />
+                            </div>
+                            <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-3.5 py-1 text-[10px] font-extrabold tracking-wider text-amber-700 dark:bg-amber-950/40 dark:text-amber-400 uppercase mb-3.5">
+                                <span className="size-1.5 rounded-full bg-amber-500" />
+                                Curated Modules Coming Soon
+                            </span>
+                            <h3 className="font-heading text-lg font-bold text-foreground">
+                                Interactive Study Guides & Prep Sheets
+                            </h3>
+                            <p className="mx-auto mt-2 max-w-2xl text-xs leading-relaxed text-muted-foreground">
+                                We are currently designing bite-sized conceptual lessons, strategy guides, and detailed category rationales mapped perfectly to the Civil Service Commission curriculum.
+                            </p>
+                        </div>
+                    ) : (
+                        <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border bg-card py-16">
+                            <BookOpen className="size-12 text-muted-foreground" />
+                            <h3 className="mt-4 text-sm font-black text-foreground">No learning modules match your search</h3>
+                            <p className="mt-1 max-w-2xl text-center text-xs text-muted-foreground leading-normal">
+                                Try checking other categories or adjust your keyword search. Admins will curate more review topics shortly!
+                            </p>
+                        </div>
+                    )
                 )}
-            </div>
+            </PageContainer>
         </>
     );
 }

@@ -76,11 +76,11 @@ export default function Welcome() {
         <>
             <Head title="Welcome" />
 
-            <div className="bg-[#FDFDFC] text-[#1b1b18] dark:bg-[#0a0a0a]">
+            <div className="">
                 <SiteHeader activeNav={activeNav} onNavClick={setActiveNav} />
                 <main className="">
                     {/* Hero Section */}
-                    <Section id="home" className="py-10 md:py-16 lg:py-20">
+                    <Section id="home" className="py-2 md:py-8 lg:py-10">
                         <div className="grid grid-cols-1 items-center gap-12 md:grid-cols-2">
                             {/* Left Column */}
                             <div className="flex flex-col items-start gap-6">
@@ -256,11 +256,11 @@ export default function Welcome() {
 
                         <div className="relative w-full">
                             {/* Horizontal connecting line behind cards - z-0 puts it behind cards but in front of section background */}
-                            <div className="absolute top-[170px] right-[16%] left-[16%] z-0 hidden h-[2.5px] bg-primary/20 md:block dark:bg-primary/10" />
+                            <div className="absolute top-[170px] right-[16%] left-[16%] z-0 hidden h-[2.5px] bg-primary md:block " />
 
                             <div className="relative z-10 grid w-full grid-cols-1 gap-8 md:grid-cols-3">
                                 {/* Step 1 */}
-                                <Card className="relative flex flex-col items-center overflow-hidden rounded-xl border border-l-[4px] border-slate-200/80 border-l-primary bg-white p-8 text-center shadow-sm transition-all duration-300 hover:shadow-md dark:border-slate-800 dark:bg-slate-950/40">
+                                <Card className="relative flex flex-col items-center overflow-hidden rounded-xl border border-l-[4px] border-slate-200/80 border-l-primary bg-white p-8 text-center shadow-sm transition-all duration-300 hover:shadow-md bg-card">
                                     <div className="z-10 flex h-12 w-12 items-center justify-center rounded-full bg-primary text-lg font-bold text-white shadow-md">
                                         1
                                     </div>
@@ -274,7 +274,7 @@ export default function Welcome() {
                                 </Card>
 
                                 {/* Step 2 */}
-                                <Card className="relative flex flex-col items-center overflow-hidden rounded-xl border border-l-[4px] border-slate-200/80 border-l-primary bg-white p-8 text-center shadow-sm transition-all duration-300 hover:shadow-md dark:border-slate-800 dark:bg-slate-950/40">
+                                <Card className="relative flex flex-col items-center overflow-hidden rounded-xl border border-l-[4px] border-slate-200/80 border-l-primary bg-white p-8 text-center shadow-sm transition-all duration-300 hover:shadow-md bg-card">
                                     <div className="z-10 flex h-12 w-12 items-center justify-center rounded-full border-2 border-primary bg-white text-lg font-bold text-primary shadow-sm dark:bg-slate-950">
                                         2
                                     </div>
@@ -288,7 +288,7 @@ export default function Welcome() {
                                 </Card>
 
                                 {/* Step 3 */}
-                                <Card className="relative flex flex-col items-center overflow-hidden rounded-xl border border-l-[4px] border-slate-200/80 border-l-primary bg-white p-8 text-center shadow-sm transition-all duration-300 hover:shadow-md dark:border-slate-800 dark:bg-slate-950/40">
+                                <Card className="relative flex flex-col items-center overflow-hidden rounded-xl border border-l-[4px] border-slate-200/80 border-l-primary bg-white p-8 text-center shadow-sm transition-all duration-300 hover:shadow-md bg-card">
                                     <div className="z-10 flex h-12 w-12 items-center justify-center rounded-full border-2 border-primary bg-white text-lg font-bold text-primary shadow-sm dark:bg-slate-950">
                                         3
                                     </div>

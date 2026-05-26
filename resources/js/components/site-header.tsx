@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { home, dashboard, login, register } from '@/routes';
 import { Button } from '@/components/ui/button';
 import AppLogo from '@/components/app-logo';
+import { ThemeToggle } from '@/components/theme-toggle';
 import { Menu, X } from 'lucide-react';
 import type { Auth } from '@/types';
 
@@ -160,19 +161,23 @@ export default function SiteHeader({
                                 </Button>
                             </>
                         )}
+                        <ThemeToggle />
                     </div>
 
-                    <button
-                        onClick={() => setIsMenuOpen(!isMenuOpen)}
-                        className="relative z-50 flex items-center justify-center rounded-xl p-2 text-slate-600 transition-colors hover:bg-slate-100 md:hidden dark:text-slate-400 dark:hover:bg-slate-900"
-                        aria-label="Toggle Menu"
-                    >
-                        {isMenuOpen ? (
-                            <X className="h-6 w-6" />
-                        ) : (
-                            <Menu className="h-6 w-6" />
-                        )}
-                    </button>
+                    <div className="flex items-center gap-2 md:hidden">
+                        <ThemeToggle />
+                        <button
+                            onClick={() => setIsMenuOpen(!isMenuOpen)}
+                            className="relative z-50 flex items-center justify-center rounded-xl p-2 text-slate-600 transition-colors hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-900"
+                            aria-label="Toggle Menu"
+                        >
+                            {isMenuOpen ? (
+                                <X className="h-6 w-6" />
+                            ) : (
+                                <Menu className="h-6 w-6" />
+                            )}
+                        </button>
+                    </div>
                 </nav>
 
                 <div

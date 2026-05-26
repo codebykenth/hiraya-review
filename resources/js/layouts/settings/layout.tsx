@@ -46,15 +46,15 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
                     >
                         {sidebarNavItems.map((item, index) => (
                             <Button
-                                key={`${toUrl(item.href)}-${index}`}
+                                key={`${item.href ? toUrl(item.href) : index}-${index}`}
                                 size="sm"
                                 variant="ghost"
                                 asChild
                                 className={cn(
                                     'w-full justify-start transition-all duration-200',
-                                    isCurrentOrParentUrl(item.href)
-                                        ? 'bg-accent text-accent-foreground font-semibold dark:bg-neutral-800 dark:text-neutral-100'
-                                        : 'text-neutral-500 hover:bg-neutral-200/60 hover:text-black dark:text-neutral-400 dark:hover:bg-neutral-800/60',
+                                    (item.href ? isCurrentOrParentUrl(item.href) : false)
+                                        ? 'bg-blue-100/70 text-blue-700 font-bold dark:bg-blue-950/60 dark:text-blue-300 border-l-3 border-blue-600 pl-2.5 rounded-l-none'
+                                        : 'text-slate-500 hover:bg-slate-200/60 hover:text-black dark:text-slate-400 dark:hover:bg-slate-800/60 dark:hover:text-white',
                                 )}
                             >
                                 <Link href={item.href}>

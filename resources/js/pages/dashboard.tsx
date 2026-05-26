@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { PageContainer } from '@/components/page-container';
+import { Card } from '@/components/ui/card';
 import { Head, Link, usePage } from '@inertiajs/react';
 import { dashboard } from '@/routes';
 import { index as examsIndex } from '@/routes/exams';
@@ -168,7 +170,7 @@ export default function Dashboard({ stats }: DashboardProps) {
     return (
         <>
             <Head title="Dashboard" />
-            <div className="flex h-full flex-1 flex-col gap-6 overflow-y-auto rounded-xl p-6">
+            <PageContainer>
                 {/* Greeting Header & Main Action Controls */}
                 <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                     <div>
@@ -305,7 +307,7 @@ export default function Dashboard({ stats }: DashboardProps) {
                 {/* Score Trends & Category breakdown container layout */}
                 <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
                     {/* Score Trends Section */}
-                    <div className="relative rounded-xl border border-slate-200 bg-white p-6 shadow-md shadow-slate-200/50 lg:col-span-2 dark:border-slate-800 dark:bg-slate-950 dark:shadow-none">
+                    <Card className="relative p-6 lg:col-span-2">
                         <div className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                             <div className="flex flex-col gap-1">
                                 <h2 className="flex items-center gap-2 font-heading text-2xl font-black tracking-tight text-slate-950 dark:text-white">
@@ -596,6 +598,15 @@ export default function Dashboard({ stats }: DashboardProps) {
                                             {[...filteredChartData].reverse().map((run, i) => {
                                                 if (run.track === 'No Data') return null;
                                                 const isPass = run.score >= 80;
+                                                
+                                                // Consistent track pill configuration
+                                                const trackLower = run.track.toLowerCase();
+                                                const trackClass = trackLower.includes('professional exam')
+                                                    ? 'bg-blue-600 text-white dark:bg-blue-750'
+                                                    : trackLower.includes('subprofessional exam')
+                                                    ? 'bg-slate-200 text-slate-700 dark:bg-slate-800 dark:text-slate-300'
+                                                    : 'bg-emerald-600 text-white dark:bg-emerald-750';
+
                                                 return (
                                                     <tr key={i} className="hover:bg-slate-50/50 dark:hover:bg-slate-900/30">
                                                         <td className="px-4 py-4 font-black text-slate-950 dark:text-white">
@@ -605,25 +616,41 @@ export default function Dashboard({ stats }: DashboardProps) {
                                                             {run.date}
                                                         </td>
                                                         <td className="px-4 py-2.5">
-                                                            <span className="inline-flex items-center gap-1 rounded-md bg-slate-100 px-2 py-1 text-[10px] font-black text-slate-700 dark:bg-slate-800 dark:text-slate-300">
+                                                            <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-extrabold ${trackClass}`}>
                                                                 {run.track}
                                                             </span>
                                                         </td>
                                                         <td className="px-4 py-2.5">
-                                                            <div className="text-base font-black text-slate-950 dark:text-white">
-                                                                {run.score}% <span className="text-xs font-semibold text-slate-400">({run.detail.split(' ')[0]})</span>
-                                                            </div>
+                                                            {(() => {
+                                                                const scoreColorClass = run.score >= 80
+                                                                    ? 'text-emerald-650 dark:text-emerald-400'
+                                                                    : run.score >= 60
+                                                                    ? 'text-blue-600 dark:text-blue-400'
+                                                                    : 'text-rose-600 dark:text-rose-400';
+                                                                return (
+                                                                    <div className={`text-base font-black ${scoreColorClass}`}>
+                                                                        {run.score}% <span className="text-xs font-semibold text-slate-400 dark:text-slate-500">({run.detail.split(' ')[0]})</span>
+                                                                    </div>
+                                                                );
+                                                            })()}
                                                             {run.categoryScores && run.categoryScores.length > 0 && (
                                                                 <div className="mt-2 flex max-w-[24rem] flex-wrap gap-1.5">
-                                                                    {run.categoryScores.map((cat) => (
-                                                                        <span
-                                                                            key={cat.name}
-                                                                            className="inline-flex items-center gap-1 rounded-full border border-blue-100 bg-blue-50 px-2 py-1 text-[10px] font-black text-slate-700 dark:border-blue-900/40 dark:bg-blue-950/20 dark:text-slate-200"
-                                                                            title={`${cat.correct}/${cat.total} correct`}
-                                                                        >
-                                                                            {cat.name}: <span className="text-slate-900 dark:text-white">{cat.percentage}%</span>
-                                                                        </span>
-                                                                    ))}
+                                                                    {run.categoryScores.map((cat) => {
+                                                                        const catColorClass = cat.percentage >= 80
+                                                                            ? 'border-emerald-100 bg-emerald-50 text-emerald-700 dark:border-emerald-950/30 dark:bg-emerald-950/15 dark:text-emerald-400'
+                                                                            : cat.percentage >= 60
+                                                                            ? 'border-blue-100 bg-blue-50 text-blue-700 dark:border-blue-950/30 dark:bg-blue-950/15 dark:text-blue-400'
+                                                                            : 'border-rose-100 bg-rose-50 text-rose-700 dark:border-rose-950/30 dark:bg-rose-950/15 dark:text-rose-400';
+                                                                        return (
+                                                                            <span
+                                                                                key={cat.name}
+                                                                                className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[9px] font-extrabold ${catColorClass}`}
+                                                                                title={`${cat.correct}/${cat.total} correct`}
+                                                                            >
+                                                                                {cat.name}: <span className="font-black">{cat.percentage}%</span>
+                                                                            </span>
+                                                                        );
+                                                                    })}
                                                                 </div>
                                                             )}
                                                         </td>
@@ -631,7 +658,7 @@ export default function Dashboard({ stats }: DashboardProps) {
                                                             <span className={`inline-flex items-center rounded-full px-2.5 py-1 text-[9px] font-extrabold tracking-wide uppercase ${
                                                                 isPass 
                                                                     ? 'bg-emerald-50 text-emerald-700 border border-emerald-250 dark:bg-emerald-950/30 dark:text-emerald-400 dark:border-emerald-900/50'
-                                                                    : 'bg-amber-50 text-amber-700 border border-amber-250 dark:bg-amber-950/30 dark:text-amber-400 dark:border-amber-900/50'
+                                                                    : 'bg-rose-50 text-rose-700 border border-rose-250 dark:bg-rose-950/30 dark:text-rose-400 dark:border-rose-900/50'
                                                             }`}>
                                                                 {isPass ? 'Passed' : 'Failed'}
                                                             </span>
@@ -644,11 +671,11 @@ export default function Dashboard({ stats }: DashboardProps) {
                                 </div>
                             )}
                         </div>
-                    </div>
+                    </Card>
 
                     {/* Category Breakdown list */}
                     {/* Category Breakdown list */}
-                    <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-md shadow-slate-200/50 dark:border-slate-800 dark:bg-slate-950 dark:shadow-none">
+                    <Card className="relative p-6">
                         <div className="mb-5 flex items-start justify-between gap-3">
                             <div>
                                 <h2 className="font-heading text-2xl font-black tracking-tight text-slate-950 dark:text-white">
@@ -729,9 +756,9 @@ export default function Dashboard({ stats }: DashboardProps) {
                                 );
                             })}
                         </div>
-                    </div>
+                    </Card>
                 </div>
-            </div>
+            </PageContainer>
         </>
     );
 }

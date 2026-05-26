@@ -1,27 +1,10 @@
 import { Head, Link, router } from '@inertiajs/react';
 import { 
-    Search, 
-    Bell, 
-    HelpCircle, 
-    Sparkles, 
-    FileText, 
-    Target, 
-    ChevronLeft, 
-    ChevronRight, 
-    MoreVertical, 
-    Download, 
-    Database, 
-    ArrowRight,
-    PenLine,
-    FileQuestion,
-    Plus,
+    Eye, 
+    Edit2, 
     Trash2,
-    X,
-    ChevronDown,
-    Eye,
-    Edit2
+    FileQuestion
 } from 'lucide-react';
-import { useState, useEffect } from 'react';
 import { 
     index as questionsIndex, 
     create as questionsCreate,
@@ -29,11 +12,10 @@ import {
     destroy as questionsDestroy,
     show as questionsShow
 } from '@/routes/questions';
-import { ConfirmModal } from '@/components/confirm-modal';
-import { ScopeSettingsModal } from '@/components/scope-settings-modal';
-import { AdminTable, TableColumn } from '@/components/admin-table';
+import { CurationIndexShell, getCategoryStyles } from '@/components/curation-index-shell';
+import { TableColumn } from '@/components/admin-table';
+import { CategoryItem } from '@/components/drafts-review-shell';
 
-// Custom interface for question row items
 interface QuestionItem {
     id: number;
     stem: string;
@@ -42,247 +24,25 @@ interface QuestionItem {
     status: 'ACTIVE' | 'DRAFT';
 }
 
-interface CategoryItem {
-    id: number;
-    name: string;
-    slug: string;
-    is_demographic: boolean;
-    sort_order: number;
-    subcategory?: SubcategoryItem[];
-}
-
-interface SubcategoryItem {
-    id: number;
-    category_id: number;
-    name: string;
-    slug: string;
-    language: string;
-    sort_order: number;
-}
-
 interface QuestionsIndexProps {
     questions?: QuestionItem[];
     categories?: CategoryItem[];
 }
 
 export default function QuestionsIndex({ questions = [], categories = [] }: QuestionsIndexProps) {
-    const [searchTerm, setSearchTerm] = useState('');
-    const [selectedCategory, setSelectedCategory] = useState('All Categories');
-    const [selectedSubcategory, setSelectedSubcategory] = useState('All Subcategories');
-    const [selectedStatus, setSelectedStatus] = useState('All Statuses');
-
-    // Build categories tree dynamically with robust static CSC fallback
-    const cseCategoriesTree: Record<string, string[]> = {};
-    if (categories && categories.length > 0) {
-        categories.forEach(cat => {
-            cseCategoriesTree[cat.name] = (cat.subcategory || []).map(sub => sub.name);
-        });
-    } else {
-        cseCategoriesTree['General Information'] = [
-            'Philippine Constitution',
-            'Code of Conduct and Ethical Standards (R.A. 6713)',
-            'Peace and Human Rights Issues and Concepts',
-            'Environment Management and Protection'
-        ];
-        cseCategoriesTree['Verbal Ability'] = [
-            'Word meaning',
-            'Sentence completion',
-            'Error recognition',
-            'Sentence structure',
-            'Paragraph organization',
-            'Reading comprehension'
-        ];
-        cseCategoriesTree['Analytical Ability'] = [
-            'Word analogy',
-            'Symbolic logic / abstract reasoning',
-            'Identifying assumptions and drawing conclusions',
-            'Data interpretation'
-        ];
-        cseCategoriesTree['Numerical Ability'] = [
-            'Basic operations',
-            'Number sequence',
-            'Word problems'
-        ];
-        cseCategoriesTree['Clerical Ability'] = [
-            'Filing',
-            'Spelling'
-        ];
-    }
-
-    const [currentPage, setCurrentPage] = useState(1);
-    const pageSize = 10;
-
-    // Reset subcategory and current page when filters change
-    useEffect(() => {
-        setSelectedSubcategory('All Subcategories');
-        setCurrentPage(1);
-    }, [selectedCategory]);
-
-    useEffect(() => {
-        setCurrentPage(1);
-    }, [searchTerm, selectedSubcategory, selectedStatus]);
-
-    // Dynamic Syllabus Scope modal state variables
-    const [isScopeModalOpen, setIsScopeModalOpen] = useState(false);
-    const [newCategoryName, setNewCategoryName] = useState('');
-    const [selectedScopeCategory, setSelectedScopeCategory] = useState<number | null>(
-        categories && categories.length > 0 ? categories[0].id : null
-    );
-    const [newSubcategoryName, setNewSubcategoryName] = useState('');
-
-    // Custom confirm modal state
-    const [confirmModal, setConfirmModal] = useState<{
-        isOpen: boolean;
-        title: string;
-        message: string;
-        confirmLabel: string;
-        variant: 'danger' | 'success' | 'info';
-        onConfirm: () => void;
-    }>({
-        isOpen: false,
-        title: '',
-        message: '',
-        confirmLabel: '',
-        variant: 'success',
-        onConfirm: () => {},
-    });
-
-    const handleAddCategory = (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!newCategoryName.trim()) return;
-
-        router.post('/questions/categories', {
-            name: newCategoryName
-        }, {
-            preserveScroll: true,
-            onSuccess: () => {
-                setNewCategoryName('');
-            }
-        });
-    };
-
-    const handleDeleteCategory = (catId: number) => {
-        setConfirmModal({
-            isOpen: true,
-            title: 'Delete Category?',
-            message: 'Are you sure you want to delete this category? This action cannot be undone and will permanently delete all of its mapped subcategories!',
-            confirmLabel: 'Delete Category',
-            variant: 'danger',
-            onConfirm: () => {
-                router.delete(`/questions/categories/${catId}`, {
-                    preserveScroll: true,
-                    onSuccess: () => {
-                        if (selectedScopeCategory === catId) {
-                            setSelectedScopeCategory(categories.find(c => c.id !== catId)?.id || null);
-                        }
-                    }
-                });
-            }
-        });
-    };
-
-    const handleAddSubcategory = (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!selectedScopeCategory || !newSubcategoryName.trim()) return;
-
-        router.post('/questions/subcategories', {
-            category_id: selectedScopeCategory,
-            name: newSubcategoryName
-        }, {
-            preserveScroll: true,
-            onSuccess: () => {
-                setNewSubcategoryName('');
-            }
-        });
-    };
-
-    const handleDeleteSubcategory = (subId: number) => {
-        setConfirmModal({
-            isOpen: true,
-            title: 'Delete Subcategory?',
-            message: 'Are you sure you want to delete this subcategory? This action cannot be undone.',
-            confirmLabel: 'Delete Subcategory',
-            variant: 'danger',
-            onConfirm: () => {
-                router.delete(`/questions/subcategories/${subId}`, {
-                    preserveScroll: true
-                });
-            }
-        });
-    };
-
-    const handleDeleteQuestion = (qId: number) => {
-        setConfirmModal({
-            isOpen: true,
-            title: 'Delete Question?',
-            message: 'Are you sure you want to delete this question? This action cannot be undone and will permanently remove it from all database records.',
-            confirmLabel: 'Delete Question',
-            variant: 'danger',
-            onConfirm: () => {
-                router.delete(questionsDestroy(qId).url, {
-                    preserveScroll: true
-                });
-            }
-        });
-    };
-
-    const filteredQuestions = questions.filter((q) => {
-        const matchesSearch = 
-            q.stem.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            q.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            q.subcategory.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            String(q.id).includes(searchTerm);
-
-        const matchesCategory = 
-            selectedCategory === 'All Categories' || 
-            q.category === selectedCategory;
-
-        const matchesSubcategory = 
-            selectedSubcategory === 'All Subcategories' || 
-            q.subcategory === selectedSubcategory;
-
-        const matchesStatus = 
-            selectedStatus === 'All Statuses' || 
-            q.status === selectedStatus;
-
-        return matchesSearch && matchesCategory && matchesSubcategory && matchesStatus;
-    });
-
-    const totalPages = Math.ceil(filteredQuestions.length / pageSize);
-    const startIndex = (currentPage - 1) * pageSize;
-    const paginatedQuestions = filteredQuestions.slice(startIndex, startIndex + pageSize);
-
-    // Helper to render appropriate styling for categories
-    const getCategoryStyles = (category: string) => {
-        switch (category) {
-            case 'Analytical Ability':
-                return 'bg-indigo-50 text-indigo-650 border-indigo-100 dark:bg-indigo-950/20 dark:text-indigo-400 dark:border-indigo-900/30';
-            case 'Numerical Ability':
-                return 'bg-emerald-50 text-emerald-650 border-emerald-100 dark:bg-emerald-950/20 dark:text-emerald-400 dark:border-emerald-900/30';
-            case 'Verbal Ability':
-                return 'bg-blue-50 text-blue-650 border-blue-100 dark:bg-blue-950/20 dark:text-blue-400 dark:border-blue-900/30';
-            case 'Clerical Ability':
-                return 'bg-amber-50 text-amber-650 border-amber-100 dark:bg-amber-950/20 dark:text-amber-400 dark:border-amber-900/30';
-            case 'General Information':
-                return 'bg-rose-50 text-rose-650 border-rose-100 dark:bg-rose-950/20 dark:text-rose-400 dark:border-rose-900/30';
-            default:
-                return 'bg-slate-50 text-slate-650 border-slate-100 dark:bg-slate-900 dark:text-slate-400 dark:border-slate-850';
-        }
-    };
-
-    const columns: TableColumn<QuestionItem>[] = [
+    const columns = (confirmDelete: (item: QuestionItem) => void): TableColumn<QuestionItem>[] => [
         {
             header: 'Question ID',
             render: (q) => (
-                <span className="font-bold text-slate-550">#{q.id}</span>
+                <span className="font-bold text-muted-foreground">#{q.id}</span>
             )
         },
         {
             header: 'Question Details',
             render: (q) => (
                 <>
-                    <span className="block text-xs font-black text-slate-855 dark:text-white leading-snug line-clamp-1">{q.stem}</span>
-                    <span className="mt-1 block text-[10px] font-bold text-slate-400 line-clamp-1 leading-relaxed">CSE Practice Question</span>
+                    <span className="block text-xs font-black text-foreground leading-snug line-clamp-1">{q.stem}</span>
+                    <span className="mt-1 block text-[10px] font-bold text-muted-foreground line-clamp-1 leading-relaxed">CSE Practice Question</span>
                 </>
             )
         },
@@ -297,7 +57,7 @@ export default function QuestionsIndex({ questions = [], categories = [] }: Ques
         {
             header: 'Subcategory',
             render: (q) => (
-                <span className="capitalize text-slate-550 dark:text-slate-450 font-bold">{q.subcategory}</span>
+                <span className="capitalize text-foreground font-bold">{q.subcategory}</span>
             )
         },
         {
@@ -308,7 +68,7 @@ export default function QuestionsIndex({ questions = [], categories = [] }: Ques
                         Active
                     </span>
                 ) : (
-                    <span className="inline-flex items-center gap-1 rounded-md bg-blue-50 px-2 py-0.5 text-[9px] font-extrabold text-blue-600 dark:bg-blue-950/20 dark:text-blue-400 dark:border-blue-900/30 border border-blue-100 uppercase">
+                    <span className="inline-flex items-center gap-1 rounded-md bg-blue-50 px-2 py-0.5 text-[9px] font-extrabold text-blue-650 dark:bg-blue-950/20 dark:text-blue-400 dark:border-blue-900/30 border border-blue-100 uppercase">
                         Draft
                     </span>
                 )
@@ -321,22 +81,22 @@ export default function QuestionsIndex({ questions = [], categories = [] }: Ques
                 <div className="flex items-center justify-end gap-1.5">
                     <Link
                         href={questionsShow(q.id).url}
-                        className="rounded-lg p-1.5 text-slate-450 hover:bg-slate-50 hover:text-blue-600 dark:hover:bg-slate-900 transition cursor-pointer"
+                        className="rounded-lg p-1.5 text-muted-foreground hover:bg-muted hover:text-blue-600 transition cursor-pointer"
                         title="View details"
                     >
                         <Eye className="size-4" />
                     </Link>
                     <Link
                         href={questionsEdit(q.id).url}
-                        className="rounded-lg p-1.5 text-slate-455 hover:bg-slate-50 hover:text-blue-650 dark:hover:bg-slate-900 transition cursor-pointer"
+                        className="rounded-lg p-1.5 text-muted-foreground hover:bg-muted hover:text-blue-600 transition cursor-pointer"
                         title="Edit question"
                     >
                         <Edit2 className="size-4" />
                     </Link>
                     <button
                         type="button"
-                        onClick={() => handleDeleteQuestion(q.id)}
-                        className="rounded-lg p-1.5 text-slate-450 hover:bg-slate-50 hover:text-red-650 dark:hover:bg-slate-900 transition cursor-pointer"
+                        onClick={() => confirmDelete(q)}
+                        className="rounded-lg p-1.5 text-muted-foreground hover:bg-muted hover:text-red-600 transition cursor-pointer"
                         title="Delete question"
                     >
                         <Trash2 className="size-4" />
@@ -350,253 +110,47 @@ export default function QuestionsIndex({ questions = [], categories = [] }: Ques
         <>
             <Head title="Question Management" />
 
-            <div className="flex h-full flex-1 flex-col gap-6 overflow-y-auto bg-slate-50/30 p-6">
-                
-                {/* 1. TOP HEADER SECTION */}
-                {/* <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                    <div className="relative w-full max-w-md">
-                        <Search className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-slate-400" />
-                        <input
-                            type="text"
-                            placeholder="Search questions, IDs, or topics..."
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full rounded-lg border border-slate-200 bg-white py-2.5 pr-4 pl-10 text-sm placeholder-slate-400 shadow-xs outline-none transition focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-                        />
-                    </div>
-
-                    <div className="flex items-center justify-between gap-6 md:justify-end">
-                        <div className="flex items-center gap-3">
-                            <button className="relative rounded-full p-2 text-slate-500 hover:bg-slate-100 transition focus:outline-none">
-                                <span className="absolute top-2 right-2 size-2 rounded-full bg-rose-500" />
-                                <Bell className="size-5" />
-                            </button>
-                            <button className="rounded-full p-2 text-slate-500 hover:bg-slate-100 transition focus:outline-none">
-                                <HelpCircle className="size-5" />
-                            </button>
-                        </div>
-                        
-                        <h1 className="text-xl font-bold tracking-tight text-slate-900 md:text-2xl">
-                            Question Management
-                        </h1>
-                    </div>
-                </div> */}
-
-                {/* 2. CREATION ACTIONS CARDS */}
-                <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-                    {/* AI Generator Card */}
-                    <div className="relative flex overflow-hidden rounded-2xl border border-indigo-50 bg-white p-6 shadow-xs transition hover:shadow-md">
-                        {/* Sparkles background graphics */}
-                        <div className="absolute right-0 bottom-0 opacity-10">
-                            <Sparkles className="size-32 text-indigo-300" />
-                        </div>
-                        <div className="flex gap-4 items-start z-10">
-                            <div className="flex size-14 shrink-0 items-center justify-center rounded-2xl bg-indigo-50 text-indigo-600">
-                                <Sparkles className="size-7" />
-                            </div>
-                            <div className="flex flex-col gap-2">
-                                <h3 className="text-lg font-bold text-slate-950">AI Question Generator</h3>
-                                <p className="text-sm text-slate-500 leading-relaxed">
-                                    Instantly create high-quality civil service questions from source documents or topics using our tuned LLM.
-                                </p>
-                                 <Link
-                                    href={questionsCreate({ query: { type: 'ai' } }).url}
-                                    className="mt-2 w-fit rounded-lg bg-blue-600 px-4 py-2.5 text-xs font-semibold text-white shadow-xs transition hover:bg-blue-700 focus:outline-none"
-                                >
-                                    Launch Generator
-                                </Link>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Manual Entry Card */}
-                    <div className="relative flex overflow-hidden rounded-2xl border border-emerald-50 bg-white p-6 shadow-xs transition hover:shadow-md">
-                        {/* Graphical background lines */}
-                        <div className="absolute right-0 bottom-0 opacity-5">
-                            <FileText className="size-32 text-emerald-300" />
-                        </div>
-                        <div className="flex gap-4 items-start z-10">
-                            <div className="flex size-14 shrink-0 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600">
-                                <PenLine className="size-7" />
-                            </div>
-                            <div className="flex flex-col gap-2">
-                                <h3 className="text-lg font-bold text-slate-950">Manual Question Entry</h3>
-                                <p className="text-sm text-slate-500 leading-relaxed">
-                                    Precision-craft questions with custom distractors, detailed explanations, and specific syllabus mapping.
-                                </p>
-                                <Link
-                                    href={questionsCreate({ query: { type: 'manual' } }).url}
-                                    className="mt-2 w-fit rounded-lg bg-emerald-700 px-4 py-2.5 text-xs font-semibold text-white shadow-xs transition hover:bg-emerald-800 focus:outline-none"
-                                >
-                                    New Question
-                                </Link>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Syllabus Scope Card */}
-                    <div className="relative flex overflow-hidden rounded-2xl border border-blue-50 bg-white p-6 shadow-xs transition hover:shadow-md">
-                        {/* Graphical background lines */}
-                        <div className="absolute right-0 bottom-0 opacity-10">
-                            <Database className="size-32 text-blue-300" />
-                        </div>
-                        <div className="flex gap-4 items-start z-10">
-                            <div className="flex size-14 shrink-0 items-center justify-center rounded-2xl bg-blue-50 text-blue-600">
-                                <Database className="size-7" />
-                            </div>
-                            <div className="flex flex-col gap-2">
-                                <h3 className="text-lg font-bold text-slate-950">Syllabus Scope Settings</h3>
-                                <p className="text-sm text-slate-500 leading-relaxed">
-                                    Configure exam categories & subcategories dynamically to instantly update AI prompting and filtering schemas.
-                                </p>
-                                <button
-                                    type="button"
-                                    onClick={() => {
-                                        if (categories && categories.length > 0) {
-                                            setSelectedScopeCategory(categories[0].id);
-                                        }
-                                        setIsScopeModalOpen(true);
-                                    }}
-                                    className="mt-2 w-fit rounded-lg bg-blue-600 px-4 py-2.5 text-xs font-semibold text-white shadow-xs transition hover:bg-blue-700 focus:outline-none"
-                                >
-                                    Manage Scope
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                {/* 3. FILTERS & PAGINATION PANEL */}
-                <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between rounded-xl border border-slate-150 bg-white p-4 shadow-3xs">
-                    <div className="flex flex-1 items-center gap-2 w-full md:max-w-2xl">
-                        <div className="relative w-full">
-                            <Search className="absolute top-1/2 left-3 size-3.5 -translate-y-1/2 text-slate-400" />
-                            <input
-                                type="text"
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                                placeholder="Search questions (stem, ID, topic)..."
-                                className="w-full rounded-lg border border-slate-200 pl-9 pr-3 py-1.5 text-xs font-semibold text-slate-855 placeholder:text-slate-400 focus:border-blue-500 focus:outline-none transition bg-slate-50/50"
-                            />
-                        </div>
-                    </div>
-
-                    <div className="flex flex-col gap-3 w-full md:flex-row md:items-center md:w-auto md:gap-2.5">
-                        <div className="grid grid-cols-2 gap-3 w-full sm:grid-cols-3 md:flex md:w-auto md:items-center md:gap-2.5">
-                            {/* Category Filter */}
-                            <div className="relative min-w-0 md:min-w-[145px]">
-                                <select
-                                    value={selectedCategory}
-                                    onChange={(e) => setSelectedCategory(e.target.value)}
-                                    className="w-full rounded-lg border border-slate-200 bg-white pl-2.5 pr-8 py-1.5 text-xs font-bold text-slate-700 transition focus:border-blue-500 focus:outline-none appearance-none"
-                                >
-                                    <option value="All Categories">All Categories</option>
-                                    {Object.keys(cseCategoriesTree).map(cat => (
-                                        <option key={cat} value={cat}>{cat}</option>
-                                    ))}
-                                </select>
-                                <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 size-3.5 text-slate-500 pointer-events-none" />
-                            </div>
-
-                            {/* Subcategory Filter */}
-                            <div className="relative min-w-0 md:min-w-[155px]">
-                                <select
-                                    value={selectedSubcategory}
-                                    onChange={(e) => setSelectedSubcategory(e.target.value)}
-                                    className="w-full rounded-lg border border-slate-200 bg-white pl-2.5 pr-8 py-1.5 text-xs font-bold text-slate-700 transition focus:border-blue-500 focus:outline-none appearance-none"
-                                >
-                                    <option value="All Subcategories">All Subcategories</option>
-                                    {selectedCategory !== 'All Categories' && cseCategoriesTree[selectedCategory]?.map(sub => (
-                                        <option key={sub} value={sub}>{sub}</option>
-                                    ))}
-                                    {selectedCategory === 'All Categories' && Object.values(cseCategoriesTree).flat().map((sub, idx) => (
-                                        <option key={idx} value={sub}>{sub}</option>
-                                    ))}
-                                </select>
-                                <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 size-3.5 text-slate-500 pointer-events-none" />
-                            </div>
-
-                            {/* Status Filter */}
-                            <div className="relative col-span-2 sm:col-span-1 min-w-0 md:min-w-[120px]">
-                                <select
-                                    value={selectedStatus}
-                                    onChange={(e) => setSelectedStatus(e.target.value)}
-                                    className="w-full rounded-lg border border-slate-200 bg-white pl-2.5 pr-8 py-1.5 text-xs font-bold text-slate-700 transition focus:border-blue-500 focus:outline-none appearance-none"
-                                >
-                                    <option value="All Statuses">All Statuses</option>
-                                    <option value="ACTIVE">ACTIVE</option>
-                                    <option value="DRAFT">DRAFT</option>
-                                </select>
-                                <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 size-3.5 text-slate-500 pointer-events-none" />
-                            </div>
-                        </div>
-
-                        <span className="text-xs font-bold text-slate-550 shrink-0 pl-1 text-right md:text-left block mt-1 md:mt-0">
-                            {filteredQuestions.length === 0 
-                                ? 'No matches' 
-                                : `${filteredQuestions.length} question${filteredQuestions.length === 1 ? '' : 's'}`}
-                        </span>
-                    </div>
-                </div>
-
-                {/* 4. MAIN DATATABLE */}
-                <AdminTable
-                    data={paginatedQuestions}
-                    columns={columns}
-                    title="CSE Practice Questions"
-                    legend={[
-                        { icon: Eye, label: 'View Details', variant: 'slate' },
-                        { icon: Edit2, label: 'Edit Question', variant: 'blue' },
-                        { icon: Trash2, label: 'Delete Question', variant: 'rose' }
-                    ]}
-                    emptyState={{
-                        icon: FileQuestion,
-                        title: 'No Questions Found',
-                        description: "We couldn't find any questions matching your active filters. Clear filters or launch the AI Generator to create fresh ones.",
-                        action: (
-                            <Link
-                                href={questionsCreate({ query: { type: 'ai' } }).url}
-                                className="mt-5 rounded-lg bg-blue-600 px-4 py-2 text-xs font-bold text-white shadow-3xs transition hover:bg-blue-700 inline-flex items-center gap-1.5 cursor-pointer"
-                            >
-                                <Sparkles className="size-3.5" />
-                                Launch AI Generator
-                            </Link>
-                        )
-                    }}
-                    pageSize={pageSize}
-                    currentPage={currentPage}
-                    totalItems={filteredQuestions.length}
-                    onPageChange={setCurrentPage}
-                />
-
-                
-            </div>
-
-            {/* Premium Dynamic Syllabus Scope Modal */}
-            <ScopeSettingsModal
-                isOpen={isScopeModalOpen}
-                onClose={() => setIsScopeModalOpen(false)}
+            <CurationIndexShell<QuestionItem>
+                items={questions}
                 categories={categories}
-                selectedScopeCategory={selectedScopeCategory}
-                setSelectedScopeCategory={setSelectedScopeCategory}
-                newCategoryName={newCategoryName}
-                setNewCategoryName={setNewCategoryName}
-                newSubcategoryName={newSubcategoryName}
-                setNewSubcategoryName={setNewSubcategoryName}
-                handleAddCategory={handleAddCategory}
-                handleDeleteCategory={handleDeleteCategory}
-                handleAddSubcategory={handleAddSubcategory}
-                handleDeleteSubcategory={handleDeleteSubcategory}
-            />
-            {/* Custom confirmation dialog modal matching global visual standard */}
-            <ConfirmModal
-                isOpen={confirmModal.isOpen}
-                title={confirmModal.title}
-                message={confirmModal.message}
-                confirmLabel={confirmModal.confirmLabel}
-                variant={confirmModal.variant}
-                onClose={() => setConfirmModal(prev => ({ ...prev, isOpen: false }))}
-                onConfirm={confirmModal.onConfirm}
+                columns={columns}
+                searchPlaceholder="Search questions (stem, ID, topic)..."
+                searchMatcher={(q, search) =>
+                    q.stem.toLowerCase().includes(search.toLowerCase()) ||
+                    q.category.toLowerCase().includes(search.toLowerCase()) ||
+                    q.subcategory.toLowerCase().includes(search.toLowerCase()) ||
+                    String(q.id).includes(search)
+                }
+                statusMatcher={(q, status) => q.status === status}
+                aiGenerator={{
+                    title: "AI Question Generator",
+                    description: "Instantly create high-quality civil service questions from source documents or topics using our tuned LLM.",
+                    href: questionsCreate({ query: { type: 'ai' } }).url
+                }}
+                manualEntry={{
+                    title: "Manual Question Entry",
+                    description: "Precision-craft questions with custom distractors, detailed explanations, and specific syllabus mapping.",
+                    href: questionsCreate({ query: { type: 'manual' } }).url
+                }}
+                tableTitle="CSE Practice Questions"
+                tableLegend={[
+                    { icon: Eye, label: 'View Details', variant: 'slate' },
+                    { icon: Edit2, label: 'Edit Question', variant: 'blue' },
+                    { icon: Trash2, label: 'Delete Question', variant: 'rose' }
+                ]}
+                tableEmptyState={{
+                    icon: FileQuestion,
+                    title: "No Questions Found",
+                    description: "We couldn't find any questions matching your active filters. Clear filters or launch the AI Generator to create fresh ones."
+                }}
+                onDeleteConfirm={(q) => {
+                    router.delete(questionsDestroy(q.id).url, {
+                        preserveScroll: true
+                    });
+                }}
+                getDeleteTitle={() => 'Delete Question?'}
+                getDeleteMessage={() => 'Are you sure you want to delete this question? This action cannot be undone and will permanently remove it from all database records.'}
+                deleteConfirmLabel="Delete Question"
             />
         </>
     );

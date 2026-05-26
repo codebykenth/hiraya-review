@@ -1,4 +1,6 @@
 import { Head, Link, usePage } from '@inertiajs/react';
+import { PageContainer } from '@/components/page-container';
+import { Card } from '@/components/ui/card';
 import { 
     Shield, 
     FileQuestion, 
@@ -7,9 +9,7 @@ import {
     Database, 
     Layers, 
     TrendingUp,
-    Clock,
-    Activity,
-    CheckCircle2
+    Activity
 } from 'lucide-react';
 import { index as questionsIndex, drafts as questionsDrafts } from '@/routes/questions';
 
@@ -64,7 +64,7 @@ export default function AdminDashboard({ metrics, recentAttempts = [], categorie
     return (
         <>
             <Head title="Admin Dashboard" />
-            <div className="flex h-full flex-1 flex-col gap-6 overflow-y-auto rounded-xl p-6">
+            <PageContainer>
                 
                 {/* 1. WELCOME & BANNER */}
                 <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
@@ -92,7 +92,7 @@ export default function AdminDashboard({ metrics, recentAttempts = [], categorie
                         </Link>
                         <Link
                             href={questionsDrafts()}
-                            className="flex items-center justify-center gap-1.5 rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-xs font-semibold text-slate-700 shadow-xs transition hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-350 dark:hover:bg-slate-900"
+                            className="flex items-center justify-center gap-1.5 rounded-lg border border-slate-200 px-4 py-2.5 text-xs font-semibold shadow-xs transition hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-350 dark:hover:bg-slate-900"
                         >
                             <ListChecks className="size-3.5" />
                             Review Drafts
@@ -103,7 +103,7 @@ export default function AdminDashboard({ metrics, recentAttempts = [], categorie
                 {/* 2. STATS ANALYTICS GRID */}
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                     {/* STAT CARD 1: QUESTION BANK */}
-                    <div className="rounded-xl border border-slate-100 bg-white p-5 shadow-xs dark:border-slate-850 dark:bg-slate-950">
+                    <Card className="p-5 shadow-xs">
                         <div className="flex items-center justify-between">
                             <span className="text-[10px] font-extrabold tracking-wider text-slate-400 uppercase">Question Bank</span>
                             <div className="flex size-8 items-center justify-center rounded-lg bg-blue-50 text-blue-600 dark:bg-blue-950/50 dark:text-blue-400">
@@ -119,10 +119,10 @@ export default function AdminDashboard({ metrics, recentAttempts = [], categorie
                             <span className="text-slate-300 dark:text-slate-700">•</span>
                             <span className="text-blue-600 dark:text-blue-400">{metrics.draft_questions} Drafts</span>
                         </div>
-                    </div>
+                    </Card>
 
                     {/* STAT CARD 2: EXAMS COMPLETED */}
-                    <div className="rounded-xl border border-slate-100 bg-white p-5 shadow-xs dark:border-slate-850 dark:bg-slate-950">
+                    <Card className="p-5 shadow-xs">
                         <div className="flex items-center justify-between">
                             <span className="text-[10px] font-extrabold tracking-wider text-slate-400 uppercase">Total Attempts</span>
                             <div className="flex size-8 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600 dark:bg-emerald-950/50 dark:text-emerald-400">
@@ -137,10 +137,10 @@ export default function AdminDashboard({ metrics, recentAttempts = [], categorie
                             <TrendingUp className="size-3 text-emerald-600" />
                             <span className="text-emerald-600 dark:text-emerald-400 font-bold">Dynamic monitoring active</span>
                         </div>
-                    </div>
+                    </Card>
 
                     {/* STAT CARD 3: TOTAL EXAMINEES */}
-                    <div className="rounded-xl border border-slate-100 bg-white p-5 shadow-xs dark:border-slate-850 dark:bg-slate-950">
+                    <Card className="p-5 shadow-xs">
                         <div className="flex items-center justify-between">
                             <span className="text-[10px] font-extrabold tracking-wider text-slate-400 uppercase">Total Examinees</span>
                             <div className="flex size-8 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600 dark:bg-indigo-950/50 dark:text-indigo-400">
@@ -154,10 +154,10 @@ export default function AdminDashboard({ metrics, recentAttempts = [], categorie
                         <div className="mt-2.5 text-[10px] font-bold text-slate-500">
                             Examinees preparing for exam
                         </div>
-                    </div>
+                    </Card>
 
                     {/* STAT CARD 4: BLUEPRINT SCOPES */}
-                    <div className="rounded-xl border border-slate-100 bg-white p-5 shadow-xs dark:border-slate-850 dark:bg-slate-950">
+                    <Card className="p-5 shadow-xs">
                         <div className="flex items-center justify-between">
                             <span className="text-[10px] font-extrabold tracking-wider text-slate-400 uppercase">Blueprint Scopes</span>
                             <div className="flex size-8 items-center justify-center rounded-lg bg-pink-50 text-pink-600 dark:bg-pink-950/50 dark:text-pink-400">
@@ -171,14 +171,14 @@ export default function AdminDashboard({ metrics, recentAttempts = [], categorie
                         <div className="mt-2.5 flex items-center gap-2 text-[10px] font-bold text-slate-500">
                             <span>{metrics.total_subcategories} subcategories configured</span>
                         </div>
-                    </div>
+                    </Card>
                 </div>
 
                 {/* 3. SPLIT PANE ANALYSIS: ATTEMPTS & SYLLABUS DISPERSAL */}
                 <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
                     
                     {/* Left Column: Recent Examinee Attempts */}
-                    <div className="rounded-xl border border-slate-100 bg-white p-6 shadow-xs lg:col-span-2 dark:border-slate-850 dark:bg-slate-950">
+                    <Card className="p-6 shadow-xs lg:col-span-2">
                         <div className="flex items-center justify-between mb-5">
                             <div>
                                 <h2 className="text-md font-bold text-slate-900 dark:text-white">Recent Exam Attempts</h2>
@@ -192,8 +192,8 @@ export default function AdminDashboard({ metrics, recentAttempts = [], categorie
                         {recentAttempts.length === 0 ? (
                             <div className="flex flex-col items-center justify-center py-12 text-center">
                                 <Activity className="size-8 text-slate-350 dark:text-slate-750 animate-pulse mb-3" />
-                                <h3 className="text-xs font-bold text-slate-800 dark:text-slate-350">No exam attempts logged yet</h3>
-                                <p className="text-[11px] text-slate-500 mt-1 max-w-2xl leading-relaxed">Taker activity results will render dynamically here when examinees complete exams.</p>
+                                <h3 className="text-xs font-bold">No exam attempts logged yet</h3>
+                                <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 max-w-2xl leading-relaxed">Taker activity results will render dynamically here when examinees complete exams.</p>
                             </div>
                         ) : (
                             <div className="divide-y divide-slate-100 dark:divide-slate-900">
@@ -226,13 +226,13 @@ export default function AdminDashboard({ metrics, recentAttempts = [], categorie
                                 ))}
                             </div>
                         )}
-                    </div>
+                    </Card>
 
                     {/* Right Column: Syllabus Dispersal */}
-                    <div className="flex flex-col rounded-xl border border-slate-100 bg-white p-6 shadow-xs dark:border-slate-850 dark:bg-slate-950">
+                    <Card className="flex flex-col p-6 shadow-xs">
                         <div className="mb-5">
                             <h2 className="text-md font-bold text-slate-900 dark:text-white">Syllabus Scope Dispersal</h2>
-                            <p className="text-xs text-slate-500 mt-0.5">Distribution density of active review questions.</p>
+                            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Distribution density of active review questions.</p>
                         </div>
 
                         {categoriesStats.length === 0 ? (
@@ -263,9 +263,9 @@ export default function AdminDashboard({ metrics, recentAttempts = [], categorie
                                 })}
                             </div>
                         )}
-                    </div>
+                    </Card>
                 </div>
-            </div>
+            </PageContainer>
         </>
     );
 }

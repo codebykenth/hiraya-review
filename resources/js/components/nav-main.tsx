@@ -9,8 +9,7 @@ import {
     SidebarMenuItem,
     SidebarMenuSub,
     SidebarMenuSubItem,
-    SidebarMenuSubButton,
-    Sidebar
+    SidebarMenuSubButton
 } from '@/components/ui/sidebar';
 import { useCurrentUrl } from '@/hooks/use-current-url';
 import type { NavItem } from '@/types';
@@ -23,34 +22,41 @@ export function NavMain({ items = [], label = 'Platform' }: { items: NavItem[], 
     // Smart auto-expansion state: automatically expand sections where a sub-item is active
     const [openItems, setOpenItems] = useState<Record<string, boolean>>(() => {
         const initial: Record<string, boolean> = {};
-        items.forEach(item => {
+        for (const item of items) {
             if (item.items) {
                 const hasActiveChild = item.items.some(sub => isCurrentUrl(sub.href));
                 if (hasActiveChild) {
                     initial[item.title] = true;
+                    break;
                 }
             }
-        });
+        }
         return initial;
     });
 
     // Sync auto-expansion if the URL shifts externally
     useEffect(() => {
-        items.forEach(item => {
+        const next: Record<string, boolean> = {};
+        for (const item of items) {
             if (item.items) {
                 const hasActiveChild = item.items.some(sub => isCurrentUrl(sub.href));
-                if (hasActiveChild && !openItems[item.title]) {
-                    setOpenItems(prev => ({ ...prev, [item.title]: true }));
+                if (hasActiveChild) {
+                    next[item.title] = true;
+                    break;
                 }
             }
-        });
+        }
+        setOpenItems(next);
     }, [url, items]);
 
     const toggleItem = (title: string) => {
-        setOpenItems(prev => ({
-            ...prev,
-            [title]: !prev[title]
-        }));
+        setOpenItems(prev => {
+            const next: Record<string, boolean> = {};
+            if (!prev[title]) {
+                next[title] = true;
+            }
+            return next;
+        });
     };
 
     return (
