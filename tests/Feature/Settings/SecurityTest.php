@@ -102,3 +102,23 @@ test('correct password must be provided to update password', function () {
         ->assertSessionHasErrors('current_password')
         ->assertRedirect(route('security.edit'));
 });
+
+test('security page does not require password confirmation for social users', function () {
+    $this->skipUnlessFortifyHas(Features::twoFactorAuthentication());
+
+    $user = User::factory()->create([
+        'provider' => 'facebook',
+        'provider_id' => '1234567890',
+        'password' => null,
+    ]);
+
+    Features::twoFactorAuthentication([
+        'confirm' => true,
+        'confirmPassword' => true,
+    ]);
+
+    $response = $this->actingAs($user)
+        ->get(route('security.edit'));
+
+    $response->assertOk();
+});
