@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { PageContainer } from '@/components/page-container';
 import { Head, Link, router, setLayoutProps } from '@inertiajs/react';
 import { index as examsIndex } from '@/routes/exams';
@@ -118,7 +118,7 @@ const renderFormattedText = (text: string, stripLogicSymbols: boolean = false, l
             if (!paraText) return null;
 
             // Strict 1-liner comment: Regex to match standard math expressions, logic arrow chains, negation states, parenthesized variables, and single letter variables
-            const mathPattern = /(\b\d+(?:\.\d+)?%|\b\d+\/\d+\b|\[[^\]]+\]|\bProject\s+[A-Z]\b|\bQ[1-4]\b|(?:\b\d+(?:,\d{3})*(?:\.\d+)?\s*[\+\-\*\/=]\s*)+\d+(?:,\d{3})*(?:\.\d+)?%?|[~¬]?\s*\b[A-Z]\b\s*(?:->|=>)\s*[~¬]?\s*\b[A-Z]\b(?:\s*(?:->|=>)\s*[~¬]?\s*\b[A-Z]\b)*|[~¬]\s*\b[A-Z]\b|\(\s*[~¬]?\s*\b[A-Z]\b\s*\)|'\s*\b[A-Z]\b\s*'|"\s*\b[A-Z]\b\s*"|\b[B-H|J-N|P-Z]\b)/g;
+            const mathPattern = /(\b\d+(?:\.\d+)?%|\b\d+\/\d+\b|\[[^\]]+\]|\bProject\s+[A-Z]\b|\bQ[1-4]\b|(?:\b\d+(?:,\d{3})*(?:\.\d+)?\s*[+\-*/=]\s*)+\d+(?:,\d{3})*(?:\.\d+)?%?|[~¬]?\s*\b[A-Z]\b\s*(?:->|=>)\s*[~¬]?\s*\b[A-Z]\b(?:\s*(?:->|=>)\s*[~¬]?\s*\b[A-Z]\b)*|[~¬]\s*\b[A-Z]\b|\(\s*[~¬]?\s*\b[A-Z]\b\s*\)|'\s*\b[A-Z]\b\s*'|"\s*\b[A-Z]\b\s*"|\b[B-H|J-N|P-Z]\b)/g;
 
             const renderSingleVariable = (v: string) => {
                 const cleaned = v.trim();
@@ -724,8 +724,6 @@ const fallbackQuestions: Question[] = [
 export default function ExamIndex({
     questions = [],
     categories = [],
-    tracks = [],
-    exams,
     savedAttempt,
     retakeSource,
     seenQuestionIdsByTrack = { Professional: [], Subprofessional: [], Drill: [] },
@@ -772,16 +770,55 @@ export default function ExamIndex({
     const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
     const [isTimed, setIsTimed] = useState<boolean>(true);
 
-    timeLeftRef.current = timeLeft;
+    // Dynamic metrics configured to update the simulation parameters instantly
+    const getSimulationDetails = (examId: number | null) => {
+        if (examId === 1) {
+            return {
+                title: 'Professional Level Reviewer',
+                totalItems: 170,
+                scoredItems: 150,
+                timeLimit: '3h 10m',
+                timeLimitSecs: 11400,
+                targetPace: '1.1 min/item',
+                allowedCategories: ['General Information', 'Verbal Ability', 'Analytical Ability', 'Numerical Ability']
+            };
+        }
+        if (examId === 2) {
+            return {
+                title: 'Sub-Professional Level Reviewer',
+                totalItems: 165,
+                scoredItems: 145,
+                timeLimit: '2h 40m',
+                timeLimitSecs: 9600,
+                targetPace: '1.0 min/item',
+                allowedCategories: ['General Information', 'Verbal Ability', 'Clerical Ability', 'Numerical Ability']
+            };
+        }
+        // Custom Practice Drill specs
+        return {
+            title: drillCategoryName || savedAttempt?.cat_scores?.metadata?.category_name || 'Practice Drill',
+            totalItems: activeQuestions.length || 30,
+            scoredItems: activeQuestions.length || 30,
+            timeLimit: formatDuration(sessionTimeLimitSecs || 0),
+            timeLimitSecs: sessionTimeLimitSecs || 0,
+            targetPace: '1.0 min/item',
+            allowedCategories: categories.map(c => c.name)
+        };
+    };
+
+    const details = getSimulationDetails(selectedExamId);
+    const isDrillSession = selectedExamId === null || selectedExamId > 2 || savedAttempt?.cat_scores?.metadata?.track === 'Drill' || drillCategoryName !== null;
+
+    useEffect(() => {
+        timeLeftRef.current = timeLeft;
+    }, [timeLeft]);
 
     // Result review states
     const [isExamSubmitted, setIsExamSubmitted] = useState(false);
     const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
-    const [showDetailedReview, setShowDetailedReview] = useState(false);
     const [reviewScreenActive, setReviewScreenActive] = useState(false);
     const [reviewStatusFilter, setReviewStatusFilter] = useState<'all' | 'correct' | 'incorrect'>('all');
-    const [reviewCategoryFilter, setReviewCategoryFilter] = useState('All Categories');
-    const [visibleReviewCount, setVisibleReviewCount] = useState(5);
+    const [reviewCategoryFilter, _setReviewCategoryFilter] = useState('All Categories');
 
     // Sync currentIdx with review filters dynamically
     useEffect(() => {
@@ -807,10 +844,12 @@ export default function ExamIndex({
                 return true;
             });
             if (firstMatchIdx !== -1) {
-                setCurrentIdx(firstMatchIdx);
+                setTimeout(() => {
+                    setCurrentIdx(firstMatchIdx);
+                }, 0);
             }
         }
-    }, [reviewCategoryFilter, reviewStatusFilter, reviewScreenActive]);
+    }, [reviewCategoryFilter, reviewStatusFilter, reviewScreenActive, activeQuestions, currentIdx, answers]);
 
     const [showRetakeModal, setShowRetakeModal] = useState(false);
     const [submittedByTimer, setSubmittedByTimer] = useState(false);
@@ -856,9 +895,6 @@ export default function ExamIndex({
                 }).filter(Boolean) as Question[];
             }
 
-            setActiveQuestions(loadedQuestions);
-            setAnswers(savedAttempt.answers);
-
             const catScores = savedAttempt.cat_scores ?? {};
             const meta = catScores.metadata ?? {};
             const correctCount = meta.correct_count || 0;
@@ -867,24 +903,10 @@ export default function ExamIndex({
             const wrongCount = total - correctCount - (meta.skipped_count || 0);
 
             const isTimedSaved = meta.is_timed !== false;
-            setIsTimed(isTimedSaved);
             const isSubprofessional = meta.track === 'Subprofessional';
             const limitSecs = isTimedSaved ? (isSubprofessional ? 9000 : 11400) : 0;
             const storedDuration = Number(meta.duration_secs ?? catScores.duration_secs ?? 0);
             const elapsedSecs = isTimedSaved ? Math.min(limitSecs, Math.max(0, storedDuration)) : storedDuration;
-
-            if (meta.track === 'Drill') {
-                setSelectedExamId(null as any);
-                setDrillCategoryId(savedAttempt.category_id);
-                setDrillCategoryName(meta.category_name || 'Practice Drill');
-                setDrillSubcategories(meta.selected_subcategories || []);
-                setDrillLanguage(meta.language || 'English');
-                setDrillQuestionCount(meta.question_count || loadedQuestions.length);
-            } else {
-                setSelectedExamId(isSubprofessional ? 2 : 1);
-            }
-            setSessionTimeLimitSecs(isTimedSaved ? limitSecs : 0);
-            setTimeLeft(isTimedSaved ? Math.max(0, limitSecs - elapsedSecs) : elapsedSecs);
 
             // Reconstruct a precise categoryScoreMap directly from loadedQuestions and savedAttempt.answers
             // to ensure subcategory breakdowns are ALWAYS fully populated and accurate, even for legacy or drill attempts!
@@ -927,26 +949,43 @@ export default function ExamIndex({
                 finalCatMap = computedCatMap;
             }
 
-            setResults({
-                score: correctCount,
-                total,
-                percentage,
-                correctCount,
-                wrongCount,
-                skippedCount: meta.skipped_count || 0,
-                categoryScoreMap: finalCatMap,
-                elapsedSecs,
-            });
+            setTimeout(() => {
+                setActiveQuestions(loadedQuestions);
+                setAnswers(savedAttempt.answers);
+                setIsTimed(isTimedSaved);
+                if (meta.track === 'Drill') {
+                    setSelectedExamId(null as any);
+                    setDrillCategoryId(savedAttempt.category_id);
+                    setDrillCategoryName(meta.category_name || 'Practice Drill');
+                    setDrillSubcategories(meta.selected_subcategories || []);
+                    setDrillLanguage(meta.language || 'English');
+                    setDrillQuestionCount(meta.question_count || loadedQuestions.length);
+                } else {
+                    setSelectedExamId(isSubprofessional ? 2 : 1);
+                }
+                setSessionTimeLimitSecs(isTimedSaved ? limitSecs : 0);
+                setTimeLeft(isTimedSaved ? Math.max(0, limitSecs - elapsedSecs) : elapsedSecs);
 
-            setIsExamSubmitted(true);
-            setIsExamActive(false);
+                setResults({
+                    score: correctCount,
+                    total,
+                    percentage,
+                    correctCount,
+                    wrongCount,
+                    skippedCount: meta.skipped_count || 0,
+                    categoryScoreMap: finalCatMap,
+                    elapsedSecs,
+                });
 
-            // Activate review immediately if review=true is set in search query params
-            const params = new URLSearchParams(window.location.search);
-            if (params.get('review') === 'true') {
-                setReviewScreenActive(true);
-                setVisibleReviewCount(5);
-            }
+                setIsExamSubmitted(true);
+                setIsExamActive(false);
+
+                // Activate review immediately if review=true is set in search query params
+                const params = new URLSearchParams(window.location.search);
+                if (params.get('review') === 'true') {
+                    setReviewScreenActive(true);
+                }
+            }, 0);
         }
     }, [savedAttempt, questions]);
 
@@ -1013,46 +1052,9 @@ export default function ExamIndex({
                 });
             }, 0);
         }
-    }, [isExamSubmitted, results, reviewScreenActive, savedAttempt]);
+    }, [isExamSubmitted, results, reviewScreenActive, savedAttempt, isDrillSession, drillCategoryName, lastStoredAttemptId]);
 
-    // Dynamic metrics configured to update the simulation parameters instantly
-    const getSimulationDetails = (examId: number | null) => {
-        if (examId === 1) {
-            return {
-                title: 'Professional Level Reviewer',
-                totalItems: 170,
-                scoredItems: 150,
-                timeLimit: '3h 10m',
-                timeLimitSecs: 11400,
-                targetPace: '1.1 min/item',
-                allowedCategories: ['General Information', 'Verbal Ability', 'Analytical Ability', 'Numerical Ability']
-            };
-        }
-        if (examId === 2) {
-            return {
-                title: 'Sub-Professional Level Reviewer',
-                totalItems: 165,
-                scoredItems: 145,
-                timeLimit: '2h 40m',
-                timeLimitSecs: 9600,
-                targetPace: '1.0 min/item',
-                allowedCategories: ['General Information', 'Verbal Ability', 'Clerical Ability', 'Numerical Ability']
-            };
-        }
-        // Custom Practice Drill specs
-        return {
-            title: drillCategoryName || savedAttempt?.cat_scores?.metadata?.category_name || 'Practice Drill',
-            totalItems: activeQuestions.length || 30,
-            scoredItems: activeQuestions.length || 30,
-            timeLimit: formatDuration(sessionTimeLimitSecs || 0),
-            timeLimitSecs: sessionTimeLimitSecs || 0,
-            targetPace: '1.0 min/item',
-            allowedCategories: categories.map(c => c.name)
-        };
-    };
 
-    const details = getSimulationDetails(selectedExamId);
-    const isDrillSession = selectedExamId === null || selectedExamId > 2 || savedAttempt?.cat_scores?.metadata?.track === 'Drill' || drillCategoryName !== null;
 
     const getActiveTimeLimitSecs = () =>
         isTimed ? (sessionTimeLimitSecs || details.timeLimitSecs) : 0;
@@ -1076,24 +1078,10 @@ export default function ExamIndex({
         return Math.max(0, limit - getResultsElapsedSecs());
     };
 
-    const resolveQuestionPool = (examId: number | null, excludeIds: number[] = []) => {
-        const specs = getSimulationDetails(examId);
-        let sourcePool = questions.length > 0 ? questions : fallbackQuestions;
-        let filtered = sourcePool.filter(q =>
-            specs.allowedCategories.includes(q.category) && !excludeIds.includes(q.id)
-        );
-        if (filtered.length === 0) {
-            filtered = fallbackQuestions.filter(q =>
-                specs.allowedCategories.includes(q.category) && !excludeIds.includes(q.id)
-            );
-        }
-        return { specs, filtered };
-    };
-
     const getTrackNameForExam = (examId: number | null) =>
         examId === 2 ? 'Subprofessional' : 'Professional';
 
-    const getSeenIdsForExam = (examId: number | null) => {
+    const getSeenIdsForExam = useCallback((examId: number | null) => {
         const track = getTrackNameForExam(examId);
         const fromServer = seenQuestionIdsByTrack[track as keyof typeof seenQuestionIdsByTrack] ?? [];
         const fromCurrentSession =
@@ -1101,11 +1089,9 @@ export default function ExamIndex({
                 ? activeQuestions.map(q => q.id)
                 : [];
         return [...new Set([...fromServer, ...fromCurrentSession])];
-    };
+    }, [seenQuestionIdsByTrack, selectedExamId, activeQuestions]);
 
-    const buildFreshExamPool = (examId: number | null) => {
-        const specs = getSimulationDetails(examId);
-
+    const buildFreshExamPool = useCallback((examId: number | null) => {
         // 1. Gather all source questions
         let sourcePool = questions.length > 0 ? questions : fallbackQuestions;
 
@@ -1177,9 +1163,9 @@ export default function ExamIndex({
         const finalPool = [...shuffledDemographics, ...scoredPool];
 
         return finalPool.map(shuffleOptionsForQuestion);
-    };
+    }, [questions, getSeenIdsForExam]);
 
-    const buildSameExamPool = (questionIds: number[]) => {
+    const buildSameExamPool = useCallback((questionIds: number[]) => {
         let sourcePool = [...questions, ...demographicQuestions];
         if (questions.length === 0) {
             sourcePool = [...fallbackQuestions, ...demographicQuestions];
@@ -1193,9 +1179,9 @@ export default function ExamIndex({
             .map(id => sourcePool.find(q => q.id === id) || [...fallbackQuestions, ...demographicQuestions].find(q => q.id === id))
             .filter((q): q is Question => Boolean(q))
             .map(shuffleOptionsForQuestion);
-    };
+    }, [questions]);
 
-    const beginExamSession = (examPool: Question[], examId: number | null) => {
+    const beginExamSession = useCallback((examPool: Question[], examId: number | null) => {
         const specs = getSimulationDetails(examId);
         const isDrill = examId === null || examId > 2;
 
@@ -1215,11 +1201,10 @@ export default function ExamIndex({
         setIsExamActive(true);
         setIsExamSubmitted(false);
         setReviewScreenActive(false);
-        setShowDetailedReview(false);
         setResults(null);
         setSubmittedByTimer(false);
         setShowRetakeModal(false);
-    };
+    }, []);
 
     const getRetakeContext = () => {
         if (pendingRetake) return pendingRetake;
@@ -1309,13 +1294,14 @@ export default function ExamIndex({
 
         if (startType && !savedAttempt) {
             const examId = startType === 'subprofessional' ? 2 : 1;
-            setSelectedExamId(examId);
-
             const url = new URL(window.location.href);
             url.searchParams.delete('start');
             window.history.replaceState({}, '', url.toString());
 
-            beginExamSession(buildFreshExamPool(examId), examId);
+            setTimeout(() => {
+                setSelectedExamId(examId);
+                beginExamSession(buildFreshExamPool(examId), examId);
+            }, 0);
         } else if (isDrillStart && !savedAttempt) {
             const catName = params.get('category_name') || 'General Information';
             const catId = params.get('category_id') ? Number(params.get('category_id')) : null;
@@ -1327,14 +1313,10 @@ export default function ExamIndex({
             if (subcatsStr) {
                 try {
                     subcats = JSON.parse(subcatsStr);
-                } catch (e) { }
+                } catch {
+                    /* ignore parsing errors */
+                }
             }
-
-            setDrillCategoryId(catId);
-            setDrillCategoryName(`${catName} Practice`);
-            setDrillSubcategories(subcats);
-            setDrillLanguage(lang);
-            setDrillQuestionCount(qCountParam === 'all' ? 'all' : Number(qCountParam));
 
             // Clean query params from URL
             const url = new URL(window.location.href);
@@ -1377,26 +1359,31 @@ export default function ExamIndex({
 
             const limitSecs = isTimedParam ? finalPool.length * 60 : 0;
 
-            // Trigger drill session
-            setSelectedExamId(null as any);
-            setIsTimed(isTimedParam);
-            setActiveQuestions(finalPool);
-            setCurrentIdx(0);
-            setAnswers({});
-            setFlagged({});
-            setSelectedPaletteCategory('All Categories');
-            setSessionTimeLimitSecs(limitSecs);
-            setTimeLeft(isTimedParam ? limitSecs : 0);
-            timeLeftRef.current = isTimedParam ? limitSecs : 0;
-            setIsExamActive(true);
-            setIsExamSubmitted(false);
-            setReviewScreenActive(false);
-            setShowDetailedReview(false);
-            setResults(null);
-            setSubmittedByTimer(false);
-            setShowRetakeModal(false);
-
             setTimeout(() => {
+                setDrillCategoryId(catId);
+                setDrillCategoryName(`${catName} Practice`);
+                setDrillSubcategories(subcats);
+                setDrillLanguage(lang);
+                setDrillQuestionCount(qCountParam === 'all' ? 'all' : Number(qCountParam));
+
+                // Trigger drill session
+                setSelectedExamId(null as any);
+                setIsTimed(isTimedParam);
+                setActiveQuestions(finalPool);
+                setCurrentIdx(0);
+                setAnswers({});
+                setFlagged({});
+                setSelectedPaletteCategory('All Categories');
+                setSessionTimeLimitSecs(limitSecs);
+                setTimeLeft(isTimedParam ? limitSecs : 0);
+                timeLeftRef.current = isTimedParam ? limitSecs : 0;
+                setIsExamActive(true);
+                setIsExamSubmitted(false);
+                setReviewScreenActive(false);
+                setResults(null);
+                setSubmittedByTimer(false);
+                setShowRetakeModal(false);
+
                 setLayoutProps({
                     breadcrumbs: [
                         { title: 'Practice', href: '/drills' },
@@ -1405,7 +1392,7 @@ export default function ExamIndex({
                 });
             }, 0);
         }
-    }, [questions, savedAttempt]);
+    }, [questions, savedAttempt, beginExamSession, buildFreshExamPool]);
 
     // Auto-start retake when choice was made on the history page
     useEffect(() => {
@@ -1414,35 +1401,37 @@ export default function ExamIndex({
         const isDrill = retakeSource.track === 'Drill';
         const examId = isDrill ? null : (retakeSource.track === 'Subprofessional' ? 2 : 1);
 
-        setPendingRetake({
-            attemptId: retakeSource.attempt_id,
-            questionIds: retakeSource.question_ids,
-            examId,
-        });
+        setTimeout(() => {
+            setPendingRetake({
+                attemptId: retakeSource.attempt_id,
+                questionIds: retakeSource.question_ids,
+                examId,
+            });
 
-        if (retakeSource.mode === 'same') {
-            beginExamSession(buildSameExamPool(retakeSource.question_ids), examId);
-        } else {
-            if (isDrill) {
-                // Strict 1-liner comment: Resolve original category from retake pool to draw a fresh randomized sample
-                const oldQuestions = retakeSource.question_ids.map(id => questions.find(q => q.id === id) || fallbackQuestions.find(q => q.id === id)).filter((q): q is Question => Boolean(q));
-                const catName = oldQuestions[0]?.category || 'General Information';
-                let sourcePool = questions.length > 0 ? questions : fallbackQuestions;
-                let pool = sourcePool.filter(q => q.category === catName);
-                const shuffled = [...pool].sort(() => Math.random() - 0.5);
-                const countLimit = retakeSource.question_ids.length;
-                const freshPool = shuffled.slice(0, countLimit).map(shuffleOptionsForQuestion);
-                beginExamSession(freshPool, null);
+            if (retakeSource.mode === 'same') {
+                beginExamSession(buildSameExamPool(retakeSource.question_ids), examId);
             } else {
-                beginExamSession(buildFreshExamPool(examId), examId);
+                if (isDrill) {
+                    // Strict 1-liner comment: Resolve original category from retake pool to draw a fresh randomized sample
+                    const oldQuestions = retakeSource.question_ids.map(id => questions.find(q => q.id === id) || fallbackQuestions.find(q => q.id === id)).filter((q): q is Question => Boolean(q));
+                    const catName = oldQuestions[0]?.category || 'General Information';
+                    let sourcePool = questions.length > 0 ? questions : fallbackQuestions;
+                    let pool = sourcePool.filter(q => q.category === catName);
+                    const shuffled = [...pool].sort(() => Math.random() - 0.5);
+                    const countLimit = retakeSource.question_ids.length;
+                    const freshPool = shuffled.slice(0, countLimit).map(shuffleOptionsForQuestion);
+                    beginExamSession(freshPool, null);
+                } else {
+                    beginExamSession(buildFreshExamPool(examId), examId);
+                }
             }
-        }
+        }, 0);
 
         const url = new URL(window.location.href);
         url.searchParams.delete('retake_same');
         url.searchParams.delete('retake_fresh');
         window.history.replaceState({}, '', url.toString());
-    }, [retakeSource, savedAttempt, questions]);
+    }, [retakeSource, savedAttempt, questions, beginExamSession, buildSameExamPool, buildFreshExamPool]);
 
     const handleSubmitExamRef = useRef<(auto?: boolean) => void>(() => { });
 
@@ -1661,7 +1650,9 @@ export default function ExamIndex({
             });
     };
 
-    handleSubmitExamRef.current = handleSubmitExam;
+    useEffect(() => {
+        handleSubmitExamRef.current = handleSubmitExam;
+    }, [handleSubmitExam]);
 
     // Exit back to config
     const handleExitExam = () => {
@@ -2204,28 +2195,8 @@ export default function ExamIndex({
     // Render the Post-Exam review scorecard view
     if (isExamSubmitted && results) {
         if (reviewScreenActive) {
-            // Filter questions by selected filters
-            const filteredQuestions = activeQuestions.map((q, idx) => ({ q, originalIdx: idx })).filter(({ q, originalIdx }) => {
-                const chosen = answers[originalIdx];
-                const isCorrect = chosen === q.correct_option;
-
-                // Filter by category selection
-                if (reviewCategoryFilter !== 'All Categories' && q.category !== reviewCategoryFilter) return false;
-
-                // Filter by performance state
-                if (reviewStatusFilter === 'correct') {
-                    return isCorrect;
-                } else if (reviewStatusFilter === 'incorrect') {
-                    return !isCorrect;
-                }
-
-                return true;
-            });
-
             const currentQuestion = activeQuestions[currentIdx];
             const chosenOption = answers[currentIdx];
-            const isCurrentCorrect = chosenOption === currentQuestion?.correct_option;
-            const currentLetter = chosenOption !== undefined ? String.fromCharCode(65 + chosenOption) : 'Skipped';
 
             return (
                 <>
@@ -2494,7 +2465,9 @@ export default function ExamIndex({
                                                 day: 'numeric',
                                                 year: 'numeric'
                                             })}`;
-                                        } catch (e) { }
+                                        } catch {
+                                            /* ignore invalid date string format */
+                                        }
                                     }
                                     return `Completed on ${new Date().toLocaleDateString('en-US', {
                                         month: 'long',
@@ -2508,7 +2481,6 @@ export default function ExamIndex({
                             <button
                                 onClick={() => {
                                     setReviewScreenActive(true);
-                                    setVisibleReviewCount(5);
                                 }}
                                 className="cursor-pointer flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-xs font-bold shadow-3xs transition hover:bg-slate-55/60 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-300 focus:outline-none"
                             >
@@ -2567,9 +2539,8 @@ export default function ExamIndex({
 
                     {/* Executive Radial Gauge + Elapsed stats + AI advice widgets grid */}
                     {(() => {
-                        const totalLimitSecs = getActiveTimeLimitSecs();
-                        const elapsedSecs = getResultsElapsedSecs();
-                        const remainingSecs = getResultsRemainingSecs();
+                        const elapsedSecs = results.elapsedSecs ?? 0;
+                        const remainingSecs = isTimed ? Math.max(0, getActiveTimeLimitSecs() - elapsedSecs) : 0;
                         const elapsedText = formatDuration(elapsedSecs);
                         const underLimitText =
                             remainingSecs > 0

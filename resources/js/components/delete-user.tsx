@@ -17,7 +17,6 @@ import {
 import { Label } from '@/components/ui/label';
 
 export default function DeleteUser() {
-    const { auth } = usePage<any>().props;
     const [confirmation, setConfirmation] = useState('');
 
     return (

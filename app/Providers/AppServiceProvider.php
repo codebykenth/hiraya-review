@@ -63,7 +63,7 @@ class AppServiceProvider extends ServiceProvider
         });
 
         RateLimiter::for('support-submission', function (Request $request) {
-            if (!app()->isProduction()) {
+            if (!app()->isProduction() && !app()->environment('testing')) {
                 return Limit::none();
             }
 

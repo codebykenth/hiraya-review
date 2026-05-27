@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Head, useForm, router } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 import { 
     index as adminLearnIndex,
     drafts as adminLearnDrafts,
@@ -42,7 +42,9 @@ export default function DraftsLearnList({ initialDrafts = [], categories = [] }:
 
     // Sync local state when Inertia refreshes initialDrafts from backend
     useEffect(() => {
-        setDraftModules(initialDrafts);
+        setTimeout(() => {
+            setDraftModules(initialDrafts);
+        }, 0);
     }, [initialDrafts]);
 
     // Actions
@@ -84,7 +86,10 @@ export default function DraftsLearnList({ initialDrafts = [], categories = [] }:
         const approvedModules = draftModules.filter(m => m.approved);
         if (approvedModules.length === 0) return;
 
-        const modulesToSave = approvedModules.map(({ isEditing, approved, ...rest }) => rest);
+        const modulesToSave = approvedModules.map(m => {
+            const { isEditing, approved, ...rest } = m;
+            return rest;
+        });
 
         router.post(adminLearnStore().url, {
             modules: modulesToSave,

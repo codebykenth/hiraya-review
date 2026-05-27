@@ -1,10 +1,9 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { PageContainer } from '@/components/page-container';
 import { PageHeader } from '@/components/page-header';
 import { Card } from '@/components/ui/card';
 import { Head, Link } from '@inertiajs/react';
-import AppLayout from '@/layouts/app-layout';
-import { Search, BookOpen, Clock, Tag, ArrowRight, Sparkles, AlertCircle } from 'lucide-react';
+import { Search, BookOpen, Clock, Tag, ArrowRight } from 'lucide-react';
 
 interface LearnModule {
     id: number;

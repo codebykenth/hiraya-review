@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { PageContainer } from '@/components/page-container';
 import { PageHeader } from '@/components/page-header';
 import { Card } from '@/components/ui/card';
@@ -126,7 +126,7 @@ export default function Drills({ questions = [], categories = [] }: DrillsProps)
     // ----------------------------------------------------
     // Configuration Actions
     // ----------------------------------------------------
-    const handleCategoryClick = (
+    const handleCategoryClick = useCallback((
         catName: string, 
         totalParam?: string | null,
         langParam?: string | null,
@@ -178,7 +178,7 @@ export default function Drills({ questions = [], categories = [] }: DrillsProps)
         setLanguage(targetLanguage);
         setIsTimed(targetTimed);
         setViewState('config');
-    };
+    }, [categories]);
 
     // Strict 1-liner comment: Safely cap selected question count if category filters reduce available pool
     useEffect(() => {
@@ -236,7 +236,7 @@ export default function Drills({ questions = [], categories = [] }: DrillsProps)
                 return () => clearTimeout(timer);
             }
         }
-    }, [categories]);
+    }, [categories, handleCategoryClick]);
 
     const toggleSubcat = (subcatName: string) => {
         if (isRetakeConfig) return;

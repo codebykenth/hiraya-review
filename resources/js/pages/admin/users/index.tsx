@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { PageContainer } from '@/components/page-container';
-import { Head, Link, router, usePage } from '@inertiajs/react';
+import { Head, router, usePage } from '@inertiajs/react';
 import { 
     Search, 
     Shield, 
@@ -12,9 +12,7 @@ import {
     ChevronDown
 } from 'lucide-react';
 import { 
-    index as adminUsersIndex,
-    update as adminUsersUpdate,
-    destroy as adminUsersDestroy
+    index as adminUsersIndex
 } from '@/routes/admin/users';
 import { ConfirmModal } from '@/components/confirm-modal';
 import { AdminTable, TableColumn } from '@/components/admin-table';
@@ -146,7 +144,6 @@ export default function AdminUsersIndex({ users = [], stats }: AdminUsersIndexPr
         return matchesSearch && matchesRole;
     });
 
-    const totalPages = Math.ceil(filteredUsers.length / pageSize);
     const startIndex = (currentPage - 1) * pageSize;
     const paginatedUsers = filteredUsers.slice(startIndex, startIndex + pageSize);
 
