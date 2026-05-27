@@ -257,7 +257,7 @@ export default function CreateQuestion({ type = 'ai', categories = [] }: CreateP
 
                         {errorMsg && (
                             <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-xs font-semibold text-red-800 flex items-start gap-2.5">
-                                <AlertCircle className="size-4 text-red-655 shrink-0 mt-0.5" />
+                                <AlertCircle className="size-4 text-red-600 shrink-0 mt-0.5" />
                                 <span>{errorMsg}</span>
                             </div>
                         )}
@@ -365,7 +365,7 @@ export default function CreateQuestion({ type = 'ai', categories = [] }: CreateP
                             required
                         />
                         {errors.stem && (
-                            <p className="inline-flex items-center gap-1 text-xs font-semibold text-red-655 mt-1">
+                            <p className="inline-flex items-center gap-1 text-xs font-semibold text-red-600 mt-1">
                                 <AlertCircle className="size-3.5" />
                                 {errors.stem}
                             </p>
@@ -446,7 +446,7 @@ export default function CreateQuestion({ type = 'ai', categories = [] }: CreateP
                             required
                         />
                         {errors.explanation && (
-                            <p className="inline-flex items-center gap-1 text-xs font-semibold text-red-655 mt-1">
+                            <p className="inline-flex items-center gap-1 text-xs font-semibold text-red-600 mt-1">
                                 <AlertCircle className="size-3.5" />
                                 {errors.explanation}
                             </p>

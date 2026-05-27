@@ -1,4 +1,4 @@
-import { Form } from '@inertiajs/react';
+import { Form, usePage } from '@inertiajs/react';
 import { useRef } from 'react';
 import ProfileController from '@/actions/App/Http/Controllers/Settings/ProfileController';
 import Heading from '@/components/heading';
@@ -17,6 +17,8 @@ import {
 import { Label } from '@/components/ui/label';
 
 export default function DeleteUser() {
+    const { auth } = usePage<any>().props;
+    const isSocialUser = !!auth.user?.provider;
     const passwordInput = useRef<HTMLInputElement>(null);
 
     return (
@@ -48,10 +50,20 @@ export default function DeleteUser() {
                             Are you sure you want to delete your account?
                         </DialogTitle>
                         <DialogDescription>
-                            Once your account is deleted, all of its resources
-                            and data will also be permanently deleted. Please
-                            enter your password to confirm you would like to
-                            permanently delete your account.
+                            {isSocialUser ? (
+                                <>
+                                    Once your account is deleted, all of its resources
+                                    and data will also be permanently deleted. Please
+                                    confirm you would like to permanently delete your account.
+                                </>
+                            ) : (
+                                <>
+                                    Once your account is deleted, all of its resources
+                                    and data will also be permanently deleted. Please
+                                    enter your password to confirm you would like to
+                                    permanently delete your account.
+                                </>
+                            )}
                         </DialogDescription>
 
                         <Form
@@ -66,29 +78,31 @@ export default function DeleteUser() {
                         >
                             {({ resetAndClearErrors, processing, errors }) => (
                                 <>
-                                    <div className="grid gap-2">
-                                        <Label
-                                            htmlFor="password"
-                                            className="sr-only"
-                                        >
-                                            Password
-                                        </Label>
+                                    {!isSocialUser && (
+                                        <div className="grid gap-2">
+                                            <Label
+                                                htmlFor="password"
+                                                className="sr-only"
+                                            >
+                                                Password
+                                            </Label>
 
-                                        <PasswordInput
-                                            id="password"
-                                            name="password"
-                                            ref={passwordInput}
-                                            placeholder="Password"
-                                            autoComplete="current-password"
-                                        />
+                                            <PasswordInput
+                                                id="password"
+                                                name="password"
+                                                ref={passwordInput}
+                                                placeholder="Password"
+                                                autoComplete="current-password"
+                                            />
 
-                                        <InputError message={errors.password} />
-                                    </div>
+                                            <InputError message={errors.password} />
+                                        </div>
+                                    )}
 
                                     <DialogFooter className="gap-2">
                                         <DialogClose asChild>
                                             <Button
-                                                variant="secondary"
+                                                variant="outline"
                                                 onClick={() =>
                                                     resetAndClearErrors()
                                                 }
@@ -98,16 +112,12 @@ export default function DeleteUser() {
                                         </DialogClose>
 
                                         <Button
+                                            type="submit"
                                             variant="destructive"
                                             disabled={processing}
-                                            asChild
+                                            data-test="confirm-delete-user-button"
                                         >
-                                            <button
-                                                type="submit"
-                                                data-test="confirm-delete-user-button"
-                                            >
-                                                Delete account
-                                            </button>
+                                            Delete account
                                         </Button>
                                     </DialogFooter>
                                 </>

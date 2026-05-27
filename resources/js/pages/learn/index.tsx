@@ -172,7 +172,7 @@ export default function LearnIndex({ modules, categories }: LearnIndexProps) {
                     /* Empty State / Coming Soon State */
                     searchQuery === '' ? (
                         <div className="relative overflow-hidden rounded-2xl border-2 border-dashed border-border bg-card/70 p-12 text-center shadow-sm transition-all duration-300 hover:border-blue-300 dark:hover:border-blue-900/50">
-                            <div className="mx-auto flex size-14 items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-900 text-muted-foreground mb-5 ring-8 ring-slate-50">
+                            <div className="mx-auto flex size-14 items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-900 text-muted-foreground mb-5 ring-8">
                                 <BookOpen className="size-6 text-blue-600 dark:text-blue-400" />
                             </div>
                             <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-3.5 py-1 text-[10px] font-extrabold tracking-wider text-amber-700 dark:bg-amber-950/40 dark:text-amber-400 uppercase mb-3.5">

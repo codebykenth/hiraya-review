@@ -344,7 +344,7 @@ export default function AdminLearnCreate({ categories, initialTopic = '' }: Admi
                                 onChange={e => setData('title', e.target.value)}
                                 required
                             />
-                            {errors.title && <span className="mt-1 block text-[10px] text-red-655 font-medium">{errors.title}</span>}
+                            {errors.title && <span className="mt-1 block text-[10px] text-red-600 font-medium">{errors.title}</span>}
                         </div>
 
                         {/* Row: Topic & Est Minutes */}
@@ -358,7 +358,7 @@ export default function AdminLearnCreate({ categories, initialTopic = '' }: Admi
                                     onChange={e => setData('topic', e.target.value)}
                                     required
                                 />
-                                {errors.topic && <span className="mt-1 block text-[10px] text-red-655 font-medium">{errors.topic}</span>}
+                                {errors.topic && <span className="mt-1 block text-[10px] text-red-600 font-medium">{errors.topic}</span>}
                             </div>
 
                             <div>
@@ -375,7 +375,7 @@ export default function AdminLearnCreate({ categories, initialTopic = '' }: Admi
                                         required
                                     />
                                 </div>
-                                {errors.estimated_minutes && <span className="mt-1 block text-[10px] text-red-655 font-medium">{errors.estimated_minutes}</span>}
+                                {errors.estimated_minutes && <span className="mt-1 block text-[10px] text-red-600 font-medium">{errors.estimated_minutes}</span>}
                             </div>
                         </div>
 
@@ -390,7 +390,7 @@ export default function AdminLearnCreate({ categories, initialTopic = '' }: Admi
                                 className="w-full rounded-xl border border-slate-200 bg-slate-50/20 p-3 text-xs font-semibold focus:border-blue-500 focus:outline-none dark:border-slate-800 dark:bg-slate-900 dark:text-white"
                                 required
                             />
-                            {errors.summary && <span className="mt-1 block text-[10px] text-red-655 font-medium">{errors.summary}</span>}
+                            {errors.summary && <span className="mt-1 block text-[10px] text-red-600 font-medium">{errors.summary}</span>}
                         </div>
 
                         {/* Markdown Content */}
@@ -404,7 +404,7 @@ export default function AdminLearnCreate({ categories, initialTopic = '' }: Admi
                                 className="w-full rounded-xl border border-slate-200 bg-slate-50/20 p-3 text-xs font-semibold font-mono leading-relaxed focus:border-blue-500 focus:outline-none dark:border-slate-800 dark:bg-slate-900 dark:text-white"
                                 required
                             />
-                            {errors.content && <span className="mt-1 block text-[10px] text-red-655 font-medium">{errors.content}</span>}
+                            {errors.content && <span className="mt-1 block text-[10px] text-red-600 font-medium">{errors.content}</span>}
                         </div>
                     </div>
                 </div>

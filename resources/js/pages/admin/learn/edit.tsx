@@ -174,7 +174,7 @@ export default function AdminLearnEdit({ module, categories }: AdminLearnEditPro
                         onChange={e => setData('summary', e.target.value)}
                         className="w-full rounded-xl border border-border bg-muted p-3 text-xs font-semibold focus:border-blue-500 focus:outline-none text-foreground"
                     />
-                    {errors.summary && <span className="mt-1 block text-[10px] text-red-655 font-medium">{errors.summary}</span>}
+                    {errors.summary && <span className="mt-1 block text-[10px] text-red-600 font-medium">{errors.summary}</span>}
                 </div>
 
                 {/* Lesson Material Markdown Content */}
@@ -186,7 +186,7 @@ export default function AdminLearnEdit({ module, categories }: AdminLearnEditPro
                         onChange={e => setData('content', e.target.value)}
                         className="w-full rounded-xl border border-border bg-muted p-3 text-xs font-semibold font-mono leading-relaxed focus:border-blue-500 focus:outline-none text-foreground"
                     />
-                    {errors.content && <span className="mt-1 block text-[10px] text-red-655 font-medium">{errors.content}</span>}
+                    {errors.content && <span className="mt-1 block text-[10px] text-red-600 font-medium">{errors.content}</span>}
                 </div>
             </CurationEditShell>
         </>

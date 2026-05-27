@@ -92,7 +92,7 @@ export default function Support() {
                                             <p className="mt-2 max-w-2xl text-sm text-muted-foreground animate-fade-in">
                                                 Thanks for reaching out, {submittedData?.name}. We will review your message and reply via email at {submittedData?.email} within 24 hours.
                                             </p>
-                                            <div className="mt-6 rounded-lg border border-amber-200/50 bg-amber-50/50 p-3 text-xs font-semibold text-amber-800 flex items-start gap-2.5 dark:bg-amber-950/20 dark:border-amber-900/30 dark:text-amber-400 max-w-md">
+                                            <div className="mt-6 rounded-lg border border-amber-200/50 bg-amber-50/50 p-3 text-xs font-semibold text-amber-800 flex items-start gap-2.5 dark:bg-amber-950/20 dark:border-amber-900/30 dark:text-amber-400 max-w-2xl">
                                                 <span>You have successfully sent your support request. You can submit another message tomorrow.</span>
                                             </div>
                                         </div>

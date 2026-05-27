@@ -113,7 +113,7 @@ export function ScopeSettingsModal({
                                                 e.stopPropagation();
                                                 handleDeleteCategory(cat.id);
                                             }}
-                                            className="rounded-lg p-1 text-slate-400 hover:bg-red-50 hover:text-red-655 dark:hover:bg-slate-900 transition cursor-pointer"
+                                            className="rounded-lg p-1 text-slate-400 hover:bg-red-50 hover:text-red-600 dark:hover:bg-slate-900 transition cursor-pointer"
                                         >
                                             <Trash2 className="size-3.5" />
                                         </button>
@@ -160,7 +160,7 @@ export function ScopeSettingsModal({
                                             <button 
                                                 type="button"
                                                 onClick={() => handleDeleteSubcategory(sub.id)}
-                                                className="rounded-lg p-1 text-slate-400 hover:bg-red-50 hover:text-red-655 dark:hover:bg-slate-900 transition shrink-0 cursor-pointer"
+                                                className="rounded-lg p-1 text-slate-400 hover:bg-red-50 hover:text-red-600 dark:hover:bg-slate-900 transition shrink-0 cursor-pointer"
                                             >
                                                 <Trash2 className="size-3.5" />
                                             </button>

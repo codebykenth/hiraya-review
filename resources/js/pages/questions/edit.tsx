@@ -164,7 +164,7 @@ export default function QuestionEdit({ question, categories = [] }: QuestionEdit
                     onValueChange={(val) => setData('language', val)}
                     options={['English', 'Tagalog']}
                 />
-                {errors.language && <span className="mt-1 block text-[10px] text-red-655 font-medium">{errors.language}</span>}
+                {errors.language && <span className="mt-1 block text-[10px] text-red-600 font-medium">{errors.language}</span>}
 
                 {/* Question Stem (Text) */}
                 <div>
@@ -252,7 +252,7 @@ export default function QuestionEdit({ question, categories = [] }: QuestionEdit
                         }`}
                         required
                     />
-                    {errors.explanation && <span className="mt-1 block text-[10px] text-red-655 font-medium">{errors.explanation}</span>}
+                    {errors.explanation && <span className="mt-1 block text-[10px] text-red-600 font-medium">{errors.explanation}</span>}
                 </div>
             </CurationEditShell>
         </>

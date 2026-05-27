@@ -134,7 +134,7 @@ const renderFormattedText = (text: string, stripLogicSymbols: boolean = false, l
 
                 if (isNegated) {
                     return (
-                        <span className="inline-flex items-center text-xs font-bold text-red-655 bg-red-50 border border-red-100 px-1.5 py-0.5 rounded-md font-mono select-all shadow-3xs">
+                        <span className="inline-flex items-center text-xs font-bold text-red-600 bg-red-50 border border-red-100 px-1.5 py-0.5 rounded-md font-mono select-all shadow-3xs">
                             <span className="text-[10px] text-red-400 mr-0.5 font-bold">¬</span>
                             {letter}
                         </span>

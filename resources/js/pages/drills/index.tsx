@@ -99,7 +99,7 @@ const renderFormattedText = (text: string) => {
                 
                 if (isNegated) {
                     return (
-                        <span className="inline-flex items-center text-xs font-bold text-red-655 bg-red-50 border border-red-100 px-1.5 py-0.5 rounded-md font-mono select-all shadow-3xs">
+                        <span className="inline-flex items-center text-xs font-bold text-red-600 bg-red-50 border border-red-100 px-1.5 py-0.5 rounded-md font-mono select-all shadow-3xs">
                             <span className="text-[10px] text-red-400 mr-0.5 font-bold">¬</span>
                             {letter}
                         </span>
@@ -534,11 +534,11 @@ export default function Drills({ questions = [], categories = [] }: DrillsProps)
                     </div>
                 ) : (
                     <div className="flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-border bg-card py-20 text-center shadow-sm">
-                        <div className="mx-auto flex size-14 items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-900 text-muted-foreground mb-5 ring-8 ring-slate-50 dark:ring-slate-950">
+                        <div className="mx-auto flex size-14 items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-900 text-muted-foreground mb-5 ring-8">
                             <Brain className="size-6 text-blue-650" />
                         </div>
                         <h3 className="font-heading text-lg font-bold text-foreground">No Practice Drills Available</h3>
-                        <p className="mx-auto mt-2 max-w-md text-xs leading-relaxed text-muted-foreground">
+                        <p className="mx-auto mt-2 max-w-2xl text-xs leading-relaxed text-muted-foreground">
                             Practice drill modules are coming soon! We are currently compiling comprehensive exam question banks.
                         </p>
                     </div>
