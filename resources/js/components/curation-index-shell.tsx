@@ -5,7 +5,7 @@ import {
     FileText,
     Database,
     PenLine,
-    ChevronDown
+    ChevronDown,
 } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
 import type { TableColumn } from '@/components/admin-table';
@@ -36,7 +36,9 @@ export function getCategoryStyles(category: string) {
 export interface CurationIndexShellProps<T> {
     items: T[];
     categories: CategoryItem[];
-    columns: TableColumn<T>[] | ((confirmDelete: (item: T) => void) => TableColumn<T>[]);
+    columns:
+        | TableColumn<T>[]
+        | ((confirmDelete: (item: T) => void) => TableColumn<T>[]);
     searchPlaceholder: string;
     searchMatcher: (item: T, query: string) => boolean;
     statusMatcher: (item: T, status: string) => boolean;
@@ -53,7 +55,11 @@ export interface CurationIndexShellProps<T> {
     };
     // Table customization
     tableTitle: string;
-    tableLegend: { icon: React.ComponentType<any>; label: string; variant: 'slate' | 'blue' | 'rose' }[];
+    tableLegend: {
+        icon: React.ComponentType<any>;
+        label: string;
+        variant: 'slate' | 'blue' | 'rose';
+    }[];
     tableEmptyState: {
         icon: React.ComponentType<any>;
         title: string;
@@ -81,12 +87,13 @@ export function CurationIndexShell<T>({
     onDeleteConfirm,
     getDeleteTitle,
     getDeleteMessage,
-    deleteConfirmLabel
+    deleteConfirmLabel,
 }: CurationIndexShellProps<T>) {
     const [searchTerm, setSearchTerm] = useState('');
     const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('All Categories');
-    const [selectedSubcategory, setSelectedSubcategory] = useState('All Subcategories');
+    const [selectedSubcategory, setSelectedSubcategory] =
+        useState('All Subcategories');
     const [selectedStatus, setSelectedStatus] = useState('All Statuses');
 
     useEffect(() => {
@@ -101,15 +108,17 @@ export function CurationIndexShell<T>({
     const cseCategoriesTree: Record<string, string[]> = {};
 
     if (categories && categories.length > 0) {
-        categories.forEach(cat => {
-            cseCategoriesTree[cat.name] = (cat.subcategory || []).map(sub => sub.name);
+        categories.forEach((cat) => {
+            cseCategoriesTree[cat.name] = (cat.subcategory || []).map(
+                (sub) => sub.name,
+            );
         });
     } else {
         cseCategoriesTree['General Information'] = [
             'Philippine Constitution',
             'Code of Conduct and Ethical Standards (R.A. 6713)',
             'Peace and Human Rights Issues and Concepts',
-            'Environment Management and Protection'
+            'Environment Management and Protection',
         ];
         cseCategoriesTree['Verbal Ability'] = [
             'Word meaning',
@@ -117,23 +126,20 @@ export function CurationIndexShell<T>({
             'Error recognition',
             'Sentence structure',
             'Paragraph organization',
-            'Reading comprehension'
+            'Reading comprehension',
         ];
         cseCategoriesTree['Analytical Ability'] = [
             'Word analogy',
             'Symbolic logic / abstract reasoning',
             'Identifying assumptions and drawing conclusions',
-            'Data interpretation'
+            'Data interpretation',
         ];
         cseCategoriesTree['Numerical Ability'] = [
             'Basic operations',
             'Number sequence',
-            'Word problems'
+            'Word problems',
         ];
-        cseCategoriesTree['Clerical Ability'] = [
-            'Filing',
-            'Spelling'
-        ];
+        cseCategoriesTree['Clerical Ability'] = ['Filing', 'Spelling'];
     }
 
     const [currentPage, setCurrentPage] = useState(1);
@@ -142,9 +148,9 @@ export function CurationIndexShell<T>({
     // Dynamic Syllabus Scope modal state variables
     const [isScopeModalOpen, setIsScopeModalOpen] = useState(false);
     const [newCategoryName, setNewCategoryName] = useState('');
-    const [selectedScopeCategory, setSelectedScopeCategory] = useState<number | null>(
-        categories && categories.length > 0 ? categories[0].id : null
-    );
+    const [selectedScopeCategory, setSelectedScopeCategory] = useState<
+        number | null
+    >(categories && categories.length > 0 ? categories[0].id : null);
     const [newSubcategoryName, setNewSubcategoryName] = useState('');
 
     // Custom confirm modal state
@@ -161,7 +167,7 @@ export function CurationIndexShell<T>({
         message: '',
         confirmLabel: '',
         variant: 'success',
-        onConfirm: () => { },
+        onConfirm: () => {},
     });
 
     const handleAddCategory = (e: React.FormEvent) => {
@@ -171,21 +177,26 @@ export function CurationIndexShell<T>({
             return;
         }
 
-        router.post('/questions/categories', {
-            name: newCategoryName
-        }, {
-            preserveScroll: true,
-            onSuccess: () => {
-                setNewCategoryName('');
-            }
-        });
+        router.post(
+            '/questions/categories',
+            {
+                name: newCategoryName,
+            },
+            {
+                preserveScroll: true,
+                onSuccess: () => {
+                    setNewCategoryName('');
+                },
+            },
+        );
     };
 
     const handleDeleteCategory = (catId: number) => {
         setConfirmModal({
             isOpen: true,
             title: 'Delete Category?',
-            message: 'Are you sure you want to delete this category? This action cannot be undone and will permanently delete all of its mapped subcategories!',
+            message:
+                'Are you sure you want to delete this category? This action cannot be undone and will permanently delete all of its mapped subcategories!',
             confirmLabel: 'Delete Category',
             variant: 'danger',
             onConfirm: () => {
@@ -193,11 +204,14 @@ export function CurationIndexShell<T>({
                     preserveScroll: true,
                     onSuccess: () => {
                         if (selectedScopeCategory === catId) {
-                            setSelectedScopeCategory(categories.find(c => c.id !== catId)?.id || null);
+                            setSelectedScopeCategory(
+                                categories.find((c) => c.id !== catId)?.id ||
+                                    null,
+                            );
                         }
-                    }
+                    },
                 });
-            }
+            },
         });
     };
 
@@ -208,35 +222,40 @@ export function CurationIndexShell<T>({
             return;
         }
 
-        router.post('/questions/subcategories', {
-            category_id: selectedScopeCategory,
-            name: newSubcategoryName
-        }, {
-            preserveScroll: true,
-            onSuccess: () => {
-                setNewSubcategoryName('');
-            }
-        });
+        router.post(
+            '/questions/subcategories',
+            {
+                category_id: selectedScopeCategory,
+                name: newSubcategoryName,
+            },
+            {
+                preserveScroll: true,
+                onSuccess: () => {
+                    setNewSubcategoryName('');
+                },
+            },
+        );
     };
 
     const handleDeleteSubcategory = (subId: number) => {
         setConfirmModal({
             isOpen: true,
             title: 'Delete Subcategory?',
-            message: 'Are you sure you want to delete this subcategory? This action cannot be undone.',
+            message:
+                'Are you sure you want to delete this subcategory? This action cannot be undone.',
             confirmLabel: 'Delete Subcategory',
             variant: 'danger',
             onConfirm: () => {
                 router.delete(`/questions/subcategories/${subId}`, {
-                    preserveScroll: true
+                    preserveScroll: true,
                 });
-            }
+            },
         });
     };
 
     const [itemToDelete, setItemToDelete] = useState<T | null>(null);
 
-    const filteredItems = items.filter(item => {
+    const filteredItems = items.filter((item) => {
         const matchesSearch = searchMatcher(item, debouncedSearchTerm);
 
         const matchesCategory =
@@ -251,17 +270,23 @@ export function CurationIndexShell<T>({
             selectedStatus === 'All Statuses' ||
             statusMatcher(item, selectedStatus);
 
-        return matchesSearch && matchesCategory && matchesSubcategory && matchesStatus;
+        return (
+            matchesSearch &&
+            matchesCategory &&
+            matchesSubcategory &&
+            matchesStatus
+        );
     });
 
     const paginatedItems = filteredItems.slice(
         (currentPage - 1) * pageSize,
-        (currentPage - 1) * pageSize + pageSize
+        (currentPage - 1) * pageSize + pageSize,
     );
 
-    const resolvedColumns = typeof columns === 'function'
-        ? (columns as any)(setItemToDelete)
-        : columns;
+    const resolvedColumns =
+        typeof columns === 'function'
+            ? (columns as any)(setItemToDelete)
+            : columns;
 
     return (
         <PageContainer>
@@ -269,19 +294,24 @@ export function CurationIndexShell<T>({
             <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
                 {/* AI Generator Card */}
                 <div className="relative flex overflow-hidden rounded-2xl border border-border bg-card p-6 shadow-xs transition hover:shadow-md">
-                    <div className="absolute right-0 bottom-0 opacity-10 pointer-events-none">
+                    <div className="pointer-events-none absolute right-0 bottom-0 opacity-10">
                         <Sparkles className="size-32 text-indigo-300 dark:text-indigo-900" />
                     </div>
-                    <div className="flex gap-4 items-start z-10">
-                        <div className="flex size-14 shrink-0 items-center justify-center rounded-2xl bg-indigo-50 text-indigo-650 dark:bg-indigo-950/20 dark:text-indigo-400">
+                    <div className="z-10 flex items-start gap-4">
+                        <div className="text-indigo-650 flex size-14 shrink-0 items-center justify-center rounded-2xl bg-indigo-50 dark:bg-indigo-950/20 dark:text-indigo-400">
                             <Sparkles className="size-7" />
                         </div>
                         <div className="flex flex-col gap-2">
-                            <h3 className="text-lg font-bold text-foreground">{aiGenerator.title}</h3>
-                            <p className="text-sm text-muted-foreground leading-relaxed">
+                            <h3 className="text-lg font-bold text-foreground">
+                                {aiGenerator.title}
+                            </h3>
+                            <p className="text-sm leading-relaxed text-muted-foreground">
                                 {aiGenerator.description}
                             </p>
-                            <Link href={aiGenerator.href} className="mt-2 block">
+                            <Link
+                                href={aiGenerator.href}
+                                className="mt-2 block"
+                            >
                                 <Button
                                     type="button"
                                     variant="default"
@@ -296,19 +326,24 @@ export function CurationIndexShell<T>({
 
                 {/* Manual Entry Card */}
                 <div className="relative flex overflow-hidden rounded-2xl border border-border bg-card p-6 shadow-xs transition hover:shadow-md">
-                    <div className="absolute right-0 bottom-0 opacity-5 pointer-events-none">
+                    <div className="pointer-events-none absolute right-0 bottom-0 opacity-5">
                         <FileText className="size-32 text-emerald-300 dark:text-emerald-900" />
                     </div>
-                    <div className="flex gap-4 items-start z-10">
-                        <div className="flex size-14 shrink-0 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-650 dark:bg-emerald-950/20 dark:text-emerald-400">
+                    <div className="z-10 flex items-start gap-4">
+                        <div className="text-emerald-650 flex size-14 shrink-0 items-center justify-center rounded-2xl bg-emerald-50 dark:bg-emerald-950/20 dark:text-emerald-400">
                             <PenLine className="size-7" />
                         </div>
                         <div className="flex flex-col gap-2">
-                            <h3 className="text-lg font-bold text-foreground">{manualEntry.title}</h3>
-                            <p className="text-sm text-muted-foreground leading-relaxed">
+                            <h3 className="text-lg font-bold text-foreground">
+                                {manualEntry.title}
+                            </h3>
+                            <p className="text-sm leading-relaxed text-muted-foreground">
                                 {manualEntry.description}
                             </p>
-                            <Link href={manualEntry.href} className="mt-2 block">
+                            <Link
+                                href={manualEntry.href}
+                                className="mt-2 block"
+                            >
                                 <Button
                                     type="button"
                                     variant="success"
@@ -323,17 +358,21 @@ export function CurationIndexShell<T>({
 
                 {/* Syllabus Scope Card */}
                 <div className="relative flex overflow-hidden rounded-2xl border border-border bg-card p-6 shadow-xs transition hover:shadow-md">
-                    <div className="absolute right-0 bottom-0 opacity-10 pointer-events-none">
+                    <div className="pointer-events-none absolute right-0 bottom-0 opacity-10">
                         <Database className="size-32 text-blue-300 dark:text-blue-900" />
                     </div>
-                    <div className="flex gap-4 items-start z-10">
-                        <div className="flex size-14 shrink-0 items-center justify-center rounded-2xl bg-blue-50 text-blue-650 dark:bg-blue-950/20 dark:text-blue-400">
+                    <div className="z-10 flex items-start gap-4">
+                        <div className="text-blue-650 flex size-14 shrink-0 items-center justify-center rounded-2xl bg-blue-50 dark:bg-blue-950/20 dark:text-blue-400">
                             <Database className="size-7" />
                         </div>
                         <div className="flex flex-col gap-2">
-                            <h3 className="text-lg font-bold text-foreground">Syllabus Scope Settings</h3>
-                            <p className="text-sm text-muted-foreground leading-relaxed">
-                                Configure exam categories & subcategories dynamically to instantly update AI prompting and filtering schemas.
+                            <h3 className="text-lg font-bold text-foreground">
+                                Syllabus Scope Settings
+                            </h3>
+                            <p className="text-sm leading-relaxed text-muted-foreground">
+                                Configure exam categories & subcategories
+                                dynamically to instantly update AI prompting and
+                                filtering schemas.
                             </p>
                             <div className="mt-2">
                                 <Button
@@ -341,8 +380,13 @@ export function CurationIndexShell<T>({
                                     variant="default"
                                     size="sm"
                                     onClick={() => {
-                                        if (categories && categories.length > 0) {
-                                            setSelectedScopeCategory(categories[0].id);
+                                        if (
+                                            categories &&
+                                            categories.length > 0
+                                        ) {
+                                            setSelectedScopeCategory(
+                                                categories[0].id,
+                                            );
                                         }
 
                                         setIsScopeModalOpen(true);
@@ -357,10 +401,10 @@ export function CurationIndexShell<T>({
             </div>
 
             {/* 2. FILTERS & SEARCH PANEL */}
-            <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between rounded-xl border border-border bg-card p-4 shadow-3xs mt-6">
-                <div className="flex flex-1 items-center gap-2 w-full md:max-w-2xl">
+            <div className="shadow-3xs mt-6 flex flex-col gap-4 rounded-xl border border-border bg-card p-4 md:flex-row md:items-center md:justify-between">
+                <div className="flex w-full flex-1 items-center gap-2 md:max-w-2xl">
                     <div className="relative w-full">
-                        <Search className="absolute top-1/2 left-3 size-3.5 -translate-y-1/2 text-slate-450" />
+                        <Search className="text-slate-450 absolute top-1/2 left-3 size-3.5 -translate-y-1/2" />
                         <input
                             type="text"
                             value={searchTerm}
@@ -369,13 +413,13 @@ export function CurationIndexShell<T>({
                                 setCurrentPage(1);
                             }}
                             placeholder={searchPlaceholder}
-                            className="w-full rounded-lg border border-border pl-9 pr-3 py-1.5 text-xs font-semibold text-foreground placeholder:text-muted-foreground focus:border-blue-500 focus:outline-none transition bg-muted"
+                            className="w-full rounded-lg border border-border bg-muted py-1.5 pr-3 pl-9 text-xs font-semibold text-foreground transition placeholder:text-muted-foreground focus:border-blue-500 focus:outline-none"
                         />
                     </div>
                 </div>
 
-                <div className="flex flex-col gap-3 w-full md:flex-row md:items-center md:w-auto md:gap-2.5">
-                    <div className="grid grid-cols-2 gap-3 w-full sm:grid-cols-3 md:flex md:w-auto md:items-center md:gap-2.5">
+                <div className="flex w-full flex-col gap-3 md:w-auto md:flex-row md:items-center md:gap-2.5">
+                    <div className="grid w-full grid-cols-2 gap-3 sm:grid-cols-3 md:flex md:w-auto md:items-center md:gap-2.5">
                         {/* Category Filter */}
                         <div className="relative min-w-0 md:min-w-[145px]">
                             <select
@@ -385,14 +429,25 @@ export function CurationIndexShell<T>({
                                     setSelectedSubcategory('All Subcategories');
                                     setCurrentPage(1);
                                 }}
-                                className="w-full rounded-lg border border-border bg-background pl-2.5 pr-8 py-1.5 text-xs font-bold text-foreground transition focus:border-blue-500 focus:outline-none appearance-none"
+                                className="w-full appearance-none rounded-lg border border-border bg-background py-1.5 pr-8 pl-2.5 text-xs font-bold text-foreground transition focus:border-blue-500 focus:outline-none"
                             >
-                                <option value="All Categories" className="dark:bg-slate-950">All Categories</option>
-                                {Object.keys(cseCategoriesTree).map(cat => (
-                                    <option key={cat} value={cat} className="dark:bg-slate-950">{cat}</option>
+                                <option
+                                    value="All Categories"
+                                    className="dark:bg-slate-950"
+                                >
+                                    All Categories
+                                </option>
+                                {Object.keys(cseCategoriesTree).map((cat) => (
+                                    <option
+                                        key={cat}
+                                        value={cat}
+                                        className="dark:bg-slate-950"
+                                    >
+                                        {cat}
+                                    </option>
                                 ))}
                             </select>
-                            <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 size-3.5 text-slate-550 pointer-events-none" />
+                            <ChevronDown className="text-slate-550 pointer-events-none absolute top-1/2 right-2.5 size-3.5 -translate-y-1/2" />
                         </div>
 
                         {/* Subcategory Filter */}
@@ -403,38 +458,76 @@ export function CurationIndexShell<T>({
                                     setSelectedSubcategory(e.target.value);
                                     setCurrentPage(1);
                                 }}
-                                className="w-full rounded-lg border border-border bg-background pl-2.5 pr-8 py-1.5 text-xs font-bold text-foreground transition focus:border-blue-500 focus:outline-none appearance-none"
+                                className="w-full appearance-none rounded-lg border border-border bg-background py-1.5 pr-8 pl-2.5 text-xs font-bold text-foreground transition focus:border-blue-500 focus:outline-none"
                             >
-                                <option value="All Subcategories" className="dark:bg-slate-950">All Subcategories</option>
-                                {selectedCategory !== 'All Categories' && cseCategoriesTree[selectedCategory]?.map(sub => (
-                                    <option key={sub} value={sub} className="dark:bg-slate-950">{sub}</option>
-                                ))}
-                                {selectedCategory === 'All Categories' && Object.values(cseCategoriesTree).flat().map((sub, idx) => (
-                                    <option key={idx} value={sub} className="dark:bg-slate-950">{sub}</option>
-                                ))}
+                                <option
+                                    value="All Subcategories"
+                                    className="dark:bg-slate-950"
+                                >
+                                    All Subcategories
+                                </option>
+                                {selectedCategory !== 'All Categories' &&
+                                    cseCategoriesTree[selectedCategory]?.map(
+                                        (sub) => (
+                                            <option
+                                                key={sub}
+                                                value={sub}
+                                                className="dark:bg-slate-950"
+                                            >
+                                                {sub}
+                                            </option>
+                                        ),
+                                    )}
+                                {selectedCategory === 'All Categories' &&
+                                    Object.values(cseCategoriesTree)
+                                        .flat()
+                                        .map((sub, idx) => (
+                                            <option
+                                                key={idx}
+                                                value={sub}
+                                                className="dark:bg-slate-950"
+                                            >
+                                                {sub}
+                                            </option>
+                                        ))}
                             </select>
-                            <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 size-3.5 text-slate-550 pointer-events-none" />
+                            <ChevronDown className="text-slate-550 pointer-events-none absolute top-1/2 right-2.5 size-3.5 -translate-y-1/2" />
                         </div>
 
                         {/* Status Filter */}
-                        <div className="relative col-span-2 sm:col-span-1 min-w-0 md:min-w-[120px]">
+                        <div className="relative col-span-2 min-w-0 sm:col-span-1 md:min-w-[120px]">
                             <select
                                 value={selectedStatus}
                                 onChange={(e) => {
                                     setSelectedStatus(e.target.value);
                                     setCurrentPage(1);
                                 }}
-                                className="w-full rounded-lg border border-border bg-background pl-2.5 pr-8 py-1.5 text-xs font-bold text-foreground transition focus:border-blue-500 focus:outline-none appearance-none"
+                                className="w-full appearance-none rounded-lg border border-border bg-background py-1.5 pr-8 pl-2.5 text-xs font-bold text-foreground transition focus:border-blue-500 focus:outline-none"
                             >
-                                <option value="All Statuses" className="dark:bg-slate-950">All Statuses</option>
-                                <option value="ACTIVE" className="dark:bg-slate-950">ACTIVE</option>
-                                <option value="DRAFT" className="dark:bg-slate-950">DRAFT</option>
+                                <option
+                                    value="All Statuses"
+                                    className="dark:bg-slate-950"
+                                >
+                                    All Statuses
+                                </option>
+                                <option
+                                    value="ACTIVE"
+                                    className="dark:bg-slate-950"
+                                >
+                                    ACTIVE
+                                </option>
+                                <option
+                                    value="DRAFT"
+                                    className="dark:bg-slate-950"
+                                >
+                                    DRAFT
+                                </option>
                             </select>
-                            <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 size-3.5 text-slate-550 pointer-events-none" />
+                            <ChevronDown className="text-slate-550 pointer-events-none absolute top-1/2 right-2.5 size-3.5 -translate-y-1/2" />
                         </div>
                     </div>
 
-                    <span className="text-xs font-bold text-muted-foreground shrink-0 pl-1 text-right md:text-left block mt-1 md:mt-0">
+                    <span className="mt-1 block shrink-0 pl-1 text-right text-xs font-bold text-muted-foreground md:mt-0 md:text-left">
                         {filteredItems.length === 0
                             ? 'No matches'
                             : `${filteredItems.length} found`}
@@ -464,7 +557,7 @@ export function CurationIndexShell<T>({
                                     Launch AI Generator
                                 </Button>
                             </Link>
-                        )
+                        ),
                     }}
                     pageSize={pageSize}
                     currentPage={currentPage}
@@ -513,10 +606,12 @@ export function CurationIndexShell<T>({
                 message={confirmModal.message}
                 confirmLabel={confirmModal.confirmLabel}
                 variant={confirmModal.variant}
-                onClose={() => setConfirmModal(prev => ({ ...prev, isOpen: false }))}
+                onClose={() =>
+                    setConfirmModal((prev) => ({ ...prev, isOpen: false }))
+                }
                 onConfirm={() => {
                     confirmModal.onConfirm();
-                    setConfirmModal(prev => ({ ...prev, isOpen: false }));
+                    setConfirmModal((prev) => ({ ...prev, isOpen: false }));
                 }}
             />
         </PageContainer>

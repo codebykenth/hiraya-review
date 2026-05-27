@@ -3,7 +3,10 @@ import { HelpCircle } from 'lucide-react';
 import React, { useState } from 'react';
 import { CurationEditShell } from '@/components/curation-edit-shell';
 import { SelectField } from '@/components/ui/select';
-import { index as questionsIndex, update as questionsUpdate } from '@/routes/questions';
+import {
+    index as questionsIndex,
+    update as questionsUpdate,
+} from '@/routes/questions';
 
 interface Subcategory {
     id: number;
@@ -38,19 +41,24 @@ interface QuestionEditProps {
     categories: Category[];
 }
 
-export default function QuestionEdit({ question, categories = [] }: QuestionEditProps) {
+export default function QuestionEdit({
+    question,
+    categories = [],
+}: QuestionEditProps) {
     const cseCategoriesTree: Record<string, string[]> = {};
 
     if (categories && categories.length > 0) {
-        categories.forEach(cat => {
-            cseCategoriesTree[cat.name] = (cat.subcategory || []).map(sub => sub.name);
+        categories.forEach((cat) => {
+            cseCategoriesTree[cat.name] = (cat.subcategory || []).map(
+                (sub) => sub.name,
+            );
         });
     } else {
         cseCategoriesTree['General Information'] = [
             'Philippine Constitution',
             'Code of Conduct and Ethical Standards (R.A. 6713)',
             'Peace and Human Rights Issues and Concepts',
-            'Environment Management and Protection'
+            'Environment Management and Protection',
         ];
         cseCategoriesTree['Verbal Ability'] = [
             'Word meaning',
@@ -58,27 +66,28 @@ export default function QuestionEdit({ question, categories = [] }: QuestionEdit
             'Error recognition',
             'Sentence structure',
             'Paragraph organization',
-            'Reading comprehension'
+            'Reading comprehension',
         ];
         cseCategoriesTree['Analytical Ability'] = [
             'Word analogy',
             'Symbolic logic / abstract reasoning',
             'Identifying assumptions and drawing conclusions',
-            'Data interpretation'
+            'Data interpretation',
         ];
         cseCategoriesTree['Numerical Ability'] = [
             'Basic operations',
             'Number sequence',
-            'Word problems'
+            'Word problems',
         ];
-        cseCategoriesTree['Clerical Ability'] = [
-            'Filing',
-            'Spelling'
-        ];
+        cseCategoriesTree['Clerical Ability'] = ['Filing', 'Spelling'];
     }
 
-    const [selectedCategoryName, setSelectedCategoryName] = useState(question.category || Object.keys(cseCategoriesTree)[0]);
-    const [selectedSubcategoryName, setSelectedSubcategoryName] = useState(question.subcategory || cseCategoriesTree[selectedCategoryName]?.[0]);
+    const [selectedCategoryName, setSelectedCategoryName] = useState(
+        question.category || Object.keys(cseCategoriesTree)[0],
+    );
+    const [selectedSubcategoryName, setSelectedSubcategoryName] = useState(
+        question.subcategory || cseCategoriesTree[selectedCategoryName]?.[0],
+    );
 
     // Main Form Setup
     const { data, setData, put, processing, errors } = useForm({
@@ -86,9 +95,10 @@ export default function QuestionEdit({ question, categories = [] }: QuestionEdit
         subcategory: selectedSubcategoryName,
         language: question.language || 'English',
         stem: question.stem || '',
-        options: question.options && question.options.length > 0
-            ? [...question.options]
-            : ['', '', '', '', ''],
+        options:
+            question.options && question.options.length > 0
+                ? [...question.options]
+                : ['', '', '', '', ''],
         correct_option: question.correct_option ?? 0,
         explanation: question.explanation || '',
         status: question.status === 'ACTIVE' ? 'active' : 'draft',
@@ -96,7 +106,7 @@ export default function QuestionEdit({ question, categories = [] }: QuestionEdit
 
     const handleCategoryChange = (catName: string) => {
         setSelectedCategoryName(catName);
-        setData(prev => ({
+        setData((prev) => ({
             ...prev,
             category: catName,
             subcategory: cseCategoriesTree[catName]?.[0] || '',
@@ -135,19 +145,28 @@ export default function QuestionEdit({ question, categories = [] }: QuestionEdit
                 headerIcon={HelpCircle}
                 statusLabel="Publish Status"
                 statusValue={data.status === 'active'}
-                onStatusToggle={() => setData('status', data.status === 'active' ? 'draft' : 'active')}
+                onStatusToggle={() =>
+                    setData(
+                        'status',
+                        data.status === 'active' ? 'draft' : 'active',
+                    )
+                }
                 onSaveSubmit={handleSubmit}
                 isSaving={processing}
             >
                 {/* Row: Category & Subcategory Selection */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <SelectField
                         label="Target Category"
                         value={selectedCategoryName}
                         onValueChange={handleCategoryChange}
                         options={Object.keys(cseCategoriesTree)}
                     />
-                    {errors.category && <span className="mt-1 block text-[10px] text-red-650 font-medium">{errors.category}</span>}
+                    {errors.category && (
+                        <span className="text-red-650 mt-1 block text-[10px] font-medium">
+                            {errors.category}
+                        </span>
+                    )}
 
                     <SelectField
                         label="Target Subcategory"
@@ -155,7 +174,11 @@ export default function QuestionEdit({ question, categories = [] }: QuestionEdit
                         onValueChange={handleSubcategoryChange}
                         options={activeSubcategories}
                     />
-                    {errors.subcategory && <span className="mt-1 block text-[10px] text-red-650 font-medium">{errors.subcategory}</span>}
+                    {errors.subcategory && (
+                        <span className="text-red-650 mt-1 block text-[10px] font-medium">
+                            {errors.subcategory}
+                        </span>
+                    )}
                 </div>
 
                 {/* Language */}
@@ -165,18 +188,30 @@ export default function QuestionEdit({ question, categories = [] }: QuestionEdit
                     onValueChange={(val) => setData('language', val)}
                     options={['English', 'Tagalog']}
                 />
-                {errors.language && <span className="mt-1 block text-[10px] text-red-600 font-medium">{errors.language}</span>}
+                {errors.language && (
+                    <span className="mt-1 block text-[10px] font-medium text-red-600">
+                        {errors.language}
+                    </span>
+                )}
 
                 {/* Question Stem (Text) */}
                 <div>
-                    <div className="flex items-center justify-between mb-1.5">
-                        <label className="block font-extrabold text-[10px] text-slate-400 uppercase">Question Stem</label>
+                    <div className="mb-1.5 flex items-center justify-between">
+                        <label className="block text-[10px] font-extrabold text-slate-400 uppercase">
+                            Question Stem
+                        </label>
 
                         {/* Mock Formatting toolbar for premium aesthetics */}
                         <div className="flex items-center gap-1 rounded-lg border border-border bg-muted p-1">
-                            <span className="px-2 py-0.5 text-[9px] font-black text-slate-500 rounded transition select-none">B</span>
-                            <span className="px-2 py-0.5 text-[9px] italic text-slate-500 rounded transition select-none">I</span>
-                            <span className="px-2 py-0.5 text-[9px] text-slate-500 rounded transition select-none font-mono">List</span>
+                            <span className="rounded px-2 py-0.5 text-[9px] font-black text-slate-500 transition select-none">
+                                B
+                            </span>
+                            <span className="rounded px-2 py-0.5 text-[9px] text-slate-500 italic transition select-none">
+                                I
+                            </span>
+                            <span className="rounded px-2 py-0.5 font-mono text-[9px] text-slate-500 transition select-none">
+                                List
+                            </span>
                         </div>
                     </div>
 
@@ -185,46 +220,59 @@ export default function QuestionEdit({ question, categories = [] }: QuestionEdit
                         onChange={(e) => setData('stem', e.target.value)}
                         rows={5}
                         placeholder="Enter question text, scenario, logic criteria, or reading passage..."
-                        className={`w-full rounded-xl border p-3 text-xs font-semibold focus:border-blue-500 focus:outline-none text-foreground bg-background ${errors.stem ? 'border-red-500' : 'border-border'
-                            }`}
+                        className={`w-full rounded-xl border bg-background p-3 text-xs font-semibold text-foreground focus:border-blue-500 focus:outline-none ${
+                            errors.stem ? 'border-red-500' : 'border-border'
+                        }`}
                         required
                     />
-                    {errors.stem && <span className="mt-1 block text-[10px] text-red-650 font-medium">{errors.stem}</span>}
+                    {errors.stem && (
+                        <span className="text-red-650 mt-1 block text-[10px] font-medium">
+                            {errors.stem}
+                        </span>
+                    )}
                 </div>
 
                 {/* Distractor Choices */}
                 <div>
-                    <label className="block mb-2 font-extrabold text-[10px] text-slate-400 uppercase">
+                    <label className="mb-2 block text-[10px] font-extrabold text-slate-400 uppercase">
                         Distractor Options & Correct Choice
                     </label>
                     <div className="space-y-3">
                         {data.options.map((option, idx) => (
                             <div
                                 key={idx}
-                                className={`flex items-center gap-3.5 rounded-xl border p-3 transition duration-200 ${data.correct_option === idx
-                                        ? 'border-emerald-250 bg-emerald-50/20 dark:border-emerald-850 dark:bg-emerald-950/10'
+                                className={`flex items-center gap-3.5 rounded-xl border p-3 transition duration-200 ${
+                                    data.correct_option === idx
+                                        ? 'border-emerald-250 dark:border-emerald-850 bg-emerald-50/20 dark:bg-emerald-950/10'
                                         : 'border-border'
-                                    }`}
+                                }`}
                             >
                                 <input
                                     type="radio"
                                     name="correct_option"
                                     checked={data.correct_option === idx}
-                                    onChange={() => setData('correct_option', idx)}
-                                    className="size-4.5 accent-emerald-600 cursor-pointer"
+                                    onChange={() =>
+                                        setData('correct_option', idx)
+                                    }
+                                    className="size-4.5 cursor-pointer accent-emerald-600"
                                 />
 
-                                <span className={`inline-flex size-6.5 items-center justify-center rounded-lg text-[10px] font-black shrink-0 ${data.correct_option === idx
-                                        ? 'bg-emerald-600 text-white'
-                                        : 'bg-muted text-muted-foreground'
-                                    }`}>
+                                <span
+                                    className={`inline-flex size-6.5 shrink-0 items-center justify-center rounded-lg text-[10px] font-black ${
+                                        data.correct_option === idx
+                                            ? 'bg-emerald-600 text-white'
+                                            : 'bg-muted text-muted-foreground'
+                                    }`}
+                                >
                                     {String.fromCharCode(65 + idx)}
                                 </span>
 
                                 <input
                                     type="text"
                                     value={option}
-                                    onChange={(e) => handleOptionChange(idx, e.target.value)}
+                                    onChange={(e) =>
+                                        handleOptionChange(idx, e.target.value)
+                                    }
                                     placeholder={`Option ${String.fromCharCode(65 + idx)} distractor text...`}
                                     className="w-full bg-transparent text-xs font-semibold text-foreground placeholder:text-muted-foreground focus:outline-none"
                                     required
@@ -232,12 +280,16 @@ export default function QuestionEdit({ question, categories = [] }: QuestionEdit
                             </div>
                         ))}
                     </div>
-                    {errors.options && <span className="mt-1 block text-[10px] text-red-650 font-medium">{errors.options}</span>}
+                    {errors.options && (
+                        <span className="text-red-650 mt-1 block text-[10px] font-medium">
+                            {errors.options}
+                        </span>
+                    )}
                 </div>
 
                 {/* Explanation */}
                 <div>
-                    <label className="block mb-1 text-muted-foreground font-extrabold text-[10px] uppercase">
+                    <label className="mb-1 block text-[10px] font-extrabold text-muted-foreground uppercase">
                         Cognitive Explanation & Rationale
                     </label>
                     <textarea
@@ -245,11 +297,18 @@ export default function QuestionEdit({ question, categories = [] }: QuestionEdit
                         rows={5}
                         onChange={(e) => setData('explanation', e.target.value)}
                         placeholder="Explain solution steps, logic chains, spelling constraints, or mental shortcuts..."
-                        className={`w-full rounded-xl border p-3 text-xs font-semibold focus:border-blue-500 focus:outline-none text-foreground bg-background ${errors.explanation ? 'border-red-500' : 'border-border'
-                            }`}
+                        className={`w-full rounded-xl border bg-background p-3 text-xs font-semibold text-foreground focus:border-blue-500 focus:outline-none ${
+                            errors.explanation
+                                ? 'border-red-500'
+                                : 'border-border'
+                        }`}
                         required
                     />
-                    {errors.explanation && <span className="mt-1 block text-[10px] text-red-600 font-medium">{errors.explanation}</span>}
+                    {errors.explanation && (
+                        <span className="mt-1 block text-[10px] font-medium text-red-600">
+                            {errors.explanation}
+                        </span>
+                    )}
                 </div>
             </CurationEditShell>
         </>

@@ -5,7 +5,7 @@ interface BrandNameProps {
 export default function BrandName({ className = '' }: BrandNameProps) {
     return (
         <span className={className}>
-            Hiraya <span className="text-primary font-black">CSE</span>
+            Hiraya <span className="font-black text-primary">CSE</span>
         </span>
     );
 }

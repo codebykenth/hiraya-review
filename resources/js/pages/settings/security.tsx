@@ -80,7 +80,9 @@ export default function Security(props: Props) {
                                         placeholder="Current password"
                                     />
 
-                                    <InputError message={errors.current_password} />
+                                    <InputError
+                                        message={errors.current_password}
+                                    />
                                 </div>
                             )}
 

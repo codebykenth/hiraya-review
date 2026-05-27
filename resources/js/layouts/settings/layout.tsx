@@ -52,8 +52,12 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
                                 asChild
                                 className={cn(
                                     'w-full justify-start transition-all duration-200',
-                                    (item.href ? isCurrentOrParentUrl(item.href) : false)
-                                        ? 'bg-blue-100/70 text-blue-700 font-bold dark:bg-blue-950/60 dark:text-blue-300 border-l-3 border-blue-600 pl-2.5 rounded-l-none'
+                                    (
+                                        item.href
+                                            ? isCurrentOrParentUrl(item.href)
+                                            : false
+                                    )
+                                        ? 'rounded-l-none border-l-3 border-blue-600 bg-blue-100/70 pl-2.5 font-bold text-blue-700 dark:bg-blue-950/60 dark:text-blue-300'
                                         : 'text-slate-500 hover:bg-slate-200/60 hover:text-black dark:text-slate-400 dark:hover:bg-slate-800/60 dark:hover:text-white',
                                 )}
                             >

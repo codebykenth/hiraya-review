@@ -50,8 +50,12 @@ export default function DeleteUser() {
                         <DialogDescription>
                             Once your account is deleted, all of its resources
                             and data will also be permanently deleted. Please
-                            confirm you would like to permanently delete your account
-                            by typing "<span className="font-bold text-foreground">delete account</span>".
+                            confirm you would like to permanently delete your
+                            account by typing "
+                            <span className="font-bold text-foreground">
+                                delete account
+                            </span>
+                            ".
                         </DialogDescription>
 
                         <Form
@@ -66,7 +70,10 @@ export default function DeleteUser() {
                             {({ resetAndClearErrors, processing, errors }) => (
                                 <>
                                     <div className="grid gap-2">
-                                        <Label htmlFor="confirmation" className="sr-only">
+                                        <Label
+                                            htmlFor="confirmation"
+                                            className="sr-only"
+                                        >
                                             Confirmation text
                                         </Label>
 
@@ -74,12 +81,16 @@ export default function DeleteUser() {
                                             id="confirmation"
                                             name="confirmation"
                                             value={confirmation}
-                                            onChange={(e) => setConfirmation(e.target.value)}
+                                            onChange={(e) =>
+                                                setConfirmation(e.target.value)
+                                            }
                                             placeholder="delete account"
                                             autoComplete="off"
                                         />
 
-                                        <InputError message={errors.confirmation} />
+                                        <InputError
+                                            message={errors.confirmation}
+                                        />
                                     </div>
 
                                     <DialogFooter className="gap-2">
@@ -98,7 +109,11 @@ export default function DeleteUser() {
                                         <Button
                                             type="submit"
                                             variant="destructive"
-                                            disabled={processing || confirmation !== 'delete account'}
+                                            disabled={
+                                                processing ||
+                                                confirmation !==
+                                                    'delete account'
+                                            }
                                             data-test="confirm-delete-user-button"
                                         >
                                             Delete account

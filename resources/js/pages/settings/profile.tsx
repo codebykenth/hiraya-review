@@ -76,7 +76,7 @@ export default function Profile({
                                     className={cn(
                                         'mt-1 block w-full',
                                         auth.user.email_verified_at !== null &&
-                                        'bg-muted/50 text-muted-foreground select-none cursor-not-allowed',
+                                            'cursor-not-allowed bg-muted/50 text-muted-foreground select-none',
                                     )}
                                     defaultValue={auth.user.email}
                                     name="email"
@@ -84,7 +84,9 @@ export default function Profile({
                                     autoComplete="username"
                                     placeholder="Email address"
                                     // Prevent changing already verified email to maintain authentication consistency.
-                                    readOnly={auth.user.email_verified_at !== null}
+                                    readOnly={
+                                        auth.user.email_verified_at !== null
+                                    }
                                 />
 
                                 <InputError
@@ -110,11 +112,11 @@ export default function Profile({
 
                                         {status ===
                                             'verification-link-sent' && (
-                                                <div className="mt-2 text-sm font-medium text-green-600">
-                                                    A new verification link has been
-                                                    sent to your email address.
-                                                </div>
-                                            )}
+                                            <div className="mt-2 text-sm font-medium text-green-600">
+                                                A new verification link has been
+                                                sent to your email address.
+                                            </div>
+                                        )}
                                     </div>
                                 )}
 

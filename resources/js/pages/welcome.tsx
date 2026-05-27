@@ -96,7 +96,9 @@ export default function Welcome() {
         },
     ];
 
-    const [activeTab, setActiveTab] = useState<'flow' | 'structure' | 'tips'>('flow');
+    const [activeTab, setActiveTab] = useState<'flow' | 'structure' | 'tips'>(
+        'flow',
+    );
 
     const studySteps = [
         {
@@ -104,53 +106,57 @@ export default function Welcome() {
             title: 'Diagnostic Benchmark',
             icon: ClipboardList,
             color: 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/30',
-            description: 'Begin by taking a full-length simulated Mock Exam to establish your baseline score. The actual exam requires an 80% passing rate.',
+            description:
+                'Begin by taking a full-length simulated Mock Exam to establish your baseline score. The actual exam requires an 80% passing rate.',
             actionLabel: 'Take Mock Exam',
             actionUrl: '/exams',
             tips: [
                 'Choose Professional (170 questions, 3h 10m) or Subprofessional (165 questions, 2h 40m).',
-                'Take it in a quiet environment without calculators or search aids to mimic real test conditions.'
-            ]
+                'Take it in a quiet environment without calculators or search aids to mimic real test conditions.',
+            ],
         },
         {
             phase: 'Phase 2',
             title: 'Conceptual Study Hub',
             icon: BookOpen,
             color: 'text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/30',
-            description: 'Navigate to the Study Hub (Learn Section) to read concise, high-yield syllabus modules generated from core civil service subjects.',
+            description:
+                'Navigate to the Study Hub (Learn Section) to read concise, high-yield syllabus modules generated from core civil service subjects.',
             actionLabel: 'Explore Study Hub',
             actionUrl: '/learn',
             tips: [
                 'Focus on topics highlighted as focus areas in your dashboard.',
-                'Use the interactive summaries to lock in key concepts and terms.'
-            ]
+                'Use the interactive summaries to lock in key concepts and terms.',
+            ],
         },
         {
             phase: 'Phase 3',
             title: 'Focused Practice Drills',
             icon: Target,
             color: 'text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/30',
-            description: 'Strengthen weaker subject subcategories with Practice Drills. Create custom sets with active immediate explanations.',
+            description:
+                'Strengthen weaker subject subcategories with Practice Drills. Create custom sets with active immediate explanations.',
             actionLabel: 'Launch Practice Drill',
             actionUrl: '/drills',
             tips: [
                 'Target specific mathematical, verbal, or analytical subcategories.',
-                'Read the instant visual explanations immediately after answering each question.'
-            ]
+                'Read the instant visual explanations immediately after answering each question.',
+            ],
         },
         {
             phase: 'Phase 4',
             title: 'Mistake Curation & Analytics',
             icon: History,
             color: 'text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/30',
-            description: 'Track your scoring mastery, passing ratios, and average speed. Review every single incorrect response in Attempt History.',
+            description:
+                'Track your scoring mastery, passing ratios, and average speed. Review every single incorrect response in Attempt History.',
             actionLabel: 'Review Attempt History',
             actionUrl: '/history',
             tips: [
                 'Review failed attempts once a week to verify you understand the correct logic.',
-                'Re-run drills on subcategories where your score is below 80%.'
-            ]
-        }
+                'Re-run drills on subcategories where your score is below 80%.',
+            ],
+        },
     ];
 
     const examStructure = {
@@ -159,44 +165,71 @@ export default function Welcome() {
             items: 170,
             time: '3 hours and 10 minutes',
             scope: [
-                { name: 'Numerical Ability', detail: 'Basic Operations, Word Problems, Data Interpretation' },
-                { name: 'Analytical Ability', detail: 'Word Association, Identifying Assumptions, Logical Reasoning' },
-                { name: 'Verbal Ability', detail: 'Vocabulary, Grammar, Sentence Completion, Reading Comprehension' },
-                { name: 'General Information', detail: 'Philippine Constitution, Code of Conduct, Peace & Human Rights' }
-            ]
+                {
+                    name: 'Numerical Ability',
+                    detail: 'Basic Operations, Word Problems, Data Interpretation',
+                },
+                {
+                    name: 'Analytical Ability',
+                    detail: 'Word Association, Identifying Assumptions, Logical Reasoning',
+                },
+                {
+                    name: 'Verbal Ability',
+                    detail: 'Vocabulary, Grammar, Sentence Completion, Reading Comprehension',
+                },
+                {
+                    name: 'General Information',
+                    detail: 'Philippine Constitution, Code of Conduct, Peace & Human Rights',
+                },
+            ],
         },
         subprofessional: {
             title: 'Subprofessional Exam Level',
             items: 165,
             time: '2 hours and 40 minutes',
             scope: [
-                { name: 'Numerical Ability', detail: 'Basic Operations, Word Problems' },
-                { name: 'Clerical Ability', detail: 'Filing, Spelling, General Clerical Procedures' },
-                { name: 'Verbal Ability', detail: 'Vocabulary, Grammar, Sentence Completion, Reading Comprehension' },
-                { name: 'General Information', detail: 'Philippine Constitution, Code of Conduct, Peace & Human Rights' }
-            ]
-        }
+                {
+                    name: 'Numerical Ability',
+                    detail: 'Basic Operations, Word Problems',
+                },
+                {
+                    name: 'Clerical Ability',
+                    detail: 'Filing, Spelling, General Clerical Procedures',
+                },
+                {
+                    name: 'Verbal Ability',
+                    detail: 'Vocabulary, Grammar, Sentence Completion, Reading Comprehension',
+                },
+                {
+                    name: 'General Information',
+                    detail: 'Philippine Constitution, Code of Conduct, Peace & Human Rights',
+                },
+            ],
+        },
     };
 
     const generalTips = [
         {
             title: 'Maintain the 80% Benchmark',
-            description: 'Both Professional and Subprofessional examinations require a minimum rating of 80.00% to pass. Standardize your drills and mock exam benchmarks at 80% accuracy.',
+            description:
+                'Both Professional and Subprofessional examinations require a minimum rating of 80.00% to pass. Standardize your drills and mock exam benchmarks at 80% accuracy.',
             icon: Award,
-            color: 'border-l-emerald-500 text-emerald-600'
+            color: 'border-l-emerald-500 text-emerald-600',
         },
         {
             title: 'Master Time Management',
-            description: 'You have roughly 67 seconds per question on the Professional exam, and 58 seconds on the Subprofessional exam. Train your pace under the timer inside the Mock Exam mode.',
+            description:
+                'You have roughly 67 seconds per question on the Professional exam, and 58 seconds on the Subprofessional exam. Train your pace under the timer inside the Mock Exam mode.',
             icon: Clock,
-            color: 'border-l-blue-500 text-blue-600'
+            color: 'border-l-blue-500 text-blue-600',
         },
         {
             title: 'Analyze Explanations',
-            description: 'Getting questions wrong is part of study optimization. Make it a habit to hover or click on explanations to see the mathematical formula or grammatical rule applied.',
+            description:
+                'Getting questions wrong is part of study optimization. Make it a habit to hover or click on explanations to see the mathematical formula or grammatical rule applied.',
             icon: Lightbulb,
-            color: 'border-l-indigo-500 text-indigo-600'
-        }
+            color: 'border-l-indigo-500 text-indigo-600',
+        },
     ];
 
     return (
@@ -383,11 +416,11 @@ export default function Welcome() {
 
                         <div className="relative w-full">
                             {/* Horizontal connecting line behind cards - z-0 puts it behind cards but in front of section background */}
-                            <div className="absolute top-[170px] right-[16%] left-[16%] z-0 hidden h-[2.5px] bg-primary md:block " />
+                            <div className="absolute top-[170px] right-[16%] left-[16%] z-0 hidden h-[2.5px] bg-primary md:block" />
 
                             <div className="relative z-10 grid w-full grid-cols-1 gap-8 md:grid-cols-3">
                                 {/* Step 1 */}
-                                <Card className="relative flex flex-col items-center overflow-hidden rounded-xl border border-l-[4px] border-slate-200/80 border-l-primary bg-white p-8 text-center shadow-sm transition-all duration-300 hover:shadow-md bg-card">
+                                <Card className="relative flex flex-col items-center overflow-hidden rounded-xl border border-l-[4px] border-slate-200/80 border-l-primary bg-card bg-white p-8 text-center shadow-sm transition-all duration-300 hover:shadow-md">
                                     <div className="z-10 flex h-12 w-12 items-center justify-center rounded-full bg-primary text-lg font-bold text-white shadow-md">
                                         1
                                     </div>
@@ -401,7 +434,7 @@ export default function Welcome() {
                                 </Card>
 
                                 {/* Step 2 */}
-                                <Card className="relative flex flex-col items-center overflow-hidden rounded-xl border border-l-[4px] border-slate-200/80 border-l-primary bg-white p-8 text-center shadow-sm transition-all duration-300 hover:shadow-md bg-card">
+                                <Card className="relative flex flex-col items-center overflow-hidden rounded-xl border border-l-[4px] border-slate-200/80 border-l-primary bg-card bg-white p-8 text-center shadow-sm transition-all duration-300 hover:shadow-md">
                                     <div className="z-10 flex h-12 w-12 items-center justify-center rounded-full border-2 border-primary bg-white text-lg font-bold text-primary shadow-sm dark:bg-slate-950">
                                         2
                                     </div>
@@ -415,7 +448,7 @@ export default function Welcome() {
                                 </Card>
 
                                 {/* Step 3 */}
-                                <Card className="relative flex flex-col items-center overflow-hidden rounded-xl border border-l-[4px] border-slate-200/80 border-l-primary bg-white p-8 text-center shadow-sm transition-all duration-300 hover:shadow-md bg-card">
+                                <Card className="relative flex flex-col items-center overflow-hidden rounded-xl border border-l-[4px] border-slate-200/80 border-l-primary bg-card bg-white p-8 text-center shadow-sm transition-all duration-300 hover:shadow-md">
                                     <div className="z-10 flex h-12 w-12 items-center justify-center rounded-full border-2 border-primary bg-white text-lg font-bold text-primary shadow-sm dark:bg-slate-950">
                                         3
                                     </div>
@@ -440,31 +473,34 @@ export default function Welcome() {
                         />
 
                         {/* Navigation Tabs */}
-                        <div className="flex border-b border-border mb-8 justify-center flex-wrap gap-2">
+                        <div className="mb-8 flex flex-wrap justify-center gap-2 border-b border-border">
                             <button
                                 onClick={() => setActiveTab('flow')}
-                                className={`border-b-2 px-5 py-3 text-sm font-semibold transition-all ${activeTab === 'flow'
-                                    ? 'border-primary text-primary font-bold'
-                                    : 'border-transparent text-muted-foreground hover:text-foreground'
-                                    }`}
+                                className={`border-b-2 px-5 py-3 text-sm font-semibold transition-all ${
+                                    activeTab === 'flow'
+                                        ? 'border-primary font-bold text-primary'
+                                        : 'border-transparent text-muted-foreground hover:text-foreground'
+                                }`}
                             >
                                 Reviewer Study Flow
                             </button>
                             <button
                                 onClick={() => setActiveTab('structure')}
-                                className={`border-b-2 px-5 py-3 text-sm font-semibold transition-all ${activeTab === 'structure'
-                                    ? 'border-primary text-primary font-bold'
-                                    : 'border-transparent text-muted-foreground hover:text-foreground'
-                                    }`}
+                                className={`border-b-2 px-5 py-3 text-sm font-semibold transition-all ${
+                                    activeTab === 'structure'
+                                        ? 'border-primary font-bold text-primary'
+                                        : 'border-transparent text-muted-foreground hover:text-foreground'
+                                }`}
                             >
                                 CSE Exam Structure
                             </button>
                             <button
                                 onClick={() => setActiveTab('tips')}
-                                className={`border-b-2 px-5 py-3 text-sm font-semibold transition-all ${activeTab === 'tips'
-                                    ? 'border-primary text-primary font-bold'
-                                    : 'border-transparent text-muted-foreground hover:text-foreground'
-                                    }`}
+                                className={`border-b-2 px-5 py-3 text-sm font-semibold transition-all ${
+                                    activeTab === 'tips'
+                                        ? 'border-primary font-bold text-primary'
+                                        : 'border-transparent text-muted-foreground hover:text-foreground'
+                                }`}
                             >
                                 Smart Study Tips
                             </button>
@@ -472,26 +508,39 @@ export default function Welcome() {
 
                         {/* Tab Content: Flow */}
                         {activeTab === 'flow' && (
-                            <div className="space-y-6 max-w-5xl mx-auto">
-                                <div className="rounded-xl border border-blue-100 bg-blue-50/20 p-5 dark:border-blue-900/30 dark:bg-blue-950/10 flex gap-3.5 items-start">
-                                    <Info className="size-5 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
+                            <div className="mx-auto max-w-5xl space-y-6">
+                                <div className="flex items-start gap-3.5 rounded-xl border border-blue-100 bg-blue-50/20 p-5 dark:border-blue-900/30 dark:bg-blue-950/10">
+                                    <Info className="mt-0.5 size-5 shrink-0 text-blue-600 dark:text-blue-400" />
                                     <div>
-                                        <h3 className="font-semibold text-blue-900 dark:text-blue-300 text-sm">Recommended Study Pathway</h3>
-                                        <p className="text-xs text-blue-700/95 dark:text-blue-400/90 mt-1 leading-relaxed">
-                                            Studies show that taking a diagnostic test first helps identify exact focus subcategories, which prevents wasting time reviewing areas you have already mastered. Follow the four-phase system below to maximize your efficiency.
+                                        <h3 className="text-sm font-semibold text-blue-900 dark:text-blue-300">
+                                            Recommended Study Pathway
+                                        </h3>
+                                        <p className="mt-1 text-xs leading-relaxed text-blue-700/95 dark:text-blue-400/90">
+                                            Studies show that taking a
+                                            diagnostic test first helps identify
+                                            exact focus subcategories, which
+                                            prevents wasting time reviewing
+                                            areas you have already mastered.
+                                            Follow the four-phase system below
+                                            to maximize your efficiency.
                                         </p>
                                     </div>
                                 </div>
 
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                                     {studySteps.map((step, idx) => (
-                                        <Card key={idx} className="overflow-hidden border border-border bg-card hover:border-slate-350 dark:hover:border-slate-700 transition duration-200">
-                                            <div className="p-6 space-y-4">
-                                                <div className="flex justify-between items-center">
-                                                    <span className="text-[10px] font-black uppercase tracking-wider bg-slate-100 text-slate-600 dark:bg-slate-900 dark:text-slate-400 px-2.5 py-1 rounded-full">
+                                        <Card
+                                            key={idx}
+                                            className="hover:border-slate-350 overflow-hidden border border-border bg-card transition duration-200 dark:hover:border-slate-700"
+                                        >
+                                            <div className="space-y-4 p-6">
+                                                <div className="flex items-center justify-between">
+                                                    <span className="rounded-full bg-slate-100 px-2.5 py-1 text-[10px] font-black tracking-wider text-slate-600 uppercase dark:bg-slate-900 dark:text-slate-400">
                                                         {step.phase}
                                                     </span>
-                                                    <div className={`p-2 rounded-lg ${step.color}`}>
+                                                    <div
+                                                        className={`rounded-lg p-2 ${step.color}`}
+                                                    >
                                                         <step.icon className="size-5" />
                                                     </div>
                                                 </div>
@@ -499,20 +548,29 @@ export default function Welcome() {
                                                     <h3 className="font-heading text-lg font-black text-slate-900 dark:text-white">
                                                         {step.title}
                                                     </h3>
-                                                    <p className="mt-2 text-xs text-muted-foreground leading-relaxed">
+                                                    <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
                                                         {step.description}
                                                     </p>
                                                 </div>
 
                                                 <div className="border-t border-border pt-4">
-                                                    <h4 className="text-[10px] font-black uppercase tracking-wider text-muted-foreground mb-2">Pro study tips:</h4>
+                                                    <h4 className="mb-2 text-[10px] font-black tracking-wider text-muted-foreground uppercase">
+                                                        Pro study tips:
+                                                    </h4>
                                                     <ul className="space-y-1.5">
-                                                        {step.tips.map((tip, tIdx) => (
-                                                            <li key={tIdx} className="flex gap-2 items-start text-xs font-semibold text-slate-900 dark:text-slate-100">
-                                                                <CheckCircle2 className="size-3.5 text-emerald-500 shrink-0 mt-0.5" />
-                                                                <span>{tip}</span>
-                                                            </li>
-                                                        ))}
+                                                        {step.tips.map(
+                                                            (tip, tIdx) => (
+                                                                <li
+                                                                    key={tIdx}
+                                                                    className="flex items-start gap-2 text-xs font-semibold text-slate-900 dark:text-slate-100"
+                                                                >
+                                                                    <CheckCircle2 className="mt-0.5 size-3.5 shrink-0 text-emerald-500" />
+                                                                    <span>
+                                                                        {tip}
+                                                                    </span>
+                                                                </li>
+                                                            ),
+                                                        )}
                                                     </ul>
                                                 </div>
                                             </div>
@@ -524,76 +582,143 @@ export default function Welcome() {
 
                         {/* Tab Content: Structure */}
                         {activeTab === 'structure' && (
-                            <div className="space-y-6 max-w-5xl mx-auto">
-                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                            <div className="mx-auto max-w-5xl space-y-6">
+                                <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
                                     {/* Professional Section */}
-                                    <Card className="p-6 space-y-6 border border-border bg-card">
-                                        <div className="border-b border-border pb-4 space-y-1.5">
-                                            <h3 className="font-heading text-xl font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+                                    <Card className="space-y-6 border border-border bg-card p-6">
+                                        <div className="space-y-1.5 border-b border-border pb-4">
+                                            <h3 className="flex items-center gap-2 font-heading text-xl font-extrabold text-slate-900 dark:text-white">
                                                 <Award className="size-5 text-blue-600 dark:text-blue-400" />
-                                                {examStructure.professional.title}
+                                                {
+                                                    examStructure.professional
+                                                        .title
+                                                }
                                             </h3>
                                             <p className="text-xs text-muted-foreground">
-                                                Qualifies eligibility for both first-level (clerical) and second-level (technical/scientific) government positions.
+                                                Qualifies eligibility for both
+                                                first-level (clerical) and
+                                                second-level
+                                                (technical/scientific)
+                                                government positions.
                                             </p>
                                         </div>
 
                                         <div className="grid grid-cols-2 gap-4">
                                             <div className="rounded-xl border border-slate-100 bg-slate-50/50 p-4 dark:border-slate-900/50 dark:bg-slate-900/20">
-                                                <span className="block text-[10px] font-bold text-muted-foreground uppercase">Number of Items</span>
-                                                <span className="text-2xl font-black text-slate-800 dark:text-white">{examStructure.professional.items} items</span>
+                                                <span className="block text-[10px] font-bold text-muted-foreground uppercase">
+                                                    Number of Items
+                                                </span>
+                                                <span className="text-2xl font-black text-slate-800 dark:text-white">
+                                                    {
+                                                        examStructure
+                                                            .professional.items
+                                                    }{' '}
+                                                    items
+                                                </span>
                                             </div>
                                             <div className="rounded-xl border border-slate-100 bg-slate-50/50 p-4 dark:border-slate-900/50 dark:bg-slate-900/20">
-                                                <span className="block text-[10px] font-bold text-muted-foreground uppercase">Time Limit</span>
-                                                <span className="text-lg font-black text-slate-800 dark:text-white">{examStructure.professional.time}</span>
+                                                <span className="block text-[10px] font-bold text-muted-foreground uppercase">
+                                                    Time Limit
+                                                </span>
+                                                <span className="text-lg font-black text-slate-800 dark:text-white">
+                                                    {
+                                                        examStructure
+                                                            .professional.time
+                                                    }
+                                                </span>
                                             </div>
                                         </div>
 
                                         <div className="space-y-4">
-                                            <h4 className="text-[10px] font-black uppercase tracking-wider text-muted-foreground">Subjects Coverage & Scope:</h4>
+                                            <h4 className="text-[10px] font-black tracking-wider text-muted-foreground uppercase">
+                                                Subjects Coverage & Scope:
+                                            </h4>
                                             <div className="divide-y divide-border rounded-xl border border-border">
-                                                {examStructure.professional.scope.map((scope, idx) => (
-                                                    <div key={idx} className="p-3.5 space-y-1 hover:bg-slate-50/30 dark:hover:bg-slate-900/10 transition">
-                                                        <span className="block text-sm font-bold text-slate-900 dark:text-white">{scope.name}</span>
-                                                        <span className="block text-xs text-muted-foreground leading-relaxed">{scope.detail}</span>
-                                                    </div>
-                                                ))}
+                                                {examStructure.professional.scope.map(
+                                                    (scope, idx) => (
+                                                        <div
+                                                            key={idx}
+                                                            className="space-y-1 p-3.5 transition hover:bg-slate-50/30 dark:hover:bg-slate-900/10"
+                                                        >
+                                                            <span className="block text-sm font-bold text-slate-900 dark:text-white">
+                                                                {scope.name}
+                                                            </span>
+                                                            <span className="block text-xs leading-relaxed text-muted-foreground">
+                                                                {scope.detail}
+                                                            </span>
+                                                        </div>
+                                                    ),
+                                                )}
                                             </div>
                                         </div>
                                     </Card>
 
                                     {/* Subprofessional Section */}
-                                    <Card className="p-6 space-y-6 border border-border bg-card">
-                                        <div className="border-b border-border pb-4 space-y-1.5">
-                                            <h3 className="font-heading text-xl font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+                                    <Card className="space-y-6 border border-border bg-card p-6">
+                                        <div className="space-y-1.5 border-b border-border pb-4">
+                                            <h3 className="flex items-center gap-2 font-heading text-xl font-extrabold text-slate-900 dark:text-white">
                                                 <Award className="size-5 text-indigo-600 dark:text-indigo-400" />
-                                                {examStructure.subprofessional.title}
+                                                {
+                                                    examStructure
+                                                        .subprofessional.title
+                                                }
                                             </h3>
                                             <p className="text-xs text-muted-foreground">
-                                                Qualifies eligibility exclusively for first-level government positions (clerical, custodial, trade services).
+                                                Qualifies eligibility
+                                                exclusively for first-level
+                                                government positions (clerical,
+                                                custodial, trade services).
                                             </p>
                                         </div>
 
                                         <div className="grid grid-cols-2 gap-4">
                                             <div className="rounded-xl border border-slate-100 bg-slate-50/50 p-4 dark:border-slate-900/50 dark:bg-slate-900/20">
-                                                <span className="block text-[10px] font-bold text-muted-foreground uppercase">Number of Items</span>
-                                                <span className="text-2xl font-black text-slate-800 dark:text-white">{examStructure.subprofessional.items} items</span>
+                                                <span className="block text-[10px] font-bold text-muted-foreground uppercase">
+                                                    Number of Items
+                                                </span>
+                                                <span className="text-2xl font-black text-slate-800 dark:text-white">
+                                                    {
+                                                        examStructure
+                                                            .subprofessional
+                                                            .items
+                                                    }{' '}
+                                                    items
+                                                </span>
                                             </div>
                                             <div className="rounded-xl border border-slate-100 bg-slate-50/50 p-4 dark:border-slate-900/50 dark:bg-slate-900/20">
-                                                <span className="block text-[10px] font-bold text-muted-foreground uppercase">Time Limit</span>
-                                                <span className="text-lg font-black text-slate-800 dark:text-white">{examStructure.subprofessional.time}</span>
+                                                <span className="block text-[10px] font-bold text-muted-foreground uppercase">
+                                                    Time Limit
+                                                </span>
+                                                <span className="text-lg font-black text-slate-800 dark:text-white">
+                                                    {
+                                                        examStructure
+                                                            .subprofessional
+                                                            .time
+                                                    }
+                                                </span>
                                             </div>
                                         </div>
 
                                         <div className="space-y-4">
-                                            <h4 className="text-[10px] font-black uppercase tracking-wider text-muted-foreground">Subjects Coverage & Scope:</h4>
+                                            <h4 className="text-[10px] font-black tracking-wider text-muted-foreground uppercase">
+                                                Subjects Coverage & Scope:
+                                            </h4>
                                             <div className="divide-y divide-border rounded-xl border border-border">
-                                                {examStructure.subprofessional.scope.map((scope, idx) => (
-                                                    <div key={idx} className="p-3.5 space-y-1 hover:bg-slate-50/30 dark:hover:bg-slate-900/10 transition">
-                                                        <span className="block text-sm font-bold text-slate-900 dark:text-white">{scope.name}</span>
-                                                        <span className="block text-xs text-muted-foreground leading-relaxed">{scope.detail}</span>
-                                                    </div>
-                                                ))}
+                                                {examStructure.subprofessional.scope.map(
+                                                    (scope, idx) => (
+                                                        <div
+                                                            key={idx}
+                                                            className="space-y-1 p-3.5 transition hover:bg-slate-50/30 dark:hover:bg-slate-900/10"
+                                                        >
+                                                            <span className="block text-sm font-bold text-slate-900 dark:text-white">
+                                                                {scope.name}
+                                                            </span>
+                                                            <span className="block text-xs leading-relaxed text-muted-foreground">
+                                                                {scope.detail}
+                                                            </span>
+                                                        </div>
+                                                    ),
+                                                )}
                                             </div>
                                         </div>
                                     </Card>
@@ -603,15 +728,18 @@ export default function Welcome() {
 
                         {/* Tab Content: Tips */}
                         {activeTab === 'tips' && (
-                            <div className="space-y-6 max-w-5xl mx-auto">
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div className="mx-auto max-w-5xl space-y-6">
+                                <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
                                     {generalTips.map((tip, idx) => (
-                                        <Card key={idx} className={`p-6 border border-border bg-card border-l-4 ${tip.color} space-y-4`}>
+                                        <Card
+                                            key={idx}
+                                            className={`border border-l-4 border-border bg-card p-6 ${tip.color} space-y-4`}
+                                        >
                                             <div className="flex items-center gap-3">
-                                                <div className="p-2 rounded-lg bg-slate-100 dark:bg-slate-900">
+                                                <div className="rounded-lg bg-slate-100 p-2 dark:bg-slate-900">
                                                     <tip.icon className="size-5 shrink-0 text-slate-800 dark:text-slate-200" />
                                                 </div>
-                                                <h3 className="font-heading font-black text-base text-slate-900 dark:text-white leading-tight">
+                                                <h3 className="font-heading text-base leading-tight font-black text-slate-900 dark:text-white">
                                                     {tip.title}
                                                 </h3>
                                             </div>
@@ -622,22 +750,43 @@ export default function Welcome() {
                                     ))}
                                 </div>
 
-                                <Card className="p-6 space-y-4 border border-border bg-card">
-                                    <h3 className="font-heading text-lg font-black text-slate-900 dark:text-white flex items-center gap-2">
+                                <Card className="space-y-4 border border-border bg-card p-6">
+                                    <h3 className="flex items-center gap-2 font-heading text-lg font-black text-slate-900 dark:text-white">
                                         <HelpCircle className="size-5 text-primary" />
                                         Frequently Asked Reviewer Questions
                                     </h3>
                                     <div className="space-y-4 divide-y divide-border">
-                                        <div className="pt-2 space-y-1.5">
-                                            <span className="block text-xs font-bold text-slate-900 dark:text-white">How reliable is the AI Lesson Generator and Mock Questions?</span>
-                                            <span className="block text-xs text-muted-foreground leading-relaxed">
-                                                All dynamic lessons and test questions are fully vetted by a dual-stage filtering system in the reviewer curation pipeline. They conform strictly to the Philippine Civil Service Commission (CSC) scope guidelines.
+                                        <div className="space-y-1.5 pt-2">
+                                            <span className="block text-xs font-bold text-slate-900 dark:text-white">
+                                                How reliable is the AI Lesson
+                                                Generator and Mock Questions?
+                                            </span>
+                                            <span className="block text-xs leading-relaxed text-muted-foreground">
+                                                All dynamic lessons and test
+                                                questions are fully vetted by a
+                                                dual-stage filtering system in
+                                                the reviewer curation pipeline.
+                                                They conform strictly to the
+                                                Philippine Civil Service
+                                                Commission (CSC) scope
+                                                guidelines.
                                             </span>
                                         </div>
-                                        <div className="pt-4 space-y-1.5">
-                                            <span className="block text-xs font-bold text-slate-900 dark:text-white">Can I practice with specific subcategories only?</span>
-                                            <span className="block text-xs text-muted-foreground leading-relaxed">
-                                                Yes! Under "Practice Drill", you can check and uncheck any individual category or fine-grained subcategory (such as "Filing" under Clerical Ability, or "Philippine Constitution" under General Information) to curate specialized practice sessions.
+                                        <div className="space-y-1.5 pt-4">
+                                            <span className="block text-xs font-bold text-slate-900 dark:text-white">
+                                                Can I practice with specific
+                                                subcategories only?
+                                            </span>
+                                            <span className="block text-xs leading-relaxed text-muted-foreground">
+                                                Yes! Under "Practice Drill", you
+                                                can check and uncheck any
+                                                individual category or
+                                                fine-grained subcategory (such
+                                                as "Filing" under Clerical
+                                                Ability, or "Philippine
+                                                Constitution" under General
+                                                Information) to curate
+                                                specialized practice sessions.
                                             </span>
                                         </div>
                                     </div>
@@ -677,17 +826,19 @@ export default function Welcome() {
                                                 {faq.question}
                                             </span>
                                             <ChevronDown
-                                                className={`h-5 w-5 shrink-0 text-slate-400 transition-transform duration-300 ${isOpen
-                                                    ? 'rotate-180 text-primary'
-                                                    : ''
-                                                    }`}
+                                                className={`h-5 w-5 shrink-0 text-slate-400 transition-transform duration-300 ${
+                                                    isOpen
+                                                        ? 'rotate-180 text-primary'
+                                                        : ''
+                                                }`}
                                             />
                                         </button>
                                         <div
-                                            className={`transition-all duration-300 ease-in-out ${isOpen
-                                                ? 'dark:border-slate-850 max-h-[250px] border-t border-slate-100'
-                                                : 'max-h-0'
-                                                } overflow-hidden`}
+                                            className={`transition-all duration-300 ease-in-out ${
+                                                isOpen
+                                                    ? 'dark:border-slate-850 max-h-[250px] border-t border-slate-100'
+                                                    : 'max-h-0'
+                                            } overflow-hidden`}
                                         >
                                             <div className="px-6 py-5 text-sm leading-relaxed font-normal text-slate-600 dark:text-slate-400">
                                                 {faq.answer}

@@ -8,7 +8,7 @@ import {
     ChevronDown,
     ListChecks,
     Inbox,
-    ChevronLeft
+    ChevronLeft,
 } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
 import { PageContainer } from '@/components/page-container';
@@ -74,21 +74,23 @@ export function DraftsReviewShell<T extends BaseDraftItem>({
     emptyStateActionUrl,
     emptyStateActionLabel,
     emptyStateActionIcon: EmptyStateActionIcon = ListChecks,
-    renderItem
+    renderItem,
 }: DraftsReviewShellProps<T>) {
     // Build categories tree dynamically with robust static CSC fallback
     const cseCategoriesTree: Record<string, string[]> = {};
 
     if (categories && categories.length > 0) {
-        categories.forEach(cat => {
-            cseCategoriesTree[cat.name] = (cat.subcategory || []).map(sub => sub.name);
+        categories.forEach((cat) => {
+            cseCategoriesTree[cat.name] = (cat.subcategory || []).map(
+                (sub) => sub.name,
+            );
         });
     } else {
         cseCategoriesTree['General Information'] = [
             'Philippine Constitution',
             'Code of Conduct and Ethical Standards (R.A. 6713)',
             'Peace and Human Rights Issues and Concepts',
-            'Environment Management and Protection'
+            'Environment Management and Protection',
         ];
         cseCategoriesTree['Verbal Ability'] = [
             'Word meaning',
@@ -96,29 +98,28 @@ export function DraftsReviewShell<T extends BaseDraftItem>({
             'Error recognition',
             'Sentence structure',
             'Paragraph organization',
-            'Reading comprehension'
+            'Reading comprehension',
         ];
         cseCategoriesTree['Analytical Ability'] = [
             'Word analogy',
             'Symbolic logic / abstract reasoning',
             'Identifying assumptions and drawing conclusions',
-            'Data interpretation'
+            'Data interpretation',
         ];
         cseCategoriesTree['Numerical Ability'] = [
             'Basic operations',
             'Number sequence',
-            'Word problems'
+            'Word problems',
         ];
-        cseCategoriesTree['Clerical Ability'] = [
-            'Filing',
-            'Spelling'
-        ];
+        cseCategoriesTree['Clerical Ability'] = ['Filing', 'Spelling'];
     }
 
     // Filtering & Pagination States
     const [filterSearch, setFilterSearch] = useState('');
     const [debouncedFilterSearch, setDebouncedFilterSearch] = useState('');
-    const [filterStatus, setFilterStatus] = useState<'all' | 'approved' | 'pending'>('all');
+    const [filterStatus, setFilterStatus] = useState<
+        'all' | 'approved' | 'pending'
+    >('all');
     const [filterCategory, setFilterCategory] = useState<string>('all');
     const [filterSubcategory, setFilterSubcategory] = useState<string>('all');
     const [currentPage, setCurrentPage] = useState(1);
@@ -132,7 +133,7 @@ export function DraftsReviewShell<T extends BaseDraftItem>({
         return () => clearTimeout(handler);
     }, [filterSearch]);
 
-    const filteredDrafts = items.filter(item => {
+    const filteredDrafts = items.filter((item) => {
         const matchesSearch = searchMatcher(item, debouncedFilterSearch);
 
         const matchesStatus =
@@ -141,23 +142,27 @@ export function DraftsReviewShell<T extends BaseDraftItem>({
             (filterStatus === 'pending' && !item.approved);
 
         const matchesCategory =
-            filterCategory === 'all' ||
-            item.category === filterCategory;
+            filterCategory === 'all' || item.category === filterCategory;
 
         const matchesSubcategory =
             filterSubcategory === 'all' ||
             item.subcategory === filterSubcategory;
 
-        return matchesSearch && matchesStatus && matchesCategory && matchesSubcategory;
+        return (
+            matchesSearch &&
+            matchesStatus &&
+            matchesCategory &&
+            matchesSubcategory
+        );
     });
 
     const totalPages = Math.ceil(filteredDrafts.length / pageSize);
     const paginatedDrafts = filteredDrafts.slice(
         (currentPage - 1) * pageSize,
-        currentPage * pageSize
+        currentPage * pageSize,
     );
 
-    const approvedCount = items.filter(item => item.approved).length;
+    const approvedCount = items.filter((item) => item.approved).length;
 
     return (
         <PageContainer>
@@ -166,7 +171,7 @@ export function DraftsReviewShell<T extends BaseDraftItem>({
                 <div>
                     <Link
                         href={backUrl}
-                        className="flex w-fit items-center gap-1 text-xs font-black text-foreground hover:text-blue-600 transition cursor-pointer focus:outline-none"
+                        className="flex w-fit cursor-pointer items-center gap-1 text-xs font-black text-foreground transition hover:text-blue-600 focus:outline-none"
                     >
                         <ChevronLeft className="size-4" />
                         {backLabel}
@@ -174,9 +179,7 @@ export function DraftsReviewShell<T extends BaseDraftItem>({
                     <h1 className="mt-2 text-2xl font-black tracking-tight text-foreground">
                         {title}
                     </h1>
-                    <p className="text-sm text-muted-foreground">
-                        {subtitle}
-                    </p>
+                    <p className="text-sm text-muted-foreground">{subtitle}</p>
                 </div>
 
                 {/* BULK ACTIONS HEADER DECK */}
@@ -189,7 +192,9 @@ export function DraftsReviewShell<T extends BaseDraftItem>({
                             icon={ListChecks}
                             onClick={onToggleAll}
                         >
-                            {items.every(item => item.approved) ? 'Unapprove All' : 'Approve All'}
+                            {items.every((item) => item.approved)
+                                ? 'Unapprove All'
+                                : 'Approve All'}
                         </Button>
                         <Button
                             type="button"
@@ -207,8 +212,8 @@ export function DraftsReviewShell<T extends BaseDraftItem>({
 
             {/* 2. DRAFT SEARCH & FILTER CONTROLS */}
             {items.length > 0 && (
-                <div className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-border bg-card p-4 shadow-3xs mt-6">
-                    <div className="flex flex-1 min-w-[260px] items-center gap-2">
+                <div className="shadow-3xs mt-6 flex flex-wrap items-center justify-between gap-4 rounded-xl border border-border bg-card p-4">
+                    <div className="flex min-w-[260px] flex-1 items-center gap-2">
                         <input
                             type="text"
                             value={filterSearch}
@@ -217,7 +222,7 @@ export function DraftsReviewShell<T extends BaseDraftItem>({
                                 setCurrentPage(1);
                             }}
                             placeholder={searchPlaceholder}
-                            className="w-full rounded-lg border border-border px-3 py-1.5 text-xs font-semibold text-foreground placeholder:text-muted-foreground focus:border-blue-500 focus:outline-none transition bg-muted"
+                            className="w-full rounded-lg border border-border bg-muted px-3 py-1.5 text-xs font-semibold text-foreground transition placeholder:text-muted-foreground focus:border-blue-500 focus:outline-none"
                         />
                     </div>
 
@@ -231,14 +236,25 @@ export function DraftsReviewShell<T extends BaseDraftItem>({
                                     setFilterSubcategory('all');
                                     setCurrentPage(1);
                                 }}
-                                className="w-full rounded-lg border border-border bg-background pl-2.5 pr-8 py-1.5 text-xs font-bold text-foreground transition focus:border-blue-500 focus:outline-none appearance-none"
+                                className="w-full appearance-none rounded-lg border border-border bg-background py-1.5 pr-8 pl-2.5 text-xs font-bold text-foreground transition focus:border-blue-500 focus:outline-none"
                             >
-                                <option value="all" className="dark:bg-slate-950">All Categories</option>
-                                {Object.keys(cseCategoriesTree).map(cat => (
-                                    <option key={cat} value={cat} className="dark:bg-slate-950">{cat}</option>
+                                <option
+                                    value="all"
+                                    className="dark:bg-slate-950"
+                                >
+                                    All Categories
+                                </option>
+                                {Object.keys(cseCategoriesTree).map((cat) => (
+                                    <option
+                                        key={cat}
+                                        value={cat}
+                                        className="dark:bg-slate-950"
+                                    >
+                                        {cat}
+                                    </option>
                                 ))}
                             </select>
-                            <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 size-3.5 text-slate-550 pointer-events-none" />
+                            <ChevronDown className="text-slate-550 pointer-events-none absolute top-1/2 right-2.5 size-3.5 -translate-y-1/2" />
                         </div>
 
                         {/* Subcategory Filter */}
@@ -249,17 +265,40 @@ export function DraftsReviewShell<T extends BaseDraftItem>({
                                     setFilterSubcategory(e.target.value);
                                     setCurrentPage(1);
                                 }}
-                                className="w-full rounded-lg border border-border bg-background pl-2.5 pr-8 py-1.5 text-xs font-bold text-foreground transition focus:border-blue-500 focus:outline-none appearance-none"
+                                className="w-full appearance-none rounded-lg border border-border bg-background py-1.5 pr-8 pl-2.5 text-xs font-bold text-foreground transition focus:border-blue-500 focus:outline-none"
                             >
-                                <option value="all" className="dark:bg-slate-950">All Subcategories</option>
-                                {filterCategory !== 'all' && cseCategoriesTree[filterCategory]?.map(sub => (
-                                    <option key={sub} value={sub} className="dark:bg-slate-950">{sub}</option>
-                                ))}
-                                {filterCategory === 'all' && Object.values(cseCategoriesTree).flat().map((sub, idx) => (
-                                    <option key={idx} value={sub} className="dark:bg-slate-950">{sub}</option>
-                                ))}
+                                <option
+                                    value="all"
+                                    className="dark:bg-slate-950"
+                                >
+                                    All Subcategories
+                                </option>
+                                {filterCategory !== 'all' &&
+                                    cseCategoriesTree[filterCategory]?.map(
+                                        (sub) => (
+                                            <option
+                                                key={sub}
+                                                value={sub}
+                                                className="dark:bg-slate-950"
+                                            >
+                                                {sub}
+                                            </option>
+                                        ),
+                                    )}
+                                {filterCategory === 'all' &&
+                                    Object.values(cseCategoriesTree)
+                                        .flat()
+                                        .map((sub, idx) => (
+                                            <option
+                                                key={idx}
+                                                value={sub}
+                                                className="dark:bg-slate-950"
+                                            >
+                                                {sub}
+                                            </option>
+                                        ))}
                             </select>
-                            <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 size-3.5 text-slate-550 pointer-events-none" />
+                            <ChevronDown className="text-slate-550 pointer-events-none absolute top-1/2 right-2.5 size-3.5 -translate-y-1/2" />
                         </div>
 
                         {/* Status Filter */}
@@ -270,16 +309,31 @@ export function DraftsReviewShell<T extends BaseDraftItem>({
                                     setFilterStatus(e.target.value as any);
                                     setCurrentPage(1);
                                 }}
-                                className="w-full rounded-lg border border-border bg-background pl-2.5 pr-8 py-1.5 text-xs font-bold text-foreground transition focus:border-blue-500 focus:outline-none appearance-none"
+                                className="w-full appearance-none rounded-lg border border-border bg-background py-1.5 pr-8 pl-2.5 text-xs font-bold text-foreground transition focus:border-blue-500 focus:outline-none"
                             >
-                                <option value="all" className="dark:bg-slate-950">All Statuses</option>
-                                <option value="approved" className="dark:bg-slate-950">Approved Only</option>
-                                <option value="pending" className="dark:bg-slate-950">Pending Only</option>
+                                <option
+                                    value="all"
+                                    className="dark:bg-slate-950"
+                                >
+                                    All Statuses
+                                </option>
+                                <option
+                                    value="approved"
+                                    className="dark:bg-slate-950"
+                                >
+                                    Approved Only
+                                </option>
+                                <option
+                                    value="pending"
+                                    className="dark:bg-slate-950"
+                                >
+                                    Pending Only
+                                </option>
                             </select>
-                            <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 size-3.5 text-slate-550 pointer-events-none" />
+                            <ChevronDown className="text-slate-550 pointer-events-none absolute top-1/2 right-2.5 size-3.5 -translate-y-1/2" />
                         </div>
 
-                        <span className="text-xs text-muted-foreground font-bold shrink-0 pl-1">
+                        <span className="shrink-0 pl-1 text-xs font-bold text-muted-foreground">
                             {filteredDrafts.length} found
                         </span>
                     </div>
@@ -288,44 +342,52 @@ export function DraftsReviewShell<T extends BaseDraftItem>({
 
             {/* 2.5 DRAFT ACTIONS LEGEND */}
             {items.length > 0 && (
-                <div className="flex flex-wrap items-center justify-end gap-3 text-[10px] font-extrabold uppercase tracking-wider bg-card border border-border p-3 rounded-xl mt-4">
+                <div className="mt-4 flex flex-wrap items-center justify-end gap-3 rounded-xl border border-border bg-card p-3 text-[10px] font-extrabold tracking-wider uppercase">
                     <span className="text-muted-foreground">Legend:</span>
-                    <div className="flex items-center gap-1.5 bg-emerald-50/50 dark:bg-emerald-950/10 px-2 py-1 rounded-lg border border-emerald-100 dark:border-emerald-900/20">
-                        <span className="flex size-5.5 items-center justify-center rounded-md border border-emerald-250 bg-emerald-100 text-emerald-700 dark:border-emerald-900/30 dark:bg-emerald-950/20 dark:text-emerald-400">
+                    <div className="flex items-center gap-1.5 rounded-lg border border-emerald-100 bg-emerald-50/50 px-2 py-1 dark:border-emerald-900/20 dark:bg-emerald-950/10">
+                        <span className="border-emerald-250 flex size-5.5 items-center justify-center rounded-md border bg-emerald-100 text-emerald-700 dark:border-emerald-900/30 dark:bg-emerald-950/20 dark:text-emerald-400">
                             <Check className="size-3" />
                         </span>
-                        <span className="text-emerald-800 dark:text-emerald-300">Approve / Unapprove Draft</span>
+                        <span className="text-emerald-800 dark:text-emerald-300">
+                            Approve / Unapprove Draft
+                        </span>
                     </div>
-                    <div className="flex items-center gap-1.5 bg-blue-50/50 dark:bg-blue-950/10 px-2 py-1 rounded-lg border border-blue-100 dark:border-blue-900/20">
-                        <span className="flex size-5.5 items-center justify-center rounded-md border border-blue-250 bg-blue-100 text-blue-700 dark:border-blue-900/30 dark:bg-blue-950/20 dark:text-blue-400">
+                    <div className="flex items-center gap-1.5 rounded-lg border border-blue-100 bg-blue-50/50 px-2 py-1 dark:border-blue-900/20 dark:bg-blue-950/10">
+                        <span className="border-blue-250 flex size-5.5 items-center justify-center rounded-md border bg-blue-100 text-blue-700 dark:border-blue-900/30 dark:bg-blue-950/20 dark:text-blue-400">
                             <Edit3 className="size-3" />
                         </span>
-                        <span className="text-blue-800 dark:text-blue-300">Edit Inline</span>
+                        <span className="text-blue-800 dark:text-blue-300">
+                            Edit Inline
+                        </span>
                     </div>
-                    <div className="flex items-center gap-1.5 bg-rose-50/50 dark:bg-rose-950/10 px-2 py-1 rounded-lg border border-rose-100 dark:border-rose-900/20">
-                        <span className="flex size-5.5 items-center justify-center rounded-md border border-rose-250 bg-rose-100 text-rose-700 dark:border-rose-900/30 dark:bg-rose-950/20 dark:text-rose-400">
+                    <div className="flex items-center gap-1.5 rounded-lg border border-rose-100 bg-rose-50/50 px-2 py-1 dark:border-rose-900/20 dark:bg-rose-950/10">
+                        <span className="border-rose-250 flex size-5.5 items-center justify-center rounded-md border bg-rose-100 text-rose-700 dark:border-rose-900/30 dark:bg-rose-950/20 dark:text-rose-400">
                             <X className="size-3" />
                         </span>
-                        <span className="text-rose-800 dark:text-rose-300">Delete Draft</span>
+                        <span className="text-rose-800 dark:text-rose-300">
+                            Delete Draft
+                        </span>
                     </div>
                 </div>
             )}
 
             {/* 3. DRAFT STREAM WORKSPACE */}
-            <div className="flex flex-col gap-6 mt-6">
+            <div className="mt-6 flex flex-col gap-6">
                 {items.length === 0 ? (
                     /* COMPLETELY EMPTY SYSTEM-WIDE DRAFTS STATE */
                     <div className="flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-border bg-card p-16 text-center">
                         <div className="mx-auto mb-4 flex size-16 items-center justify-center rounded-2xl bg-muted text-muted-foreground">
                             <Inbox className="size-8" />
                         </div>
-                        <h3 className="text-lg font-bold text-foreground">{emptyStateTitle}</h3>
-                        <p className="mt-1.5 text-sm text-muted-foreground max-w-2xl">
+                        <h3 className="text-lg font-bold text-foreground">
+                            {emptyStateTitle}
+                        </h3>
+                        <p className="mt-1.5 max-w-2xl text-sm text-muted-foreground">
                             {emptyStateDescription}
                         </p>
                         <Link
                             href={emptyStateActionUrl}
-                            className="mt-6 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-bold text-white transition hover:bg-blue-700 shadow-md inline-flex items-center gap-1.5 cursor-pointer"
+                            className="mt-6 inline-flex cursor-pointer items-center gap-1.5 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-bold text-white shadow-md transition hover:bg-blue-700"
                         >
                             <EmptyStateActionIcon className="size-4" />
                             {emptyStateActionLabel}
@@ -337,7 +399,9 @@ export function DraftsReviewShell<T extends BaseDraftItem>({
                         <div className="mx-auto mb-4 flex size-14 items-center justify-center rounded-2xl bg-muted text-muted-foreground">
                             <FileText className="size-6" />
                         </div>
-                        <h3 className="font-bold text-foreground">No Matching Drafts</h3>
+                        <h3 className="font-bold text-foreground">
+                            No Matching Drafts
+                        </h3>
                         <p className="mt-1 text-xs text-muted-foreground">
                             No drafts match your active filters.
                         </p>
@@ -346,7 +410,10 @@ export function DraftsReviewShell<T extends BaseDraftItem>({
                             variant="default"
                             size="sm"
                             onClick={() => {
-                                setFilterSearch(''); setFilterStatus('all'); setFilterCategory('all'); setFilterSubcategory('all');
+                                setFilterSearch('');
+                                setFilterStatus('all');
+                                setFilterCategory('all');
+                                setFilterSubcategory('all');
                             }}
                         >
                             Reset Filters
@@ -361,9 +428,24 @@ export function DraftsReviewShell<T extends BaseDraftItem>({
 
                         {/* Pagination bar */}
                         {filteredDrafts.length > 0 && (
-                            <div className="flex flex-col sm:flex-row items-center justify-between border-t border-border bg-muted px-6 py-4 gap-3 rounded-b-xl mt-4">
+                            <div className="mt-4 flex flex-col items-center justify-between gap-3 rounded-b-xl border-t border-border bg-muted px-6 py-4 sm:flex-row">
                                 <span className="text-xs font-bold text-muted-foreground">
-                                    Showing <strong className="text-foreground">{(currentPage - 1) * pageSize + 1}</strong> to <strong className="text-foreground">{Math.min(currentPage * pageSize, filteredDrafts.length)}</strong> of <strong className="text-foreground">{filteredDrafts.length}</strong> results
+                                    Showing{' '}
+                                    <strong className="text-foreground">
+                                        {(currentPage - 1) * pageSize + 1}
+                                    </strong>{' '}
+                                    to{' '}
+                                    <strong className="text-foreground">
+                                        {Math.min(
+                                            currentPage * pageSize,
+                                            filteredDrafts.length,
+                                        )}
+                                    </strong>{' '}
+                                    of{' '}
+                                    <strong className="text-foreground">
+                                        {filteredDrafts.length}
+                                    </strong>{' '}
+                                    results
                                 </span>
 
                                 {totalPages > 1 && (
@@ -371,36 +453,57 @@ export function DraftsReviewShell<T extends BaseDraftItem>({
                                         <button
                                             type="button"
                                             disabled={currentPage === 1}
-                                            onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-                                            className="rounded-lg border border-border bg-card px-3 py-1.5 text-xs font-bold text-foreground shadow-3xs transition hover:bg-muted disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer focus:outline-none"
+                                            onClick={() =>
+                                                setCurrentPage((prev) =>
+                                                    Math.max(1, prev - 1),
+                                                )
+                                            }
+                                            className="shadow-3xs cursor-pointer rounded-lg border border-border bg-card px-3 py-1.5 text-xs font-bold text-foreground transition hover:bg-muted focus:outline-none disabled:cursor-not-allowed disabled:opacity-40"
                                         >
                                             Previous
                                         </button>
 
-                                        {Array.from({ length: totalPages }).map((_, idx) => {
-                                            const pageNum = idx + 1;
-                                            const isActive = pageNum === currentPage;
+                                        {Array.from({ length: totalPages }).map(
+                                            (_, idx) => {
+                                                const pageNum = idx + 1;
+                                                const isActive =
+                                                    pageNum === currentPage;
 
-                                            return (
-                                                <button
-                                                    key={pageNum}
-                                                    type="button"
-                                                    onClick={() => setCurrentPage(pageNum)}
-                                                    className={`size-8 rounded-lg text-xs font-black shadow-3xs transition focus:outline-none cursor-pointer ${isActive
-                                                        ? 'bg-blue-600 text-white'
-                                                        : 'border border-border bg-card text-foreground hover:bg-muted'
+                                                return (
+                                                    <button
+                                                        key={pageNum}
+                                                        type="button"
+                                                        onClick={() =>
+                                                            setCurrentPage(
+                                                                pageNum,
+                                                            )
+                                                        }
+                                                        className={`shadow-3xs size-8 cursor-pointer rounded-lg text-xs font-black transition focus:outline-none ${
+                                                            isActive
+                                                                ? 'bg-blue-600 text-white'
+                                                                : 'border border-border bg-card text-foreground hover:bg-muted'
                                                         }`}
-                                                >
-                                                    {pageNum}
-                                                </button>
-                                            );
-                                        })}
+                                                    >
+                                                        {pageNum}
+                                                    </button>
+                                                );
+                                            },
+                                        )}
 
                                         <button
                                             type="button"
-                                            disabled={currentPage === totalPages}
-                                            onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-                                            className="rounded-lg border border-border bg-card px-3 py-1.5 text-xs font-bold text-foreground shadow-3xs transition hover:bg-muted disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer focus:outline-none"
+                                            disabled={
+                                                currentPage === totalPages
+                                            }
+                                            onClick={() =>
+                                                setCurrentPage((prev) =>
+                                                    Math.min(
+                                                        totalPages,
+                                                        prev + 1,
+                                                    ),
+                                                )
+                                            }
+                                            className="shadow-3xs cursor-pointer rounded-lg border border-border bg-card px-3 py-1.5 text-xs font-bold text-foreground transition hover:bg-muted focus:outline-none disabled:cursor-not-allowed disabled:opacity-40"
                                         >
                                             Next
                                         </button>

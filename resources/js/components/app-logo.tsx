@@ -4,7 +4,7 @@ import BrandName from '@/components/brand-name';
 export default function AppLogo() {
     return (
         <>
-            <div className="flex aspect-square size-14 items-center justify-center rounded-md overflow-hidden bg-transparent">
+            <div className="flex aspect-square size-14 items-center justify-center overflow-hidden rounded-md bg-transparent">
                 <AppLogoIcon className="size-14 object-contain" />
             </div>
             <div className="grid flex-1 text-left text-sm">

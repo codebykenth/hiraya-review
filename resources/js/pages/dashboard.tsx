@@ -11,7 +11,11 @@ import {
     Info,
 } from 'lucide-react';
 import { useState } from 'react';
-import { TrackBadge, StatusBadge, ScoreProgress } from '@/components/attempt-components';
+import {
+    TrackBadge,
+    StatusBadge,
+    ScoreProgress,
+} from '@/components/attempt-components';
 import { PageContainer } from '@/components/page-container';
 import { Card } from '@/components/ui/card';
 import { dashboard } from '@/routes';
@@ -41,7 +45,13 @@ interface DashboardProps {
         strongestArea: string;
         weakestArea: string;
         chartData: ChartDataPoint[];
-        categories: { name: string; percentage: number; color: string; correct: number; total: number }[];
+        categories: {
+            name: string;
+            percentage: number;
+            color: string;
+            correct: number;
+            total: number;
+        }[];
         passingRate: number;
         totalDuration: string;
         avgDuration: string;
@@ -55,7 +65,9 @@ export default function Dashboard({ stats }: DashboardProps) {
     const firstName = auth?.user?.name ? auth.user.name.split(' ')[0] : 'User';
     const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
     const [isOpen, setIsOpen] = useState(false);
-    const [selectedFilter, setSelectedFilter] = useState<'6' | '12' | 'exams' | 'drills'>('6');
+    const [selectedFilter, setSelectedFilter] = useState<
+        '6' | '12' | 'exams' | 'drills'
+    >('6');
 
     const defaultStats = {
         avgScore: 84,
@@ -67,12 +79,54 @@ export default function Dashboard({ stats }: DashboardProps) {
         avgDuration: '16m 15s',
         totalQuestionsSolved: 340,
         chartData: [
-            { score: 40, label: 'Run 1', date: 'May 20', track: 'Professional Exam', detail: '68/170 Correct', categoryScores: [] },
-            { score: 52, label: 'Run 2', date: 'May 21', track: 'Subprofessional Exam', detail: '78/150 Correct', categoryScores: [] },
-            { score: 45, label: 'Run 3', date: 'May 22', track: 'Analytical Drill', detail: '18/40 Correct', categoryScores: [] },
-            { score: 68, label: 'Run 4', date: 'May 23', track: 'Verbal Drill', detail: '27/40 Correct', categoryScores: [] },
-            { score: 60, label: 'Run 5', date: 'May 24', track: 'Numerical Drill', detail: '24/40 Correct', categoryScores: [] },
-            { score: 85, label: 'Run 6', date: 'May 25', track: 'Professional Exam', detail: '144/170 Correct', categoryScores: [] },
+            {
+                score: 40,
+                label: 'Run 1',
+                date: 'May 20',
+                track: 'Professional Exam',
+                detail: '68/170 Correct',
+                categoryScores: [],
+            },
+            {
+                score: 52,
+                label: 'Run 2',
+                date: 'May 21',
+                track: 'Subprofessional Exam',
+                detail: '78/150 Correct',
+                categoryScores: [],
+            },
+            {
+                score: 45,
+                label: 'Run 3',
+                date: 'May 22',
+                track: 'Analytical Drill',
+                detail: '18/40 Correct',
+                categoryScores: [],
+            },
+            {
+                score: 68,
+                label: 'Run 4',
+                date: 'May 23',
+                track: 'Verbal Drill',
+                detail: '27/40 Correct',
+                categoryScores: [],
+            },
+            {
+                score: 60,
+                label: 'Run 5',
+                date: 'May 24',
+                track: 'Numerical Drill',
+                detail: '24/40 Correct',
+                categoryScores: [],
+            },
+            {
+                score: 85,
+                label: 'Run 6',
+                date: 'May 25',
+                track: 'Professional Exam',
+                detail: '144/170 Correct',
+                categoryScores: [],
+            },
         ],
         categories: [
             {
@@ -110,7 +164,7 @@ export default function Dashboard({ stats }: DashboardProps) {
                 correct: 28,
                 total: 40,
             },
-        ]
+        ],
     };
 
     const activeStats = stats || defaultStats;
@@ -122,12 +176,21 @@ export default function Dashboard({ stats }: DashboardProps) {
         let items = [...chartData];
 
         if (selectedFilter === 'exams') {
-            items = items.filter(dp => dp.track.toLowerCase().includes('exam'));
+            items = items.filter((dp) =>
+                dp.track.toLowerCase().includes('exam'),
+            );
         } else if (selectedFilter === 'drills') {
-            items = items.filter(dp => dp.track.toLowerCase().includes('drill'));
+            items = items.filter((dp) =>
+                dp.track.toLowerCase().includes('drill'),
+            );
         }
 
-        const limitCount = selectedFilter === '12' ? 12 : (selectedFilter === '6' ? 6 : items.length);
+        const limitCount =
+            selectedFilter === '12'
+                ? 12
+                : selectedFilter === '6'
+                  ? 6
+                  : items.length;
 
         return items.slice(-limitCount);
     })();
@@ -143,7 +206,7 @@ export default function Dashboard({ stats }: DashboardProps) {
         const x =
             chartPaddingLeft +
             (idx * (chartWidth - chartPaddingLeft - chartPaddingRight)) /
-            (filteredChartData.length - 1 || 1);
+                (filteredChartData.length - 1 || 1);
         const y =
             chartHeight -
             chartPadding -
@@ -168,7 +231,10 @@ export default function Dashboard({ stats }: DashboardProps) {
     }, '');
 
     // Form an enclosed shape path to apply the soft gradient background fill
-    const areaD = points.length > 0 ? `${pathD} L ${points[points.length - 1].x} ${chartHeight - chartPadding} L ${points[0].x} ${chartHeight - chartPadding} Z` : '';
+    const areaD =
+        points.length > 0
+            ? `${pathD} L ${points[points.length - 1].x} ${chartHeight - chartPadding} L ${points[0].x} ${chartHeight - chartPadding} Z`
+            : '';
 
     const categories = activeStats.categories;
 
@@ -187,16 +253,31 @@ export default function Dashboard({ stats }: DashboardProps) {
                             </span>
                         </h1>
                         <p className="mt-2 text-sm text-slate-500 md:text-base dark:text-slate-400">
-                            Let's continue your preparation for the Civil Service Exam.
+                            Let's continue your preparation for the Civil
+                            Service Exam.
                         </p>
                     </div>
                     <div className="flex flex-col items-stretch gap-3 sm:items-end">
                         <div className="flex flex-wrap gap-2">
-                            <Link href={examsIndex({ query: { start: 'professional' } }).url} className="flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-xs font-semibold text-white shadow-sm transition hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none">
+                            <Link
+                                href={
+                                    examsIndex({
+                                        query: { start: 'professional' },
+                                    }).url
+                                }
+                                className="flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-xs font-semibold text-white shadow-sm transition hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none"
+                            >
                                 <Play className="size-3.5 fill-current" />
                                 Start Professional Exam
                             </Link>
-                            <Link href={examsIndex({ query: { start: 'subprofessional' } }).url} className="flex items-center justify-center gap-2 rounded-lg border border-blue-200 bg-blue-50/50 px-4 py-2.5 text-xs font-semibold text-blue-600 transition hover:bg-blue-100/50 dark:border-blue-900/50 dark:bg-blue-950/20 dark:text-blue-400 dark:hover:bg-blue-900/30">
+                            <Link
+                                href={
+                                    examsIndex({
+                                        query: { start: 'subprofessional' },
+                                    }).url
+                                }
+                                className="flex items-center justify-center gap-2 rounded-lg border border-blue-200 bg-blue-50/50 px-4 py-2.5 text-xs font-semibold text-blue-600 transition hover:bg-blue-100/50 dark:border-blue-900/50 dark:bg-blue-950/20 dark:text-blue-400 dark:hover:bg-blue-900/30"
+                            >
                                 Start Subprofessional Exam
                             </Link>
                         </div>
@@ -318,19 +399,22 @@ export default function Dashboard({ stats }: DashboardProps) {
                                 <h2 className="flex items-center gap-2 font-heading text-2xl font-black tracking-tight text-slate-950 dark:text-white">
                                     Score History
                                     {isDemoMode && (
-                                        <span className="inline-flex items-center gap-1 rounded-full border border-amber-200/65 bg-amber-55 px-2 py-0.5 text-[9px] font-black uppercase tracking-wide text-amber-700 dark:border-amber-900/50 dark:bg-amber-950/20 dark:text-amber-400">
+                                        <span className="bg-amber-55 inline-flex items-center gap-1 rounded-full border border-amber-200/65 px-2 py-0.5 text-[9px] font-black tracking-wide text-amber-700 uppercase dark:border-amber-900/50 dark:bg-amber-950/20 dark:text-amber-400">
                                             Demo Data
                                         </span>
                                     )}
                                 </h2>
                                 <p className="text-sm font-semibold text-slate-500 dark:text-slate-400">
-                                    Track your score percentage across recent attempts.
+                                    Track your score percentage across recent
+                                    attempts.
                                 </p>
                                 <div className="group relative flex w-fit items-center gap-1 text-xs font-bold text-slate-400">
                                     <Info className="size-3.5 cursor-help" />
                                     Trend details
-                                    <div className="pointer-events-none absolute bottom-full left-1/2 mb-2 z-20 w-48 -translate-x-1/2 rounded bg-slate-900 p-2 text-[10px] text-white opacity-0 shadow-lg transition-opacity group-hover:opacity-100 dark:bg-slate-800">
-                                        Displays the scores of your last 6 attempts. Hover on any node to view details.
+                                    <div className="pointer-events-none absolute bottom-full left-1/2 z-20 mb-2 w-48 -translate-x-1/2 rounded bg-slate-900 p-2 text-[10px] text-white opacity-0 shadow-lg transition-opacity group-hover:opacity-100 dark:bg-slate-800">
+                                        Displays the scores of your last 6
+                                        attempts. Hover on any node to view
+                                        details.
                                     </div>
                                 </div>
                             </div>
@@ -339,10 +423,12 @@ export default function Dashboard({ stats }: DashboardProps) {
                                     onClick={() => setIsOpen(!isOpen)}
                                     className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-bold text-slate-700 shadow-sm transition hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-300 dark:hover:bg-slate-900"
                                 >
-                                    {selectedFilter === '6' && "Last 6 Runs"}
-                                    {selectedFilter === '12' && "Last 12 Runs"}
-                                    {selectedFilter === 'exams' && "Mock Exams Only"}
-                                    {selectedFilter === 'drills' && "Custom Drills Only"}
+                                    {selectedFilter === '6' && 'Last 6 Runs'}
+                                    {selectedFilter === '12' && 'Last 12 Runs'}
+                                    {selectedFilter === 'exams' &&
+                                        'Mock Exams Only'}
+                                    {selectedFilter === 'drills' &&
+                                        'Custom Drills Only'}
                                     <ChevronDown className="size-3.5" />
                                 </button>
 
@@ -352,23 +438,39 @@ export default function Dashboard({ stats }: DashboardProps) {
                                             className="fixed inset-0 z-10"
                                             onClick={() => setIsOpen(false)}
                                         />
-                                        <div className="absolute right-0 mt-2 w-48 origin-top-right rounded-lg border border-slate-200 bg-white p-1 shadow-lg ring-1 ring-black/5 z-20 focus:outline-none dark:border-slate-800 dark:bg-slate-950">
+                                        <div className="absolute right-0 z-20 mt-2 w-48 origin-top-right rounded-lg border border-slate-200 bg-white p-1 shadow-lg ring-1 ring-black/5 focus:outline-none dark:border-slate-800 dark:bg-slate-950">
                                             {[
-                                                { value: '6', label: 'Last 6 Runs' },
-                                                { value: '12', label: 'Last 12 Runs' },
-                                                { value: 'exams', label: 'Mock Exams Only' },
-                                                { value: 'drills', label: 'Custom Drills Only' },
+                                                {
+                                                    value: '6',
+                                                    label: 'Last 6 Runs',
+                                                },
+                                                {
+                                                    value: '12',
+                                                    label: 'Last 12 Runs',
+                                                },
+                                                {
+                                                    value: 'exams',
+                                                    label: 'Mock Exams Only',
+                                                },
+                                                {
+                                                    value: 'drills',
+                                                    label: 'Custom Drills Only',
+                                                },
                                             ].map((opt) => (
                                                 <button
                                                     key={opt.value}
                                                     onClick={() => {
-                                                        setSelectedFilter(opt.value as any);
+                                                        setSelectedFilter(
+                                                            opt.value as any,
+                                                        );
                                                         setIsOpen(false);
                                                     }}
-                                                    className={`flex w-full items-center px-3 py-2 text-left text-xs rounded-md transition ${selectedFilter === opt.value
-                                                        ? 'bg-blue-50 text-blue-600 font-bold dark:bg-blue-950/40 dark:text-blue-400'
-                                                        : 'text-slate-700 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-900'
-                                                        }`}
+                                                    className={`flex w-full items-center rounded-md px-3 py-2 text-left text-xs transition ${
+                                                        selectedFilter ===
+                                                        opt.value
+                                                            ? 'bg-blue-50 font-bold text-blue-600 dark:bg-blue-950/40 dark:text-blue-400'
+                                                            : 'text-slate-700 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-900'
+                                                    }`}
                                                 >
                                                     {opt.label}
                                                 </button>
@@ -382,32 +484,53 @@ export default function Dashboard({ stats }: DashboardProps) {
                         {/* Interactive SVG line chart visualization */}
                         <div className="relative h-[260px] w-full rounded-xl border border-slate-200 bg-gradient-to-b from-slate-50 to-white p-3 dark:border-slate-800/70 dark:from-slate-900/30 dark:to-slate-950">
                             {/* Detailed HTML absolute glassmorphic tooltip card */}
-                            {hoveredIdx !== null && filteredChartData[hoveredIdx] && filteredChartData[hoveredIdx].track !== 'No Data' && (
-                                <div
-                                    className="absolute z-10 -translate-x-1/2 -translate-y-full rounded-lg border border-blue-200/50 bg-white/95 p-3 shadow-xl backdrop-blur-sm transition-all duration-150 pointer-events-none dark:border-slate-800/50 dark:bg-slate-950/95"
-                                    style={{
-                                        left: `${(points[hoveredIdx].x / chartWidth) * 100}%`,
-                                        top: `${(points[hoveredIdx].y / chartHeight) * 100 - 8}%`,
-                                    }}
-                                >
-                                    <div className="flex flex-col gap-1 min-w-[130px]">
-                                        <span className="text-[10px] font-extrabold uppercase tracking-wide text-blue-600 dark:text-blue-400">
-                                            {filteredChartData[hoveredIdx].track}
-                                        </span>
-                                        <div className="flex items-baseline justify-between gap-3">
-                                            <span className="text-sm font-black text-slate-800 dark:text-white">
-                                                {filteredChartData[hoveredIdx].score}%
+                            {hoveredIdx !== null &&
+                                filteredChartData[hoveredIdx] &&
+                                filteredChartData[hoveredIdx].track !==
+                                    'No Data' && (
+                                    <div
+                                        className="pointer-events-none absolute z-10 -translate-x-1/2 -translate-y-full rounded-lg border border-blue-200/50 bg-white/95 p-3 shadow-xl backdrop-blur-sm transition-all duration-150 dark:border-slate-800/50 dark:bg-slate-950/95"
+                                        style={{
+                                            left: `${(points[hoveredIdx].x / chartWidth) * 100}%`,
+                                            top: `${(points[hoveredIdx].y / chartHeight) * 100 - 8}%`,
+                                        }}
+                                    >
+                                        <div className="flex min-w-[130px] flex-col gap-1">
+                                            <span className="text-[10px] font-extrabold tracking-wide text-blue-600 uppercase dark:text-blue-400">
+                                                {
+                                                    filteredChartData[
+                                                        hoveredIdx
+                                                    ].track
+                                                }
                                             </span>
-                                            <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">
-                                                {filteredChartData[hoveredIdx].detail}
+                                            <div className="flex items-baseline justify-between gap-3">
+                                                <span className="text-sm font-black text-slate-800 dark:text-white">
+                                                    {
+                                                        filteredChartData[
+                                                            hoveredIdx
+                                                        ].score
+                                                    }
+                                                    %
+                                                </span>
+                                                <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">
+                                                    {
+                                                        filteredChartData[
+                                                            hoveredIdx
+                                                        ].detail
+                                                    }
+                                                </span>
+                                            </div>
+                                            <span className="text-[9px] text-slate-400">
+                                                Date:{' '}
+                                                {
+                                                    filteredChartData[
+                                                        hoveredIdx
+                                                    ].date
+                                                }
                                             </span>
                                         </div>
-                                        <span className="text-[9px] text-slate-400">
-                                            Date: {filteredChartData[hoveredIdx].date}
-                                        </span>
                                     </div>
-                                </div>
-                            )}
+                                )}
 
                             <svg
                                 className="h-full w-full"
@@ -463,14 +586,17 @@ export default function Dashboard({ stats }: DashboardProps) {
                                         chartPadding -
                                         (level *
                                             (chartHeight - chartPadding * 2)) /
-                                        100;
+                                            100;
 
                                     return (
                                         <g key={level}>
                                             <line
                                                 x1={chartPaddingLeft}
                                                 y1={y}
-                                                x2={chartWidth - chartPaddingRight}
+                                                x2={
+                                                    chartWidth -
+                                                    chartPaddingRight
+                                                }
                                                 y2={y}
                                                 stroke="currentColor"
                                                 strokeWidth="0.5"
@@ -493,7 +619,10 @@ export default function Dashboard({ stats }: DashboardProps) {
 
                                 {points.length > 0 && (
                                     <>
-                                        <path d={areaD} fill="url(#chartGradient)" />
+                                        <path
+                                            d={areaD}
+                                            fill="url(#chartGradient)"
+                                        />
                                         <path
                                             d={pathD}
                                             fill="none"
@@ -534,28 +663,39 @@ export default function Dashboard({ stats }: DashboardProps) {
                                         <circle
                                             cx={p.x}
                                             cy={p.y}
-                                            r={hoveredIdx === idx ? "6" : "4.5"}
+                                            r={hoveredIdx === idx ? '6' : '4.5'}
                                             fill="#ffffff"
                                             stroke="#2563eb"
-                                            strokeWidth={hoveredIdx === idx ? "3" : "2"}
+                                            strokeWidth={
+                                                hoveredIdx === idx ? '3' : '2'
+                                            }
                                             className="cursor-pointer transition-all duration-150"
-                                            onMouseEnter={() => setHoveredIdx(idx)}
-                                            onMouseLeave={() => setHoveredIdx(null)}
+                                            onMouseEnter={() =>
+                                                setHoveredIdx(idx)
+                                            }
+                                            onMouseLeave={() =>
+                                                setHoveredIdx(null)
+                                            }
                                         />
 
                                         {/* Score tag text inside SVG */}
-                                        {idx === points.length - 1 && hoveredIdx === null && (
-                                            <text
-                                                x={p.x - 15}
-                                                y={p.y - 12}
-                                                fontSize="11"
-                                                fontWeight="bold"
-                                                fill="#2563eb"
-                                                className="dark:fill-blue-400"
-                                            >
-                                                {filteredChartData[idx].score}%
-                                            </text>
-                                        )}
+                                        {idx === points.length - 1 &&
+                                            hoveredIdx === null && (
+                                                <text
+                                                    x={p.x - 15}
+                                                    y={p.y - 12}
+                                                    fontSize="11"
+                                                    fontWeight="bold"
+                                                    fill="#2563eb"
+                                                    className="dark:fill-blue-400"
+                                                >
+                                                    {
+                                                        filteredChartData[idx]
+                                                            .score
+                                                    }
+                                                    %
+                                                </text>
+                                            )}
 
                                         {/* Dynamic X-Axis label dates */}
                                         <text
@@ -574,64 +714,109 @@ export default function Dashboard({ stats }: DashboardProps) {
                         </div>
 
                         {/* Recent Attempts Table/List filling the empty space */}
-                        <div className="mt-6 border-t border-slate-100 pt-6 dark:border-slate-850">
-                            <h3 className="mb-4 flex items-center gap-1.5 text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                                Run Details ({filteredChartData.filter(d => d.track !== 'No Data').length} attempts matched)
+                        <div className="dark:border-slate-850 mt-6 border-t border-slate-100 pt-6">
+                            <h3 className="mb-4 flex items-center gap-1.5 text-xs font-black tracking-wider text-slate-500 uppercase dark:text-slate-400">
+                                Run Details (
+                                {
+                                    filteredChartData.filter(
+                                        (d) => d.track !== 'No Data',
+                                    ).length
+                                }{' '}
+                                attempts matched)
                                 {isDemoMode && (
-                                    <span className="lowercase text-amber-500 font-extrabold dark:text-amber-400">
+                                    <span className="font-extrabold text-amber-500 lowercase dark:text-amber-400">
                                         (preview only)
                                     </span>
                                 )}
                             </h3>
-                            {filteredChartData.filter(d => d.track !== 'No Data').length === 0 ? (
-                                <p className="text-xs text-slate-400 py-3 text-center border border-dashed border-slate-150 rounded-lg dark:border-slate-800">
-                                    No attempt logs available for this filter range.
+                            {filteredChartData.filter(
+                                (d) => d.track !== 'No Data',
+                            ).length === 0 ? (
+                                <p className="border-slate-150 rounded-lg border border-dashed py-3 text-center text-xs text-slate-400 dark:border-slate-800">
+                                    No attempt logs available for this filter
+                                    range.
                                 </p>
                             ) : (
                                 <div className="overflow-x-auto rounded-lg border border-border">
                                     <table className="w-full text-left text-sm text-foreground">
-                                        <thead className="bg-slate-50/50 dark:bg-slate-900/30 text-[10px] font-black uppercase tracking-wider text-muted-foreground border-b border-border">
+                                        <thead className="border-b border-border bg-slate-50/50 text-[10px] font-black tracking-wider text-muted-foreground uppercase dark:bg-slate-900/30">
                                             <tr>
-                                                <th className="px-4 py-2.5">Attempt</th>
-                                                <th className="px-4 py-2.5">Date</th>
-                                                <th className="px-4 py-2.5">Type</th>
-                                                <th className="px-4 py-2.5">Score & Categories</th>
-                                                <th className="px-4 py-2.5 text-right">Result</th>
+                                                <th className="px-4 py-2.5">
+                                                    Attempt
+                                                </th>
+                                                <th className="px-4 py-2.5">
+                                                    Date
+                                                </th>
+                                                <th className="px-4 py-2.5">
+                                                    Type
+                                                </th>
+                                                <th className="px-4 py-2.5">
+                                                    Score & Categories
+                                                </th>
+                                                <th className="px-4 py-2.5 text-right">
+                                                    Result
+                                                </th>
                                             </tr>
                                         </thead>
-                                        <tbody className="divide-y divide-border dark:divide-slate-900/80 bg-card">
-                                            {[...filteredChartData].reverse().map((run, i) => {
-                                                if (run.track === 'No Data') {
-                                                    return null;
-                                                }
+                                        <tbody className="divide-y divide-border bg-card dark:divide-slate-900/80">
+                                            {[...filteredChartData]
+                                                .reverse()
+                                                .map((run, i) => {
+                                                    if (
+                                                        run.track === 'No Data'
+                                                    ) {
+                                                        return null;
+                                                    }
 
-                                                const status = run.score >= 80 ? 'Pass' : 'Fail';
+                                                    const status =
+                                                        run.score >= 80
+                                                            ? 'Pass'
+                                                            : 'Fail';
 
-                                                return (
-                                                    <tr key={i} className="hover:bg-slate-50/20 dark:hover:bg-slate-900/10 transition">
-                                                        <td className="px-4 py-4 font-black text-slate-950 dark:text-white">
-                                                            {run.label}
-                                                        </td>
-                                                        <td className="px-4 py-2.5 text-slate-500 dark:text-slate-400">
-                                                            {run.date}
-                                                        </td>
-                                                        <td className="px-4 py-2.5">
-                                                            <TrackBadge track={run.track} />
-                                                        </td>
-                                                        <td className="px-4 py-2.5">
-                                                            <ScoreProgress
-                                                                score={run.score}
-                                                                status={status}
-                                                                detail={run.detail}
-                                                                categoryScores={run.categoryScores}
-                                                            />
-                                                        </td>
-                                                        <td className="px-4 py-2.5 text-right">
-                                                            <StatusBadge status={status} />
-                                                        </td>
-                                                    </tr>
-                                                );
-                                            })}
+                                                    return (
+                                                        <tr
+                                                            key={i}
+                                                            className="transition hover:bg-slate-50/20 dark:hover:bg-slate-900/10"
+                                                        >
+                                                            <td className="px-4 py-4 font-black text-slate-950 dark:text-white">
+                                                                {run.label}
+                                                            </td>
+                                                            <td className="px-4 py-2.5 text-slate-500 dark:text-slate-400">
+                                                                {run.date}
+                                                            </td>
+                                                            <td className="px-4 py-2.5">
+                                                                <TrackBadge
+                                                                    track={
+                                                                        run.track
+                                                                    }
+                                                                />
+                                                            </td>
+                                                            <td className="px-4 py-2.5">
+                                                                <ScoreProgress
+                                                                    score={
+                                                                        run.score
+                                                                    }
+                                                                    status={
+                                                                        status
+                                                                    }
+                                                                    detail={
+                                                                        run.detail
+                                                                    }
+                                                                    categoryScores={
+                                                                        run.categoryScores
+                                                                    }
+                                                                />
+                                                            </td>
+                                                            <td className="px-4 py-2.5 text-right">
+                                                                <StatusBadge
+                                                                    status={
+                                                                        status
+                                                                    }
+                                                                />
+                                                            </td>
+                                                        </tr>
+                                                    );
+                                                })}
                                         </tbody>
                                     </table>
                                 </div>
@@ -651,7 +836,7 @@ export default function Dashboard({ stats }: DashboardProps) {
                                     Subject accuracy at a glance.
                                 </p>
                             </div>
-                            <span className="rounded-full bg-slate-100 px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-slate-500 dark:bg-slate-900 dark:text-slate-400">
+                            <span className="rounded-full bg-slate-100 px-2.5 py-1 text-[10px] font-black tracking-wider text-slate-500 uppercase dark:bg-slate-900 dark:text-slate-400">
                                 Mastery
                             </span>
                         </div>
@@ -660,18 +845,22 @@ export default function Dashboard({ stats }: DashboardProps) {
                             {categories.map((cat) => {
                                 // Compute dynamic mastery descriptors & badge styles
                                 let label = 'Not Started';
-                                let badgeClass = 'bg-slate-50 text-slate-600 border-slate-200/60 dark:bg-slate-900 dark:text-slate-400 dark:border-slate-800';
+                                let badgeClass =
+                                    'bg-slate-50 text-slate-600 border-slate-200/60 dark:bg-slate-900 dark:text-slate-400 dark:border-slate-800';
 
                                 if (cat.total && cat.total > 0) {
                                     if (cat.percentage >= 80) {
                                         label = 'Mastery';
-                                        badgeClass = 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/30 dark:text-emerald-400 dark:border-emerald-900/50';
+                                        badgeClass =
+                                            'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/30 dark:text-emerald-400 dark:border-emerald-900/50';
                                     } else if (cat.percentage >= 60) {
                                         label = 'Proficient';
-                                        badgeClass = 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/30 dark:text-blue-400 dark:border-blue-900/50';
+                                        badgeClass =
+                                            'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/30 dark:text-blue-400 dark:border-blue-900/50';
                                     } else {
                                         label = 'Needs Work';
-                                        badgeClass = 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/30 dark:text-amber-400 dark:border-amber-900/50';
+                                        badgeClass =
+                                            'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/30 dark:text-amber-400 dark:border-amber-900/50';
                                     }
                                 }
 
@@ -688,15 +877,16 @@ export default function Dashboard({ stats }: DashboardProps) {
                                                 <span className="mt-0.5 block text-xs font-bold text-slate-500 dark:text-slate-400">
                                                     {cat.total && cat.total > 0
                                                         ? `${cat.correct}/${cat.total} solved`
-                                                        : '0/0 solved'
-                                                    }
+                                                        : '0/0 solved'}
                                                 </span>
                                             </div>
                                             <div className="flex shrink-0 flex-col items-end gap-1">
                                                 <span className="font-heading text-2xl font-black text-slate-950 dark:text-white">
                                                     {cat.percentage}%
                                                 </span>
-                                                <span className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[9px] font-extrabold tracking-wide uppercase ${badgeClass}`}>
+                                                <span
+                                                    className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[9px] font-extrabold tracking-wide uppercase ${badgeClass}`}
+                                                >
                                                     {label}
                                                 </span>
                                             </div>
@@ -713,7 +903,18 @@ export default function Dashboard({ stats }: DashboardProps) {
 
                                         <div className="flex items-center justify-end">
                                             <Link
-                                                href={drillsIndex({ query: { category: cat.name === 'General' ? 'General Information' : cat.name + ' Ability' } }).url}
+                                                href={
+                                                    drillsIndex({
+                                                        query: {
+                                                            category:
+                                                                cat.name ===
+                                                                'General'
+                                                                    ? 'General Information'
+                                                                    : cat.name +
+                                                                      ' Ability',
+                                                        },
+                                                    }).url
+                                                }
                                                 className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs font-black text-blue-600 transition hover:bg-blue-50 hover:text-blue-700 dark:text-blue-400 dark:hover:bg-blue-950/30 dark:hover:text-blue-300"
                                             >
                                                 Start {cat.name} Drill &rarr;

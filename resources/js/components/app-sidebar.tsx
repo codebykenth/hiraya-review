@@ -1,5 +1,18 @@
 import { Link, usePage } from '@inertiajs/react';
-import { BookOpen, ClipboardList, FileQuestion, FileText, History, LayoutGrid, Shield, Sparkles, Target, ListChecks, Users, Compass } from 'lucide-react';
+import {
+    BookOpen,
+    ClipboardList,
+    FileQuestion,
+    FileText,
+    History,
+    LayoutGrid,
+    Shield,
+    Sparkles,
+    Target,
+    ListChecks,
+    Users,
+    Compass,
+} from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
@@ -11,17 +24,23 @@ import {
     SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem,
-    SidebarSeparator
+    SidebarSeparator,
 } from '@/components/ui/sidebar';
 import { dashboard, guide } from '@/routes';
 import { dashboard as adminDashboard } from '@/routes/admin';
-import { index as adminLearnIndex, drafts as adminLearnDrafts } from '@/routes/admin/learn';
+import {
+    index as adminLearnIndex,
+    drafts as adminLearnDrafts,
+} from '@/routes/admin/learn';
 import { index as adminUsersIndex } from '@/routes/admin/users';
 import { index as drillsIndex } from '@/routes/drills';
 import { index as examsIndex } from '@/routes/exams';
 import { index as historyIndex } from '@/routes/history';
 import { index as learnIndex } from '@/routes/learn';
-import { index as questionsIndex, drafts as questionsDrafts } from '@/routes/questions';
+import {
+    index as questionsIndex,
+    drafts as questionsDrafts,
+} from '@/routes/questions';
 
 import type { NavItem } from '@/types';
 
@@ -77,8 +96,8 @@ const adminNavItems: NavItem[] = [
                 title: 'Drafts Review',
                 href: questionsDrafts(),
                 icon: ListChecks,
-            }
-        ]
+            },
+        ],
     },
     {
         title: 'Learn',
@@ -93,8 +112,8 @@ const adminNavItems: NavItem[] = [
                 title: 'Drafts Review',
                 href: adminLearnDrafts(),
                 icon: ListChecks,
-            }
-        ]
+            },
+        ],
     },
     {
         title: 'Users',
@@ -104,9 +123,9 @@ const adminNavItems: NavItem[] = [
                 title: 'User Management',
                 href: adminUsersIndex(),
                 icon: ListChecks,
-            }
-        ]
-    }
+            },
+        ],
+    },
 ];
 
 export function AppSidebar() {
@@ -130,10 +149,12 @@ export function AppSidebar() {
             <SidebarContent className="overflow-x-hidden">
                 <NavMain items={generalNavItems} />
 
-                {isAdmin && <>
-                    <SidebarSeparator className='my-2' />
-                    <NavMain items={adminNavItems} label='Administrator' />
-                </>}
+                {isAdmin && (
+                    <>
+                        <SidebarSeparator className="my-2" />
+                        <NavMain items={adminNavItems} label="Administrator" />
+                    </>
+                )}
             </SidebarContent>
 
             <SidebarFooter>

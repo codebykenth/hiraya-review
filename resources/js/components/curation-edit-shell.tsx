@@ -32,39 +32,48 @@ export function CurationEditShell({
     onStatusToggle,
     onSaveSubmit,
     isSaving,
-    children
+    children,
 }: CurationEditShellProps) {
     return (
         <PageContainer className="bg-slate-50/30 dark:bg-slate-900/20">
             {/* Back Link */}
             <Link
                 href={backUrl}
-                className="flex w-fit items-center gap-1 text-xs font-black text-foreground hover:text-blue-600 transition focus:outline-none"
+                className="flex w-fit items-center gap-1 text-xs font-black text-foreground transition hover:text-blue-600 focus:outline-none"
             >
                 <ChevronLeft className="size-4" />
                 {backLabel}
             </Link>
 
-            <PageHeader title={title} description={description} className="mt-2.5 mb-6" />
+            <PageHeader
+                title={title}
+                description={description}
+                className="mt-2.5 mb-6"
+            />
 
             <div className="max-w-4xl">
-                <form onSubmit={onSaveSubmit} className="flex flex-col gap-6 rounded-2xl border border-border bg-card p-6 shadow-sm">
-
+                <form
+                    onSubmit={onSaveSubmit}
+                    className="flex flex-col gap-6 rounded-2xl border border-border bg-card p-6 shadow-sm"
+                >
                     <div className="flex items-center justify-between border-b border-border pb-3.5">
-                        <span className="text-xs font-black text-foreground uppercase flex items-center gap-1.5">
-                            <HeaderIcon className="size-4.5 text-blue-600 animate-pulse" />
+                        <span className="flex items-center gap-1.5 text-xs font-black text-foreground uppercase">
+                            <HeaderIcon className="size-4.5 animate-pulse text-blue-600" />
                             {headerTitle}
                         </span>
 
                         <div className="flex items-center gap-2">
-                            <span className="text-[10px] font-extrabold tracking-wider text-muted-foreground uppercase">{statusLabel}:</span>
+                            <span className="text-[10px] font-extrabold tracking-wider text-muted-foreground uppercase">
+                                {statusLabel}:
+                            </span>
                             <button
                                 type="button"
                                 onClick={onStatusToggle}
-                                className={`rounded-lg px-3 py-1.5 text-[10px] font-extrabold uppercase transition cursor-pointer border ${statusValue
-                                    ? 'bg-emerald-50 text-emerald-700 border-emerald-150 dark:bg-emerald-950/20 dark:text-emerald-400 dark:border-emerald-900/30'
-                                    : 'bg-muted text-muted-foreground border-border'
-                                    }`}
+                                className={`cursor-pointer rounded-lg border px-3 py-1.5 text-[10px] font-extrabold uppercase transition ${
+                                    statusValue
+                                        ? 'border-emerald-150 bg-emerald-50 text-emerald-700 dark:border-emerald-900/30 dark:bg-emerald-950/20 dark:text-emerald-400'
+                                        : 'border-border bg-muted text-muted-foreground'
+                                }`}
                             >
                                 {statusValue ? 'Active' : 'Draft'}
                             </button>
@@ -75,7 +84,7 @@ export function CurationEditShell({
                         {children}
                     </div>
 
-                    <div className="mt-4 border-t border-border pt-4 flex items-center justify-end">
+                    <div className="mt-4 flex items-center justify-end border-t border-border pt-4">
                         <Button
                             type="submit"
                             variant="default"

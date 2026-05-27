@@ -1,10 +1,26 @@
 import { Head, Link, router, useForm } from '@inertiajs/react';
-import { Sparkles, FileText, AlertCircle, Save, RotateCcw, Sparkle, Cpu, BookOpen, HelpCircle, CheckCircle2 } from 'lucide-react';
+import {
+    Sparkles,
+    FileText,
+    AlertCircle,
+    Save,
+    RotateCcw,
+    Sparkle,
+    Cpu,
+    BookOpen,
+    HelpCircle,
+    CheckCircle2,
+} from 'lucide-react';
 import React, { useState, useEffect, useMemo } from 'react';
 import { CurationCreateShell } from '@/components/curation-create-shell';
 import { Button } from '@/components/ui/button';
 import { SelectField } from '@/components/ui/select';
-import { index as questionsIndex, store as questionsStore, drafts as questionsDrafts, generate as questionsGenerate } from '@/routes/questions';
+import {
+    index as questionsIndex,
+    store as questionsStore,
+    drafts as questionsDrafts,
+    generate as questionsGenerate,
+} from '@/routes/questions';
 
 interface CategoryItem {
     id: number;
@@ -29,23 +45,28 @@ interface CreateProps {
     categories?: CategoryItem[];
 }
 
-export default function CreateQuestion({ type = 'ai', categories = [] }: CreateProps) {
-    const [activeTab, setActiveTab] = useState<'ai' | 'manual'>(type === 'manual' ? 'manual' : 'ai');
+export default function CreateQuestion({
+    type = 'ai',
+    categories = [],
+}: CreateProps) {
+    const [activeTab, setActiveTab] = useState<'ai' | 'manual'>(
+        type === 'manual' ? 'manual' : 'ai',
+    );
 
     // Wrap cseCategoriesTree in useMemo so its reference doesn't change on every render
     const cseCategoriesTree = useMemo(() => {
         const tree: Record<string, string[]> = {};
 
         if (categories && categories.length > 0) {
-            categories.forEach(cat => {
-                tree[cat.name] = (cat.subcategory || []).map(sub => sub.name);
+            categories.forEach((cat) => {
+                tree[cat.name] = (cat.subcategory || []).map((sub) => sub.name);
             });
         } else {
             tree['General Information'] = [
                 'Philippine Constitution',
                 'Code of Conduct and Ethical Standards (R.A. 6713)',
                 'Peace and Human Rights Issues and Concepts',
-                'Environment Management and Protection'
+                'Environment Management and Protection',
             ];
             tree['Verbal Ability'] = [
                 'Word meaning',
@@ -53,34 +74,34 @@ export default function CreateQuestion({ type = 'ai', categories = [] }: CreateP
                 'Error recognition',
                 'Sentence structure',
                 'Paragraph organization',
-                'Reading comprehension'
+                'Reading comprehension',
             ];
             tree['Analytical Ability'] = [
                 'Word analogy',
                 'Symbolic logic / abstract reasoning',
                 'Identifying assumptions and drawing conclusions',
-                'Data interpretation'
+                'Data interpretation',
             ];
             tree['Numerical Ability'] = [
                 'Basic operations',
                 'Number sequence',
-                'Word problems'
+                'Word problems',
             ];
-            tree['Clerical Ability'] = [
-                'Filing',
-                'Spelling'
-            ];
+            tree['Clerical Ability'] = ['Filing', 'Spelling'];
         }
 
         return tree;
     }, [categories]); // Recalculate only if categories prop changes
 
-    const defaultCategory = Object.keys(cseCategoriesTree)[0] || 'Analytical Ability';
-    const defaultSubcategory = cseCategoriesTree[defaultCategory]?.[0] || 'Word analogy';
+    const defaultCategory =
+        Object.keys(cseCategoriesTree)[0] || 'Analytical Ability';
+    const defaultSubcategory =
+        cseCategoriesTree[defaultCategory]?.[0] || 'Word analogy';
 
     // AI Generator State
     const [aiCategory, setAiCategory] = useState<string>(defaultCategory);
-    const [aiSubcategory, setAiSubcategory] = useState<string>(defaultSubcategory);
+    const [aiSubcategory, setAiSubcategory] =
+        useState<string>(defaultSubcategory);
     const [aiCount, setAiCount] = useState<number>(3);
     const [aiLanguage, setAiLanguage] = useState<string>('English');
     const [aiPrompt, setAiPrompt] = useState<string>('');
@@ -143,7 +164,7 @@ export default function CreateQuestion({ type = 'ai', categories = [] }: CreateP
             return;
         }
 
-        if (data.options.some(opt => !opt.trim())) {
+        if (data.options.some((opt) => !opt.trim())) {
             return;
         }
 
@@ -151,7 +172,7 @@ export default function CreateQuestion({ type = 'ai', categories = [] }: CreateP
             preserveScroll: true,
             onSuccess: () => {
                 reset();
-            }
+            },
         });
     };
 
@@ -161,13 +182,16 @@ export default function CreateQuestion({ type = 'ai', categories = [] }: CreateP
         setSuccessMsg(null);
 
         try {
-            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+            const csrfToken =
+                document
+                    .querySelector('meta[name="csrf-token"]')
+                    ?.getAttribute('content') || '';
             const response = await fetch(questionsGenerate().url, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': csrfToken,
-                    'Accept': 'application/json',
+                    Accept: 'application/json',
                 },
                 body: JSON.stringify({
                     category: aiCategory,
@@ -181,28 +205,34 @@ export default function CreateQuestion({ type = 'ai', categories = [] }: CreateP
             const resData = await response.json();
 
             if (!response.ok) {
-                throw new Error(resData.error || 'Failed to generate questions. Please try again.');
+                throw new Error(
+                    resData.error ||
+                        'Failed to generate questions. Please try again.',
+                );
             }
 
-            setSuccessMsg('Questions generated successfully! They are saved as drafts and ready for review.');
-
+            setSuccessMsg(
+                'Questions generated successfully! They are saved as drafts and ready for review.',
+            );
         } catch (err: any) {
-            setErrorMsg(err.message || 'An error occurred while generating questions.');
+            setErrorMsg(
+                err.message || 'An error occurred while generating questions.',
+            );
         } finally {
             setIsGenerating(false);
         }
     };
 
     const aiContent = (
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-12 items-start">
+        <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-12">
             {/* Config panel (7/12 cols) */}
-            <div className="lg:col-span-7 flex flex-col gap-6">
-                <div className="rounded-2xl border border-border bg-card p-6 shadow-xs relative overflow-hidden">
-                    <div className="absolute top-0 right-0 -mr-16 -mt-16 w-44 h-44 rounded-full bg-blue-500/5 blur-3xl pointer-events-none" />
+            <div className="flex flex-col gap-6 lg:col-span-7">
+                <div className="relative overflow-hidden rounded-2xl border border-border bg-card p-6 shadow-xs">
+                    <div className="pointer-events-none absolute top-0 right-0 -mt-16 -mr-16 h-44 w-44 rounded-full bg-blue-500/5 blur-3xl" />
 
-                    <div className="flex items-center justify-between border-b border-border pb-4 mb-4">
+                    <div className="mb-4 flex items-center justify-between border-b border-border pb-4">
                         <h2 className="inline-flex items-center gap-2 text-base font-bold text-foreground">
-                            <Sparkles className="size-4 text-blue-600 animate-pulse" />
+                            <Sparkles className="size-4 animate-pulse text-blue-600" />
                             Configuration Options
                         </h2>
                     </div>
@@ -233,10 +263,12 @@ export default function CreateQuestion({ type = 'ai', categories = [] }: CreateP
                                 value={aiCount}
                                 disabled={isGenerating}
                                 onValueChange={(val) => setAiCount(Number(val))}
-                                options={[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(c => ({
-                                    value: c,
-                                    label: `${c} Question${c > 1 ? 's' : ''}`
-                                }))}
+                                options={[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(
+                                    (c) => ({
+                                        value: c,
+                                        label: `${c} Question${c > 1 ? 's' : ''}`,
+                                    }),
+                                )}
                             />
 
                             {/* Language Select */}
@@ -252,30 +284,41 @@ export default function CreateQuestion({ type = 'ai', categories = [] }: CreateP
                         {/* Additional Prompting Context */}
                         <div className="flex flex-col gap-1.5">
                             <div className="flex items-center justify-between">
-                                <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Additional AI Context (Optional)</label>
-                                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Max 250 Chars</span>
+                                <label className="text-xs font-bold tracking-wider text-muted-foreground uppercase">
+                                    Additional AI Context (Optional)
+                                </label>
+                                <span className="text-[10px] font-bold tracking-widest text-muted-foreground uppercase">
+                                    Max 250 Chars
+                                </span>
                             </div>
                             <textarea
                                 value={aiPrompt}
                                 disabled={isGenerating}
-                                onChange={(e) => setAiPrompt(e.target.value.slice(0, 250))}
+                                onChange={(e) =>
+                                    setAiPrompt(e.target.value.slice(0, 250))
+                                }
                                 placeholder="E.g., Focus on recent Republic Acts, make options highly tricky, or emphasize logical fallacies..."
                                 rows={4}
-                                className="w-full rounded-xl border border-border p-4 text-sm font-medium text-foreground placeholder:text-muted-foreground focus:bg-background focus:outline-none focus:border-blue-500 transition duration-150 disabled:opacity-55"
+                                className="w-full rounded-xl border border-border p-4 text-sm font-medium text-foreground transition duration-150 placeholder:text-muted-foreground focus:border-blue-500 focus:bg-background focus:outline-none disabled:opacity-55"
                             />
                         </div>
 
                         {successMsg && (
-                            <div className="rounded-xl border border-emerald-250 bg-emerald-50/40 p-4 text-xs font-semibold text-emerald-800 flex items-start gap-3 shadow-3xs border-l-4 border-l-emerald-500 dark:bg-emerald-950/20 dark:border-emerald-900/30">
-                                <CheckCircle2 className="size-4.5 text-emerald-650 shrink-0 mt-0.5" />
-                                <div className="flex flex-col gap-1.5 flex-1">
-                                    <span className="font-extrabold text-emerald-950">Questions Generated!</span>
-                                    <span className="text-muted-foreground leading-relaxed font-semibold">
-                                        Your questions have been successfully created and stored as drafts. You can review and publish them on the Drafts Review page.
+                            <div className="border-emerald-250 shadow-3xs flex items-start gap-3 rounded-xl border border-l-4 border-l-emerald-500 bg-emerald-50/40 p-4 text-xs font-semibold text-emerald-800 dark:border-emerald-900/30 dark:bg-emerald-950/20">
+                                <CheckCircle2 className="text-emerald-650 mt-0.5 size-4.5 shrink-0" />
+                                <div className="flex flex-1 flex-col gap-1.5">
+                                    <span className="font-extrabold text-emerald-950">
+                                        Questions Generated!
+                                    </span>
+                                    <span className="leading-relaxed font-semibold text-muted-foreground">
+                                        Your questions have been successfully
+                                        created and stored as drafts. You can
+                                        review and publish them on the Drafts
+                                        Review page.
                                     </span>
                                     <Link
                                         href={questionsDrafts().url}
-                                        className="inline-flex items-center gap-1 mt-1 text-emerald-700 hover:text-emerald-900 font-extrabold underline transition"
+                                        className="mt-1 inline-flex items-center gap-1 font-extrabold text-emerald-700 underline transition hover:text-emerald-900"
                                     >
                                         Go to Drafts Review &rarr;
                                     </Link>
@@ -284,22 +327,25 @@ export default function CreateQuestion({ type = 'ai', categories = [] }: CreateP
                         )}
 
                         {errorMsg && (
-                            <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-xs font-semibold text-red-800 flex items-start gap-2.5">
-                                <AlertCircle className="size-4 text-red-600 shrink-0 mt-0.5" />
+                            <div className="flex items-start gap-2.5 rounded-xl border border-red-200 bg-red-50 p-4 text-xs font-semibold text-red-800">
+                                <AlertCircle className="mt-0.5 size-4 shrink-0 text-red-600" />
                                 <span>{errorMsg}</span>
                             </div>
                         )}
 
                         <div className="pt-2">
                             {isGenerating ? (
-                                <div className="rounded-xl border border-border bg-muted p-5 flex flex-col gap-3.5 animate-pulse shadow-3xs">
+                                <div className="shadow-3xs flex animate-pulse flex-col gap-3.5 rounded-xl border border-border bg-muted p-5">
                                     <div className="flex items-center gap-3">
-                                        <div className="size-5.5 rounded-full border-2 border-blue-650 border-t-transparent animate-spin shrink-0" />
-                                        <span className="text-sm font-bold text-foreground">Synthesizing CSE questions via Gemini...</span>
+                                        <div className="border-blue-650 size-5.5 shrink-0 animate-spin rounded-full border-2 border-t-transparent" />
+                                        <span className="text-sm font-bold text-foreground">
+                                            Synthesizing CSE questions via
+                                            Gemini...
+                                        </span>
                                     </div>
                                     <div className="space-y-2">
-                                        <div className="h-3 bg-border rounded-sm w-5/6" />
-                                        <div className="h-3 bg-border rounded-sm w-3/4" />
+                                        <div className="h-3 w-5/6 rounded-sm bg-border" />
+                                        <div className="h-3 w-3/4 rounded-sm bg-border" />
                                     </div>
                                 </div>
                             ) : (
@@ -320,38 +366,60 @@ export default function CreateQuestion({ type = 'ai', categories = [] }: CreateP
             </div>
 
             {/* Informational Column (5/12 cols) */}
-            <div className="lg:col-span-5 flex flex-col gap-6">
-                <div className="rounded-2xl border border-slate-250 bg-gradient-to-br from-blue-950 to-slate-900 p-6 text-white shadow-md relative overflow-hidden">
-                    <div className="absolute -top-12 -right-12 w-48 h-48 rounded-full bg-blue-600/10 blur-2xl pointer-events-none" />
-                    <div className="absolute -bottom-16 -left-16 w-56 h-56 bg-emerald-600/5 rounded-full blur-3xl pointer-events-none" />
+            <div className="flex flex-col gap-6 lg:col-span-5">
+                <div className="border-slate-250 relative overflow-hidden rounded-2xl border bg-gradient-to-br from-blue-950 to-slate-900 p-6 text-white shadow-md">
+                    <div className="pointer-events-none absolute -top-12 -right-12 h-48 w-48 rounded-full bg-blue-600/10 blur-2xl" />
+                    <div className="pointer-events-none absolute -bottom-16 -left-16 h-56 w-56 rounded-full bg-emerald-600/5 blur-3xl" />
 
-                    <h2 className="text-base font-extrabold tracking-tight inline-flex items-center gap-2 border-b border-white/10 pb-4.5 mb-4 w-full">
+                    <h2 className="mb-4 inline-flex w-full items-center gap-2 border-b border-white/10 pb-4.5 text-base font-extrabold tracking-tight">
                         <Cpu className="size-4.5 text-blue-400" />
                         Gemini Question Synthesizer
                     </h2>
 
-                    <div className="space-y-4 text-xs font-semibold text-slate-305 leading-relaxed">
+                    <div className="text-slate-305 space-y-4 text-xs leading-relaxed font-semibold">
                         <div className="flex gap-3.5">
-                            <BookOpen className="size-4 text-emerald-400 shrink-0 mt-0.5" />
+                            <BookOpen className="mt-0.5 size-4 shrink-0 text-emerald-400" />
                             <div>
-                                <h4 className="text-slate-200 font-bold mb-1">Standardized Exam Blueprint</h4>
-                                <p className="text-slate-400">Questions are synthesized directly against civil service exam guidelines, mapping to key cognitive difficulty standards (Recall, Application, Analysis).</p>
+                                <h4 className="mb-1 font-bold text-slate-200">
+                                    Standardized Exam Blueprint
+                                </h4>
+                                <p className="text-slate-400">
+                                    Questions are synthesized directly against
+                                    civil service exam guidelines, mapping to
+                                    key cognitive difficulty standards (Recall,
+                                    Application, Analysis).
+                                </p>
                             </div>
                         </div>
 
                         <div className="flex gap-3.5">
-                            <Sparkles className="size-4 text-purple-400 shrink-0 mt-0.5" />
+                            <Sparkles className="mt-0.5 size-4 shrink-0 text-purple-400" />
                             <div>
-                                <h4 className="text-slate-200 font-bold mb-1">Contextual Prompting</h4>
-                                <p className="text-slate-400">Use the Additional Context block to hone in on specific review modules—e.g. Philippine Constitutional amendments, fractions, or paragraph ordering puzzles.</p>
+                                <h4 className="mb-1 font-bold text-slate-200">
+                                    Contextual Prompting
+                                </h4>
+                                <p className="text-slate-400">
+                                    Use the Additional Context block to hone in
+                                    on specific review modules—e.g. Philippine
+                                    Constitutional amendments, fractions, or
+                                    paragraph ordering puzzles.
+                                </p>
                             </div>
                         </div>
 
                         <div className="flex gap-3.5">
-                            <HelpCircle className="size-4 text-blue-400 shrink-0 mt-0.5" />
+                            <HelpCircle className="mt-0.5 size-4 shrink-0 text-blue-400" />
                             <div>
-                                <h4 className="text-slate-200 font-bold mb-1">Interactive Review Queue</h4>
-                                <p className="text-slate-400 font-medium">Once questions are generated, they flow straight into the <strong>Drafts Review Center</strong>, allowing you to edit and batch-approve them in a unified dashboard.</p>
+                                <h4 className="mb-1 font-bold text-slate-200">
+                                    Interactive Review Queue
+                                </h4>
+                                <p className="font-medium text-slate-400">
+                                    Once questions are generated, they flow
+                                    straight into the{' '}
+                                    <strong>Drafts Review Center</strong>,
+                                    allowing you to edit and batch-approve them
+                                    in a unified dashboard.
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -361,23 +429,51 @@ export default function CreateQuestion({ type = 'ai', categories = [] }: CreateP
     );
 
     const manualContent = (
-        <form onSubmit={handleManualSubmit} className="grid grid-cols-1 gap-6 lg:grid-cols-12 items-start">
+        <form
+            onSubmit={handleManualSubmit}
+            className="grid grid-cols-1 items-start gap-6 lg:grid-cols-12"
+        >
             {/* CONTENT EDITORS (8/12 cols) */}
-            <div className="lg:col-span-8 flex flex-col gap-6">
+            <div className="flex flex-col gap-6 lg:col-span-8">
                 <div className="rounded-2xl border border-border bg-card p-6 shadow-xs">
-                    <h2 className="text-base font-bold text-foreground border-b border-border pb-3 mb-4 inline-flex items-center gap-2">
+                    <h2 className="mb-4 inline-flex items-center gap-2 border-b border-border pb-3 text-base font-bold text-foreground">
                         <FileText className="size-4.5 text-emerald-600" />
                         Question Content
                     </h2>
 
                     <div className="space-y-4">
                         <div className="flex items-center justify-between">
-                            <label htmlFor="stem" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Question Stem (Rich Text)</label>
+                            <label
+                                htmlFor="stem"
+                                className="text-xs font-bold tracking-wider text-muted-foreground uppercase"
+                            >
+                                Question Stem (Rich Text)
+                            </label>
                             <div className="flex items-center gap-1 rounded-lg border border-border bg-muted p-1">
-                                <button type="button" className="px-2 py-0.5 text-xs font-black text-muted-foreground hover:bg-card rounded transition select-none">B</button>
-                                <button type="button" className="px-2 py-0.5 text-xs italic text-muted-foreground hover:bg-card rounded transition select-none">I</button>
-                                <button type="button" className="px-2 py-0.5 text-xs text-muted-foreground hover:bg-card rounded transition select-none font-mono">List</button>
-                                <button type="button" className="px-2 py-0.5 text-xs text-muted-foreground hover:bg-card rounded transition select-none">Link</button>
+                                <button
+                                    type="button"
+                                    className="rounded px-2 py-0.5 text-xs font-black text-muted-foreground transition select-none hover:bg-card"
+                                >
+                                    B
+                                </button>
+                                <button
+                                    type="button"
+                                    className="rounded px-2 py-0.5 text-xs text-muted-foreground italic transition select-none hover:bg-card"
+                                >
+                                    I
+                                </button>
+                                <button
+                                    type="button"
+                                    className="rounded px-2 py-0.5 font-mono text-xs text-muted-foreground transition select-none hover:bg-card"
+                                >
+                                    List
+                                </button>
+                                <button
+                                    type="button"
+                                    className="rounded px-2 py-0.5 text-xs text-muted-foreground transition select-none hover:bg-card"
+                                >
+                                    Link
+                                </button>
                             </div>
                         </div>
 
@@ -387,12 +483,15 @@ export default function CreateQuestion({ type = 'ai', categories = [] }: CreateP
                             onChange={(e) => setData('stem', e.target.value)}
                             rows={6}
                             placeholder="Enter the main question text, scenario, or analytical passage here..."
-                            className={`w-full rounded-xl border p-4 text-sm font-medium text-foreground placeholder:text-muted-foreground focus:bg-background focus:outline-none transition ${errors.stem ? 'border-red-500 focus:border-red-500' : 'border-border focus:border-blue-500'
-                                }`}
+                            className={`w-full rounded-xl border p-4 text-sm font-medium text-foreground transition placeholder:text-muted-foreground focus:bg-background focus:outline-none ${
+                                errors.stem
+                                    ? 'border-red-500 focus:border-red-500'
+                                    : 'border-border focus:border-blue-500'
+                            }`}
                             required
                         />
                         {errors.stem && (
-                            <p className="inline-flex items-center gap-1 text-xs font-semibold text-red-600 mt-1">
+                            <p className="mt-1 inline-flex items-center gap-1 text-xs font-semibold text-red-600">
                                 <AlertCircle className="size-3.5" />
                                 {errors.stem}
                             </p>
@@ -402,12 +501,12 @@ export default function CreateQuestion({ type = 'ai', categories = [] }: CreateP
 
                 {/* Answer Options Card */}
                 <div className="rounded-2xl border border-border bg-card p-6 shadow-xs">
-                    <div className="flex items-center justify-between border-b border-border pb-3 mb-4">
-                        <h2 className="text-base font-bold text-foreground inline-flex items-center gap-2">
+                    <div className="mb-4 flex items-center justify-between border-b border-border pb-3">
+                        <h2 className="inline-flex items-center gap-2 text-base font-bold text-foreground">
                             <CheckCircle2 className="size-4.5 text-emerald-600" />
                             Answer Options
                         </h2>
-                        <span className="inline-flex rounded-md bg-blue-550/10 px-2 py-0.5 text-[10px] font-bold text-blue-700 tracking-wider uppercase">
+                        <span className="bg-blue-550/10 inline-flex rounded-md px-2 py-0.5 text-[10px] font-bold tracking-wider text-blue-700 uppercase">
                             Mark 1 Correct Answer
                         </span>
                     </div>
@@ -416,32 +515,40 @@ export default function CreateQuestion({ type = 'ai', categories = [] }: CreateP
                         {data.options.map((option, idx) => (
                             <div
                                 key={idx}
-                                className={`flex items-center gap-4 rounded-xl border p-3.5 transition duration-200 ${data.correct_option === idx
-                                    ? 'border-emerald-250 bg-emerald-50/20'
-                                    : 'border-border'
-                                    }`}
+                                className={`flex items-center gap-4 rounded-xl border p-3.5 transition duration-200 ${
+                                    data.correct_option === idx
+                                        ? 'border-emerald-250 bg-emerald-50/20'
+                                        : 'border-border'
+                                }`}
                             >
-                                <label className="flex items-center cursor-pointer">
+                                <label className="flex cursor-pointer items-center">
                                     <input
                                         type="radio"
                                         name="correct_option"
                                         checked={data.correct_option === idx}
-                                        onChange={() => setData('correct_option', idx)}
-                                        className="size-5 accent-emerald-600 cursor-pointer"
+                                        onChange={() =>
+                                            setData('correct_option', idx)
+                                        }
+                                        className="size-5 cursor-pointer accent-emerald-600"
                                     />
                                 </label>
 
-                                <span className={`inline-flex size-7 items-center justify-center rounded-lg text-xs font-bold shrink-0 ${data.correct_option === idx
-                                    ? 'bg-emerald-600 text-white'
-                                    : 'bg-muted text-muted-foreground'
-                                    }`}>
+                                <span
+                                    className={`inline-flex size-7 shrink-0 items-center justify-center rounded-lg text-xs font-bold ${
+                                        data.correct_option === idx
+                                            ? 'bg-emerald-600 text-white'
+                                            : 'bg-muted text-muted-foreground'
+                                    }`}
+                                >
                                     {String.fromCharCode(65 + idx)}
                                 </span>
 
                                 <input
                                     type="text"
                                     value={option}
-                                    onChange={(e) => handleOptionChange(idx, e.target.value)}
+                                    onChange={(e) =>
+                                        handleOptionChange(idx, e.target.value)
+                                    }
                                     placeholder={`Enter option ${String.fromCharCode(65 + idx)} content`}
                                     className="w-full bg-transparent text-sm font-semibold text-foreground placeholder:text-muted-foreground focus:outline-none"
                                     required
@@ -453,24 +560,34 @@ export default function CreateQuestion({ type = 'ai', categories = [] }: CreateP
 
                 {/* Explanation Card */}
                 <div className="rounded-2xl border border-border bg-card p-6 shadow-xs">
-                    <h2 className="text-base font-bold text-foreground border-b border-border pb-3 mb-4">
+                    <h2 className="mb-4 border-b border-border pb-3 text-base font-bold text-foreground">
                         Explanation & Rationale
                     </h2>
 
                     <div className="space-y-2">
-                        <label htmlFor="explanation" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Provide the reasoning behind the correct answer</label>
+                        <label
+                            htmlFor="explanation"
+                            className="text-xs font-bold tracking-wider text-muted-foreground uppercase"
+                        >
+                            Provide the reasoning behind the correct answer
+                        </label>
                         <textarea
                             id="explanation"
                             value={data.explanation}
-                            onChange={(e) => setData('explanation', e.target.value)}
+                            onChange={(e) =>
+                                setData('explanation', e.target.value)
+                            }
                             rows={4}
                             placeholder="Why is this the correct answer? Provide logic constraints, solution steps, or constitutional references..."
-                            className={`w-full rounded-xl border p-4 text-sm font-medium text-foreground placeholder:text-muted-foreground focus:bg-background focus:outline-none transition ${errors.explanation ? 'border-red-500' : 'border-slate-200 focus:border-blue-500'
-                                }`}
+                            className={`w-full rounded-xl border p-4 text-sm font-medium text-foreground transition placeholder:text-muted-foreground focus:bg-background focus:outline-none ${
+                                errors.explanation
+                                    ? 'border-red-500'
+                                    : 'border-slate-200 focus:border-blue-500'
+                            }`}
                             required
                         />
                         {errors.explanation && (
-                            <p className="inline-flex items-center gap-1 text-xs font-semibold text-red-600 mt-1">
+                            <p className="mt-1 inline-flex items-center gap-1 text-xs font-semibold text-red-600">
                                 <AlertCircle className="size-3.5" />
                                 {errors.explanation}
                             </p>
@@ -480,9 +597,9 @@ export default function CreateQuestion({ type = 'ai', categories = [] }: CreateP
             </div>
 
             {/* METADATA, ATTACHMENT & SUBMISSIONS (4/12 cols) */}
-            <div className="lg:col-span-4 flex flex-col gap-6">
+            <div className="flex flex-col gap-6 lg:col-span-4">
                 <div className="rounded-2xl border border-border bg-card p-6 shadow-xs">
-                    <h2 className="text-base font-bold border-b border-slate-100 pb-3 mb-4">
+                    <h2 className="mb-4 border-b border-slate-100 pb-3 text-base font-bold">
                         Metadata
                     </h2>
 
@@ -513,25 +630,29 @@ export default function CreateQuestion({ type = 'ai', categories = [] }: CreateP
 
                         {/* Status Toggles */}
                         <div className="flex flex-col gap-1.5">
-                            <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Default Status</label>
-                            <div className="grid grid-cols-2 gap-2 bg-muted rounded-xl p-1 border border-border">
+                            <label className="text-xs font-bold tracking-wider text-muted-foreground uppercase">
+                                Default Status
+                            </label>
+                            <div className="grid grid-cols-2 gap-2 rounded-xl border border-border bg-muted p-1">
                                 <button
                                     type="button"
                                     onClick={() => setData('status', 'active')}
-                                    className={`py-2 text-xs font-bold rounded-lg transition cursor-pointer ${data.status === 'active'
-                                        ? 'bg-card text-foreground shadow-xs'
-                                        : 'text-muted-foreground hover:text-foreground'
-                                        }`}
+                                    className={`cursor-pointer rounded-lg py-2 text-xs font-bold transition ${
+                                        data.status === 'active'
+                                            ? 'bg-card text-foreground shadow-xs'
+                                            : 'text-muted-foreground hover:text-foreground'
+                                    }`}
                                 >
                                     Active / Live
                                 </button>
                                 <button
                                     type="button"
                                     onClick={() => setData('status', 'draft')}
-                                    className={`py-2 text-xs font-bold rounded-lg transition cursor-pointer ${data.status === 'draft'
-                                        ? 'bg-white text-slate-900 shadow-xs'
-                                        : 'text-slate-500 hover:text-slate-900'
-                                        }`}
+                                    className={`cursor-pointer rounded-lg py-2 text-xs font-bold transition ${
+                                        data.status === 'draft'
+                                            ? 'bg-white text-slate-900 shadow-xs'
+                                            : 'text-slate-500 hover:text-slate-900'
+                                    }`}
                                 >
                                     Draft
                                 </button>
@@ -575,7 +696,11 @@ export default function CreateQuestion({ type = 'ai', categories = [] }: CreateP
         <>
             <Head title="Create Question" />
             <CurationCreateShell
-                title={activeTab === 'ai' ? 'AI Question Generator' : 'Manual Question Entry'}
+                title={
+                    activeTab === 'ai'
+                        ? 'AI Question Generator'
+                        : 'Manual Question Entry'
+                }
                 description={
                     activeTab === 'ai'
                         ? 'Configure parameters to generate new exam questions.'

@@ -11,7 +11,7 @@ export function PageHeader({
     title,
     description,
     className = '',
-    descriptionClassName = 'mt-2 text-sm text-muted-foreground'
+    descriptionClassName = 'mt-2 text-sm text-muted-foreground',
 }: PageHeaderProps) {
     return (
         <div className={className}>
@@ -19,9 +19,7 @@ export function PageHeader({
                 {title}
             </h1>
             {description && (
-                <p className={descriptionClassName}>
-                    {description}
-                </p>
+                <p className={descriptionClassName}>{description}</p>
             )}
         </div>
     );

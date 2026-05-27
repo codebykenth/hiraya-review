@@ -10,7 +10,9 @@ import { send } from '@/routes/verification';
 export default function VerifyEmail({ status }: { status?: string }) {
     const [resendCount, setResendCount] = useState<number>(() => {
         if (typeof window !== 'undefined') {
-            const storedCount = sessionStorage.getItem('verifyEmailResendCount');
+            const storedCount = sessionStorage.getItem(
+                'verifyEmailResendCount',
+            );
 
             return storedCount ? parseInt(storedCount, 10) : 0;
         }
@@ -20,7 +22,9 @@ export default function VerifyEmail({ status }: { status?: string }) {
 
     const [timeLeft, setTimeLeft] = useState<number>(() => {
         if (typeof window !== 'undefined') {
-            const storedNextTime = sessionStorage.getItem('verifyEmailNextAllowedTime');
+            const storedNextTime = sessionStorage.getItem(
+                'verifyEmailNextAllowedTime',
+            );
 
             if (storedNextTime) {
                 const nextTime = parseInt(storedNextTime, 10);

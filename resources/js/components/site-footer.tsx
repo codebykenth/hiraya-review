@@ -18,7 +18,8 @@ export default function SiteFooter() {
 
                 <div className="flex w-full flex-col items-start justify-between gap-6 border-t border-slate-200/60 pt-6 text-left md:flex-row md:items-center dark:border-slate-800/60">
                     <p className="text-xs font-normal text-slate-500 dark:text-slate-400">
-                        &copy; {new Date().getFullYear()} <BrandName />. All rights reserved.
+                        &copy; {new Date().getFullYear()} <BrandName />. All
+                        rights reserved.
                     </p>
 
                     <div className="flex flex-wrap gap-x-8 gap-y-3">
@@ -45,9 +46,20 @@ export default function SiteFooter() {
 
                 {/* Legal / Non-Affiliation Disclaimer */}
                 <div className="border-t border-slate-200/40 pt-6 dark:border-slate-800/40">
-                    <p className="text-[11px] leading-relaxed font-medium text-slate-700 dark:text-slate-300 text-left">
-                        <span className="font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mr-1.5">Disclaimer:</span>
-                        This platform is an independent, unofficial study reviewer and preparation portal. It is not affiliated, associated, authorized, endorsed by, or in any way officially connected with the Civil Service Commission (CSC) of the Philippines, or any government agency or department. All brand names, logos, or exam designations referenced herein are trademarks or registered trademarks of their respective holders, and their use does not imply any affiliation with or endorsement by them.
+                    <p className="text-left text-[11px] leading-relaxed font-medium text-slate-700 dark:text-slate-300">
+                        <span className="mr-1.5 font-bold tracking-wider text-slate-500 uppercase dark:text-slate-400">
+                            Disclaimer:
+                        </span>
+                        This platform is an independent, unofficial study
+                        reviewer and preparation portal. It is not affiliated,
+                        associated, authorized, endorsed by, or in any way
+                        officially connected with the Civil Service Commission
+                        (CSC) of the Philippines, or any government agency or
+                        department. All brand names, logos, or exam designations
+                        referenced herein are trademarks or registered
+                        trademarks of their respective holders, and their use
+                        does not imply any affiliation with or endorsement by
+                        them.
                     </p>
                 </div>
             </div>

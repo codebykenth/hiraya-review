@@ -1,17 +1,15 @@
 import { Head, Link, router } from '@inertiajs/react';
-import {
-    Eye,
-    Edit2,
-    Trash2,
-    FileText
-} from 'lucide-react';
+import { Eye, Edit2, Trash2, FileText } from 'lucide-react';
 import type { TableColumn } from '@/components/admin-table';
-import { CurationIndexShell, getCategoryStyles } from '@/components/curation-index-shell';
+import {
+    CurationIndexShell,
+    getCategoryStyles,
+} from '@/components/curation-index-shell';
 import type { CategoryItem } from '@/components/drafts-review-shell';
 import {
     index as adminLearnIndex,
     create as adminLearnCreate,
-    edit as adminLearnEdit
+    edit as adminLearnEdit,
 } from '@/routes/admin/learn';
 import { show as learnShow } from '@/routes/learn';
 
@@ -33,30 +31,43 @@ interface AdminLearnIndexProps {
     categories?: CategoryItem[];
 }
 
-export default function AdminLearnIndex({ modules = [], categories = [] }: AdminLearnIndexProps) {
-    const columns = (confirmDelete: (item: LearnModule) => void): TableColumn<LearnModule>[] => [
+export default function AdminLearnIndex({
+    modules = [],
+    categories = [],
+}: AdminLearnIndexProps) {
+    const columns = (
+        confirmDelete: (item: LearnModule) => void,
+    ): TableColumn<LearnModule>[] => [
         {
             header: 'Module ID',
-            render: (mod) => <span className="font-bold text-muted-foreground">#{mod.id}</span>
+            render: (mod) => (
+                <span className="font-bold text-muted-foreground">
+                    #{mod.id}
+                </span>
+            ),
         },
         {
             header: 'Lesson Details',
             render: (mod) => (
                 <>
-                    <span className="block text-xs font-black text-foreground leading-snug line-clamp-1">{mod.title}</span>
-                    <span className="mt-1 block text-[10px] font-bold text-muted-foreground line-clamp-1 leading-relaxed">
+                    <span className="line-clamp-1 block text-xs leading-snug font-black text-foreground">
+                        {mod.title}
+                    </span>
+                    <span className="mt-1 line-clamp-1 block text-[10px] leading-relaxed font-bold text-muted-foreground">
                         {mod.summary || 'CSE Syllabus Study Module'}
                     </span>
                 </>
-            )
+            ),
         },
         {
             header: 'Category',
             render: (mod) => (
-                <span className={`inline-flex rounded-md border px-2 py-0.5 text-[9px] font-extrabold tracking-wide uppercase ${getCategoryStyles(mod.category)}`}>
+                <span
+                    className={`inline-flex rounded-md border px-2 py-0.5 text-[9px] font-extrabold tracking-wide uppercase ${getCategoryStyles(mod.category)}`}
+                >
                     {mod.category}
                 </span>
-            )
+            ),
         },
         {
             header: 'Subcategory',
@@ -64,19 +75,20 @@ export default function AdminLearnIndex({ modules = [], categories = [] }: Admin
                 <span className="text-[11px] font-bold text-muted-foreground capitalize">
                     {mod.subcategory}
                 </span>
-            )
+            ),
         },
         {
             header: 'Status',
-            render: (mod) => mod.is_published ? (
-                <span className="inline-flex items-center gap-1 rounded-md bg-emerald-50 px-2 py-0.5 text-[9px] font-extrabold text-emerald-700 dark:bg-emerald-950/20 dark:text-emerald-400 dark:border-emerald-900/30 border border-emerald-100 uppercase">
-                    Active
-                </span>
-            ) : (
-                <span className="inline-flex items-center gap-1 rounded-md bg-blue-50 px-2 py-0.5 text-[9px] font-extrabold text-blue-650 dark:bg-blue-950/20 dark:text-blue-400 dark:border-blue-900/30 border border-blue-100 uppercase">
-                    Draft
-                </span>
-            )
+            render: (mod) =>
+                mod.is_published ? (
+                    <span className="inline-flex items-center gap-1 rounded-md border border-emerald-100 bg-emerald-50 px-2 py-0.5 text-[9px] font-extrabold text-emerald-700 uppercase dark:border-emerald-900/30 dark:bg-emerald-950/20 dark:text-emerald-400">
+                        Active
+                    </span>
+                ) : (
+                    <span className="text-blue-650 inline-flex items-center gap-1 rounded-md border border-blue-100 bg-blue-50 px-2 py-0.5 text-[9px] font-extrabold uppercase dark:border-blue-900/30 dark:bg-blue-950/20 dark:text-blue-400">
+                        Draft
+                    </span>
+                ),
         },
         {
             header: 'Actions',
@@ -85,14 +97,14 @@ export default function AdminLearnIndex({ modules = [], categories = [] }: Admin
                 <div className="flex items-center justify-end gap-1.5">
                     <Link
                         href={learnShow(mod.slug).url}
-                        className="rounded-lg p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground transition"
+                        className="rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted hover:text-foreground"
                         title="Student Preview"
                     >
                         <Eye className="size-4" />
                     </Link>
                     <Link
                         href={adminLearnEdit(mod.id).url}
-                        className="rounded-lg p-1.5 text-muted-foreground hover:bg-muted hover:text-blue-600 transition"
+                        className="rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted hover:text-blue-600"
                         title="Edit details"
                     >
                         <Edit2 className="size-4" />
@@ -100,14 +112,14 @@ export default function AdminLearnIndex({ modules = [], categories = [] }: Admin
                     <button
                         type="button"
                         onClick={() => confirmDelete(mod)}
-                        className="rounded-lg p-1.5 text-muted-foreground hover:bg-muted hover:text-red-600 transition cursor-pointer"
+                        className="cursor-pointer rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted hover:text-red-600"
                         title="Delete module"
                     >
                         <Trash2 className="size-4" />
                     </button>
                 </div>
-            )
-        }
+            ),
+        },
     ];
 
     return (
@@ -123,7 +135,9 @@ export default function AdminLearnIndex({ modules = [], categories = [] }: Admin
                     mod.title.toLowerCase().includes(search.toLowerCase()) ||
                     mod.topic.toLowerCase().includes(search.toLowerCase()) ||
                     mod.category.toLowerCase().includes(search.toLowerCase()) ||
-                    mod.subcategory.toLowerCase().includes(search.toLowerCase()) ||
+                    mod.subcategory
+                        .toLowerCase()
+                        .includes(search.toLowerCase()) ||
                     String(mod.id).includes(search)
                 }
                 statusMatcher={(mod, status) =>
@@ -131,31 +145,36 @@ export default function AdminLearnIndex({ modules = [], categories = [] }: Admin
                     (status === 'DRAFT' && !mod.is_published)
                 }
                 aiGenerator={{
-                    title: "AI Lesson Generator",
-                    description: "Instantly create rich, syllabus-aligned study modules and interactive quick-checks using Gemini AI.",
-                    href: adminLearnCreate({ query: { type: 'ai' } }).url
+                    title: 'AI Lesson Generator',
+                    description:
+                        'Instantly create rich, syllabus-aligned study modules and interactive quick-checks using Gemini AI.',
+                    href: adminLearnCreate({ query: { type: 'ai' } }).url,
                 }}
                 manualEntry={{
-                    title: "Manual Lesson Entry",
-                    description: "Precision-craft detailed tutorials, study guides, and review materials manually with standard Markdown support.",
-                    href: adminLearnCreate({ query: { type: 'manual' } }).url
+                    title: 'Manual Lesson Entry',
+                    description:
+                        'Precision-craft detailed tutorials, study guides, and review materials manually with standard Markdown support.',
+                    href: adminLearnCreate({ query: { type: 'manual' } }).url,
                 }}
                 tableTitle="CSE Learning Modules"
                 tableLegend={[
                     { icon: Eye, label: 'Student Preview', variant: 'slate' },
                     { icon: Edit2, label: 'Edit Module', variant: 'blue' },
-                    { icon: Trash2, label: 'Delete Module', variant: 'rose' }
+                    { icon: Trash2, label: 'Delete Module', variant: 'rose' },
                 ]}
                 tableEmptyState={{
                     icon: FileText,
-                    title: "No Modules Found",
-                    description: "We couldn't find any learning modules matching your active filters. Clear filters or launch the AI Generator to create fresh ones."
+                    title: 'No Modules Found',
+                    description:
+                        "We couldn't find any learning modules matching your active filters. Clear filters or launch the AI Generator to create fresh ones.",
                 }}
                 onDeleteConfirm={(mod) => {
                     router.delete(`/admin/learn/${mod.id}`);
                 }}
                 getDeleteTitle={() => 'Delete Study Module?'}
-                getDeleteMessage={(mod) => `Are you sure you want to permanently delete the learning module "${mod.title}"? This action cannot be undone.`}
+                getDeleteMessage={(mod) =>
+                    `Are you sure you want to permanently delete the learning module "${mod.title}"? This action cannot be undone.`
+                }
                 deleteConfirmLabel="Delete Module"
             />
         </>

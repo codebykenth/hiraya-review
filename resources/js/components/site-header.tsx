@@ -95,8 +95,9 @@ export default function SiteHeader({
             />
 
             <header
-                className={`sticky top-0 left-0 z-50 w-full border-b border-gray-200 bg-white/90 text-sm backdrop-blur-md transition-all duration-300 not-has-[nav]:hidden dark:border-gray-800 dark:bg-black/90 ${showHeader ? 'translate-y-0 shadow-sm' : '-translate-y-full'
-                    }`}
+                className={`sticky top-0 left-0 z-50 w-full border-b border-gray-200 bg-white/90 text-sm backdrop-blur-md transition-all duration-300 not-has-[nav]:hidden dark:border-gray-800 dark:bg-black/90 ${
+                    showHeader ? 'translate-y-0 shadow-sm' : '-translate-y-full'
+                }`}
             >
                 <nav className="container mx-auto flex items-center justify-between gap-4 px-6 py-4">
                     <div className="flex items-center">
@@ -125,10 +126,11 @@ export default function SiteHeader({
                                                 onClick={() =>
                                                     handleLinkClick(link.id)
                                                 }
-                                                className={`border-b-2 pb-1 transition-all ${isHomeActive
-                                                    ? 'border-primary font-bold text-primary'
-                                                    : 'border-transparent text-muted-foreground hover:border-border hover:text-foreground'
-                                                    }`}
+                                                className={`border-b-2 pb-1 transition-all ${
+                                                    isHomeActive
+                                                        ? 'border-primary font-bold text-primary'
+                                                        : 'border-transparent text-muted-foreground hover:border-border hover:text-foreground'
+                                                }`}
                                             >
                                                 {link.label}
                                             </a>
@@ -187,10 +189,11 @@ export default function SiteHeader({
                 </nav>
 
                 <div
-                    className={`absolute top-full right-0 left-0 z-40 transform border-b border-slate-200 bg-white/95 backdrop-blur-lg transition-all duration-300 ease-in-out md:hidden dark:border-slate-800 dark:bg-black/95 ${isMenuOpen
-                        ? 'translate-y-0 opacity-100'
-                        : 'pointer-events-none -translate-y-10 opacity-0'
-                        }`}
+                    className={`absolute top-full right-0 left-0 z-40 transform border-b border-slate-200 bg-white/95 backdrop-blur-lg transition-all duration-300 ease-in-out md:hidden dark:border-slate-800 dark:bg-black/95 ${
+                        isMenuOpen
+                            ? 'translate-y-0 opacity-100'
+                            : 'pointer-events-none -translate-y-10 opacity-0'
+                    }`}
                 >
                     <div className="container mx-auto flex flex-col gap-6 px-6 py-6">
                         {!auth.user && (
@@ -214,10 +217,11 @@ export default function SiteHeader({
                                                     onClick={() =>
                                                         handleLinkClick(link.id)
                                                     }
-                                                    className={`block py-1 transition-all ${isHomeActive
-                                                        ? 'font-bold text-primary'
-                                                        : 'text-muted-foreground hover:text-foreground'
-                                                        }`}
+                                                    className={`block py-1 transition-all ${
+                                                        isHomeActive
+                                                            ? 'font-bold text-primary'
+                                                            : 'text-muted-foreground hover:text-foreground'
+                                                    }`}
                                                 >
                                                     {link.label}
                                                 </a>
