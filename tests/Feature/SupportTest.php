@@ -54,6 +54,7 @@ test('support submission validation rules are enforced', function () {
 });
 
 test('rate limit is active in production environment and returns Inertia errors', function () {
+    config(['services.support.test_rate_limit' => true]);
     Mail::fake();
 
     // First request should succeed

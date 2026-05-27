@@ -9,6 +9,7 @@ import { useState, useEffect } from 'react';
 import { index as questionsIndex, store as questionsStore, create as questionsCreate, destroy as questionsDestroy } from '@/routes/questions';
 import { DraftsReviewShell } from '@/components/drafts-review-shell';
 import type { CategoryItem } from '@/components/drafts-review-shell';
+import { Input } from '@/components/ui/input';
 
 interface DraftQuestion {
     id: number;
@@ -66,7 +67,7 @@ const renderFormattedText = (text: string) => {
             if (!paraText) return null;
 
             // Strict 1-liner comment: Regex to match standard math expressions, logic arrow chains, negation states, parenthesized variables, and single letter variables
-            const mathPattern = /(\b\d+(?:\.\d+)?%|\b\d+\/\d+\b|\[[^\]]+\]|\bProject\s+[A-Z]\b|\bQ[1-4]\b|(?:\b\d+(?:,\d{3})*(?:\.\d+)?\s*[\+\-\*\/=]\s*)+\d+(?:,\d{3})*(?:\.\d+)?%?|[~¬]?\s*\b[A-Z]\b\s*(?:->|=>)\s*[~¬]?\s*\b[A-Z]\b(?:\s*(?:->|=>)\s*[~¬]?\s*\b[A-Z]\b)*|[~¬]\s*\b[A-Z]\b|\(\s*[~¬]?\s*\b[A-Z]\b\s*\)|'\s*[~¬]?\s*\b[A-Z]\b\s*'|"\s*[~¬]?\s*\b[A-Z]\b\s*"|\b[B-H|J-N|P-Z]\b)/g;
+            const mathPattern = /(\b\d+(?:\.\d+)?%|\b\d+\/\d+\b|\[[^\]]+\]|\bProject\s+[A-Z]\b|\bQ[1-4]\b|(?:\b\d+(?:,\d{3})*(?:\.\d+)?\s*(?:[+*=-]|\/)\s*)+\d+(?:,\d{3})*(?:\.\d+)?%?|[~¬]?\s*\b[A-Z]\b\s*(?:->|=>)\s*[~¬]?\s*\b[A-Z]\b(?:\s*(?:->|=>)\s*[~¬]?\s*\b[A-Z]\b)*|[~¬]\s*\b[A-Z]\b|\(\s*[~¬]?\s*\b[A-Z]\b\s*\)|'\s*[~¬]?\s*\b[A-Z]\b\s*'|"\s*[~¬]?\s*\b[A-Z]\b\s*"|\b[B-H|J-N|P-Z]\b)/g;
             const boldParts = paraText.split(/(\*\*[^*]+\*\*)/g);
 
             const renderSingleVariable = (v: string) => {
@@ -294,7 +295,10 @@ export default function DraftsQuestionList({ initialDrafts = [], categories = []
 
     // Sync local state when Inertia refreshes initialDrafts from backend
     useEffect(() => {
-        setDraftQuestions(initialDrafts);
+        const timer = setTimeout(() => {
+            setDraftQuestions(initialDrafts);
+        }, 0);
+        return () => clearTimeout(timer);
     }, [initialDrafts]);
 
     // Actions
@@ -351,7 +355,7 @@ export default function DraftsQuestionList({ initialDrafts = [], categories = []
         const approvedQuestions = draftQuestions.filter(q => q.approved);
         if (approvedQuestions.length === 0) return;
 
-        const questionsToSave = approvedQuestions.map(({ isEditing, approved, ...rest }) => rest);
+        const questionsToSave = approvedQuestions.map(({ isEditing: _isEditing, approved: _approved, ...rest }) => rest);
 
         router.post(questionsStore().url, {
             questions: questionsToSave,
@@ -481,11 +485,10 @@ export default function DraftsQuestionList({ initialDrafts = [], categories = []
                                                     className="size-4 accent-emerald-600 shrink-0 cursor-pointer"
                                                 />
                                                 <span className="text-xs font-bold text-muted-foreground uppercase">{String.fromCharCode(65 + optIdx)}</span>
-                                                <input
+                                                <Input
                                                     type="text"
                                                     value={opt}
                                                     onChange={(e) => handleUpdateDraftOption(q.id, optIdx, e.target.value)}
-                                                    className="w-full rounded-lg border border-border px-3 py-1.5 text-xs font-semibold focus:border-blue-500 focus:outline-none text-foreground bg-background"
                                                 />
                                             </div>
                                         ) : (

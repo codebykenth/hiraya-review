@@ -4,6 +4,7 @@ import { PageHeader } from '@/components/page-header';
 import { Card } from '@/components/ui/card';
 import { Head, Link } from '@inertiajs/react';
 import { Search, BookOpen, Clock, Tag, ArrowRight } from 'lucide-react';
+import { Input } from '@/components/ui/input';
 
 interface LearnModule {
     id: number;
@@ -68,12 +69,12 @@ export default function LearnIndex({ modules, categories }: LearnIndexProps) {
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between rounded-2xl border border-border bg-card p-5 shadow-2xs">
                     <div className="relative flex-1">
                         <Search className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
-                        <input
+                        <Input
                             type="text"
                             placeholder="Search by topic, lesson name, or syllabus keywords..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full rounded-xl border border-border bg-slate-50/35 py-2.5 pl-10 pr-4 text-xs font-medium focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:bg-slate-900/50 text-foreground"
+                            className="pl-10"
                         />
                     </div>
                     

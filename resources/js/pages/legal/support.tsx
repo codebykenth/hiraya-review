@@ -4,6 +4,7 @@ import SiteFooter from '@/components/site-footer';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Mail, MessageSquare, ShieldAlert, ArrowRight } from 'lucide-react';
+import { Input } from '@/components/ui/input';
 import { useState } from 'react';
 import { store as supportStore } from '@/routes/support';
 
@@ -108,15 +109,14 @@ export default function Support() {
                                                     <label htmlFor="name" className="text-xs font-bold text-foreground">
                                                         Your Name
                                                     </label>
-                                                    <input
+                                                    <Input
                                                         type="text"
                                                         id="name"
                                                         required
                                                         value={data.name}
                                                         onChange={(e) => setData('name', e.target.value)}
                                                         placeholder="Juan Dela Cruz"
-                                                        className={`w-full rounded-lg border bg-white px-4 py-2.5 text-sm text-foreground transition focus:border-blue-500 focus:outline-none dark:bg-slate-900 ${errors.name ? 'border-red-500' : 'border-border'
-                                                            }`}
+                                                        className={errors.name ? 'border-red-500 focus:border-red-500' : ''}
                                                     />
                                                     {errors.name && (
                                                         <p className="text-xs font-semibold text-red-650 mt-1">{errors.name}</p>
@@ -126,15 +126,14 @@ export default function Support() {
                                                     <label htmlFor="email" className="text-xs font-bold text-foreground">
                                                         Email Address
                                                     </label>
-                                                    <input
+                                                    <Input
                                                         type="email"
                                                         id="email"
                                                         required
                                                         value={data.email}
                                                         onChange={(e) => setData('email', e.target.value)}
                                                         placeholder="juan@example.com"
-                                                        className={`w-full rounded-lg border bg-white px-4 py-2.5 text-sm text-foreground transition focus:border-blue-500 focus:outline-none dark:bg-slate-900 ${errors.email ? 'border-red-500' : 'border-border'
-                                                            }`}
+                                                        className={errors.email ? 'border-red-500 focus:border-red-500' : ''}
                                                     />
                                                     {errors.email && (
                                                         <p className="text-xs font-semibold text-red-650 mt-1">{errors.email}</p>

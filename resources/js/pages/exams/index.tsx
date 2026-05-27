@@ -771,7 +771,7 @@ export default function ExamIndex({
     const [isTimed, setIsTimed] = useState<boolean>(true);
 
     // Dynamic metrics configured to update the simulation parameters instantly
-    const getSimulationDetails = (examId: number | null) => {
+    const getSimulationDetails = useCallback((examId: number | null) => {
         if (examId === 1) {
             return {
                 title: 'Professional Level Reviewer',
@@ -804,7 +804,7 @@ export default function ExamIndex({
             targetPace: '1.0 min/item',
             allowedCategories: categories.map(c => c.name)
         };
-    };
+    }, [drillCategoryName, savedAttempt, activeQuestions, sessionTimeLimitSecs, categories]);
 
     const details = getSimulationDetails(selectedExamId);
     const isDrillSession = selectedExamId === null || selectedExamId > 2 || savedAttempt?.cat_scores?.metadata?.track === 'Drill' || drillCategoryName !== null;
@@ -818,7 +818,7 @@ export default function ExamIndex({
     const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
     const [reviewScreenActive, setReviewScreenActive] = useState(false);
     const [reviewStatusFilter, setReviewStatusFilter] = useState<'all' | 'correct' | 'incorrect'>('all');
-    const [reviewCategoryFilter, _setReviewCategoryFilter] = useState('All Categories');
+    const [reviewCategoryFilter] = useState('All Categories');
 
     // Sync currentIdx with review filters dynamically
     useEffect(() => {
@@ -1070,14 +1070,6 @@ export default function ExamIndex({
         return Math.max(0, Math.min(limit, limit - timeLeftRef.current));
     };
 
-    const getResultsRemainingSecs = () => {
-        if (!isTimed) {
-            return 0;
-        }
-        const limit = getActiveTimeLimitSecs();
-        return Math.max(0, limit - getResultsElapsedSecs());
-    };
-
     const getTrackNameForExam = (examId: number | null) =>
         examId === 2 ? 'Subprofessional' : 'Professional';
 
@@ -1204,7 +1196,7 @@ export default function ExamIndex({
         setResults(null);
         setSubmittedByTimer(false);
         setShowRetakeModal(false);
-    }, []);
+    }, [getSimulationDetails]);
 
     const getRetakeContext = () => {
         if (pendingRetake) return pendingRetake;
@@ -1517,16 +1509,16 @@ export default function ExamIndex({
                 confirmLabel: 'Yes, Submit',
                 variant: unansweredCount > 0 ? 'danger' : 'success',
                 onConfirm: () => {
-                    executeSubmit(auto);
+                    executeSubmit();
                 }
             });
             return;
         }
 
-        executeSubmit(auto);
+        executeSubmit();
     };
 
-    const executeSubmit = (auto = false) => {
+    const executeSubmit = () => {
         if (timerRef.current) clearInterval(timerRef.current);
 
         let score = 0;
@@ -1650,6 +1642,7 @@ export default function ExamIndex({
             });
     };
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => {
         handleSubmitExamRef.current = handleSubmitExam;
     }, [handleSubmitExam]);

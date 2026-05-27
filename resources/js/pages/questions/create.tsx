@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Head, Link, router, useForm } from '@inertiajs/react';
-import { Sparkles, PenLine, FileText, AlertCircle, Save, RotateCcw, Sparkle, Cpu, BookOpen, HelpCircle, CheckCircle2 } from 'lucide-react';
+import { Sparkles, FileText, AlertCircle, Save, RotateCcw, Sparkle, Cpu, BookOpen, HelpCircle, CheckCircle2 } from 'lucide-react';
 import { index as questionsIndex, store as questionsStore, drafts as questionsDrafts, generate as questionsGenerate } from '@/routes/questions';
 import { SelectField } from '@/components/ui/select';
 import { CurationCreateShell } from '@/components/curation-create-shell';
@@ -85,9 +85,15 @@ export default function CreateQuestion({ type = 'ai', categories = [] }: CreateP
     // Sync subcategories for AI view
     useEffect(() => {
         if (cseCategoriesTree[aiCategory]) {
-            setAiSubcategory(cseCategoriesTree[aiCategory][0]);
+            const firstSub = cseCategoriesTree[aiCategory][0];
+            if (aiSubcategory !== firstSub) {
+                const timer = setTimeout(() => {
+                    setAiSubcategory(firstSub);
+                }, 0);
+                return () => clearTimeout(timer);
+            }
         }
-    }, [aiCategory]);
+    }, [aiCategory, aiSubcategory]);
 
     // Manual Entry Form
     const { data, setData, post, processing, errors, reset } = useForm({
@@ -104,9 +110,15 @@ export default function CreateQuestion({ type = 'ai', categories = [] }: CreateP
     // Sync subcategories for Manual view
     useEffect(() => {
         if (cseCategoriesTree[data.category]) {
-            setData('subcategory', cseCategoriesTree[data.category][0]);
+            const firstSub = cseCategoriesTree[data.category][0];
+            if (data.subcategory !== firstSub) {
+                const timer = setTimeout(() => {
+                    setData('subcategory', firstSub);
+                }, 0);
+                return () => clearTimeout(timer);
+            }
         }
-    }, [data.category]);
+    }, [data.category, data.subcategory]);
 
     const handleOptionChange = (idx: number, val: string) => {
         const newOptions = [...data.options];

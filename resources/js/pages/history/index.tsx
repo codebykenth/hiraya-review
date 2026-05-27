@@ -9,18 +9,15 @@ import {
     Search, 
     ChevronDown, 
     Calendar, 
-    Download, 
     Clock, 
-    CheckCircle2, 
     XCircle, 
-    HelpCircle,
     RotateCcw,
     BookOpen,
-    Filter,
     Trash2,
     X
 } from 'lucide-react';
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@/components/ui/tooltip';
+import { Input } from '@/components/ui/input';
 
 interface Attempt {
     id: number;
@@ -168,13 +165,13 @@ export default function HistoryPage({ attempts = [], pagination, filters }: Hist
                         
                         {/* Search bar form */}
                         <form onSubmit={handleSearchSubmit} className="relative flex-1 max-w-2xl">
-                            <input
-                                type="text"
-                                value={searchVal}
-                                onChange={(e) => setSearchVal(e.target.value)}
-                                placeholder="Search exams by name or ID..."
-                                className="w-full rounded-lg border border-border bg-white pl-9 pr-4 py-2 text-xs font-bold text-foreground transition focus:border-blue-500 focus:outline-none dark:bg-slate-900"
-                            />
+                             <Input
+                                 type="text"
+                                 value={searchVal}
+                                 onChange={(e) => setSearchVal(e.target.value)}
+                                 placeholder="Search exams by name or ID..."
+                                 className="pl-9"
+                             />
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
                         </form>
 

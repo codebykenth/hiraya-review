@@ -1,4 +1,4 @@
-import { Form, usePage } from '@inertiajs/react';
+import { Form } from '@inertiajs/react';
 import { useState } from 'react';
 import ProfileController from '@/actions/App/Http/Controllers/Settings/ProfileController';
 import Heading from '@/components/heading';

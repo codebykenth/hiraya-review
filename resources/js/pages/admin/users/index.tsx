@@ -16,6 +16,7 @@ import {
 } from '@/routes/admin/users';
 import { ConfirmModal } from '@/components/confirm-modal';
 import { AdminTable, TableColumn } from '@/components/admin-table';
+import { Input } from '@/components/ui/input';
 
 interface UserItem {
     id: number;
@@ -311,7 +312,7 @@ export default function AdminUsersIndex({ users = [], stats }: AdminUsersIndexPr
                     <div className="flex flex-1 items-center gap-2 w-full md:max-w-2xl">
                         <div className="relative w-full">
                             <Search className="absolute top-1/2 left-3 size-3.5 -translate-y-1/2 text-slate-400" />
-                            <input
+                            <Input
                                 type="text"
                                 value={searchTerm}
                                 onChange={(e) => {
@@ -319,7 +320,7 @@ export default function AdminUsersIndex({ users = [], stats }: AdminUsersIndexPr
                                     setCurrentPage(1);
                                 }}
                                 placeholder="Search users by name, email, or ID..."
-                                className="w-full rounded-lg border border-border pl-9 pr-3 py-1.5 text-xs font-semibold text-foreground placeholder:text-muted-foreground focus:border-blue-500 focus:outline-none transition bg-muted"
+                                className="pl-9"
                             />
                         </div>
                     </div>

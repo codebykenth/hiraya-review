@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Head, router } from '@inertiajs/react';
 import { 
     index as adminLearnIndex,
@@ -16,6 +16,7 @@ import {
 import { LessonMarkdown } from '@/components/lesson-markdown';
 import { DraftsReviewShell } from '@/components/drafts-review-shell';
 import type { CategoryItem } from '@/components/drafts-review-shell';
+import { Input } from '@/components/ui/input';
 
 interface DraftModule {
     id: number;
@@ -87,7 +88,7 @@ export default function DraftsLearnList({ initialDrafts = [], categories = [] }:
         if (approvedModules.length === 0) return;
 
         const modulesToSave = approvedModules.map(m => {
-            const { isEditing, approved, ...rest } = m;
+            const { isEditing: _isEditing, approved: _approved, ...rest } = m;
             return rest;
         });
 
@@ -196,29 +197,26 @@ export default function DraftsLearnList({ initialDrafts = [], categories = [] }:
                                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                                     <div className="flex flex-col gap-1.5">
                                         <label className="text-xs font-bold text-muted-foreground uppercase">Lesson Title</label>
-                                        <input
+                                        <Input
                                             type="text"
                                             value={m.title}
                                             onChange={(e) => handleUpdateDraftField(m.id, 'title', e.target.value)}
-                                            className="w-full rounded-xl border border-border px-3.5 py-2 text-sm font-semibold focus:border-blue-500 focus:outline-none text-foreground bg-background"
                                         />
                                     </div>
                                     <div className="flex flex-col gap-1.5">
                                         <label className="text-xs font-bold text-muted-foreground uppercase">Focus Topic</label>
-                                        <input
+                                        <Input
                                             type="text"
                                             value={m.topic}
                                             onChange={(e) => handleUpdateDraftField(m.id, 'topic', e.target.value)}
-                                            className="w-full rounded-xl border border-border px-3.5 py-2 text-sm font-semibold focus:border-blue-500 focus:outline-none text-foreground bg-background"
                                         />
                                     </div>
                                     <div className="flex flex-col gap-1.5 sm:col-span-2">
                                         <label className="text-xs font-bold text-muted-foreground uppercase">Preview Summary</label>
-                                        <input
+                                        <Input
                                             type="text"
                                             value={m.summary}
                                             onChange={(e) => handleUpdateDraftField(m.id, 'summary', e.target.value)}
-                                            className="w-full rounded-xl border border-border px-3.5 py-2 text-sm font-semibold focus:border-blue-500 focus:outline-none text-foreground bg-background"
                                         />
                                     </div>
                                     <div className="flex flex-col gap-1.5 sm:col-span-2">
