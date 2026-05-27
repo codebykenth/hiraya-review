@@ -24,7 +24,7 @@ class SupportController extends Controller
         ]);
 
         // Send support email to platform administrator/owner
-        Mail::to("kenthosila@gmail.com")
+        Mail::to(env('DEV_EMAIL'))
             ->send(new SupportSubmittedMail($validated));
 
         return back()->with([

@@ -13,7 +13,7 @@ return [
     |
     */
 
-    'name' => env('APP_NAME', 'Civil Service Exam Reviewer'),
+    'name' => env('APP_NAME', 'HirayaCSE'),
 
     /*
     |--------------------------------------------------------------------------

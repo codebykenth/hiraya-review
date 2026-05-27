@@ -4,6 +4,7 @@ use App\Http\Controllers\ExamController;
 use App\Http\Controllers\QuestionController;
 use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\SupportController;
+use App\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Route;
 
 Route::inertia('/', 'welcome')->name('home');
@@ -20,6 +21,9 @@ Route::get('ping', fn () => response()->json([
     'status' => 'alive',
     'timestamp' => now()->toIso8601String(),
 ]));
+Route::get('/auth/{provider}', [AuthController::class, 'redirectToProvider']);
+
+Route::get('/auth/{provider}/callback', [AuthController::class, 'handleProviderCallback']);
 
 Route::inertia('dev-docs', 'dev-docs')
     ->name('dev-docs')

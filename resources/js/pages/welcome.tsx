@@ -29,7 +29,7 @@ export default function Welcome() {
 
         const observerOptions = {
             root: null,
-            rootMargin: '-30% 0px -60% 0px', // Active when section occupies middle-upper window
+            rootMargin: '-20% 0px -40% 0px', // Wider, more natural detection band
             threshold: 0,
         };
 
@@ -48,7 +48,20 @@ export default function Welcome() {
             }
         });
 
-        return () => observer.disconnect();
+        // Ensure "home" is active when at the top of the page
+        const handleScroll = () => {
+            if (window.scrollY < 100) {
+                setActiveNav('home');
+            }
+        };
+
+        window.addEventListener('scroll', handleScroll, { passive: true });
+        handleScroll(); // Trigger immediately on mount
+
+        return () => {
+            observer.disconnect();
+            window.removeEventListener('scroll', handleScroll);
+        };
     }, []);
 
     const faqs = [

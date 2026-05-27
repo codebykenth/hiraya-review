@@ -33,7 +33,7 @@ export default function Support() {
             <Head title="Contact Support" />
             <div className="flex min-h-screen flex-col bg-slate-50/30 dark:bg-slate-950/20">
                 <SiteHeader activeNav="" />
-                
+
                 <main className="flex-1 py-12 px-6">
                     <div className="mx-auto max-w-5xl">
                         <div className="mb-8 flex items-center gap-4">
@@ -53,7 +53,7 @@ export default function Support() {
                         <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
                             {/* Left Side: Support Channels Info */}
                             <div className="space-y-6 lg:col-span-1">
-                               
+
 
                                 <Card className="p-6 space-y-4">
                                     <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400">
@@ -115,9 +115,8 @@ export default function Support() {
                                                         value={data.name}
                                                         onChange={(e) => setData('name', e.target.value)}
                                                         placeholder="Juan Dela Cruz"
-                                                        className={`w-full rounded-lg border bg-white px-4 py-2.5 text-sm text-foreground transition focus:border-blue-500 focus:outline-none dark:bg-slate-900 ${
-                                                            errors.name ? 'border-red-500' : 'border-border'
-                                                        }`}
+                                                        className={`w-full rounded-lg border bg-white px-4 py-2.5 text-sm text-foreground transition focus:border-blue-500 focus:outline-none dark:bg-slate-900 ${errors.name ? 'border-red-500' : 'border-border'
+                                                            }`}
                                                     />
                                                     {errors.name && (
                                                         <p className="text-xs font-semibold text-red-650 mt-1">{errors.name}</p>
@@ -134,9 +133,8 @@ export default function Support() {
                                                         value={data.email}
                                                         onChange={(e) => setData('email', e.target.value)}
                                                         placeholder="juan@example.com"
-                                                        className={`w-full rounded-lg border bg-white px-4 py-2.5 text-sm text-foreground transition focus:border-blue-500 focus:outline-none dark:bg-slate-900 ${
-                                                            errors.email ? 'border-red-500' : 'border-border'
-                                                        }`}
+                                                        className={`w-full rounded-lg border bg-white px-4 py-2.5 text-sm text-foreground transition focus:border-blue-500 focus:outline-none dark:bg-slate-900 ${errors.email ? 'border-red-500' : 'border-border'
+                                                            }`}
                                                     />
                                                     {errors.email && (
                                                         <p className="text-xs font-semibold text-red-650 mt-1">{errors.email}</p>
@@ -155,9 +153,8 @@ export default function Support() {
                                                     value={data.message}
                                                     onChange={(e) => setData('message', e.target.value)}
                                                     placeholder="How can we help you? Please describe your request or question in detail..."
-                                                    className={`w-full rounded-lg border bg-white px-4 py-2.5 text-sm text-foreground transition focus:border-blue-500 focus:outline-none dark:bg-slate-900 ${
-                                                        errors.message ? 'border-red-500' : 'border-border'
-                                                    }`}
+                                                    className={`w-full rounded-lg border bg-white px-4 py-2.5 text-sm text-foreground transition focus:border-blue-500 focus:outline-none dark:bg-slate-900 ${errors.message ? 'border-red-500' : 'border-border'
+                                                        }`}
                                                 />
                                                 {errors.message && (
                                                     <p className="text-xs font-semibold text-red-650 mt-1">{errors.message}</p>
