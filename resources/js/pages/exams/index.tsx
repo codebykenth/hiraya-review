@@ -1471,7 +1471,7 @@ export default function ExamIndex({
     };
 
 
-    const executeSubmit = () => {
+    const executeSubmit = useCallback(() => {
         if (timerRef.current) clearInterval(timerRef.current);
 
         let score = 0;
@@ -1543,6 +1543,7 @@ export default function ExamIndex({
         const trackName = isDrillSession ? 'Drill' : (details.title.includes('Sub-Professional') ? 'Subprofessional' : 'Professional');
         const finalCategoryId = isDrillSession ? (drillCategoryId || savedAttempt?.category_id || null) : null;
         const finalCategoryName = isDrillSession ? (drillCategoryName || savedAttempt?.cat_scores?.metadata?.category_name || 'Practice Drill') : details.title;
+
         // Map the answers array back to original unshuffled options indices for backend DB persistence
         const originalAnswers: Record<number, number> = {};
         Object.entries(answers).forEach(([key, chosenIndex]) => {
@@ -1593,7 +1594,25 @@ export default function ExamIndex({
             .catch(err => {
                 console.error('Failed to persist attempt:', err);
             });
-    };
+
+    }, [
+        activeQuestions,
+        answers,
+        sessionTimeLimitSecs,
+        details,
+        isTimed,
+        selectedExamId,
+        drillCategoryName,
+        drillCategoryId,
+        savedAttempt,
+        drillSubcategories,
+        drillLanguage,
+        drillQuestionCount,
+        setResults,
+        setIsExamSubmitted,
+        setIsExamActive,
+        setLastStoredAttemptId
+    ]);
 
     // Submit Exam & calculate grade breakdown
     const handleSubmitExam = useCallback((auto = false) => {
