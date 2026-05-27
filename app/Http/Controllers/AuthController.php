@@ -42,7 +42,7 @@ class AuthController extends Controller
 
         if (! $socialUser->getEmail()) {
             return redirect()->route('login')->withErrors([
-                'email' => 'Could not retrieve email from ' . ucfirst($provider) . '.',
+                'email' => 'Could not retrieve email from '.ucfirst($provider).'.',
             ]);
         }
 
@@ -60,6 +60,7 @@ class AuthController extends Controller
                 $user->update([
                     'provider' => $provider,
                     'provider_id' => $socialUser->getId(),
+                    'terms_accepted_at' => $user->terms_accepted_at ?? now(),
                 ]);
             } else {
                 // Create new user
@@ -70,6 +71,7 @@ class AuthController extends Controller
                     'role' => 'user',
                     'provider' => $provider,
                     'provider_id' => $socialUser->getId(),
+                    'terms_accepted_at' => now(),
                 ]);
 
                 $user->email_verified_at = now();

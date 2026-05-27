@@ -7,7 +7,7 @@ export default function AppLogo() {
             <div className="flex aspect-square size-14 items-center justify-center overflow-hidden rounded-md bg-transparent">
                 <AppLogoIcon className="size-14 object-contain" />
             </div>
-            <div className="grid flex-1 text-left text-sm">
+            <div className="grid flex-1 text-left text-2xl">
                 <span className="mb-0.5 truncate leading-tight font-semibold">
                     <BrandName />
                 </span>

@@ -1,8 +1,12 @@
 import { Form, Head } from '@inertiajs/react';
+import { useState } from 'react';
+import ConsentCheckbox from '@/components/consent-checkbox';
 import FacebookIcon from '@/components/facebook-icon';
 import GoogleIcon from '@/components/google-icon';
 import InputError from '@/components/input-error';
 import PasswordInput from '@/components/password-input';
+import SocialConsentModal from '@/components/social-consent-modal';
+import type { SocialProvider } from '@/components/social-consent-modal';
 import TextLink from '@/components/text-link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -16,9 +20,20 @@ type Props = {
 };
 
 export default function Register({ passwordRules }: Props) {
+    const [termsAccepted, setTermsAccepted] = useState(false);
+    const [socialModal, setSocialModal] = useState<SocialProvider | null>(null);
+
     return (
         <>
             <Head title="Register" />
+
+            {socialModal && (
+                <SocialConsentModal
+                    provider={socialModal}
+                    onClose={() => setSocialModal(null)}
+                />
+            )}
+
             <Form
                 {...store.form()}
                 resetOnSuccess={['password', 'password_confirmation']}
@@ -96,10 +111,18 @@ export default function Register({ passwordRules }: Props) {
                                 />
                             </div>
 
+                            <ConsentCheckbox
+                                id="terms"
+                                checked={termsAccepted}
+                                onCheckedChange={(v) => setTermsAccepted(!!v)}
+                                tabIndex={5}
+                            />
+
                             <Button
                                 type="submit"
-                                className="mt-2 h-12 w-full rounded-xl bg-blue-600 text-base font-semibold text-white shadow-md transition-all duration-200 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-500"
-                                tabIndex={5}
+                                disabled={!termsAccepted}
+                                className="mt-2 h-12 w-full rounded-xl bg-blue-600 text-base font-semibold text-white shadow-md transition-all duration-200 hover:bg-blue-700 disabled:opacity-50 dark:bg-blue-600 dark:hover:bg-blue-500"
+                                tabIndex={6}
                                 data-test="register-user-button"
                             >
                                 {processing && <Spinner />}
@@ -120,9 +143,7 @@ export default function Register({ passwordRules }: Props) {
                                 type="button"
                                 variant="outline"
                                 className="h-11 rounded-xl border-slate-200 font-medium transition-colors hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-slate-900"
-                                onClick={() => {
-                                    window.location.href = '/auth/google';
-                                }}
+                                onClick={() => setSocialModal('google')}
                             >
                                 <GoogleIcon className="mr-2 h-4 w-4" />
                                 Google
@@ -131,9 +152,7 @@ export default function Register({ passwordRules }: Props) {
                                 type="button"
                                 variant="outline"
                                 className="h-11 rounded-xl border-slate-200 font-medium transition-colors hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-slate-900"
-                                onClick={() => {
-                                    window.location.href = '/auth/facebook';
-                                }}
+                                onClick={() => setSocialModal('facebook')}
                             >
                                 <FacebookIcon className="mr-2 h-4 w-4 text-blue-600 dark:text-blue-400" />
                                 Facebook
@@ -144,7 +163,7 @@ export default function Register({ passwordRules }: Props) {
                             Already have an account?{' '}
                             <TextLink
                                 href={login()}
-                                tabIndex={6}
+                                tabIndex={7}
                                 className="font-semibold text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300"
                             >
                                 Log in
