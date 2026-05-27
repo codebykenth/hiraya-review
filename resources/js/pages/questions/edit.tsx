@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
 import { Head, useForm } from '@inertiajs/react';
 import { HelpCircle } from 'lucide-react';
-import { index as questionsIndex, update as questionsUpdate } from '@/routes/questions';
-import { SelectField } from '@/components/ui/select';
+import React, { useState } from 'react';
 import { CurationEditShell } from '@/components/curation-edit-shell';
+import { SelectField } from '@/components/ui/select';
+import { index as questionsIndex, update as questionsUpdate } from '@/routes/questions';
 
 interface Subcategory {
     id: number;
@@ -40,6 +40,7 @@ interface QuestionEditProps {
 
 export default function QuestionEdit({ question, categories = [] }: QuestionEditProps) {
     const cseCategoriesTree: Record<string, string[]> = {};
+
     if (categories && categories.length > 0) {
         categories.forEach(cat => {
             cseCategoriesTree[cat.name] = (cat.subcategory || []).map(sub => sub.name);
@@ -85,8 +86,8 @@ export default function QuestionEdit({ question, categories = [] }: QuestionEdit
         subcategory: selectedSubcategoryName,
         language: question.language || 'English',
         stem: question.stem || '',
-        options: question.options && question.options.length > 0 
-            ? [...question.options] 
+        options: question.options && question.options.length > 0
+            ? [...question.options]
             : ['', '', '', '', ''],
         correct_option: question.correct_option ?? 0,
         explanation: question.explanation || '',
@@ -124,7 +125,7 @@ export default function QuestionEdit({ question, categories = [] }: QuestionEdit
     return (
         <>
             <Head title={`Edit Question #${question.id}`} />
-            
+
             <CurationEditShell
                 title="Edit Question Content"
                 description="Update syllabus classifications, multiple-choice distractors, correct answers, or rationales."
@@ -170,7 +171,7 @@ export default function QuestionEdit({ question, categories = [] }: QuestionEdit
                 <div>
                     <div className="flex items-center justify-between mb-1.5">
                         <label className="block font-extrabold text-[10px] text-slate-400 uppercase">Question Stem</label>
-                        
+
                         {/* Mock Formatting toolbar for premium aesthetics */}
                         <div className="flex items-center gap-1 rounded-lg border border-border bg-muted p-1">
                             <span className="px-2 py-0.5 text-[9px] font-black text-slate-500 rounded transition select-none">B</span>
@@ -184,9 +185,8 @@ export default function QuestionEdit({ question, categories = [] }: QuestionEdit
                         onChange={(e) => setData('stem', e.target.value)}
                         rows={5}
                         placeholder="Enter question text, scenario, logic criteria, or reading passage..."
-                        className={`w-full rounded-xl border p-3 text-xs font-semibold focus:border-blue-500 focus:outline-none text-foreground bg-background ${
-                            errors.stem ? 'border-red-500' : 'border-border'
-                        }`}
+                        className={`w-full rounded-xl border p-3 text-xs font-semibold focus:border-blue-500 focus:outline-none text-foreground bg-background ${errors.stem ? 'border-red-500' : 'border-border'
+                            }`}
                         required
                     />
                     {errors.stem && <span className="mt-1 block text-[10px] text-red-650 font-medium">{errors.stem}</span>}
@@ -199,13 +199,12 @@ export default function QuestionEdit({ question, categories = [] }: QuestionEdit
                     </label>
                     <div className="space-y-3">
                         {data.options.map((option, idx) => (
-                            <div 
-                                key={idx} 
-                                className={`flex items-center gap-3.5 rounded-xl border p-3 transition duration-200 ${
-                                    data.correct_option === idx 
-                                ? 'border-emerald-250 bg-emerald-50/20 dark:border-emerald-850 dark:bg-emerald-950/10' 
+                            <div
+                                key={idx}
+                                className={`flex items-center gap-3.5 rounded-xl border p-3 transition duration-200 ${data.correct_option === idx
+                                        ? 'border-emerald-250 bg-emerald-50/20 dark:border-emerald-850 dark:bg-emerald-950/10'
                                         : 'border-border'
-                                }`}
+                                    }`}
                             >
                                 <input
                                     type="radio"
@@ -215,11 +214,10 @@ export default function QuestionEdit({ question, categories = [] }: QuestionEdit
                                     className="size-4.5 accent-emerald-600 cursor-pointer"
                                 />
 
-                                <span className={`inline-flex size-6.5 items-center justify-center rounded-lg text-[10px] font-black shrink-0 ${
-                                    data.correct_option === idx
+                                <span className={`inline-flex size-6.5 items-center justify-center rounded-lg text-[10px] font-black shrink-0 ${data.correct_option === idx
                                         ? 'bg-emerald-600 text-white'
                                         : 'bg-muted text-muted-foreground'
-                                }`}>
+                                    }`}>
                                     {String.fromCharCode(65 + idx)}
                                 </span>
 
@@ -247,9 +245,8 @@ export default function QuestionEdit({ question, categories = [] }: QuestionEdit
                         rows={5}
                         onChange={(e) => setData('explanation', e.target.value)}
                         placeholder="Explain solution steps, logic chains, spelling constraints, or mental shortcuts..."
-                        className={`w-full rounded-xl border p-3 text-xs font-semibold focus:border-blue-500 focus:outline-none text-foreground bg-background ${
-                            errors.explanation ? 'border-red-500' : 'border-border'
-                        }`}
+                        className={`w-full rounded-xl border p-3 text-xs font-semibold focus:border-blue-500 focus:outline-none text-foreground bg-background ${errors.explanation ? 'border-red-500' : 'border-border'
+                            }`}
                         required
                     />
                     {errors.explanation && <span className="mt-1 block text-[10px] text-red-600 font-medium">{errors.explanation}</span>}

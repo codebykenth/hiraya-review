@@ -1,9 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { PageContainer } from '@/components/page-container';
-import { PageHeader } from '@/components/page-header';
-import { Card } from '@/components/ui/card';
 import { Head, setLayoutProps, router } from '@inertiajs/react';
-import { index as drillsIndex } from '@/routes/drills';
 import {
     BookOpen,
     Brain,
@@ -17,6 +12,11 @@ import {
     Check,
     Hourglass
 } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { PageContainer } from '@/components/page-container';
+import { PageHeader } from '@/components/page-header';
+import { Card } from '@/components/ui/card';
+import { index as drillsIndex } from '@/routes/drills';
 
 interface Question {
     id: number;
@@ -43,14 +43,20 @@ interface Category {
 
 // Strict 1-liner comment: Generate exactly 5 nicely-rounded intervals up to total pool size
 const generateQuestionOptions = (totalCount: number): number[] => {
-    if (totalCount <= 0) return [];
+    if (totalCount <= 0) {
+        return [];
+    }
+
     if (totalCount <= 5) {
         return Array.from({ length: totalCount }, (_, i) => i + 1);
     }
+
     const options: number[] = [];
+
     for (let i = 1; i <= 5; i++) {
         options.push(Math.round((totalCount / 5) * i));
     }
+
     return Array.from(new Set(options)).sort((a, b) => a - b);
 };
 
@@ -60,30 +66,30 @@ interface DrillsProps {
 }
 
 const categoryMeta: Record<string, { icon: React.ComponentType<any>; bgColor: string; description: string }> = {
-    'Verbal Ability': { 
-        icon: BookOpen, 
-        bgColor: 'bg-blue-600', 
-        description: 'Test your vocabulary, reading comprehension, and error recognition through text-based scenarios.' 
+    'Verbal Ability': {
+        icon: BookOpen,
+        bgColor: 'bg-blue-600',
+        description: 'Test your vocabulary, reading comprehension, and error recognition through text-based scenarios.'
     },
-    'Analytical Ability': { 
-        icon: Brain, 
-        bgColor: 'bg-emerald-600', 
-        description: 'Solve logical reasoning problems, identify logical assumptions, and interpret data trends.' 
+    'Analytical Ability': {
+        icon: Brain,
+        bgColor: 'bg-emerald-600',
+        description: 'Solve logical reasoning problems, identify logical assumptions, and interpret data trends.'
     },
-    'Clerical Ability': { 
-        icon: ClipboardList, 
-        bgColor: 'bg-indigo-600', 
-        description: 'Practice alphabetical filing, information checking, and spelling rules.' 
+    'Clerical Ability': {
+        icon: ClipboardList,
+        bgColor: 'bg-indigo-600',
+        description: 'Practice alphabetical filing, information checking, and spelling rules.'
     },
-    'Numerical Ability': { 
-        icon: Calculator, 
-        bgColor: 'bg-green-600', 
-        description: 'Solve math word problems, basic arithmetic operations, and number sequences.' 
+    'Numerical Ability': {
+        icon: Calculator,
+        bgColor: 'bg-green-600',
+        description: 'Solve math word problems, basic arithmetic operations, and number sequences.'
     },
-    'General Information': { 
-        icon: Globe, 
-        bgColor: 'bg-cyan-600', 
-        description: 'Review the Philippine Constitution, RA 6713, peace concepts, and environmental protection laws.' 
+    'General Information': {
+        icon: Globe,
+        bgColor: 'bg-cyan-600',
+        description: 'Review the Philippine Constitution, RA 6713, peace concepts, and environmental protection laws.'
     }
 };
 
@@ -127,7 +133,7 @@ export default function Drills({ questions = [], categories = [] }: DrillsProps)
     // Configuration Actions
     // ----------------------------------------------------
     const handleCategoryClick = useCallback((
-        catName: string, 
+        catName: string,
         totalParam?: string | null,
         langParam?: string | null,
         subcatsParam?: string[] | null,
@@ -135,7 +141,7 @@ export default function Drills({ questions = [], categories = [] }: DrillsProps)
     ) => {
         // Map hub selection to database model categories
         const dbCategory = categories.find((c: Category) => c.name.toLowerCase().includes(catName.toLowerCase()) || catName.toLowerCase().includes(c.name.toLowerCase()));
-        
+
         // Form fallback category structure if not initialized in database
         const finalCategory = dbCategory || {
             id: 999,
@@ -145,11 +151,13 @@ export default function Drills({ questions = [], categories = [] }: DrillsProps)
 
         // Determine question count based on total parameter or fallback to 30
         let targetCount: number | 'all' = 30;
+
         if (totalParam) {
             if (totalParam === 'all') {
                 targetCount = 'all';
             } else {
                 const parsed = parseInt(totalParam, 10);
+
                 if (!isNaN(parsed)) {
                     targetCount = parsed as number | 'all';
                 }
@@ -158,6 +166,7 @@ export default function Drills({ questions = [], categories = [] }: DrillsProps)
 
         // Determine language selection or fallback to English
         let targetLanguage: 'English' | 'Filipino' | 'Both' = 'English';
+
         if (langParam) {
             if (langParam === 'English' || langParam === 'Filipino' || langParam === 'Both') {
                 targetLanguage = langParam as 'English' | 'Filipino' | 'Both';
@@ -184,13 +193,17 @@ export default function Drills({ questions = [], categories = [] }: DrillsProps)
     useEffect(() => {
         if (viewState === 'config' && selectedCategory) {
             const currentFilteredCount = questions.filter(q => {
-                const catMatch = q.category.toLowerCase().includes(selectedCategory.name.toLowerCase()) || 
-                                 selectedCategory.name.toLowerCase().includes(q.category.toLowerCase());
+                const catMatch = q.category.toLowerCase().includes(selectedCategory.name.toLowerCase()) ||
+                    selectedCategory.name.toLowerCase().includes(q.category.toLowerCase());
                 const subcatMatch = selectedSubcats.length === 0 || selectedSubcats.some(subName => q.subcategory.toLowerCase().includes(subName.toLowerCase()) || subName.toLowerCase().includes(q.subcategory.toLowerCase()));
-                
+
                 let langMatch = true;
-                if (language === 'English') langMatch = q.language === 'English';
-                else if (language === 'Filipino') langMatch = q.language === 'Filipino';
+
+                if (language === 'English') {
+                    langMatch = q.language === 'English';
+                } else if (language === 'Filipino') {
+                    langMatch = q.language === 'Filipino';
+                }
 
                 return catMatch && subcatMatch && langMatch;
             }).length;
@@ -199,6 +212,7 @@ export default function Drills({ questions = [], categories = [] }: DrillsProps)
                 const timer = setTimeout(() => {
                     setQuestionCount(currentFilteredCount || 1);
                 }, 0);
+
                 return () => clearTimeout(timer);
             }
         }
@@ -213,12 +227,13 @@ export default function Drills({ questions = [], categories = [] }: DrillsProps)
             const langParam = params.get('language');
             const subcatsParam = params.get('subcategories');
             const timedParam = params.get('timed');
-            
+
             if (catParam) {
                 const newUrl = window.location.pathname;
                 window.history.replaceState({}, document.title, newUrl);
-                
+
                 let parsedSubcats: string[] | null = null;
+
                 if (subcatsParam) {
                     try {
                         parsedSubcats = JSON.parse(decodeURIComponent(subcatsParam));
@@ -226,20 +241,24 @@ export default function Drills({ questions = [], categories = [] }: DrillsProps)
                         // ignore malformed strings
                     }
                 }
-                
+
                 const timer = setTimeout(() => {
                     handleCategoryClick(catParam, totalParam, langParam, parsedSubcats, timedParam);
                     // Only lock settings if actual historical configurations were supplied in URL
                     const hasRetakeParams = !!(totalParam || langParam || subcatsParam || timedParam);
                     setIsRetakeConfig(hasRetakeParams);
                 }, 0);
+
                 return () => clearTimeout(timer);
             }
         }
     }, [categories, handleCategoryClick]);
 
     const toggleSubcat = (subcatName: string) => {
-        if (isRetakeConfig) return;
+        if (isRetakeConfig) {
+            return;
+        }
+
         setSelectedSubcats(prev =>
             prev.includes(subcatName)
                 ? prev.filter(s => s !== subcatName)
@@ -251,7 +270,9 @@ export default function Drills({ questions = [], categories = [] }: DrillsProps)
     // Drill Execution
     // ----------------------------------------------------
     const startDrill = () => {
-        if (!selectedCategory) return;
+        if (!selectedCategory) {
+            return;
+        }
 
         const queryParams = new URLSearchParams({
             drill: 'true',
@@ -261,7 +282,7 @@ export default function Drills({ questions = [], categories = [] }: DrillsProps)
             language: language,
             timed: String(isTimed),
         });
-        
+
         if (selectedSubcats.length > 0) {
             queryParams.append('subcategories', JSON.stringify(selectedSubcats));
         }
@@ -288,13 +309,13 @@ export default function Drills({ questions = [], categories = [] }: DrillsProps)
                                 description: 'Master your skills in this civil service exam practice module.'
                             };
                             const CardIcon = meta.icon;
-                            const actualCount = questions.filter(q => 
-                                q.category.toLowerCase().includes(cat.name.toLowerCase()) || 
+                            const actualCount = questions.filter(q =>
+                                q.category.toLowerCase().includes(cat.name.toLowerCase()) ||
                                 cat.name.toLowerCase().includes(q.category.toLowerCase())
                             ).length;
 
                             return (
-                                <Card 
+                                <Card
                                     key={cat.id}
                                     onClick={() => handleCategoryClick(cat.name)}
                                     className="group relative flex flex-col justify-between overflow-hidden p-6 cursor-pointer transition-all duration-300 hover:-translate-y-1 hover:shadow-md"
@@ -319,7 +340,7 @@ export default function Drills({ questions = [], categories = [] }: DrillsProps)
 
                                     <div className="mt-6 flex flex-wrap gap-1.5">
                                         {cat.subcategory.map(sub => (
-                                            <span 
+                                            <span
                                                 key={sub.id}
                                                 className="rounded-lg border border-border bg-slate-50/50 px-2 py-0.5 text-xs font-semibold text-muted-foreground dark:bg-slate-900/40"
                                             >
@@ -337,9 +358,9 @@ export default function Drills({ questions = [], categories = [] }: DrillsProps)
                             <Brain className="size-6 text-blue-600 dark:text-blue-400" />
                         </div>
                         <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-3.5 py-1 text-[10px] font-extrabold tracking-wider text-amber-700 dark:bg-amber-950/40 dark:text-amber-400 uppercase mb-3.5">
-                                <span className="size-1.5 rounded-full bg-amber-500" />
-                                Coming Soon
-                            </span>
+                            <span className="size-1.5 rounded-full bg-amber-500" />
+                            Coming Soon
+                        </span>
                         <h3 className="font-heading text-lg font-bold text-foreground">No Practice Drills Available</h3>
                         <p className="mx-auto mt-2 max-w-2xl text-xs leading-relaxed text-muted-foreground">
                             Practice drill modules are coming soon! We are currently compiling comprehensive exam question banks.
@@ -352,7 +373,9 @@ export default function Drills({ questions = [], categories = [] }: DrillsProps)
 
     // Configuration View (2nd Image)
     const renderConfig = () => {
-        if (!selectedCategory) return null;
+        if (!selectedCategory) {
+            return null;
+        }
 
         const meta = categoryMeta[selectedCategory.name] || {
             icon: Brain,
@@ -360,16 +383,20 @@ export default function Drills({ questions = [], categories = [] }: DrillsProps)
             description: 'Master your skills in this practice module.'
         };
         const CategoryIcon = meta.icon;
-        
+
         // Calculate dynamic matching questions in this configuration
         const filteredQCount = questions.filter(q => {
-            const catMatch = q.category.toLowerCase().includes(selectedCategory.name.toLowerCase()) || 
-                             selectedCategory.name.toLowerCase().includes(q.category.toLowerCase());
+            const catMatch = q.category.toLowerCase().includes(selectedCategory.name.toLowerCase()) ||
+                selectedCategory.name.toLowerCase().includes(q.category.toLowerCase());
             const subcatMatch = selectedSubcats.length === 0 || selectedSubcats.some(subName => q.subcategory.toLowerCase().includes(subName.toLowerCase()) || subName.toLowerCase().includes(q.subcategory.toLowerCase()));
-            
+
             let langMatch = true;
-            if (language === 'English') langMatch = q.language === 'English';
-            else if (language === 'Filipino') langMatch = q.language === 'Filipino';
+
+            if (language === 'English') {
+                langMatch = q.language === 'English';
+            } else if (language === 'Filipino') {
+                langMatch = q.language === 'Filipino';
+            }
 
             return catMatch && subcatMatch && langMatch;
         }).length;
@@ -395,7 +422,7 @@ export default function Drills({ questions = [], categories = [] }: DrillsProps)
                             <span className="text-sm">🔄</span>
                             <span><strong>Retake Mode Active:</strong> Settings have been locked to match your historical attempt.</span>
                         </div>
-                        <button 
+                        <button
                             type="button"
                             onClick={() => setIsRetakeConfig(false)}
                             className="rounded-lg bg-amber-100 hover:bg-amber-200 px-3 py-1.5 font-bold text-amber-900 dark:bg-amber-955 dark:hover:bg-amber-900 dark:text-amber-300 transition shrink-0 cursor-pointer focus:outline-none"
@@ -418,10 +445,10 @@ export default function Drills({ questions = [], categories = [] }: DrillsProps)
 
                 {/* Config Split Grid */}
                 <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-                    
+
                     {/* Left Params Pane */}
                     <div className="flex flex-col gap-5 lg:col-span-2">
-                        
+
                         {/* 1. Subcategory Selector */}
                         <Card className="p-5 shadow-2xs">
                             <span className="text-[10px] font-extrabold tracking-wider text-muted-foreground uppercase block mb-3">
@@ -430,18 +457,17 @@ export default function Drills({ questions = [], categories = [] }: DrillsProps)
                             <div className="flex flex-wrap gap-2.5">
                                 {selectedCategory.subcategory.map(sub => {
                                     const isSelected = selectedSubcats.includes(sub.name);
+
                                     return (
                                         <button
                                             key={sub.name}
                                             disabled={isRetakeConfig}
                                             onClick={() => toggleSubcat(sub.name)}
-                                            className={`flex items-center gap-1 rounded-full px-4.5 py-2 text-xs font-bold transition focus:outline-none ${
-                                                isRetakeConfig ? 'opacity-60 pointer-events-none select-none' : ''
-                                            } ${
-                                                isSelected
+                                            className={`flex items-center gap-1 rounded-full px-4.5 py-2 text-xs font-bold transition focus:outline-none ${isRetakeConfig ? 'opacity-60 pointer-events-none select-none' : ''
+                                                } ${isSelected
                                                     ? 'bg-blue-50 text-blue-700 border-2 border-blue-600 dark:bg-blue-950/30 dark:text-blue-400'
                                                     : 'bg-white text-muted-foreground border border-border hover:bg-slate-50 dark:bg-slate-900 dark:hover:bg-slate-800/50'
-                                            }`}
+                                                }`}
                                         >
                                             {sub.name}
                                             {isSelected && <Check className="size-3" />}
@@ -464,19 +490,18 @@ export default function Drills({ questions = [], categories = [] }: DrillsProps)
                             <div className="flex flex-wrap gap-2">
                                 {generateQuestionOptions(filteredQCount).map(count => {
                                     const isSelected = questionCount === count;
+
                                     return (
                                         <button
                                             key={count}
                                             type="button"
                                             disabled={isRetakeConfig}
                                             onClick={() => setQuestionCount(count)}
-                                            className={`rounded-lg px-4 py-2 text-xs font-bold transition focus:outline-none border cursor-pointer ${
-                                                isRetakeConfig ? 'opacity-60 pointer-events-none select-none' : ''
-                                            } ${
-                                                isSelected
+                                            className={`rounded-lg px-4 py-2 text-xs font-bold transition focus:outline-none border cursor-pointer ${isRetakeConfig ? 'opacity-60 pointer-events-none select-none' : ''
+                                                } ${isSelected
                                                     ? 'bg-blue-600 text-white border-blue-600 shadow-xs'
                                                     : 'bg-slate-50/50 text-muted-foreground border-border hover:bg-slate-100 dark:bg-slate-900 dark:hover:bg-slate-800'
-                                            }`}
+                                                }`}
                                         >
                                             {count}
                                         </button>
@@ -487,21 +512,18 @@ export default function Drills({ questions = [], categories = [] }: DrillsProps)
                                     type="button"
                                     disabled={isRetakeConfig}
                                     onClick={() => setQuestionCount('all')}
-                                    className={`rounded-lg px-4 py-2 text-xs font-bold transition focus:outline-none border cursor-pointer ${
-                                        isRetakeConfig ? 'opacity-60 pointer-events-none select-none' : ''
-                                    } ${
-                                        questionCount === 'all'
+                                    className={`rounded-lg px-4 py-2 text-xs font-bold transition focus:outline-none border cursor-pointer ${isRetakeConfig ? 'opacity-60 pointer-events-none select-none' : ''
+                                        } ${questionCount === 'all'
                                             ? 'bg-blue-600 text-white border-blue-600 shadow-xs'
                                             : 'bg-slate-50/50 text-muted-foreground border-border hover:bg-slate-100 dark:bg-slate-900 dark:hover:bg-slate-800'
-                                    }`}
+                                        }`}
                                 >
                                     All
                                 </button>
 
                                 {/* Custom number input */}
-                                <div className={`flex items-center gap-2 rounded-lg border border-border bg-slate-50/20 px-3 py-1 text-xs focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500 transition dark:bg-slate-900/30 ${
-                                    isRetakeConfig ? 'opacity-60 pointer-events-none select-none' : ''
-                                }`}>
+                                <div className={`flex items-center gap-2 rounded-lg border border-border bg-slate-50/20 px-3 py-1 text-xs focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500 transition dark:bg-slate-900/30 ${isRetakeConfig ? 'opacity-60 pointer-events-none select-none' : ''
+                                    }`}>
                                     <span className="text-muted-foreground font-bold shrink-0">Custom:</span>
                                     <input
                                         type="number"
@@ -512,6 +534,7 @@ export default function Drills({ questions = [], categories = [] }: DrillsProps)
                                         placeholder={`1-${filteredQCount}`}
                                         onChange={(e) => {
                                             const val = e.target.value === '' ? '' : Math.min(filteredQCount, Math.max(1, parseInt(e.target.value, 10)));
+
                                             if (typeof val === 'number' && !isNaN(val)) {
                                                 setQuestionCount(val);
                                             }
@@ -530,13 +553,13 @@ export default function Drills({ questions = [], categories = [] }: DrillsProps)
                             <div className="flex flex-wrap gap-6">
                                 {['English', 'Filipino', 'Both'].map(lang => {
                                     const isSelected = language === lang;
+
                                     return (
-                                        <label key={lang} className={`flex items-center gap-2 cursor-pointer text-xs font-bold text-foreground ${
-                                            isRetakeConfig ? 'opacity-60 pointer-events-none select-none' : ''
-                                        }`}>
-                                            <input 
-                                                type="radio" 
-                                                name="drill-lang" 
+                                        <label key={lang} className={`flex items-center gap-2 cursor-pointer text-xs font-bold text-foreground ${isRetakeConfig ? 'opacity-60 pointer-events-none select-none' : ''
+                                            }`}>
+                                            <input
+                                                type="radio"
+                                                name="drill-lang"
                                                 disabled={isRetakeConfig}
                                                 checked={isSelected}
                                                 onChange={() => setLanguage(lang as 'English' | 'Filipino' | 'Both')}
@@ -559,13 +582,11 @@ export default function Drills({ questions = [], categories = [] }: DrillsProps)
                                     type="button"
                                     disabled={isRetakeConfig}
                                     onClick={() => setIsTimed(true)}
-                                    className={`flex items-start gap-3 rounded-xl border p-4 text-left transition-all cursor-pointer ${
-                                        isRetakeConfig ? 'opacity-60 pointer-events-none select-none' : ''
-                                    } ${
-                                        isTimed
+                                    className={`flex items-start gap-3 rounded-xl border p-4 text-left transition-all cursor-pointer ${isRetakeConfig ? 'opacity-60 pointer-events-none select-none' : ''
+                                        } ${isTimed
                                             ? 'border-blue-600 bg-blue-50/10 dark:border-blue-500 dark:bg-blue-950/10'
                                             : 'border-border bg-card hover:bg-slate-50/50 dark:hover:bg-slate-900/40'
-                                    }`}
+                                        }`}
                                 >
                                     <div className={`rounded-lg p-2 ${isTimed ? 'bg-blue-600 text-white' : 'bg-slate-100 text-muted-foreground dark:bg-slate-900'}`}>
                                         <Timer className="size-4" />
@@ -582,13 +603,11 @@ export default function Drills({ questions = [], categories = [] }: DrillsProps)
                                     type="button"
                                     disabled={isRetakeConfig}
                                     onClick={() => setIsTimed(false)}
-                                    className={`flex items-start gap-3 rounded-xl border p-4 text-left transition-all cursor-pointer ${
-                                        isRetakeConfig ? 'opacity-60 pointer-events-none select-none' : ''
-                                    } ${
-                                        !isTimed
+                                    className={`flex items-start gap-3 rounded-xl border p-4 text-left transition-all cursor-pointer ${isRetakeConfig ? 'opacity-60 pointer-events-none select-none' : ''
+                                        } ${!isTimed
                                             ? 'border-emerald-600 bg-emerald-50/10 dark:border-emerald-500 dark:bg-emerald-950/10'
                                             : 'border-border bg-card hover:bg-slate-50/50 dark:hover:bg-slate-900/40'
-                                    }`}
+                                        }`}
                                 >
                                     <div className={`rounded-lg p-2 ${!isTimed ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-muted-foreground dark:bg-slate-900'}`}>
                                         <Hourglass className="size-4" />
@@ -633,11 +652,10 @@ export default function Drills({ questions = [], categories = [] }: DrillsProps)
                                     </div>
                                     <div className="flex items-center justify-between">
                                         <span className="text-muted-foreground">Format:</span>
-                                        <span className={`rounded-md px-2 py-0.5 font-bold text-[10px] uppercase ${
-                                            isTimed 
-                                                ? 'bg-blue-50 text-blue-700 dark:bg-blue-950/30 dark:text-blue-400' 
-                                                : 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400'
-                                        }`}>
+                                        <span className={`rounded-md px-2 py-0.5 font-bold text-[10px] uppercase ${isTimed
+                                            ? 'bg-blue-50 text-blue-700 dark:bg-blue-950/30 dark:text-blue-400'
+                                            : 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400'
+                                            }`}>
                                             {isTimed ? 'Timed Practice' : 'Untimed Practice'}
                                         </span>
                                     </div>

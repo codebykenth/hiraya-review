@@ -1,16 +1,16 @@
-import React, { useState } from 'react';
 import { Head, Link, useForm, router } from '@inertiajs/react';
 import { Sparkles, BookOpen, Clock, HelpCircle, PenLine, Cpu, Sparkle, CheckCircle2, RotateCcw, Save } from 'lucide-react';
+import React, { useState } from 'react';
+import { CurationCreateShell } from '@/components/curation-create-shell';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { SelectField } from '@/components/ui/select';
 import {
     index as adminLearnIndex,
     create as adminLearnCreate,
     store as adminLearnStore,
     generate as adminLearnGenerate
 } from '@/routes/admin/learn';
-import { SelectField } from '@/components/ui/select';
-import { Input } from '@/components/ui/input';
-import { CurationCreateShell } from '@/components/curation-create-shell';
-import { Button } from '@/components/ui/button';
 
 interface Subcategory {
     id: number;
@@ -61,6 +61,7 @@ export default function AdminLearnCreate({ categories, initialTopic = '' }: Admi
     const handleCategoryChange = (catName: string) => {
         setSelectedCategoryName(catName);
         const cat = categories.find(c => c.name === catName);
+
         if (cat) {
             setData(prev => ({
                 ...prev,
@@ -74,8 +75,10 @@ export default function AdminLearnCreate({ categories, initialTopic = '' }: Admi
     const handleSubcategoryChange = (subName: string) => {
         setSelectedSubcategoryName(subName);
         const cat = categories.find(c => c.name === selectedCategoryName);
+
         if (cat) {
             const sub = cat.subcategory.find(s => s.name === subName);
+
             if (sub) {
                 setData('subcategory_id', sub.id);
             }
@@ -87,29 +90,61 @@ export default function AdminLearnCreate({ categories, initialTopic = '' }: Admi
         const sub = subcategory.toLowerCase().trim();
 
         if (cat.includes('numerical') || sub.includes('basic operations') || sub.includes('sequence') || sub.includes('problems')) {
-            if (sub.includes('sequence')) return 'Number Series and Pattern Recognition';
-            if (sub.includes('problems')) return 'Algebraic Word Problems, Rate, and Work Computations';
+            if (sub.includes('sequence')) {
+                return 'Number Series and Pattern Recognition';
+            }
+
+            if (sub.includes('problems')) {
+                return 'Algebraic Word Problems, Rate, and Work Computations';
+            }
+
             return 'Order of Operations (PEMDAS) and Fraction Arithmetic';
         }
+
         if (cat.includes('verbal') || sub.includes('word meaning') || sub.includes('completion') || sub.includes('recognition')) {
-            if (sub.includes('error')) return 'Subject-Verb Agreement and Grammar Error Recognition';
-            if (sub.includes('structure')) return 'Sentence Structure and Correct Modifiers';
+            if (sub.includes('error')) {
+                return 'Subject-Verb Agreement and Grammar Error Recognition';
+            }
+
+            if (sub.includes('structure')) {
+                return 'Sentence Structure and Correct Modifiers';
+            }
+
             return 'Contextual Synonyms and High-frequency Vocabulary Words';
         }
+
         if (cat.includes('analytical') || sub.includes('analogy') || sub.includes('logic') || sub.includes('conclusions')) {
-            if (sub.includes('analogy')) return 'Single and Double Word Analogy Relationships';
-            if (sub.includes('logic') || sub.includes('reasoning')) return 'Propositional Logic, Venn Diagrams, and Abstract Reasoning';
+            if (sub.includes('analogy')) {
+                return 'Single and Double Word Analogy Relationships';
+            }
+
+            if (sub.includes('logic') || sub.includes('reasoning')) {
+                return 'Propositional Logic, Venn Diagrams, and Abstract Reasoning';
+            }
+
             return 'Drawing Valid Conclusions and Identifying Logical Assumptions';
         }
+
         if (cat.includes('clerical') || sub.includes('filing') || sub.includes('spelling')) {
-            if (sub.includes('filing')) return 'Alphabetical Filing and Indexing Rules';
+            if (sub.includes('filing')) {
+                return 'Alphabetical Filing and Indexing Rules';
+            }
+
             return 'Commonly Confused Words and Civil Service Spelling Rules';
         }
+
         if (cat.includes('general') || sub.includes('constitution') || sub.includes('conduct') || sub.includes('peace')) {
-            if (sub.includes('constitution')) return 'The Philippine Constitution: Article III Bill of Rights';
-            if (sub.includes('conduct') || sub.includes('6713')) return 'Republic Act 6713: Code of Conduct and Ethical Standards for Public Officials';
+            if (sub.includes('constitution')) {
+                return 'The Philippine Constitution: Article III Bill of Rights';
+            }
+
+            if (sub.includes('conduct') || sub.includes('6713')) {
+                return 'Republic Act 6713: Code of Conduct and Ethical Standards for Public Officials';
+            }
+
             return 'Environmental Protection and Human Rights Issues';
         }
+
         return 'Civil Service Exam Core Review Syllabus Lesson';
     };
 
@@ -138,6 +173,7 @@ export default function AdminLearnCreate({ categories, initialTopic = '' }: Admi
 
             if (!response.ok) {
                 const errData = await response.json().catch(() => ({}));
+
                 throw new Error(errData.error || `HTTP error! status: ${response.status}`);
             }
 

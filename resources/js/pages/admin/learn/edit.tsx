@@ -1,13 +1,13 @@
-import React, { useState } from 'react';
 import { Head, useForm } from '@inertiajs/react';
 import { BookOpen, Clock } from 'lucide-react';
-import { 
+import React, { useState } from 'react';
+import { CurationEditShell } from '@/components/curation-edit-shell';
+import { Input } from '@/components/ui/input';
+import { SelectField } from '@/components/ui/select';
+import {
     index as adminLearnIndex,
     update as adminLearnUpdate
 } from '@/routes/admin/learn';
-import { SelectField } from '@/components/ui/select';
-import { Input } from '@/components/ui/input';
-import { CurationEditShell } from '@/components/curation-edit-shell';
 
 interface Subcategory {
     id: number;
@@ -43,7 +43,7 @@ interface AdminLearnEditProps {
 export default function AdminLearnEdit({ module, categories }: AdminLearnEditProps) {
     const initialCategory = categories.find(c => c.id === module.category_id);
     const [selectedCategoryName, setSelectedCategoryName] = useState(initialCategory?.name || categories[0]?.name || '');
-    
+
     const initialCategoryObject = categories.find(c => c.name === selectedCategoryName);
     const initialSubcategory = initialCategoryObject?.subcategory.find(s => s.id === module.subcategory_id);
     const [selectedSubcategoryName, setSelectedSubcategoryName] = useState(initialSubcategory?.name || initialCategoryObject?.subcategory[0]?.name || '');
@@ -63,6 +63,7 @@ export default function AdminLearnEdit({ module, categories }: AdminLearnEditPro
     const handleCategoryChange = (catName: string) => {
         setSelectedCategoryName(catName);
         const cat = categories.find(c => c.name === catName);
+
         if (cat) {
             setData(prev => ({
                 ...prev,
@@ -76,8 +77,10 @@ export default function AdminLearnEdit({ module, categories }: AdminLearnEditPro
     const handleSubcategoryChange = (subName: string) => {
         setSelectedSubcategoryName(subName);
         const cat = categories.find(c => c.name === selectedCategoryName);
+
         if (cat) {
             const sub = cat.subcategory.find(s => s.name === subName);
+
             if (sub) {
                 setData('subcategory_id', sub.id);
             }
@@ -94,7 +97,7 @@ export default function AdminLearnEdit({ module, categories }: AdminLearnEditPro
     return (
         <>
             <Head title="Edit Learning Module" />
-            
+
             <CurationEditShell
                 title="Edit Study Module"
                 description="Update the lesson title, syllabus categorization, preview summaries, or core Markdown content material."
@@ -147,7 +150,7 @@ export default function AdminLearnEdit({ module, categories }: AdminLearnEditPro
                         />
                         {errors.topic && <span className="mt-1 block text-[10px] text-red-650 font-medium">{errors.topic}</span>}
                     </div>
-                    
+
                     <div>
                         <label className="block mb-1 text-muted-foreground font-extrabold text-[10px] uppercase">Estimated minutes read</label>
                         <div className="relative">

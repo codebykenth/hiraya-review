@@ -1,6 +1,4 @@
 import { Head, Link } from '@inertiajs/react';
-import { useState, useEffect } from 'react';
-import { Badge } from '@/components/ui/badge';
 import {
     ArrowRight,
     Sparkles,
@@ -20,13 +18,15 @@ import {
     Info,
     HelpCircle,
 } from 'lucide-react';
-import Section from '@/components/section';
+import { useState, useEffect } from 'react';
 import FeatureGrid from '@/components/feature-grid';
+import Section from '@/components/section';
 import SectionHeader from '@/components/section-header';
-import { Card } from '@/components/ui/card';
-import SiteHeader from '@/components/site-header';
 import SiteFooter from '@/components/site-footer';
+import SiteHeader from '@/components/site-header';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
 import { register } from '@/routes';
 
 export default function Welcome() {
@@ -53,6 +53,7 @@ export default function Welcome() {
 
         sections.forEach((id) => {
             const element = document.getElementById(id);
+
             if (element) {
                 observer.observe(element);
             }
@@ -442,31 +443,28 @@ export default function Welcome() {
                         <div className="flex border-b border-border mb-8 justify-center flex-wrap gap-2">
                             <button
                                 onClick={() => setActiveTab('flow')}
-                                className={`border-b-2 px-5 py-3 text-sm font-semibold transition-all ${
-                                    activeTab === 'flow'
-                                        ? 'border-primary text-primary font-bold'
-                                        : 'border-transparent text-muted-foreground hover:text-foreground'
-                                }`}
+                                className={`border-b-2 px-5 py-3 text-sm font-semibold transition-all ${activeTab === 'flow'
+                                    ? 'border-primary text-primary font-bold'
+                                    : 'border-transparent text-muted-foreground hover:text-foreground'
+                                    }`}
                             >
                                 Reviewer Study Flow
                             </button>
                             <button
                                 onClick={() => setActiveTab('structure')}
-                                className={`border-b-2 px-5 py-3 text-sm font-semibold transition-all ${
-                                    activeTab === 'structure'
-                                        ? 'border-primary text-primary font-bold'
-                                        : 'border-transparent text-muted-foreground hover:text-foreground'
-                                }`}
+                                className={`border-b-2 px-5 py-3 text-sm font-semibold transition-all ${activeTab === 'structure'
+                                    ? 'border-primary text-primary font-bold'
+                                    : 'border-transparent text-muted-foreground hover:text-foreground'
+                                    }`}
                             >
                                 CSE Exam Structure
                             </button>
                             <button
                                 onClick={() => setActiveTab('tips')}
-                                className={`border-b-2 px-5 py-3 text-sm font-semibold transition-all ${
-                                    activeTab === 'tips'
-                                        ? 'border-primary text-primary font-bold'
-                                        : 'border-transparent text-muted-foreground hover:text-foreground'
-                                }`}
+                                className={`border-b-2 px-5 py-3 text-sm font-semibold transition-all ${activeTab === 'tips'
+                                    ? 'border-primary text-primary font-bold'
+                                    : 'border-transparent text-muted-foreground hover:text-foreground'
+                                    }`}
                             >
                                 Smart Study Tips
                             </button>
@@ -661,6 +659,7 @@ export default function Welcome() {
                         <div className="mx-auto flex w-full max-w-3xl flex-col gap-3">
                             {faqs.map((faq, index) => {
                                 const isOpen = openFaqIndex === index;
+
                                 return (
                                     <div
                                         key={index}
@@ -678,19 +677,17 @@ export default function Welcome() {
                                                 {faq.question}
                                             </span>
                                             <ChevronDown
-                                                className={`h-5 w-5 shrink-0 text-slate-400 transition-transform duration-300 ${
-                                                    isOpen
-                                                        ? 'rotate-180 text-primary'
-                                                        : ''
-                                                }`}
+                                                className={`h-5 w-5 shrink-0 text-slate-400 transition-transform duration-300 ${isOpen
+                                                    ? 'rotate-180 text-primary'
+                                                    : ''
+                                                    }`}
                                             />
                                         </button>
                                         <div
-                                            className={`transition-all duration-300 ease-in-out ${
-                                                isOpen
-                                                    ? 'dark:border-slate-850 max-h-[250px] border-t border-slate-100'
-                                                    : 'max-h-0'
-                                            } overflow-hidden`}
+                                            className={`transition-all duration-300 ease-in-out ${isOpen
+                                                ? 'dark:border-slate-850 max-h-[250px] border-t border-slate-100'
+                                                : 'max-h-0'
+                                                } overflow-hidden`}
                                         >
                                             <div className="px-6 py-5 text-sm leading-relaxed font-normal text-slate-600 dark:text-slate-400">
                                                 {faq.answer}

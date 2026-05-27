@@ -1,23 +1,23 @@
 import { Head, router, Link } from '@inertiajs/react';
-import { PageContainer } from '@/components/page-container';
-import { PageHeader } from '@/components/page-header';
-import { TrackBadge, StatusBadge, ScoreProgress } from '@/components/attempt-components';
-import { Card } from '@/components/ui/card';
-import React, { useState } from 'react';
-import { index as historyIndex } from '@/routes/history';
-import { 
-    Search, 
-    ChevronDown, 
-    Calendar, 
-    Clock, 
-    XCircle, 
+import {
+    Search,
+    ChevronDown,
+    Calendar,
+    Clock,
+    XCircle,
     RotateCcw,
     BookOpen,
     Trash2,
     X
 } from 'lucide-react';
-import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@/components/ui/tooltip';
+import React, { useState } from 'react';
+import { TrackBadge, StatusBadge, ScoreProgress } from '@/components/attempt-components';
+import { PageContainer } from '@/components/page-container';
+import { PageHeader } from '@/components/page-header';
+import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@/components/ui/tooltip';
+import { index as historyIndex } from '@/routes/history';
 
 interface Attempt {
     id: number;
@@ -86,7 +86,7 @@ export default function HistoryPage({ attempts = [], pagination, filters }: Hist
         message: '',
         confirmLabel: '',
         variant: 'success',
-        onConfirm: () => {},
+        onConfirm: () => { },
     });
 
     // Strict 1-liner comment: Open same/fresh choice modal for all exam and drill retakes from history
@@ -113,14 +113,14 @@ export default function HistoryPage({ attempts = [], pagination, filters }: Hist
     // Handle instant filter update via Inertia router
     const updateFilters = (newSearch: string, newTrack: string, newDate: string) => {
         router.get(
-            historyIndex().url, 
-            { 
-                search: newSearch, 
-                track: newTrack, 
+            historyIndex().url,
+            {
+                search: newSearch,
+                track: newTrack,
                 date: newDate,
                 page: 1 // Reset pagination to page 1 on filter
-            }, 
-            { 
+            },
+            {
                 preserveState: true,
                 replace: true
             }
@@ -150,7 +150,7 @@ export default function HistoryPage({ attempts = [], pagination, filters }: Hist
             <Head title="Attempt History" />
 
             <PageContainer>
-                
+
                 {/* 1. HEADER SECTION */}
                 <PageHeader
                     title="Attempt History"
@@ -162,16 +162,16 @@ export default function HistoryPage({ attempts = [], pagination, filters }: Hist
                 {/* 2. FILTERS CONTAINER CARD */}
                 <div className="rounded-xl border border-border bg-card p-4 shadow-3xs">
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-                        
+
                         {/* Search bar form */}
                         <form onSubmit={handleSearchSubmit} className="relative flex-1 max-w-2xl">
-                             <Input
-                                 type="text"
-                                 value={searchVal}
-                                 onChange={(e) => setSearchVal(e.target.value)}
-                                 placeholder="Search exams by name or ID..."
-                                 className="pl-9"
-                             />
+                            <Input
+                                type="text"
+                                value={searchVal}
+                                onChange={(e) => setSearchVal(e.target.value)}
+                                placeholder="Search exams by name or ID..."
+                                className="pl-9"
+                            />
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
                         </form>
 
@@ -212,13 +212,13 @@ export default function HistoryPage({ attempts = [], pagination, filters }: Hist
 
                 {/* 3. ATTEMPTS TABLE CONTAINER CARD */}
                 <Card className="overflow-hidden flex flex-col justify-between min-h-[420px] p-0 gap-0">
-                    
+
                     {/* Card Header with Legend */}
                     <div className="flex flex-col gap-3 border-b border-border p-5 sm:flex-row sm:items-center sm:justify-between">
                         <span className="font-heading text-sm font-extrabold text-foreground">
                             Attempt Records
                         </span>
-                        
+
                         {/* Legend */}
                         <div className="flex flex-wrap items-center gap-4 text-[10px] font-extrabold uppercase tracking-wider">
                             <span className="text-muted-foreground/80">Legend:</span>
@@ -281,7 +281,7 @@ export default function HistoryPage({ attempts = [], pagination, filters }: Hist
                                     attempts.map((att) => {
                                         return (
                                             <tr key={att.id} className="hover:bg-slate-50/20 dark:hover:bg-slate-900/10 transition">
-                                                
+
                                                 {/* DATE & TIME */}
                                                 <td className="px-6 py-4.5 whitespace-nowrap">
                                                     <div className="text-xs font-black text-foreground leading-normal">
@@ -299,7 +299,7 @@ export default function HistoryPage({ attempts = [], pagination, filters }: Hist
 
                                                 {/* CATEGORY */}
                                                 <td className="px-6 py-4.5">
-                                                    <span 
+                                                    <span
                                                         className="text-xs font-extrabold text-foreground block max-w-[280px] whitespace-normal break-words leading-relaxed"
                                                         title={att.category}
                                                     >
@@ -309,9 +309,9 @@ export default function HistoryPage({ attempts = [], pagination, filters }: Hist
 
                                                 {/* SCORE */}
                                                 <td className="px-6 py-4.5">
-                                                    <ScoreProgress 
-                                                        score={att.score} 
-                                                        status={att.status} 
+                                                    <ScoreProgress
+                                                        score={att.score}
+                                                        status={att.status}
                                                         categoryScores={att.category_scores}
                                                     />
                                                 </td>
@@ -333,7 +333,7 @@ export default function HistoryPage({ attempts = [], pagination, filters }: Hist
                                                     <div className="flex items-center justify-end gap-2">
                                                         <Tooltip>
                                                             <TooltipTrigger asChild>
-                                                                 <button
+                                                                <button
                                                                     type="button"
                                                                     onClick={() => handleRetakeClick(att)}
                                                                     className="flex size-8 items-center justify-center rounded-lg border border-amber-200 bg-amber-50 text-amber-700 hover:bg-amber-100 hover:text-amber-800 transition dark:border-amber-900/30 dark:bg-amber-950/20 dark:text-amber-400 dark:hover:bg-amber-900/30 dark:hover:text-amber-305 shadow-2xs cursor-pointer focus:outline-none"
@@ -361,7 +361,7 @@ export default function HistoryPage({ attempts = [], pagination, filters }: Hist
                                                                 <span>Review Answers</span>
                                                             </TooltipContent>
                                                         </Tooltip>
-                                                        
+
                                                         <Tooltip>
                                                             <TooltipTrigger asChild>
                                                                 <button
@@ -393,19 +393,19 @@ export default function HistoryPage({ attempts = [], pagination, filters }: Hist
                             <span className="text-xs font-bold text-muted-foreground">
                                 Showing <strong className="text-foreground">{(pagination.current_page - 1) * pagination.per_page + 1}</strong> to <strong className="text-foreground">{Math.min(pagination.current_page * pagination.per_page, pagination.total)}</strong> of <strong className="text-foreground">{pagination.total}</strong> results
                             </span>
-                            
+
                             <div className="flex items-center gap-1.5">
-                                 {/* Previous button */}
+                                {/* Previous button */}
                                 <button
                                     disabled={pagination.current_page === 1}
-                                    onClick={() => router.get('/history', { 
-                                        search: searchVal, 
-                                        track: selectedTrack, 
-                                        date: selectedDate, 
-                                        page: pagination.current_page - 1 
+                                    onClick={() => router.get('/history', {
+                                        search: searchVal,
+                                        track: selectedTrack,
+                                        date: selectedDate,
+                                        page: pagination.current_page - 1
                                     }, { preserveState: true })}
                                     className="rounded-lg border border-border bg-white px-3 py-1.5 text-xs font-bold text-muted-foreground shadow-3xs transition hover:bg-slate-50 dark:hover:bg-slate-800 dark:hover:text-white disabled:opacity-40 disabled:cursor-not-allowed dark:bg-slate-900"
-                                  >
+                                >
                                     Previous
                                 </button>
 
@@ -413,20 +413,20 @@ export default function HistoryPage({ attempts = [], pagination, filters }: Hist
                                 {Array.from({ length: pagination.last_page }).map((_, idx) => {
                                     const pageNum = idx + 1;
                                     const isActive = pageNum === pagination.current_page;
+
                                     return (
                                         <button
                                             key={pageNum}
-                                            onClick={() => router.get('/history', { 
-                                                search: searchVal, 
-                                                track: selectedTrack, 
-                                                date: selectedDate, 
-                                                page: pageNum 
+                                            onClick={() => router.get('/history', {
+                                                search: searchVal,
+                                                track: selectedTrack,
+                                                date: selectedDate,
+                                                page: pageNum
                                             }, { preserveState: true })}
-                                            className={`size-8 rounded-lg text-xs font-black shadow-3xs transition focus:outline-none ${
-                                                isActive
+                                            className={`size-8 rounded-lg text-xs font-black shadow-3xs transition focus:outline-none ${isActive
                                                     ? 'bg-blue-600 text-white'
                                                     : 'border border-border bg-white text-muted-foreground hover:bg-slate-50 dark:hover:bg-slate-800 dark:hover:text-white dark:bg-slate-900'
-                                            }`}
+                                                }`}
                                         >
                                             {pageNum}
                                         </button>
@@ -436,11 +436,11 @@ export default function HistoryPage({ attempts = [], pagination, filters }: Hist
                                 {/* Next button */}
                                 <button
                                     disabled={pagination.current_page === pagination.last_page}
-                                    onClick={() => router.get('/history', { 
-                                        search: searchVal, 
-                                        track: selectedTrack, 
-                                        date: selectedDate, 
-                                        page: pagination.current_page + 1 
+                                    onClick={() => router.get('/history', {
+                                        search: searchVal,
+                                        track: selectedTrack,
+                                        date: selectedDate,
+                                        page: pagination.current_page + 1
                                     }, { preserveState: true })}
                                     className="rounded-lg border border-border bg-white px-3 py-1.5 text-xs font-bold text-muted-foreground shadow-3xs transition hover:bg-slate-50 dark:hover:bg-slate-800 dark:hover:text-white disabled:opacity-40 disabled:cursor-not-allowed dark:bg-slate-900"
                                 >
@@ -520,7 +520,7 @@ export default function HistoryPage({ attempts = [], pagination, filters }: Hist
             {/* Custom confirmation dialog modal matching global visual standard */}
             {confirmModal.isOpen && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4 animate-in fade-in duration-200">
-                    <div 
+                    <div
                         className="relative w-full max-w-2xl rounded-xl border border-border bg-card p-6 shadow-xl animate-in zoom-in-95 duration-205"
                         role="dialog"
                         aria-modal="true"
@@ -558,13 +558,12 @@ export default function HistoryPage({ attempts = [], pagination, filters }: Hist
                                     setConfirmModal(prev => ({ ...prev, isOpen: false }));
                                     confirmModal.onConfirm();
                                 }}
-                                className={`cursor-pointer rounded-lg px-4.5 py-2 text-xs font-bold text-white shadow-3xs transition focus:outline-none ${
-                                    confirmModal.variant === 'danger'
+                                className={`cursor-pointer rounded-lg px-4.5 py-2 text-xs font-bold text-white shadow-3xs transition focus:outline-none ${confirmModal.variant === 'danger'
                                         ? 'bg-rose-600 hover:bg-rose-700 active:bg-rose-800'
                                         : confirmModal.variant === 'success'
-                                        ? 'bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800'
-                                        : 'bg-blue-600 hover:bg-blue-700 active:bg-blue-800'
-                                }`}
+                                            ? 'bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800'
+                                            : 'bg-blue-600 hover:bg-blue-700 active:bg-blue-800'
+                                    }`}
                             >
                                 {confirmModal.confirmLabel}
                             </button>

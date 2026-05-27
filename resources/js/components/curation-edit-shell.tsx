@@ -1,8 +1,8 @@
+import { Link } from '@inertiajs/react';
+import { ChevronLeft, Save } from 'lucide-react';
 import React from 'react';
 import { PageContainer } from '@/components/page-container';
 import { PageHeader } from '@/components/page-header';
-import { Link } from '@inertiajs/react';
-import { ChevronLeft, Save } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface CurationEditShellProps {
@@ -49,23 +49,22 @@ export function CurationEditShell({
 
             <div className="max-w-4xl">
                 <form onSubmit={onSaveSubmit} className="flex flex-col gap-6 rounded-2xl border border-border bg-card p-6 shadow-sm">
-                    
+
                     <div className="flex items-center justify-between border-b border-border pb-3.5">
                         <span className="text-xs font-black text-foreground uppercase flex items-center gap-1.5">
                             <HeaderIcon className="size-4.5 text-blue-600 animate-pulse" />
                             {headerTitle}
                         </span>
-                        
+
                         <div className="flex items-center gap-2">
                             <span className="text-[10px] font-extrabold tracking-wider text-muted-foreground uppercase">{statusLabel}:</span>
                             <button
                                 type="button"
                                 onClick={onStatusToggle}
-                                className={`rounded-lg px-3 py-1.5 text-[10px] font-extrabold uppercase transition cursor-pointer border ${
-                                    statusValue 
-                                        ? 'bg-emerald-50 text-emerald-700 border-emerald-150 dark:bg-emerald-950/20 dark:text-emerald-400 dark:border-emerald-900/30' 
-                                        : 'bg-muted text-muted-foreground border-border'
-                                }`}
+                                className={`rounded-lg px-3 py-1.5 text-[10px] font-extrabold uppercase transition cursor-pointer border ${statusValue
+                                    ? 'bg-emerald-50 text-emerald-700 border-emerald-150 dark:bg-emerald-950/20 dark:text-emerald-400 dark:border-emerald-900/30'
+                                    : 'bg-muted text-muted-foreground border-border'
+                                    }`}
                             >
                                 {statusValue ? 'Active' : 'Draft'}
                             </button>

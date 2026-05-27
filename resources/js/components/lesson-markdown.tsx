@@ -60,13 +60,21 @@ const cleanText = (value: string): string =>
 export function LessonMarkdown({ content = '' }: LessonMarkdownProps) {
     const findMatchingBrace = useCallback((str: string, startIndex: number): number => {
         let count = 0;
+
         for (let idx = startIndex; idx < str.length; idx++) {
-            if (str[idx] === '{') count++;
+            if (str[idx] === '{') {
+                count++;
+            }
+
             if (str[idx] === '}') {
                 count--;
-                if (count === 0) return idx;
+
+                if (count === 0) {
+                    return idx;
+                }
             }
         }
+
         return -1;
     }, []);
 
@@ -78,6 +86,7 @@ export function LessonMarkdown({ content = '' }: LessonMarkdownProps) {
             while (i < str.length) {
                 if (str.startsWith('\\text{', i)) {
                     const matchIndex = findMatchingBrace(str, i + 5);
+
                     if (matchIndex !== -1) {
                         result.push(
                             <span key={i} className="mx-1 font-sans font-medium">
@@ -92,13 +101,16 @@ export function LessonMarkdown({ content = '' }: LessonMarkdownProps) {
                 if (str.startsWith('\\frac{', i)) {
                     const numStart = i + 5;
                     const numEnd = findMatchingBrace(str, numStart);
+
                     if (numEnd !== -1) {
                         let denomStart = numEnd + 1;
+
                         while (denomStart < str.length && str[denomStart] !== '{') {
                             denomStart++;
                         }
 
                         const denomEnd = denomStart < str.length ? findMatchingBrace(str, denomStart) : -1;
+
                         if (denomEnd !== -1) {
                             result.push(
                                 <span key={i} className="mx-1 inline-flex flex-col align-middle leading-none text-center">
@@ -118,8 +130,10 @@ export function LessonMarkdown({ content = '' }: LessonMarkdownProps) {
 
                 if (str[i] === '^' || str[i] === '_') {
                     const isSup = str[i] === '^';
+
                     if (str[i + 1] === '{') {
                         const braceEnd = findMatchingBrace(str, i + 1);
+
                         if (braceEnd !== -1) {
                             const content = parseBlock(str.substring(i + 2, braceEnd));
                             result.push(
@@ -184,6 +198,7 @@ export function LessonMarkdown({ content = '' }: LessonMarkdownProps) {
                 ];
 
                 const command = commands.find((item) => str.startsWith(item.cmd, i));
+
                 if (command) {
                     result.push(
                         <span key={i} className="mx-0.5">
@@ -212,13 +227,18 @@ export function LessonMarkdown({ content = '' }: LessonMarkdownProps) {
 
     const parseInline = useCallback((text: string): React.ReactNode => {
         const normalized = cleanText(text);
-        if (!normalized) return null;
+
+        if (!normalized) {
+            return null;
+        }
 
         const result: React.ReactNode[] = [];
         let i = 0;
 
         const parseBoldOnly = (str: string, keyPrefix: string): React.ReactNode[] => {
-            if (!str) return [];
+            if (!str) {
+                return [];
+            }
 
             const boldRegex = /\*+([^*]+?)\*+/g;
             const parts: React.ReactNode[] = [];
@@ -229,6 +249,7 @@ export function LessonMarkdown({ content = '' }: LessonMarkdownProps) {
                 if (match.index > lastIdx) {
                     parts.push(str.substring(lastIdx, match.index));
                 }
+
                 parts.push(
                     <strong key={`${keyPrefix}-bold-${match.index}`} className="font-extrabold text-slate-950 dark:text-white">
                         {match[1].trim()}
@@ -247,6 +268,7 @@ export function LessonMarkdown({ content = '' }: LessonMarkdownProps) {
         while (i < normalized.length) {
             if (normalized.startsWith('$$', i)) {
                 const endIdx = normalized.indexOf('$$', i + 2);
+
                 if (endIdx !== -1) {
                     result.push(
                         <div
@@ -263,6 +285,7 @@ export function LessonMarkdown({ content = '' }: LessonMarkdownProps) {
 
             if (normalized[i] === '$') {
                 const endIdx = normalized.indexOf('$', i + 1);
+
                 if (endIdx !== -1) {
                     result.push(
                         <span
@@ -362,6 +385,7 @@ export function LessonMarkdown({ content = '' }: LessonMarkdownProps) {
 
             if (/^[-*_]{2,30}$/.test(trimmed)) {
                 rendered.push(<hr key={`hr-${idx}`} className="my-8 border-t border-slate-200 dark:border-slate-800" />);
+
                 return;
             }
 
@@ -380,10 +404,12 @@ export function LessonMarkdown({ content = '' }: LessonMarkdownProps) {
                 } else {
                     tableRows.push(cells);
                 }
+
                 return;
             }
 
             const headerMatch = trimmed.match(/^(#{1,6})\s+(.*)$/);
+
             if (headerMatch) {
                 const level = headerMatch[1].length;
                 const headerText = headerMatch[2];
@@ -399,9 +425,8 @@ export function LessonMarkdown({ content = '' }: LessonMarkdownProps) {
                     rendered.push(
                         <h2
                             key={`h2-${idx}`}
-                            className={`mb-4 mt-8 flex items-center gap-2 border-b pb-3 text-xl font-black leading-tight dark:border-slate-800 dark:text-white ${
-                                isCheckSection ? 'border-blue-200 text-blue-800 dark:text-blue-300' : 'border-slate-200 text-slate-950'
-                            }`}
+                            className={`mb-4 mt-8 flex items-center gap-2 border-b pb-3 text-xl font-black leading-tight dark:border-slate-800 dark:text-white ${isCheckSection ? 'border-blue-200 text-blue-800 dark:text-blue-300' : 'border-slate-200 text-slate-950'
+                                }`}
                         >
                             {isCheckSection ? <HelpCircle className="size-6 shrink-0" /> : null}
                             {parseLineContent(headerText)}
@@ -421,6 +446,7 @@ export function LessonMarkdown({ content = '' }: LessonMarkdownProps) {
                         </h4>,
                     );
                 }
+
                 return;
             }
 
@@ -437,6 +463,7 @@ export function LessonMarkdown({ content = '' }: LessonMarkdownProps) {
                         <div className="text-base leading-8 text-slate-800 dark:text-slate-200">{parseLineContent(body)}</div>
                     </div>,
                 );
+
                 return;
             }
 
@@ -449,6 +476,7 @@ export function LessonMarkdown({ content = '' }: LessonMarkdownProps) {
                         </div>
                     </div>,
                 );
+
                 return;
             }
 
@@ -464,6 +492,7 @@ export function LessonMarkdown({ content = '' }: LessonMarkdownProps) {
                         <span>{parseLineContent(trimmed.substring(2))}</span>
                     </div>,
                 );
+
                 return;
             }
 
@@ -477,6 +506,7 @@ export function LessonMarkdown({ content = '' }: LessonMarkdownProps) {
                         <span>{parseLineContent(trimmed)}</span>
                     </div>,
                 );
+
                 return;
             }
 
@@ -489,6 +519,7 @@ export function LessonMarkdown({ content = '' }: LessonMarkdownProps) {
                         {parseLineContent(trimmed)}
                     </div>,
                 );
+
                 return;
             }
 
@@ -499,6 +530,7 @@ export function LessonMarkdown({ content = '' }: LessonMarkdownProps) {
                         <span>{parseLineContent(trimmed.substring(1).trim())}</span>
                     </div>,
                 );
+
                 return;
             }
 
@@ -512,11 +544,13 @@ export function LessonMarkdown({ content = '' }: LessonMarkdownProps) {
                         <span>{parseLineContent(trimmed.substring(numberEnd + 1).trim())}</span>
                     </div>,
                 );
+
                 return;
             }
 
             if (trimmed === '') {
                 rendered.push(<div key={`empty-${idx}`} className="h-3" />);
+
                 return;
             }
 

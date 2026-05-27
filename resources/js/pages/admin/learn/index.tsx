@@ -1,19 +1,19 @@
 import { Head, Link, router } from '@inertiajs/react';
-import { 
-    Eye, 
-    Edit2, 
-    Trash2, 
-    FileText 
+import {
+    Eye,
+    Edit2,
+    Trash2,
+    FileText
 } from 'lucide-react';
-import { 
+import type { TableColumn } from '@/components/admin-table';
+import { CurationIndexShell, getCategoryStyles } from '@/components/curation-index-shell';
+import type { CategoryItem } from '@/components/drafts-review-shell';
+import {
     index as adminLearnIndex,
     create as adminLearnCreate,
     edit as adminLearnEdit
 } from '@/routes/admin/learn';
 import { show as learnShow } from '@/routes/learn';
-import { CurationIndexShell, getCategoryStyles } from '@/components/curation-index-shell';
-import { TableColumn } from '@/components/admin-table';
-import { CategoryItem } from '@/components/drafts-review-shell';
 
 interface LearnModule {
     id: number;

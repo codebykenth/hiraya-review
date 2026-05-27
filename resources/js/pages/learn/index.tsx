@@ -1,9 +1,9 @@
+import { Head, Link } from '@inertiajs/react';
+import { Search, BookOpen, Clock, Tag, ArrowRight } from 'lucide-react';
 import { useState } from 'react';
 import { PageContainer } from '@/components/page-container';
 import { PageHeader } from '@/components/page-header';
 import { Card } from '@/components/ui/card';
-import { Head, Link } from '@inertiajs/react';
-import { Search, BookOpen, Clock, Tag, ArrowRight } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 
 interface LearnModule {
@@ -44,13 +44,13 @@ export default function LearnIndex({ modules, categories }: LearnIndexProps) {
 
     // Strict 1-liner comment: Filter lessons based on active category and query keywords
     const filteredModules = modules.filter(mod => {
-        const matchesQuery = 
+        const matchesQuery =
             mod.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
             mod.topic.toLowerCase().includes(searchQuery.toLowerCase()) ||
             mod.summary.toLowerCase().includes(searchQuery.toLowerCase());
-            
+
         const matchesCategory = selectedCategory === 'all' || mod.category === selectedCategory;
-        
+
         return matchesQuery && matchesCategory;
     });
 
@@ -58,7 +58,7 @@ export default function LearnIndex({ modules, categories }: LearnIndexProps) {
         <>
             <Head title="Learning Tutorials" />
             <PageContainer>
-                
+
                 {/* Header Banner */}
                 <PageHeader
                     title="CSE Study Hub"
@@ -77,29 +77,28 @@ export default function LearnIndex({ modules, categories }: LearnIndexProps) {
                             className="pl-10"
                         />
                     </div>
-                    
+
                     <div className="flex flex-wrap gap-2">
                         <button
                             onClick={() => setSelectedCategory('all')}
-                            className={`rounded-lg px-4 py-2 text-xs font-extrabold transition cursor-pointer ${
-                                selectedCategory === 'all'
+                            className={`rounded-lg px-4 py-2 text-xs font-extrabold transition cursor-pointer ${selectedCategory === 'all'
                                     ? 'bg-blue-600 text-white shadow-xs'
                                     : 'bg-slate-50 text-muted-foreground hover:bg-slate-100 dark:bg-slate-900 dark:hover:bg-slate-800'
-                            }`}
+                                }`}
                         >
                             All Categories
                         </button>
                         {categories.map(cat => {
                             const isSelected = selectedCategory === cat.name;
+
                             return (
                                 <button
                                     key={cat.id}
                                     onClick={() => setSelectedCategory(cat.name)}
-                                    className={`rounded-lg px-4 py-2 text-xs font-extrabold transition cursor-pointer ${
-                                        isSelected
+                                    className={`rounded-lg px-4 py-2 text-xs font-extrabold transition cursor-pointer ${isSelected
                                             ? 'bg-blue-600 text-white shadow-xs'
                                             : 'bg-slate-50 text-muted-foreground hover:bg-slate-100 dark:bg-slate-900 dark:hover:bg-slate-800'
-                                    }`}
+                                        }`}
                                 >
                                     {cat.name}
                                 </button>
@@ -127,42 +126,42 @@ export default function LearnIndex({ modules, categories }: LearnIndexProps) {
                                 >
                                     <Card className="flex flex-col justify-between overflow-hidden p-6 transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-md h-full">
                                         <div>
-                                        {/* Badges row */}
-                                        <div className="flex flex-wrap items-center gap-2">
-                                            <span className={`rounded-full px-2.5 py-0.5 text-[9px] font-extrabold tracking-wide uppercase border ${colors.bg} ${colors.text} ${colors.border}`}>
-                                                {mod.category}
+                                            {/* Badges row */}
+                                            <div className="flex flex-wrap items-center gap-2">
+                                                <span className={`rounded-full px-2.5 py-0.5 text-[9px] font-extrabold tracking-wide uppercase border ${colors.bg} ${colors.text} ${colors.border}`}>
+                                                    {mod.category}
+                                                </span>
+                                                <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[9px] font-bold text-muted-foreground dark:bg-slate-900">
+                                                    {mod.subcategory}
+                                                </span>
+                                            </div>
+
+                                            <h3 className="mt-5 font-heading text-lg font-bold text-foreground leading-snug group-hover:text-blue-600 transition dark:group-hover:text-blue-400">
+                                                {mod.title}
+                                            </h3>
+
+                                            <div className="mt-2.5 flex items-center gap-1.5 text-[10px] font-bold text-muted-foreground uppercase">
+                                                <Tag className="size-3" />
+                                                <span>Topic: {mod.topic}</span>
+                                            </div>
+
+                                            <p className="mt-3 text-xs leading-relaxed text-muted-foreground line-clamp-3">
+                                                {mod.summary}
+                                            </p>
+                                        </div>
+
+                                        {/* Action Footing */}
+                                        <div className="mt-6 flex items-center justify-between border-t border-border pt-4">
+                                            <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                                                <Clock className="size-3.5" />
+                                                <span>{mod.estimated_minutes} min read</span>
+                                            </div>
+
+                                            <span className="flex items-center gap-1 text-xs font-black text-blue-600 group-hover:gap-2 transition-all dark:text-blue-450">
+                                                Start Lesson
+                                                <ArrowRight className="size-3.5" />
                                             </span>
-                                            <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[9px] font-bold text-muted-foreground dark:bg-slate-900">
-                                                {mod.subcategory}
-                                            </span>
                                         </div>
-
-                                        <h3 className="mt-5 font-heading text-lg font-bold text-foreground leading-snug group-hover:text-blue-600 transition dark:group-hover:text-blue-400">
-                                            {mod.title}
-                                        </h3>
-                                        
-                                        <div className="mt-2.5 flex items-center gap-1.5 text-[10px] font-bold text-muted-foreground uppercase">
-                                            <Tag className="size-3" />
-                                            <span>Topic: {mod.topic}</span>
-                                        </div>
-
-                                        <p className="mt-3 text-xs leading-relaxed text-muted-foreground line-clamp-3">
-                                            {mod.summary}
-                                        </p>
-                                    </div>
-
-                                    {/* Action Footing */}
-                                    <div className="mt-6 flex items-center justify-between border-t border-border pt-4">
-                                        <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                                            <Clock className="size-3.5" />
-                                            <span>{mod.estimated_minutes} min read</span>
-                                        </div>
-                                        
-                                        <span className="flex items-center gap-1 text-xs font-black text-blue-600 group-hover:gap-2 transition-all dark:text-blue-450">
-                                            Start Lesson
-                                            <ArrowRight className="size-3.5" />
-                                        </span>
-                                    </div>
                                     </Card>
                                 </Link>
                             );

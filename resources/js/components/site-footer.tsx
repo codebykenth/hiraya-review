@@ -1,5 +1,5 @@
-import BrandName from '@/components/brand-name';
 import { Link } from '@inertiajs/react';
+import BrandName from '@/components/brand-name';
 
 // Renders the standard visitor footer shared across the home, login, and registration pages
 export default function SiteFooter() {

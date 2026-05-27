@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
 import { Link, usePage } from '@inertiajs/react';
 import { ChevronRight } from 'lucide-react';
+import { useState, useEffect } from 'react';
 import {
     SidebarGroup,
     SidebarGroupLabel,
@@ -12,8 +12,8 @@ import {
     SidebarMenuSubButton
 } from '@/components/ui/sidebar';
 import { useCurrentUrl } from '@/hooks/use-current-url';
-import type { NavItem } from '@/types';
 import { cn } from '@/lib/utils';
+import type { NavItem } from '@/types';
 
 export function NavMain({ items = [], label = 'Platform' }: { items: NavItem[], label?: string }) {
     const { isCurrentUrl } = useCurrentUrl();
@@ -22,42 +22,51 @@ export function NavMain({ items = [], label = 'Platform' }: { items: NavItem[], 
     // Smart auto-expansion state: automatically expand sections where a sub-item is active
     const [openItems, setOpenItems] = useState<Record<string, boolean>>(() => {
         const initial: Record<string, boolean> = {};
+
         for (const item of items) {
             if (item.items) {
                 const hasActiveChild = item.items.some(sub => isCurrentUrl(sub.href));
+
                 if (hasActiveChild) {
                     initial[item.title] = true;
                     break;
                 }
             }
         }
+
         return initial;
     });
 
     // Sync auto-expansion if the URL shifts externally
     useEffect(() => {
         const next: Record<string, boolean> = {};
+
         for (const item of items) {
             if (item.items) {
                 const hasActiveChild = item.items.some(sub => isCurrentUrl(sub.href));
+
                 if (hasActiveChild) {
                     next[item.title] = true;
                     break;
                 }
             }
         }
+
         const timer = setTimeout(() => {
             setOpenItems(next);
         }, 0);
+
         return () => clearTimeout(timer);
     }, [url, items, isCurrentUrl]);
 
     const toggleItem = (title: string) => {
         setOpenItems(prev => {
             const next: Record<string, boolean> = {};
+
             if (!prev[title]) {
                 next[title] = true;
             }
+
             return next;
         });
     };
@@ -104,6 +113,7 @@ export function NavMain({ items = [], label = 'Platform' }: { items: NavItem[], 
                                     <SidebarMenuSub className="transition-all duration-200 ease-in-out mt-1">
                                         {item.items!.map((sub) => {
                                             const subActive = isCurrentUrl(sub.href);
+
                                             return (
                                                 <SidebarMenuSubItem key={sub.title}>
                                                     <SidebarMenuSubButton
@@ -133,6 +143,7 @@ export function NavMain({ items = [], label = 'Platform' }: { items: NavItem[], 
 
                     // Support highlighting History when drilling attempts are active
                     const hasAttemptId = url.includes('attempt_id=');
+
                     if (hasAttemptId) {
                         if (item.title === 'History') {
                             active = true;

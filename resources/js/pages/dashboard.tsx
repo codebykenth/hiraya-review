@@ -1,11 +1,4 @@
-import { useState } from 'react';
-import { PageContainer } from '@/components/page-container';
-import { TrackBadge, StatusBadge, ScoreProgress } from '@/components/attempt-components';
-import { Card } from '@/components/ui/card';
 import { Head, Link, usePage } from '@inertiajs/react';
-import { dashboard } from '@/routes';
-import { index as examsIndex } from '@/routes/exams';
-import { index as drillsIndex } from '@/routes/drills';
 import {
     Play,
     TrendingUp,
@@ -17,6 +10,13 @@ import {
     Target,
     Info,
 } from 'lucide-react';
+import { useState } from 'react';
+import { TrackBadge, StatusBadge, ScoreProgress } from '@/components/attempt-components';
+import { PageContainer } from '@/components/page-container';
+import { Card } from '@/components/ui/card';
+import { dashboard } from '@/routes';
+import { index as drillsIndex } from '@/routes/drills';
+import { index as examsIndex } from '@/routes/exams';
 
 interface ChartDataPoint {
     score: number;
@@ -120,6 +120,7 @@ export default function Dashboard({ stats }: DashboardProps) {
     // Filter/slice the dynamic chart data points based on filter state
     const filteredChartData = (() => {
         let items = [...chartData];
+
         if (selectedFilter === 'exams') {
             items = items.filter(dp => dp.track.toLowerCase().includes('exam'));
         } else if (selectedFilter === 'drills') {
@@ -127,6 +128,7 @@ export default function Dashboard({ stats }: DashboardProps) {
         }
 
         const limitCount = selectedFilter === '12' ? 12 : (selectedFilter === '6' ? 6 : items.length);
+
         return items.slice(-limitCount);
     })();
 
@@ -141,22 +143,27 @@ export default function Dashboard({ stats }: DashboardProps) {
         const x =
             chartPaddingLeft +
             (idx * (chartWidth - chartPaddingLeft - chartPaddingRight)) /
-                (filteredChartData.length - 1 || 1);
+            (filteredChartData.length - 1 || 1);
         const y =
             chartHeight -
             chartPadding -
             (dp.score * (chartHeight - chartPadding * 2)) / 100;
+
         return { x, y };
     });
 
     // Generate smooth bezier curves connecting the score data points
     const pathD = points.reduce((acc, p, i) => {
-        if (i === 0) return `M ${p.x} ${p.y}`;
+        if (i === 0) {
+            return `M ${p.x} ${p.y}`;
+        }
+
         const prev = points[i - 1];
         const cpX1 = prev.x + (p.x - prev.x) / 2;
         const cpY1 = prev.y;
         const cpX2 = prev.x + (p.x - prev.x) / 2;
         const cpY2 = p.y;
+
         return `${acc} C ${cpX1} ${cpY1}, ${cpX2} ${cpY2}, ${p.x} ${p.y}`;
     }, '');
 
@@ -328,7 +335,7 @@ export default function Dashboard({ stats }: DashboardProps) {
                                 </div>
                             </div>
                             <div className="relative">
-                                <button 
+                                <button
                                     onClick={() => setIsOpen(!isOpen)}
                                     className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-bold text-slate-700 shadow-sm transition hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-300 dark:hover:bg-slate-900"
                                 >
@@ -338,11 +345,11 @@ export default function Dashboard({ stats }: DashboardProps) {
                                     {selectedFilter === 'drills' && "Custom Drills Only"}
                                     <ChevronDown className="size-3.5" />
                                 </button>
-                                
+
                                 {isOpen && (
                                     <>
-                                        <div 
-                                            className="fixed inset-0 z-10" 
+                                        <div
+                                            className="fixed inset-0 z-10"
                                             onClick={() => setIsOpen(false)}
                                         />
                                         <div className="absolute right-0 mt-2 w-48 origin-top-right rounded-lg border border-slate-200 bg-white p-1 shadow-lg ring-1 ring-black/5 z-20 focus:outline-none dark:border-slate-800 dark:bg-slate-950">
@@ -358,11 +365,10 @@ export default function Dashboard({ stats }: DashboardProps) {
                                                         setSelectedFilter(opt.value as any);
                                                         setIsOpen(false);
                                                     }}
-                                                    className={`flex w-full items-center px-3 py-2 text-left text-xs rounded-md transition ${
-                                                        selectedFilter === opt.value
-                                                            ? 'bg-blue-50 text-blue-600 font-bold dark:bg-blue-950/40 dark:text-blue-400'
-                                                            : 'text-slate-700 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-900'
-                                                    }`}
+                                                    className={`flex w-full items-center px-3 py-2 text-left text-xs rounded-md transition ${selectedFilter === opt.value
+                                                        ? 'bg-blue-50 text-blue-600 font-bold dark:bg-blue-950/40 dark:text-blue-400'
+                                                        : 'text-slate-700 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-900'
+                                                        }`}
                                                 >
                                                     {opt.label}
                                                 </button>
@@ -377,7 +383,7 @@ export default function Dashboard({ stats }: DashboardProps) {
                         <div className="relative h-[260px] w-full rounded-xl border border-slate-200 bg-gradient-to-b from-slate-50 to-white p-3 dark:border-slate-800/70 dark:from-slate-900/30 dark:to-slate-950">
                             {/* Detailed HTML absolute glassmorphic tooltip card */}
                             {hoveredIdx !== null && filteredChartData[hoveredIdx] && filteredChartData[hoveredIdx].track !== 'No Data' && (
-                                <div 
+                                <div
                                     className="absolute z-10 -translate-x-1/2 -translate-y-full rounded-lg border border-blue-200/50 bg-white/95 p-3 shadow-xl backdrop-blur-sm transition-all duration-150 pointer-events-none dark:border-slate-800/50 dark:bg-slate-950/95"
                                     style={{
                                         left: `${(points[hoveredIdx].x / chartWidth) * 100}%`,
@@ -457,7 +463,8 @@ export default function Dashboard({ stats }: DashboardProps) {
                                         chartPadding -
                                         (level *
                                             (chartHeight - chartPadding * 2)) /
-                                            100;
+                                        100;
+
                                     return (
                                         <g key={level}>
                                             <line
@@ -535,7 +542,7 @@ export default function Dashboard({ stats }: DashboardProps) {
                                             onMouseEnter={() => setHoveredIdx(idx)}
                                             onMouseLeave={() => setHoveredIdx(null)}
                                         />
-                                        
+
                                         {/* Score tag text inside SVG */}
                                         {idx === points.length - 1 && hoveredIdx === null && (
                                             <text
@@ -549,7 +556,7 @@ export default function Dashboard({ stats }: DashboardProps) {
                                                 {filteredChartData[idx].score}%
                                             </text>
                                         )}
-                                        
+
                                         {/* Dynamic X-Axis label dates */}
                                         <text
                                             x={p.x}
@@ -594,9 +601,12 @@ export default function Dashboard({ stats }: DashboardProps) {
                                         </thead>
                                         <tbody className="divide-y divide-border dark:divide-slate-900/80 bg-card">
                                             {[...filteredChartData].reverse().map((run, i) => {
-                                                if (run.track === 'No Data') return null;
+                                                if (run.track === 'No Data') {
+                                                    return null;
+                                                }
+
                                                 const status = run.score >= 80 ? 'Pass' : 'Fail';
-                                                
+
                                                 return (
                                                     <tr key={i} className="hover:bg-slate-50/20 dark:hover:bg-slate-900/10 transition">
                                                         <td className="px-4 py-4 font-black text-slate-950 dark:text-white">
@@ -609,9 +619,9 @@ export default function Dashboard({ stats }: DashboardProps) {
                                                             <TrackBadge track={run.track} />
                                                         </td>
                                                         <td className="px-4 py-2.5">
-                                                            <ScoreProgress 
-                                                                score={run.score} 
-                                                                status={status} 
+                                                            <ScoreProgress
+                                                                score={run.score}
+                                                                status={status}
                                                                 detail={run.detail}
                                                                 categoryScores={run.categoryScores}
                                                             />
@@ -651,6 +661,7 @@ export default function Dashboard({ stats }: DashboardProps) {
                                 // Compute dynamic mastery descriptors & badge styles
                                 let label = 'Not Started';
                                 let badgeClass = 'bg-slate-50 text-slate-600 border-slate-200/60 dark:bg-slate-900 dark:text-slate-400 dark:border-slate-800';
+
                                 if (cat.total && cat.total > 0) {
                                     if (cat.percentage >= 80) {
                                         label = 'Mastery';
@@ -675,7 +686,7 @@ export default function Dashboard({ stats }: DashboardProps) {
                                                     {cat.name} Ability
                                                 </span>
                                                 <span className="mt-0.5 block text-xs font-bold text-slate-500 dark:text-slate-400">
-                                                    {cat.total && cat.total > 0 
+                                                    {cat.total && cat.total > 0
                                                         ? `${cat.correct}/${cat.total} solved`
                                                         : '0/0 solved'
                                                     }

@@ -1,10 +1,10 @@
 import { Link, usePage } from '@inertiajs/react';
+import { Menu, X } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import { home, dashboard, login, register } from '@/routes';
-import { Button } from '@/components/ui/button';
 import AppLogo from '@/components/app-logo';
 import { ThemeToggle } from '@/components/theme-toggle';
-import { Menu, X } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { home, dashboard, login, register } from '@/routes';
 import type { Auth } from '@/types';
 
 // Declare expected page props to satisfy TypeScript strict compiler checks
@@ -34,6 +34,7 @@ export default function SiteHeader({
 
             const totalHeight =
                 document.documentElement.scrollHeight - window.innerHeight;
+
             if (totalHeight > 0) {
                 const progress = (currentScrollY / totalHeight) * 100;
                 setScrollProgress(progress);
@@ -53,6 +54,7 @@ export default function SiteHeader({
         };
 
         window.addEventListener('scroll', handleScroll, { passive: true });
+
         return () => window.removeEventListener('scroll', handleScroll);
     }, [lastScrollY, showHeader]);
 
@@ -69,6 +71,7 @@ export default function SiteHeader({
         if (typeof window !== 'undefined' && window.location.pathname === '/') {
             return href;
         }
+
         return id === 'home' ? home().url : `${home().url}${href}`;
     };
 
@@ -76,6 +79,7 @@ export default function SiteHeader({
         if (onNavClick) {
             onNavClick(id);
         }
+
         setIsMenuOpen(false);
     };
 
@@ -91,9 +95,8 @@ export default function SiteHeader({
             />
 
             <header
-                className={`sticky top-0 left-0 z-50 w-full border-b border-gray-200 bg-white/90 text-sm backdrop-blur-md transition-all duration-300 not-has-[nav]:hidden dark:border-gray-800 dark:bg-black/90 ${
-                    showHeader ? 'translate-y-0 shadow-sm' : '-translate-y-full'
-                }`}
+                className={`sticky top-0 left-0 z-50 w-full border-b border-gray-200 bg-white/90 text-sm backdrop-blur-md transition-all duration-300 not-has-[nav]:hidden dark:border-gray-800 dark:bg-black/90 ${showHeader ? 'translate-y-0 shadow-sm' : '-translate-y-full'
+                    }`}
             >
                 <nav className="container mx-auto flex items-center justify-between gap-4 px-6 py-4">
                     <div className="flex items-center">
@@ -111,6 +114,7 @@ export default function SiteHeader({
                                         typeof window !== 'undefined' &&
                                         window.location.pathname === '/' &&
                                         isLinkActive;
+
                                     return (
                                         <li key={link.id}>
                                             <a
@@ -121,11 +125,10 @@ export default function SiteHeader({
                                                 onClick={() =>
                                                     handleLinkClick(link.id)
                                                 }
-                                                className={`border-b-2 pb-1 transition-all ${
-                                                    isHomeActive
-                                                        ? 'border-primary font-bold text-primary'
-                                                        : 'border-transparent text-muted-foreground hover:border-border hover:text-foreground'
-                                                }`}
+                                                className={`border-b-2 pb-1 transition-all ${isHomeActive
+                                                    ? 'border-primary font-bold text-primary'
+                                                    : 'border-transparent text-muted-foreground hover:border-border hover:text-foreground'
+                                                    }`}
                                             >
                                                 {link.label}
                                             </a>
@@ -184,11 +187,10 @@ export default function SiteHeader({
                 </nav>
 
                 <div
-                    className={`absolute top-full right-0 left-0 z-40 transform border-b border-slate-200 bg-white/95 backdrop-blur-lg transition-all duration-300 ease-in-out md:hidden dark:border-slate-800 dark:bg-black/95 ${
-                        isMenuOpen
-                            ? 'translate-y-0 opacity-100'
-                            : 'pointer-events-none -translate-y-10 opacity-0'
-                    }`}
+                    className={`absolute top-full right-0 left-0 z-40 transform border-b border-slate-200 bg-white/95 backdrop-blur-lg transition-all duration-300 ease-in-out md:hidden dark:border-slate-800 dark:bg-black/95 ${isMenuOpen
+                        ? 'translate-y-0 opacity-100'
+                        : 'pointer-events-none -translate-y-10 opacity-0'
+                        }`}
                 >
                     <div className="container mx-auto flex flex-col gap-6 px-6 py-6">
                         {!auth.user && (
@@ -201,6 +203,7 @@ export default function SiteHeader({
                                             typeof window !== 'undefined' &&
                                             window.location.pathname === '/' &&
                                             isLinkActive;
+
                                         return (
                                             <li key={link.id}>
                                                 <a
@@ -211,11 +214,10 @@ export default function SiteHeader({
                                                     onClick={() =>
                                                         handleLinkClick(link.id)
                                                     }
-                                                    className={`block py-1 transition-all ${
-                                                        isHomeActive
-                                                            ? 'font-bold text-primary'
-                                                            : 'text-muted-foreground hover:text-foreground'
-                                                    }`}
+                                                    className={`block py-1 transition-all ${isHomeActive
+                                                        ? 'font-bold text-primary'
+                                                        : 'text-muted-foreground hover:text-foreground'
+                                                        }`}
                                                 >
                                                     {link.label}
                                                 </a>

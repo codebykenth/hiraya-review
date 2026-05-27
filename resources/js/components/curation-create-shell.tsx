@@ -1,8 +1,8 @@
+import { Link } from '@inertiajs/react';
+import { ChevronLeft, Sparkles, PenLine } from 'lucide-react';
 import React from 'react';
 import { PageContainer } from '@/components/page-container';
 import { PageHeader } from '@/components/page-header';
-import { Link } from '@inertiajs/react';
-import { ChevronLeft, Sparkles, PenLine } from 'lucide-react';
 
 interface CurationCreateShellProps {
     title: string;
@@ -45,11 +45,10 @@ export function CurationCreateShell({
                     <button
                         type="button"
                         onClick={() => onTabChange('ai')}
-                        className={`inline-flex items-center gap-2 rounded-lg px-4 py-2 text-xs font-black uppercase tracking-wider transition cursor-pointer ${
-                            activeTab === 'ai'
-                                ? 'bg-white text-slate-950 shadow-xs dark:bg-slate-900 dark:text-white'
-                                : 'text-slate-500 hover:text-slate-900 dark:text-slate-450 dark:hover:text-slate-200'
-                        }`}
+                        className={`inline-flex items-center gap-2 rounded-lg px-4 py-2 text-xs font-black uppercase tracking-wider transition cursor-pointer ${activeTab === 'ai'
+                            ? 'bg-white text-slate-950 shadow-xs dark:bg-slate-900 dark:text-white'
+                            : 'text-slate-500 hover:text-slate-900 dark:text-slate-450 dark:hover:text-slate-200'
+                            }`}
                     >
                         <Sparkles className="size-4 text-blue-600 animate-pulse" />
                         AI Generator
@@ -57,11 +56,10 @@ export function CurationCreateShell({
                     <button
                         type="button"
                         onClick={() => onTabChange('manual')}
-                        className={`inline-flex items-center gap-2 rounded-lg px-4 py-2 text-xs font-black uppercase tracking-wider transition cursor-pointer ${
-                            activeTab === 'manual'
-                                ? 'bg-white text-slate-950 shadow-xs dark:bg-slate-900 dark:text-white'
-                                : 'text-slate-500 hover:text-slate-900 dark:text-slate-450 dark:hover:text-slate-200'
-                        }`}
+                        className={`inline-flex items-center gap-2 rounded-lg px-4 py-2 text-xs font-black uppercase tracking-wider transition cursor-pointer ${activeTab === 'manual'
+                            ? 'bg-white text-slate-950 shadow-xs dark:bg-slate-900 dark:text-white'
+                            : 'text-slate-500 hover:text-slate-900 dark:text-slate-450 dark:hover:text-slate-200'
+                            }`}
                     >
                         <PenLine className="size-4 text-emerald-600" />
                         Manual Entry

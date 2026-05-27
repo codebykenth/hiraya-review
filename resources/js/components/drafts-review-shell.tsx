@@ -1,5 +1,3 @@
-import React, { useState, useEffect } from 'react';
-import { PageContainer } from '@/components/page-container';
 import { Link } from '@inertiajs/react';
 import {
     Check,
@@ -12,6 +10,8 @@ import {
     Inbox,
     ChevronLeft
 } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { PageContainer } from '@/components/page-container';
 import { Button } from './ui/button';
 
 export interface BaseDraftItem {
@@ -78,6 +78,7 @@ export function DraftsReviewShell<T extends BaseDraftItem>({
 }: DraftsReviewShellProps<T>) {
     // Build categories tree dynamically with robust static CSC fallback
     const cseCategoriesTree: Record<string, string[]> = {};
+
     if (categories && categories.length > 0) {
         categories.forEach(cat => {
             cseCategoriesTree[cat.name] = (cat.subcategory || []).map(sub => sub.name);
@@ -127,6 +128,7 @@ export function DraftsReviewShell<T extends BaseDraftItem>({
         const handler = setTimeout(() => {
             setDebouncedFilterSearch(filterSearch);
         }, 300);
+
         return () => clearTimeout(handler);
     }, [filterSearch]);
 
@@ -343,7 +345,9 @@ export function DraftsReviewShell<T extends BaseDraftItem>({
                             type="button"
                             variant="default"
                             size="sm"
-                            onClick={() => { setFilterSearch(''); setFilterStatus('all'); setFilterCategory('all'); setFilterSubcategory('all'); }}
+                            onClick={() => {
+                                setFilterSearch(''); setFilterStatus('all'); setFilterCategory('all'); setFilterSubcategory('all');
+                            }}
                         >
                             Reset Filters
                         </Button>
@@ -376,6 +380,7 @@ export function DraftsReviewShell<T extends BaseDraftItem>({
                                         {Array.from({ length: totalPages }).map((_, idx) => {
                                             const pageNum = idx + 1;
                                             const isActive = pageNum === currentPage;
+
                                             return (
                                                 <button
                                                     key={pageNum}

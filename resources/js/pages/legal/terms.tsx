@@ -1,8 +1,8 @@
 import { Head } from '@inertiajs/react';
-import SiteHeader from '@/components/site-header';
-import SiteFooter from '@/components/site-footer';
-import { Card } from '@/components/ui/card';
 import { FileText } from 'lucide-react';
+import SiteFooter from '@/components/site-footer';
+import SiteHeader from '@/components/site-header';
+import { Card } from '@/components/ui/card';
 
 export default function Terms() {
     return (
@@ -10,7 +10,7 @@ export default function Terms() {
             <Head title="Terms of Service" />
             <div className="flex min-h-screen flex-col bg-slate-50/30 dark:bg-slate-950/20">
                 <SiteHeader activeNav="" />
-                
+
                 <main className="flex-1 py-12 px-6">
                     <div className="mx-auto max-w-4xl">
                         <div className="mb-8 flex items-center gap-4">

@@ -11,34 +11,43 @@ export default function VerifyEmail({ status }: { status?: string }) {
     const [resendCount, setResendCount] = useState<number>(() => {
         if (typeof window !== 'undefined') {
             const storedCount = sessionStorage.getItem('verifyEmailResendCount');
+
             return storedCount ? parseInt(storedCount, 10) : 0;
         }
+
         return 0;
     });
-    
+
     const [timeLeft, setTimeLeft] = useState<number>(() => {
         if (typeof window !== 'undefined') {
             const storedNextTime = sessionStorage.getItem('verifyEmailNextAllowedTime');
+
             if (storedNextTime) {
                 const nextTime = parseInt(storedNextTime, 10);
                 const remaining = Math.ceil((nextTime - Date.now()) / 1000);
+
                 return remaining > 0 ? remaining : 0;
             }
         }
+
         return 0;
     });
 
     // Countdown timer
     useEffect(() => {
-        if (timeLeft <= 0) return;
+        if (timeLeft <= 0) {
+            return;
+        }
 
         const interval = setInterval(() => {
             const storedNextTime = sessionStorage.getItem(
                 'verifyEmailNextAllowedTime',
             );
+
             if (storedNextTime) {
                 const nextTime = parseInt(storedNextTime, 10);
                 const remaining = Math.ceil((nextTime - Date.now()) / 1000);
+
                 if (remaining <= 0) {
                     setTimeLeft(0);
                 } else {
@@ -68,8 +77,10 @@ export default function VerifyEmail({ status }: { status?: string }) {
         if (seconds < 60) {
             return `${seconds}s`;
         }
+
         const mins = Math.floor(seconds / 60);
         const secs = seconds % 60;
+
         return `${mins}m ${secs < 10 ? '0' : ''}${secs}s`;
     };
 

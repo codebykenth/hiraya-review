@@ -1,5 +1,5 @@
-import React from 'react';
 import { ArrowRight } from 'lucide-react';
+import React from 'react';
 
 interface ExplanationPreviewProps {
     text: string;
@@ -20,6 +20,7 @@ export function ExplanationPreview({ text }: ExplanationPreviewProps) {
             if (match.index > lastIndex) {
                 parts.push(lineText.substring(lastIndex, match.index));
             }
+
             parts.push(
                 <strong key={match.index} className="font-black text-foreground">
                     {match[1]}
@@ -27,6 +28,7 @@ export function ExplanationPreview({ text }: ExplanationPreviewProps) {
             );
             lastIndex = boldRegex.lastIndex;
         }
+
         if (lastIndex < lineText.length) {
             parts.push(lineText.substring(lastIndex));
         }
@@ -39,6 +41,7 @@ export function ExplanationPreview({ text }: ExplanationPreviewProps) {
 
     lines.forEach((line, idx) => {
         const trimmed = line.trim();
+
         if (!trimmed) {
             return;
         }
@@ -52,6 +55,7 @@ export function ExplanationPreview({ text }: ExplanationPreviewProps) {
                     <p className="text-xs leading-relaxed text-foreground font-semibold">{content}</p>
                 </div>
             );
+
             return;
         }
 
@@ -72,6 +76,7 @@ export function ExplanationPreview({ text }: ExplanationPreviewProps) {
                     ))}
                 </div>
             );
+
             return;
         }
 
@@ -83,6 +88,7 @@ export function ExplanationPreview({ text }: ExplanationPreviewProps) {
                     <li className="font-semibold">{parseInlineBold(textVal)}</li>
                 </ul>
             );
+
             return;
         }
 

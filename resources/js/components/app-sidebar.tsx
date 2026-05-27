@@ -15,13 +15,13 @@ import {
 } from '@/components/ui/sidebar';
 import { dashboard, guide } from '@/routes';
 import { dashboard as adminDashboard } from '@/routes/admin';
-import { index as examsIndex } from '@/routes/exams';
-import { index as historyIndex } from '@/routes/history';
-import { index as drillsIndex } from '@/routes/drills';
-import { index as questionsIndex, drafts as questionsDrafts } from '@/routes/questions';
-import { index as learnIndex } from '@/routes/learn';
 import { index as adminLearnIndex, drafts as adminLearnDrafts } from '@/routes/admin/learn';
 import { index as adminUsersIndex } from '@/routes/admin/users';
+import { index as drillsIndex } from '@/routes/drills';
+import { index as examsIndex } from '@/routes/exams';
+import { index as historyIndex } from '@/routes/history';
+import { index as learnIndex } from '@/routes/learn';
+import { index as questionsIndex, drafts as questionsDrafts } from '@/routes/questions';
 
 import type { NavItem } from '@/types';
 

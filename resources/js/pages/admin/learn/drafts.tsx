@@ -1,11 +1,4 @@
-import { useState, useEffect } from 'react';
 import { Head, router } from '@inertiajs/react';
-import { 
-    index as adminLearnIndex,
-    drafts as adminLearnDrafts,
-    store as adminLearnStore,
-    destroy as adminLearnDestroy
-} from '@/routes/admin/learn';
 import {
     Check,
     X,
@@ -13,10 +6,17 @@ import {
     FileText,
     Sparkles
 } from 'lucide-react';
-import { LessonMarkdown } from '@/components/lesson-markdown';
+import { useState, useEffect } from 'react';
 import { DraftsReviewShell } from '@/components/drafts-review-shell';
 import type { CategoryItem } from '@/components/drafts-review-shell';
+import { LessonMarkdown } from '@/components/lesson-markdown';
 import { Input } from '@/components/ui/input';
+import {
+    index as adminLearnIndex,
+    drafts as adminLearnDrafts,
+    store as adminLearnStore,
+    destroy as adminLearnDestroy
+} from '@/routes/admin/learn';
 
 interface DraftModule {
     id: number;
@@ -85,12 +85,16 @@ export default function DraftsLearnList({ initialDrafts = [], categories = [] }:
 
     const handleCommitApproved = () => {
         const approvedModules = draftModules.filter(m => m.approved);
-        if (approvedModules.length === 0) return;
+
+        if (approvedModules.length === 0) {
+            return;
+        }
 
         const modulesToSave = approvedModules.map(m => {
             const copy = { ...m } as any;
             delete copy.isEditing;
             delete copy.approved;
+
             return copy;
         });
 
@@ -248,27 +252,25 @@ export default function DraftsLearnList({ initialDrafts = [], categories = [] }:
                                                 <FileText className="size-4 text-muted-foreground" />
                                                 <span className="text-[10px] font-black tracking-wider uppercase text-muted-foreground">Lesson Material Preview</span>
                                             </div>
-                                            
+
                                             <div className="inline-flex rounded-lg bg-muted p-0.5">
                                                 <button
                                                     type="button"
                                                     onClick={() => setPreviewMode(prev => ({ ...prev, [m.id]: 'preview' }))}
-                                                    className={`rounded-md px-2 py-1 text-[9.5px] font-extrabold uppercase transition cursor-pointer ${
-                                                        (previewMode[m.id] || 'preview') === 'preview'
-                                                            ? 'bg-card text-blue-600 shadow-3xs dark:text-white'
-                                                            : 'text-muted-foreground hover:text-foreground'
-                                                    }`}
+                                                    className={`rounded-md px-2 py-1 text-[9.5px] font-extrabold uppercase transition cursor-pointer ${(previewMode[m.id] || 'preview') === 'preview'
+                                                        ? 'bg-card text-blue-600 shadow-3xs dark:text-white'
+                                                        : 'text-muted-foreground hover:text-foreground'
+                                                        }`}
                                                 >
                                                     Visual Format
                                                 </button>
                                                 <button
                                                     type="button"
                                                     onClick={() => setPreviewMode(prev => ({ ...prev, [m.id]: 'raw' }))}
-                                                    className={`rounded-md px-2 py-1 text-[9.5px] font-extrabold uppercase transition cursor-pointer ${
-                                                        previewMode[m.id] === 'raw'
-                                                            ? 'bg-card text-blue-600 shadow-3xs dark:text-white'
-                                                            : 'text-muted-foreground hover:text-foreground'
-                                                    }`}
+                                                    className={`rounded-md px-2 py-1 text-[9.5px] font-extrabold uppercase transition cursor-pointer ${previewMode[m.id] === 'raw'
+                                                        ? 'bg-card text-blue-600 shadow-3xs dark:text-white'
+                                                        : 'text-muted-foreground hover:text-foreground'
+                                                        }`}
                                                 >
                                                     Raw Source
                                                 </button>

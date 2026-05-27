@@ -1,10 +1,10 @@
-import React, { useState, useEffect, useMemo } from 'react';
 import { Head, Link, router, useForm } from '@inertiajs/react';
 import { Sparkles, FileText, AlertCircle, Save, RotateCcw, Sparkle, Cpu, BookOpen, HelpCircle, CheckCircle2 } from 'lucide-react';
-import { index as questionsIndex, store as questionsStore, drafts as questionsDrafts, generate as questionsGenerate } from '@/routes/questions';
-import { SelectField } from '@/components/ui/select';
+import React, { useState, useEffect, useMemo } from 'react';
 import { CurationCreateShell } from '@/components/curation-create-shell';
 import { Button } from '@/components/ui/button';
+import { SelectField } from '@/components/ui/select';
+import { index as questionsIndex, store as questionsStore, drafts as questionsDrafts, generate as questionsGenerate } from '@/routes/questions';
 
 interface CategoryItem {
     id: number;
@@ -35,7 +35,7 @@ export default function CreateQuestion({ type = 'ai', categories = [] }: CreateP
     // Wrap cseCategoriesTree in useMemo so its reference doesn't change on every render
     const cseCategoriesTree = useMemo(() => {
         const tree: Record<string, string[]> = {};
-        
+
         if (categories && categories.length > 0) {
             categories.forEach(cat => {
                 tree[cat.name] = (cat.subcategory || []).map(sub => sub.name);
@@ -71,6 +71,7 @@ export default function CreateQuestion({ type = 'ai', categories = [] }: CreateP
                 'Spelling'
             ];
         }
+
         return tree;
     }, [categories]); // Recalculate only if categories prop changes
 
@@ -91,10 +92,12 @@ export default function CreateQuestion({ type = 'ai', categories = [] }: CreateP
     useEffect(() => {
         if (cseCategoriesTree[aiCategory]) {
             const firstSub = cseCategoriesTree[aiCategory][0];
+
             if (aiSubcategory !== firstSub) {
                 const timer = setTimeout(() => {
                     setAiSubcategory(firstSub);
                 }, 0);
+
                 return () => clearTimeout(timer);
             }
         }
@@ -116,10 +119,12 @@ export default function CreateQuestion({ type = 'ai', categories = [] }: CreateP
     useEffect(() => {
         if (cseCategoriesTree[data.category]) {
             const firstSub = cseCategoriesTree[data.category][0];
+
             if (data.subcategory !== firstSub) {
                 const timer = setTimeout(() => {
                     setData('subcategory', firstSub);
                 }, 0);
+
                 return () => clearTimeout(timer);
             }
         }
@@ -133,8 +138,14 @@ export default function CreateQuestion({ type = 'ai', categories = [] }: CreateP
 
     const handleManualSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        if (!data.stem.trim()) return;
-        if (data.options.some(opt => !opt.trim())) return;
+
+        if (!data.stem.trim()) {
+            return;
+        }
+
+        if (data.options.some(opt => !opt.trim())) {
+            return;
+        }
 
         post(questionsStore().url, {
             preserveScroll: true,
@@ -376,9 +387,8 @@ export default function CreateQuestion({ type = 'ai', categories = [] }: CreateP
                             onChange={(e) => setData('stem', e.target.value)}
                             rows={6}
                             placeholder="Enter the main question text, scenario, or analytical passage here..."
-                            className={`w-full rounded-xl border p-4 text-sm font-medium text-foreground placeholder:text-muted-foreground focus:bg-background focus:outline-none transition ${
-                                errors.stem ? 'border-red-500 focus:border-red-500' : 'border-border focus:border-blue-500'
-                            }`}
+                            className={`w-full rounded-xl border p-4 text-sm font-medium text-foreground placeholder:text-muted-foreground focus:bg-background focus:outline-none transition ${errors.stem ? 'border-red-500 focus:border-red-500' : 'border-border focus:border-blue-500'
+                                }`}
                             required
                         />
                         {errors.stem && (
@@ -404,13 +414,12 @@ export default function CreateQuestion({ type = 'ai', categories = [] }: CreateP
 
                     <div className="space-y-4">
                         {data.options.map((option, idx) => (
-                            <div 
-                                key={idx} 
-                                className={`flex items-center gap-4 rounded-xl border p-3.5 transition duration-200 ${
-                                    data.correct_option === idx 
-                                        ? 'border-emerald-250 bg-emerald-50/20' 
-                                        : 'border-border'
-                                }`}
+                            <div
+                                key={idx}
+                                className={`flex items-center gap-4 rounded-xl border p-3.5 transition duration-200 ${data.correct_option === idx
+                                    ? 'border-emerald-250 bg-emerald-50/20'
+                                    : 'border-border'
+                                    }`}
                             >
                                 <label className="flex items-center cursor-pointer">
                                     <input
@@ -422,11 +431,10 @@ export default function CreateQuestion({ type = 'ai', categories = [] }: CreateP
                                     />
                                 </label>
 
-                                <span className={`inline-flex size-7 items-center justify-center rounded-lg text-xs font-bold shrink-0 ${
-                                    data.correct_option === idx
-                                        ? 'bg-emerald-600 text-white'
-                                        : 'bg-muted text-muted-foreground'
-                                }`}>
+                                <span className={`inline-flex size-7 items-center justify-center rounded-lg text-xs font-bold shrink-0 ${data.correct_option === idx
+                                    ? 'bg-emerald-600 text-white'
+                                    : 'bg-muted text-muted-foreground'
+                                    }`}>
                                     {String.fromCharCode(65 + idx)}
                                 </span>
 
@@ -457,9 +465,8 @@ export default function CreateQuestion({ type = 'ai', categories = [] }: CreateP
                             onChange={(e) => setData('explanation', e.target.value)}
                             rows={4}
                             placeholder="Why is this the correct answer? Provide logic constraints, solution steps, or constitutional references..."
-                            className={`w-full rounded-xl border p-4 text-sm font-medium text-foreground placeholder:text-muted-foreground focus:bg-background focus:outline-none transition ${
-                                errors.explanation ? 'border-red-500' : 'border-slate-200 focus:border-blue-500'
-                            }`}
+                            className={`w-full rounded-xl border p-4 text-sm font-medium text-foreground placeholder:text-muted-foreground focus:bg-background focus:outline-none transition ${errors.explanation ? 'border-red-500' : 'border-slate-200 focus:border-blue-500'
+                                }`}
                             required
                         />
                         {errors.explanation && (
@@ -511,22 +518,20 @@ export default function CreateQuestion({ type = 'ai', categories = [] }: CreateP
                                 <button
                                     type="button"
                                     onClick={() => setData('status', 'active')}
-                                    className={`py-2 text-xs font-bold rounded-lg transition cursor-pointer ${
-                                        data.status === 'active'
-                                            ? 'bg-card text-foreground shadow-xs'
-                                            : 'text-muted-foreground hover:text-foreground'
-                                    }`}
+                                    className={`py-2 text-xs font-bold rounded-lg transition cursor-pointer ${data.status === 'active'
+                                        ? 'bg-card text-foreground shadow-xs'
+                                        : 'text-muted-foreground hover:text-foreground'
+                                        }`}
                                 >
                                     Active / Live
                                 </button>
                                 <button
                                     type="button"
                                     onClick={() => setData('status', 'draft')}
-                                    className={`py-2 text-xs font-bold rounded-lg transition cursor-pointer ${
-                                        data.status === 'draft'
-                                            ? 'bg-white text-slate-900 shadow-xs'
-                                            : 'text-slate-500 hover:text-slate-900'
-                                    }`}
+                                    className={`py-2 text-xs font-bold rounded-lg transition cursor-pointer ${data.status === 'draft'
+                                        ? 'bg-white text-slate-900 shadow-xs'
+                                        : 'text-slate-500 hover:text-slate-900'
+                                        }`}
                                 >
                                     Draft
                                 </button>
@@ -572,8 +577,8 @@ export default function CreateQuestion({ type = 'ai', categories = [] }: CreateP
             <CurationCreateShell
                 title={activeTab === 'ai' ? 'AI Question Generator' : 'Manual Question Entry'}
                 description={
-                    activeTab === 'ai' 
-                        ? 'Configure parameters to generate new exam questions.' 
+                    activeTab === 'ai'
+                        ? 'Configure parameters to generate new exam questions.'
                         : 'Create high-quality exam items with structured metadata and clear rationales.'
                 }
                 backUrl={questionsIndex().url}

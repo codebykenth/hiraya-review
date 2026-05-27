@@ -6,10 +6,10 @@ import {
     ListChecks
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import { index as questionsIndex, store as questionsStore, create as questionsCreate, destroy as questionsDestroy } from '@/routes/questions';
 import { DraftsReviewShell } from '@/components/drafts-review-shell';
 import type { CategoryItem } from '@/components/drafts-review-shell';
 import { Input } from '@/components/ui/input';
+import { index as questionsIndex, store as questionsStore, create as questionsCreate, destroy as questionsDestroy } from '@/routes/questions';
 
 interface DraftQuestion {
     id: number;
@@ -29,7 +29,9 @@ interface DraftsProps {
 }
 
 const renderFormattedText = (text: string) => {
-    if (!text) return null;
+    if (!text) {
+        return null;
+    }
 
     // Strict 1-liner comment: Pre-format continuous single-line numbered lists to newlines
     const cleanedText = text.replace(/(?:\s+|:|^)(\d+\.)\s+/g, '\n$1 ');
@@ -38,20 +40,26 @@ const renderFormattedText = (text: string) => {
     const parts = cleanedText.split(tableRegex);
 
     const formatNumberedLists = (inputText: string) => {
-        if (!inputText) return null;
+        if (!inputText) {
+            return null;
+        }
 
         const lines = inputText.split(/\n/);
         const listRegex = /^\s*(\(\d+\)|\d+\.)\s+(.+)$/;
 
         const listItems: { marker: string; text: string }[] = [];
-        let introLines: string[] = [];
-        let outroLines: string[] = [];
+        const introLines: string[] = [];
+        const outroLines: string[] = [];
 
         for (const line of lines) {
             const trimmed = line.trim();
-            if (!trimmed) continue;
+
+            if (!trimmed) {
+                continue;
+            }
 
             const match = trimmed.match(listRegex);
+
             if (match) {
                 listItems.push({ marker: match[1], text: match[2] });
             } else {
@@ -64,7 +72,9 @@ const renderFormattedText = (text: string) => {
         }
 
         const renderRichParagraph = (paraText: string, defaultClass: string = "text-muted-foreground leading-relaxed text-sm font-normal") => {
-            if (!paraText) return null;
+            if (!paraText) {
+                return null;
+            }
 
             // Strict 1-liner comment: Regex to match standard math expressions, logic arrow chains, negation states, parenthesized variables, and single letter variables
             const mathPattern = /(\b\d+(?:\.\d+)?%|\b\d+\/\d+\b|\[[^\]]+\]|\bProject\s+[A-Z]\b|\bQ[1-4]\b|(?:\b\d+(?:,\d{3})*(?:\.\d+)?\s*(?:[+*=-]|\/)\s*)+\d+(?:,\d{3})*(?:\.\d+)?%?|[~¬]?\s*\b[A-Z]\b\s*(?:->|=>)\s*[~¬]?\s*\b[A-Z]\b(?:\s*(?:->|=>)\s*[~¬]?\s*\b[A-Z]\b)*|[~¬]\s*\b[A-Z]\b|\(\s*[~¬]?\s*\b[A-Z]\b\s*\)|'\s*[~¬]?\s*\b[A-Z]\b\s*'|"\s*[~¬]?\s*\b[A-Z]\b\s*"|\b[B-H|J-N|P-Z]\b)/g;
@@ -83,6 +93,7 @@ const renderFormattedText = (text: string) => {
                         </span>
                     );
                 }
+
                 return (
                     <span className="inline-flex items-center text-xs font-bold text-blue-700 bg-blue-50 border border-blue-100 px-1.5 py-0.5 rounded-md font-mono select-all shadow-3xs dark:bg-blue-950/20 dark:border-blue-900/30 dark:text-blue-400">
                         {letter}
@@ -94,6 +105,7 @@ const renderFormattedText = (text: string) => {
                 // If it is a logic chain
                 if (token.includes('->') || token.includes('=>')) {
                     const variables = token.split(/\s*(?:->|=>)\s*/);
+
                     return (
                         <span className="inline-flex items-center gap-1 mx-1 my-0.5 bg-muted border border-border px-2 py-1 rounded-xl shadow-3xs hover:bg-muted/50 transition">
                             {variables.map((v, idx) => (
@@ -109,6 +121,7 @@ const renderFormattedText = (text: string) => {
                 // If it is parenthesized
                 if (token.startsWith('(') && token.endsWith(')')) {
                     const inner = token.slice(1, -1);
+
                     return (
                         <span className="text-muted-foreground font-semibold select-all">
                             ( {renderSingleVariable(inner)} )
@@ -119,6 +132,7 @@ const renderFormattedText = (text: string) => {
                 // If it is in single quotes
                 if (token.startsWith("'") && token.endsWith("'")) {
                     const inner = token.slice(1, -1);
+
                     return (
                         <span className="text-muted-foreground font-semibold select-all">
                             '{renderSingleVariable(inner)}'
@@ -129,6 +143,7 @@ const renderFormattedText = (text: string) => {
                 // If it is in double quotes
                 if (token.startsWith('"') && token.endsWith('"')) {
                     const inner = token.slice(1, -1);
+
                     return (
                         <span className="text-muted-foreground font-semibold select-all">
                             "{renderSingleVariable(inner)}"
@@ -156,6 +171,7 @@ const renderFormattedText = (text: string) => {
                         const innerText = isBold ? boldPart.slice(2, -2) : boldPart;
 
                         const tokens = innerText.split(mathPattern);
+
                         return (
                             <span key={bIdx}>
                                 {tokens.map((token, tIdx) => {
@@ -169,6 +185,7 @@ const renderFormattedText = (text: string) => {
                                             </span>
                                         );
                                     }
+
                                     return <span key={tIdx}>{token}</span>;
                                 })}
                             </span>
@@ -235,6 +252,7 @@ const renderFormattedText = (text: string) => {
             {parts.map((part, index) => {
                 if (part.trim().startsWith('|')) {
                     const lines = part.trim().split('\n');
+
                     if (lines.length < 2) {
                         return <p key={index} className="text-foreground whitespace-pre-wrap">{part}</p>;
                     }
@@ -298,6 +316,7 @@ export default function DraftsQuestionList({ initialDrafts = [], categories = []
         const timer = setTimeout(() => {
             setDraftQuestions(initialDrafts);
         }, 0);
+
         return () => clearTimeout(timer);
     }, [initialDrafts]);
 
@@ -341,8 +360,10 @@ export default function DraftsQuestionList({ initialDrafts = [], categories = []
             if (q.id === id) {
                 const newOpts = [...q.options];
                 newOpts[optIdx] = val;
+
                 return { ...q, options: newOpts };
             }
+
             return q;
         }));
     };
@@ -353,12 +374,16 @@ export default function DraftsQuestionList({ initialDrafts = [], categories = []
 
     const handleCommitApproved = () => {
         const approvedQuestions = draftQuestions.filter(q => q.approved);
-        if (approvedQuestions.length === 0) return;
+
+        if (approvedQuestions.length === 0) {
+            return;
+        }
 
         const questionsToSave = approvedQuestions.map(q => {
             const copy = { ...q } as any;
             delete copy.isEditing;
             delete copy.approved;
+
             return copy;
         });
 
@@ -398,8 +423,8 @@ export default function DraftsQuestionList({ initialDrafts = [], categories = []
                     <div
                         key={q.id}
                         className={`rounded-2xl border transition duration-205 bg-card p-6 shadow-xs ${q.approved
-                                ? 'border-emerald-250 ring-1 ring-emerald-500/10 shadow-emerald-50/10 dark:border-emerald-800'
-                                : 'border-border hover:border-slate-350 dark:hover:border-slate-700'
+                            ? 'border-emerald-250 ring-1 ring-emerald-500/10 shadow-emerald-50/10 dark:border-emerald-800'
+                            : 'border-border hover:border-slate-350 dark:hover:border-slate-700'
                             }`}
                     >
                         {/* Card Header metadata */}
@@ -428,8 +453,8 @@ export default function DraftsQuestionList({ initialDrafts = [], categories = []
                                     type="button"
                                     onClick={() => toggleApproveDraft(q.id)}
                                     className={`p-1.5 rounded-lg border transition cursor-pointer ${q.approved
-                                            ? 'bg-emerald-50 border-emerald-200 text-emerald-700 dark:bg-emerald-950/40 dark:border-emerald-800 dark:text-emerald-400'
-                                            : 'bg-card border-border text-muted-foreground hover:text-foreground'
+                                        ? 'bg-emerald-50 border-emerald-200 text-emerald-700 dark:bg-emerald-950/40 dark:border-emerald-800 dark:text-emerald-400'
+                                        : 'bg-card border-border text-muted-foreground hover:text-foreground'
                                         }`}
                                     title={q.approved ? "Approved (Click to Unapprove)" : "Mark Approved"}
                                 >
@@ -439,8 +464,8 @@ export default function DraftsQuestionList({ initialDrafts = [], categories = []
                                     type="button"
                                     onClick={() => toggleEditDraft(q.id)}
                                     className={`p-1.5 rounded-lg border transition cursor-pointer ${q.isEditing
-                                            ? 'bg-blue-50 border-blue-200 text-blue-700 dark:bg-blue-950/40 dark:border-blue-800 dark:text-blue-400'
-                                            : 'bg-card border-border text-muted-foreground hover:text-foreground'
+                                        ? 'bg-blue-50 border-blue-200 text-blue-700 dark:bg-blue-950/40 dark:border-blue-800 dark:text-blue-400'
+                                        : 'bg-card border-border text-muted-foreground hover:text-foreground'
                                         }`}
                                     title="Edit Draft Inline"
                                 >
@@ -478,6 +503,7 @@ export default function DraftsQuestionList({ initialDrafts = [], categories = []
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
                             {q.options.map((opt, optIdx) => {
                                 const isCorrect = q.correct_option === optIdx;
+
                                 return (
                                     <div key={optIdx} className="relative flex items-center">
                                         {q.isEditing ? (
@@ -501,14 +527,14 @@ export default function DraftsQuestionList({ initialDrafts = [], categories = []
                                                 type="button"
                                                 onClick={() => handleUpdateDraftCorrectOption(q.id, optIdx)}
                                                 className={`flex w-full items-center justify-between rounded-xl border px-4 py-3 text-left transition ${isCorrect
-                                                        ? 'bg-emerald-50/70 border-emerald-250 text-emerald-950 dark:text-emerald-400 dark:bg-emerald-950/20 dark:border-emerald-900/40 font-bold'
-                                                        : 'bg-muted border-border hover:border-slate-200 text-foreground font-semibold'
+                                                    ? 'bg-emerald-50/70 border-emerald-250 text-emerald-950 dark:text-emerald-400 dark:bg-emerald-950/20 dark:border-emerald-900/40 font-bold'
+                                                    : 'bg-muted border-border hover:border-slate-200 text-foreground font-semibold'
                                                     }`}
                                             >
                                                 <div className="flex gap-2.5 items-center">
                                                     <span className={`inline-flex size-6 shrink-0 items-center justify-center rounded-lg text-xs font-bold ${isCorrect
-                                                            ? 'bg-emerald-600 text-white dark:bg-emerald-400'
-                                                            : 'bg-muted text-muted-foreground'
+                                                        ? 'bg-emerald-600 text-white dark:bg-emerald-400'
+                                                        : 'bg-muted text-muted-foreground'
                                                         }`}>
                                                         {String.fromCharCode(65 + optIdx)}
                                                     </span>

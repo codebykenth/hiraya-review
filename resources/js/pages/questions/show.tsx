@@ -1,21 +1,20 @@
-import React from 'react';
-import { PageContainer } from '@/components/page-container';
-import { PageHeader } from '@/components/page-header';
 import { Head, Link } from '@inertiajs/react';
-import { 
-    ChevronLeft, 
-    PenLine, 
-    HelpCircle, 
-    Sparkles, 
-    Globe, 
-    Layers, 
-    Activity 
+import {
+    ChevronLeft,
+    PenLine,
+    HelpCircle,
+    Sparkles,
+    Globe,
+    Layers,
+    Activity
 } from 'lucide-react';
-import { index as questionsIndex, edit as questionsEdit } from '@/routes/questions';
 import { getCategoryStyles } from '@/components/curation-index-shell';
 import { ExplanationPreview } from '@/components/explanation-preview';
+import { PageContainer } from '@/components/page-container';
+import { PageHeader } from '@/components/page-header';
 
 import { Button } from '@/components/ui/button';
+import { index as questionsIndex, edit as questionsEdit } from '@/routes/questions';
 
 interface QuestionItem {
     id: number;
@@ -38,7 +37,7 @@ export default function QuestionShow({ question }: QuestionShowProps) {
         <>
             <Head title={`Question Details #${question.id}`} />
             <PageContainer>
-                
+
                 {/* Back Link */}
                 <Link
                     href={questionsIndex().url}
@@ -70,7 +69,7 @@ export default function QuestionShow({ question }: QuestionShowProps) {
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     {/* Left & Middle Column: Question Stem & Choices */}
                     <div className="lg:col-span-2 space-y-6">
-                        
+
                         {/* 1. Main Question Card */}
                         <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
                             <div className="flex items-center justify-between border-b border-border pb-3.5 mb-5">
@@ -78,7 +77,7 @@ export default function QuestionShow({ question }: QuestionShowProps) {
                                     <HelpCircle className="size-4.5 text-blue-600" />
                                     Exam Practice Question
                                 </span>
-                                
+
                                 <span className={`inline-flex rounded-md border px-2 py-0.5 text-[9px] font-extrabold tracking-wide uppercase ${getCategoryStyles(question.category)}`}>
                                     {question.category}
                                 </span>
@@ -93,30 +92,28 @@ export default function QuestionShow({ question }: QuestionShowProps) {
                             <div className="space-y-3">
                                 {question.options.map((option, idx) => {
                                     const isCorrect = question.correct_option === idx;
+
                                     return (
-                                        <div 
-                                            key={idx} 
-                                            className={`flex items-center gap-4 rounded-xl border p-4 transition duration-200 ${
-                                                isCorrect 
-                                                    ? 'border-emerald-250 bg-emerald-50/20 dark:border-emerald-800 dark:bg-emerald-950/10' 
-                                                    : 'border-border'
-                                            }`}
+                                        <div
+                                            key={idx}
+                                            className={`flex items-center gap-4 rounded-xl border p-4 transition duration-200 ${isCorrect
+                                                ? 'border-emerald-250 bg-emerald-50/20 dark:border-emerald-800 dark:bg-emerald-950/10'
+                                                : 'border-border'
+                                                }`}
                                         >
                                             {/* Choice Index Badge */}
-                                            <span className={`inline-flex size-7 items-center justify-center rounded-lg text-xs font-black shrink-0 ${
-                                                isCorrect
-                                                    ? 'bg-emerald-600 text-white'
-                                                    : 'bg-muted text-muted-foreground'
-                                            }`}>
+                                            <span className={`inline-flex size-7 items-center justify-center rounded-lg text-xs font-black shrink-0 ${isCorrect
+                                                ? 'bg-emerald-600 text-white'
+                                                : 'bg-muted text-muted-foreground'
+                                                }`}>
                                                 {String.fromCharCode(65 + idx)}
                                             </span>
 
                                             {/* Option text */}
-                                            <span className={`text-xs font-semibold leading-relaxed ${
-                                                isCorrect 
-                                                    ? 'text-foreground font-extrabold' 
-                                                    : 'text-muted-foreground'
-                                            }`}>
+                                            <span className={`text-xs font-semibold leading-relaxed ${isCorrect
+                                                ? 'text-foreground font-extrabold'
+                                                : 'text-muted-foreground'
+                                                }`}>
                                                 {option}
                                             </span>
 
@@ -145,7 +142,7 @@ export default function QuestionShow({ question }: QuestionShowProps) {
 
                     {/* Right Column: Metadata details card */}
                     <div className="space-y-6">
-                        
+
                         {/* Summary specifications card */}
                         <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
                             <h2 className="text-xs font-black text-foreground uppercase tracking-wider block mb-4 border-b border-border pb-3">

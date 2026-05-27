@@ -1,11 +1,11 @@
 import { Head, useForm } from '@inertiajs/react';
-import SiteHeader from '@/components/site-header';
-import SiteFooter from '@/components/site-footer';
-import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Mail, MessageSquare, ShieldAlert, ArrowRight } from 'lucide-react';
-import { Input } from '@/components/ui/input';
 import { useState } from 'react';
+import SiteFooter from '@/components/site-footer';
+import SiteHeader from '@/components/site-header';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
 import { store as supportStore } from '@/routes/support';
 
 export default function Support() {

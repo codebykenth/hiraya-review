@@ -1,16 +1,16 @@
 import { Head, Link, usePage } from '@inertiajs/react';
-import { PageContainer } from '@/components/page-container';
-import { Card } from '@/components/ui/card';
-import { 
-    Shield, 
-    FileQuestion, 
-    ListChecks, 
-    Users, 
-    Database, 
-    Layers, 
+import {
+    Shield,
+    FileQuestion,
+    ListChecks,
+    Users,
+    Database,
+    Layers,
     TrendingUp,
     Activity
 } from 'lucide-react';
+import { PageContainer } from '@/components/page-container';
+import { Card } from '@/components/ui/card';
 import { index as questionsIndex, drafts as questionsDrafts } from '@/routes/questions';
 
 // Strongly typed dashboard props
@@ -65,7 +65,7 @@ export default function AdminDashboard({ metrics, recentAttempts = [], categorie
         <>
             <Head title="Admin Dashboard" />
             <PageContainer>
-                
+
                 {/* 1. WELCOME & BANNER */}
                 <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                     <div>
@@ -176,7 +176,7 @@ export default function AdminDashboard({ metrics, recentAttempts = [], categorie
 
                 {/* 3. SPLIT PANE ANALYSIS: ATTEMPTS & SYLLABUS DISPERSAL */}
                 <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-                    
+
                     {/* Left Column: Recent Examinee Attempts */}
                     <Card className="p-6 shadow-xs lg:col-span-2">
                         <div className="flex items-center justify-between mb-5">
@@ -212,13 +212,12 @@ export default function AdminDashboard({ metrics, recentAttempts = [], categorie
                                             <div className="text-right">
                                                 <span className="text-[10px] font-extrabold text-slate-500 block">{attempt.category}</span>
                                             </div>
-                                            <span className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-black ${
-                                                attempt.percentage >= 80 
-                                                    ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400' 
-                                                    : attempt.percentage >= 70 
-                                                    ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-950/30 dark:text-indigo-400'
-                                                    : 'bg-rose-50 text-rose-700 dark:bg-rose-950/30 dark:text-rose-400'
-                                            }`}>
+                                            <span className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-black ${attempt.percentage >= 80
+                                                    ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400'
+                                                    : attempt.percentage >= 70
+                                                        ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-950/30 dark:text-indigo-400'
+                                                        : 'bg-rose-50 text-rose-700 dark:bg-rose-950/30 dark:text-rose-400'
+                                                }`}>
                                                 {attempt.percentage}%
                                             </span>
                                         </div>
@@ -245,7 +244,7 @@ export default function AdminDashboard({ metrics, recentAttempts = [], categorie
                                 {categoriesStats.map((cat) => {
                                     const total = metrics.total_questions || 1;
                                     const pct = Math.round((cat.question_count / total) * 100);
-                                    
+
                                     return (
                                         <div key={cat.id} className="flex flex-col gap-1.5">
                                             <div className="flex items-center justify-between text-[11px] font-bold">
@@ -253,7 +252,7 @@ export default function AdminDashboard({ metrics, recentAttempts = [], categorie
                                                 <span className="text-slate-900 dark:text-white">{cat.question_count} Qs ({pct}%)</span>
                                             </div>
                                             <div className="h-1.5 w-full rounded-full bg-slate-50 dark:bg-slate-900 border border-slate-100/50 dark:border-slate-900">
-                                                <div 
+                                                <div
                                                     className="h-full rounded-full bg-gradient-to-r from-blue-500 to-blue-600 transition-all duration-500"
                                                     style={{ width: `${Math.max(3, pct)}%` }}
                                                 />

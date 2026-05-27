@@ -1,22 +1,23 @@
-import { useState, useEffect } from 'react';
-import { PageContainer } from '@/components/page-container';
 import { Head, router, usePage } from '@inertiajs/react';
-import { 
-    Search, 
-    Shield, 
-    Users, 
-    UserPlus, 
-    Trash2, 
+import {
+    Search,
+    Shield,
+    Users,
+    UserPlus,
+    Trash2,
     Calendar,
     Activity,
     ChevronDown
 } from 'lucide-react';
-import { 
+import { useState, useEffect } from 'react';
+import type { TableColumn } from '@/components/admin-table';
+import { AdminTable } from '@/components/admin-table';
+import { ConfirmModal } from '@/components/confirm-modal';
+import { PageContainer } from '@/components/page-container';
+import { Input } from '@/components/ui/input';
+import {
     index as adminUsersIndex
 } from '@/routes/admin/users';
-import { ConfirmModal } from '@/components/confirm-modal';
-import { AdminTable, TableColumn } from '@/components/admin-table';
-import { Input } from '@/components/ui/input';
 
 interface UserItem {
     id: number;
@@ -53,6 +54,7 @@ export default function AdminUsersIndex({ users = [], stats }: AdminUsersIndexPr
         const handler = setTimeout(() => {
             setDebouncedSearchTerm(searchTerm);
         }, 300);
+
         return () => clearTimeout(handler);
     }, [searchTerm]);
 
@@ -70,7 +72,7 @@ export default function AdminUsersIndex({ users = [], stats }: AdminUsersIndexPr
         message: '',
         confirmLabel: '',
         variant: 'success',
-        onConfirm: () => {},
+        onConfirm: () => { },
     });
 
     const handleRoleChange = (user: UserItem, targetRole: 'admin' | 'student') => {
@@ -82,8 +84,9 @@ export default function AdminUsersIndex({ users = [], stats }: AdminUsersIndexPr
                 message: 'You cannot demote yourself from administrative status. This is to ensure you maintain access to this dashboard.',
                 confirmLabel: 'Understood',
                 variant: 'info',
-                onConfirm: () => {},
+                onConfirm: () => { },
             });
+
             return;
         }
 
@@ -112,8 +115,9 @@ export default function AdminUsersIndex({ users = [], stats }: AdminUsersIndexPr
                 message: 'You cannot delete the active administrator account you are currently logged into.',
                 confirmLabel: 'Understood',
                 variant: 'info',
-                onConfirm: () => {},
+                onConfirm: () => { },
             });
+
             return;
         }
 
@@ -132,14 +136,14 @@ export default function AdminUsersIndex({ users = [], stats }: AdminUsersIndexPr
     };
 
     const filteredUsers = users.filter((u) => {
-        const matchesSearch = 
+        const matchesSearch =
             u.name.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
             u.email.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
             String(u.id).includes(debouncedSearchTerm);
 
-        const matchesRole = 
-            selectedRole === 'All Roles' || 
-            (selectedRole === 'Admins' && u.role === 'admin') || 
+        const matchesRole =
+            selectedRole === 'All Roles' ||
+            (selectedRole === 'Admins' && u.role === 'admin') ||
             (selectedRole === 'Students' && u.role === 'student');
 
         return matchesSearch && matchesRole;
@@ -220,7 +224,7 @@ export default function AdminUsersIndex({ users = [], stats }: AdminUsersIndexPr
                             <Shield className="size-4" />
                         </button>
                     )}
-                    
+
                     <button
                         onClick={() => handleDeleteUser(u)}
                         disabled={u.id === currentUser.id}
@@ -239,7 +243,7 @@ export default function AdminUsersIndex({ users = [], stats }: AdminUsersIndexPr
             <Head title="User Management" />
 
             <PageContainer>
-                
+
                 {/* 1. METRICS DASHBOARD CARDS */}
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
                     {/* Total Registered */}
@@ -343,8 +347,8 @@ export default function AdminUsersIndex({ users = [], stats }: AdminUsersIndexPr
                         </div>
 
                         <span className="text-xs font-bold text-muted-foreground shrink-0 pl-1 text-right md:text-left block mt-1 md:mt-0">
-                            {filteredUsers.length === 0 
-                                ? 'No matches' 
+                            {filteredUsers.length === 0
+                                ? 'No matches'
                                 : `${filteredUsers.length} user${filteredUsers.length === 1 ? '' : 's'}`}
                         </span>
                     </div>

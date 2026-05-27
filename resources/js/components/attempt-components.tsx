@@ -1,11 +1,10 @@
-import React from 'react';
 import { CheckCircle2, XCircle } from 'lucide-react';
 
 export function TrackBadge({ track }: { track: string }) {
     const lowerTrack = track.toLowerCase();
     let trackLabel = track;
     let trackClass = '';
-    
+
     if (lowerTrack.includes('subprofessional')) {
         trackLabel = 'Subprofessional';
         trackClass = 'bg-slate-150 text-slate-700 dark:bg-slate-800 dark:text-slate-300';
@@ -16,7 +15,7 @@ export function TrackBadge({ track }: { track: string }) {
         trackLabel = 'Drill';
         trackClass = 'bg-emerald-600 text-white dark:bg-emerald-750';
     }
-    
+
     return (
         <span className={`inline-flex rounded-full px-2.5 py-0.5 text-[10px] font-extrabold uppercase ${trackClass}`}>
             {trackLabel}
@@ -79,19 +78,21 @@ export function ScoreProgress({
     const scoreColor = isPass
         ? 'text-emerald-700 dark:text-emerald-450'
         : isFail
-        ? 'text-rose-650 dark:text-rose-400'
-        : 'text-blue-655 dark:text-blue-450';
+            ? 'text-rose-650 dark:text-rose-400'
+            : 'text-blue-655 dark:text-blue-450';
 
     const scoreBarColor = isPass
         ? 'bg-emerald-600'
         : isFail
-        ? 'bg-rose-600'
-        : 'bg-blue-600';
+            ? 'bg-rose-600'
+            : 'bg-blue-600';
 
     // Parse fraction from detail string if available (e.g. "68/170 Correct" or "11/150")
     let fraction = '';
+
     if (detail) {
         const match = detail.match(/(\d+\/\d+)/);
+
         if (match) {
             fraction = match[1];
         }
@@ -118,7 +119,7 @@ export function ScoreProgress({
                     />
                 </div>
             </div>
-            
+
             {categoryScores && categoryScores.length > 0 && (
                 <div className="flex max-w-[24rem] flex-wrap gap-1.5">
                     {categoryScores.map((cat) => (

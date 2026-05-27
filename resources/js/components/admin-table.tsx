@@ -53,13 +53,14 @@ export function AdminTable<T>({
                             {title}
                         </span>
                     )}
-                    
+
                     {legend && legend.length > 0 && (
                         <div className="flex flex-wrap items-center gap-3 text-[10px] font-extrabold uppercase tracking-wider">
                             <span className="text-slate-400/80">Legend:</span>
                             {legend.map((item, idx) => {
                                 let badgeClass = '';
                                 let iconWrapperClass = '';
+
                                 switch (item.variant) {
                                     case 'amber':
                                         badgeClass = 'bg-amber-50/50 dark:bg-amber-950/10 border-amber-100 dark:border-amber-900/20 text-amber-800 dark:text-amber-300';
@@ -85,6 +86,7 @@ export function AdminTable<T>({
                                         badgeClass = 'bg-slate-50/50 dark:bg-slate-900/10 border-slate-200 dark:border-slate-800/40 text-slate-700 dark:text-slate-300';
                                         iconWrapperClass = 'border-slate-300 bg-slate-100 text-slate-600 dark:border-slate-850 dark:bg-slate-900 dark:text-slate-400';
                                 }
+
                                 return (
                                     <div key={idx} className={`flex items-center gap-1.5 px-2 py-1 rounded-lg border ${badgeClass}`}>
                                         <span className={`flex size-5.5 items-center justify-center rounded-md border ${iconWrapperClass}`}>
@@ -149,7 +151,7 @@ export function AdminTable<T>({
                     <span className="text-xs font-bold text-slate-555 dark:text-slate-400">
                         Showing <strong className="text-slate-900 dark:text-white">{(currentPage - 1) * pageSize + 1}</strong> to <strong className="text-slate-900 dark:text-white">{Math.min(currentPage * pageSize, totalItems)}</strong> of <strong className="text-slate-900 dark:text-white">{totalItems}</strong> results
                     </span>
-                    
+
                     {totalPages > 1 && onPageChange && (
                         <div className="flex items-center gap-1.5">
                             <Button
@@ -165,17 +167,17 @@ export function AdminTable<T>({
                             {Array.from({ length: totalPages }).map((_, idx) => {
                                 const pageNum = idx + 1;
                                 const isActive = pageNum === currentPage;
+
                                 return (
                                     <Button
                                         key={pageNum}
                                         variant={isActive ? 'default' : 'outline'}
                                         size="sm"
                                         onClick={() => onPageChange(pageNum)}
-                                        className={`size-8 p-0 text-xs font-black transition cursor-pointer focus:outline-none ${
-                                            isActive
-                                                ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-3xs'
-                                                : 'border-slate-200 bg-white text-slate-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-350 dark:hover:bg-slate-850'
-                                        }`}
+                                        className={`size-8 p-0 text-xs font-black transition cursor-pointer focus:outline-none ${isActive
+                                            ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-3xs'
+                                            : 'border-slate-200 bg-white text-slate-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-350 dark:hover:bg-slate-850'
+                                            }`}
                                     >
                                         {pageNum}
                                     </Button>

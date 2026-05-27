@@ -1,20 +1,20 @@
 import { Head, Link, router } from '@inertiajs/react';
-import { 
-    Eye, 
-    Edit2, 
+import {
+    Eye,
+    Edit2,
     Trash2,
     FileQuestion
 } from 'lucide-react';
-import { 
-    index as questionsIndex, 
+import type { TableColumn } from '@/components/admin-table';
+import { CurationIndexShell, getCategoryStyles } from '@/components/curation-index-shell';
+import type { CategoryItem } from '@/components/drafts-review-shell';
+import {
+    index as questionsIndex,
     create as questionsCreate,
     edit as questionsEdit,
     destroy as questionsDestroy,
     show as questionsShow
 } from '@/routes/questions';
-import { CurationIndexShell, getCategoryStyles } from '@/components/curation-index-shell';
-import { TableColumn } from '@/components/admin-table';
-import { CategoryItem } from '@/components/drafts-review-shell';
 
 interface QuestionItem {
     id: number;

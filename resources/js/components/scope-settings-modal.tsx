@@ -1,5 +1,5 @@
-import React from 'react';
 import { X, Database, Plus, Trash2 } from 'lucide-react';
+import React from 'react';
 
 export interface CategoryItem {
     id: number;
@@ -41,7 +41,9 @@ export function ScopeSettingsModal({
     handleAddSubcategory,
     handleDeleteSubcategory
 }: ScopeSettingsModalProps) {
-    if (!isOpen) return null;
+    if (!isOpen) {
+        return null;
+    }
 
     const activeCategory = categories.find(c => c.id === selectedScopeCategory);
 
@@ -57,7 +59,7 @@ export function ScopeSettingsModal({
                         </h2>
                         <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Customize your exam blueprint and automatically tune the Gemini AI review questions writer.</p>
                     </div>
-                    <button 
+                    <button
                         type="button"
                         onClick={onClose}
                         className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-900 dark:hover:text-slate-250 transition"
@@ -71,18 +73,18 @@ export function ScopeSettingsModal({
                     {/* Left Column: Categories List */}
                     <div className="w-1/2 border-r border-slate-100 dark:border-slate-900 flex flex-col p-6 overflow-y-auto">
                         <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mb-3.5">Categories</h3>
-                        
+
                         <form onSubmit={handleAddCategory} className="flex gap-2 mb-4">
-                            <input 
-                                type="text" 
+                            <input
+                                type="text"
                                 placeholder="Add new category..."
                                 value={newCategoryName}
                                 onChange={(e) => setNewCategoryName(e.target.value)}
                                 className="flex-1 rounded-xl border border-slate-250 bg-white px-3.5 py-2 text-sm font-semibold text-slate-800 placeholder:text-slate-400 focus:border-blue-500 focus:outline-none transition dark:border-slate-800 dark:bg-slate-900 dark:text-white"
                                 required
                             />
-                            <button 
-                                type="submit" 
+                            <button
+                                type="submit"
                                 className="inline-flex items-center justify-center rounded-xl bg-blue-600 px-4 text-sm font-bold text-white transition hover:bg-blue-700 active:bg-blue-800 shadow-3xs cursor-pointer shrink-0"
                             >
                                 <Plus className="size-4" />
@@ -91,14 +93,13 @@ export function ScopeSettingsModal({
 
                         <div className="space-y-2 flex-1">
                             {categories.map(cat => (
-                                <div 
-                                    key={cat.id} 
+                                <div
+                                    key={cat.id}
                                     onClick={() => setSelectedScopeCategory(cat.id)}
-                                    className={`flex items-center justify-between rounded-xl border p-3 cursor-pointer transition select-none ${
-                                        selectedScopeCategory === cat.id 
-                                            ? 'border-blue-200 bg-blue-50/50 text-blue-900 shadow-3xs dark:border-blue-900/40 dark:bg-blue-950/20 dark:text-blue-200' 
-                                            : 'border-slate-150 bg-white text-slate-700 hover:bg-slate-50 dark:border-slate-850 dark:bg-slate-950 dark:text-slate-300 dark:hover:bg-slate-900'
-                                    }`}
+                                    className={`flex items-center justify-between rounded-xl border p-3 cursor-pointer transition select-none ${selectedScopeCategory === cat.id
+                                        ? 'border-blue-200 bg-blue-50/50 text-blue-900 shadow-3xs dark:border-blue-900/40 dark:bg-blue-950/20 dark:text-blue-200'
+                                        : 'border-slate-150 bg-white text-slate-700 hover:bg-slate-50 dark:border-slate-850 dark:bg-slate-950 dark:text-slate-300 dark:hover:bg-slate-900'
+                                        }`}
                                 >
                                     <span className="text-sm font-semibold truncate pr-2">
                                         {cat.name}
@@ -107,7 +108,7 @@ export function ScopeSettingsModal({
                                         <span className="rounded-md bg-slate-100 px-1.5 py-0.5 text-[10px] font-bold text-slate-500 dark:bg-slate-900 dark:text-slate-450">
                                             {(cat.subcategory || []).length} subs
                                         </span>
-                                        <button 
+                                        <button
                                             type="button"
                                             onClick={(e) => {
                                                 e.stopPropagation();
@@ -132,16 +133,16 @@ export function ScopeSettingsModal({
                         {selectedScopeCategory ? (
                             <>
                                 <form onSubmit={handleAddSubcategory} className="flex gap-2 mb-4">
-                                    <input 
-                                        type="text" 
+                                    <input
+                                        type="text"
                                         placeholder="Add new subcategory..."
                                         value={newSubcategoryName}
                                         onChange={(e) => setNewSubcategoryName(e.target.value)}
                                         className="flex-1 rounded-xl border border-slate-250 bg-white px-3.5 py-2 text-sm font-semibold text-slate-800 placeholder:text-slate-400 focus:border-blue-500 focus:outline-none transition dark:border-slate-800 dark:bg-slate-900 dark:text-white"
                                         required
                                     />
-                                    <button 
-                                        type="submit" 
+                                    <button
+                                        type="submit"
                                         className="inline-flex items-center justify-center rounded-xl bg-blue-600 px-4 text-sm font-bold text-white transition hover:bg-blue-700 active:bg-blue-800 shadow-3xs cursor-pointer shrink-0"
                                     >
                                         <Plus className="size-4" />
@@ -150,14 +151,14 @@ export function ScopeSettingsModal({
 
                                 <div className="space-y-2 flex-1">
                                     {((activeCategory?.subcategory) || []).map(sub => (
-                                        <div 
-                                            key={sub.id} 
+                                        <div
+                                            key={sub.id}
                                             className="flex items-center justify-between rounded-xl border border-slate-150 bg-white p-3 text-slate-700 shadow-3xs dark:border-slate-850 dark:bg-slate-950 dark:text-slate-300"
                                         >
                                             <span className="text-sm font-medium truncate pr-2">
                                                 {sub.name}
                                             </span>
-                                            <button 
+                                            <button
                                                 type="button"
                                                 onClick={() => handleDeleteSubcategory(sub.id)}
                                                 className="rounded-lg p-1 text-slate-400 hover:bg-red-50 hover:text-red-600 dark:hover:bg-slate-900 transition shrink-0 cursor-pointer"

@@ -1,10 +1,4 @@
 import { Head, Link, usePage } from '@inertiajs/react';
-import { useState } from 'react';
-import SiteHeader from '@/components/site-header';
-import SiteFooter from '@/components/site-footer';
-import AppLayout from '@/layouts/app-layout';
-import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import {
     Compass,
     BookOpen,
@@ -19,6 +13,12 @@ import {
     Lightbulb,
     Info
 } from 'lucide-react';
+import { useState } from 'react';
+import SiteFooter from '@/components/site-footer';
+import SiteHeader from '@/components/site-header';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import AppLayout from '@/layouts/app-layout';
 import type { Auth } from '@/types';
 
 type PageProps = {
@@ -152,31 +152,28 @@ export default function Guide() {
             <div className="flex border-b border-border">
                 <button
                     onClick={() => setActiveTab('flow')}
-                    className={`border-b-2 px-5 py-3 text-sm font-semibold transition-all ${
-                        activeTab === 'flow'
-                            ? 'border-primary text-primary font-bold'
-                            : 'border-transparent text-muted-foreground hover:text-foreground'
-                    }`}
+                    className={`border-b-2 px-5 py-3 text-sm font-semibold transition-all ${activeTab === 'flow'
+                        ? 'border-primary text-primary font-bold'
+                        : 'border-transparent text-muted-foreground hover:text-foreground'
+                        }`}
                 >
                     Reviewer Study Flow
                 </button>
                 <button
                     onClick={() => setActiveTab('structure')}
-                    className={`border-b-2 px-5 py-3 text-sm font-semibold transition-all ${
-                        activeTab === 'structure'
-                            ? 'border-primary text-primary font-bold'
-                            : 'border-transparent text-muted-foreground hover:text-foreground'
-                    }`}
+                    className={`border-b-2 px-5 py-3 text-sm font-semibold transition-all ${activeTab === 'structure'
+                        ? 'border-primary text-primary font-bold'
+                        : 'border-transparent text-muted-foreground hover:text-foreground'
+                        }`}
                 >
                     CSE Exam Structure
                 </button>
                 <button
                     onClick={() => setActiveTab('tips')}
-                    className={`border-b-2 px-5 py-3 text-sm font-semibold transition-all ${
-                        activeTab === 'tips'
-                            ? 'border-primary text-primary font-bold'
-                            : 'border-transparent text-muted-foreground hover:text-foreground'
-                    }`}
+                    className={`border-b-2 px-5 py-3 text-sm font-semibold transition-all ${activeTab === 'tips'
+                        ? 'border-primary text-primary font-bold'
+                        : 'border-transparent text-muted-foreground hover:text-foreground'
+                        }`}
                 >
                     Smart Study Tips
                 </button>

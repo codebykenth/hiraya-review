@@ -1,7 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { PageContainer } from '@/components/page-container';
 import { Head, Link, router, setLayoutProps } from '@inertiajs/react';
-import { index as examsIndex } from '@/routes/exams';
 import {
     Award,
     ClipboardList,
@@ -25,6 +22,9 @@ import {
     Calculator,
     Users
 } from 'lucide-react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { PageContainer } from '@/components/page-container';
+import { index as examsIndex } from '@/routes/exams';
 
 interface Question {
     id: number;
@@ -66,18 +66,23 @@ const extractPropositions = (stem: string) => {
         let phrase = parts[parts.length - 1].trim();
 
         phrase = phrase.replace(/^(?:a|an|the|they|he|she|it|to)\s+/i, '');
+
         if (phrase) {
             phrase = phrase.charAt(0).toUpperCase() + phrase.slice(1);
+
             if (!matches.some(m => m.letter === letter)) {
                 matches.push({ letter, phrase });
             }
         }
     }
+
     return matches;
 };
 
 const renderFormattedText = (text: string, stripLogicSymbols: boolean = false, letterMap?: Record<string, string>) => {
-    if (!text) return null;
+    if (!text) {
+        return null;
+    }
 
     // Strict 1-liner comment: Dynamically strip parenthesized logical variable markers if requested
     const processedText = stripLogicSymbols ? text.replace(/\s*\(\s*[~¬]?\s*[A-Z]\s*\)/g, '') : text;
@@ -89,20 +94,26 @@ const renderFormattedText = (text: string, stripLogicSymbols: boolean = false, l
     const parts = cleanedText.split(tableRegex);
 
     const formatNumberedLists = (inputText: string) => {
-        if (!inputText) return null;
+        if (!inputText) {
+            return null;
+        }
 
         const lines = inputText.split(/\n/);
         const listRegex = /^\s*(\(\d+\)|\d+\.)\s+(.+)$/;
 
         const listItems: { marker: string; text: string }[] = [];
-        let introLines: string[] = [];
-        let outroLines: string[] = [];
+        const introLines: string[] = [];
+        const outroLines: string[] = [];
 
         for (const line of lines) {
             const trimmed = line.trim();
-            if (!trimmed) continue;
+
+            if (!trimmed) {
+                continue;
+            }
 
             const match = trimmed.match(listRegex);
+
             if (match) {
                 listItems.push({ marker: match[1], text: match[2] });
             } else {
@@ -115,7 +126,9 @@ const renderFormattedText = (text: string, stripLogicSymbols: boolean = false, l
         }
 
         const renderRichParagraph = (paraText: string, defaultClass: string = "text-slate-655 leading-relaxed text-base font-medium") => {
-            if (!paraText) return null;
+            if (!paraText) {
+                return null;
+            }
 
             // Strict 1-liner comment: Regex to match standard math expressions, logic arrow chains, negation states, parenthesized variables, and single letter variables
             const mathPattern = /(\b\d+(?:\.\d+)?%|\b\d+\/\d+\b|\[[^\]]+\]|\bProject\s+[A-Z]\b|\bQ[1-4]\b|(?:\b\d+(?:,\d{3})*(?:\.\d+)?\s*[+\-*/=]\s*)+\d+(?:,\d{3})*(?:\.\d+)?%?|[~¬]?\s*\b[A-Z]\b\s*(?:->|=>)\s*[~¬]?\s*\b[A-Z]\b(?:\s*(?:->|=>)\s*[~¬]?\s*\b[A-Z]\b)*|[~¬]\s*\b[A-Z]\b|\(\s*[~¬]?\s*\b[A-Z]\b\s*\)|'\s*\b[A-Z]\b\s*'|"\s*\b[A-Z]\b\s*"|\b[B-H|J-N|P-Z]\b)/g;
@@ -138,6 +151,7 @@ const renderFormattedText = (text: string, stripLogicSymbols: boolean = false, l
                         </span>
                     );
                 }
+
                 return (
                     <span className="inline-flex items-center text-xs font-bold text-blue-700 bg-blue-50 border border-blue-100 px-1.5 py-0.5 rounded-md font-mono select-all shadow-3xs">
                         {letter}
@@ -149,6 +163,7 @@ const renderFormattedText = (text: string, stripLogicSymbols: boolean = false, l
                 // If it is a logic chain
                 if (token.includes('->') || token.includes('=>')) {
                     const variables = token.split(/\s*(?:->|=>)\s*/);
+
                     return (
                         <span className="inline-flex items-center gap-1 mx-1 my-0.5 bg-slate-50 border border-slate-200/80 px-2 py-1 rounded-xl shadow-3xs hover:bg-slate-100/50 transition">
                             {variables.map((v, idx) => (
@@ -177,18 +192,21 @@ const renderFormattedText = (text: string, stripLogicSymbols: boolean = false, l
             // Strict 1-liner comment: Render inner paragraph tokens for bold text and logical math symbols
             const renderRichParagraphContent = (inputText: string) => {
                 const boldParts = inputText.split(/(\*\*[^*]+\*\*)/g);
+
                 return boldParts.map((bPart, bIdx) => {
                     if (bPart.startsWith('**') && bPart.endsWith('**')) {
                         return <strong key={bIdx} className="font-black text-slate-850 dark:text-white">{bPart.slice(2, -2)}</strong>;
                     }
 
                     const mathParts = bPart.split(mathPattern);
+
                     return (
                         <React.Fragment key={bIdx}>
                             {mathParts.map((mPart, mIdx) => {
                                 if (mPart.match(mathPattern)) {
                                     return <React.Fragment key={mIdx}>{renderTokenContent(mPart)}</React.Fragment>;
                                 }
+
                                 return <span key={mIdx}>{mPart}</span>;
                             })}
                         </React.Fragment>
@@ -198,9 +216,11 @@ const renderFormattedText = (text: string, stripLogicSymbols: boolean = false, l
 
             // Strict 1-liner comment: Match step-by-step indicators to render styled step block cards
             const stepMatch = paraText.match(/^\s*Step\s+(\d+)\s*:\s*(.+)$/i);
+
             if (stepMatch) {
                 const stepNum = stepMatch[1];
                 const stepContent = stepMatch[2];
+
                 return (
                     <div className="flex gap-3 items-start border-l-3 border-blue-500 bg-blue-50/15 dark:bg-blue-950/10 p-3.5 rounded-r-xl my-2.5 shadow-3xs">
                         <span className="flex size-5.5 shrink-0 items-center justify-center rounded-full bg-blue-600 text-[10px] font-black text-white font-mono shadow-3xs select-none mt-0.5">
@@ -220,9 +240,11 @@ const renderFormattedText = (text: string, stripLogicSymbols: boolean = false, l
 
             // Strict 1-liner comment: Match mental math shortcut triggers to render stylized tips cards
             const shortcutMatch = paraText.match(/^\s*(🧠\s*)?(Mental Math Shortcut|Fast Track|Shortcut)\s*:\s*(.+)$/i);
+
             if (shortcutMatch) {
                 const title = shortcutMatch[2];
                 const shortcutContent = shortcutMatch[3];
+
                 return (
                     <div className="flex gap-3 items-start border-l-3 border-amber-500 bg-amber-50/15 dark:bg-amber-950/10 p-3.5 rounded-r-xl my-3 shadow-3xs">
                         <span className="flex size-5.5 shrink-0 items-center justify-center rounded-full bg-amber-500 text-white shadow-3xs select-none text-[11px] mt-0.5">
@@ -289,7 +311,10 @@ const renderFormattedText = (text: string, stripLogicSymbols: boolean = false, l
 
     const renderTable = (tableText: string) => {
         const rows = tableText.trim().split('\n');
-        if (rows.length === 0) return null;
+
+        if (rows.length === 0) {
+            return null;
+        }
 
         const parseRow = (rowText: string) => {
             return rowText.split('|').slice(1, -1).map(cell => cell.trim());
@@ -328,6 +353,7 @@ const renderFormattedText = (text: string, stripLogicSymbols: boolean = false, l
                 if (part.match(tableRegex)) {
                     return <React.Fragment key={index}>{renderTable(part)}</React.Fragment>;
                 }
+
                 return <React.Fragment key={index}>{formatNumberedLists(part)}</React.Fragment>;
             })}
         </div>
@@ -363,24 +389,47 @@ interface ExamIndexProps {
 /** Formats seconds for display; matches history table rules (seconds if under 1m). */
 function formatDuration(secs: number, includeSecs = true): string {
     const clamped = Math.max(0, Math.floor(secs));
-    if (clamped === 0) return '0s';
+
+    if (clamped === 0) {
+        return '0s';
+    }
 
     const h = Math.floor(clamped / 3600);
     const m = Math.floor((clamped % 3600) / 60);
     const s = clamped % 60;
 
     if (!includeSecs) {
-        if (clamped < 60) return `${clamped}s`;
+        if (clamped < 60) {
+            return `${clamped}s`;
+        }
+
         const parts: string[] = [];
-        if (h > 0) parts.push(`${h}h`);
-        if (m > 0) parts.push(`${m}m`);
+
+        if (h > 0) {
+            parts.push(`${h}h`);
+        }
+
+        if (m > 0) {
+            parts.push(`${m}m`);
+        }
+
         return parts.join(' ') || '0s';
     }
 
     const parts: string[] = [];
-    if (h > 0) parts.push(`${h}h`);
-    if (m > 0) parts.push(`${m}m`);
-    if (s > 0 || parts.length === 0) parts.push(`${s}s`);
+
+    if (h > 0) {
+        parts.push(`${h}h`);
+    }
+
+    if (m > 0) {
+        parts.push(`${m}m`);
+    }
+
+    if (s > 0 || parts.length === 0) {
+        parts.push(`${s}s`);
+    }
+
     return parts.join(' ') || '0s';
 }
 
@@ -770,6 +819,20 @@ export default function ExamIndex({
     const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
     const [isTimed, setIsTimed] = useState<boolean>(true);
 
+    // Refs to preserve stable memoization for executeSubmit
+    const activeQuestionsRef = useRef<Question[]>(activeQuestions);
+    const answersRef = useRef<Record<number, number>>(answers);
+    const sessionTimeLimitSecsRef = useRef<number>(sessionTimeLimitSecs);
+
+    const isTimedRef = useRef<boolean>(isTimed);
+    const selectedExamIdRef = useRef<number | null>(selectedExamId);
+    const drillCategoryNameRef = useRef<string | null>(drillCategoryName);
+    const drillCategoryIdRef = useRef<number | null>(drillCategoryId);
+    const savedAttemptRef = useRef<any>(savedAttempt);
+    const drillSubcategoriesRef = useRef<string[]>(drillSubcategories);
+    const drillLanguageRef = useRef<string>(drillLanguage);
+    const drillQuestionCountRef = useRef<number | 'all'>(drillQuestionCount);
+
     // Dynamic metrics configured to update the simulation parameters instantly
     const getSimulationDetails = useCallback((examId: number | null) => {
         if (examId === 1) {
@@ -783,6 +846,7 @@ export default function ExamIndex({
                 allowedCategories: ['General Information', 'Verbal Ability', 'Analytical Ability', 'Numerical Ability']
             };
         }
+
         if (examId === 2) {
             return {
                 title: 'Sub-Professional Level Reviewer',
@@ -794,6 +858,7 @@ export default function ExamIndex({
                 allowedCategories: ['General Information', 'Verbal Ability', 'Clerical Ability', 'Numerical Ability']
             };
         }
+
         // Custom Practice Drill specs
         return {
             title: drillCategoryName || savedAttempt?.cat_scores?.metadata?.category_name || 'Practice Drill',
@@ -810,6 +875,28 @@ export default function ExamIndex({
     const detailsTitle = details.title;
     const detailsTimeLimitSecs = details.timeLimitSecs;
     const isDrillSession = selectedExamId === null || selectedExamId > 2 || savedAttempt?.cat_scores?.metadata?.track === 'Drill' || drillCategoryName !== null;
+    const detailsTitleRef = useRef<string>(detailsTitle);
+    const detailsTimeLimitSecsRef = useRef<number>(detailsTimeLimitSecs);
+
+    useEffect(() => {
+        activeQuestionsRef.current = activeQuestions;
+        answersRef.current = answers;
+        sessionTimeLimitSecsRef.current = sessionTimeLimitSecs;
+        detailsTitleRef.current = detailsTitle;
+        detailsTimeLimitSecsRef.current = detailsTimeLimitSecs;
+        isTimedRef.current = isTimed;
+        selectedExamIdRef.current = selectedExamId;
+        drillCategoryNameRef.current = drillCategoryName;
+        drillCategoryIdRef.current = drillCategoryId;
+        savedAttemptRef.current = savedAttempt;
+        drillSubcategoriesRef.current = drillSubcategories;
+        drillLanguageRef.current = drillLanguage;
+        drillQuestionCountRef.current = drillQuestionCount;
+    }, [
+        activeQuestions, answers, sessionTimeLimitSecs, detailsTitle, detailsTimeLimitSecs,
+        isTimed, selectedExamId, drillCategoryName, drillCategoryId, savedAttempt,
+        drillSubcategories, drillLanguage, drillQuestionCount
+    ]);
 
     useEffect(() => {
         timeLeftRef.current = timeLeft;
@@ -824,27 +911,52 @@ export default function ExamIndex({
 
     // Sync currentIdx with review filters dynamically
     useEffect(() => {
-        if (!reviewScreenActive || !activeQuestions || activeQuestions.length === 0) return;
+        if (!reviewScreenActive || !activeQuestions || activeQuestions.length === 0) {
+            return;
+        }
+
         const isCurrentIdxMatch = activeQuestions[currentIdx] && (() => {
             const q = activeQuestions[currentIdx];
-            if (reviewCategoryFilter !== 'All Categories' && q.category !== reviewCategoryFilter) return false;
+
+            if (reviewCategoryFilter !== 'All Categories' && q.category !== reviewCategoryFilter) {
+                return false;
+            }
+
             const chosen = answers[currentIdx];
             const isCorrect = chosen === q.correct_option;
-            if (reviewStatusFilter === 'correct' && !isCorrect) return false;
-            if (reviewStatusFilter === 'incorrect' && isCorrect) return false;
+
+            if (reviewStatusFilter === 'correct' && !isCorrect) {
+                return false;
+            }
+
+            if (reviewStatusFilter === 'incorrect' && isCorrect) {
+                return false;
+            }
+
             return true;
         })();
 
         if (!isCurrentIdxMatch) {
             // Find first match
             const firstMatchIdx = activeQuestions.findIndex((q, idx) => {
-                if (reviewCategoryFilter !== 'All Categories' && q.category !== reviewCategoryFilter) return false;
+                if (reviewCategoryFilter !== 'All Categories' && q.category !== reviewCategoryFilter) {
+                    return false;
+                }
+
                 const chosen = answers[idx];
                 const isCorrect = chosen === q.correct_option;
-                if (reviewStatusFilter === 'correct' && !isCorrect) return false;
-                if (reviewStatusFilter === 'incorrect' && isCorrect) return false;
+
+                if (reviewStatusFilter === 'correct' && !isCorrect) {
+                    return false;
+                }
+
+                if (reviewStatusFilter === 'incorrect' && isCorrect) {
+                    return false;
+                }
+
                 return true;
             });
+
             if (firstMatchIdx !== -1) {
                 setTimeout(() => {
                     setCurrentIdx(firstMatchIdx);
@@ -882,10 +994,12 @@ export default function ExamIndex({
         if (savedAttempt) {
             // Reconstruct questions pool if some are missing from database (e.g. fallback questions)
             let loadedQuestions = [...questions];
+
             if (savedAttempt.question_ids && savedAttempt.question_ids.length > 0) {
                 const missingIds = savedAttempt.question_ids.filter((id: number) => !loadedQuestions.some(q => q.id === id));
                 missingIds.forEach((id: number) => {
                     const fallbackQ = fallbackQuestions.find(q => q.id === id);
+
                     if (fallbackQ) {
                         loadedQuestions.push(fallbackQ);
                     }
@@ -930,12 +1044,15 @@ export default function ExamIndex({
                 if (!computedCatMap[q.category]) {
                     computedCatMap[q.category] = { correct: 0, total: 0, subcats: {} };
                 }
+
                 computedCatMap[q.category].total += 1;
 
                 const subcatName = q.subcategory || 'General Concepts';
+
                 if (!computedCatMap[q.category].subcats[subcatName]) {
                     computedCatMap[q.category].subcats[subcatName] = { correct: 0, total: 0 };
                 }
+
                 computedCatMap[q.category].subcats[subcatName].total += 1;
 
                 if (chosen !== undefined && isCorrect) {
@@ -947,6 +1064,7 @@ export default function ExamIndex({
             // Use the computed map if the saved one lacks subcategory info
             let finalCatMap = savedAttempt.cat_scores?.categoryScoreMap || savedAttempt.cat_scores;
             const hasSubcats = finalCatMap && Object.values(finalCatMap).some((c: any) => c.subcats && Object.keys(c.subcats).length > 0);
+
             if (!hasSubcats || Object.keys(computedCatMap).length > 0) {
                 finalCatMap = computedCatMap;
             }
@@ -955,6 +1073,7 @@ export default function ExamIndex({
                 setActiveQuestions(loadedQuestions);
                 setAnswers(savedAttempt.answers);
                 setIsTimed(isTimedSaved);
+
                 if (meta.track === 'Drill') {
                     setSelectedExamId(null as any);
                     setDrillCategoryId(savedAttempt.category_id);
@@ -965,6 +1084,7 @@ export default function ExamIndex({
                 } else {
                     setSelectedExamId(isSubprofessional ? 2 : 1);
                 }
+
                 setSessionTimeLimitSecs(isTimedSaved ? limitSecs : 0);
                 setTimeLeft(isTimedSaved ? Math.max(0, limitSecs - elapsedSecs) : elapsedSecs);
 
@@ -984,6 +1104,7 @@ export default function ExamIndex({
 
                 // Activate review immediately if review=true is set in search query params
                 const params = new URLSearchParams(window.location.search);
+
                 if (params.get('review') === 'true') {
                     setReviewScreenActive(true);
                 }
@@ -1071,12 +1192,13 @@ export default function ExamIndex({
             selectedExamId === examId && activeQuestions.length > 0
                 ? activeQuestions.map(q => q.id)
                 : [];
+
         return [...new Set([...fromServer, ...fromCurrentSession])];
     }, [seenQuestionIdsByTrack, selectedExamId, activeQuestions]);
 
     const buildFreshExamPool = useCallback((examId: number | null) => {
         // 1. Gather all source questions
-        let sourcePool = questions.length > 0 ? questions : fallbackQuestions;
+        const sourcePool = questions.length > 0 ? questions : fallbackQuestions;
 
         // Separate categories
         const verbalPool = sourcePool.filter(q => q.category === 'Verbal Ability');
@@ -1093,6 +1215,7 @@ export default function ExamIndex({
             const seen = pool.filter(q => seenSet.has(q.id));
 
             let picked = [...unseen].sort(() => Math.random() - 0.5);
+
             if (picked.length < targetCount) {
                 const shuffledSeen = [...seen].sort(() => Math.random() - 0.5);
                 picked = [...picked, ...shuffledSeen.slice(0, targetCount - picked.length)];
@@ -1112,7 +1235,8 @@ export default function ExamIndex({
             return picked.slice(0, targetCount);
         };
 
-        let scoredPool: Question[] = [];
+        const scoredPool: Question[] = [];
+
         if (examId === 1) {
             // Professional: 150 scored items
             const verbal = pickFromCategory(verbalPool, 45, 'Verbal Ability');
@@ -1150,14 +1274,20 @@ export default function ExamIndex({
 
     const buildSameExamPool = useCallback((questionIds: number[]) => {
         let sourcePool = [...questions, ...demographicQuestions];
+
         if (questions.length === 0) {
             sourcePool = [...fallbackQuestions, ...demographicQuestions];
         }
+
         const missingIds = questionIds.filter(id => !sourcePool.some(q => q.id === id));
         missingIds.forEach(id => {
             const fallbackQ = [...fallbackQuestions, ...demographicQuestions].find(q => q.id === id);
-            if (fallbackQ) sourcePool = [...sourcePool, fallbackQ];
+
+            if (fallbackQ) {
+                sourcePool = [...sourcePool, fallbackQ];
+            }
         });
+
         return questionIds
             .map(id => sourcePool.find(q => q.id === id) || [...fallbackQuestions, ...demographicQuestions].find(q => q.id === id))
             .filter((q): q is Question => Boolean(q))
@@ -1190,16 +1320,21 @@ export default function ExamIndex({
     }, [getSimulationDetails]);
 
     const getRetakeContext = () => {
-        if (pendingRetake) return pendingRetake;
+        if (pendingRetake) {
+            return pendingRetake;
+        }
+
         if (savedAttempt?.question_ids?.length) {
             const meta = savedAttempt.cat_scores?.metadata || {};
             const examId = meta.track === 'Subprofessional' ? 2 : 1;
+
             return {
                 attemptId: savedAttempt.id,
                 questionIds: savedAttempt.question_ids,
                 examId,
             };
         }
+
         if (lastStoredAttemptId && activeQuestions.length > 0) {
             return {
                 attemptId: lastStoredAttemptId,
@@ -1207,17 +1342,23 @@ export default function ExamIndex({
                 examId: selectedExamId,
             };
         }
+
         return null;
     };
 
     const handleRetakeSame = () => {
         const ctx = getRetakeContext();
-        if (!ctx || ctx.questionIds.length === 0) return;
+
+        if (!ctx || ctx.questionIds.length === 0) {
+            return;
+        }
+
         const originalIsTimed = savedAttempt
             ? (savedAttempt.cat_scores?.metadata?.is_timed !== false)
             : isTimed;
         beginExamSession(buildSameExamPool(ctx.questionIds), ctx.examId);
         setIsTimed(originalIsTimed);
+
         if (!originalIsTimed) {
             setSessionTimeLimitSecs(0);
             setTimeLeft(0);
@@ -1227,24 +1368,33 @@ export default function ExamIndex({
 
     const handleRetakeFresh = () => {
         const ctx = getRetakeContext();
-        if (!ctx) return;
+
+        if (!ctx) {
+            return;
+        }
+
         const originalIsTimed = savedAttempt
             ? (savedAttempt.cat_scores?.metadata?.is_timed !== false)
             : isTimed;
 
         let finalPool = [];
+
         if (ctx.examId === null || ctx.examId > 2) {
             // For custom drills, select fresh randomized questions from the same category config
             const catName = drillCategoryName?.replace(' Practice', '') || savedAttempt?.cat_scores?.metadata?.category_name || 'General Information';
-            let sourcePool = questions.length > 0 ? questions : fallbackQuestions;
-            let pool = sourcePool.filter(q => {
+            const sourcePool = questions.length > 0 ? questions : fallbackQuestions;
+            const pool = sourcePool.filter(q => {
                 const catMatch = q.category.toLowerCase().includes(catName.toLowerCase()) ||
                     catName.toLowerCase().includes(q.category.toLowerCase());
                 const subcatMatch = drillSubcategories.length === 0 || drillSubcategories.some(subName => q.subcategory.toLowerCase().includes(subName.toLowerCase()) || subName.toLowerCase().includes(q.subcategory.toLowerCase()));
 
                 let langMatch = true;
-                if (drillLanguage === 'English') langMatch = q.language === 'English' || !q.language;
-                else if (drillLanguage === 'Filipino') langMatch = q.language === 'Filipino';
+
+                if (drillLanguage === 'English') {
+                    langMatch = q.language === 'English' || !q.language;
+                } else if (drillLanguage === 'Filipino') {
+                    langMatch = q.language === 'Filipino';
+                }
 
                 return catMatch && subcatMatch && langMatch;
             });
@@ -1257,6 +1407,7 @@ export default function ExamIndex({
 
         beginExamSession(finalPool, ctx.examId);
         setIsTimed(originalIsTimed);
+
         if (!originalIsTimed) {
             setSessionTimeLimitSecs(0);
             setTimeLeft(0);
@@ -1293,6 +1444,7 @@ export default function ExamIndex({
             const subcatsStr = params.get('subcategories');
             const isTimedParam = params.get('timed') !== 'false';
             let subcats: string[] = [];
+
             if (subcatsStr) {
                 try {
                     subcats = JSON.parse(subcatsStr);
@@ -1313,7 +1465,7 @@ export default function ExamIndex({
             window.history.replaceState({}, '', url.toString());
 
             // Build Drill Pool
-            let sourcePool = questions.length > 0 ? questions : fallbackQuestions;
+            const sourcePool = questions.length > 0 ? questions : fallbackQuestions;
 
             let pool = sourcePool.filter(q => {
                 const catMatch = q.category.toLowerCase().includes(catName.toLowerCase()) ||
@@ -1321,8 +1473,12 @@ export default function ExamIndex({
                 const subcatMatch = subcats.length === 0 || subcats.some(subName => q.subcategory.toLowerCase().includes(subName.toLowerCase()) || subName.toLowerCase().includes(q.subcategory.toLowerCase()));
 
                 let langMatch = true;
-                if (lang === 'English') langMatch = q.language === 'English' || !q.language;
-                else if (lang === 'Filipino') langMatch = q.language === 'Filipino';
+
+                if (lang === 'English') {
+                    langMatch = q.language === 'English' || !q.language;
+                } else if (lang === 'Filipino') {
+                    langMatch = q.language === 'Filipino';
+                }
 
                 return catMatch && subcatMatch && langMatch;
             });
@@ -1379,7 +1535,9 @@ export default function ExamIndex({
 
     // Auto-start retake when choice was made on the history page
     useEffect(() => {
-        if (!retakeSource?.mode || savedAttempt) return;
+        if (!retakeSource?.mode || savedAttempt) {
+            return;
+        }
 
         const isDrill = retakeSource.track === 'Drill';
         const examId = isDrill ? null : (retakeSource.track === 'Subprofessional' ? 2 : 1);
@@ -1398,8 +1556,8 @@ export default function ExamIndex({
                     // Strict 1-liner comment: Resolve original category from retake pool to draw a fresh randomized sample
                     const oldQuestions = retakeSource.question_ids.map(id => questions.find(q => q.id === id) || fallbackQuestions.find(q => q.id === id)).filter((q): q is Question => Boolean(q));
                     const catName = oldQuestions[0]?.category || 'General Information';
-                    let sourcePool = questions.length > 0 ? questions : fallbackQuestions;
-                    let pool = sourcePool.filter(q => q.category === catName);
+                    const sourcePool = questions.length > 0 ? questions : fallbackQuestions;
+                    const pool = sourcePool.filter(q => q.category === catName);
                     const shuffled = [...pool].sort(() => Math.random() - 0.5);
                     const countLimit = retakeSource.question_ids.length;
                     const freshPool = shuffled.slice(0, countLimit).map(shuffleOptionsForQuestion);
@@ -1428,23 +1586,30 @@ export default function ExamIndex({
                             clearInterval(timerRef.current!);
                             timeLeftRef.current = 0;
                             handleSubmitExamRef.current(true);
+
                             return 0;
                         }
+
                         const next = prev - 1;
                         timeLeftRef.current = next;
+
                         return next;
                     });
                 } else {
                     setTimeLeft(prev => {
                         const next = prev + 1;
                         timeLeftRef.current = next;
+
                         return next;
                     });
                 }
             }, 1000);
         }
+
         return () => {
-            if (timerRef.current) clearInterval(timerRef.current);
+            if (timerRef.current) {
+                clearInterval(timerRef.current);
+            }
         };
     }, [isExamActive, isExamSubmitted, isTimed]);
 
@@ -1453,6 +1618,7 @@ export default function ExamIndex({
         const h = Math.floor(secs / 3600);
         const m = Math.floor((secs % 3600) / 60);
         const s = secs % 60;
+
         return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
     };
 
@@ -1474,7 +1640,16 @@ export default function ExamIndex({
 
 
     const executeSubmit = useCallback(() => {
-        if (timerRef.current) clearInterval(timerRef.current);
+        if (timerRef.current) {
+            clearInterval(timerRef.current);
+        }
+
+        const activeQs = activeQuestionsRef.current;
+        const ans = answersRef.current;
+        const sessionSecs = sessionTimeLimitSecsRef.current;
+        const detailsTitleLocal = detailsTitleRef.current || '';
+        const detailsTimeLimitLocal = detailsTimeLimitSecsRef.current || 0;
+        const isTimedLocal = isTimedRef.current;
 
         let score = 0;
         let correctCount = 0;
@@ -1486,11 +1661,10 @@ export default function ExamIndex({
             subcats: Record<string, { correct: number; total: number }>
         }> = {};
 
-        activeQuestions.forEach((q, idx) => {
-            const chosen = answers[idx];
+        activeQs.forEach((q, idx) => {
+            const chosen = ans[idx];
             const isCorrect = chosen === q.correct_option;
 
-            // Exclude demographic questions from score calculation
             if (q.category === 'Demographic Profile' || q.isDemographic) {
                 return;
             }
@@ -1498,12 +1672,15 @@ export default function ExamIndex({
             if (!catMap[q.category]) {
                 catMap[q.category] = { correct: 0, total: 0, subcats: {} };
             }
+
             catMap[q.category].total += 1;
 
             const subcatName = q.subcategory || 'General Concepts';
+
             if (!catMap[q.category].subcats[subcatName]) {
                 catMap[q.category].subcats[subcatName] = { correct: 0, total: 0 };
             }
+
             catMap[q.category].subcats[subcatName].total += 1;
 
             if (chosen === undefined) {
@@ -1518,10 +1695,10 @@ export default function ExamIndex({
             }
         });
 
-        const scoredItemsCount = activeQuestions.filter(q => !(q.category === 'Demographic Profile' || q.isDemographic)).length || 1;
+        const scoredItemsCount = activeQs.filter(q => !(q.category === 'Demographic Profile' || q.isDemographic)).length || 1;
         const percentage = Math.round((score / scoredItemsCount) * 100);
-        const limitSecs = sessionTimeLimitSecs || detailsTimeLimitSecs;
-        const elapsedSecs = isTimed
+        const limitSecs = sessionSecs || detailsTimeLimitLocal;
+        const elapsedSecs = isTimedLocal
             ? Math.min(limitSecs, Math.max(0, limitSecs - timeLeftRef.current))
             : timeLeftRef.current;
 
@@ -1539,18 +1716,18 @@ export default function ExamIndex({
         setIsExamSubmitted(true);
         setIsExamActive(false);
 
-        // Persist attempt in DB in background
+        // Persist attempt
         const durationSecs = elapsedSecs;
-        const isDrillSession = selectedExamId === null || drillCategoryName !== null;
-        const trackName = isDrillSession ? 'Drill' : (detailsTitle.includes('Sub-Professional') ? 'Subprofessional' : 'Professional');
-        const finalCategoryId = isDrillSession ? (drillCategoryId || savedAttempt?.category_id || null) : null;
-        const finalCategoryName = isDrillSession ? (drillCategoryName || savedAttempt?.cat_scores?.metadata?.category_name || 'Practice Drill') : detailsTitle;
+        const isDrillSession = selectedExamIdRef.current === null || drillCategoryNameRef.current !== null;
+        const trackName = isDrillSession ? 'Drill' : (detailsTitleLocal.includes('Sub-Professional') ? 'Subprofessional' : 'Professional');
+        const finalCategoryId = isDrillSession ? (drillCategoryIdRef.current || savedAttemptRef.current?.category_id || null) : null;
+        const finalCategoryName = isDrillSession ? (drillCategoryNameRef.current || savedAttemptRef.current?.cat_scores?.metadata?.category_name || 'Practice Drill') : detailsTitleLocal;
 
-        // Map the answers array back to original unshuffled options indices for backend DB persistence
         const originalAnswers: Record<number, number> = {};
-        Object.entries(answers).forEach(([key, chosenIndex]) => {
+        Object.entries(ans).forEach(([key, chosenIndex]) => {
             const idx = Number(key);
-            const q = activeQuestions[idx];
+            const q = activeQs[idx];
+
             if (chosenIndex !== undefined && q && q.originalOptionIndices) {
                 originalAnswers[idx] = q.originalOptionIndices[chosenIndex];
             } else {
@@ -1560,7 +1737,7 @@ export default function ExamIndex({
 
         const payload = {
             category_id: finalCategoryId,
-            question_ids: activeQuestions.map(q => q.id),
+            question_ids: activeQs.map(q => q.id),
             answers: originalAnswers,
             cat_scores: {
                 categoryScoreMap: catMap,
@@ -1571,10 +1748,10 @@ export default function ExamIndex({
                     total_questions: scoredItemsCount,
                     skipped_count: skippedCount,
                     duration_secs: durationSecs,
-                    is_timed: isTimed,
-                    selected_subcategories: isDrillSession ? (drillSubcategories.length > 0 ? drillSubcategories : undefined) : undefined,
-                    language: isDrillSession ? drillLanguage : undefined,
-                    question_count: isDrillSession ? (drillQuestionCount === 'all' ? 'all' : drillQuestionCount) : undefined,
+                    is_timed: isTimedLocal,
+                    selected_subcategories: isDrillSession ? (drillSubcategoriesRef.current.length > 0 ? drillSubcategoriesRef.current : undefined) : undefined,
+                    language: isDrillSession ? drillLanguageRef.current : undefined,
+                    question_count: isDrillSession ? (drillQuestionCountRef.current === 'all' ? 'all' : drillQuestionCountRef.current) : undefined,
                 }
             }
         };
@@ -1597,25 +1774,7 @@ export default function ExamIndex({
                 console.error('Failed to persist attempt:', err);
             });
 
-    }, [
-        activeQuestions,
-        answers,
-        sessionTimeLimitSecs,
-        detailsTitle,
-        detailsTimeLimitSecs,
-        isTimed,
-        selectedExamId,
-        drillCategoryName,
-        drillCategoryId,
-        savedAttempt,
-        drillSubcategories,
-        drillLanguage,
-        drillQuestionCount,
-        setResults,
-        setIsExamSubmitted,
-        setIsExamActive,
-        setLastStoredAttemptId
-    ]);
+    }, []);
 
     // Submit Exam & calculate grade breakdown
     const handleSubmitExam = useCallback((auto = false) => {
@@ -1630,6 +1789,7 @@ export default function ExamIndex({
 
             let confirmMsg = 'Are you sure you want to finish and submit your exam?';
             let title = 'Submit Exam?';
+
             if (unansweredCount > 0) {
                 confirmMsg = `⚠️ WARNING: You have ${unansweredCount} unanswered questions out of ${totalQuestions} total questions. Unanswered questions will be marked as incorrect.\n\nAre you absolutely sure you want to submit the exam now?`;
                 title = 'Submit with Unanswered Items?';
@@ -1648,13 +1808,14 @@ export default function ExamIndex({
                     executeSubmit();
                 }
             });
+
             return;
         }
 
         executeSubmit();
     }, [activeQuestions, answers, executeSubmit]);
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+
     useEffect(() => {
         handleSubmitExamRef.current = handleSubmitExam;
     }, [handleSubmitExam]);
@@ -1667,8 +1828,10 @@ export default function ExamIndex({
             } else {
                 router.get('/history');
             }
+
             return;
         }
+
         if (!isExamSubmitted) {
             setConfirmModal({
                 isOpen: true,
@@ -1679,6 +1842,7 @@ export default function ExamIndex({
                 onConfirm: () => {
                     if (isDrillSession) {
                         router.get('/drills');
+
                         return;
                     }
 
@@ -1688,11 +1852,13 @@ export default function ExamIndex({
                     setShowRetakeModal(false);
                 }
             });
+
             return;
         }
 
         if (isDrillSession) {
             router.get('/drills');
+
             return;
         }
 
@@ -2385,6 +2551,7 @@ export default function ExamIndex({
                                                                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                                                                             {propositions.map((prop, idx) => {
                                                                                 const newLetter = String.fromCharCode(65 + idx);
+
                                                                                 return (
                                                                                     <div key={idx} className="flex items-center gap-2 text-xs">
                                                                                         <span className="inline-flex size-5 items-center justify-center rounded bg-blue-50 dark:bg-blue-950/40 text-[10px] font-black text-blue-700 dark:text-blue-400 border border-blue-100/60 dark:border-blue-900/40 font-mono">
@@ -2474,6 +2641,7 @@ export default function ExamIndex({
                                             /* ignore invalid date string format */
                                         }
                                     }
+
                                     return `Completed on ${new Date().toLocaleDateString('en-US', {
                                         month: 'long',
                                         day: 'numeric',
@@ -2555,16 +2723,27 @@ export default function ExamIndex({
                         let percentile = '22nd';
                         let topText = 'Top 78% of test takers';
                         const pct = results.percentage;
-                        if (pct >= 95) { percentile = '99th'; topText = 'Top 1% of test takers'; }
-                        else if (pct >= 90) { percentile = '95th'; topText = 'Top 5% of test takers'; }
-                        else if (pct >= 85) { percentile = '91st'; topText = 'Top 9% of test takers'; }
-                        else if (pct >= 80) { percentile = '88th'; topText = 'Top 12% of test takers'; }
-                        else if (pct >= 75) { percentile = '80th'; topText = 'Top 20% of test takers'; }
-                        else if (pct >= 70) { percentile = '73rd'; topText = 'Top 27% of test takers'; }
-                        else if (pct >= 60) { percentile = '58th'; topText = 'Top 42% of test takers'; }
-                        else if (pct >= 50) { percentile = '41st'; topText = 'Top 59% of test takers'; }
+
+                        if (pct >= 95) {
+                            percentile = '99th'; topText = 'Top 1% of test takers';
+                        } else if (pct >= 90) {
+                            percentile = '95th'; topText = 'Top 5% of test takers';
+                        } else if (pct >= 85) {
+                            percentile = '91st'; topText = 'Top 9% of test takers';
+                        } else if (pct >= 80) {
+                            percentile = '88th'; topText = 'Top 12% of test takers';
+                        } else if (pct >= 75) {
+                            percentile = '80th'; topText = 'Top 20% of test takers';
+                        } else if (pct >= 70) {
+                            percentile = '73rd'; topText = 'Top 27% of test takers';
+                        } else if (pct >= 60) {
+                            percentile = '58th'; topText = 'Top 42% of test takers';
+                        } else if (pct >= 50) {
+                            percentile = '41st'; topText = 'Top 59% of test takers';
+                        }
 
                         let aiAnalysisText = '';
+
                         if (results.correctCount === 0) {
                             aiAnalysisText = "You did not answer any questions correctly on this attempt. We recommend reviewing the foundational concepts across all categories, starting with General Information and Verbal Ability, to build up your core competencies.";
                         } else {
@@ -2580,10 +2759,12 @@ export default function ExamIndex({
                                     targetCategoryName = cat;
                                     Object.entries(val.subcats).forEach(([sub, subVal]) => {
                                         const subPct = subVal.total > 0 ? (subVal.correct / subVal.total) * 100 : 0;
+
                                         if (subPct > strongestSubcatPct) {
                                             strongestSubcatPct = subPct;
                                             strongestSubcat = sub;
                                         }
+
                                         if (subPct < weakestSubcatPct) {
                                             weakestSubcatPct = subPct;
                                             weakestSubcat = sub;
@@ -2591,8 +2772,13 @@ export default function ExamIndex({
                                     });
                                 });
 
-                                if (!strongestSubcat) strongestSubcat = 'fundamental questions';
-                                if (!weakestSubcat) weakestSubcat = 'specific target modules';
+                                if (!strongestSubcat) {
+                                    strongestSubcat = 'fundamental questions';
+                                }
+
+                                if (!weakestSubcat) {
+                                    weakestSubcat = 'specific target modules';
+                                }
 
                                 if (strongestSubcat === weakestSubcat) {
                                     if (results.percentage >= 80) {
@@ -2613,14 +2799,17 @@ export default function ExamIndex({
 
                                 Object.entries(results.categoryScoreMap).forEach(([cat, val]) => {
                                     const catPct = val.total > 0 ? (val.correct / val.total) * 100 : 0;
+
                                     if (catPct > strongestPct) {
                                         strongestPct = catPct;
                                         strongestCategory = cat;
                                     }
+
                                     if (catPct < weakestPct) {
                                         weakestPct = catPct;
                                         weakestCategory = cat;
                                         const subEntries = Object.entries(val.subcats);
+
                                         if (subEntries.length > 0) {
                                             const sortedSubs = [...subEntries].sort((a, b) => (a[1].correct / a[1].total) - (b[1].correct / b[1].total));
                                             weakestSubcat = sortedSubs[0][0];
@@ -2628,8 +2817,13 @@ export default function ExamIndex({
                                     }
                                 });
 
-                                if (!strongestCategory) strongestCategory = 'Verbal Ability';
-                                if (!weakestCategory) weakestCategory = 'Numerical Ability';
+                                if (!strongestCategory) {
+                                    strongestCategory = 'Verbal Ability';
+                                }
+
+                                if (!weakestCategory) {
+                                    weakestCategory = 'Numerical Ability';
+                                }
 
                                 aiAnalysisText = `Your strongest area was ${strongestCategory}. To improve your overall score, focus review efforts on ${weakestCategory}, specifically ${weakestSubcat} modules.`;
                             }
@@ -2749,11 +2943,18 @@ export default function ExamIndex({
 
                                 // Select appropriate icon matching the topic blueprint
                                 let IconComponent = BookOpen;
-                                if (cat.toLowerCase().includes('verbal')) IconComponent = BookOpen;
-                                else if (cat.toLowerCase().includes('numerical') || cat.toLowerCase().includes('quant') || cat.toLowerCase().includes('math')) IconComponent = Calculator;
-                                else if (cat.toLowerCase().includes('analytical') || cat.toLowerCase().includes('abstract') || cat.toLowerCase().includes('reason')) IconComponent = Brain;
-                                else if (cat.toLowerCase().includes('clerical')) IconComponent = ClipboardList;
-                                else IconComponent = Award;
+
+                                if (cat.toLowerCase().includes('verbal')) {
+                                    IconComponent = BookOpen;
+                                } else if (cat.toLowerCase().includes('numerical') || cat.toLowerCase().includes('quant') || cat.toLowerCase().includes('math')) {
+                                    IconComponent = Calculator;
+                                } else if (cat.toLowerCase().includes('analytical') || cat.toLowerCase().includes('abstract') || cat.toLowerCase().includes('reason')) {
+                                    IconComponent = Brain;
+                                } else if (cat.toLowerCase().includes('clerical')) {
+                                    IconComponent = ClipboardList;
+                                } else {
+                                    IconComponent = Award;
+                                }
 
                                 // Grade range indicators
                                 const barColor = pct >= 80 ? 'bg-emerald-700' : pct >= 70 ? 'bg-blue-600 animate-pulse' : 'bg-rose-600';

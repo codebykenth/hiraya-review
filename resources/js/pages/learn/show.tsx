@@ -1,10 +1,10 @@
 import { Head, Link } from '@inertiajs/react';
-import { PageContainer } from '@/components/page-container';
-import { Card } from '@/components/ui/card';
 import { BookMarked, Calendar, ChevronLeft, Clock, Lightbulb } from 'lucide-react';
 import { useEffect, useRef } from 'react';
-import { LessonMarkdown } from '@/components/lesson-markdown';
 import { getCategoryStyles } from '@/components/curation-index-shell';
+import { LessonMarkdown } from '@/components/lesson-markdown';
+import { PageContainer } from '@/components/page-container';
+import { Card } from '@/components/ui/card';
 
 interface LearnShowProps {
     module: {
@@ -56,6 +56,7 @@ export default function LearnShow({ module, recommended }: LearnShowProps) {
 
         return () => {
             window.removeEventListener('scroll', handleScroll);
+
             if (frameId) {
                 window.cancelAnimationFrame(frameId);
             }

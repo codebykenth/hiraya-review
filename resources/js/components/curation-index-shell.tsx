@@ -1,5 +1,3 @@
-import React, { useState, useEffect } from 'react';
-import { PageContainer } from '@/components/page-container';
 import { Link, router } from '@inertiajs/react';
 import {
     Search,
@@ -9,10 +7,13 @@ import {
     PenLine,
     ChevronDown
 } from 'lucide-react';
-import { CategoryItem } from './drafts-review-shell';
+import React, { useState, useEffect } from 'react';
+import type { TableColumn } from '@/components/admin-table';
+import { AdminTable } from '@/components/admin-table';
 import { ConfirmModal } from '@/components/confirm-modal';
+import { PageContainer } from '@/components/page-container';
 import { ScopeSettingsModal } from '@/components/scope-settings-modal';
-import { AdminTable, TableColumn } from '@/components/admin-table';
+import type { CategoryItem } from './drafts-review-shell';
 import { Button } from './ui/button';
 
 export function getCategoryStyles(category: string) {
@@ -92,11 +93,13 @@ export function CurationIndexShell<T>({
         const handler = setTimeout(() => {
             setDebouncedSearchTerm(searchTerm);
         }, 300);
+
         return () => clearTimeout(handler);
     }, [searchTerm]);
 
     // Build categories tree dynamically with robust static CSC fallback
     const cseCategoriesTree: Record<string, string[]> = {};
+
     if (categories && categories.length > 0) {
         categories.forEach(cat => {
             cseCategoriesTree[cat.name] = (cat.subcategory || []).map(sub => sub.name);
@@ -158,12 +161,15 @@ export function CurationIndexShell<T>({
         message: '',
         confirmLabel: '',
         variant: 'success',
-        onConfirm: () => {},
+        onConfirm: () => { },
     });
 
     const handleAddCategory = (e: React.FormEvent) => {
         e.preventDefault();
-        if (!newCategoryName.trim()) return;
+
+        if (!newCategoryName.trim()) {
+            return;
+        }
 
         router.post('/questions/categories', {
             name: newCategoryName
@@ -197,7 +203,10 @@ export function CurationIndexShell<T>({
 
     const handleAddSubcategory = (e: React.FormEvent) => {
         e.preventDefault();
-        if (!selectedScopeCategory || !newSubcategoryName.trim()) return;
+
+        if (!selectedScopeCategory || !newSubcategoryName.trim()) {
+            return;
+        }
 
         router.post('/questions/subcategories', {
             category_id: selectedScopeCategory,
@@ -250,8 +259,8 @@ export function CurationIndexShell<T>({
         (currentPage - 1) * pageSize + pageSize
     );
 
-    const resolvedColumns = typeof columns === 'function' 
-        ? (columns as any)(setItemToDelete) 
+    const resolvedColumns = typeof columns === 'function'
+        ? (columns as any)(setItemToDelete)
         : columns;
 
     return (
@@ -335,6 +344,7 @@ export function CurationIndexShell<T>({
                                         if (categories && categories.length > 0) {
                                             setSelectedScopeCategory(categories[0].id);
                                         }
+
                                         setIsScopeModalOpen(true);
                                     }}
                                 >

@@ -1,14 +1,14 @@
-import React from 'react';
 import { Sun, Moon, Monitor, Check } from 'lucide-react';
-import { useAppearance } from '@/hooks/use-appearance';
-import type { Appearance } from '@/hooks/use-appearance';
+import React from 'react';
+import { Button } from '@/components/ui/button';
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Button } from '@/components/ui/button';
+import { useAppearance } from '@/hooks/use-appearance';
+import type { Appearance } from '@/hooks/use-appearance';
 
 export function ThemeToggle() {
     const { appearance, updateAppearance } = useAppearance();
@@ -36,6 +36,7 @@ export function ThemeToggle() {
             <DropdownMenuContent align="end" className="w-36 rounded-xl p-1 shadow-lg border border-border bg-popover text-popover-foreground">
                 {options.map(({ value, label, icon: Icon }) => {
                     const isActive = appearance === value;
+
                     return (
                         <DropdownMenuItem
                             key={value}

@@ -1,5 +1,5 @@
-import React from 'react';
 import { X, ShieldAlert } from 'lucide-react';
+import React from 'react';
 import { Button } from '@/components/ui/button';
 
 export interface ConfirmModalProps {
@@ -23,7 +23,9 @@ export function ConfirmModal({
     onClose,
     onConfirm
 }: ConfirmModalProps) {
-    if (!isOpen) return null;
+    if (!isOpen) {
+        return null;
+    }
 
     const getButtonConfig = () => {
         switch (variant) {
@@ -52,7 +54,7 @@ export function ConfirmModal({
 
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4 animate-in fade-in duration-200">
-            <div 
+            <div
                 className="relative w-full max-w-2xl rounded-xl border border-slate-200 bg-white p-6 shadow-xl dark:border-slate-800 dark:bg-slate-950 animate-in zoom-in-95 duration-205"
                 role="dialog"
                 aria-modal="true"
@@ -75,7 +77,7 @@ export function ConfirmModal({
                             {title}
                         </h3>
                     </div>
-                    
+
                     <div className="mt-2.5 text-xs leading-relaxed text-slate-555 dark:text-slate-450 whitespace-pre-line">
                         {message}
                     </div>
