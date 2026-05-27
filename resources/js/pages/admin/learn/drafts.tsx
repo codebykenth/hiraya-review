@@ -88,8 +88,10 @@ export default function DraftsLearnList({ initialDrafts = [], categories = [] }:
         if (approvedModules.length === 0) return;
 
         const modulesToSave = approvedModules.map(m => {
-            const { isEditing: _isEditing, approved: _approved, ...rest } = m;
-            return rest;
+            const copy = { ...m } as any;
+            delete copy.isEditing;
+            delete copy.approved;
+            return copy;
         });
 
         router.post(adminLearnStore().url, {

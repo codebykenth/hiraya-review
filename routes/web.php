@@ -12,6 +12,7 @@ Route::inertia('/', 'welcome')->name('home');
 Route::inertia('privacy', 'legal/privacy')->name('privacy');
 Route::inertia('terms', 'legal/terms')->name('terms');
 Route::inertia('support', 'legal/support')->name('support');
+Route::inertia('guide', 'guide')->name('guide');
 
 Route::post('support', [SupportController::class, 'store'])
     ->name('support.store')

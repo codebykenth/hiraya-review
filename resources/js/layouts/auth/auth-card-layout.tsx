@@ -31,9 +31,8 @@ export default function AuthCardLayout({
                         {/* Card Header */}
                         <div className="flex flex-col items-center gap-3 px-10 pt-10 pb-0 text-center">
                             {/* School icon */}
-                            <div className="flex h-12 w-12 items-center justify-center rounded-md bg-primary text-white shadow-sm">
-                                {/* <School className="h-6 w-6" /> */}
-                                <AppLogoIcon className="size-6 fill-current text-white dark:text-black" />
+                            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white border border-slate-200/80 dark:border-slate-800 dark:bg-slate-900 shadow-sm overflow-hidden p-1">
+                                <AppLogoIcon className="size-10 object-contain" />
                             </div>
 
                             <span className="font-heading text-2xl font-bold tracking-tight text-slate-900 dark:text-white">

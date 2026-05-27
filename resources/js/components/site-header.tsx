@@ -1,6 +1,6 @@
 import { Link, usePage } from '@inertiajs/react';
 import { useState, useEffect } from 'react';
-import { home, dashboard, login, register } from '@/routes';
+import { home, dashboard, login, register, guide } from '@/routes';
 import { Button } from '@/components/ui/button';
 import AppLogo from '@/components/app-logo';
 import { ThemeToggle } from '@/components/theme-toggle';
@@ -60,6 +60,7 @@ export default function SiteHeader({
         { id: 'home', label: 'Home', href: '#' },
         { id: 'features', label: 'Features', href: '#features' },
         { id: 'path', label: 'Process', href: '#path' },
+        { id: 'guide', label: 'Reviewer Guide', href: '#guide' },
         { id: 'faq', label: 'FAQ', href: '#faq' },
     ];
 

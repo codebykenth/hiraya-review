@@ -1,4 +1,11 @@
-// A single source of truth for the application name
-export default function BrandName() {
-    return <div className="text-2xl font-bold">Hiraya <span className="text-primary">CSE</span></div>
+interface BrandNameProps {
+    className?: string;
+}
+
+export default function BrandName({ className = '' }: BrandNameProps) {
+    return (
+        <span className={className}>
+            Hiraya <span className="text-primary font-black">CSE</span>
+        </span>
+    );
 }

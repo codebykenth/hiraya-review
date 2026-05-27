@@ -83,6 +83,7 @@ export default function CreateQuestion({ type = 'ai', categories = [] }: CreateP
     const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
     // Sync subcategories for AI view
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => {
         if (cseCategoriesTree[aiCategory]) {
             const firstSub = cseCategoriesTree[aiCategory][0];
@@ -108,6 +109,7 @@ export default function CreateQuestion({ type = 'ai', categories = [] }: CreateP
     });
 
     // Sync subcategories for Manual view
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => {
         if (cseCategoriesTree[data.category]) {
             const firstSub = cseCategoriesTree[data.category][0];

@@ -355,7 +355,12 @@ export default function DraftsQuestionList({ initialDrafts = [], categories = []
         const approvedQuestions = draftQuestions.filter(q => q.approved);
         if (approvedQuestions.length === 0) return;
 
-        const questionsToSave = approvedQuestions.map(({ isEditing: _isEditing, approved: _approved, ...rest }) => rest);
+        const questionsToSave = approvedQuestions.map(q => {
+            const copy = { ...q } as any;
+            delete copy.isEditing;
+            delete copy.approved;
+            return copy;
+        });
 
         router.post(questionsStore().url, {
             questions: questionsToSave,

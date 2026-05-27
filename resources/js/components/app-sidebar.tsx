@@ -1,5 +1,5 @@
 import { Link, usePage } from '@inertiajs/react';
-import { BookOpen, ClipboardList, FileQuestion, FileText, History, LayoutGrid, Shield, Sparkles, Target, ListChecks, Users } from 'lucide-react';
+import { BookOpen, ClipboardList, FileQuestion, FileText, History, LayoutGrid, Shield, Sparkles, Target, ListChecks, Users, Compass } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
@@ -13,7 +13,7 @@ import {
     SidebarMenuItem,
     SidebarSeparator
 } from '@/components/ui/sidebar';
-import { dashboard } from '@/routes';
+import { dashboard, guide } from '@/routes';
 import { dashboard as adminDashboard } from '@/routes/admin';
 import { index as examsIndex } from '@/routes/exams';
 import { index as historyIndex } from '@/routes/history';
@@ -50,6 +50,11 @@ const generalNavItems: NavItem[] = [
         title: 'History',
         href: historyIndex(),
         icon: History,
+    },
+    {
+        title: 'Reviewer Guide',
+        href: guide(),
+        icon: Compass,
     },
 ];
 
