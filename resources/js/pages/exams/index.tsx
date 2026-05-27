@@ -1059,17 +1059,6 @@ export default function ExamIndex({
     const getActiveTimeLimitSecs = () =>
         isTimed ? (sessionTimeLimitSecs || details.timeLimitSecs) : 0;
 
-    const getResultsElapsedSecs = () => {
-        if (results?.elapsedSecs != null) {
-            return results.elapsedSecs;
-        }
-        if (!isTimed) {
-            return timeLeftRef.current;
-        }
-        const limit = getActiveTimeLimitSecs();
-        return Math.max(0, Math.min(limit, limit - timeLeftRef.current));
-    };
-
     const getTrackNameForExam = (examId: number | null) =>
         examId === 2 ? 'Subprofessional' : 'Professional';
 
@@ -1481,42 +1470,6 @@ export default function ExamIndex({
         }));
     };
 
-    // Submit Exam & calculate grade breakdown
-    const handleSubmitExam = (auto = false) => {
-        if (auto) {
-            setSubmittedByTimer(true);
-        }
-
-        if (!auto) {
-            const totalQuestions = activeQuestions.length;
-            const answeredCount = Object.keys(answers).filter(key => answers[Number(key)] !== undefined).length;
-            const unansweredCount = totalQuestions - answeredCount;
-
-            let confirmMsg = 'Are you sure you want to finish and submit your exam?';
-            let title = 'Submit Exam?';
-            if (unansweredCount > 0) {
-                confirmMsg = `⚠️ WARNING: You have ${unansweredCount} unanswered questions out of ${totalQuestions} total questions. Unanswered questions will be marked as incorrect.\n\nAre you absolutely sure you want to submit the exam now?`;
-                title = 'Submit with Unanswered Items?';
-            } else {
-                confirmMsg = 'All questions have been answered! Are you ready to submit your exam and view your scorecard?';
-                title = 'Ready to Submit?';
-            }
-
-            setConfirmModal({
-                isOpen: true,
-                title,
-                message: confirmMsg,
-                confirmLabel: 'Yes, Submit',
-                variant: unansweredCount > 0 ? 'danger' : 'success',
-                onConfirm: () => {
-                    executeSubmit();
-                }
-            });
-            return;
-        }
-
-        executeSubmit();
-    };
 
     const executeSubmit = () => {
         if (timerRef.current) clearInterval(timerRef.current);
@@ -1641,6 +1594,43 @@ export default function ExamIndex({
                 console.error('Failed to persist attempt:', err);
             });
     };
+
+    // Submit Exam & calculate grade breakdown
+    const handleSubmitExam = useCallback((auto = false) => {
+        if (auto) {
+            setSubmittedByTimer(true);
+        }
+
+        if (!auto) {
+            const totalQuestions = activeQuestions.length;
+            const answeredCount = Object.keys(answers).filter(key => answers[Number(key)] !== undefined).length;
+            const unansweredCount = totalQuestions - answeredCount;
+
+            let confirmMsg = 'Are you sure you want to finish and submit your exam?';
+            let title = 'Submit Exam?';
+            if (unansweredCount > 0) {
+                confirmMsg = `⚠️ WARNING: You have ${unansweredCount} unanswered questions out of ${totalQuestions} total questions. Unanswered questions will be marked as incorrect.\n\nAre you absolutely sure you want to submit the exam now?`;
+                title = 'Submit with Unanswered Items?';
+            } else {
+                confirmMsg = 'All questions have been answered! Are you ready to submit your exam and view your scorecard?';
+                title = 'Ready to Submit?';
+            }
+
+            setConfirmModal({
+                isOpen: true,
+                title,
+                message: confirmMsg,
+                confirmLabel: 'Yes, Submit',
+                variant: unansweredCount > 0 ? 'danger' : 'success',
+                onConfirm: () => {
+                    executeSubmit();
+                }
+            });
+            return;
+        }
+
+        executeSubmit();
+    }, [activeQuestions, answers, executeSubmit]);
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Head, Link, router, useForm } from '@inertiajs/react';
 import { Sparkles, FileText, AlertCircle, Save, RotateCcw, Sparkle, Cpu, BookOpen, HelpCircle, CheckCircle2 } from 'lucide-react';
 import { index as questionsIndex, store as questionsStore, drafts as questionsDrafts, generate as questionsGenerate } from '@/routes/questions';
@@ -32,42 +32,47 @@ interface CreateProps {
 export default function CreateQuestion({ type = 'ai', categories = [] }: CreateProps) {
     const [activeTab, setActiveTab] = useState<'ai' | 'manual'>(type === 'manual' ? 'manual' : 'ai');
 
-    const cseCategoriesTree: Record<string, string[]> = {};
-    if (categories && categories.length > 0) {
-        categories.forEach(cat => {
-            cseCategoriesTree[cat.name] = (cat.subcategory || []).map(sub => sub.name);
-        });
-    } else {
-        cseCategoriesTree['General Information'] = [
-            'Philippine Constitution',
-            'Code of Conduct and Ethical Standards (R.A. 6713)',
-            'Peace and Human Rights Issues and Concepts',
-            'Environment Management and Protection'
-        ];
-        cseCategoriesTree['Verbal Ability'] = [
-            'Word meaning',
-            'Sentence completion',
-            'Error recognition',
-            'Sentence structure',
-            'Paragraph organization',
-            'Reading comprehension'
-        ];
-        cseCategoriesTree['Analytical Ability'] = [
-            'Word analogy',
-            'Symbolic logic / abstract reasoning',
-            'Identifying assumptions and drawing conclusions',
-            'Data interpretation'
-        ];
-        cseCategoriesTree['Numerical Ability'] = [
-            'Basic operations',
-            'Number sequence',
-            'Word problems'
-        ];
-        cseCategoriesTree['Clerical Ability'] = [
-            'Filing',
-            'Spelling'
-        ];
-    }
+    // Wrap cseCategoriesTree in useMemo so its reference doesn't change on every render
+    const cseCategoriesTree = useMemo(() => {
+        const tree: Record<string, string[]> = {};
+        
+        if (categories && categories.length > 0) {
+            categories.forEach(cat => {
+                tree[cat.name] = (cat.subcategory || []).map(sub => sub.name);
+            });
+        } else {
+            tree['General Information'] = [
+                'Philippine Constitution',
+                'Code of Conduct and Ethical Standards (R.A. 6713)',
+                'Peace and Human Rights Issues and Concepts',
+                'Environment Management and Protection'
+            ];
+            tree['Verbal Ability'] = [
+                'Word meaning',
+                'Sentence completion',
+                'Error recognition',
+                'Sentence structure',
+                'Paragraph organization',
+                'Reading comprehension'
+            ];
+            tree['Analytical Ability'] = [
+                'Word analogy',
+                'Symbolic logic / abstract reasoning',
+                'Identifying assumptions and drawing conclusions',
+                'Data interpretation'
+            ];
+            tree['Numerical Ability'] = [
+                'Basic operations',
+                'Number sequence',
+                'Word problems'
+            ];
+            tree['Clerical Ability'] = [
+                'Filing',
+                'Spelling'
+            ];
+        }
+        return tree;
+    }, [categories]); // Recalculate only if categories prop changes
 
     const defaultCategory = Object.keys(cseCategoriesTree)[0] || 'Analytical Ability';
     const defaultSubcategory = cseCategoriesTree[defaultCategory]?.[0] || 'Word analogy';
@@ -83,7 +88,6 @@ export default function CreateQuestion({ type = 'ai', categories = [] }: CreateP
     const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
     // Sync subcategories for AI view
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => {
         if (cseCategoriesTree[aiCategory]) {
             const firstSub = cseCategoriesTree[aiCategory][0];
@@ -94,7 +98,7 @@ export default function CreateQuestion({ type = 'ai', categories = [] }: CreateP
                 return () => clearTimeout(timer);
             }
         }
-    }, [aiCategory, aiSubcategory]);
+    }, [aiCategory, aiSubcategory, cseCategoriesTree]);
 
     // Manual Entry Form
     const { data, setData, post, processing, errors, reset } = useForm({
@@ -109,7 +113,6 @@ export default function CreateQuestion({ type = 'ai', categories = [] }: CreateP
     });
 
     // Sync subcategories for Manual view
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => {
         if (cseCategoriesTree[data.category]) {
             const firstSub = cseCategoriesTree[data.category][0];
@@ -120,7 +123,7 @@ export default function CreateQuestion({ type = 'ai', categories = [] }: CreateP
                 return () => clearTimeout(timer);
             }
         }
-    }, [data.category, data.subcategory]);
+    }, [data.category, data.subcategory, cseCategoriesTree, setData]);
 
     const handleOptionChange = (idx: number, val: string) => {
         const newOptions = [...data.options];

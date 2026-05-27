@@ -7,24 +7,29 @@ use App\Http\Controllers\SupportController;
 use App\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Route;
 
-Route::inertia('/', 'welcome')->name('home');
+// Public page views — rate limited to prevent scraping & DDoS floods
+Route::middleware('throttle:global-views')->group(function () {
+    Route::inertia('/', 'welcome')->name('home');
+    Route::inertia('privacy', 'legal/privacy')->name('privacy');
+    Route::inertia('terms', 'legal/terms')->name('terms');
+    Route::inertia('support', 'legal/support')->name('support');
+    Route::inertia('guide', 'guide')->name('guide');
 
-Route::inertia('privacy', 'legal/privacy')->name('privacy');
-Route::inertia('terms', 'legal/terms')->name('terms');
-Route::inertia('support', 'legal/support')->name('support');
-Route::inertia('guide', 'guide')->name('guide');
+    Route::get('ping', fn () => response()->json([
+        'status' => 'alive',
+        'timestamp' => now()->toIso8601String(),
+    ]));
+});
 
 Route::post('support', [SupportController::class, 'store'])
     ->name('support.store')
     ->middleware('throttle:support-submission');
 
-Route::get('ping', fn () => response()->json([
-    'status' => 'alive',
-    'timestamp' => now()->toIso8601String(),
-]));
-Route::get('/auth/{provider}', [AuthController::class, 'redirectToProvider']);
-
-Route::get('/auth/{provider}/callback', [AuthController::class, 'handleProviderCallback']);
+// OAuth social login — rate limited to prevent redirect flooding against providers
+Route::middleware('throttle:10,1')->group(function () {
+    Route::get('/auth/{provider}', [AuthController::class, 'redirectToProvider']);
+    Route::get('/auth/{provider}/callback', [AuthController::class, 'handleProviderCallback']);
+});
 
 Route::inertia('dev-docs', 'dev-docs')
     ->name('dev-docs')

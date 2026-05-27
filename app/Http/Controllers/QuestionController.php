@@ -13,6 +13,15 @@ use Illuminate\Support\Facades\Cache;
 class QuestionController extends Controller
 {
     /**
+     * Helper to verify if the active user is an administrator.
+     */
+    private function checkAdminAccess(): void
+    {
+        if (!auth()->user() || auth()->user()->role !== 'admin') {
+            abort(403, 'Unauthorized access to scope management.');
+        }
+    }
+    /**
      * Helper to ensure categories are seeded dynamically if empty.
      */
     private function ensureCategoriesSeeded(): void
@@ -591,6 +600,8 @@ Language: {$validated['language']}
      */
     public function storeCategory(Request $request)
     {
+        $this->checkAdminAccess();
+
         $validated = $request->validate([
             'name' => 'required|string|max:255|unique:categories,name',
         ]);
@@ -611,6 +622,8 @@ Language: {$validated['language']}
      */
     public function destroyCategory(Category $category)
     {
+        $this->checkAdminAccess();
+
         // Delete related subcategories & questions first
         $category->subcategory()->delete();
         $category->delete();
@@ -624,6 +637,8 @@ Language: {$validated['language']}
      */
     public function storeSubcategory(Request $request)
     {
+        $this->checkAdminAccess();
+
         $validated = $request->validate([
             'category_id' => 'required|exists:categories,id',
             'name' => 'required|string|max:255',
@@ -646,6 +661,8 @@ Language: {$validated['language']}
      */
     public function destroySubcategory(Subcategory $subcategory)
     {
+        $this->checkAdminAccess();
+
         $subcategory->delete();
         $this->clearCache();
 
