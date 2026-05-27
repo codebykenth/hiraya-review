@@ -1,5 +1,6 @@
 import React from 'react';
 import { PageContainer } from '@/components/page-container';
+import { PageHeader } from '@/components/page-header';
 import { Head, Link } from '@inertiajs/react';
 import { 
     ChevronLeft, 
@@ -49,14 +50,10 @@ export default function QuestionShow({ question }: QuestionShowProps) {
 
                 {/* Title & Edit Actions */}
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                    <div>
-                        <h1 className="font-heading text-3xl font-bold tracking-tight text-foreground md:text-4xl">
-                            Question Details
-                        </h1>
-                        <p className="mt-2 text-sm text-muted-foreground">
-                            Inspect CSE practice content, correct answer configurations, and cognitive rationales.
-                        </p>
-                    </div>
+                    <PageHeader
+                        title="Question Details"
+                        description="Inspect CSE practice content, correct answer configurations, and cognitive rationales."
+                    />
 
                     <Link href={questionsEdit(question.id).url}>
                         <Button

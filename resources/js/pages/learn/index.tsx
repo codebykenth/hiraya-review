@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { PageContainer } from '@/components/page-container';
+import { PageHeader } from '@/components/page-header';
 import { Card } from '@/components/ui/card';
 import { Head, Link } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
@@ -59,14 +60,10 @@ export default function LearnIndex({ modules, categories }: LearnIndexProps) {
             <PageContainer>
                 
                 {/* Header Banner */}
-                <div>
-                    <h1 className="font-heading text-3xl font-bold tracking-tight text-foreground md:text-4xl">
-                        CSE Study Hub
-                    </h1>
-                    <p className="mt-2 text-sm text-muted-foreground">
-                        Dive deep into core subjects, learn mental shortcuts, and master exam theories with our dedicated curated study guides.
-                    </p>
-                </div>
+                <PageHeader
+                    title="CSE Study Hub"
+                    description="Dive deep into core subjects, learn mental shortcuts, and master exam theories with our dedicated curated study guides."
+                />
 
                 {/* Search and Category Filter Row */}
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between rounded-2xl border border-border bg-card p-5 shadow-2xs">

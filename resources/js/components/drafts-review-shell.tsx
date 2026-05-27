@@ -185,7 +185,7 @@ export function DraftsReviewShell<T extends BaseDraftItem>({
                     <div className="flex items-center gap-2">
                         <Button
                             type="button"
-                            variant="secondary"
+                            variant="outline"
                             size="sm"
                             icon={ListChecks}
                             onClick={onToggleAll}

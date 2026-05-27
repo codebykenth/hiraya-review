@@ -1,5 +1,6 @@
 import React from 'react';
 import { PageContainer } from '@/components/page-container';
+import { PageHeader } from '@/components/page-header';
 import { Link } from '@inertiajs/react';
 import { ChevronLeft, Save } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -44,14 +45,7 @@ export function CurationEditShell({
                 {backLabel}
             </Link>
 
-            <div className="mt-2.5 mb-6">
-                <h1 className="font-heading text-3xl font-bold tracking-tight text-foreground md:text-4xl">
-                    {title}
-                </h1>
-                <p className="mt-2 text-sm text-muted-foreground">
-                    {description}
-                </p>
-            </div>
+            <PageHeader title={title} description={description} className="mt-2.5 mb-6" />
 
             <div className="max-w-4xl">
                 <form onSubmit={onSaveSubmit} className="flex flex-col gap-6 rounded-2xl border border-border bg-card p-6 shadow-sm">

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { PageContainer } from '@/components/page-container';
+import { PageHeader } from '@/components/page-header';
 import { Card } from '@/components/ui/card';
 import { Head, Link, setLayoutProps, router } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
@@ -474,14 +475,10 @@ export default function Drills({ questions = [], categories = [] }: DrillsProps)
     const renderHub = () => {
         return (
             <div className="flex flex-col gap-6">
-                <div>
-                    <h1 className="font-heading text-3xl font-bold tracking-tight text-foreground md:text-4xl">
-                        Practice Drill Hub
-                    </h1>
-                    <p className="mt-2 text-sm text-muted-foreground">
-                        Select a category below to focus your practice. Each drill module is designed to target specific cognitive areas required for civil service examinations.
-                    </p>
-                </div>
+                <PageHeader
+                    title="Practice Drill Hub"
+                    description="Select a category below to focus your practice. Each drill module is designed to target specific cognitive areas required for civil service examinations."
+                />
 
                 {categories.length > 0 ? (
                     <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -513,10 +510,10 @@ export default function Drills({ questions = [], categories = [] }: DrillsProps)
                                             </span>
                                         </div>
 
-                                        <h3 className="mt-5 font-heading text-lg font-bold text-foreground transition group-hover:text-blue-600 dark:group-hover:text-blue-400">
+                                        <h3 className="mt-5 font-heading text-xl font-bold text-foreground transition group-hover:text-blue-600 dark:group-hover:text-blue-400">
                                             {cat.name}
                                         </h3>
-                                        <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
+                                        <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
                                             {meta.description}
                                         </p>
                                     </div>
@@ -525,7 +522,7 @@ export default function Drills({ questions = [], categories = [] }: DrillsProps)
                                         {cat.subcategory.map(sub => (
                                             <span 
                                                 key={sub.id}
-                                                className="rounded-lg border border-border bg-slate-50/50 px-2 py-0.5 text-[9px] font-semibold text-muted-foreground dark:bg-slate-900/40"
+                                                className="rounded-lg border border-border bg-slate-50/50 px-2 py-0.5 text-xs font-semibold text-muted-foreground dark:bg-slate-900/40"
                                             >
                                                 {sub.name}
                                             </span>
@@ -610,14 +607,10 @@ export default function Drills({ questions = [], categories = [] }: DrillsProps)
                     <div className={`rounded-xl ${meta.bgColor} p-3 text-white shadow-xs`}>
                         <CategoryIcon className="size-6" />
                     </div>
-                    <div>
-                        <h1 className="font-heading text-3xl font-bold tracking-tight text-foreground md:text-4xl">
-                            {selectedCategory.name} Practice
-                        </h1>
-                        <p className="mt-2 text-sm text-muted-foreground">
-                            Configure your drill session parameters below.
-                        </p>
-                    </div>
+                    <PageHeader
+                        title={`${selectedCategory.name} Practice`}
+                        description="Configure your drill session parameters below."
+                    />
                 </div>
 
                 {/* Config Split Grid */}

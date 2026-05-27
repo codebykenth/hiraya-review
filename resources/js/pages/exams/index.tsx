@@ -2039,7 +2039,7 @@ export default function ExamIndex({
                                                     key={origIdx}
                                                     onClick={() => setCurrentIdx(origIdx)}
                                                     className={`relative flex size-10 items-center justify-center rounded-lg border text-xs font-bold transition focus:outline-none ${isActive
-                                                        ? 'border-blue-600 bg-blue-50 text-blue-600 dark:text-blue-400 ring-2 ring-blue-600 ring-offset-1 dark:ring-offset-background font-black'
+                                                        ? 'border-blue-600 bg-blue-50 text-blue-600 dark:text-blue-400 bg-card ring-2 ring-blue-600 ring-offset-1 dark:ring-offset-background font-black'
                                                         : isAnswered
                                                             ? 'border-blue-600 bg-blue-600 text-white hover:bg-blue-700'
                                                             : isFlagged
@@ -2739,7 +2739,7 @@ export default function ExamIndex({
                                             <Sparkles className="size-3.5 text-amber-500" />
                                             <span>Performance Insights</span>
                                         </div>
-                                        <p className="text-xs font-semibold text-slate-700 leading-relaxed dark:text-slate-350">
+                                        <p className="text-xs font-semibold text-slate-850 leading-relaxed">
                                             {aiAnalysisText}
                                         </p>
                                     </div>

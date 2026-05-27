@@ -7,6 +7,11 @@ use Illuminate\Support\Facades\Route;
 
 Route::inertia('/', 'welcome')->name('home');
 
+Route::get('ping', fn () => response()->json([
+    'status' => 'alive',
+    'timestamp' => now()->toIso8601String(),
+]));
+
 Route::inertia('dev-docs', 'dev-docs')
     ->name('dev-docs')
     ->middleware(['auth', 'verified', 'can:access-dev-docs']);

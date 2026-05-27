@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { PageContainer } from '@/components/page-container';
+import { TrackBadge, StatusBadge, ScoreProgress } from '@/components/attempt-components';
 import { Card } from '@/components/ui/card';
 import { Head, Link, usePage } from '@inertiajs/react';
 import { dashboard } from '@/routes';
@@ -583,9 +584,9 @@ export default function Dashboard({ stats }: DashboardProps) {
                                     No attempt logs available for this filter range.
                                 </p>
                             ) : (
-                                <div className="overflow-x-auto rounded-lg border border-slate-100 dark:border-slate-800/80">
-                                    <table className="w-full text-left text-sm text-slate-600 dark:text-slate-300">
-                                        <thead className="bg-slate-50/80 text-[10px] font-extrabold uppercase tracking-wider text-slate-600 dark:bg-slate-900/60 dark:text-slate-400">
+                                <div className="overflow-x-auto rounded-lg border border-border">
+                                    <table className="w-full text-left text-sm text-foreground">
+                                        <thead className="bg-slate-50/50 dark:bg-slate-900/30 text-[10px] font-black uppercase tracking-wider text-muted-foreground border-b border-border">
                                             <tr>
                                                 <th className="px-4 py-2.5">Attempt</th>
                                                 <th className="px-4 py-2.5">Date</th>
@@ -594,21 +595,13 @@ export default function Dashboard({ stats }: DashboardProps) {
                                                 <th className="px-4 py-2.5 text-right">Result</th>
                                             </tr>
                                         </thead>
-                                        <tbody className="divide-y divide-slate-100 bg-white dark:divide-slate-850 dark:bg-slate-950">
+                                        <tbody className="divide-y divide-border dark:divide-slate-900/80 bg-card">
                                             {[...filteredChartData].reverse().map((run, i) => {
                                                 if (run.track === 'No Data') return null;
-                                                const isPass = run.score >= 80;
+                                                const status = run.score >= 80 ? 'Pass' : 'Fail';
                                                 
-                                                // Consistent track pill configuration
-                                                const trackLower = run.track.toLowerCase();
-                                                const trackClass = trackLower.includes('professional exam')
-                                                    ? 'bg-blue-600 text-white dark:bg-blue-750'
-                                                    : trackLower.includes('subprofessional exam')
-                                                    ? 'bg-slate-200 text-slate-700 dark:bg-slate-800 dark:text-slate-300'
-                                                    : 'bg-emerald-600 text-white dark:bg-emerald-750';
-
                                                 return (
-                                                    <tr key={i} className="hover:bg-slate-50/50 dark:hover:bg-slate-900/30">
+                                                    <tr key={i} className="hover:bg-slate-50/20 dark:hover:bg-slate-900/10 transition">
                                                         <td className="px-4 py-4 font-black text-slate-950 dark:text-white">
                                                             {run.label}
                                                         </td>
@@ -616,52 +609,18 @@ export default function Dashboard({ stats }: DashboardProps) {
                                                             {run.date}
                                                         </td>
                                                         <td className="px-4 py-2.5">
-                                                            <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-extrabold ${trackClass}`}>
-                                                                {run.track}
-                                                            </span>
+                                                            <TrackBadge track={run.track} />
                                                         </td>
                                                         <td className="px-4 py-2.5">
-                                                            {(() => {
-                                                                const scoreColorClass = run.score >= 80
-                                                                    ? 'text-emerald-650 dark:text-emerald-400'
-                                                                    : run.score >= 60
-                                                                    ? 'text-blue-600 dark:text-blue-400'
-                                                                    : 'text-rose-600 dark:text-rose-400';
-                                                                return (
-                                                                    <div className={`text-base font-black ${scoreColorClass}`}>
-                                                                        {run.score}% <span className="text-xs font-semibold text-slate-400 dark:text-slate-500">({run.detail.split(' ')[0]})</span>
-                                                                    </div>
-                                                                );
-                                                            })()}
-                                                            {run.categoryScores && run.categoryScores.length > 0 && (
-                                                                <div className="mt-2 flex max-w-[24rem] flex-wrap gap-1.5">
-                                                                    {run.categoryScores.map((cat) => {
-                                                                        const catColorClass = cat.percentage >= 80
-                                                                            ? 'border-emerald-100 bg-emerald-50 text-emerald-700 dark:border-emerald-950/30 dark:bg-emerald-950/15 dark:text-emerald-400'
-                                                                            : cat.percentage >= 60
-                                                                            ? 'border-blue-100 bg-blue-50 text-blue-700 dark:border-blue-950/30 dark:bg-blue-950/15 dark:text-blue-400'
-                                                                            : 'border-rose-100 bg-rose-50 text-rose-700 dark:border-rose-950/30 dark:bg-rose-950/15 dark:text-rose-400';
-                                                                        return (
-                                                                            <span
-                                                                                key={cat.name}
-                                                                                className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[9px] font-extrabold ${catColorClass}`}
-                                                                                title={`${cat.correct}/${cat.total} correct`}
-                                                                            >
-                                                                                {cat.name}: <span className="font-black">{cat.percentage}%</span>
-                                                                            </span>
-                                                                        );
-                                                                    })}
-                                                                </div>
-                                                            )}
+                                                            <ScoreProgress 
+                                                                score={run.score} 
+                                                                status={status} 
+                                                                detail={run.detail}
+                                                                categoryScores={run.categoryScores}
+                                                            />
                                                         </td>
                                                         <td className="px-4 py-2.5 text-right">
-                                                            <span className={`inline-flex items-center rounded-full px-2.5 py-1 text-[9px] font-extrabold tracking-wide uppercase ${
-                                                                isPass 
-                                                                    ? 'bg-emerald-50 text-emerald-700 border border-emerald-250 dark:bg-emerald-950/30 dark:text-emerald-400 dark:border-emerald-900/50'
-                                                                    : 'bg-rose-50 text-rose-700 border border-rose-250 dark:bg-rose-950/30 dark:text-rose-400 dark:border-rose-900/50'
-                                                            }`}>
-                                                                {isPass ? 'Passed' : 'Failed'}
-                                                            </span>
+                                                            <StatusBadge status={status} />
                                                         </td>
                                                     </tr>
                                                 );

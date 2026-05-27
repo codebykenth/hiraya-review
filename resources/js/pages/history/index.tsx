@@ -1,5 +1,7 @@
 import { Head, router, Link } from '@inertiajs/react';
 import { PageContainer } from '@/components/page-container';
+import { PageHeader } from '@/components/page-header';
+import { TrackBadge, StatusBadge, ScoreProgress } from '@/components/attempt-components';
 import { Card } from '@/components/ui/card';
 import React, { useState } from 'react';
 import { index as historyIndex } from '@/routes/history';
@@ -153,14 +155,12 @@ export default function HistoryPage({ attempts = [], pagination, filters }: Hist
             <PageContainer>
                 
                 {/* 1. HEADER SECTION */}
-                <div className="flex flex-col gap-1">
-                    <h1 className="font-heading text-3xl font-bold tracking-tight text-foreground md:text-4xl">
-                        Attempt History
-                    </h1>
-                    <p className="text-sm text-muted-foreground max-w-3xl leading-relaxed">
-                        Review your past performance, analyze detailed score breakdowns, and identify specific areas for improvement across all your exam tracks.
-                    </p>
-                </div>
+                <PageHeader
+                    title="Attempt History"
+                    description="Review your past performance, analyze detailed score breakdowns, and identify specific areas for improvement across all your exam tracks."
+                    descriptionClassName="text-sm text-muted-foreground max-w-3xl leading-relaxed"
+                    className="flex flex-col gap-1"
+                />
 
                 {/* 2. FILTERS CONTAINER CARD */}
                 <div className="rounded-xl border border-border bg-card p-4 shadow-3xs">
@@ -282,44 +282,6 @@ export default function HistoryPage({ attempts = [], pagination, filters }: Hist
                                     </tr>
                                 ) : (
                                     attempts.map((att) => {
-                                        
-                                        // Track pill configuration
-                                        let trackClass = '';
-                                        if (att.track === 'Professional') {
-                                            trackClass = 'bg-blue-600 text-white dark:bg-blue-750';
-                                        } else if (att.track === 'Subprofessional') {
-                                            trackClass = 'bg-slate-200 text-slate-700 dark:bg-slate-800 dark:text-slate-300';
-                                        } else { // Drill
-                                            trackClass = 'bg-emerald-600 text-white dark:bg-emerald-750';
-                                        }
-
-                                        // Status badge configuration
-                                        let statusClass = '';
-                                        let StatusIcon = HelpCircle;
-                                        if (att.status === 'Pass') {
-                                            statusClass = 'bg-emerald-50 text-emerald-800 dark:bg-emerald-950/30 dark:text-emerald-450';
-                                            StatusIcon = CheckCircle2;
-                                        } else if (att.status === 'Fail') {
-                                            statusClass = 'bg-rose-50 text-rose-800 dark:bg-rose-950/30 dark:text-rose-450';
-                                            StatusIcon = XCircle;
-                                        } else { // Completed
-                                            statusClass = 'bg-blue-50 text-blue-800 dark:bg-blue-950/30 dark:text-blue-450';
-                                            StatusIcon = CheckCircle2;
-                                        }
-
-                                        // Score colors
-                                        const scoreColor = att.status === 'Pass' 
-                                            ? 'text-emerald-700 dark:text-emerald-450' 
-                                            : att.status === 'Fail' 
-                                            ? 'text-rose-650 dark:text-rose-400' 
-                                            : 'text-blue-655 dark:text-blue-450';
-                                        
-                                        const scoreBarColor = att.status === 'Pass' 
-                                            ? 'bg-emerald-600' 
-                                            : att.status === 'Fail' 
-                                            ? 'bg-rose-600' 
-                                            : 'bg-blue-600';
-
                                         return (
                                             <tr key={att.id} className="hover:bg-slate-50/20 dark:hover:bg-slate-900/10 transition">
                                                 
@@ -335,9 +297,7 @@ export default function HistoryPage({ attempts = [], pagination, filters }: Hist
 
                                                 {/* TRACK */}
                                                 <td className="px-6 py-4.5 whitespace-nowrap">
-                                                    <span className={`inline-flex rounded-full px-2.5 py-0.5 text-[10px] font-extrabold ${trackClass}`}>
-                                                        {att.track}
-                                                    </span>
+                                                    <TrackBadge track={att.track} />
                                                 </td>
 
                                                 {/* CATEGORY */}
@@ -352,40 +312,16 @@ export default function HistoryPage({ attempts = [], pagination, filters }: Hist
 
                                                 {/* SCORE */}
                                                 <td className="px-6 py-4.5">
-                                                    <div className="flex flex-col gap-2">
-                                                        <div className="flex items-center gap-3">
-                                                            <span className={`text-xs font-black w-8 shrink-0 ${scoreColor}`}>
-                                                                {att.score}%
-                                                            </span>
-                                                            <div className="h-1.5 w-24 rounded-full bg-slate-100 dark:bg-slate-900/50">
-                                                                <div 
-                                                                    className={`h-full rounded-full transition-all duration-300 ${scoreBarColor}`}
-                                                                    style={{ width: `${Math.max(3, att.score)}%` }}
-                                                                />
-                                                            </div>
-                                                        </div>
-                                                        {att.category_scores && att.category_scores.length > 0 && (
-                                                            <div className="flex max-w-[24rem] flex-wrap gap-1.5">
-                                                                {att.category_scores.map((cat) => (
-                                                                    <span
-                                                                        key={cat.name}
-                                                                        className="inline-flex items-center gap-1 rounded-md border border-border bg-slate-50 px-1.5 py-0.5 text-[9px] font-bold text-muted-foreground dark:bg-slate-900"
-                                                                        title={`${cat.correct}/${cat.total} correct`}
-                                                                    >
-                                                                        {cat.name}: <span className="text-foreground">{cat.percentage}%</span>
-                                                                    </span>
-                                                                ))}
-                                                            </div>
-                                                        )}
-                                                    </div>
+                                                    <ScoreProgress 
+                                                        score={att.score} 
+                                                        status={att.status} 
+                                                        categoryScores={att.category_scores}
+                                                    />
                                                 </td>
 
                                                 {/* STATUS */}
                                                 <td className="px-6 py-4.5 whitespace-nowrap">
-                                                    <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[10px] font-extrabold ${statusClass}`}>
-                                                        <StatusIcon className="size-3 shrink-0" />
-                                                        {att.status}
-                                                    </span>
+                                                    <StatusBadge status={att.status} />
                                                 </td>
 
                                                 {/* DURATION */}
