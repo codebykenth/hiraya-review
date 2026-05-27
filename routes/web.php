@@ -14,6 +14,7 @@ Route::middleware('throttle:global-views')->group(function () {
     Route::inertia('terms', 'legal/terms')->name('terms');
     Route::inertia('support', 'legal/support')->name('support');
     Route::inertia('guide', 'guide')->name('guide');
+    Route::get('exams', [ExamController::class, 'index'])->name('exams.index');
 
     Route::get('ping', fn () => response()->json([
         'status' => 'alive',
@@ -40,7 +41,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::middleware('throttle:global-views')->group(function () {
         Route::get('dashboard', [ExamController::class, 'dashboard'])->name('dashboard');
         Route::get('admin/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
-        Route::get('exams', [ExamController::class, 'index'])->name('exams.index');
         Route::get('drills', [ExamController::class, 'drills'])->name('drills.index');
         Route::get('history', [ExamController::class, 'history'])->name('history.index');
         Route::get('questions/drafts', [QuestionController::class, 'drafts'])->name('questions.drafts');

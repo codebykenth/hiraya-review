@@ -12,6 +12,7 @@ use Inertia\Response;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Cache;
 
 class AdminLearnController extends Controller
 {
@@ -22,6 +23,19 @@ class AdminLearnController extends Controller
     {
         if (!auth()->user() || auth()->user()->role !== 'admin') {
             abort(403, 'Unauthorized access to learning administration.');
+        }
+    }
+
+    /**
+     * Clear all related learning caches when content is modified.
+     */
+    private function clearCache(?LearnModule $module = null): void
+    {
+        Cache::forget('learn.modules.published');
+        Cache::forget('categories.tree');
+        if ($module) {
+            Cache::forget("learn.module.show.{$module->slug}");
+            Cache::forget("learn.module.recommended.{$module->id}");
         }
     }
 
@@ -146,6 +160,8 @@ class AdminLearnController extends Controller
                 }
             }
 
+            $this->clearCache();
+
             return redirect()->route('admin.learn.drafts')->with('success', "{$savedCount} approved learning modules published successfully!");
         }
 
@@ -181,6 +197,8 @@ class AdminLearnController extends Controller
             'is_published' => (bool) $validated['is_published'],
             'created_by' => auth()->id(),
         ]);
+
+        $this->clearCache();
 
         return redirect()->route('admin.learn.index')->with('success', 'Learning module created successfully!');
     }
@@ -253,6 +271,8 @@ class AdminLearnController extends Controller
             'is_published' => (bool) $validated['is_published'],
         ]);
 
+        $this->clearCache($module);
+
         return redirect()->route('admin.learn.index')->with('success', 'Learning module updated successfully!');
     }
 
@@ -265,6 +285,8 @@ class AdminLearnController extends Controller
 
         $module = LearnModule::findOrFail($id);
         $module->delete();
+
+        $this->clearCache($module);
 
         return redirect()->route('admin.learn.index')->with('success', 'Learning module deleted successfully!');
     }
@@ -453,6 +475,8 @@ Topic: {$validated['topic']}
                 'is_published' => false,
                 'created_by' => auth()->id(),
             ]);
+
+            $this->clearCache($dbModule);
 
             return response()->json([
                 'success' => true,

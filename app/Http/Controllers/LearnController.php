@@ -7,6 +7,7 @@ use App\Models\LearnModule;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
+use Illuminate\Support\Facades\Cache;
 
 class LearnController extends Controller
 {
@@ -15,26 +16,32 @@ class LearnController extends Controller
      */
     public function index(Request $request): Response
     {
-        // Load published learning modules with relations to avoid N+1 queries
-        $modules = LearnModule::with(['category', 'subcategory'])
-            ->where('is_published', true)
-            ->latest()
-            ->get()
-            ->map(function ($mod) {
-                return [
-                    'id' => $mod->id,
-                    'title' => $mod->title,
-                    'slug' => $mod->slug,
-                    'topic' => $mod->topic,
-                    'summary' => $mod->summary,
-                    'estimated_minutes' => $mod->estimated_minutes,
-                    'category' => $mod->category?->name ?? 'General Info',
-                    'subcategory' => $mod->subcategory?->name ?? 'Core Concepts',
-                ];
-            });
+        // Load published learning modules with relations from cache to avoid N+1 queries and DB pressure
+        $modules = Cache::rememberForever('learn.modules.published', function () {
+            return LearnModule::with(['category', 'subcategory'])
+                ->where('is_published', true)
+                ->latest()
+                ->get()
+                ->map(function ($mod) {
+                    return [
+                        'id' => $mod->id,
+                        'title' => $mod->title,
+                        'slug' => $mod->slug,
+                        'topic' => $mod->topic,
+                        'summary' => $mod->summary,
+                        'estimated_minutes' => $mod->estimated_minutes,
+                        'category' => $mod->category?->name ?? 'General Info',
+                        'subcategory' => $mod->subcategory?->name ?? 'Core Concepts',
+                    ];
+                })->toArray();
+        });
 
-        // Load all active categories to help filter modules on the frontend
-        $categories = Category::with('subcategory')->orderBy('sort_order')->get();
+        // Load all active categories from shared categories tree cache
+        $categories = Cache::rememberForever('categories.tree', function () {
+            return Category::with(['subcategory' => function($query) {
+                $query->orderBy('sort_order');
+            }])->orderBy('sort_order')->get()->toArray();
+        });
 
         return Inertia::render('learn/index', [
             'modules' => $modules,
@@ -47,29 +54,38 @@ class LearnController extends Controller
      */
     public function show(string $slug): Response
     {
-        $query = LearnModule::with(['category', 'subcategory', 'creator'])
-            ->where('slug', $slug);
+        $isAdmin = auth()->user() && auth()->user()->role === 'admin';
 
-        // Allow admins to preview draft/unpublished modules
-        if (!auth()->user() || auth()->user()->role !== 'admin') {
-            $query->where('is_published', true);
+        if ($isAdmin) {
+            // Admins can see draft/unpublished modules in real-time without caching
+            $module = LearnModule::with(['category', 'subcategory', 'creator'])
+                ->where('slug', $slug)
+                ->firstOrFail();
+        } else {
+            // General users fetch cached module details for blazing fast speeds
+            $module = Cache::rememberForever("learn.module.show.{$slug}", function () use ($slug) {
+                return LearnModule::with(['category', 'subcategory', 'creator'])
+                    ->where('slug', $slug)
+                    ->where('is_published', true)
+                    ->firstOrFail();
+            });
         }
 
-        $module = $query->firstOrFail();
-
-        // Load up next/recommended modules under the same category to prompt next reads
-        $recommended = LearnModule::where('category_id', $module->category_id)
-            ->where('id', '!=', $module->id)
-            ->where('is_published', true)
-            ->take(3)
-            ->get()
-            ->map(function ($mod) {
-                return [
-                    'title' => $mod->title,
-                    'slug' => $mod->slug,
-                    'estimated_minutes' => $mod->estimated_minutes,
-                ];
-            });
+        // Fetch recommended lessons from cache
+        $recommended = Cache::rememberForever("learn.module.recommended.{$module->id}", function () use ($module) {
+            return LearnModule::where('category_id', $module->category_id)
+                ->where('id', '!=', $module->id)
+                ->where('is_published', true)
+                ->take(3)
+                ->get()
+                ->map(function ($mod) {
+                    return [
+                        'title' => $mod->title,
+                        'slug' => $mod->slug,
+                        'estimated_minutes' => $mod->estimated_minutes,
+                    ];
+                })->toArray();
+        });
 
         return Inertia::render('learn/show', [
             'module' => [

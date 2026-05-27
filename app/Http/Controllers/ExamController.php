@@ -503,13 +503,17 @@ class ExamController extends Controller
         return $minutes . 'm';
     }
 
-    private function seenQuestionIdsByTrack(int $userId): array
+    private function seenQuestionIdsByTrack(?int $userId): array
     {
         $byTrack = [
             'Professional' => [],
             'Subprofessional' => [],
             'Drill' => [],
         ];
+
+        if (!$userId) {
+            return $byTrack;
+        }
 
         $attempts = \App\Models\ExamAttempt::where('user_id', $userId)->get();
 
@@ -531,24 +535,29 @@ class ExamController extends Controller
 
     public function drills(Request $request)
     {
-        $queryQuestions = Question::where('status', 'active')
-            ->with(['subcategory.category']);
+        $questions = Cache::rememberForever('questions.active', function () {
+            return Question::where('status', 'active')
+                ->with(['subcategory.category'])
+                ->get()
+                ->map(function ($q) {
+                    return [
+                        'id' => $q->id,
+                        'stem' => $q->stem,
+                        'options' => $q->options ?? [],
+                        'correct_option' => $q->correct_option,
+                        'explanation' => $q->explanation ?? '',
+                        'category' => $q->subcategory?->category?->name ?? 'General Information',
+                        'subcategory' => $q->subcategory?->name ?? '',
+                        'language' => $q->language ?? 'English',
+                    ];
+                })->toArray();
+        });
 
-        $questions = $queryQuestions->get()
-            ->map(function ($q) {
-                return [
-                    'id' => $q->id,
-                    'stem' => $q->stem,
-                    'options' => $q->options ?? [],
-                    'correct_option' => $q->correct_option,
-                    'explanation' => $q->explanation ?? '',
-                    'category' => $q->subcategory?->category?->name ?? 'General Information',
-                    'subcategory' => $q->subcategory?->name ?? '',
-                    'language' => $q->language ?? 'English',
-                ];
-            });
-
-        $categories = Category::with('subcategory')->get();
+        $categories = Cache::rememberForever('categories.tree', function () {
+            return Category::with(['subcategory' => function($query) {
+                $query->orderBy('sort_order');
+            }])->orderBy('sort_order')->get()->toArray();
+        });
 
         return Inertia::render('drills/index', [
             'questions' => $questions,

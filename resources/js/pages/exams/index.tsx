@@ -807,6 +807,8 @@ export default function ExamIndex({
     }, [drillCategoryName, savedAttempt, activeQuestions, sessionTimeLimitSecs, categories]);
 
     const details = getSimulationDetails(selectedExamId);
+    const detailsTitle = details.title;
+    const detailsTimeLimitSecs = details.timeLimitSecs;
     const isDrillSession = selectedExamId === null || selectedExamId > 2 || savedAttempt?.cat_scores?.metadata?.track === 'Drill' || drillCategoryName !== null;
 
     useEffect(() => {
@@ -1518,7 +1520,7 @@ export default function ExamIndex({
 
         const scoredItemsCount = activeQuestions.filter(q => !(q.category === 'Demographic Profile' || q.isDemographic)).length || 1;
         const percentage = Math.round((score / scoredItemsCount) * 100);
-        const limitSecs = sessionTimeLimitSecs || details.timeLimitSecs;
+        const limitSecs = sessionTimeLimitSecs || detailsTimeLimitSecs;
         const elapsedSecs = isTimed
             ? Math.min(limitSecs, Math.max(0, limitSecs - timeLeftRef.current))
             : timeLeftRef.current;
@@ -1540,9 +1542,9 @@ export default function ExamIndex({
         // Persist attempt in DB in background
         const durationSecs = elapsedSecs;
         const isDrillSession = selectedExamId === null || drillCategoryName !== null;
-        const trackName = isDrillSession ? 'Drill' : (details.title.includes('Sub-Professional') ? 'Subprofessional' : 'Professional');
+        const trackName = isDrillSession ? 'Drill' : (detailsTitle.includes('Sub-Professional') ? 'Subprofessional' : 'Professional');
         const finalCategoryId = isDrillSession ? (drillCategoryId || savedAttempt?.category_id || null) : null;
-        const finalCategoryName = isDrillSession ? (drillCategoryName || savedAttempt?.cat_scores?.metadata?.category_name || 'Practice Drill') : details.title;
+        const finalCategoryName = isDrillSession ? (drillCategoryName || savedAttempt?.cat_scores?.metadata?.category_name || 'Practice Drill') : detailsTitle;
 
         // Map the answers array back to original unshuffled options indices for backend DB persistence
         const originalAnswers: Record<number, number> = {};
@@ -1599,7 +1601,8 @@ export default function ExamIndex({
         activeQuestions,
         answers,
         sessionTimeLimitSecs,
-        details,
+        detailsTitle,
+        detailsTimeLimitSecs,
         isTimed,
         selectedExamId,
         drillCategoryName,
