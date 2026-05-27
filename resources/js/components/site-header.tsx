@@ -44,7 +44,9 @@ export default function SiteHeader({
             } else if (currentScrollY > lastScrollY) {
                 setShowHeader(false);
             } else {
-                showHeader || setShowHeader(true);
+                if (!showHeader) {
+                    setShowHeader(true);
+                }
             }
 
             setLastScrollY(currentScrollY);

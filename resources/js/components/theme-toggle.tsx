@@ -11,7 +11,7 @@ import {
 import { Button } from '@/components/ui/button';
 
 export function ThemeToggle() {
-    const { appearance, resolvedAppearance, updateAppearance } = useAppearance();
+    const { appearance, updateAppearance } = useAppearance();
 
     const options: { value: Appearance; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
         { value: 'light', label: 'Light', icon: Sun },

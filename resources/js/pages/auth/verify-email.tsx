@@ -8,28 +8,25 @@ import { logout } from '@/routes';
 import { send } from '@/routes/verification';
 
 export default function VerifyEmail({ status }: { status?: string }) {
-    const [resendCount, setResendCount] = useState<number>(0);
-    const [timeLeft, setTimeLeft] = useState<number>(0);
-
-    // Hydrate state from sessionStorage on mount
-    useEffect(() => {
-        const storedCount = sessionStorage.getItem('verifyEmailResendCount');
-        const storedNextTime = sessionStorage.getItem(
-            'verifyEmailNextAllowedTime',
-        );
-
-        if (storedCount) {
-            setResendCount(parseInt(storedCount, 10));
+    const [resendCount, setResendCount] = useState<number>(() => {
+        if (typeof window !== 'undefined') {
+            const storedCount = sessionStorage.getItem('verifyEmailResendCount');
+            return storedCount ? parseInt(storedCount, 10) : 0;
         }
-
-        if (storedNextTime) {
-            const nextTime = parseInt(storedNextTime, 10);
-            const remaining = Math.ceil((nextTime - Date.now()) / 1000);
-            if (remaining > 0) {
-                setTimeLeft(remaining);
+        return 0;
+    });
+    
+    const [timeLeft, setTimeLeft] = useState<number>(() => {
+        if (typeof window !== 'undefined') {
+            const storedNextTime = sessionStorage.getItem('verifyEmailNextAllowedTime');
+            if (storedNextTime) {
+                const nextTime = parseInt(storedNextTime, 10);
+                const remaining = Math.ceil((nextTime - Date.now()) / 1000);
+                return remaining > 0 ? remaining : 0;
             }
         }
-    }, []);
+        return 0;
+    });
 
     // Countdown timer
     useEffect(() => {

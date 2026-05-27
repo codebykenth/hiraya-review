@@ -1,6 +1,4 @@
 import { Head } from '@inertiajs/react';
-import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
-import { devDocs } from '@/routes';
 
 export default function DevDocs() {
     return (

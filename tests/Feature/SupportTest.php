@@ -54,6 +54,7 @@ test('support submission validation rules are enforced', function () {
 });
 
 test('rate limit is active in production environment and returns Inertia errors', function () {
+    $this->withoutMiddleware(\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class);
     app()->detectEnvironment(fn () => 'production');
     Mail::fake();
 

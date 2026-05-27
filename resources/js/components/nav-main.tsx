@@ -46,8 +46,11 @@ export function NavMain({ items = [], label = 'Platform' }: { items: NavItem[], 
                 }
             }
         }
-        setOpenItems(next);
-    }, [url, items]);
+        const timer = setTimeout(() => {
+            setOpenItems(next);
+        }, 0);
+        return () => clearTimeout(timer);
+    }, [url, items, isCurrentUrl]);
 
     const toggleItem = (title: string) => {
         setOpenItems(prev => {

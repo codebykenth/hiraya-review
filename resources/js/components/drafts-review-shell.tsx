@@ -116,25 +116,22 @@ export function DraftsReviewShell<T extends BaseDraftItem>({
 
     // Filtering & Pagination States
     const [filterSearch, setFilterSearch] = useState('');
+    const [debouncedFilterSearch, setDebouncedFilterSearch] = useState('');
     const [filterStatus, setFilterStatus] = useState<'all' | 'approved' | 'pending'>('all');
     const [filterCategory, setFilterCategory] = useState<string>('all');
     const [filterSubcategory, setFilterSubcategory] = useState<string>('all');
     const [currentPage, setCurrentPage] = useState(1);
     const pageSize = 5;
 
-    // Reset pagination on filter change
     useEffect(() => {
-        setCurrentPage(1);
-    }, [filterSearch, filterStatus, filterCategory, filterSubcategory]);
+        const handler = setTimeout(() => {
+            setDebouncedFilterSearch(filterSearch);
+        }, 300);
+        return () => clearTimeout(handler);
+    }, [filterSearch]);
 
-    // Reset subcategory filter when category filter changes
-    useEffect(() => {
-        setFilterSubcategory('all');
-    }, [filterCategory]);
-
-    // Apply filters
     const filteredDrafts = items.filter(item => {
-        const matchesSearch = searchMatcher(item, filterSearch);
+        const matchesSearch = searchMatcher(item, debouncedFilterSearch);
 
         const matchesStatus =
             filterStatus === 'all' ||
@@ -213,7 +210,10 @@ export function DraftsReviewShell<T extends BaseDraftItem>({
                         <input
                             type="text"
                             value={filterSearch}
-                            onChange={(e) => setFilterSearch(e.target.value)}
+                            onChange={(e) => {
+                                setFilterSearch(e.target.value);
+                                setCurrentPage(1);
+                            }}
                             placeholder={searchPlaceholder}
                             className="w-full rounded-lg border border-border px-3 py-1.5 text-xs font-semibold text-foreground placeholder:text-muted-foreground focus:border-blue-500 focus:outline-none transition bg-muted"
                         />
@@ -224,7 +224,11 @@ export function DraftsReviewShell<T extends BaseDraftItem>({
                         <div className="relative min-w-[120px]">
                             <select
                                 value={filterCategory}
-                                onChange={(e) => setFilterCategory(e.target.value)}
+                                onChange={(e) => {
+                                    setFilterCategory(e.target.value);
+                                    setFilterSubcategory('all');
+                                    setCurrentPage(1);
+                                }}
                                 className="w-full rounded-lg border border-border bg-background pl-2.5 pr-8 py-1.5 text-xs font-bold text-foreground transition focus:border-blue-500 focus:outline-none appearance-none"
                             >
                                 <option value="all" className="dark:bg-slate-950">All Categories</option>
@@ -239,7 +243,10 @@ export function DraftsReviewShell<T extends BaseDraftItem>({
                         <div className="relative min-w-[130px]">
                             <select
                                 value={filterSubcategory}
-                                onChange={(e) => setFilterSubcategory(e.target.value)}
+                                onChange={(e) => {
+                                    setFilterSubcategory(e.target.value);
+                                    setCurrentPage(1);
+                                }}
                                 className="w-full rounded-lg border border-border bg-background pl-2.5 pr-8 py-1.5 text-xs font-bold text-foreground transition focus:border-blue-500 focus:outline-none appearance-none"
                             >
                                 <option value="all" className="dark:bg-slate-950">All Subcategories</option>
@@ -257,7 +264,10 @@ export function DraftsReviewShell<T extends BaseDraftItem>({
                         <div className="relative w-28">
                             <select
                                 value={filterStatus}
-                                onChange={(e) => setFilterStatus(e.target.value as any)}
+                                onChange={(e) => {
+                                    setFilterStatus(e.target.value as any);
+                                    setCurrentPage(1);
+                                }}
                                 className="w-full rounded-lg border border-border bg-background pl-2.5 pr-8 py-1.5 text-xs font-bold text-foreground transition focus:border-blue-500 focus:outline-none appearance-none"
                             >
                                 <option value="all" className="dark:bg-slate-950">All Statuses</option>

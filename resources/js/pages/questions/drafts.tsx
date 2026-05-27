@@ -1,4 +1,4 @@
-import { Head, Link, useForm, router } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 import {
     Check,
     X,
@@ -7,7 +7,8 @@ import {
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { index as questionsIndex, store as questionsStore, create as questionsCreate, destroy as questionsDestroy } from '@/routes/questions';
-import { DraftsReviewShell, CategoryItem } from '@/components/drafts-review-shell';
+import { DraftsReviewShell } from '@/components/drafts-review-shell';
+import type { CategoryItem } from '@/components/drafts-review-shell';
 
 interface DraftQuestion {
     id: number;

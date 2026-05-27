@@ -14,7 +14,8 @@ import {
     Sparkles
 } from 'lucide-react';
 import { LessonMarkdown } from '@/components/lesson-markdown';
-import { DraftsReviewShell, CategoryItem } from '@/components/drafts-review-shell';
+import { DraftsReviewShell } from '@/components/drafts-review-shell';
+import type { CategoryItem } from '@/components/drafts-review-shell';
 
 interface DraftModule {
     id: number;

@@ -1,10 +1,8 @@
 import type { PropsWithChildren } from 'react';
-import { School } from 'lucide-react';
 import SiteHeader from '@/components/site-header';
 import SiteFooter from '@/components/site-footer';
 import BrandName from '@/components/brand-name';
 import AppLogoIcon from '@/components/app-logo-icon';
-import AppLogo from '@/components/app-logo';
 
 export default function AuthCardLayout({
     children,

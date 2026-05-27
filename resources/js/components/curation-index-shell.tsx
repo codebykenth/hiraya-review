@@ -7,9 +7,7 @@ import {
     FileText,
     Database,
     PenLine,
-    ChevronDown,
-    PlusCircle,
-    Trash2
+    ChevronDown
 } from 'lucide-react';
 import { CategoryItem } from './drafts-review-shell';
 import { ConfirmModal } from '@/components/confirm-modal';
@@ -85,9 +83,17 @@ export function CurationIndexShell<T>({
     deleteConfirmLabel
 }: CurationIndexShellProps<T>) {
     const [searchTerm, setSearchTerm] = useState('');
+    const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('All Categories');
     const [selectedSubcategory, setSelectedSubcategory] = useState('All Subcategories');
     const [selectedStatus, setSelectedStatus] = useState('All Statuses');
+
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            setDebouncedSearchTerm(searchTerm);
+        }, 300);
+        return () => clearTimeout(handler);
+    }, [searchTerm]);
 
     // Build categories tree dynamically with robust static CSC fallback
     const cseCategoriesTree: Record<string, string[]> = {};
@@ -129,16 +135,6 @@ export function CurationIndexShell<T>({
 
     const [currentPage, setCurrentPage] = useState(1);
     const pageSize = 10;
-
-    // Reset subcategory and current page when filters change
-    useEffect(() => {
-        setSelectedSubcategory('All Subcategories');
-        setCurrentPage(1);
-    }, [selectedCategory]);
-
-    useEffect(() => {
-        setCurrentPage(1);
-    }, [searchTerm, selectedSubcategory, selectedStatus]);
 
     // Dynamic Syllabus Scope modal state variables
     const [isScopeModalOpen, setIsScopeModalOpen] = useState(false);
@@ -232,7 +228,7 @@ export function CurationIndexShell<T>({
     const [itemToDelete, setItemToDelete] = useState<T | null>(null);
 
     const filteredItems = items.filter(item => {
-        const matchesSearch = searchMatcher(item, searchTerm);
+        const matchesSearch = searchMatcher(item, debouncedSearchTerm);
 
         const matchesCategory =
             selectedCategory === 'All Categories' ||
@@ -358,7 +354,10 @@ export function CurationIndexShell<T>({
                         <input
                             type="text"
                             value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
+                            onChange={(e) => {
+                                setSearchTerm(e.target.value);
+                                setCurrentPage(1);
+                            }}
                             placeholder={searchPlaceholder}
                             className="w-full rounded-lg border border-border pl-9 pr-3 py-1.5 text-xs font-semibold text-foreground placeholder:text-muted-foreground focus:border-blue-500 focus:outline-none transition bg-muted"
                         />
@@ -371,7 +370,11 @@ export function CurationIndexShell<T>({
                         <div className="relative min-w-0 md:min-w-[145px]">
                             <select
                                 value={selectedCategory}
-                                onChange={(e) => setSelectedCategory(e.target.value)}
+                                onChange={(e) => {
+                                    setSelectedCategory(e.target.value);
+                                    setSelectedSubcategory('All Subcategories');
+                                    setCurrentPage(1);
+                                }}
                                 className="w-full rounded-lg border border-border bg-background pl-2.5 pr-8 py-1.5 text-xs font-bold text-foreground transition focus:border-blue-500 focus:outline-none appearance-none"
                             >
                                 <option value="All Categories" className="dark:bg-slate-950">All Categories</option>
@@ -386,7 +389,10 @@ export function CurationIndexShell<T>({
                         <div className="relative min-w-0 md:min-w-[155px]">
                             <select
                                 value={selectedSubcategory}
-                                onChange={(e) => setSelectedSubcategory(e.target.value)}
+                                onChange={(e) => {
+                                    setSelectedSubcategory(e.target.value);
+                                    setCurrentPage(1);
+                                }}
                                 className="w-full rounded-lg border border-border bg-background pl-2.5 pr-8 py-1.5 text-xs font-bold text-foreground transition focus:border-blue-500 focus:outline-none appearance-none"
                             >
                                 <option value="All Subcategories" className="dark:bg-slate-950">All Subcategories</option>
@@ -404,7 +410,10 @@ export function CurationIndexShell<T>({
                         <div className="relative col-span-2 sm:col-span-1 min-w-0 md:min-w-[120px]">
                             <select
                                 value={selectedStatus}
-                                onChange={(e) => setSelectedStatus(e.target.value)}
+                                onChange={(e) => {
+                                    setSelectedStatus(e.target.value);
+                                    setCurrentPage(1);
+                                }}
                                 className="w-full rounded-lg border border-border bg-background pl-2.5 pr-8 py-1.5 text-xs font-bold text-foreground transition focus:border-blue-500 focus:outline-none appearance-none"
                             >
                                 <option value="All Statuses" className="dark:bg-slate-950">All Statuses</option>
@@ -484,6 +493,20 @@ export function CurationIndexShell<T>({
                         onDeleteConfirm(itemToDelete);
                         setItemToDelete(null);
                     }
+                }}
+            />
+
+            {/* Confirm modal for categories/subcategories deletion */}
+            <ConfirmModal
+                isOpen={confirmModal.isOpen}
+                title={confirmModal.title}
+                message={confirmModal.message}
+                confirmLabel={confirmModal.confirmLabel}
+                variant={confirmModal.variant}
+                onClose={() => setConfirmModal(prev => ({ ...prev, isOpen: false }))}
+                onConfirm={() => {
+                    confirmModal.onConfirm();
+                    setConfirmModal(prev => ({ ...prev, isOpen: false }));
                 }}
             />
         </PageContainer>

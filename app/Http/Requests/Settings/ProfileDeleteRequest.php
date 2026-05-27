@@ -2,14 +2,11 @@
 
 namespace App\Http\Requests\Settings;
 
-use App\Concerns\PasswordValidationRules;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
 class ProfileDeleteRequest extends FormRequest
 {
-    use PasswordValidationRules;
-
     /**
      * Get the validation rules that apply to the request.
      *
@@ -17,12 +14,21 @@ class ProfileDeleteRequest extends FormRequest
      */
     public function rules(): array
     {
-        $user = $this->user();
-
         return [
-            'password' => $user && $user->provider
-                ? ['nullable', 'string']
-                : $this->currentPasswordRules(),
+            'confirmation' => ['required', 'string', 'in:delete account'],
+        ];
+    }
+
+    /**
+     * Get custom messages for validator errors.
+     *
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'confirmation.in' => __('Please type "delete account" exactly to confirm.'),
+            'confirmation.required' => __('Please type "delete account" exactly to confirm.'),
         ];
     }
 }

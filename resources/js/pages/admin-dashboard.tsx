@@ -57,7 +57,7 @@ interface AdminDashboardProps {
     tracks: TrackItem[];
 }
 
-export default function AdminDashboard({ metrics, recentAttempts = [], categoriesStats = [], tracks = [] }: AdminDashboardProps) {
+export default function AdminDashboard({ metrics, recentAttempts = [], categoriesStats = [] }: AdminDashboardProps) {
     const { auth } = usePage().props;
     const adminName = auth?.user?.name ? auth.user.name.split(' ')[0] : 'Admin';
 

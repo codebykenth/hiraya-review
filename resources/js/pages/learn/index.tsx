@@ -177,13 +177,13 @@ export default function LearnIndex({ modules, categories }: LearnIndexProps) {
                             </div>
                             <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-3.5 py-1 text-[10px] font-extrabold tracking-wider text-amber-700 dark:bg-amber-950/40 dark:text-amber-400 uppercase mb-3.5">
                                 <span className="size-1.5 rounded-full bg-amber-500" />
-                                Curated Modules Coming Soon
+                                Coming Soon
                             </span>
                             <h3 className="font-heading text-lg font-bold text-foreground">
-                                Interactive Study Guides & Prep Sheets
+                                No Learning Modules  Available
                             </h3>
                             <p className="mx-auto mt-2 max-w-2xl text-xs leading-relaxed text-muted-foreground">
-                                We are currently designing bite-sized conceptual lessons, strategy guides, and detailed category rationales mapped perfectly to the Civil Service Commission curriculum.
+                                We are currently designing bite-sized conceptual lessons, strategy guides, and detailed category rationales.
                             </p>
                         </div>
                     ) : (

@@ -13,11 +13,8 @@ import {
     Award,
     FileText,
     ChevronDown,
-    Zap,
     Clock,
-    CheckCircle2,
     Target,
-    HelpCircle,
     Info,
 } from 'lucide-react';
 

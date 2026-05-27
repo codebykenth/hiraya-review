@@ -7,15 +7,9 @@ import {
     Users, 
     UserPlus, 
     Trash2, 
-    ShieldAlert, 
-    ChevronLeft, 
-    ChevronRight, 
-    X, 
-    ChevronDown,
-    Activity,
     Calendar,
-    HelpCircle,
-    CheckCircle2
+    Activity,
+    ChevronDown
 } from 'lucide-react';
 import { 
     index as adminUsersIndex,
@@ -51,14 +45,17 @@ export default function AdminUsersIndex({ users = [], stats }: AdminUsersIndexPr
     const currentUser = auth.user;
 
     const [searchTerm, setSearchTerm] = useState('');
+    const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
     const [selectedRole, setSelectedRole] = useState('All Roles');
     const [currentPage, setCurrentPage] = useState(1);
     const pageSize = 10;
 
-    // Reset pagination when searching or filtering
     useEffect(() => {
-        setCurrentPage(1);
-    }, [searchTerm, selectedRole]);
+        const handler = setTimeout(() => {
+            setDebouncedSearchTerm(searchTerm);
+        }, 300);
+        return () => clearTimeout(handler);
+    }, [searchTerm]);
 
     // Custom confirm/warning modal state
     const [confirmModal, setConfirmModal] = useState<{
@@ -137,9 +134,9 @@ export default function AdminUsersIndex({ users = [], stats }: AdminUsersIndexPr
 
     const filteredUsers = users.filter((u) => {
         const matchesSearch = 
-            u.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            u.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            String(u.id).includes(searchTerm);
+            u.name.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
+            u.email.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
+            String(u.id).includes(debouncedSearchTerm);
 
         const matchesRole = 
             selectedRole === 'All Roles' || 
@@ -320,7 +317,10 @@ export default function AdminUsersIndex({ users = [], stats }: AdminUsersIndexPr
                             <input
                                 type="text"
                                 value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
+                                onChange={(e) => {
+                                    setSearchTerm(e.target.value);
+                                    setCurrentPage(1);
+                                }}
                                 placeholder="Search users by name, email, or ID..."
                                 className="w-full rounded-lg border border-border pl-9 pr-3 py-1.5 text-xs font-semibold text-foreground placeholder:text-muted-foreground focus:border-blue-500 focus:outline-none transition bg-muted"
                             />
@@ -331,7 +331,10 @@ export default function AdminUsersIndex({ users = [], stats }: AdminUsersIndexPr
                         <div className="relative min-w-0 md:min-w-[145px]">
                             <select
                                 value={selectedRole}
-                                onChange={(e) => setSelectedRole(e.target.value)}
+                                onChange={(e) => {
+                                    setSelectedRole(e.target.value);
+                                    setCurrentPage(1);
+                                }}
                                 className="w-full rounded-lg border border-border bg-background pl-2.5 pr-8 py-1.5 text-xs font-bold text-foreground transition focus:border-blue-500 focus:outline-none appearance-none"
                             >
                                 <option value="All Roles">All Roles</option>

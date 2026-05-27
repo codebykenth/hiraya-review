@@ -17,10 +17,8 @@ import {
     Flag,
     ChevronLeft,
     ChevronRight,
-    Play,
     BookOpen,
     HelpCircle,
-    Database,
     RotateCcw,
     ChevronDown,
     Brain,
@@ -963,47 +961,57 @@ export default function ExamIndex({
 
             if (savedAttempt) {
                 if (reviewScreenActive) {
-                    setLayoutProps({
-                        breadcrumbs: [
-                            { title: 'History', href: '/history' },
-                            { title: attemptTitle, href: `/exams?attempt_id=${savedAttempt.id}` },
-                            { title: 'Answer Review', href: '#' }
-                        ]
-                    });
+                    setTimeout(() => {
+                        setLayoutProps({
+                            breadcrumbs: [
+                                { title: 'History', href: '/history' },
+                                { title: attemptTitle, href: `/exams?attempt_id=${savedAttempt.id}` },
+                                { title: 'Answer Review', href: '#' }
+                            ]
+                        });
+                    }, 0);
                 } else {
-                    setLayoutProps({
-                        breadcrumbs: [
-                            { title: 'History', href: '/history' },
-                            { title: attemptTitle, href: '#' }
-                        ]
-                    });
+                    setTimeout(() => {
+                        setLayoutProps({
+                            breadcrumbs: [
+                                { title: 'History', href: '/history' },
+                                { title: attemptTitle, href: '#' }
+                            ]
+                        });
+                    }, 0);
                 }
             } else {
                 if (reviewScreenActive) {
-                    setLayoutProps({
-                        breadcrumbs: [
-                            { title: parentTitle, href: parentHref },
-                            { title: 'History', href: '/history' },
-                            { title: attemptTitle, href: `/exams?attempt_id=${lastStoredAttemptId || 104}` },
-                            { title: 'Answer Review', href: '#' }
-                        ]
-                    });
+                    setTimeout(() => {
+                        setLayoutProps({
+                            breadcrumbs: [
+                                { title: parentTitle, href: parentHref },
+                                { title: 'History', href: '/history' },
+                                { title: attemptTitle, href: `/exams?attempt_id=${lastStoredAttemptId || 104}` },
+                                { title: 'Answer Review', href: '#' }
+                            ]
+                        });
+                    }, 0);
                 } else {
-                    setLayoutProps({
-                        breadcrumbs: [
-                            { title: parentTitle, href: parentHref },
-                            { title: 'History', href: '/history' },
-                            { title: attemptTitle, href: '#' }
-                        ]
-                    });
+                    setTimeout(() => {
+                        setLayoutProps({
+                            breadcrumbs: [
+                                { title: parentTitle, href: parentHref },
+                                { title: 'History', href: '/history' },
+                                { title: attemptTitle, href: '#' }
+                            ]
+                        });
+                    }, 0);
                 }
             }
         } else {
-            setLayoutProps({
-                breadcrumbs: [
-                    { title: 'Exams', href: '/exams' }
-                ]
-            });
+            setTimeout(() => {
+                setLayoutProps({
+                    breadcrumbs: [
+                        { title: 'Exams', href: '/exams' }
+                    ]
+                });
+            }, 0);
         }
     }, [isExamSubmitted, results, reviewScreenActive, savedAttempt]);
 
@@ -1388,12 +1396,14 @@ export default function ExamIndex({
             setSubmittedByTimer(false);
             setShowRetakeModal(false);
 
-            setLayoutProps({
-                breadcrumbs: [
-                    { title: 'Practice', href: '/drills' },
-                    { title: `${catName} Active Practice`, href: '#' }
-                ]
-            });
+            setTimeout(() => {
+                setLayoutProps({
+                    breadcrumbs: [
+                        { title: 'Practice', href: '/drills' },
+                        { title: `${catName} Active Practice`, href: '#' }
+                    ]
+                });
+            }, 0);
         }
     }, [questions, savedAttempt]);
 

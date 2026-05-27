@@ -1,9 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { PageContainer } from '@/components/page-container';
 import { PageHeader } from '@/components/page-header';
 import { Card } from '@/components/ui/card';
-import { Head, Link, setLayoutProps, router } from '@inertiajs/react';
-import AppLayout from '@/layouts/app-layout';
+import { Head, setLayoutProps, router } from '@inertiajs/react';
 import { index as drillsIndex } from '@/routes/drills';
 import {
     BookOpen,
@@ -12,19 +11,11 @@ import {
     ClipboardList,
     Globe,
     CheckCircle2,
-    Clock,
     Timer,
     ChevronLeft,
     ChevronRight,
-    X,
-    LayoutGrid,
-    RotateCcw,
-    Play,
-    AlertCircle,
-    Flag,
     Check,
-    Hourglass,
-    Award
+    Hourglass
 } from 'lucide-react';
 
 interface Question {
@@ -49,207 +40,6 @@ interface Category {
     name: string;
     subcategory: Subcategory[];
 }
-
-const renderFormattedText = (text: string) => {
-    if (!text) return null;
-
-    // Strict 1-liner comment: Pre-format continuous single-line numbered lists to newlines
-    const cleanedText = text.replace(/(?:\s+|:|^)(\d+\.)\s+/g, '\n$1 ');
-
-    const tableRegex = /((?:^|\n)\|[^\n]+\|[^\n]*(?:\n\|[^\n]+\|[^\n]*)+)/g;
-    const parts = cleanedText.split(tableRegex);
-
-    const formatNumberedLists = (inputText: string) => {
-        if (!inputText) return null;
-
-        const lines = inputText.split(/\n/);
-        const listRegex = /^\s*(\(\d+\)|\d+\.)\s+(.+)$/;
-        
-        const listItems: { marker: string; text: string }[] = [];
-        let introLines: string[] = [];
-        let outroLines: string[] = [];
-        
-        for (const line of lines) {
-            const trimmed = line.trim();
-            if (!trimmed) continue;
-            
-            const match = trimmed.match(listRegex);
-            if (match) {
-                listItems.push({ marker: match[1], text: match[2] });
-            } else {
-                if (listItems.length === 0) {
-                    introLines.push(line);
-                } else {
-                    outroLines.push(line);
-                }
-            }
-        }
-
-        const renderRichParagraph = (paraText: string, defaultClass: string = "text-muted-foreground leading-relaxed text-base font-medium") => {
-            if (!paraText) return null;
-
-            // Strict 1-liner comment: Regex to match standard math expressions, logic arrow chains, negation states, parenthesized variables, and single letter variables
-            const mathPattern = /(\b\d+(?:\.\d+)?%|\b\d+\/\d+\b|\[[^\]]+\]|\bProject\s+[A-Z]\b|\bQ[1-4]\b|(?:\b\d+(?:,\d{3})*(?:\.\d+)?\s*[\+\-\*\/=]\s*)+\d+(?:,\d{3})*(?:\.\d+)?%?|[~¬]?\s*\b[A-Z]\b\s*(?:->|=>)\s*[~¬]?\s*\b[A-Z]\b(?:\s*(?:->|=>)\s*[~¬]?\s*\b[A-Z]\b)*|[~¬]\s*\b[A-Z]\b|\(\s*[~¬]?\s*\b[A-Z]\b\s*\)|'\s*\b[A-Z]\b\s*'|"\s*\b[A-Z]\b\s*"|\b[B-H|J-N|P-Z]\b)/g;
-            const boldParts = paraText.split(/(\*\*[^*]+\*\*)/g);
-            
-            const renderSingleVariable = (v: string) => {
-                const cleaned = v.trim();
-                const isNegated = cleaned.startsWith('~') || cleaned.startsWith('¬');
-                const letter = cleaned.replace(/[~¬]\s*/, '');
-                
-                if (isNegated) {
-                    return (
-                        <span className="inline-flex items-center text-xs font-bold text-red-600 bg-red-50 border border-red-100 px-1.5 py-0.5 rounded-md font-mono select-all shadow-3xs">
-                            <span className="text-[10px] text-red-400 mr-0.5 font-bold">¬</span>
-                            {letter}
-                        </span>
-                    );
-                }
-                return (
-                    <span className="inline-flex items-center text-xs font-bold text-blue-700 bg-blue-50 border border-blue-100 px-1.5 py-0.5 rounded-md font-mono select-all shadow-3xs">
-                        {letter}
-                    </span>
-                );
-            };
-
-            const renderTokenContent = (token: string) => {
-                // If it is a logic chain
-                if (token.includes('->') || token.includes('=>')) {
-                    const variables = token.split(/\s*(?:->|=>)\s*/);
-                    return (
-                        <span className="inline-flex items-center gap-1 mx-1 my-0.5 bg-slate-50 dark:bg-slate-900 border border-border px-2 py-1 rounded-xl shadow-3xs hover:bg-slate-100/55 dark:hover:bg-slate-800 transition">
-                            {variables.map((v, idx) => (
-                                <span key={idx} className="inline-flex items-center gap-1">
-                                    {idx > 0 && <span className="text-muted-foreground font-bold text-xs select-none">➔</span>}
-                                    {renderSingleVariable(v)}
-                                </span>
-                            ))}
-                        </span>
-                    );
-                }
-                
-                // If it is a regular bold token or other matched token
-                if (token.startsWith('**') && token.endsWith('**')) {
-                    return <strong className="font-extrabold text-foreground">{token.slice(2, -2)}</strong>;
-                }
-
-                // If it matches brackets or generic variable
-                if (token.startsWith('[') && token.endsWith(']')) {
-                    return <span className="font-mono text-xs bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-indigo-600 dark:text-indigo-400 font-semibold">{token}</span>;
-                }
-
-                return <span>{token}</span>;
-            };
-
-            return (
-                <p className={defaultClass}>
-                    {boldParts.map((bPart, bIdx) => {
-                        if (bPart.startsWith('**') && bPart.endsWith('**')) {
-                            return <strong key={bIdx} className="font-black text-foreground">{bPart.slice(2, -2)}</strong>;
-                        }
-                        
-                        const mathParts = bPart.split(mathPattern);
-                        return (
-                            <React.Fragment key={bIdx}>
-                                {mathParts.map((mPart, mIdx) => {
-                                    if (mPart.match(mathPattern)) {
-                                        return <React.Fragment key={mIdx}>{renderTokenContent(mPart)}</React.Fragment>;
-                                    }
-                                    return <span key={mIdx}>{mPart}</span>;
-                                })}
-                            </React.Fragment>
-                        );
-                    })}
-                </p>
-            );
-        };
-
-        return (
-            <div className="flex flex-col gap-3.5">
-                {introLines.length > 0 && (
-                    <div className="flex flex-col gap-2">
-                        {introLines.map((line, idx) => (
-                            <React.Fragment key={idx}>
-                                {renderRichParagraph(line, "text-[18px] font-extrabold text-foreground leading-relaxed")}
-                            </React.Fragment>
-                        ))}
-                    </div>
-                )}
-
-                {listItems.length > 0 && (
-                    <div className="flex flex-col gap-2.5 my-2 pl-1">
-                        {listItems.map((item, idx) => (
-                            <div key={idx} className="flex items-start gap-3 rounded-lg border border-border bg-slate-50/40 p-3 hover:border-blue-300 transition dark:bg-slate-900/10">
-                                <span className="inline-flex size-7 shrink-0 items-center justify-center rounded-md bg-blue-50 text-xs font-black text-blue-600 dark:bg-blue-950/40 dark:text-blue-400">
-                                    {item.marker.replace('.', '')}
-                                </span>
-                                <div className="flex-1 mt-0.5">
-                                    {renderRichParagraph(item.text, "text-base font-semibold leading-relaxed text-foreground")}
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                )}
-
-                {outroLines.length > 0 && (
-                    <div className="flex flex-col gap-2">
-                        {outroLines.map((line, idx) => (
-                            <React.Fragment key={idx}>
-                                {renderRichParagraph(line, "text-[18px] font-extrabold text-foreground leading-relaxed")}
-                            </React.Fragment>
-                        ))}
-                    </div>
-                )}
-            </div>
-        );
-    };
-
-    const renderTable = (tableText: string) => {
-        const rows = tableText.trim().split('\n');
-        if (rows.length === 0) return null;
-
-        const parseRow = (rowText: string) => {
-            return rowText.split('|').slice(1, -1).map(cell => cell.trim());
-        };
-
-        const headers = parseRow(rows[0]);
-        const dataRows = rows.slice(2).map(parseRow);
-
-        return (
-            <div className="my-4 overflow-x-auto rounded-xl border border-border shadow-3xs">
-                <table className="w-full text-left border-collapse text-xs">
-                    <thead>
-                        <tr className="bg-slate-50/80 border-b border-border dark:bg-slate-900/30">
-                            {headers.map((h, i) => (
-                                <th key={i} className="px-4 py-3 font-extrabold uppercase tracking-wider text-muted-foreground">{h}</th>
-                            ))}
-                        </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-100 dark:divide-slate-900/50">
-                        {dataRows.map((row, ri) => (
-                            <tr key={ri} className="hover:bg-slate-50/20 dark:hover:bg-slate-900/10">
-                                {row.map((cell, ci) => (
-                                    <td key={ci} className="px-4 py-3 font-semibold text-foreground leading-relaxed">{cell}</td>
-                                ))}
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
-        );
-    };
-
-    return (
-        <div className="flex flex-col gap-1.5">
-            {parts.map((part, index) => {
-                if (part.match(tableRegex)) {
-                    return <React.Fragment key={index}>{renderTable(part)}</React.Fragment>;
-                }
-                return <React.Fragment key={index}>{formatNumberedLists(part)}</React.Fragment>;
-            })}
-        </div>
-    );
-};
 
 // Strict 1-liner comment: Generate exactly 5 nicely-rounded intervals up to total pool size
 const generateQuestionOptions = (totalCount: number): number[] => {
@@ -314,73 +104,24 @@ export default function Drills({ questions = [], categories = [] }: DrillsProps)
     // Dynamically update layout breadcrumbs at the top header
     useEffect(() => {
         if (viewState === 'config') {
-            setLayoutProps({
-                breadcrumbs: [
-                    { title: 'Drills', href: '/drills' },
-                    { title: `${selectedCategory?.name || 'Category'} Setup`, href: '#' }
-                ]
-            });
+            setTimeout(() => {
+                setLayoutProps({
+                    breadcrumbs: [
+                        { title: 'Drills', href: '/drills' },
+                        { title: `${selectedCategory?.name || 'Category'} Setup`, href: '#' }
+                    ]
+                });
+            }, 0);
         } else {
-            setLayoutProps({
-                breadcrumbs: [
-                    { title: 'Drills', href: '/drills' }
-                ]
-            });
+            setTimeout(() => {
+                setLayoutProps({
+                    breadcrumbs: [
+                        { title: 'Drills', href: '/drills' }
+                    ]
+                });
+            }, 0);
         }
     }, [viewState, selectedCategory]);
-
-    // Strict 1-liner comment: Safely cap selected question count if category filters reduce available pool
-    useEffect(() => {
-        if (viewState === 'config' && selectedCategory) {
-            const currentFilteredCount = questions.filter(q => {
-                const catMatch = q.category.toLowerCase().includes(selectedCategory.name.toLowerCase()) || 
-                                 selectedCategory.name.toLowerCase().includes(q.category.toLowerCase());
-                const subcatMatch = selectedSubcats.length === 0 || selectedSubcats.some(subName => q.subcategory.toLowerCase().includes(subName.toLowerCase()) || subName.toLowerCase().includes(q.subcategory.toLowerCase()));
-                
-                let langMatch = true;
-                if (language === 'English') langMatch = q.language === 'English';
-                else if (language === 'Filipino') langMatch = q.language === 'Filipino';
-
-                return catMatch && subcatMatch && langMatch;
-            }).length;
-
-            if (questionCount !== 'all' && questionCount > currentFilteredCount) {
-                setQuestionCount(currentFilteredCount || 1);
-            }
-        }
-    }, [selectedSubcats, language, selectedCategory, viewState, questions]);
-
-    // Strict 1-liner comment: Pre-select category, subcategories, language, and question count on retake
-    useEffect(() => {
-        if (categories && categories.length > 0) {
-            const params = new URLSearchParams(window.location.search);
-            const catParam = params.get('category');
-            const totalParam = params.get('total');
-            const langParam = params.get('language');
-            const subcatsParam = params.get('subcategories');
-            const timedParam = params.get('timed');
-            
-            if (catParam) {
-                const newUrl = window.location.pathname;
-                window.history.replaceState({}, document.title, newUrl);
-                
-                let parsedSubcats: string[] | null = null;
-                if (subcatsParam) {
-                    try {
-                        parsedSubcats = JSON.parse(decodeURIComponent(subcatsParam));
-                    } catch (e) {
-                        // ignore malformed strings
-                    }
-                }
-                
-                handleCategoryClick(catParam, totalParam, langParam, parsedSubcats, timedParam);
-                
-                // Only lock settings if actual historical configurations were supplied in URL
-                const hasRetakeParams = !!(totalParam || langParam || subcatsParam || timedParam);
-                setIsRetakeConfig(hasRetakeParams);
-            }
-        }
-    }, [categories]);
 
     // ----------------------------------------------------
     // Configuration Actions
@@ -438,6 +179,64 @@ export default function Drills({ questions = [], categories = [] }: DrillsProps)
         setIsTimed(targetTimed);
         setViewState('config');
     };
+
+    // Strict 1-liner comment: Safely cap selected question count if category filters reduce available pool
+    useEffect(() => {
+        if (viewState === 'config' && selectedCategory) {
+            const currentFilteredCount = questions.filter(q => {
+                const catMatch = q.category.toLowerCase().includes(selectedCategory.name.toLowerCase()) || 
+                                 selectedCategory.name.toLowerCase().includes(q.category.toLowerCase());
+                const subcatMatch = selectedSubcats.length === 0 || selectedSubcats.some(subName => q.subcategory.toLowerCase().includes(subName.toLowerCase()) || subName.toLowerCase().includes(q.subcategory.toLowerCase()));
+                
+                let langMatch = true;
+                if (language === 'English') langMatch = q.language === 'English';
+                else if (language === 'Filipino') langMatch = q.language === 'Filipino';
+
+                return catMatch && subcatMatch && langMatch;
+            }).length;
+
+            if (questionCount !== 'all' && questionCount > currentFilteredCount) {
+                const timer = setTimeout(() => {
+                    setQuestionCount(currentFilteredCount || 1);
+                }, 0);
+                return () => clearTimeout(timer);
+            }
+        }
+    }, [selectedSubcats, language, selectedCategory, viewState, questions, questionCount]);
+
+    // Strict 1-liner comment: Pre-select category, subcategories, language, and question count on retake
+    useEffect(() => {
+        if (categories && categories.length > 0) {
+            const params = new URLSearchParams(window.location.search);
+            const catParam = params.get('category');
+            const totalParam = params.get('total');
+            const langParam = params.get('language');
+            const subcatsParam = params.get('subcategories');
+            const timedParam = params.get('timed');
+            
+            if (catParam) {
+                const newUrl = window.location.pathname;
+                window.history.replaceState({}, document.title, newUrl);
+                
+                let parsedSubcats: string[] | null = null;
+                if (subcatsParam) {
+                    try {
+                        parsedSubcats = JSON.parse(decodeURIComponent(subcatsParam));
+                    } catch {
+                        // ignore malformed strings
+                    }
+                }
+                
+                const timer = setTimeout(() => {
+                    handleCategoryClick(catParam, totalParam, langParam, parsedSubcats, timedParam);
+                    // Only lock settings if actual historical configurations were supplied in URL
+                    const hasRetakeParams = !!(totalParam || langParam || subcatsParam || timedParam);
+                    setIsRetakeConfig(hasRetakeParams);
+                }, 0);
+                return () => clearTimeout(timer);
+            }
+        }
+    }, [categories]);
 
     const toggleSubcat = (subcatName: string) => {
         if (isRetakeConfig) return;
@@ -535,8 +334,12 @@ export default function Drills({ questions = [], categories = [] }: DrillsProps)
                 ) : (
                     <div className="flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-border bg-card py-20 text-center shadow-sm">
                         <div className="mx-auto flex size-14 items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-900 text-muted-foreground mb-5 ring-8">
-                            <Brain className="size-6 text-blue-650" />
+                            <Brain className="size-6 text-blue-600 dark:text-blue-400" />
                         </div>
+                        <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-3.5 py-1 text-[10px] font-extrabold tracking-wider text-amber-700 dark:bg-amber-950/40 dark:text-amber-400 uppercase mb-3.5">
+                                <span className="size-1.5 rounded-full bg-amber-500" />
+                                Coming Soon
+                            </span>
                         <h3 className="font-heading text-lg font-bold text-foreground">No Practice Drills Available</h3>
                         <p className="mx-auto mt-2 max-w-2xl text-xs leading-relaxed text-muted-foreground">
                             Practice drill modules are coming soon! We are currently compiling comprehensive exam question banks.
