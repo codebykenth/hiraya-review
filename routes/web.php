@@ -3,9 +3,18 @@
 use App\Http\Controllers\ExamController;
 use App\Http\Controllers\QuestionController;
 use App\Http\Controllers\AdminDashboardController;
+use App\Http\Controllers\SupportController;
 use Illuminate\Support\Facades\Route;
 
 Route::inertia('/', 'welcome')->name('home');
+
+Route::inertia('privacy', 'legal/privacy')->name('privacy');
+Route::inertia('terms', 'legal/terms')->name('terms');
+Route::inertia('support', 'legal/support')->name('support');
+
+Route::post('support', [SupportController::class, 'store'])
+    ->name('support.store')
+    ->middleware('throttle:support-submission');
 
 Route::get('ping', fn () => response()->json([
     'status' => 'alive',

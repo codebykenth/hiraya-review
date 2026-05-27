@@ -109,7 +109,6 @@ export default function Login({ status, canResetPassword }: Props) {
                         </div>
 
                         <div className="grid grid-cols-2 gap-4">
-                            {/* Standard clickable mockup elements for visual alignment */}
                             <Button
                                 type="button"
                                 variant="outline"
@@ -140,7 +139,6 @@ export default function Login({ status, canResetPassword }: Props) {
                                 </svg>
                                 Google
                             </Button>
-                            {/* Standard clickable mockup elements for visual alignment */}
                             <Button
                                 type="button"
                                 variant="outline"

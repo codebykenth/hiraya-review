@@ -35,6 +35,10 @@ class AppServiceProvider extends ServiceProvider
         }
 
         RateLimiter::for('ai-generation', function (Request $request) {
+            if (!app()->isProduction()) {
+                return Limit::none();
+            }
+
             return Limit::perMinute(5)->by($request->user()?->id ?: $request->ip())->response(function (Request $request, array $headers) {
                 return response()->json([
                     'error' => 'You are generating questions too quickly. Please wait a moment and try again.'
@@ -43,11 +47,37 @@ class AppServiceProvider extends ServiceProvider
         });
 
         RateLimiter::for('global-views', function (Request $request) {
+            if (!app()->isProduction()) {
+                return Limit::none();
+            }
+
             return Limit::perMinute(120)->by($request->user()?->id ?: $request->ip());
         });
 
         RateLimiter::for('global-mutations', function (Request $request) {
+            if (!app()->isProduction()) {
+                return Limit::none();
+            }
+
             return Limit::perMinute(30)->by($request->user()?->id ?: $request->ip());
+        });
+
+        RateLimiter::for('support-submission', function (Request $request) {
+            if (!app()->isProduction()) {
+                return Limit::none();
+            }
+
+            return Limit::perDay(1)->by($request->ip())->response(function (Request $request, array $headers) {
+                if ($request->header('X-Inertia')) {
+                    return back()->withErrors([
+                        'rate_limit' => 'You have already submitted a support request today. To prevent spam, submissions are limited to one per day.'
+                    ]);
+                }
+
+                return response()->json([
+                    'error' => 'You have already submitted a support request today. To prevent spam, submissions are limited to one per day.'
+                ], 429, $headers);
+            });
         });
 
         Gate::define('access-dev-docs', function (User $user) {
