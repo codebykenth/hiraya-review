@@ -1,4 +1,4 @@
-import { Head, Link, router, setLayoutProps } from '@inertiajs/react';
+import { Head, Link, router, setLayoutProps, usePage } from '@inertiajs/react';
 import {
     Award,
     ClipboardList,
@@ -21,6 +21,8 @@ import {
     Brain,
     Calculator,
     Users,
+    Lock,
+    LogIn,
 } from 'lucide-react';
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { PageContainer } from '@/components/page-container';
@@ -954,16 +956,111 @@ export default function ExamIndex({
         Drill: [],
     },
 }: ExamIndexProps) {
-    const [selectedExamId, setSelectedExamId] = useState<number | null>(1);
-    const [drillCategoryId, setDrillCategoryId] = useState<number | null>(null);
-    const [drillCategoryName, setDrillCategoryName] = useState<string | null>(
-        null,
+    const { auth } = usePage().props;
+    const [mounted, setMounted] = useState(false);
+    useEffect(() => {
+        setTimeout(() => setMounted(true), 0);
+    }, []);
+
+    // Synchronously parse active session to avoid any layout flash on reload
+    const restoredSession = (() => {
+        if (typeof window !== 'undefined') {
+            const params = new URLSearchParams(window.location.search);
+
+            if (params.get('attempt_id') || savedAttempt) {
+                return null;
+            }
+
+            const savedSessionStr = localStorage.getItem('active_exam_session');
+
+            if (savedSessionStr) {
+                try {
+                    const session = JSON.parse(savedSessionStr);
+
+                    if (
+                        session &&
+                        session.questionIds &&
+                        session.questionIds.length > 0
+                    ) {
+                        return session;
+                    }
+                } catch {
+                    return null;
+                }
+            }
+        }
+
+        return null;
+    })();
+
+    const getRestoredQuestions = (sessionQuestionIds: number[]) => {
+        let loadedQuestions = [...questions];
+
+        if (questions.length === 0) {
+            loadedQuestions = [...fallbackQuestions];
+        }
+
+        return sessionQuestionIds
+            .map((id: number) => {
+                return (
+                    loadedQuestions.find((q) => q.id === id) ||
+                    demographicQuestions.find((q) => q.id === id) ||
+                    fallbackQuestions.find((q) => q.id === id)
+                );
+            })
+            .filter(Boolean) as Question[];
+    };
+
+    const [selectedExamId, setSelectedExamId] = useState<number | null>(() => {
+        if (restoredSession) {
+            return restoredSession.selectedExamId;
+        }
+
+        return 1;
+    });
+    const [drillCategoryId, setDrillCategoryId] = useState<number | null>(
+        () => {
+            if (restoredSession) {
+                return restoredSession.drillCategoryId;
+            }
+
+            return null;
+        },
     );
-    const [drillSubcategories, setDrillSubcategories] = useState<string[]>([]);
-    const [drillLanguage, setDrillLanguage] = useState<string>('English');
+    const [drillCategoryName, setDrillCategoryName] = useState<string | null>(
+        () => {
+            if (restoredSession) {
+                return restoredSession.drillCategoryName;
+            }
+
+            return null;
+        },
+    );
+    const [drillSubcategories, setDrillSubcategories] = useState<string[]>(
+        () => {
+            if (restoredSession) {
+                return restoredSession.drillSubcategories || [];
+            }
+
+            return [];
+        },
+    );
+    const [drillLanguage, setDrillLanguage] = useState<string>(() => {
+        if (restoredSession) {
+            return restoredSession.drillLanguage || 'English';
+        }
+
+        return 'English';
+    });
     const [drillQuestionCount, setDrillQuestionCount] = useState<
         number | 'all'
-    >(30);
+    >(() => {
+        if (restoredSession) {
+            return restoredSession.drillQuestionCount || 30;
+        }
+
+        return 30;
+    });
 
     // Custom confirm modal state
     const [confirmModal, setConfirmModal] = useState<{
@@ -983,24 +1080,99 @@ export default function ExamIndex({
     });
 
     // Core state variables managing the active exam simulation
-    const [isExamActive, setIsExamActive] = useState(false);
-    const [activeQuestions, setActiveQuestions] = useState<Question[]>([]);
-    const [currentIdx, setCurrentIdx] = useState(0);
-    const [answers, setAnswers] = useState<Record<number, number>>({});
-    const [flagged, setFlagged] = useState<Record<number, boolean>>({});
+    const [isExamActive, setIsExamActive] = useState(() => {
+        return restoredSession !== null;
+    });
+    const [activeQuestions, setActiveQuestions] = useState<Question[]>(() => {
+        if (restoredSession) {
+            const pool = getRestoredQuestions(restoredSession.questionIds);
+
+            if (pool.length > 0) {
+                return pool;
+            }
+        }
+
+        return [];
+    });
+    const [currentIdx, setCurrentIdx] = useState(() => {
+        if (restoredSession) {
+            return restoredSession.currentIdx || 0;
+        }
+
+        return 0;
+    });
+    const [answers, setAnswers] = useState<Record<number, number>>(() => {
+        if (restoredSession) {
+            return restoredSession.answers || {};
+        }
+
+        return {};
+    });
+    const [flagged, setFlagged] = useState<Record<number, boolean>>(() => {
+        if (restoredSession) {
+            return restoredSession.flagged || {};
+        }
+
+        return {};
+    });
     const [isMobilePaletteOpen, setIsMobilePaletteOpen] = useState(false);
+
+    // Guest free attempt state
+    const [isFreeAttempt, setIsFreeAttempt] = useState(() => {
+        if (restoredSession) {
+            return restoredSession.isFreeAttempt || false;
+        }
+
+        return false;
+    });
+    const [showRegisterModal, setShowRegisterModal] = useState(false);
+    const [showLockedModal, setShowLockedModal] = useState(false);
+
+    // Result review states
+    const [isExamSubmitted, setIsExamSubmitted] = useState(false);
+    const [expandedCategory, setExpandedCategory] = useState<string | null>(
+        null,
+    );
+    const [reviewScreenActive, setReviewScreenActive] = useState(false);
+    const [reviewStatusFilter, setReviewStatusFilter] = useState<
+        'all' | 'correct' | 'incorrect'
+    >('all');
+    const [reviewCategoryFilter] = useState('All Categories');
+
+    const [isRestored] = useState(true);
 
     // Filter of the sidebar question grid/palette
     const [selectedPaletteCategory, setSelectedPaletteCategory] =
         useState('All Categories');
+    const [filterPaletteByCategory, setFilterPaletteByCategory] =
+        useState('All Categories');
 
     // Live countdown timer variables
-    const [timeLeft, setTimeLeft] = useState<number>(11400); // 3h 10m default
-    const [sessionTimeLimitSecs, setSessionTimeLimitSecs] =
-        useState<number>(11400);
+    const [timeLeft, setTimeLeft] = useState<number>(() => {
+        if (restoredSession) {
+            return restoredSession.timeLeft;
+        }
+
+        return 11400; // 3h 10m default
+    });
+    const [sessionTimeLimitSecs, setSessionTimeLimitSecs] = useState<number>(
+        () => {
+            if (restoredSession) {
+                return restoredSession.sessionTimeLimitSecs;
+            }
+
+            return 11400;
+        },
+    );
     const timeLeftRef = useRef(timeLeft);
     const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
-    const [isTimed, setIsTimed] = useState<boolean>(true);
+    const [isTimed, setIsTimed] = useState<boolean>(() => {
+        if (restoredSession) {
+            return restoredSession.isTimed !== false;
+        }
+
+        return true;
+    });
 
     // Refs to preserve stable memoization for executeSubmit
     const activeQuestionsRef = useRef<Question[]>(activeQuestions);
@@ -1015,6 +1187,7 @@ export default function ExamIndex({
     const drillSubcategoriesRef = useRef<string[]>(drillSubcategories);
     const drillLanguageRef = useRef<string>(drillLanguage);
     const drillQuestionCountRef = useRef<number | 'all'>(drillQuestionCount);
+    const isFreeAttemptRef = useRef<boolean>(false);
 
     // Dynamic metrics configured to update the simulation parameters instantly
     const getSimulationDetails = useCallback(
@@ -1028,10 +1201,10 @@ export default function ExamIndex({
                     timeLimitSecs: 11400,
                     targetPace: '1.1 min/item',
                     allowedCategories: [
-                        'General Information',
                         'Verbal Ability',
                         'Analytical Ability',
                         'Numerical Ability',
+                        'General Information',
                     ],
                 };
             }
@@ -1045,10 +1218,10 @@ export default function ExamIndex({
                     timeLimitSecs: 9600,
                     targetPace: '1.0 min/item',
                     allowedCategories: [
-                        'General Information',
                         'Verbal Ability',
                         'Clerical Ability',
                         'Numerical Ability',
+                        'General Information',
                     ],
                 };
             }
@@ -1101,6 +1274,7 @@ export default function ExamIndex({
         drillSubcategoriesRef.current = drillSubcategories;
         drillLanguageRef.current = drillLanguage;
         drillQuestionCountRef.current = drillQuestionCount;
+        isFreeAttemptRef.current = isFreeAttempt;
     }, [
         activeQuestions,
         answers,
@@ -1115,22 +1289,89 @@ export default function ExamIndex({
         drillSubcategories,
         drillLanguage,
         drillQuestionCount,
+        isFreeAttempt,
     ]);
 
     useEffect(() => {
         timeLeftRef.current = timeLeft;
     }, [timeLeft]);
 
-    // Result review states
-    const [isExamSubmitted, setIsExamSubmitted] = useState(false);
-    const [expandedCategory, setExpandedCategory] = useState<string | null>(
-        null,
-    );
-    const [reviewScreenActive, setReviewScreenActive] = useState(false);
-    const [reviewStatusFilter, setReviewStatusFilter] = useState<
-        'all' | 'correct' | 'incorrect'
-    >('all');
-    const [reviewCategoryFilter] = useState('All Categories');
+    // Auto-save active exam session to localStorage in real-time
+    useEffect(() => {
+        if (!isRestored) {
+            return;
+        }
+
+        if (isExamActive && activeQuestions.length > 0) {
+            const state = {
+                selectedExamId,
+                drillCategoryId,
+                drillCategoryName,
+                drillSubcategories,
+                drillLanguage,
+                drillQuestionCount,
+                questionIds: activeQuestions.map((q) => q.id),
+                answers,
+                flagged,
+                currentIdx,
+                timeLeft,
+                isTimed,
+                sessionTimeLimitSecs,
+                isFreeAttempt,
+            };
+            localStorage.setItem('active_exam_session', JSON.stringify(state));
+        } else if (!isExamActive && !isExamSubmitted) {
+            localStorage.removeItem('active_exam_session');
+        }
+    }, [
+        isRestored,
+        isExamActive,
+        activeQuestions,
+        selectedExamId,
+        drillCategoryId,
+        drillCategoryName,
+        drillSubcategories,
+        drillLanguage,
+        drillQuestionCount,
+        answers,
+        flagged,
+        currentIdx,
+        timeLeft,
+        isTimed,
+        sessionTimeLimitSecs,
+        isFreeAttempt,
+        isExamSubmitted,
+    ]);
+
+    // Clear auto-save session on successful submission
+    useEffect(() => {
+        if (isExamSubmitted) {
+            localStorage.removeItem('active_exam_session');
+        }
+    }, [isExamSubmitted]);
+
+    // Sync switch categories filter with current question's category dynamically
+    useEffect(() => {
+        if (activeQuestions && activeQuestions[currentIdx]) {
+            const currentCategory = activeQuestions[currentIdx].category;
+
+            setTimeout(() => {
+                setSelectedPaletteCategory(currentCategory);
+
+                // If the active question is outside the filtered category, reset the filter to 'All Categories'
+                setFilterPaletteByCategory((prevFilter) => {
+                    if (
+                        prevFilter !== 'All Categories' &&
+                        prevFilter !== currentCategory
+                    ) {
+                        return 'All Categories';
+                    }
+
+                    return prevFilter;
+                });
+            }, 0);
+        }
+    }, [currentIdx, activeQuestions]);
 
     // Sync currentIdx with review filters dynamically
     useEffect(() => {
@@ -1600,15 +1841,13 @@ export default function ExamIndex({
                     'General Information',
                 );
 
-                // Group by category, but keep category blocks in a randomized order, and shuffle questions within each category block
+                // Group by category in fixed sequential order, with questions within each category block already randomized/shuffled
                 const categoriesToPool = [
                     verbal,
                     analytical,
                     numerical,
                     general,
-                ]
-                    .filter((c) => c.length > 0)
-                    .sort(() => Math.random() - 0.5);
+                ].filter((c) => c.length > 0);
                 categoriesToPool.forEach((catPool) => {
                     scoredPool.push(...catPool);
                 });
@@ -1635,10 +1874,13 @@ export default function ExamIndex({
                     'General Information',
                 );
 
-                // Group by category, but keep category blocks in a randomized order, and shuffle questions within each category block
-                const categoriesToPool = [verbal, clerical, numerical, general]
-                    .filter((c) => c.length > 0)
-                    .sort(() => Math.random() - 0.5);
+                // Group by category in fixed sequential order, with questions within each category block already randomized/shuffled
+                const categoriesToPool = [
+                    verbal,
+                    clerical,
+                    numerical,
+                    general,
+                ].filter((c) => c.length > 0);
                 categoriesToPool.forEach((catPool) => {
                     scoredPool.push(...catPool);
                 });
@@ -1852,11 +2094,17 @@ export default function ExamIndex({
 
         if (startType && !savedAttempt) {
             const examId = startType === 'subprofessional' ? 2 : 1;
+            const isFree = params.get('free_attempt') === '1';
             const url = new URL(window.location.href);
             url.searchParams.delete('start');
+            url.searchParams.delete('free_attempt');
             window.history.replaceState({}, '', url.toString());
 
             setTimeout(() => {
+                if (isFree) {
+                    setIsFreeAttempt(true);
+                }
+
                 setSelectedExamId(examId);
                 beginExamSession(buildFreshExamPool(examId), examId);
             }, 0);
@@ -2051,6 +2299,68 @@ export default function ExamIndex({
         buildFreshExamPool,
     ]);
 
+    // Restore guest free exam session after registration
+    useEffect(() => {
+        if (!auth?.user) {
+            return;
+        }
+
+        if (questions.length === 0) {
+            return;
+        }
+
+        if (isExamActive || isExamSubmitted) {
+            return;
+        }
+
+        const savedState = localStorage.getItem('pending_free_exam');
+
+        if (!savedState) {
+            return;
+        }
+
+        try {
+            const state = JSON.parse(savedState);
+            localStorage.removeItem('pending_free_exam');
+
+            // Rebuild question pool from saved IDs
+            const sourcePool = [...questions, ...demographicQuestions];
+            const pool: Question[] = state.questionIds
+                .map((id: number) =>
+                    sourcePool.find((q: Question) => q.id === id),
+                )
+                .filter((q: Question | undefined): q is Question => Boolean(q))
+                .map(shuffleOptionsForQuestion);
+
+            if (pool.length === 0) {
+                return;
+            }
+
+            setTimeout(() => {
+                setSelectedExamId(state.selectedExamId);
+                setIsTimed(state.isTimed);
+                setActiveQuestions(pool);
+                setCurrentIdx(state.currentIdx);
+                setAnswers(state.answers || {});
+                setFlagged({});
+                setSelectedPaletteCategory('All Categories');
+                setSessionTimeLimitSecs(state.sessionTimeLimitSecs);
+                setTimeLeft(state.timeLeft);
+                timeLeftRef.current = state.timeLeft;
+                setIsFreeAttempt(false);
+                setIsExamActive(true);
+                setIsExamSubmitted(false);
+                setReviewScreenActive(false);
+                setResults(null);
+                setSubmittedByTimer(false);
+                setShowRetakeModal(false);
+            }, 0);
+        } catch {
+            localStorage.removeItem('pending_free_exam');
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [questions]);
+
     const handleSubmitExamRef = useRef<(auto?: boolean) => void>(() => {});
 
     // Live countdown interval handler — auto-submits and shows scorecard when time runs out
@@ -2062,7 +2372,12 @@ export default function ExamIndex({
                         if (prev <= 1) {
                             clearInterval(timerRef.current!);
                             timeLeftRef.current = 0;
-                            handleSubmitExamRef.current(true);
+
+                            if (isFreeAttemptRef.current) {
+                                setShowRegisterModal(true);
+                            } else {
+                                handleSubmitExamRef.current(true);
+                            }
 
                             return 0;
                         }
@@ -2113,6 +2428,80 @@ export default function ExamIndex({
             ...prev,
             [currentIdx]: optionIndex,
         }));
+    };
+
+    // Centralized question navigation handler for free attempt restrictions
+    const handleQuestionNavigate = (targetIdx: number) => {
+        if (!isFreeAttempt) {
+            setCurrentIdx(targetIdx);
+
+            return;
+        }
+
+        // Going backward is always allowed
+        if (targetIdx <= currentIdx) {
+            setCurrentIdx(targetIdx);
+
+            return;
+        }
+
+        // Check 20-question limit
+        if (targetIdx >= 20) {
+            setShowLockedModal(true);
+
+            return;
+        }
+
+        setCurrentIdx(targetIdx);
+    };
+
+    const handleCategoryChange = (category: string) => {
+        if (
+            isFreeAttempt &&
+            category !== 'All Categories' &&
+            category !== 'Demographic Profile'
+        ) {
+            setShowLockedModal(true);
+
+            return;
+        }
+
+        setSelectedPaletteCategory(category);
+        setFilterPaletteByCategory(category);
+
+        if (category !== 'All Categories') {
+            const firstIdx = activeQuestions.findIndex(
+                (q) => q.category === category,
+            );
+
+            if (firstIdx !== -1) {
+                handleQuestionNavigate(firstIdx);
+            }
+        }
+    };
+
+    // Save guest exam state to localStorage and redirect to register
+    const handleRegisterFromFreeExam = () => {
+        const state = {
+            selectedExamId,
+            questionIds: activeQuestions.map((q) => q.id),
+            answers,
+            currentIdx,
+            timeLeft: timeLeftRef.current,
+            isTimed,
+            sessionTimeLimitSecs,
+        };
+        localStorage.setItem('pending_free_exam', JSON.stringify(state));
+        setShowRegisterModal(false);
+        router.visit('/register');
+    };
+
+    // Cancel free attempt and go back to welcome
+    const handleCancelFreeExam = () => {
+        setShowRegisterModal(false);
+        setIsExamActive(false);
+        setIsFreeAttempt(false);
+        router.visit('/');
     };
 
     const executeSubmit = useCallback(() => {
@@ -2266,6 +2655,11 @@ export default function ExamIndex({
             },
         };
 
+        // Skip database persistence for guest free attempts
+        if (isFreeAttemptRef.current) {
+            return;
+        }
+
         fetch('/exams/attempts', {
             method: 'POST',
             headers: {
@@ -2342,6 +2736,26 @@ export default function ExamIndex({
 
     // Exit back to config
     const handleExitExam = () => {
+        // Free attempt exit: no database save, go to welcome
+        if (isFreeAttempt && !isExamSubmitted) {
+            setConfirmModal({
+                isOpen: true,
+                title: 'Exit Free Mock Exam?',
+                message:
+                    'Your progress will be lost. Are you sure you want to exit?',
+                confirmLabel: 'Yes, Exit',
+                variant: 'danger',
+                onConfirm: () => {
+                    localStorage.removeItem('active_exam_session');
+                    setIsExamActive(false);
+                    setIsFreeAttempt(false);
+                    router.visit('/');
+                },
+            });
+
+            return;
+        }
+
         if (savedAttempt && isExamSubmitted) {
             if (isDrillSession) {
                 router.get('/drills');
@@ -2361,6 +2775,8 @@ export default function ExamIndex({
                 confirmLabel: 'Yes, Exit',
                 variant: 'danger',
                 onConfirm: () => {
+                    localStorage.removeItem('active_exam_session');
+
                     if (isDrillSession) {
                         router.get('/drills');
 
@@ -2509,11 +2925,25 @@ export default function ExamIndex({
             .map((q, idx) => ({ ...q, originalIndex: idx }))
             .filter((item) => {
                 return (
-                    selectedPaletteCategory === 'All Categories' ||
-                    item.category === selectedPaletteCategory
+                    filterPaletteByCategory === 'All Categories' ||
+                    item.category === filterPaletteByCategory
                 );
             });
     };
+
+    // Prevent layout flash/shift during SSR or hydration
+    if (!mounted) {
+        return (
+            <div className="flex h-screen items-center justify-center bg-slate-50 dark:bg-slate-950">
+                <div className="flex flex-col items-center gap-4">
+                    <div className="h-12 w-12 animate-spin rounded-full border-4 border-blue-600 border-t-transparent"></div>
+                    <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
+                        Loading your session...
+                    </p>
+                </div>
+            </div>
+        );
+    }
 
     // Render the Live active exam simulator view
     if (isExamActive) {
@@ -2699,8 +3129,8 @@ export default function ExamIndex({
                             <div className="mx-auto mt-8 flex w-full max-w-3xl items-center justify-between gap-4 border-t border-border pt-6">
                                 <button
                                     onClick={() =>
-                                        setCurrentIdx((prev) =>
-                                            Math.max(0, prev - 1),
+                                        handleQuestionNavigate(
+                                            Math.max(0, currentIdx - 1),
                                         )
                                     }
                                     disabled={currentIdx === 0}
@@ -2710,14 +3140,21 @@ export default function ExamIndex({
                                     Previous Question
                                 </button>
 
-                                {currentIdx < activeQuestions.length - 1 ? (
+                                {isFreeAttempt && currentIdx === 19 ? (
                                     <button
                                         onClick={() =>
-                                            setCurrentIdx((prev) =>
-                                                Math.min(
-                                                    activeQuestions.length - 1,
-                                                    prev + 1,
-                                                ),
+                                            setShowRegisterModal(true)
+                                        }
+                                        className="shadow-3xs flex items-center gap-1.5 rounded-lg bg-emerald-600 px-6 py-2.5 text-xs font-bold text-white transition hover:bg-emerald-700 focus:outline-none"
+                                    >
+                                        <CheckCircle2 className="size-4" />
+                                        Finish Preview
+                                    </button>
+                                ) : currentIdx < activeQuestions.length - 1 ? (
+                                    <button
+                                        onClick={() =>
+                                            handleQuestionNavigate(
+                                                currentIdx + 1,
                                             )
                                         }
                                         className="shadow-3xs flex items-center gap-1.5 rounded-lg bg-blue-600 px-5 py-2.5 text-xs font-bold text-white transition hover:bg-blue-700 focus:outline-none"
@@ -2725,7 +3162,7 @@ export default function ExamIndex({
                                         Next Question
                                         <ChevronRight className="size-4" />
                                     </button>
-                                ) : (
+                                ) : !isFreeAttempt ? (
                                     <button
                                         onClick={() => handleSubmitExam(false)}
                                         className="flex items-center gap-1.5 rounded-lg bg-emerald-600 px-6 py-2.5 text-xs font-bold text-white shadow-xs transition hover:bg-emerald-700 focus:outline-none"
@@ -2733,7 +3170,7 @@ export default function ExamIndex({
                                         <CheckCircle2 className="size-4" />
                                         Submit Exam
                                     </button>
-                                )}
+                                ) : null}
                             </div>
                         </div>
 
@@ -2748,9 +3185,7 @@ export default function ExamIndex({
                                     <select
                                         value={selectedPaletteCategory}
                                         onChange={(e) =>
-                                            setSelectedPaletteCategory(
-                                                e.target.value,
-                                            )
+                                            handleCategoryChange(e.target.value)
                                         }
                                         className="w-full appearance-none rounded-lg border border-border bg-background py-2 pr-8 pl-2.5 text-xs font-bold text-foreground transition focus:border-blue-500 focus:outline-none"
                                     >
@@ -2821,7 +3256,9 @@ export default function ExamIndex({
                                                 <button
                                                     key={origIdx}
                                                     onClick={() =>
-                                                        setCurrentIdx(origIdx)
+                                                        handleQuestionNavigate(
+                                                            origIdx,
+                                                        )
                                                     }
                                                     className={`relative flex size-10 items-center justify-center rounded-lg border text-xs font-bold transition focus:outline-none ${
                                                         isActive
@@ -2830,13 +3267,21 @@ export default function ExamIndex({
                                                               ? 'border-blue-600 bg-blue-600 text-white hover:bg-blue-700'
                                                               : isFlagged
                                                                 ? 'dark:bg-rose-955/20 border-rose-300 bg-rose-50 font-extrabold text-rose-700 dark:border-rose-900/40 dark:text-rose-400'
-                                                                : 'border-border bg-background text-foreground hover:bg-muted'
+                                                                : isFreeAttempt &&
+                                                                    origIdx >=
+                                                                        20
+                                                                  ? 'border-border bg-background text-muted-foreground/40 hover:bg-muted'
+                                                                  : 'border-border bg-background text-foreground hover:bg-muted'
                                                     }`}
                                                 >
                                                     {origIdx + 1}
                                                     {isFlagged && (
                                                         <div className="absolute top-0.5 right-0.5 size-2 rounded-full border border-white bg-rose-500 shadow-xs dark:border-slate-950" />
                                                     )}
+                                                    {isFreeAttempt &&
+                                                        origIdx >= 20 && (
+                                                            <Lock className="absolute -top-1 -right-1 size-3 text-muted-foreground" />
+                                                        )}
                                                 </button>
                                             );
                                         })}
@@ -2844,15 +3289,17 @@ export default function ExamIndex({
                                 )}
                             </div>
 
-                            <div className="border-t border-border p-4">
-                                <button
-                                    onClick={() => handleSubmitExam(false)}
-                                    className="flex w-full items-center justify-center gap-1.5 rounded-lg bg-emerald-600 py-3 text-xs font-bold text-white shadow-xs transition hover:bg-emerald-700 focus:outline-none"
-                                >
-                                    <CheckCircle2 className="size-4" />
-                                    Submit Exam
-                                </button>
-                            </div>
+                            {!isFreeAttempt && (
+                                <div className="border-t border-border p-4">
+                                    <button
+                                        onClick={() => handleSubmitExam(false)}
+                                        className="flex w-full items-center justify-center gap-1.5 rounded-lg bg-emerald-600 py-3 text-xs font-bold text-white shadow-xs transition hover:bg-emerald-700 focus:outline-none"
+                                    >
+                                        <CheckCircle2 className="size-4" />
+                                        Submit Exam
+                                    </button>
+                                </div>
+                            )}
                         </div>
                     </div>
 
@@ -2890,7 +3337,7 @@ export default function ExamIndex({
                                         <select
                                             value={selectedPaletteCategory}
                                             onChange={(e) =>
-                                                setSelectedPaletteCategory(
+                                                handleCategoryChange(
                                                     e.target.value,
                                                 )
                                             }
@@ -2956,7 +3403,9 @@ export default function ExamIndex({
                                                 <button
                                                     key={origIdx}
                                                     onClick={() => {
-                                                        setCurrentIdx(origIdx);
+                                                        handleQuestionNavigate(
+                                                            origIdx,
+                                                        );
                                                         setIsMobilePaletteOpen(
                                                             false,
                                                         );
@@ -2968,13 +3417,21 @@ export default function ExamIndex({
                                                               ? 'border-blue-600 bg-blue-600 text-white hover:bg-blue-700'
                                                               : isFlagged
                                                                 ? 'dark:bg-rose-905/20 border-rose-300 bg-rose-50 text-rose-700 dark:border-rose-900/40 dark:text-rose-400'
-                                                                : 'border-border bg-background text-foreground hover:bg-muted'
+                                                                : isFreeAttempt &&
+                                                                    origIdx >=
+                                                                        20
+                                                                  ? 'border-border bg-background text-muted-foreground/40 hover:bg-muted'
+                                                                  : 'border-border bg-background text-foreground hover:bg-muted'
                                                     }`}
                                                 >
                                                     {origIdx + 1}
                                                     {isFlagged && (
                                                         <div className="absolute top-0.5 right-0.5 size-2 rounded-full border border-white bg-rose-500 shadow-xs dark:border-slate-950" />
                                                     )}
+                                                    {isFreeAttempt &&
+                                                        origIdx >= 20 && (
+                                                            <Lock className="absolute -top-1 -right-1 size-3 text-muted-foreground" />
+                                                        )}
                                                 </button>
                                             );
                                         })}
@@ -2982,22 +3439,102 @@ export default function ExamIndex({
                                 </div>
 
                                 {/* Sidebar Quick Submit trigger */}
-                                <div className="border-t border-border bg-muted/20 p-4">
+                                {!isFreeAttempt && (
+                                    <div className="border-t border-border bg-muted/20 p-4">
+                                        <button
+                                            onClick={() => {
+                                                setIsMobilePaletteOpen(false);
+                                                handleSubmitExam(false);
+                                            }}
+                                            className="flex w-full items-center justify-center gap-1.5 rounded-lg bg-emerald-600 py-3 text-xs font-bold text-white shadow-xs transition hover:bg-emerald-700 focus:outline-none"
+                                        >
+                                            <CheckCircle2 className="size-4" />
+                                            Submit Exam
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    )}
+                    {customConfirmModal}
+
+                    {/* Guest Free Attempt: Locked Question Modal */}
+                    {showLockedModal && (
+                        <div className="fixed inset-0 z-[100] flex animate-in items-center justify-center bg-slate-900/60 p-4 backdrop-blur-xs duration-200 fade-in">
+                            <div className="relative w-full max-w-2xl animate-in rounded-xl border border-slate-200 bg-white p-6 shadow-xl duration-200 zoom-in-95 dark:border-slate-800 dark:bg-slate-950">
+                                <div className="mb-1 flex items-center gap-2">
+                                    <Lock className="size-5 text-blue-600" />
+                                    <h3 className="font-heading text-lg font-bold text-slate-900 dark:text-white">
+                                        Premium Feature Locked
+                                    </h3>
+                                </div>
+                                <p className="mt-2 text-xs leading-relaxed text-slate-500 dark:text-slate-400">
+                                    Register a free account to unlock all
+                                    questions, track your progress, and access
+                                    more premium features of the mock exam.
+                                </p>
+                                <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-end">
                                     <button
-                                        onClick={() => {
-                                            setIsMobilePaletteOpen(false);
-                                            handleSubmitExam(false);
-                                        }}
-                                        className="flex w-full items-center justify-center gap-1.5 rounded-lg bg-emerald-600 py-3 text-xs font-bold text-white shadow-xs transition hover:bg-emerald-700 focus:outline-none"
+                                        type="button"
+                                        onClick={() =>
+                                            setShowLockedModal(false)
+                                        }
+                                        className="rounded-lg border border-slate-200 px-5 py-2.5 text-xs font-bold text-slate-600 transition hover:bg-slate-50 dark:border-slate-800 dark:text-slate-400 dark:hover:bg-slate-900"
                                     >
-                                        <CheckCircle2 className="size-4" />
-                                        Submit Exam
+                                        Cancel
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={handleRegisterFromFreeExam}
+                                        className="rounded-lg bg-blue-600 px-5 py-2.5 text-xs font-bold text-white transition hover:bg-blue-700 focus:outline-none"
+                                    >
+                                        Register Now
                                     </button>
                                 </div>
                             </div>
                         </div>
                     )}
-                    {customConfirmModal}
+
+                    {/* Guest Free Attempt: Register / Continue Modal */}
+                    {showRegisterModal && (
+                        <div className="fixed inset-0 z-[100] flex animate-in items-center justify-center bg-slate-900/60 p-4 backdrop-blur-xs duration-200 fade-in">
+                            <div className="relative w-full max-w-2xl animate-in rounded-xl border border-slate-200 bg-white p-6 shadow-xl duration-200 zoom-in-95 dark:border-slate-800 dark:bg-slate-950">
+                                <div className="mb-1 flex items-center gap-2">
+                                    <Lock className="size-5 text-blue-600" />
+                                    <h3 className="font-heading text-lg font-bold text-slate-900 dark:text-white">
+                                        Free Preview Limit Reached
+                                    </h3>
+                                </div>
+                                <p className="mt-2 text-xs leading-relaxed text-slate-500 dark:text-slate-400">
+                                    You've completed the first 20 questions of
+                                    the free mock exam preview. Register a free
+                                    account to unlock the full exam, submit your
+                                    answers, and view your detailed scorecard.
+                                </p>
+                                <p className="mt-2 text-[11px] font-semibold text-emerald-600 dark:text-emerald-400">
+                                    ✓ Your progress will be saved and restored
+                                    after registration.
+                                </p>
+                                <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-end">
+                                    <button
+                                        type="button"
+                                        onClick={handleCancelFreeExam}
+                                        className="rounded-lg border border-slate-200 px-5 py-2.5 text-xs font-bold text-slate-600 transition hover:bg-slate-50 dark:border-slate-800 dark:text-slate-400 dark:hover:bg-slate-900"
+                                    >
+                                        Exit to Home
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={handleRegisterFromFreeExam}
+                                        className="flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-5 py-2.5 text-xs font-bold text-white shadow-sm transition hover:bg-blue-700 focus:outline-none"
+                                    >
+                                        <LogIn className="size-4" />
+                                        Register Free Account
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </>
         );
@@ -3922,6 +4459,7 @@ export default function ExamIndex({
                                                                                 {
                                                                                     subVal.correct
                                                                                 }
+
                                                                                 /
                                                                                 {
                                                                                     subVal.total

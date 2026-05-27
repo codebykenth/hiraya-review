@@ -1,4 +1,4 @@
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
 import {
     ArrowRight,
     Sparkles,
@@ -27,9 +27,29 @@ import SiteHeader from '@/components/site-header';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
 import { register } from '@/routes';
 
 export default function Welcome() {
+    const { auth } = usePage().props;
+    const [isFreeExamModalOpen, setIsFreeExamModalOpen] = useState(false);
+
+    const handleFreeExamStart = (track: 'professional' | 'subprofessional') => {
+        setIsFreeExamModalOpen(false);
+
+        if (auth?.user) {
+            router.visit(`/exams?start=${track}`);
+        } else {
+            router.visit(`/exams?start=${track}&free_attempt=1`);
+        }
+    };
     const [activeNav, setActiveNav] = useState('home');
     const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
 
@@ -275,6 +295,17 @@ export default function Welcome() {
                                             <ArrowRight className="h-5 w-5" />
                                         </Link>
                                     </Button>
+                                    <Button
+                                        variant="secondary"
+                                        size="lg"
+                                        onClick={() =>
+                                            setIsFreeExamModalOpen(true)
+                                        }
+                                        className="flex items-center gap-2 font-bold"
+                                    >
+                                        <FileQuestion className="h-5 w-5" />
+                                        Try Mock Test
+                                    </Button>
                                     <Button variant="outline" size="lg" asChild>
                                         <Link
                                             href={'#features'}
@@ -284,6 +315,83 @@ export default function Welcome() {
                                         </Link>
                                     </Button>
                                 </div>
+
+                                {/* Free Exam Level Selection Modal */}
+                                <Dialog
+                                    open={isFreeExamModalOpen}
+                                    onOpenChange={setIsFreeExamModalOpen}
+                                >
+                                    <DialogContent className="sm:max-w-2xl">
+                                        <DialogHeader>
+                                            <DialogTitle>
+                                                Choose Your Exam Level
+                                            </DialogTitle>
+                                            <DialogDescription>
+                                                Try a free mock exam preview.
+                                                Answer the first 20 questions to
+                                                experience the platform.
+                                            </DialogDescription>
+                                        </DialogHeader>
+                                        <div className="grid gap-3 py-4">
+                                            <button
+                                                onClick={() =>
+                                                    handleFreeExamStart(
+                                                        'professional',
+                                                    )
+                                                }
+                                                className="group flex items-center gap-4 rounded-xl border border-border bg-card p-4 text-left transition hover:border-primary hover:bg-primary/5"
+                                            >
+                                                <div className="flex size-12 items-center justify-center rounded-lg bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400">
+                                                    <Award className="size-6" />
+                                                </div>
+                                                <div>
+                                                    <p className="font-bold text-foreground">
+                                                        Professional Level
+                                                    </p>
+                                                    <p className="text-sm text-muted-foreground">
+                                                        170 questions &bull; 3
+                                                        hrs 10 mins
+                                                    </p>
+                                                </div>
+                                                <ArrowRight className="ml-auto size-5 text-muted-foreground transition group-hover:translate-x-1 group-hover:text-primary" />
+                                            </button>
+                                            <button
+                                                onClick={() =>
+                                                    handleFreeExamStart(
+                                                        'subprofessional',
+                                                    )
+                                                }
+                                                className="group flex items-center gap-4 rounded-xl border border-border bg-card p-4 text-left transition hover:border-primary hover:bg-primary/5"
+                                            >
+                                                <div className="flex size-12 items-center justify-center rounded-lg bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400">
+                                                    <ClipboardList className="size-6" />
+                                                </div>
+                                                <div>
+                                                    <p className="font-bold text-foreground">
+                                                        Subprofessional Level
+                                                    </p>
+                                                    <p className="text-sm text-muted-foreground">
+                                                        165 questions &bull; 2
+                                                        hrs 50 mins
+                                                    </p>
+                                                </div>
+                                                <ArrowRight className="ml-auto size-5 text-muted-foreground transition group-hover:translate-x-1 group-hover:text-primary" />
+                                            </button>
+                                        </div>
+                                        <DialogFooter>
+                                            <Button
+                                                variant="ghost"
+                                                onClick={() =>
+                                                    setIsFreeExamModalOpen(
+                                                        false,
+                                                    )
+                                                }
+                                            >
+                                                Cancel
+                                            </Button>
+                                        </DialogFooter>
+                                    </DialogContent>
+                                </Dialog>
                             </div>
                             {/* Right Column */}
                             <div className="relative flex items-center justify-center p-4">

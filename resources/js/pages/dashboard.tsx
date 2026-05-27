@@ -1,4 +1,4 @@
-import { Head, Link, usePage } from '@inertiajs/react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
 import {
     Play,
     TrendingUp,
@@ -10,7 +10,7 @@ import {
     Target,
     Info,
 } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
     TrackBadge,
     StatusBadge,
@@ -68,6 +68,15 @@ export default function Dashboard({ stats }: DashboardProps) {
     const [selectedFilter, setSelectedFilter] = useState<
         '6' | '12' | 'exams' | 'drills'
     >('6');
+
+    // Redirect to exams page if a pending free exam session exists after registration
+    useEffect(() => {
+        const pendingExam = localStorage.getItem('pending_free_exam');
+
+        if (pendingExam) {
+            router.visit('/exams');
+        }
+    }, []);
 
     const defaultStats = {
         avgScore: 84,
