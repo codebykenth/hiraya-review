@@ -11,7 +11,7 @@ import {
     RotateCcw,
     Save,
 } from 'lucide-react';
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { CurationCreateShell } from '@/components/curation-create-shell';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -65,6 +65,7 @@ export default function AdminLearnCreate({
     const [isGenerating, setIsGenerating] = useState(false);
     const [generationError, setGenerationError] = useState<string | null>(null);
     const [successMsg, setSuccessMsg] = useState<string | null>(null);
+    const generateAbortRef = useRef<AbortController | null>(null);
 
     // Main Manual Form Setup
     const { data, setData, post, processing, errors, reset } = useForm({
@@ -197,6 +198,10 @@ export default function AdminLearnCreate({
     };
 
     const triggerAIGeneration = async () => {
+        generateAbortRef.current?.abort();
+        const abortController = new AbortController();
+        generateAbortRef.current = abortController;
+
         setIsGenerating(true);
         setGenerationError(null);
         setSuccessMsg(null);
@@ -208,6 +213,7 @@ export default function AdminLearnCreate({
         try {
             const response = await fetch(adminLearnGenerate().url, {
                 method: 'POST',
+                signal: abortController.signal,
                 headers: {
                     'Content-Type': 'application/json',
                     Accept: 'application/json',
@@ -242,15 +248,33 @@ export default function AdminLearnCreate({
                 );
             }
         } catch (err: any) {
-            console.error(err);
-            const errMsg =
-                err.message ||
-                'A network error occurred during generation. Please verify your internet connection and try again.';
-            setGenerationError(errMsg);
+            if (err?.name === 'AbortError') {
+                setGenerationError('Generation canceled.');
+            } else {
+                console.error(err);
+                const errMsg =
+                    err.message ||
+                    'A network error occurred during generation. Please verify your internet connection and try again.';
+                setGenerationError(errMsg);
+            }
         } finally {
             setIsGenerating(false);
+            generateAbortRef.current = null;
         }
     };
+
+    const handleCancelAIGeneration = () => {
+        generateAbortRef.current?.abort();
+        generateAbortRef.current = null;
+        setIsGenerating(false);
+        setGenerationError('Generation canceled.');
+    };
+
+    useEffect(() => {
+        return () => {
+            generateAbortRef.current?.abort();
+        };
+    }, []);
 
     const handleManualSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -346,13 +370,13 @@ export default function AdminLearnCreate({
                                         successfully synthesized and committed
                                         to the database as a draft. You can
                                         publish, edit, or curate it from the
-                                        Curator Dashboard.
+                                        Syllabus Drafts Reviewer.
                                     </span>
                                     <Link
-                                        href="/admin/learn"
+                                        href="/admin/learn/drafts"
                                         className="mt-1 inline-flex items-center gap-1 font-extrabold text-emerald-700 underline transition hover:text-emerald-900"
                                     >
-                                        Go to Curator Panel &rarr;
+                                        Review Drafts &rarr;
                                     </Link>
                                 </div>
                             </div>
@@ -366,7 +390,7 @@ export default function AdminLearnCreate({
 
                         <div className="pt-2">
                             {isGenerating ? (
-                                <div className="shadow-3xs flex animate-pulse flex-col gap-3.5 rounded-xl border border-border bg-muted p-5">
+                                <div className="shadow-3xs flex flex-col gap-3.5 rounded-xl border border-border bg-muted p-5">
                                     <div className="flex items-center gap-3">
                                         <div className="border-blue-650 size-5.5 shrink-0 animate-spin rounded-full border-2 border-t-transparent" />
                                         <span className="text-sm font-bold text-foreground">
@@ -378,6 +402,16 @@ export default function AdminLearnCreate({
                                         <div className="h-3 w-5/6 rounded-sm bg-border" />
                                         <div className="h-3 w-3/4 rounded-sm bg-border" />
                                     </div>
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        size="sm"
+                                        fullWidth
+                                        icon={RotateCcw}
+                                        onClick={handleCancelAIGeneration}
+                                    >
+                                        Cancel Generation
+                                    </Button>
                                 </div>
                             ) : (
                                 <Button
@@ -534,7 +568,7 @@ export default function AdminLearnCreate({
                                             setData(
                                                 'estimated_minutes',
                                                 parseInt(e.target.value, 10) ||
-                                                    5,
+                                                5,
                                             )
                                         }
                                         className="pl-10"
@@ -637,11 +671,10 @@ export default function AdminLearnCreate({
                                     onClick={() =>
                                         setData('is_published', true)
                                     }
-                                    className={`cursor-pointer rounded-lg py-2 text-xs font-black tracking-wider uppercase transition ${
-                                        data.is_published
+                                    className={`cursor-pointer rounded-lg py-2 text-xs font-black tracking-wider uppercase transition ${data.is_published
                                             ? 'bg-white text-slate-900 shadow-xs dark:bg-slate-950 dark:text-white'
                                             : 'dark:text-slate-450 text-slate-500 hover:text-slate-900 dark:hover:text-slate-200'
-                                    }`}
+                                        }`}
                                 >
                                     Published
                                 </button>
@@ -650,11 +683,10 @@ export default function AdminLearnCreate({
                                     onClick={() =>
                                         setData('is_published', false)
                                     }
-                                    className={`cursor-pointer rounded-lg py-2 text-xs font-black tracking-wider uppercase transition ${
-                                        !data.is_published
+                                    className={`cursor-pointer rounded-lg py-2 text-xs font-black tracking-wider uppercase transition ${!data.is_published
                                             ? 'bg-white text-slate-900 shadow-xs dark:bg-slate-950 dark:text-white'
                                             : 'dark:text-slate-450 text-slate-500 hover:text-slate-900 dark:hover:text-slate-200'
-                                    }`}
+                                        }`}
                                 >
                                     Draft
                                 </button>

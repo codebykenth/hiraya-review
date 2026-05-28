@@ -11,7 +11,7 @@ import {
     HelpCircle,
     CheckCircle2,
 } from 'lucide-react';
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { CurationCreateShell } from '@/components/curation-create-shell';
 import { Button } from '@/components/ui/button';
 import { SelectField } from '@/components/ui/select';
@@ -108,6 +108,7 @@ export default function CreateQuestion({
     const [isGenerating, setIsGenerating] = useState<boolean>(false);
     const [errorMsg, setErrorMsg] = useState<string | null>(null);
     const [successMsg, setSuccessMsg] = useState<string | null>(null);
+    const generateAbortRef = useRef<AbortController | null>(null);
 
     // Sync subcategories for AI view
     useEffect(() => {
@@ -177,6 +178,10 @@ export default function CreateQuestion({
     };
 
     const handleGenerateAI = async () => {
+        generateAbortRef.current?.abort();
+        const abortController = new AbortController();
+        generateAbortRef.current = abortController;
+
         setIsGenerating(true);
         setErrorMsg(null);
         setSuccessMsg(null);
@@ -188,6 +193,7 @@ export default function CreateQuestion({
                     ?.getAttribute('content') || '';
             const response = await fetch(questionsGenerate().url, {
                 method: 'POST',
+                signal: abortController.signal,
                 headers: {
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': csrfToken,
@@ -207,7 +213,7 @@ export default function CreateQuestion({
             if (!response.ok) {
                 throw new Error(
                     resData.error ||
-                        'Failed to generate questions. Please try again.',
+                    'Failed to generate questions. Please try again.',
                 );
             }
 
@@ -215,13 +221,32 @@ export default function CreateQuestion({
                 'Questions generated successfully! They are saved as drafts and ready for review.',
             );
         } catch (err: any) {
-            setErrorMsg(
-                err.message || 'An error occurred while generating questions.',
-            );
+            if (err?.name === 'AbortError') {
+                setErrorMsg('Generation canceled.');
+            } else {
+                setErrorMsg(
+                    err.message ||
+                    'An error occurred while generating questions.',
+                );
+            }
         } finally {
             setIsGenerating(false);
+            generateAbortRef.current = null;
         }
     };
+
+    const handleCancelAIGeneration = () => {
+        generateAbortRef.current?.abort();
+        generateAbortRef.current = null;
+        setIsGenerating(false);
+        setErrorMsg('Generation canceled.');
+    };
+
+    useEffect(() => {
+        return () => {
+            generateAbortRef.current?.abort();
+        };
+    }, []);
 
     const aiContent = (
         <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-12">
@@ -335,7 +360,7 @@ export default function CreateQuestion({
 
                         <div className="pt-2">
                             {isGenerating ? (
-                                <div className="shadow-3xs flex animate-pulse flex-col gap-3.5 rounded-xl border border-border bg-muted p-5">
+                                <div className="shadow-3xs flex flex-col gap-3.5 rounded-xl border border-border bg-muted p-5">
                                     <div className="flex items-center gap-3">
                                         <div className="border-blue-650 size-5.5 shrink-0 animate-spin rounded-full border-2 border-t-transparent" />
                                         <span className="text-sm font-bold text-foreground">
@@ -347,6 +372,16 @@ export default function CreateQuestion({
                                         <div className="h-3 w-5/6 rounded-sm bg-border" />
                                         <div className="h-3 w-3/4 rounded-sm bg-border" />
                                     </div>
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        size="sm"
+                                        fullWidth
+                                        icon={RotateCcw}
+                                        onClick={handleCancelAIGeneration}
+                                    >
+                                        Cancel Generation
+                                    </Button>
                                 </div>
                             ) : (
                                 <Button
@@ -483,11 +518,10 @@ export default function CreateQuestion({
                             onChange={(e) => setData('stem', e.target.value)}
                             rows={6}
                             placeholder="Enter the main question text, scenario, or analytical passage here..."
-                            className={`w-full rounded-xl border p-4 text-sm font-medium text-foreground transition placeholder:text-muted-foreground focus:bg-background focus:outline-none ${
-                                errors.stem
+                            className={`w-full rounded-xl border p-4 text-sm font-medium text-foreground transition placeholder:text-muted-foreground focus:bg-background focus:outline-none ${errors.stem
                                     ? 'border-red-500 focus:border-red-500'
                                     : 'border-border focus:border-blue-500'
-                            }`}
+                                }`}
                             required
                         />
                         {errors.stem && (
@@ -515,11 +549,10 @@ export default function CreateQuestion({
                         {data.options.map((option, idx) => (
                             <div
                                 key={idx}
-                                className={`flex items-center gap-4 rounded-xl border p-3.5 transition duration-200 ${
-                                    data.correct_option === idx
+                                className={`flex items-center gap-4 rounded-xl border p-3.5 transition duration-200 ${data.correct_option === idx
                                         ? 'border-emerald-250 bg-emerald-50/20'
                                         : 'border-border'
-                                }`}
+                                    }`}
                             >
                                 <label className="flex cursor-pointer items-center">
                                     <input
@@ -534,11 +567,10 @@ export default function CreateQuestion({
                                 </label>
 
                                 <span
-                                    className={`inline-flex size-7 shrink-0 items-center justify-center rounded-lg text-xs font-bold ${
-                                        data.correct_option === idx
+                                    className={`inline-flex size-7 shrink-0 items-center justify-center rounded-lg text-xs font-bold ${data.correct_option === idx
                                             ? 'bg-emerald-600 text-white'
                                             : 'bg-muted text-muted-foreground'
-                                    }`}
+                                        }`}
                                 >
                                     {String.fromCharCode(65 + idx)}
                                 </span>
@@ -579,11 +611,10 @@ export default function CreateQuestion({
                             }
                             rows={4}
                             placeholder="Why is this the correct answer? Provide logic constraints, solution steps, or constitutional references..."
-                            className={`w-full rounded-xl border p-4 text-sm font-medium text-foreground transition placeholder:text-muted-foreground focus:bg-background focus:outline-none ${
-                                errors.explanation
+                            className={`w-full rounded-xl border p-4 text-sm font-medium text-foreground transition placeholder:text-muted-foreground focus:bg-background focus:outline-none ${errors.explanation
                                     ? 'border-red-500'
                                     : 'border-slate-200 focus:border-blue-500'
-                            }`}
+                                }`}
                             required
                         />
                         {errors.explanation && (
@@ -637,22 +668,20 @@ export default function CreateQuestion({
                                 <button
                                     type="button"
                                     onClick={() => setData('status', 'active')}
-                                    className={`cursor-pointer rounded-lg py-2 text-xs font-bold transition ${
-                                        data.status === 'active'
+                                    className={`cursor-pointer rounded-lg py-2 text-xs font-bold transition ${data.status === 'active'
                                             ? 'bg-card text-foreground shadow-xs'
                                             : 'text-muted-foreground hover:text-foreground'
-                                    }`}
+                                        }`}
                                 >
                                     Active / Live
                                 </button>
                                 <button
                                     type="button"
                                     onClick={() => setData('status', 'draft')}
-                                    className={`cursor-pointer rounded-lg py-2 text-xs font-bold transition ${
-                                        data.status === 'draft'
+                                    className={`cursor-pointer rounded-lg py-2 text-xs font-bold transition ${data.status === 'draft'
                                             ? 'bg-white text-slate-900 shadow-xs'
                                             : 'text-slate-500 hover:text-slate-900'
-                                    }`}
+                                        }`}
                                 >
                                     Draft
                                 </button>

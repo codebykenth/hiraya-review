@@ -1,11 +1,8 @@
 import {
-	ChevronDown,
 	Filter,
 	X,
 	Calendar,
-	Users,
 	Gauge,
-	FileText,
 	Clock,
 } from 'lucide-react';
 import React, { useState } from 'react';

@@ -5,7 +5,6 @@ import {
     Users,
     UserPlus,
     Trash2,
-    Calendar,
     Activity,
     ChevronDown,
     Filter,
@@ -17,18 +16,18 @@ import {
     Eye,
     EyeOff,
     CheckSquare,
-    Square,
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import { AdvancedFilters } from '@/components/admin/advanced-filters';
+import type { FilterState } from '@/components/admin/advanced-filters';
+import { UserDetailModal } from '@/components/admin/user-detail-modal';
 import type { TableColumn } from '@/components/admin-table';
 import { AdminTable } from '@/components/admin-table';
 import { ConfirmModal } from '@/components/confirm-modal';
 import { PageContainer } from '@/components/page-container';
-import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { index as adminUsersIndex } from '@/routes/admin/users';
-import { UserDetailModal } from '@/components/admin/user-detail-modal';
-import { AdvancedFilters, type FilterState } from '@/components/admin/advanced-filters';
 
 interface UserItem {
     id: number;
@@ -106,8 +105,12 @@ export default function AdminUsersIndex({
     });
 
     const formatDate = (dateString: string | null | undefined): string => {
-        if (!dateString) return 'Never';
+        if (!dateString) {
+            return 'Never';
+        }
+
         const date = new Date(dateString);
+
         return date.toLocaleDateString('en-US', {
             year: 'numeric',
             month: 'short',
@@ -194,6 +197,7 @@ export default function AdminUsersIndex({
             variant: 'danger',
             onConfirm: async () => {
                 setBulkActionLoading(true);
+
                 try {
                     await Promise.all(
                         Array.from(selectedUserIds).map((userId) =>
@@ -241,6 +245,7 @@ export default function AdminUsersIndex({
             variant: 'success',
             onConfirm: async () => {
                 setBulkActionLoading(true);
+
                 try {
                     await Promise.all(
                         Array.from(selectedUserIds).map((userId) =>
@@ -261,20 +266,14 @@ export default function AdminUsersIndex({
 
     const toggleSelectUser = (userId: number) => {
         const newSelected = new Set(selectedUserIds);
+
         if (newSelected.has(userId)) {
             newSelected.delete(userId);
         } else {
             newSelected.add(userId);
         }
-        setSelectedUserIds(newSelected);
-    };
 
-    const toggleSelectAll = () => {
-        if (selectedUserIds.size === paginatedUsers.length) {
-            setSelectedUserIds(new Set());
-        } else {
-            setSelectedUserIds(new Set(paginatedUsers.map((u) => u.id)));
-        }
+        setSelectedUserIds(newSelected);
     };
 
     // Filter users
@@ -316,6 +315,7 @@ export default function AdminUsersIndex({
 
             if (filters.termsAcceptance !== 'all') {
                 const hasAcceptedTerms = !!u.terms_accepted_at;
+
                 if (filters.termsAcceptance === 'accepted') {
                     matchesAdvancedFilters =
                         matchesAdvancedFilters && hasAcceptedTerms;
@@ -454,6 +454,7 @@ export default function AdminUsersIndex({
             header: 'Status',
             render: (u) => {
                 const isDeleted = !!u.deleted_at;
+
                 if (isDeleted) {
                     return (
                         <span className="inline-flex items-center gap-1 rounded-md border border-rose-100 bg-rose-50 px-2 py-0.5 text-[9px] font-extrabold tracking-wide text-rose-700 uppercase dark:border-rose-900/30 dark:bg-rose-950/20 dark:text-rose-400">
@@ -462,6 +463,7 @@ export default function AdminUsersIndex({
                         </span>
                     );
                 }
+
                 return u.is_active ? (
                     <span className="inline-flex items-center gap-1 rounded-md border border-emerald-100 bg-emerald-50 px-2 py-0.5 text-[9px] font-extrabold tracking-wide text-emerald-700 uppercase dark:border-emerald-900/30 dark:bg-emerald-950/20 dark:text-emerald-400">
                         <CheckCircle className="size-3" />
@@ -515,6 +517,7 @@ export default function AdminUsersIndex({
             className: 'w-32 text-right',
             render: (u) => {
                 const isDeleted = !!u.deleted_at;
+
                 return (
                     <div className="flex items-center justify-end gap-1.5">
                         {isDeleted ? (
@@ -589,6 +592,26 @@ export default function AdminUsersIndex({
                                         <Lock className="size-4" />
                                     </button>
                                 )}
+
+                                <button
+                                    onClick={() => handleToggleStatus(u)}
+                                    disabled={u.id === currentUser.id}
+                                    className={`cursor-pointer rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted disabled:cursor-not-allowed disabled:opacity-30 ${u.is_active
+                                            ? 'hover:text-amber-600'
+                                            : 'hover:text-emerald-600'
+                                        }`}
+                                    title={
+                                        u.is_active
+                                            ? 'Deactivate account'
+                                            : 'Activate account'
+                                    }
+                                >
+                                    {u.is_active ? (
+                                        <XCircle className="size-4" />
+                                    ) : (
+                                        <CheckCircle className="size-4" />
+                                    )}
+                                </button>
 
                                 <button
                                     onClick={() => handleDeleteUser(u)}
@@ -838,6 +861,11 @@ export default function AdminUsersIndex({
                             variant: 'emerald',
                         },
                         {
+                            icon: CheckCircle,
+                            label: 'Activate/Deactivate User',
+                            variant: 'amber',
+                        },
+                        {
                             icon: Trash2,
                             label: 'Delete Account',
                             variant: 'rose',
@@ -899,5 +927,4 @@ AdminUsersIndex.layout = {
         },
     ],
 };
-
 
