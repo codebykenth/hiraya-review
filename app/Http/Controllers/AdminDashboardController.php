@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Question;
 use App\Models\Category;
-use App\Models\Subcategory;
 use App\Models\ExamAttempt;
-use App\Models\User;
+use App\Models\Question;
+use App\Models\Subcategory;
 use App\Models\TrackConfig;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -19,7 +19,7 @@ class AdminDashboardController extends Controller
      */
     private function checkAdminAccess(): void
     {
-        if (!auth()->user() || auth()->user()->role !== 'admin') {
+        if (! auth()->user() || auth()->user()->role !== 'admin') {
             abort(403, 'Unauthorized access to admin dashboard.');
         }
     }
@@ -48,7 +48,7 @@ class AdminDashboardController extends Controller
         $categoriesStats = Category::all()->map(function ($category) {
             $subIds = Subcategory::where('category_id', $category->id)->pluck('id');
             $questionCount = Question::whereIn('subcategory_id', $subIds)->count();
-            
+
             return [
                 'id' => $category->id,
                 'name' => $category->name,
@@ -58,15 +58,15 @@ class AdminDashboardController extends Controller
 
         // 3. Recent examinee attempt activities with grade computations
         $recentAttempts = ExamAttempt::whereHas('user', function ($q) {
-                $q->where('role', '!=', 'admin');
-            })
+            $q->where('role', '!=', 'admin');
+        })
             ->with(['user', 'category'])
             ->latest()
             ->take(5)
             ->get()
             ->map(function ($attempt) {
                 $meta = $attempt->cat_scores['metadata'] ?? [];
-                
+
                 // Get correct counts and totals from metadata or fallbacks
                 $correct = $meta['correct_count'] ?? 0;
                 $total = $meta['total_questions'] ?? count($attempt->question_ids ?? []);
@@ -75,11 +75,11 @@ class AdminDashboardController extends Controller
                 // Build a descriptive track or category name
                 $trackName = $meta['track'] ?? null;
                 $categoryName = 'Full Mock Exam';
-                
+
                 if ($attempt->category) {
                     $categoryName = $attempt->category->name;
                 } elseif ($trackName) {
-                    $categoryName = $trackName . ' Level Reviewer';
+                    $categoryName = $trackName.' Level Reviewer';
                 } elseif (isset($meta['category_name'])) {
                     $categoryName = $meta['category_name'];
                 }
@@ -103,7 +103,7 @@ class AdminDashboardController extends Controller
                 'track' => $track->track,
                 'category' => $track->category?->name ?? 'All Scope',
                 'item_count' => $track->item_count,
-                'time_limit' => $track->time_limit_secs ? round($track->time_limit_secs / 60) . ' mins' : 'No limit',
+                'time_limit' => $track->time_limit_secs ? round($track->time_limit_secs / 60).' mins' : 'No limit',
             ];
         });
 

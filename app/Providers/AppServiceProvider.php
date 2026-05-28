@@ -4,15 +4,15 @@ namespace App\Providers;
 
 use App\Models\User;
 use Carbon\CarbonImmutable;
+use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
-use Illuminate\Support\Facades\RateLimiter;
-use Illuminate\Cache\RateLimiting\Limit;
-use Illuminate\Http\Request;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -35,19 +35,19 @@ class AppServiceProvider extends ServiceProvider
         }
 
         RateLimiter::for('ai-generation', function (Request $request) {
-            if (!app()->isProduction()) {
+            if (! app()->isProduction()) {
                 return Limit::none();
             }
 
             return Limit::perMinute(5)->by($request->user()?->id ?: $request->ip())->response(function (Request $request, array $headers) {
                 return response()->json([
-                    'error' => 'You are generating questions too quickly. Please wait a moment and try again.'
+                    'error' => 'You are generating questions too quickly. Please wait a moment and try again.',
                 ], 429, $headers);
             });
         });
 
         RateLimiter::for('global-views', function (Request $request) {
-            if (!app()->isProduction()) {
+            if (! app()->isProduction()) {
                 return Limit::none();
             }
 
@@ -55,7 +55,7 @@ class AppServiceProvider extends ServiceProvider
         });
 
         RateLimiter::for('global-mutations', function (Request $request) {
-            if (!app()->isProduction()) {
+            if (! app()->isProduction()) {
                 return Limit::none();
             }
 
@@ -63,19 +63,19 @@ class AppServiceProvider extends ServiceProvider
         });
 
         RateLimiter::for('support-submission', function (Request $request) {
-            if (!app()->isProduction() && !config('services.support.test_rate_limit')) {
+            if (! app()->isProduction() && ! config('services.support.test_rate_limit')) {
                 return Limit::none();
             }
 
             return Limit::perDay(1)->by($request->ip())->response(function (Request $request, array $headers) {
                 if ($request->header('X-Inertia')) {
                     return back()->withErrors([
-                        'rate_limit' => 'You have already submitted a support request today. To prevent spam, submissions are limited to one per day.'
+                        'rate_limit' => 'You have already submitted a support request today. To prevent spam, submissions are limited to one per day.',
                     ]);
                 }
 
                 return response()->json([
-                    'error' => 'You have already submitted a support request today. To prevent spam, submissions are limited to one per day.'
+                    'error' => 'You have already submitted a support request today. To prevent spam, submissions are limited to one per day.',
                 ], 429, $headers);
             });
         });

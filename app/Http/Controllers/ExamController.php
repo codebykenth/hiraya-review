@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Question;
 use App\Models\Category;
+use App\Models\ExamAttempt;
+use App\Models\Question;
 use App\Models\TrackConfig;
-use Inertia\Inertia;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Inertia\Inertia;
 
 class ExamController extends Controller
 {
@@ -23,13 +24,13 @@ class ExamController extends Controller
         $formatted = [];
 
         foreach ($scoreMap as $catName => $scoreData) {
-            if ($catName === 'metadata' || !is_array($scoreData)) {
+            if ($catName === 'metadata' || ! is_array($scoreData)) {
                 continue;
             }
 
             if ($isDrill && isset($scoreData['subcats']) && is_array($scoreData['subcats'])) {
                 foreach ($scoreData['subcats'] as $subcatName => $subcatScore) {
-                    if (!is_array($subcatScore)) {
+                    if (! is_array($subcatScore)) {
                         continue;
                     }
 
@@ -39,7 +40,7 @@ class ExamController extends Controller
                             return str_contains($normalizedSubcatName, $selectedName) || str_contains($selectedName, $normalizedSubcatName);
                         });
 
-                        if (!$matchesSelection) {
+                        if (! $matchesSelection) {
                             continue;
                         }
                     }
@@ -109,7 +110,7 @@ class ExamController extends Controller
         $retakeSource = null;
 
         if ($request->has('attempt_id')) {
-            $attempt = \App\Models\ExamAttempt::where('user_id', auth()->id())
+            $attempt = ExamAttempt::where('user_id', auth()->id())
                 ->with('category')
                 ->find($request->attempt_id);
 
@@ -128,7 +129,7 @@ class ExamController extends Controller
             }
         } elseif ($request->filled('retake_same') || $request->filled('retake_fresh')) {
             $attemptId = $request->input('retake_same') ?? $request->input('retake_fresh');
-            $attempt = \App\Models\ExamAttempt::where('user_id', auth()->id())
+            $attempt = ExamAttempt::where('user_id', auth()->id())
                 ->find($attemptId);
 
             if ($attempt) {
@@ -153,7 +154,7 @@ class ExamController extends Controller
 
         // 2. Fetch categories and tracks configurations
         $categories = Cache::rememberForever('categories.tree', function () {
-            return Category::with(['subcategory' => function($query) {
+            return Category::with(['subcategory' => function ($query) {
                 $query->orderBy('sort_order');
             }])->orderBy('sort_order')->get()->toArray();
         });
@@ -188,7 +189,7 @@ class ExamController extends Controller
             'cat_scores' => 'required|array',
         ]);
 
-        $attempt = \App\Models\ExamAttempt::create([
+        $attempt = ExamAttempt::create([
             'user_id' => auth()->id(),
             'category_id' => $validated['category_id'],
             'question_ids' => $validated['question_ids'],
@@ -198,7 +199,7 @@ class ExamController extends Controller
 
         return response()->json([
             'success' => true,
-            'attempt_id' => $attempt->id
+            'attempt_id' => $attempt->id,
         ]);
     }
 
@@ -211,7 +212,7 @@ class ExamController extends Controller
         $track = $request->input('track');
         $dateFilter = $request->input('date');
 
-        $query = \App\Models\ExamAttempt::where('user_id', auth()->id())
+        $query = ExamAttempt::where('user_id', auth()->id())
             ->with('category');
 
         if ($dateFilter === '7') {
@@ -223,7 +224,7 @@ class ExamController extends Controller
         $attempts = $query->latest()->get()->map(function ($attempt) {
             $meta = $attempt->cat_scores['metadata'] ?? [];
             $trackName = $meta['track'] ?? 'Drill';
-            if ($attempt->category_id !== null && !$trackName) {
+            if ($attempt->category_id !== null && ! $trackName) {
                 $trackName = 'Drill';
             }
 
@@ -276,14 +277,14 @@ class ExamController extends Controller
             $attempts = $attempts->filter(function ($item) use ($search) {
                 return str_contains(strtolower($item['category']), strtolower($search)) ||
                        str_contains(strtolower($item['track']), strtolower($search)) ||
-                       str_contains(strtolower((string)$item['id']), strtolower($search));
+                       str_contains(strtolower((string) $item['id']), strtolower($search));
             });
         }
 
         $page = (int) $request->input('page', 1);
         $perPage = 4;
         $totalItems = $attempts->count();
-        
+
         $paginatedAttempts = $attempts->slice(($page - 1) * $perPage, $perPage)->values()->toArray();
 
         return Inertia::render('history/index', [
@@ -298,7 +299,7 @@ class ExamController extends Controller
                 'search' => $search ?? '',
                 'track' => $track ?? 'All Tracks',
                 'date' => $dateFilter ?? '30',
-            ]
+            ],
         ]);
     }
 
@@ -308,12 +309,12 @@ class ExamController extends Controller
     public function dashboard()
     {
         $userId = auth()->id();
-        $attempts = \App\Models\ExamAttempt::where('user_id', $userId)
+        $attempts = ExamAttempt::where('user_id', $userId)
             ->latest()
             ->get();
 
         $totalExams = $attempts->count();
-        
+
         $avgScore = 0;
         $strongestArea = 'Not Started';
         $weakestArea = 'Not Started';
@@ -321,7 +322,7 @@ class ExamController extends Controller
         $totalQuestionsSolved = 0;
         $totalDurationSecs = 0;
         $avgDurationText = '0 mins';
-        
+
         $categoryTotals = [
             'Verbal Ability' => ['correct' => 0, 'total' => 0],
             'Clerical Ability' => ['correct' => 0, 'total' => 0],
@@ -333,7 +334,7 @@ class ExamController extends Controller
         if ($totalExams > 0) {
             $totalScoreSum = 0;
             $passCount = 0;
-            
+
             foreach ($attempts as $attempt) {
                 $meta = $attempt->cat_scores['metadata'] ?? [];
                 $correct = $meta['correct_count'] ?? 0;
@@ -351,11 +352,21 @@ class ExamController extends Controller
                 $scoreMap = $attempt->cat_scores['categoryScoreMap'] ?? $attempt->cat_scores ?? [];
                 foreach ($scoreMap as $catName => $scoreData) {
                     $normalizedCat = $catName;
-                    if (str_contains($catName, 'Verbal')) $normalizedCat = 'Verbal Ability';
-                    if (str_contains($catName, 'Clerical')) $normalizedCat = 'Clerical Ability';
-                    if (str_contains($catName, 'General')) $normalizedCat = 'General Information';
-                    if (str_contains($catName, 'Numerical')) $normalizedCat = 'Numerical Ability';
-                    if (str_contains($catName, 'Analytical')) $normalizedCat = 'Analytical Ability';
+                    if (str_contains($catName, 'Verbal')) {
+                        $normalizedCat = 'Verbal Ability';
+                    }
+                    if (str_contains($catName, 'Clerical')) {
+                        $normalizedCat = 'Clerical Ability';
+                    }
+                    if (str_contains($catName, 'General')) {
+                        $normalizedCat = 'General Information';
+                    }
+                    if (str_contains($catName, 'Numerical')) {
+                        $normalizedCat = 'Numerical Ability';
+                    }
+                    if (str_contains($catName, 'Analytical')) {
+                        $normalizedCat = 'Analytical Ability';
+                    }
 
                     if (isset($categoryTotals[$normalizedCat])) {
                         $categoryTotals[$normalizedCat]['correct'] += $scoreData['correct'] ?? 0;
@@ -397,9 +408,9 @@ class ExamController extends Controller
 
                 $chartData[] = [
                     'score' => $percentage,
-                    'label' => 'Run ' . $attemptIdx++,
+                    'label' => 'Run '.$attemptIdx++,
                     'date' => $date,
-                    'track' => $track === 'Drill' ? 'Custom Drill' : $track . ' Exam',
+                    'track' => $track === 'Drill' ? 'Custom Drill' : $track.' Exam',
                     'detail' => "{$correct}/{$total} Correct",
                     'categoryScores' => $this->formatAttemptCategoryScores($attempt->cat_scores ?? []),
                 ];
@@ -407,7 +418,7 @@ class ExamController extends Controller
             while (count($chartData) < 2) {
                 array_unshift($chartData, [
                     'score' => 0,
-                    'label' => 'Run ' . (count($chartData) + 1),
+                    'label' => 'Run '.(count($chartData) + 1),
                     'date' => '-',
                     'track' => 'No Data',
                     'detail' => '0/0 Correct',
@@ -436,10 +447,18 @@ class ExamController extends Controller
             $categoryPercentages[$catName] = $pct;
 
             $color = 'bg-blue-600 dark:bg-blue-500';
-            if ($catName === 'Verbal Ability') $color = 'bg-emerald-600 dark:bg-emerald-500';
-            if ($catName === 'General Information') $color = 'bg-emerald-850 dark:bg-emerald-700';
-            if ($catName === 'Numerical Ability') $color = 'bg-rose-600 dark:bg-rose-500';
-            if ($catName === 'Analytical Ability') $color = 'bg-amber-600 dark:bg-amber-500';
+            if ($catName === 'Verbal Ability') {
+                $color = 'bg-emerald-600 dark:bg-emerald-500';
+            }
+            if ($catName === 'General Information') {
+                $color = 'bg-emerald-850 dark:bg-emerald-700';
+            }
+            if ($catName === 'Numerical Ability') {
+                $color = 'bg-rose-600 dark:bg-rose-500';
+            }
+            if ($catName === 'Analytical Ability') {
+                $color = 'bg-amber-600 dark:bg-amber-500';
+            }
 
             $formattedCategories[] = [
                 'name' => str_replace(' Ability', '', str_replace(' Information', '', $catName)),
@@ -450,11 +469,11 @@ class ExamController extends Controller
             ];
         }
 
-        $activeCategoryPercentages = array_filter($categoryPercentages, fn($val) => $val > 0);
+        $activeCategoryPercentages = array_filter($categoryPercentages, fn ($val) => $val > 0);
         if (count($activeCategoryPercentages) > 0) {
             arsort($activeCategoryPercentages);
             $strongestArea = array_key_first($activeCategoryPercentages);
-            
+
             asort($activeCategoryPercentages);
             $weakestArea = array_key_first($activeCategoryPercentages);
         } else {
@@ -476,7 +495,7 @@ class ExamController extends Controller
                 'totalDuration' => $totalDurationText,
                 'avgDuration' => $avgDurationText,
                 'totalQuestionsSolved' => $totalQuestionsSolved,
-            ]
+            ],
         ]);
     }
 
@@ -490,17 +509,17 @@ class ExamController extends Controller
         $seconds = max(0, $seconds);
 
         if ($seconds < 60) {
-            return $seconds . 's';
+            return $seconds.'s';
         }
 
         $hours = intdiv($seconds, 3600);
         $minutes = intdiv($seconds % 3600, 60);
 
         if ($hours > 0) {
-            return $hours . 'h ' . $minutes . 'm';
+            return $hours.'h '.$minutes.'m';
         }
 
-        return $minutes . 'm';
+        return $minutes.'m';
     }
 
     private function seenQuestionIdsByTrack(?int $userId): array
@@ -511,11 +530,11 @@ class ExamController extends Controller
             'Drill' => [],
         ];
 
-        if (!$userId) {
+        if (! $userId) {
             return $byTrack;
         }
 
-        $attempts = \App\Models\ExamAttempt::where('user_id', $userId)->get();
+        $attempts = ExamAttempt::where('user_id', $userId)->get();
 
         foreach ($attempts as $attempt) {
             $meta = $attempt->cat_scores['metadata'] ?? [];
@@ -554,7 +573,7 @@ class ExamController extends Controller
         });
 
         $categories = Cache::rememberForever('categories.tree', function () {
-            return Category::with(['subcategory' => function($query) {
+            return Category::with(['subcategory' => function ($query) {
                 $query->orderBy('sort_order');
             }])->orderBy('sort_order')->get()->toArray();
         });
@@ -568,7 +587,7 @@ class ExamController extends Controller
     /**
      * Delete an exam attempt record.
      */
-    public function destroyAttempt(\App\Models\ExamAttempt $attempt)
+    public function destroyAttempt(ExamAttempt $attempt)
     {
         if ($attempt->user_id !== auth()->id()) {
             abort(403, 'Unauthorized action.');

@@ -2,13 +2,13 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Model;
 
 #[Fillable(['category_id', 'name', 'slug', 'language', 'sort_order'])]
 class Subcategory extends Model
 {
-    public function casts() 
+    public function casts()
     {
         return [
             'category_id' => 'integer',

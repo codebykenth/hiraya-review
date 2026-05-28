@@ -3,16 +3,16 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
-use App\Models\Subcategory;
 use App\Models\LearnModule;
+use App\Models\Subcategory;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Cache;
 
 class AdminLearnController extends Controller
 {
@@ -21,7 +21,7 @@ class AdminLearnController extends Controller
      */
     private function checkAdminAccess(): void
     {
-        if (!auth()->user() || auth()->user()->role !== 'admin') {
+        if (! auth()->user() || auth()->user()->role !== 'admin') {
             abort(403, 'Unauthorized access to learning administration.');
         }
     }
@@ -109,11 +109,11 @@ class AdminLearnController extends Controller
                     $subcategory = Subcategory::firstOrCreate(
                         [
                             'category_id' => $category->id,
-                            'slug' => Str::slug($mData['subcategory'])
+                            'slug' => Str::slug($mData['subcategory']),
                         ],
                         [
                             'name' => $mData['subcategory'],
-                            'language' => 'English'
+                            'language' => 'English',
                         ]
                     );
 
@@ -138,9 +138,9 @@ class AdminLearnController extends Controller
                         $originalSlug = $slug;
                         $count = 1;
                         while (LearnModule::where('slug', $slug)->exists()) {
-                            $slug = $originalSlug . '-' . $count++;
+                            $slug = $originalSlug.'-'.$count++;
                         }
-                        
+
                         LearnModule::create([
                             'category_id' => $category->id,
                             'subcategory_id' => $subcategory->id,
@@ -177,12 +177,12 @@ class AdminLearnController extends Controller
         ]);
 
         $slug = Str::slug($validated['title']);
-        
+
         // Ensure slug uniqueness
         $originalSlug = $slug;
         $count = 1;
         while (LearnModule::where('slug', $slug)->exists()) {
-            $slug = $originalSlug . '-' . $count++;
+            $slug = $originalSlug.'-'.$count++;
         }
 
         LearnModule::create([
@@ -255,7 +255,7 @@ class AdminLearnController extends Controller
             $originalSlug = $slug;
             $count = 1;
             while (LearnModule::where('slug', $slug)->where('id', '!=', $id)->exists()) {
-                $slug = $originalSlug . '-' . $count++;
+                $slug = $originalSlug.'-'.$count++;
             }
             $module->slug = $slug;
         }
@@ -306,9 +306,9 @@ class AdminLearnController extends Controller
         ]);
 
         $apiKey = config('services.gemini.key') ?: env('GEMINI_API_KEY');
-        if (!$apiKey) {
+        if (! $apiKey) {
             return response()->json([
-                'error' => 'GEMINI_API_KEY is not configured in environment settings.'
+                'error' => 'GEMINI_API_KEY is not configured in environment settings.',
             ], 400);
         }
 
@@ -379,7 +379,7 @@ JSON Output schema:
 Category: {$validated['category']}
 Subcategory: {$validated['subcategory']}
 Topic: {$validated['topic']}
-" . ($validated['prompt'] ? "Additional Directives: {$validated['prompt']}" : "");
+".($validated['prompt'] ? "Additional Directives: {$validated['prompt']}" : '');
 
         set_time_limit(300);
         try {
@@ -416,15 +416,16 @@ Topic: {$validated['topic']}
             );
 
             if ($response->failed()) {
-                Log::error("Gemini Learn Module Generation failed: " . $response->body());
+                Log::error('Gemini Learn Module Generation failed: '.$response->body());
+
                 return response()->json([
-                    'error' => 'The AI service is temporarily busy. Please wait a moment and try again.'
+                    'error' => 'The AI service is temporarily busy. Please wait a moment and try again.',
                 ], 500);
             }
 
             $result = $response->json();
             $text = $result['candidates'][0]['content']['parts'][0]['text'] ?? '';
-            
+
             $text = trim($text);
             if (str_starts_with($text, '```')) {
                 $text = preg_replace('/^```(?:json)?\n?|```$/', '', $text);
@@ -432,10 +433,11 @@ Topic: {$validated['topic']}
             $text = trim($text);
 
             $moduleData = json_decode($text, true);
-            if (!$moduleData || !isset($moduleData['content'])) {
-                Log::error("Gemini returned invalid learn JSON structure: " . $text);
+            if (! $moduleData || ! isset($moduleData['content'])) {
+                Log::error('Gemini returned invalid learn JSON structure: '.$text);
+
                 return response()->json([
-                    'error' => 'The generator encountered an unexpected formatting issue. Please try again.'
+                    'error' => 'The generator encountered an unexpected formatting issue. Please try again.',
                 ], 500);
             }
 
@@ -448,11 +450,11 @@ Topic: {$validated['topic']}
             $subcategory = Subcategory::firstOrCreate(
                 [
                     'category_id' => $category->id,
-                    'slug' => Str::slug($validated['subcategory'])
+                    'slug' => Str::slug($validated['subcategory']),
                 ],
                 [
                     'name' => $validated['subcategory'],
-                    'language' => 'English'
+                    'language' => 'English',
                 ]
             );
 
@@ -460,7 +462,7 @@ Topic: {$validated['topic']}
             $originalSlug = $slug;
             $count = 1;
             while (LearnModule::where('slug', $slug)->exists()) {
-                $slug = $originalSlug . '-' . $count++;
+                $slug = $originalSlug.'-'.$count++;
             }
 
             $dbModule = LearnModule::create([
@@ -480,13 +482,14 @@ Topic: {$validated['topic']}
 
             return response()->json([
                 'success' => true,
-                'module' => $dbModule
+                'module' => $dbModule,
             ]);
 
         } catch (\Exception $e) {
-            Log::error("Learn module AI generation error: " . $e->getMessage() . "\n" . $e->getTraceAsString());
+            Log::error('Learn module AI generation error: '.$e->getMessage()."\n".$e->getTraceAsString());
+
             return response()->json([
-                'error' => 'A system error occurred while generating learning content.'
+                'error' => 'A system error occurred while generating learning content.',
             ], 500);
         }
     }

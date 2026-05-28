@@ -5,10 +5,14 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Models\Question;
 use App\Models\Subcategory;
+use App\Models\User;
+use Database\Seeders\DatabaseSeeder;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
-use Illuminate\Support\Facades\Cache;
 
 class QuestionController extends Controller
 {
@@ -17,10 +21,11 @@ class QuestionController extends Controller
      */
     private function checkAdminAccess(): void
     {
-        if (!auth()->user() || auth()->user()->role !== 'admin') {
+        if (! auth()->user() || auth()->user()->role !== 'admin') {
             abort(403, 'Unauthorized access to scope management.');
         }
     }
+
     /**
      * Helper to ensure categories are seeded dynamically if empty.
      */
@@ -28,7 +33,7 @@ class QuestionController extends Controller
     {
         if (Category::count() === 0) {
             try {
-                (new \Database\Seeders\DatabaseSeeder())->run();
+                (new DatabaseSeeder)->run();
             } catch (\Exception $e) {
                 // Fail-safe silently during setup errors
             }
@@ -55,7 +60,7 @@ class QuestionController extends Controller
         });
 
         $categories = Cache::rememberForever('categories.tree', function () {
-            return Category::with(['subcategory' => function($query) {
+            return Category::with(['subcategory' => function ($query) {
                 $query->orderBy('sort_order');
             }])->orderBy('sort_order')->get()->toArray();
         });
@@ -75,7 +80,7 @@ class QuestionController extends Controller
 
         $drafts = Question::with(['subcategory.category'])
             ->where('status', 'draft')
-            ->where('created_by', auth()->id() ?: (\App\Models\User::first()?->id ?: 1))
+            ->where('created_by', auth()->id() ?: (User::first()?->id ?: 1))
             ->latest()
             ->get()
             ->map(function ($q) {
@@ -92,7 +97,7 @@ class QuestionController extends Controller
             });
 
         $categories = Cache::rememberForever('categories.tree', function () {
-            return Category::with(['subcategory' => function($query) {
+            return Category::with(['subcategory' => function ($query) {
                 $query->orderBy('sort_order');
             }])->orderBy('sort_order')->get()->toArray();
         });
@@ -111,7 +116,7 @@ class QuestionController extends Controller
         $this->ensureCategoriesSeeded();
 
         $categories = Cache::rememberForever('categories.tree', function () {
-            return Category::with(['subcategory' => function($query) {
+            return Category::with(['subcategory' => function ($query) {
                 $query->orderBy('sort_order');
             }])->orderBy('sort_order')->get()->toArray();
         });
@@ -136,9 +141,9 @@ class QuestionController extends Controller
         ]);
 
         $apiKey = config('services.gemini.key') ?: env('GEMINI_API_KEY');
-        if (!$apiKey) {
+        if (! $apiKey) {
             return response()->json([
-                'error' => 'GEMINI_API_KEY is not configured. Please add your API Key to enable this feature.'
+                'error' => 'GEMINI_API_KEY is not configured. Please add your API Key to enable this feature.',
             ], 400);
         }
 
@@ -181,10 +186,10 @@ Output format:
 Category: {$validated['category']}
 Subcategory: {$validated['subcategory']}
 Language: {$validated['language']}
-" . ($validated['prompt'] ? "Additional Context/Directives: {$validated['prompt']}" : "");
+".($validated['prompt'] ? "Additional Context/Directives: {$validated['prompt']}" : '');
         set_time_limit(300);
         try {
-            $response = \Illuminate\Support\Facades\Http::withHeaders([
+            $response = Http::withHeaders([
                 'x-goog-api-key' => $apiKey,
                 'Content-Type' => 'application/json',
             ])->timeout(300)->retry(3, 10000)->post(
@@ -217,7 +222,7 @@ Language: {$validated['language']}
                                 'properties' => [
                                     'stem' => [
                                         'type' => 'STRING',
-                                        'description' => 'The question stem or scenario. If it includes a data table, represent it beautifully as a formatted text/markdown table (e.g. using standard pipes | or formatted spacing).'
+                                        'description' => 'The question stem or scenario. If it includes a data table, represent it beautifully as a formatted text/markdown table (e.g. using standard pipes | or formatted spacing).',
                                     ],
                                     'category' => [
                                         'type' => 'STRING',
@@ -238,7 +243,7 @@ Language: {$validated['language']}
                                     ],
                                     'explanation' => [
                                         'type' => 'STRING',
-                                        'description' => 'A detailed explanation of the steps leading to the correct option.'
+                                        'description' => 'A detailed explanation of the steps leading to the correct option.',
                                     ],
                                 ],
                                 'required' => ['stem', 'category', 'subcategory', 'options', 'correct_option', 'explanation'],
@@ -254,16 +259,16 @@ Language: {$validated['language']}
             if ($response->failed()) {
                 $status = $response->status();
                 $body = $response->body();
-                \Illuminate\Support\Facades\Log::error("Gemini API call failed with status {$status}: {$body}");
+                Log::error("Gemini API call failed with status {$status}: {$body}");
 
                 if ($status === 429) {
                     return response()->json([
-                        'error' => 'The question generator is temporarily busy due to high API demand. Please wait a moment and try again.'
+                        'error' => 'The question generator is temporarily busy due to high API demand. Please wait a moment and try again.',
                     ], 429);
                 }
 
                 return response()->json([
-                    'error' => 'We encountered an issue generating your questions. Please wait a moment and try again.'
+                    'error' => 'We encountered an issue generating your questions. Please wait a moment and try again.',
                 ], 500);
             }
 
@@ -278,10 +283,11 @@ Language: {$validated['language']}
             $text = trim($text);
 
             $questions = json_decode($text, true);
-            if (!$questions || !is_array($questions)) {
-                \Illuminate\Support\Facades\Log::error("Invalid JSON structure returned by Gemini. Raw output: " . $text);
+            if (! $questions || ! is_array($questions)) {
+                Log::error('Invalid JSON structure returned by Gemini. Raw output: '.$text);
+
                 return response()->json([
-                    'error' => 'The generator encountered an unexpected formatting issue. Please try again with a different prompt.'
+                    'error' => 'The generator encountered an unexpected formatting issue. Please try again with a different prompt.',
                 ], 500);
             }
 
@@ -296,11 +302,11 @@ Language: {$validated['language']}
                     $subcategory = Subcategory::firstOrCreate(
                         [
                             'category_id' => $category->id,
-                            'slug' => Str::slug($validated['subcategory'])
+                            'slug' => Str::slug($validated['subcategory']),
                         ],
                         [
                             'name' => $validated['subcategory'],
-                            'language' => $validated['language']
+                            'language' => $validated['language'],
                         ]
                     );
 
@@ -311,7 +317,7 @@ Language: {$validated['language']}
                         'options' => $q['options'] ?? [],
                         'correct_option' => (int) ($q['correct_option'] ?? 0),
                         'explanation' => $q['explanation'] ?? '',
-                        'created_by' => auth()->id() ?: (\App\Models\User::first()?->id ?: 1),
+                        'created_by' => auth()->id() ?: (User::first()?->id ?: 1),
                         'status' => 'draft',
                     ]);
 
@@ -326,8 +332,8 @@ Language: {$validated['language']}
                         'approved' => false,
                     ];
                 } catch (\Exception $e) {
-                    \Illuminate\Support\Facades\Log::error("Failed to immediately save draft question to database: " . $e->getMessage() . "\nTrace: " . $e->getTraceAsString());
-                    
+                    Log::error('Failed to immediately save draft question to database: '.$e->getMessage()."\nTrace: ".$e->getTraceAsString());
+
                     // Fallback to dynamic review if DB throws a migration/connection exception
                     $savedQuestions[] = [
                         'id' => rand(10000, 99999),
@@ -349,9 +355,10 @@ Language: {$validated['language']}
             ]);
 
         } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::error("An exception occurred during question generation: " . $e->getMessage() . "\nTrace: " . $e->getTraceAsString());
+            Log::error('An exception occurred during question generation: '.$e->getMessage()."\nTrace: ".$e->getTraceAsString());
+
             return response()->json([
-                'error' => 'A system error occurred while generating questions. Please try again later.'
+                'error' => 'A system error occurred while generating questions. Please try again later.',
             ], 500);
         }
     }
@@ -376,11 +383,11 @@ Language: {$validated['language']}
                     $subcategory = Subcategory::firstOrCreate(
                         [
                             'category_id' => $category->id,
-                            'slug' => Str::slug($qData['subcategory'])
+                            'slug' => Str::slug($qData['subcategory']),
                         ],
                         [
                             'name' => $qData['subcategory'],
-                            'language' => 'English'
+                            'language' => 'English',
                         ]
                     );
 
@@ -407,7 +414,7 @@ Language: {$validated['language']}
                             'options' => $qData['options'],
                             'correct_option' => (int) $qData['correct_option'],
                             'explanation' => $qData['explanation'],
-                            'created_by' => auth()->id() ?: (\App\Models\User::first()?->id ?: 1),
+                            'created_by' => auth()->id() ?: (User::first()?->id ?: 1),
                             'status' => 'active',
                         ]);
                     }
@@ -447,11 +454,11 @@ Language: {$validated['language']}
             $subcategory = Subcategory::firstOrCreate(
                 [
                     'category_id' => $category->id,
-                    'slug' => Str::slug($validated['subcategory'])
+                    'slug' => Str::slug($validated['subcategory']),
                 ],
                 [
                     'name' => $validated['subcategory'],
-                    'language' => $validated['language']
+                    'language' => $validated['language'],
                 ]
             );
 
@@ -462,7 +469,7 @@ Language: {$validated['language']}
                 'options' => $validated['options'],
                 'correct_option' => (int) $validated['correct_option'],
                 'explanation' => $validated['explanation'],
-                'created_by' => auth()->id() ?: (\App\Models\User::first()?->id ?: 1),
+                'created_by' => auth()->id() ?: (User::first()?->id ?: 1),
                 'status' => $validated['status'] === 'active' ? 'active' : 'draft',
             ]);
 
@@ -471,9 +478,11 @@ Language: {$validated['language']}
             if ($validated['status'] === 'draft') {
                 return redirect()->route('questions.drafts')->with('success', 'Draft question created successfully!');
             }
+
             return redirect()->route('questions.index')->with('success', 'Question created successfully!');
         } catch (\Exception $e) {
             $this->clearCache();
+
             // Development fallback if database is not fully migrated
             return redirect()->route('questions.index')->with('success', 'Question simulation saved successfully!');
         }
@@ -497,7 +506,7 @@ Language: {$validated['language']}
                 'explanation' => $question->explanation,
                 'language' => $question->language ?? 'English',
                 'status' => strtoupper($question->status),
-            ]
+            ],
         ]);
     }
 
@@ -509,7 +518,7 @@ Language: {$validated['language']}
         $question = Question::with(['subcategory.category'])->findOrFail($id);
 
         $categories = Cache::rememberForever('categories.tree', function () {
-            return Category::with(['subcategory' => function($query) {
+            return Category::with(['subcategory' => function ($query) {
                 $query->orderBy('sort_order');
             }])->orderBy('sort_order')->get()->toArray();
         });
@@ -550,19 +559,19 @@ Language: {$validated['language']}
 
         // Find or create category/subcategory structure dynamically matching creation logic
         $category = Category::firstOrCreate([
-            'name' => $validated['category']
+            'name' => $validated['category'],
         ], [
             'slug' => Str::slug($validated['category']),
-            'sort_order' => 1
+            'sort_order' => 1,
         ]);
 
         $subcategory = Subcategory::firstOrCreate([
             'category_id' => $category->id,
-            'name' => $validated['subcategory']
+            'name' => $validated['subcategory'],
         ], [
             'slug' => Str::slug($validated['subcategory']),
             'language' => $validated['language'],
-            'sort_order' => 1
+            'sort_order' => 1,
         ]);
 
         $question->update([
@@ -629,7 +638,7 @@ Language: {$validated['language']}
         $category->delete();
         $this->clearCache();
 
-        return redirect()->back()->with('success', "Category and all its subcategories have been removed.");
+        return redirect()->back()->with('success', 'Category and all its subcategories have been removed.');
     }
 
     /**
@@ -666,7 +675,7 @@ Language: {$validated['language']}
         $subcategory->delete();
         $this->clearCache();
 
-        return redirect()->back()->with('success', "Subcategory has been removed successfully.");
+        return redirect()->back()->with('success', 'Subcategory has been removed successfully.');
     }
 
     /**

@@ -1,8 +1,7 @@
 <?php
 
-use App\Models\User;
 use App\Models\ExamAttempt;
-use App\Models\Category;
+use App\Models\User;
 
 test('guests cannot store an exam attempt', function () {
     $response = $this->postJson(route('exams.attempts.store'), [
@@ -32,7 +31,7 @@ test('authenticated users can store a timed exam attempt', function () {
                 'skipped_count' => 0,
                 'duration_secs' => 120,
                 'is_timed' => true,
-            ]
+            ],
         ],
     ]);
 
@@ -66,7 +65,7 @@ test('authenticated users can store an untimed exam attempt', function () {
                 'skipped_count' => 0,
                 'duration_secs' => 300,
                 'is_timed' => false,
-            ]
+            ],
         ],
     ]);
 

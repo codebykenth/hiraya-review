@@ -2,9 +2,9 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
 use App\Models\Category;
 use App\Models\Subcategory;
+use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
 
@@ -40,7 +40,7 @@ class DatabaseSeeder extends Seeder
                 'Philippine Constitution',
                 'Code of Conduct and Ethical Standards (R.A. 6713)',
                 'Peace and Human Rights Issues and Concepts',
-                'Environment Management and Protection'
+                'Environment Management and Protection',
             ],
             'Verbal Ability' => [
                 'Word meaning',
@@ -48,23 +48,23 @@ class DatabaseSeeder extends Seeder
                 'Error recognition',
                 'Sentence structure',
                 'Paragraph organization',
-                'Reading comprehension'
+                'Reading comprehension',
             ],
             'Analytical Ability' => [
                 'Word analogy',
                 'Symbolic logic / abstract reasoning',
                 'Identifying assumptions and drawing conclusions',
-                'Data interpretation'
+                'Data interpretation',
             ],
             'Numerical Ability' => [
                 'Basic operations',
                 'Number sequence',
-                'Word problems'
+                'Word problems',
             ],
             'Clerical Ability' => [
                 'Filing',
-                'Spelling'
-            ]
+                'Spelling',
+            ],
         ];
 
         $order = 1;

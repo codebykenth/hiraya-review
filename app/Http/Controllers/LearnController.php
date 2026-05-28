@@ -5,9 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Models\LearnModule;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Inertia\Inertia;
 use Inertia\Response;
-use Illuminate\Support\Facades\Cache;
 
 class LearnController extends Controller
 {
@@ -38,7 +38,7 @@ class LearnController extends Controller
 
         // Load all active categories from shared categories tree cache
         $categories = Cache::rememberForever('categories.tree', function () {
-            return Category::with(['subcategory' => function($query) {
+            return Category::with(['subcategory' => function ($query) {
                 $query->orderBy('sort_order');
             }])->orderBy('sort_order')->get()->toArray();
         });

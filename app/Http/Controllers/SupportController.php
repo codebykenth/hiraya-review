@@ -28,7 +28,7 @@ class SupportController extends Controller
             ->send(new SupportSubmittedMail($validated));
 
         return back()->with([
-            'success' => 'Thank you for reaching out, ' . $validated['name'] . '! We have received your message and will reply within 24 hours.'
+            'success' => 'Thank you for reaching out, '.$validated['name'].'! We have received your message and will reply within 24 hours.',
         ]);
     }
 }

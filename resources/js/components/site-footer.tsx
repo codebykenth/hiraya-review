@@ -7,7 +7,7 @@ export default function SiteFooter() {
         <footer className="border-t border-slate-200 bg-primary/20 px-6 py-12 dark:border-slate-800 dark:bg-slate-950/20">
             <div className="container mx-auto flex max-w-7xl flex-col gap-8">
                 <div className="flex w-full flex-col gap-2 text-left">
-                    <h3 className="font-heading text-2xl font-extrabold tracking-tight text-primary">
+                    <h3 className="font-heading text-2xl tracking-tight">
                         <BrandName />
                     </h3>
                     <p className="text-sm leading-relaxed font-normal text-slate-600 dark:text-slate-400">

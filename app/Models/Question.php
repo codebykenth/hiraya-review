@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Model;
 
 #[Fillable(['subcategory_id', 'language', 'stem', 'options', 'correct_option', 'explanation', 'created_by', 'status'])]
 class Question extends Model
@@ -18,11 +18,13 @@ class Question extends Model
         ];
     }
 
-    public function subcategory() {
+    public function subcategory()
+    {
         return $this->belongsTo(Subcategory::class);
     }
 
-    public function createdBy() {
+    public function createdBy()
+    {
         return $this->belongsTo(User::class, 'created_by');
     }
 }

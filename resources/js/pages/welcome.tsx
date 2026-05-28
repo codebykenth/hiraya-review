@@ -40,6 +40,7 @@ import { register } from '@/routes';
 export default function Welcome() {
     const { auth } = usePage().props;
     const [isFreeExamModalOpen, setIsFreeExamModalOpen] = useState(false);
+    const [hoveredStep, setHoveredStep] = useState<number | null>(null);
 
     const handleFreeExamStart = (track: 'professional' | 'subprofessional') => {
         setIsFreeExamModalOpen(false);
@@ -528,36 +529,79 @@ export default function Welcome() {
 
                             <div className="relative z-10 grid w-full grid-cols-1 gap-8 md:grid-cols-3">
                                 {/* Step 1 */}
-                                <Card className="relative flex flex-col items-center overflow-hidden rounded-xl border border-l-[4px] border-slate-200/80 border-l-primary bg-card bg-white p-8 text-center shadow-sm transition-all duration-300 hover:shadow-md">
-                                    <div className="z-10 flex h-12 w-12 items-center justify-center rounded-full bg-primary text-lg font-bold text-white shadow-md">
+                                <Card
+                                    onMouseEnter={() => setHoveredStep(1)}
+                                    onMouseLeave={() => setHoveredStep(null)}
+                                    className={`relative flex flex-col items-center overflow-hidden rounded-xl border border-l-4 border-slate-200/80 bg-card p-8 text-center shadow-sm transition-all duration-300 ${
+                                        hoveredStep === 1
+                                            ? 'border-l-primary'
+                                            : 'border-l-primary'
+                                    } hover:shadow-md`}
+                                >
+                                    <div
+                                        className={`z-10 flex h-12 w-12 items-center justify-center rounded-full text-lg font-bold shadow-md transition-colors duration-300 ${
+                                            hoveredStep === null ||
+                                            hoveredStep === 1
+                                                ? 'bg-primary text-white'
+                                                : 'border-2 border-primary bg-card text-primary'
+                                        }`}
+                                    >
                                         1
                                     </div>
                                     <h3 className="mt-6 font-heading text-xl font-bold text-slate-900 dark:text-white">
                                         Choose Track
                                     </h3>
-                                    <p className="mt-3 max-w-[260px] text-[14px] leading-relaxed font-normal text-slate-600 dark:text-slate-400">
+                                    <p className="mt-3 max-w-65 text-[14px] leading-relaxed font-normal text-slate-600 dark:text-slate-400">
                                         Select Professional or Sub-Professional
                                         level to tailor your question bank.
                                     </p>
                                 </Card>
 
                                 {/* Step 2 */}
-                                <Card className="relative flex flex-col items-center overflow-hidden rounded-xl border border-l-[4px] border-slate-200/80 border-l-primary bg-card bg-white p-8 text-center shadow-sm transition-all duration-300 hover:shadow-md">
-                                    <div className="z-10 flex h-12 w-12 items-center justify-center rounded-full border-2 border-primary bg-white text-lg font-bold text-primary shadow-sm dark:bg-slate-950">
+                                <Card
+                                    onMouseEnter={() => setHoveredStep(2)}
+                                    onMouseLeave={() => setHoveredStep(null)}
+                                    className={`relative flex flex-col items-center overflow-hidden rounded-xl border border-l-4 border-slate-200/80 bg-card p-8 text-center shadow-sm transition-all duration-300 ${
+                                        hoveredStep === 2
+                                            ? 'border-l-primary'
+                                            : 'border-l-primary'
+                                    } hover:shadow-md`}
+                                >
+                                    <div
+                                        className={`z-10 flex h-12 w-12 items-center justify-center rounded-full text-lg font-bold shadow-sm transition-colors duration-300 ${
+                                            hoveredStep === 2
+                                                ? 'bg-primary text-white'
+                                                : 'border-2 border-primary bg-card text-primary'
+                                        }`}
+                                    >
                                         2
                                     </div>
                                     <h3 className="mt-6 font-heading text-xl font-bold text-slate-900 dark:text-white">
                                         Take Exam
                                     </h3>
-                                    <p className="mt-3 max-w-[260px] text-[14px] leading-relaxed font-normal text-slate-600 dark:text-slate-400">
+                                    <p className="mt-3 max-w-65 text-[14px] leading-relaxed font-normal text-slate-600 dark:text-slate-400">
                                         Complete timed mocks or casual drills in
                                         a realistic test environment.
                                     </p>
                                 </Card>
 
                                 {/* Step 3 */}
-                                <Card className="relative flex flex-col items-center overflow-hidden rounded-xl border border-l-[4px] border-slate-200/80 border-l-primary bg-card bg-white p-8 text-center shadow-sm transition-all duration-300 hover:shadow-md">
-                                    <div className="z-10 flex h-12 w-12 items-center justify-center rounded-full border-2 border-primary bg-white text-lg font-bold text-primary shadow-sm dark:bg-slate-950">
+                                <Card
+                                    onMouseEnter={() => setHoveredStep(3)}
+                                    onMouseLeave={() => setHoveredStep(null)}
+                                    className={`relative flex flex-col items-center overflow-hidden rounded-xl border border-l-4 border-slate-200/80 bg-card p-8 text-center shadow-sm transition-all duration-300 ${
+                                        hoveredStep === 3
+                                            ? 'border-l-primary'
+                                            : 'border-l-primary'
+                                    } hover:shadow-md`}
+                                >
+                                    <div
+                                        className={`z-10 flex h-12 w-12 items-center justify-center rounded-full text-lg font-bold shadow-sm transition-colors duration-300 ${
+                                            hoveredStep === 3
+                                                ? 'bg-primary text-white'
+                                                : 'border-2 border-primary bg-card text-primary'
+                                        }`}
+                                    >
                                         3
                                     </div>
                                     <h3 className="mt-6 font-heading text-xl font-bold text-slate-900 dark:text-white">

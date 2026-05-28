@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Model;
 
 #[Fillable(['name', 'slug', 'is_demographic', 'sort_order'])]
 class Category extends Model
@@ -16,11 +16,13 @@ class Category extends Model
         ];
     }
 
-    public function subcategory() {
+    public function subcategory()
+    {
         return $this->hasMany(Subcategory::class);
     }
 
-    public function questions() {
+    public function questions()
+    {
         return $this->hasMany(Question::class);
     }
 }

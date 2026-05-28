@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
 use App\Models\ExamAttempt;
+use App\Models\User;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
-use Illuminate\Http\RedirectResponse;
 
 class AdminUserController extends Controller
 {
@@ -16,7 +16,7 @@ class AdminUserController extends Controller
      */
     private function checkAdminAccess(): void
     {
-        if (!auth()->user() || auth()->user()->role !== 'admin') {
+        if (! auth()->user() || auth()->user()->role !== 'admin') {
             abort(403, 'Unauthorized access to user administration.');
         }
     }
@@ -46,7 +46,7 @@ class AdminUserController extends Controller
         $stats = [
             'total_users' => User::count(),
             'total_admins' => User::where('role', 'admin')->count(),
-            'total_students' => User::where('role', 'student')->count(),
+            'total_students' => User::where('role', 'user')->count(),
             'total_attempts' => ExamAttempt::count(),
         ];
 

@@ -3,8 +3,8 @@
 namespace App\Http\Middleware;
 
 use Closure;
-use Illuminate\Http\Request;
 use Illuminate\Auth\Middleware\RequirePassword;
+use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class ConfirmPasswordForNonSocialUsers
@@ -12,7 +12,7 @@ class ConfirmPasswordForNonSocialUsers
     /**
      * Handle an incoming request.
      */
-    public function handle(Request $request, Closure $next, string $redirectToRoute = null): Response
+    public function handle(Request $request, Closure $next, ?string $redirectToRoute = null): Response
     {
         $user = $request->user();
 
