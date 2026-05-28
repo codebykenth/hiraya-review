@@ -86,6 +86,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // Admin User Management Mutations
         Route::put('admin/users/{id}', [AdminUserController::class, 'update'])->name('admin.users.update');
         Route::delete('admin/users/{id}', [AdminUserController::class, 'destroy'])->name('admin.users.destroy');
+        Route::post('admin/users/{id}/restore', [AdminUserController::class, 'restore'])->name('admin.users.restore');
+        Route::delete('admin/users/{id}/force-delete', [AdminUserController::class, 'forceDelete'])->name('admin.users.force-delete');
 
         // Dynamic Scope Management Routes
         Route::post('questions/categories', [QuestionController::class, 'storeCategory'])->name('questions.categories.store');

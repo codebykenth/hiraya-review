@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\CheckUserActive;
 use App\Http\Middleware\ConfirmPasswordForNonSocialUsers;
 use App\Http\Middleware\HandleAppearance;
 use App\Http\Middleware\HandleInertiaRequests;
@@ -25,6 +26,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->web(append: [
             HandleAppearance::class,
+            CheckUserActive::class,
             HandleInertiaRequests::class,
             AddLinkHeadersForPreloadedAssets::class,
             VerifyCsrfToken::class,

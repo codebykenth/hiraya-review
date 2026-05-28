@@ -1,4 +1,4 @@
-import { Head, router, usePage } from '@inertiajs/react';
+﻿import { Head, router, usePage } from '@inertiajs/react';
 import {
     Search,
     Shield,
@@ -8,6 +8,16 @@ import {
     Calendar,
     Activity,
     ChevronDown,
+    Filter,
+    RotateCcw,
+    CheckCircle,
+    XCircle,
+    Lock,
+    Unlock,
+    Eye,
+    EyeOff,
+    CheckSquare,
+    Square,
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import type { TableColumn } from '@/components/admin-table';
@@ -15,15 +25,22 @@ import { AdminTable } from '@/components/admin-table';
 import { ConfirmModal } from '@/components/confirm-modal';
 import { PageContainer } from '@/components/page-container';
 import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 import { index as adminUsersIndex } from '@/routes/admin/users';
+import { UserDetailModal } from '@/components/admin/user-detail-modal';
+import { AdvancedFilters, type FilterState } from '@/components/admin/advanced-filters';
 
 interface UserItem {
     id: number;
     name: string;
     email: string;
-    role: string;
+    role: 'admin' | 'student';
     created_at: string;
     attempts_count: number;
+    is_active: boolean;
+    deleted_at?: string | null;
+    terms_accepted_at?: string | null;
+    last_login_at?: string | null;
 }
 
 interface StatsSummary {
@@ -31,6 +48,7 @@ interface StatsSummary {
     total_admins: number;
     total_students: number;
     total_attempts: number;
+    terms_accepted_count?: number;
 }
 
 interface AdminUsersIndexProps {
@@ -49,7 +67,18 @@ export default function AdminUsersIndex({
     const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
     const [selectedRole, setSelectedRole] = useState('All Roles');
     const [currentPage, setCurrentPage] = useState(1);
+    const [showDeletedUsers, setShowDeletedUsers] = useState(false);
+    const [selectedUserIds, setSelectedUserIds] = useState<Set<number>>(new Set());
+    const [selectedUserModal, setSelectedUserModal] = useState<UserItem | null>(null);
+    const [showFiltersModal, setShowFiltersModal] = useState(false);
+    const [bulkActionLoading, setBulkActionLoading] = useState(false);
     const pageSize = 10;
+
+    const [filters, setFilters] = useState<FilterState>({
+        status: 'all',
+        termsAcceptance: 'all',
+        role: 'all',
+    });
 
     useEffect(() => {
         const handler = setTimeout(() => {
@@ -73,8 +102,18 @@ export default function AdminUsersIndex({
         message: '',
         confirmLabel: '',
         variant: 'success',
-        onConfirm: () => {},
+        onConfirm: () => { },
     });
+
+    const formatDate = (dateString: string | null | undefined): string => {
+        if (!dateString) return 'Never';
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+        });
+    };
 
     const handleRoleChange = (
         user: UserItem,
@@ -89,7 +128,7 @@ export default function AdminUsersIndex({
                     'You cannot demote yourself from administrative status. This is to ensure you maintain access to this dashboard.',
                 confirmLabel: 'Understood',
                 variant: 'info',
-                onConfirm: () => {},
+                onConfirm: () => { },
             });
 
             return;
@@ -125,7 +164,7 @@ export default function AdminUsersIndex({
                     'You cannot delete the active administrator account you are currently logged into.',
                 confirmLabel: 'Understood',
                 variant: 'info',
-                onConfirm: () => {},
+                onConfirm: () => { },
             });
 
             return;
@@ -133,8 +172,8 @@ export default function AdminUsersIndex({
 
         setConfirmModal({
             isOpen: true,
-            title: 'Permanently Delete User?',
-            message: `Warning: This will permanently delete the user account for "${user.name}" (${user.email}). All mock exam attempt history and statistics linked to this user will be permanently destroyed. This action cannot be undone!`,
+            title: 'Delete User Account?',
+            message: `This will soft-delete the account for "${user.name}" (${user.email}). The account data will be preserved but hidden from the system.`,
             confirmLabel: 'Delete Account',
             variant: 'danger',
             onConfirm: () => {
@@ -145,19 +184,205 @@ export default function AdminUsersIndex({
         });
     };
 
-    const filteredUsers = users.filter((u) => {
-        const matchesSearch =
-            u.name.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
-            u.email.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
-            String(u.id).includes(debouncedSearchTerm);
+    const handleBulkDelete = () => {
+        const count = selectedUserIds.size;
+        setConfirmModal({
+            isOpen: true,
+            title: 'Bulk Delete Users?',
+            message: `This will soft-delete ${count} user account${count !== 1 ? 's' : ''}. The account data will be preserved but hidden from the system.`,
+            confirmLabel: 'Delete Accounts',
+            variant: 'danger',
+            onConfirm: async () => {
+                setBulkActionLoading(true);
+                try {
+                    await Promise.all(
+                        Array.from(selectedUserIds).map((userId) =>
+                            router.delete(`/admin/users/${userId}`, {
+                                preserveScroll: true,
+                            }),
+                        ),
+                    );
+                    setSelectedUserIds(new Set());
+                } finally {
+                    setBulkActionLoading(false);
+                }
+            },
+        });
+    };
 
-        const matchesRole =
-            selectedRole === 'All Roles' ||
-            (selectedRole === 'Admins' && u.role === 'admin') ||
-            (selectedRole === 'Students' && u.role === 'student');
+    const handleToggleStatus = (user: UserItem) => {
+        const newStatus = !user.is_active;
+        const action = newStatus ? 'activate' : 'deactivate';
 
-        return matchesSearch && matchesRole;
-    });
+        setConfirmModal({
+            isOpen: true,
+            title: `${newStatus ? 'Activate' : 'Deactivate'} User?`,
+            message: `Are you sure you want to ${action} "${user.name}"'s account? They will ${newStatus ? 'be able to' : 'not be able to'} access the platform.`,
+            confirmLabel: `${newStatus ? 'Activate' : 'Deactivate'} Account`,
+            variant: newStatus ? 'success' : 'danger',
+            onConfirm: () => {
+                router.put(
+                    `/admin/users/${user.id}`,
+                    { is_active: newStatus },
+                    { preserveScroll: true },
+                );
+            },
+        });
+    };
+
+    const handleBulkToggleStatus = (activate: boolean) => {
+        const count = selectedUserIds.size;
+        const action = activate ? 'activate' : 'deactivate';
+        setConfirmModal({
+            isOpen: true,
+            title: `Bulk ${activate ? 'Activate' : 'Deactivate'} Users?`,
+            message: `This will ${action} ${count} user account${count !== 1 ? 's' : ''}.`,
+            confirmLabel: `${activate ? 'Activate' : 'Deactivate'} Accounts`,
+            variant: 'success',
+            onConfirm: async () => {
+                setBulkActionLoading(true);
+                try {
+                    await Promise.all(
+                        Array.from(selectedUserIds).map((userId) =>
+                            router.put(
+                                `/admin/users/${userId}`,
+                                { is_active: activate },
+                                { preserveScroll: true },
+                            ),
+                        ),
+                    );
+                    setSelectedUserIds(new Set());
+                } finally {
+                    setBulkActionLoading(false);
+                }
+            },
+        });
+    };
+
+    const toggleSelectUser = (userId: number) => {
+        const newSelected = new Set(selectedUserIds);
+        if (newSelected.has(userId)) {
+            newSelected.delete(userId);
+        } else {
+            newSelected.add(userId);
+        }
+        setSelectedUserIds(newSelected);
+    };
+
+    const toggleSelectAll = () => {
+        if (selectedUserIds.size === paginatedUsers.length) {
+            setSelectedUserIds(new Set());
+        } else {
+            setSelectedUserIds(new Set(paginatedUsers.map((u) => u.id)));
+        }
+    };
+
+    // Filter users
+    const filteredUsers = users
+        .filter((u) => {
+            // Apply search filter
+            const matchesSearch =
+                u.name
+                    .toLowerCase()
+                    .includes(debouncedSearchTerm.toLowerCase()) ||
+                u.email
+                    .toLowerCase()
+                    .includes(debouncedSearchTerm.toLowerCase()) ||
+                String(u.id).includes(debouncedSearchTerm);
+
+            // Apply role filter
+            const matchesRole =
+                selectedRole === 'All Roles' ||
+                (selectedRole === 'Admins' && u.role === 'admin') ||
+                (selectedRole === 'Students' && u.role === 'student');
+
+            // Apply deleted filter
+            const isDeleted = !!u.deleted_at;
+            const matchesDeletedFilter =
+                showDeletedUsers === isDeleted;
+
+            // Apply advanced filters
+            let matchesAdvancedFilters = true;
+
+            if (filters.status !== 'all') {
+                if (filters.status === 'deleted') {
+                    matchesAdvancedFilters = isDeleted;
+                } else if (filters.status === 'active') {
+                    matchesAdvancedFilters = !isDeleted && u.is_active;
+                } else if (filters.status === 'inactive') {
+                    matchesAdvancedFilters = !isDeleted && !u.is_active;
+                }
+            }
+
+            if (filters.termsAcceptance !== 'all') {
+                const hasAcceptedTerms = !!u.terms_accepted_at;
+                if (filters.termsAcceptance === 'accepted') {
+                    matchesAdvancedFilters =
+                        matchesAdvancedFilters && hasAcceptedTerms;
+                } else if (filters.termsAcceptance === 'pending') {
+                    matchesAdvancedFilters =
+                        matchesAdvancedFilters && !hasAcceptedTerms;
+                }
+            }
+
+            if (filters.role !== 'all') {
+                matchesAdvancedFilters =
+                    matchesAdvancedFilters &&
+                    ((filters.role === 'admin' && u.role === 'admin') ||
+                        (filters.role === 'student' && u.role === 'student'));
+            }
+
+            if (filters.registrationDateFrom) {
+                const from = new Date(filters.registrationDateFrom);
+                const created = new Date(u.created_at);
+                matchesAdvancedFilters =
+                    matchesAdvancedFilters && created >= from;
+            }
+
+            if (filters.registrationDateTo) {
+                const to = new Date(filters.registrationDateTo);
+                to.setHours(23, 59, 59, 999);
+                const created = new Date(u.created_at);
+                matchesAdvancedFilters =
+                    matchesAdvancedFilters && created <= to;
+            }
+
+            if (filters.lastLoginFrom && u.last_login_at) {
+                const from = new Date(filters.lastLoginFrom);
+                const lastLogin = new Date(u.last_login_at);
+                matchesAdvancedFilters =
+                    matchesAdvancedFilters && lastLogin >= from;
+            }
+
+            if (filters.lastLoginTo && u.last_login_at) {
+                const to = new Date(filters.lastLoginTo);
+                to.setHours(23, 59, 59, 999);
+                const lastLogin = new Date(u.last_login_at);
+                matchesAdvancedFilters =
+                    matchesAdvancedFilters && lastLogin <= to;
+            }
+
+            if (
+                filters.attemptsMin !== undefined &&
+                u.attempts_count < filters.attemptsMin
+            ) {
+                matchesAdvancedFilters = false;
+            }
+
+            if (
+                filters.attemptsMax !== undefined &&
+                u.attempts_count > filters.attemptsMax
+            ) {
+                matchesAdvancedFilters = false;
+            }
+
+            return (
+                matchesSearch &&
+                matchesRole &&
+                matchesDeletedFilter &&
+                matchesAdvancedFilters
+            );
+        });
 
     const startIndex = (currentPage - 1) * pageSize;
     const paginatedUsers = filteredUsers.slice(
@@ -165,7 +390,26 @@ export default function AdminUsersIndex({
         startIndex + pageSize,
     );
 
+    const complianceRate =
+        stats.total_users > 0
+            ? Math.round(
+                ((stats.terms_accepted_count || 0) / stats.total_users) * 100,
+            )
+            : 0;
+
     const columns: TableColumn<UserItem>[] = [
+        {
+            header: '',
+            className: 'w-10',
+            render: (u) => (
+                <input
+                    type="checkbox"
+                    checked={selectedUserIds.has(u.id)}
+                    onChange={() => toggleSelectUser(u.id)}
+                    className="size-4 cursor-pointer rounded border-border"
+                />
+            ),
+        },
         {
             header: 'User ID',
             render: (u) => (
@@ -175,7 +419,10 @@ export default function AdminUsersIndex({
         {
             header: 'Profile Details',
             render: (u) => (
-                <>
+                <button
+                    onClick={() => setSelectedUserModal(u)}
+                    className="text-left hover:underline cursor-pointer"
+                >
                     <span className="block text-xs leading-snug font-black text-foreground">
                         {u.name}
                         {u.id === currentUser.id && (
@@ -187,7 +434,7 @@ export default function AdminUsersIndex({
                     <span className="mt-0.5 block text-[10px] leading-normal font-bold text-muted-foreground">
                         {u.email}
                     </span>
-                </>
+                </button>
             ),
         },
         {
@@ -204,61 +451,158 @@ export default function AdminUsersIndex({
                 ),
         },
         {
-            header: 'Registration Date',
+            header: 'Status',
+            render: (u) => {
+                const isDeleted = !!u.deleted_at;
+                if (isDeleted) {
+                    return (
+                        <span className="inline-flex items-center gap-1 rounded-md border border-rose-100 bg-rose-50 px-2 py-0.5 text-[9px] font-extrabold tracking-wide text-rose-700 uppercase dark:border-rose-900/30 dark:bg-rose-950/20 dark:text-rose-400">
+                            <Trash2 className="size-3" />
+                            Deleted
+                        </span>
+                    );
+                }
+                return u.is_active ? (
+                    <span className="inline-flex items-center gap-1 rounded-md border border-emerald-100 bg-emerald-50 px-2 py-0.5 text-[9px] font-extrabold tracking-wide text-emerald-700 uppercase dark:border-emerald-900/30 dark:bg-emerald-950/20 dark:text-emerald-400">
+                        <CheckCircle className="size-3" />
+                        Active
+                    </span>
+                ) : (
+                    <span className="inline-flex items-center gap-1 rounded-md border border-amber-100 bg-amber-50 px-2 py-0.5 text-[9px] font-extrabold tracking-wide text-amber-700 uppercase dark:border-amber-900/30 dark:bg-amber-950/20 dark:text-amber-400">
+                        <XCircle className="size-3" />
+                        Inactive
+                    </span>
+                );
+            },
+        },
+        {
+            header: 'Terms Status',
+            render: (u) =>
+                u.terms_accepted_at ? (
+                    <div className="flex items-center gap-1 text-emerald-700 dark:text-emerald-400">
+                        <CheckCircle className="size-3" />
+                        <span className="text-[9px] font-bold">
+                            {formatDate(u.terms_accepted_at)}
+                        </span>
+                    </div>
+                ) : (
+                    <span className="text-[9px] font-bold text-amber-700 dark:text-amber-400">
+                        Pending
+                    </span>
+                ),
+        },
+        {
+            header: 'Last Login',
             render: (u) => (
-                <div className="flex items-center gap-1 font-bold text-muted-foreground">
-                    <Calendar className="size-3.5 text-muted-foreground/80" />
-                    <span>{u.created_at}</span>
-                </div>
+                <span className="text-[9px] font-bold text-muted-foreground">
+                    {formatDate(u.last_login_at)}
+                </span>
             ),
         },
         {
-            header: 'Mock attempts',
+            header: 'Mock Attempts',
             render: (u) => (
                 <div className="flex items-center gap-1.5">
                     <Activity className="size-3.5 text-blue-500" />
                     <span className="font-black text-foreground">
                         {u.attempts_count}
                     </span>
-                    <span className="text-[10px] font-medium text-muted-foreground">
-                        exams
-                    </span>
                 </div>
             ),
         },
         {
             header: 'Actions',
-            className: 'w-28 text-right',
-            render: (u) => (
-                <div className="flex items-center justify-end gap-1.5">
-                    {u.role === 'admin' ? (
-                        <button
-                            onClick={() => handleRoleChange(u, 'student')}
-                            className="cursor-pointer rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted hover:text-emerald-600"
-                            title="Demote to Student"
-                        >
-                            <UserPlus className="size-4" />
-                        </button>
-                    ) : (
-                        <button
-                            onClick={() => handleRoleChange(u, 'admin')}
-                            className="cursor-pointer rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted hover:text-indigo-600"
-                            title="Promote to Admin"
-                        >
-                            <Shield className="size-4" />
-                        </button>
-                    )}
+            className: 'w-32 text-right',
+            render: (u) => {
+                const isDeleted = !!u.deleted_at;
+                return (
+                    <div className="flex items-center justify-end gap-1.5">
+                        {isDeleted ? (
+                            <>
+                                <button
+                                    onClick={() => {
+                                        setConfirmModal({
+                                            isOpen: true,
+                                            title: 'Restore User Account?',
+                                            message: `Restore ${u.name}'s account?`,
+                                            confirmLabel: 'Restore',
+                                            variant: 'success',
+                                            onConfirm: () => {
+                                                router.post(
+                                                    `/admin/users/${u.id}/restore`,
+                                                    {},
+                                                    { preserveScroll: true },
+                                                );
+                                            },
+                                        });
+                                    }}
+                                    className="cursor-pointer rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted hover:text-emerald-600"
+                                    title="Restore account"
+                                >
+                                    <RotateCcw className="size-4" />
+                                </button>
+                                <button
+                                    onClick={() => {
+                                        setConfirmModal({
+                                            isOpen: true,
+                                            title: 'Permanently Delete Account?',
+                                            message: 'This will permanently delete this account. Cannot be undone!',
+                                            confirmLabel: 'Delete',
+                                            variant: 'danger',
+                                            onConfirm: () => {
+                                                router.post(
+                                                    `/admin/users/${u.id}/force-delete`,
+                                                    {},
+                                                    { preserveScroll: true },
+                                                );
+                                            },
+                                        });
+                                    }}
+                                    className="cursor-pointer rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted hover:text-red-600"
+                                    title="Permanently delete"
+                                >
+                                    <Trash2 className="size-4" />
+                                </button>
+                            </>
+                        ) : (
+                            <>
+                                {u.role === 'admin' ? (
+                                    <button
+                                        onClick={() =>
+                                            handleRoleChange(u, 'student')
+                                        }
+                                        disabled={u.id === currentUser.id}
+                                        className="cursor-pointer rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted hover:text-emerald-600 disabled:cursor-not-allowed disabled:opacity-30"
+                                        title="Demote to Student"
+                                    >
+                                        <Unlock className="size-4" />
+                                    </button>
+                                ) : (
+                                    <button
+                                        onClick={() =>
+                                            handleRoleChange(u, 'admin')
+                                        }
+                                        disabled={u.id === currentUser.id}
+                                        className="cursor-pointer rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted hover:text-indigo-600 disabled:cursor-not-allowed disabled:opacity-30"
+                                        title="Promote to Admin"
+                                    >
+                                        <Lock className="size-4" />
+                                    </button>
+                                )}
 
-                    <button
-                        onClick={() => handleDeleteUser(u)}
-                        disabled={u.id === currentUser.id}
-                        className="cursor-pointer rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted hover:text-red-600 disabled:cursor-not-allowed disabled:opacity-30"
-                        title="Delete account"
-                    >
-                        <Trash2 className="size-4" />
-                    </button>
-                </div>
-            ),
+                                <button
+                                    onClick={() => handleDeleteUser(u)}
+                                    disabled={u.id === currentUser.id}
+                                    className="cursor-pointer rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted hover:text-red-600 disabled:cursor-not-allowed disabled:opacity-30"
+                                    title="Delete account"
+                                >
+                                    <Trash2 className="size-4" />
+                                </button>
+                            </>
+                        )}
+                    </div>
+                );
+            },
         },
     ];
 
@@ -329,21 +673,21 @@ export default function AdminUsersIndex({
                         </div>
                     </div>
 
-                    {/* Exam Attempts */}
+                    {/* Compliance Rate */}
                     <div className="relative flex overflow-hidden rounded-2xl border border-border bg-card p-5 shadow-xs transition hover:shadow-md">
                         <div className="pointer-events-none absolute right-0 bottom-0 opacity-10">
-                            <Activity className="size-24 text-blue-300 dark:text-blue-900" />
+                            <CheckCircle className="size-24 text-blue-300 dark:text-blue-900" />
                         </div>
                         <div className="z-10 flex items-center gap-4">
                             <div className="text-blue-650 flex size-12 shrink-0 items-center justify-center rounded-2xl border border-blue-100/30 bg-blue-50 dark:bg-blue-950/20 dark:text-blue-400">
-                                <Activity className="size-6" />
+                                <CheckCircle className="size-6" />
                             </div>
                             <div>
                                 <span className="text-[10px] font-black tracking-wider text-blue-400 uppercase">
-                                    Total Attempts
+                                    Compliance Rate
                                 </span>
                                 <h3 className="mt-0.5 text-xl font-black text-foreground">
-                                    {stats.total_attempts}
+                                    {complianceRate}%
                                 </h3>
                             </div>
                         </div>
@@ -385,6 +729,38 @@ export default function AdminUsersIndex({
                             <ChevronDown className="pointer-events-none absolute top-1/2 right-2.5 size-3.5 -translate-y-1/2 text-slate-500" />
                         </div>
 
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setShowFiltersModal(true)}
+                            className="gap-1.5"
+                        >
+                            <Filter className="size-3.5" />
+                            Filters
+                        </Button>
+
+                        <Button
+                            variant={showDeletedUsers ? 'default' : 'outline'}
+                            size="sm"
+                            onClick={() => {
+                                setShowDeletedUsers(!showDeletedUsers);
+                                setCurrentPage(1);
+                            }}
+                            className="gap-1.5"
+                        >
+                            {showDeletedUsers ? (
+                                <>
+                                    <Eye className="size-3.5" />
+                                    Show Active
+                                </>
+                            ) : (
+                                <>
+                                    <EyeOff className="size-3.5" />
+                                    Show Deleted
+                                </>
+                            )}
+                        </Button>
+
                         <span className="mt-1 block shrink-0 pl-1 text-right text-xs font-bold text-muted-foreground md:mt-0 md:text-left">
                             {filteredUsers.length === 0
                                 ? 'No matches'
@@ -393,6 +769,58 @@ export default function AdminUsersIndex({
                     </div>
                 </div>
 
+                {/* 2.5. BULK ACTIONS PANEL */}
+                {selectedUserIds.size > 0 && (
+                    <div className="flex flex-col gap-3 rounded-xl border border-blue-100 bg-blue-50 p-4 dark:border-blue-900/30 dark:bg-blue-950/20 sm:flex-row sm:items-center sm:justify-between">
+                        <div className="flex items-center gap-3">
+                            <CheckSquare className="size-5 text-blue-600 dark:text-blue-400" />
+                            <span className="text-xs font-bold text-slate-700 dark:text-slate-300">
+                                {selectedUserIds.size} user{selectedUserIds.size !== 1 ? 's' : ''} selected
+                            </span>
+                        </div>
+                        <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setSelectedUserIds(new Set())}
+                                className="text-xs"
+                            >
+                                Deselect All
+                            </Button>
+                            <Button
+                                variant="secondary"
+                                size="sm"
+                                onClick={() => handleBulkToggleStatus(true)}
+                                disabled={bulkActionLoading}
+                                className="text-xs gap-1.5"
+                            >
+                                <CheckCircle className="size-3" />
+                                Activate
+                            </Button>
+                            <Button
+                                variant="secondary"
+                                size="sm"
+                                onClick={() => handleBulkToggleStatus(false)}
+                                disabled={bulkActionLoading}
+                                className="text-xs gap-1.5"
+                            >
+                                <XCircle className="size-3" />
+                                Deactivate
+                            </Button>
+                            <Button
+                                variant="destructive"
+                                size="sm"
+                                onClick={handleBulkDelete}
+                                disabled={bulkActionLoading}
+                                className="text-xs gap-1.5"
+                            >
+                                <Trash2 className="size-3" />
+                                Delete Selected
+                            </Button>
+                        </div>
+                    </div>
+                )}
+
                 {/* 3. MAIN USER DATATABLE */}
                 <AdminTable
                     data={paginatedUsers}
@@ -400,12 +828,12 @@ export default function AdminUsersIndex({
                     title="User Account Catalog"
                     legend={[
                         {
-                            icon: Shield,
+                            icon: Lock,
                             label: 'Promote to Admin',
                             variant: 'indigo',
                         },
                         {
-                            icon: UserPlus,
+                            icon: Unlock,
                             label: 'Demote to Student',
                             variant: 'emerald',
                         },
@@ -428,7 +856,25 @@ export default function AdminUsersIndex({
                 />
             </PageContainer>
 
-            {/* Custom confirm/warning Dialog matching Learn Curation global visual standard */}
+            {/* User Detail Modal */}
+            <UserDetailModal
+                isOpen={!!selectedUserModal}
+                user={selectedUserModal || undefined}
+                currentUserId={currentUser.id}
+                onClose={() => setSelectedUserModal(null)}
+            />
+
+            {/* Advanced Filters Modal */}
+            <AdvancedFilters
+                isOpen={showFiltersModal}
+                onClose={() => setShowFiltersModal(false)}
+                onApply={(newFilters) => {
+                    setFilters(newFilters);
+                    setCurrentPage(1);
+                }}
+                currentFilters={filters}
+            />
+
             <ConfirmModal
                 isOpen={confirmModal.isOpen}
                 title={confirmModal.title}
@@ -453,3 +899,5 @@ AdminUsersIndex.layout = {
         },
     ],
 };
+
+
