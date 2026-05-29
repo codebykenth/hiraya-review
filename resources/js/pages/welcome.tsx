@@ -104,7 +104,7 @@ export default function Welcome() {
         },
         {
             question: 'How realistic are the mock exams on this platform?',
-            answer: 'Our mock exams are designed to match the actual Civil Service Commission (CSC) exams in timing, number of items, question distribution, and distraction-free interface to build real exam-day stamina.',
+            answer: 'Our mock exams are designed to simulate the general format, timing, and structure commonly used in Civil Service Commission (CSC) examinations, with a distraction-free interface  to build real exam-day stamina.',
         },
         {
             question:
@@ -268,7 +268,7 @@ export default function Welcome() {
                                 <Badge className="rounded-full border border-primary bg-primary/15 px-4 py-1.5 text-primary-foreground transition-colors hover:bg-primary/30">
                                     <Sparkles className="mr-2 h-4 w-4 text-primary" />
                                     <span className="font-bold text-primary">
-                                        Your way to pass the Civil Service Exam
+                                        Turning dreams into exam success through disciplined review.
                                     </span>
                                 </Badge>
 
@@ -279,11 +279,7 @@ export default function Welcome() {
                                     </span>
                                 </h1>
                                 <p className="text-lg leading-relaxed text-muted-foreground">
-                                    Accelerate your preparation with our
-                                    advanced, AI-powered question bank, highly
-                                    realistic timed mock exams, and deeply
-                                    personalized analytics. Stop guessing, start
-                                    mastering.
+                                    Accelerate your preparation with an AI-assisted question bank, realistic timed mock exams, and performance analytics designed to support structured Civil Service Exam review.
                                 </p>
 
                                 <div className="flex flex-wrap gap-4 pt-2">
@@ -472,7 +468,7 @@ export default function Welcome() {
                                     </div>
                                 }
                                 cardTwoTitle="AI-Generated Questions"
-                                cardTwoDescription="Dynamic question pools that adapt to your skill level, ensuring you never run out of fresh practice material."
+                                cardTwoDescription="Dynamic question pools that provide varied practice sets to help reinforce learning and skill development."
                             />
 
                             {/* Row 2: Analytics & Category Drills (Reversed) */}
@@ -532,19 +528,17 @@ export default function Welcome() {
                                 <Card
                                     onMouseEnter={() => setHoveredStep(1)}
                                     onMouseLeave={() => setHoveredStep(null)}
-                                    className={`relative flex flex-col items-center overflow-hidden rounded-xl border border-l-4 border-slate-200/80 bg-card p-8 text-center shadow-sm transition-all duration-300 ${
-                                        hoveredStep === 1
+                                    className={`relative flex flex-col items-center overflow-hidden rounded-xl border border-l-4 border-slate-200/80 bg-card p-8 text-center shadow-sm transition-all duration-300 ${hoveredStep === 1
                                             ? 'border-l-primary'
                                             : 'border-l-primary'
-                                    } hover:shadow-md`}
+                                        } hover:shadow-md`}
                                 >
                                     <div
-                                        className={`z-10 flex h-12 w-12 items-center justify-center rounded-full text-lg font-bold shadow-md transition-colors duration-300 ${
-                                            hoveredStep === null ||
-                                            hoveredStep === 1
+                                        className={`z-10 flex h-12 w-12 items-center justify-center rounded-full text-lg font-bold shadow-md transition-colors duration-300 ${hoveredStep === null ||
+                                                hoveredStep === 1
                                                 ? 'bg-primary text-white'
                                                 : 'border-2 border-primary bg-card text-primary'
-                                        }`}
+                                            }`}
                                     >
                                         1
                                     </div>
@@ -561,18 +555,16 @@ export default function Welcome() {
                                 <Card
                                     onMouseEnter={() => setHoveredStep(2)}
                                     onMouseLeave={() => setHoveredStep(null)}
-                                    className={`relative flex flex-col items-center overflow-hidden rounded-xl border border-l-4 border-slate-200/80 bg-card p-8 text-center shadow-sm transition-all duration-300 ${
-                                        hoveredStep === 2
+                                    className={`relative flex flex-col items-center overflow-hidden rounded-xl border border-l-4 border-slate-200/80 bg-card p-8 text-center shadow-sm transition-all duration-300 ${hoveredStep === 2
                                             ? 'border-l-primary'
                                             : 'border-l-primary'
-                                    } hover:shadow-md`}
+                                        } hover:shadow-md`}
                                 >
                                     <div
-                                        className={`z-10 flex h-12 w-12 items-center justify-center rounded-full text-lg font-bold shadow-sm transition-colors duration-300 ${
-                                            hoveredStep === 2
+                                        className={`z-10 flex h-12 w-12 items-center justify-center rounded-full text-lg font-bold shadow-sm transition-colors duration-300 ${hoveredStep === 2
                                                 ? 'bg-primary text-white'
                                                 : 'border-2 border-primary bg-card text-primary'
-                                        }`}
+                                            }`}
                                     >
                                         2
                                     </div>
@@ -589,18 +581,16 @@ export default function Welcome() {
                                 <Card
                                     onMouseEnter={() => setHoveredStep(3)}
                                     onMouseLeave={() => setHoveredStep(null)}
-                                    className={`relative flex flex-col items-center overflow-hidden rounded-xl border border-l-4 border-slate-200/80 bg-card p-8 text-center shadow-sm transition-all duration-300 ${
-                                        hoveredStep === 3
+                                    className={`relative flex flex-col items-center overflow-hidden rounded-xl border border-l-4 border-slate-200/80 bg-card p-8 text-center shadow-sm transition-all duration-300 ${hoveredStep === 3
                                             ? 'border-l-primary'
                                             : 'border-l-primary'
-                                    } hover:shadow-md`}
+                                        } hover:shadow-md`}
                                 >
                                     <div
-                                        className={`z-10 flex h-12 w-12 items-center justify-center rounded-full text-lg font-bold shadow-sm transition-colors duration-300 ${
-                                            hoveredStep === 3
+                                        className={`z-10 flex h-12 w-12 items-center justify-center rounded-full text-lg font-bold shadow-sm transition-colors duration-300 ${hoveredStep === 3
                                                 ? 'bg-primary text-white'
                                                 : 'border-2 border-primary bg-card text-primary'
-                                        }`}
+                                            }`}
                                     >
                                         3
                                     </div>
@@ -628,31 +618,28 @@ export default function Welcome() {
                         <div className="mb-8 flex flex-wrap justify-center gap-2 border-b border-border">
                             <button
                                 onClick={() => setActiveTab('flow')}
-                                className={`border-b-2 px-5 py-3 text-sm font-semibold transition-all ${
-                                    activeTab === 'flow'
+                                className={`border-b-2 px-5 py-3 text-sm font-semibold transition-all ${activeTab === 'flow'
                                         ? 'border-primary font-bold text-primary'
                                         : 'border-transparent text-muted-foreground hover:text-foreground'
-                                }`}
+                                    }`}
                             >
                                 Reviewer Study Flow
                             </button>
                             <button
                                 onClick={() => setActiveTab('structure')}
-                                className={`border-b-2 px-5 py-3 text-sm font-semibold transition-all ${
-                                    activeTab === 'structure'
+                                className={`border-b-2 px-5 py-3 text-sm font-semibold transition-all ${activeTab === 'structure'
                                         ? 'border-primary font-bold text-primary'
                                         : 'border-transparent text-muted-foreground hover:text-foreground'
-                                }`}
+                                    }`}
                             >
                                 CSE Exam Structure
                             </button>
                             <button
                                 onClick={() => setActiveTab('tips')}
-                                className={`border-b-2 px-5 py-3 text-sm font-semibold transition-all ${
-                                    activeTab === 'tips'
+                                className={`border-b-2 px-5 py-3 text-sm font-semibold transition-all ${activeTab === 'tips'
                                         ? 'border-primary font-bold text-primary'
                                         : 'border-transparent text-muted-foreground hover:text-foreground'
-                                }`}
+                                    }`}
                             >
                                 Smart Study Tips
                             </button>
@@ -913,15 +900,8 @@ export default function Welcome() {
                                                 How reliable is the AI Lesson
                                                 Generator and Mock Questions?
                                             </span>
-                                            <span className="block text-xs leading-relaxed text-muted-foreground">
-                                                All dynamic lessons and test
-                                                questions are fully vetted by a
-                                                dual-stage filtering system in
-                                                the reviewer curation pipeline.
-                                                They conform strictly to the
-                                                Philippine Civil Service
-                                                Commission (CSC) scope
-                                                guidelines.
+                                            <span className="block text-xs leading-relaxed text-muted-foreground mb-4">
+                                                All dynamic lessons and test questions undergo automated and manual review checks to improve quality and relevance. Content is designed to follow commonly observed Civil Service Commission (CSC) exam coverage areas for educational purposes.
                                             </span>
                                         </div>
                                         <div className="space-y-1.5 pt-4">
@@ -978,19 +958,17 @@ export default function Welcome() {
                                                 {faq.question}
                                             </span>
                                             <ChevronDown
-                                                className={`h-5 w-5 shrink-0 text-slate-400 transition-transform duration-300 ${
-                                                    isOpen
+                                                className={`h-5 w-5 shrink-0 text-slate-400 transition-transform duration-300 ${isOpen
                                                         ? 'rotate-180 text-primary'
                                                         : ''
-                                                }`}
+                                                    }`}
                                             />
                                         </button>
                                         <div
-                                            className={`transition-all duration-300 ease-in-out ${
-                                                isOpen
+                                            className={`transition-all duration-300 ease-in-out ${isOpen
                                                     ? 'dark:border-slate-850 max-h-[250px] border-t border-slate-100'
                                                     : 'max-h-0'
-                                            } overflow-hidden`}
+                                                } overflow-hidden`}
                                         >
                                             <div className="px-6 py-5 text-sm leading-relaxed font-normal text-slate-600 dark:text-slate-400">
                                                 {faq.answer}

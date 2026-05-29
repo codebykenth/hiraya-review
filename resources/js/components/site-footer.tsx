@@ -1,66 +1,143 @@
+import React from 'react';
+import {
+    ShieldAlert,
+    Heart,
+    ExternalLink,
+    Scale,
+    ShieldCheck,
+    Mail,
+    Github,
+    Facebook,
+} from 'lucide-react';
+
 import { Link } from '@inertiajs/react';
-import BrandName from '@/components/brand-name';
+import AppLogo from './app-logo';
 
-// Renders the standard visitor footer shared across the home, login, and registration pages
-export default function SiteFooter() {
+export default function Footer() {
+    const currentYear = new Date().getFullYear();
+
     return (
-        <footer className="border-t border-slate-200 bg-primary/20 px-6 py-12 dark:border-slate-800 dark:bg-slate-950/20">
-            <div className="container mx-auto flex max-w-7xl flex-col gap-8">
-                <div className="flex w-full flex-col gap-2 text-left">
-                    <h3 className="font-heading text-2xl tracking-tight">
-                        <BrandName />
-                    </h3>
-                    <p className="text-sm leading-relaxed font-normal text-slate-600 dark:text-slate-400">
-                        Empowering candidates to succeed in public service
-                        examinations through advanced preparation tools.
-                    </p>
-                </div>
+        <footer className="w-full border-t border-border bg-card text-card-foreground">
+            <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
 
-                <div className="flex w-full flex-col items-start justify-between gap-6 border-t border-slate-200/60 pt-6 text-left md:flex-row md:items-center dark:border-slate-800/60">
-                    <p className="text-xs font-normal text-slate-500 dark:text-slate-400">
-                        &copy; {new Date().getFullYear()} <BrandName />. All
-                        rights reserved.
-                    </p>
+                {/* Top Section */}
+                <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 items-start">
 
-                    <div className="flex flex-wrap gap-x-8 gap-y-3">
+                    {/* Branding */}
+                    <div className="lg:col-span-4 flex flex-col gap-3">
                         <Link
-                            href="/privacy"
-                            className="text-xs font-semibold text-slate-600 transition-colors hover:text-primary dark:text-slate-400"
+                            href="/"
+                            className="flex items-center gap-2 text-base font-black tracking-tight text-foreground transition hover:opacity-90"
                         >
-                            Privacy Policy
+                            <AppLogo />
                         </Link>
-                        <Link
-                            href="/terms"
-                            className="text-xs font-semibold text-slate-600 transition-colors hover:text-primary dark:text-slate-400"
-                        >
-                            Terms of Service
-                        </Link>
-                        <Link
-                            href="/support"
-                            className="text-xs font-semibold text-slate-600 transition-colors hover:text-primary dark:text-slate-400"
-                        >
-                            Contact Support
-                        </Link>
+
+                        <p className="max-w-2xl text-xs font-medium leading-relaxed text-muted-foreground">
+                            An interactive reviewer platform designed to help Filipino examinees
+                            strengthen core competencies for Professional and Sub-Professional
+                            Civil Service Examination preparation.
+                        </p>
+
+                        
+                    </div>
+
+                    {/* Legal Disclaimer */}
+                    <div className="lg:col-span-8 rounded-2xl border border-amber-500/20 bg-amber-500/5 p-5 shadow-3xs dark:bg-amber-950/10">
+                        <div className="flex gap-3">
+
+                            <ShieldAlert className="mt-0.5 size-5 shrink-0 text-amber-600 dark:text-amber-500" />
+
+                            <div className="flex flex-col gap-2">
+
+                                <span className="text-xs font-black uppercase tracking-wider text-amber-800 dark:text-amber-400">
+                                    Legal Disclaimer & Educational Use Only
+                                </span>
+
+                                <p className="text-xs font-medium leading-relaxed text-amber-950/80 dark:text-slate-300">
+                                    HirayaReview is an independent educational learning platform
+                                    created solely for examination preparation and reviewer practice simulation.
+                                    <strong>
+                                        {' '}
+                                        This platform is NOT affiliated with, authorized, endorsed by,
+                                        or officially connected to the Civil Service Commission (CSC)
+                                    </strong>{' '}
+                                    or any government agency in the Philippines.
+                                </p>
+
+                                <p className="text-xs font-medium leading-relaxed text-amber-950/80 dark:text-slate-300">
+                                    All mock examinations, reviewer materials, explanations,
+                                    and practice content are independently created for educational purposes only.
+                                    Some questions and learning modules may be AI-assisted or AI-generated.
+                                </p>
+
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                {/* Legal / Non-Affiliation Disclaimer */}
-                <div className="border-t border-slate-200/40 pt-6 dark:border-slate-800/40">
-                    <p className="text-left text-[11px] leading-relaxed font-medium text-slate-700 dark:text-slate-300">
-                        <span className="mr-1.5 font-bold tracking-wider text-slate-500 uppercase dark:text-slate-400">
-                            Disclaimer:
+                {/* Divider */}
+                <div className="my-8 h-px w-full bg-border" />
+
+                {/* Bottom Section */}
+                <div className="flex flex-col items-center justify-between gap-5 text-xs font-semibold text-muted-foreground md:flex-row">
+
+                    {/* Copyright */}
+                    <div className="order-3 text-center md:order-1 md:text-left">
+                        © {currentYear} HirayaReview
+                    </div>
+
+                    {/* Footer Navigation */}
+                    <div className="order-1 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 md:order-2">
+
+                        <a
+                            href="/terms"
+                            className="inline-flex items-center gap-1.5 underline decoration-border underline-offset-4 transition hover:text-foreground hover:decoration-foreground"
+                        >
+                            <Scale className="size-3.5" />
+                            Terms of Service
+                        </a>
+
+                        <a
+                            href="/privacy"
+                            className="inline-flex items-center gap-1.5 underline decoration-border underline-offset-4 transition hover:text-foreground hover:decoration-foreground"
+                        >
+                            <ShieldCheck className="size-3.5" />
+                            Privacy Policy
+                        </a>
+
+                        <a
+                            href="/support"
+                            className="inline-flex items-center gap-1.5 underline decoration-border underline-offset-4 transition hover:text-foreground hover:decoration-foreground"
+                        >
+                            <Mail className="size-3.5" />
+                            Contact Support
+                        </a>
+                    </div>
+
+                    {/* Creator Credit */}
+                    <div className="order-2 inline-flex flex-wrap items-center justify-center gap-1.5 rounded-full border border-border bg-muted px-3 py-1.5 text-center text-foreground transition hover:bg-muted/80 md:order-3">
+
+                        <span>Made with</span>
+
+                        <Heart className="size-3.5 fill-rose-500 text-rose-500 animate-pulse" />
+
+                        <span>by</span>
+
+                        <a
+                            href="https://kenthalexisosila.dev"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1 font-bold underline transition hover:text-blue-600"
+                        >
+                            Kenth Alexis Osila
+                            <ExternalLink className="size-2.5" />
+                        </a>
+
+                        <span>
+                            to support Filipino examinees in their review journey.
                         </span>
-                        This platform is an independent, unofficial study
-                        reviewer and preparation portal. It is not affiliated,
-                        associated, authorized, endorsed by, or in any way
-                        officially connected with the Civil Service Commission
-                        (CSC) of the Philippines, or any government agency or
-                        department. All brand names, logos, or exam designations
-                        referenced herein are trademarks or registered
-                        trademarks of their respective holders, and their use
-                        does not imply any affiliation with or endorsement by
-                        them.
-                    </p>
+
+                    </div>
                 </div>
             </div>
         </footer>

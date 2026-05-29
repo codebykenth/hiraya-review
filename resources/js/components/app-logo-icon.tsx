@@ -7,7 +7,7 @@ export default function AppLogoIcon({
     return (
         <img
             src="/images/hiraya_logo.png"
-            alt="Hiraya CSE Logo"
+            alt="Hiraya Review Logo"
             className={className}
             {...props}
         />

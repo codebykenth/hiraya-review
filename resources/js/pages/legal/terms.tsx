@@ -22,12 +22,7 @@ export default function Terms() {
                                     Terms of Service
                                 </h1>
                                 <p className="mt-1.5 text-xs text-muted-foreground">
-                                    Last Updated:{' '}
-                                    {new Date().toLocaleDateString('en-US', {
-                                        year: 'numeric',
-                                        month: 'long',
-                                        day: 'numeric',
-                                    })}
+                                    Last Updated: May 29, 2026
                                 </p>
                             </div>
                         </div>
