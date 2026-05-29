@@ -1,16 +1,14 @@
-import React from 'react';
+import { Link } from '@inertiajs/react';
 import {
     ShieldAlert,
     Heart,
     ExternalLink,
     Scale,
     ShieldCheck,
-    Mail,
-    Github,
-    Facebook,
+    Mail
 } from 'lucide-react';
+import React from 'react';
 
-import { Link } from '@inertiajs/react';
 import AppLogo from './app-logo';
 
 export default function Footer() {
