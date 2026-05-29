@@ -387,10 +387,8 @@ Topic: {$validated['topic']}
                 'x-goog-api-key' => $apiKey,
                 'Content-Type' => 'application/json',
             ])->withOptions([
-                'progress' => function () {
-                    echo ' ';
-                    ob_flush();
-                    flush();
+                // Check headers as they stream in to verify connection health
+                'on_headers' => function (\Psr\Http\Message\ResponseInterface $response) {
                     if (connection_aborted()) {
                         throw new \Exception("Client aborted connection");
                     }

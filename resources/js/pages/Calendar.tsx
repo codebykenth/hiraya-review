@@ -1035,3 +1035,11 @@ export default function Calendar() {
         </>
     );
 }
+Calendar.layout = {
+    breadcrumbs: [
+        {
+            title: 'Study Plan',
+            href: '/calendar',
+        },
+    ],
+};
