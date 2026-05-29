@@ -20,7 +20,8 @@
             }
         })();
     </script>
-
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2027977096641438"
+        crossorigin="anonymous"></script>
     {{-- Inline style to set the HTML background color based on our theme in app.css --}}
     <style>
         html {
