@@ -1,0 +1,131 @@
+<?php
+
+use App\Models\StudySchedule;
+use App\Models\User;
+
+test('authenticated user can view study schedules for a month', function () {
+    $user = User::factory()->create();
+    $date = now()->format('Y-m-d');
+
+    StudySchedule::create([
+        'user_id' => $user->id,
+        'study_date' => $date,
+        'title' => 'Math Chapter 5',
+        'description' => 'Solve practice problems',
+    ]);
+
+    $response = $this->actingAs($user)->get('/study-schedules?year='.now()->year.'&month='.now()->month);
+
+    $response->assertStatus(200);
+    $response->assertJsonStructure(['schedules']);
+});
+
+test('user can create a study schedule', function () {
+    $user = User::factory()->create();
+    $date = now()->format('Y-m-d');
+
+    $response = $this->actingAs($user)->post('/study-schedules', [
+        'study_date' => $date,
+        'title' => 'Physics Study',
+        'description' => 'Chapter 3: Thermodynamics',
+    ]);
+
+    $response->assertStatus(201);
+    $response->assertJsonStructure(['id', 'user_id', 'study_date', 'title', 'description']);
+
+    $this->assertDatabaseHas('study_schedules', [
+        'user_id' => $user->id,
+        'title' => 'Physics Study',
+    ]);
+});
+
+test('user can only see their own study schedules', function () {
+    $user1 = User::factory()->create();
+    $user2 = User::factory()->create();
+    $date = now()->format('Y-m-d');
+
+    StudySchedule::create([
+        'user_id' => $user1->id,
+        'study_date' => $date,
+        'title' => 'Chemistry',
+    ]);
+
+    $response = $this->actingAs($user2)->get('/study-schedules?year='.now()->year.'&month='.now()->month);
+
+    $response->assertStatus(200);
+    $schedules = $response->json('schedules');
+    $this->assertEmpty($schedules);
+});
+
+test('user can delete their own study schedule', function () {
+    $user = User::factory()->create();
+    $date = now()->format('Y-m-d');
+
+    $schedule = StudySchedule::create([
+        'user_id' => $user->id,
+        'study_date' => $date,
+        'title' => 'Biology Study',
+    ]);
+
+    $response = $this->actingAs($user)->delete("/study-schedules/{$schedule->id}");
+
+    $response->assertStatus(204);
+    $this->assertDatabaseMissing('study_schedules', ['id' => $schedule->id]);
+});
+
+test('user cannot delete another users study schedule', function () {
+    $user1 = User::factory()->create();
+    $user2 = User::factory()->create();
+    $date = now()->format('Y-m-d');
+
+    $schedule = StudySchedule::create([
+        'user_id' => $user1->id,
+        'study_date' => $date,
+        'title' => 'English Study',
+    ]);
+
+    $response = $this->actingAs($user2)->delete("/study-schedules/{$schedule->id}");
+
+    $response->assertStatus(403);
+    $this->assertDatabaseHas('study_schedules', ['id' => $schedule->id]);
+});
+
+test('study schedule requires title', function () {
+    $user = User::factory()->create();
+    $date = now()->format('Y-m-d');
+
+    $response = $this->actingAs($user)->postJson('/study-schedules', [
+        'study_date' => $date,
+        'title' => '',
+    ]);
+
+    $response->assertStatus(422);
+});
+
+test('study schedule requires valid date', function () {
+    $user = User::factory()->create();
+
+    $response = $this->actingAs($user)->postJson('/study-schedules', [
+        'study_date' => 'invalid-date',
+        'title' => 'Math',
+    ]);
+
+    $response->assertStatus(422);
+});
+
+test('unauthenticated user cannot view calendar page', function () {
+    $response = $this->get('/calendar');
+
+    $response->assertRedirect('/login');
+});
+
+test('unauthenticated user cannot create study schedule', function () {
+    $date = now()->format('Y-m-d');
+
+    $response = $this->post('/study-schedules', [
+        'study_date' => $date,
+        'title' => 'Math Study',
+    ]);
+
+    $response->assertRedirect('/login');
+});

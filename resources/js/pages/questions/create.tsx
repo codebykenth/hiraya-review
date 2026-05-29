@@ -213,7 +213,7 @@ export default function CreateQuestion({
             if (!response.ok) {
                 throw new Error(
                     resData.error ||
-                    'Failed to generate questions. Please try again.',
+                        'Failed to generate questions. Please try again.',
                 );
             }
 
@@ -226,7 +226,7 @@ export default function CreateQuestion({
             } else {
                 setErrorMsg(
                     err.message ||
-                    'An error occurred while generating questions.',
+                        'An error occurred while generating questions.',
                 );
             }
         } finally {
@@ -518,10 +518,11 @@ export default function CreateQuestion({
                             onChange={(e) => setData('stem', e.target.value)}
                             rows={6}
                             placeholder="Enter the main question text, scenario, or analytical passage here..."
-                            className={`w-full rounded-xl border p-4 text-sm font-medium text-foreground transition placeholder:text-muted-foreground focus:bg-background focus:outline-none ${errors.stem
+                            className={`w-full rounded-xl border p-4 text-sm font-medium text-foreground transition placeholder:text-muted-foreground focus:bg-background focus:outline-none ${
+                                errors.stem
                                     ? 'border-red-500 focus:border-red-500'
                                     : 'border-border focus:border-blue-500'
-                                }`}
+                            }`}
                             required
                         />
                         {errors.stem && (
@@ -549,10 +550,11 @@ export default function CreateQuestion({
                         {data.options.map((option, idx) => (
                             <div
                                 key={idx}
-                                className={`flex items-center gap-4 rounded-xl border p-3.5 transition duration-200 ${data.correct_option === idx
+                                className={`flex items-center gap-4 rounded-xl border p-3.5 transition duration-200 ${
+                                    data.correct_option === idx
                                         ? 'border-emerald-250 bg-emerald-50/20'
                                         : 'border-border'
-                                    }`}
+                                }`}
                             >
                                 <label className="flex cursor-pointer items-center">
                                     <input
@@ -567,10 +569,11 @@ export default function CreateQuestion({
                                 </label>
 
                                 <span
-                                    className={`inline-flex size-7 shrink-0 items-center justify-center rounded-lg text-xs font-bold ${data.correct_option === idx
+                                    className={`inline-flex size-7 shrink-0 items-center justify-center rounded-lg text-xs font-bold ${
+                                        data.correct_option === idx
                                             ? 'bg-emerald-600 text-white'
                                             : 'bg-muted text-muted-foreground'
-                                        }`}
+                                    }`}
                                 >
                                     {String.fromCharCode(65 + idx)}
                                 </span>
@@ -611,10 +614,11 @@ export default function CreateQuestion({
                             }
                             rows={4}
                             placeholder="Why is this the correct answer? Provide logic constraints, solution steps, or constitutional references..."
-                            className={`w-full rounded-xl border p-4 text-sm font-medium text-foreground transition placeholder:text-muted-foreground focus:bg-background focus:outline-none ${errors.explanation
+                            className={`w-full rounded-xl border p-4 text-sm font-medium text-foreground transition placeholder:text-muted-foreground focus:bg-background focus:outline-none ${
+                                errors.explanation
                                     ? 'border-red-500'
                                     : 'border-slate-200 focus:border-blue-500'
-                                }`}
+                            }`}
                             required
                         />
                         {errors.explanation && (
@@ -668,20 +672,22 @@ export default function CreateQuestion({
                                 <button
                                     type="button"
                                     onClick={() => setData('status', 'active')}
-                                    className={`cursor-pointer rounded-lg py-2 text-xs font-bold transition ${data.status === 'active'
+                                    className={`cursor-pointer rounded-lg py-2 text-xs font-bold transition ${
+                                        data.status === 'active'
                                             ? 'bg-card text-foreground shadow-xs'
                                             : 'text-muted-foreground hover:text-foreground'
-                                        }`}
+                                    }`}
                                 >
                                     Active / Live
                                 </button>
                                 <button
                                     type="button"
                                     onClick={() => setData('status', 'draft')}
-                                    className={`cursor-pointer rounded-lg py-2 text-xs font-bold transition ${data.status === 'draft'
+                                    className={`cursor-pointer rounded-lg py-2 text-xs font-bold transition ${
+                                        data.status === 'draft'
                                             ? 'bg-white text-slate-900 shadow-xs'
                                             : 'text-slate-500 hover:text-slate-900'
-                                        }`}
+                                    }`}
                                 >
                                     Draft
                                 </button>

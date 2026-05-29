@@ -192,6 +192,15 @@ Language: {$validated['language']}
             $response = Http::withHeaders([
                 'x-goog-api-key' => $apiKey,
                 'Content-Type' => 'application/json',
+            ])->withOptions([
+                'progress' => function () {
+                    echo ' ';
+                    ob_flush();
+                    flush();
+                    if (connection_aborted()) {
+                        throw new \Exception("Client aborted connection");
+                    }
+                }
             ])->timeout(300)->retry(3, 10000)->post(
                 'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent',
                 [

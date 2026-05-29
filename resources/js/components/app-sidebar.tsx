@@ -12,6 +12,7 @@ import {
     ListChecks,
     Users,
     Compass,
+    Calendar as CalendarIcon,
 } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import { NavMain } from '@/components/nav-main';
@@ -33,6 +34,7 @@ import {
     drafts as adminLearnDrafts,
 } from '@/routes/admin/learn';
 import { index as adminUsersIndex } from '@/routes/admin/users';
+import { index as calendarIndex } from '@/routes/calendar';
 import { index as drillsIndex } from '@/routes/drills';
 import { index as examsIndex } from '@/routes/exams';
 import { index as historyIndex } from '@/routes/history';
@@ -69,6 +71,11 @@ const generalNavItems: NavItem[] = [
         title: 'History',
         href: historyIndex(),
         icon: History,
+    },
+    {
+        title: 'Study Plan',
+        href: calendarIndex(),
+        icon: CalendarIcon,
     },
     {
         title: 'Reviewer Guide',
@@ -123,6 +130,17 @@ const adminNavItems: NavItem[] = [
                 title: 'User Management',
                 href: adminUsersIndex(),
                 icon: ListChecks,
+            },
+        ],
+    },
+    {
+        title: 'Settings',
+        icon: ListChecks,
+        items: [
+            {
+                title: 'Exam Dates',
+                href: '/admin/exam-dates',
+                icon: CalendarIcon,
             },
         ],
     },

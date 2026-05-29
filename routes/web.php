@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AdminDashboardController;
+use App\Http\Controllers\AdminExamDateController;
 use App\Http\Controllers\AdminLearnController;
 use App\Http\Controllers\AdminUserController;
 use App\Http\Controllers\AuthController;
@@ -8,8 +9,11 @@ use App\Http\Controllers\ExamController;
 use App\Http\Controllers\LearnController;
 use App\Http\Controllers\QuestionController;
 use App\Http\Controllers\Settings\AcceptTermsController;
+use App\Http\Controllers\StudyScheduleController;
+use App\Http\Controllers\StudySuggestionController;
 use App\Http\Controllers\SupportController;
 use Illuminate\Support\Facades\Route;
+use Inertia\Inertia;
 
 // Public page views — rate limited to prevent scraping & DDoS floods
 Route::middleware('throttle:global-views')->group(function () {
@@ -66,6 +70,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // Admin User Management Views
         Route::get('admin/users', [AdminUserController::class, 'index'])->name('admin.users.index');
 
+        // Admin Exam Dates Views
+        Route::get('admin/exam-dates', [AdminExamDateController::class, 'index'])->name('admin.exam-dates.index');
+
         // Question Resource Views
         Route::get('questions', [QuestionController::class, 'index'])->name('questions.index');
         Route::get('questions/create', [QuestionController::class, 'create'])->name('questions.create');
@@ -89,6 +96,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('admin/users/{id}/restore', [AdminUserController::class, 'restore'])->name('admin.users.restore');
         Route::delete('admin/users/{id}/force-delete', [AdminUserController::class, 'forceDelete'])->name('admin.users.force-delete');
 
+        // Admin Exam Dates Mutations
+        Route::post('admin/exam-dates', [AdminExamDateController::class, 'store'])->name('admin.exam-dates.store');
+        Route::put('admin/exam-dates/{examDate}', [AdminExamDateController::class, 'update'])->name('admin.exam-dates.update');
+        Route::delete('admin/exam-dates/{examDate}', [AdminExamDateController::class, 'destroy'])->name('admin.exam-dates.destroy');
+
         // Dynamic Scope Management Routes
         Route::post('questions/categories', [QuestionController::class, 'storeCategory'])->name('questions.categories.store');
         Route::delete('questions/categories/{category}', [QuestionController::class, 'destroyCategory'])->name('questions.categories.destroy');
@@ -99,6 +111,21 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('questions', [QuestionController::class, 'store'])->name('questions.store');
         Route::put('questions/{question}', [QuestionController::class, 'update'])->name('questions.update');
         Route::delete('questions/{question}', [QuestionController::class, 'destroy'])->name('questions.destroy');
+    });
+
+    // Study Schedule Routes
+    Route::middleware('throttle:global-views')->group(function () {
+        Route::get('calendar', fn () => Inertia::render('Calendar'))->name('calendar.index');
+        Route::get('study-schedules', [StudyScheduleController::class, 'index'])->name('study-schedules.index');
+        Route::get('study-schedules/subcategories', [StudyScheduleController::class, 'getSubcategories'])->name('study-schedules.subcategories');
+        Route::get('study-suggestions', [StudySuggestionController::class, 'getSuggestions'])->name('study-suggestions.get');
+    });
+
+    Route::middleware('throttle:global-mutations')->group(function () {
+        Route::post('study-schedules', [StudyScheduleController::class, 'store'])->name('study-schedules.store');
+        Route::delete('study-schedules/reset', [StudyScheduleController::class, 'destroyAll'])->name('study-schedules.destroyAll');
+        Route::delete('study-schedules/{studySchedule}', [StudyScheduleController::class, 'destroy'])->name('study-schedules.destroy');
+        Route::post('study-suggestions/apply', [StudySuggestionController::class, 'applySuggestions'])->name('study-suggestions.apply');
     });
 
     // Heavy AI Generation Service Endpoint (Strictly rate limited to 5 requests/minute to protect third-party API quota)

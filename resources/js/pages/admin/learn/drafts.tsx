@@ -4,6 +4,14 @@ import { useState, useEffect } from 'react';
 import { DraftsReviewShell } from '@/components/drafts-review-shell';
 import type { CategoryItem } from '@/components/drafts-review-shell';
 import { LessonMarkdown } from '@/components/lesson-markdown';
+import { Button } from '@/components/ui/button';
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogFooter,
+} from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import {
     index as adminLearnIndex,
@@ -40,6 +48,7 @@ export default function DraftsLearnList({
     const [previewMode, setPreviewMode] = useState<
         Record<number, 'preview' | 'raw'>
     >({});
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
     // Sync local state when Inertia refreshes initialDrafts from backend
     useEffect(() => {
@@ -81,8 +90,10 @@ export default function DraftsLearnList({
                     Accept: 'application/json',
                 },
             });
-        } catch (err) {
-            console.error('Failed to permanently delete draft:', err);
+        } catch {
+            setErrorMessage(
+                'Failed to permanently delete draft. Please check your connection and try again.',
+            );
         }
     };
 
@@ -385,6 +396,31 @@ export default function DraftsLearnList({
                     </div>
                 )}
             />
+
+            {/* Error Modal */}
+            <Dialog
+                open={!!errorMessage}
+                onOpenChange={(open) => !open && setErrorMessage(null)}
+            >
+                <DialogContent className="max-w-md">
+                    <DialogHeader>
+                        <DialogTitle className="text-red-600">
+                            Error
+                        </DialogTitle>
+                        <p className="mt-2 text-sm text-slate-600">
+                            {errorMessage}
+                        </p>
+                    </DialogHeader>
+                    <DialogFooter>
+                        <Button
+                            onClick={() => setErrorMessage(null)}
+                            className="bg-red-600 text-white hover:bg-red-700"
+                        >
+                            Dismiss
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </>
     );
 }

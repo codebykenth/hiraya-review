@@ -26,6 +26,14 @@ import {
 } from 'lucide-react';
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { PageContainer } from '@/components/page-container';
+import { Button } from '@/components/ui/button';
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogFooter,
+} from '@/components/ui/dialog';
 import { index as examsIndex } from '@/routes/exams';
 
 interface Question {
@@ -957,6 +965,7 @@ export default function ExamIndex({
     },
 }: ExamIndexProps) {
     const { auth } = usePage().props;
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const [mounted, setMounted] = useState(false);
     useEffect(() => {
         setTimeout(() => setMounted(true), 0);
@@ -2679,8 +2688,10 @@ export default function ExamIndex({
                     setLastStoredAttemptId(data.attempt_id);
                 }
             })
-            .catch((err) => {
-                console.error('Failed to persist attempt:', err);
+            .catch(() => {
+                setErrorMessage(
+                    'Failed to connect to server. Your progress may not have been saved.',
+                );
             });
     }, []);
 
@@ -4660,6 +4671,31 @@ export default function ExamIndex({
                 </div>
             </PageContainer>
             {customConfirmModal}
+
+            {/* Error Modal */}
+            <Dialog
+                open={!!errorMessage}
+                onOpenChange={(open) => !open && setErrorMessage(null)}
+            >
+                <DialogContent className="max-w-md">
+                    <DialogHeader>
+                        <DialogTitle className="text-red-600">
+                            Error
+                        </DialogTitle>
+                        <p className="mt-2 text-sm text-slate-600">
+                            {errorMessage}
+                        </p>
+                    </DialogHeader>
+                    <DialogFooter>
+                        <Button
+                            onClick={() => setErrorMessage(null)}
+                            className="bg-red-600 text-white hover:bg-red-700"
+                        >
+                            Dismiss
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </>
     );
 }

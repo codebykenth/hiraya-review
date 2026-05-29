@@ -204,11 +204,11 @@ export default function Dashboard({ stats }: DashboardProps) {
         return items.slice(-limitCount);
     })();
 
-    const chartWidth = 500;
-    const chartHeight = 210;
-    const chartPadding = 24;
-    const chartPaddingLeft = 46;
-    const chartPaddingRight = 24;
+    const chartWidth = 800;
+    const chartHeight = 260;
+    const chartPadding = 32;
+    const chartPaddingLeft = 50;
+    const chartPaddingRight = 32;
 
     // Map stats points to coordinate space within the responsive SVG viewport
     const points = filteredChartData.map((dp, idx) => {
@@ -491,7 +491,7 @@ export default function Dashboard({ stats }: DashboardProps) {
                         </div>
 
                         {/* Interactive SVG line chart visualization */}
-                        <div className="relative h-[260px] w-full rounded-xl border border-slate-200 bg-gradient-to-b from-slate-50 to-white p-3 dark:border-slate-800/70 dark:from-slate-900/30 dark:to-slate-950">
+                        <div className="relative w-full rounded-xl border border-slate-200 bg-gradient-to-b from-slate-50 to-white p-3 dark:border-slate-800/70 dark:from-slate-900/30 dark:to-slate-950">
                             {/* Detailed HTML absolute glassmorphic tooltip card */}
                             {hoveredIdx !== null &&
                                 filteredChartData[hoveredIdx] &&
@@ -542,9 +542,8 @@ export default function Dashboard({ stats }: DashboardProps) {
                                 )}
 
                             <svg
-                                className="h-full w-full"
+                                className="h-auto w-full"
                                 viewBox={`0 0 ${chartWidth} ${chartHeight}`}
-                                preserveAspectRatio="none"
                             >
                                 <defs>
                                     <pattern

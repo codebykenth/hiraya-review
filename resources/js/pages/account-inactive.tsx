@@ -30,12 +30,13 @@ export default function AccountInactive({ adminEmail }: AccountInactiveProps) {
                             Account Inactive
                         </h1>
                         <p className="mb-6 text-center text-slate-600">
-                            Your account has been deactivated and is temporarily unavailable.
+                            Your account has been deactivated and is temporarily
+                            unavailable.
                         </p>
 
                         <div className="mb-8 space-y-3 rounded-md bg-slate-50 p-4">
                             <div>
-                                <p className="text-xs font-medium uppercase tracking-wide text-slate-500">
+                                <p className="text-xs font-medium tracking-wide text-slate-500 uppercase">
                                     Account Email
                                 </p>
                                 <p className="mt-1 text-sm font-medium text-slate-900">
@@ -43,7 +44,7 @@ export default function AccountInactive({ adminEmail }: AccountInactiveProps) {
                                 </p>
                             </div>
                             <div>
-                                <p className="text-xs font-medium uppercase tracking-wide text-slate-500">
+                                <p className="text-xs font-medium tracking-wide text-slate-500 uppercase">
                                     Account Name
                                 </p>
                                 <p className="mt-1 text-sm font-medium text-slate-900">
@@ -54,7 +55,8 @@ export default function AccountInactive({ adminEmail }: AccountInactiveProps) {
 
                         <div className="mb-8 space-y-4 rounded-md border border-blue-200 bg-blue-50 p-4">
                             <p className="text-sm text-slate-700">
-                                If you believe this is an error, please contact an administrator or reach out to support.
+                                If you believe this is an error, please contact
+                                an administrator or reach out to support.
                             </p>
 
                             {adminEmail && (
@@ -89,7 +91,7 @@ AccountInactive.layout = {
     breadcrumbs: [
         {
             title: 'Account Inactive',
-            href: "/"
+            href: '/',
         },
     ],
 };

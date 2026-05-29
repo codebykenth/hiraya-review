@@ -67,8 +67,12 @@ export default function AdminUsersIndex({
     const [selectedRole, setSelectedRole] = useState('All Roles');
     const [currentPage, setCurrentPage] = useState(1);
     const [showDeletedUsers, setShowDeletedUsers] = useState(false);
-    const [selectedUserIds, setSelectedUserIds] = useState<Set<number>>(new Set());
-    const [selectedUserModal, setSelectedUserModal] = useState<UserItem | null>(null);
+    const [selectedUserIds, setSelectedUserIds] = useState<Set<number>>(
+        new Set(),
+    );
+    const [selectedUserModal, setSelectedUserModal] = useState<UserItem | null>(
+        null,
+    );
     const [showFiltersModal, setShowFiltersModal] = useState(false);
     const [bulkActionLoading, setBulkActionLoading] = useState(false);
     const pageSize = 10;
@@ -101,7 +105,7 @@ export default function AdminUsersIndex({
         message: '',
         confirmLabel: '',
         variant: 'success',
-        onConfirm: () => { },
+        onConfirm: () => {},
     });
 
     const formatDate = (dateString: string | null | undefined): string => {
@@ -131,7 +135,7 @@ export default function AdminUsersIndex({
                     'You cannot demote yourself from administrative status. This is to ensure you maintain access to this dashboard.',
                 confirmLabel: 'Understood',
                 variant: 'info',
-                onConfirm: () => { },
+                onConfirm: () => {},
             });
 
             return;
@@ -167,7 +171,7 @@ export default function AdminUsersIndex({
                     'You cannot delete the active administrator account you are currently logged into.',
                 confirmLabel: 'Understood',
                 variant: 'info',
-                onConfirm: () => { },
+                onConfirm: () => {},
             });
 
             return;
@@ -277,112 +281,103 @@ export default function AdminUsersIndex({
     };
 
     // Filter users
-    const filteredUsers = users
-        .filter((u) => {
-            // Apply search filter
-            const matchesSearch =
-                u.name
-                    .toLowerCase()
-                    .includes(debouncedSearchTerm.toLowerCase()) ||
-                u.email
-                    .toLowerCase()
-                    .includes(debouncedSearchTerm.toLowerCase()) ||
-                String(u.id).includes(debouncedSearchTerm);
+    const filteredUsers = users.filter((u) => {
+        // Apply search filter
+        const matchesSearch =
+            u.name.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
+            u.email.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
+            String(u.id).includes(debouncedSearchTerm);
 
-            // Apply role filter
-            const matchesRole =
-                selectedRole === 'All Roles' ||
-                (selectedRole === 'Admins' && u.role === 'admin') ||
-                (selectedRole === 'Students' && u.role === 'student');
+        // Apply role filter
+        const matchesRole =
+            selectedRole === 'All Roles' ||
+            (selectedRole === 'Admins' && u.role === 'admin') ||
+            (selectedRole === 'Students' && u.role === 'student');
 
-            // Apply deleted filter
-            const isDeleted = !!u.deleted_at;
-            const matchesDeletedFilter =
-                showDeletedUsers === isDeleted;
+        // Apply deleted filter
+        const isDeleted = !!u.deleted_at;
+        const matchesDeletedFilter = showDeletedUsers === isDeleted;
 
-            // Apply advanced filters
-            let matchesAdvancedFilters = true;
+        // Apply advanced filters
+        let matchesAdvancedFilters = true;
 
-            if (filters.status !== 'all') {
-                if (filters.status === 'deleted') {
-                    matchesAdvancedFilters = isDeleted;
-                } else if (filters.status === 'active') {
-                    matchesAdvancedFilters = !isDeleted && u.is_active;
-                } else if (filters.status === 'inactive') {
-                    matchesAdvancedFilters = !isDeleted && !u.is_active;
-                }
+        if (filters.status !== 'all') {
+            if (filters.status === 'deleted') {
+                matchesAdvancedFilters = isDeleted;
+            } else if (filters.status === 'active') {
+                matchesAdvancedFilters = !isDeleted && u.is_active;
+            } else if (filters.status === 'inactive') {
+                matchesAdvancedFilters = !isDeleted && !u.is_active;
             }
+        }
 
-            if (filters.termsAcceptance !== 'all') {
-                const hasAcceptedTerms = !!u.terms_accepted_at;
+        if (filters.termsAcceptance !== 'all') {
+            const hasAcceptedTerms = !!u.terms_accepted_at;
 
-                if (filters.termsAcceptance === 'accepted') {
-                    matchesAdvancedFilters =
-                        matchesAdvancedFilters && hasAcceptedTerms;
-                } else if (filters.termsAcceptance === 'pending') {
-                    matchesAdvancedFilters =
-                        matchesAdvancedFilters && !hasAcceptedTerms;
-                }
-            }
-
-            if (filters.role !== 'all') {
+            if (filters.termsAcceptance === 'accepted') {
                 matchesAdvancedFilters =
-                    matchesAdvancedFilters &&
-                    ((filters.role === 'admin' && u.role === 'admin') ||
-                        (filters.role === 'student' && u.role === 'student'));
-            }
-
-            if (filters.registrationDateFrom) {
-                const from = new Date(filters.registrationDateFrom);
-                const created = new Date(u.created_at);
+                    matchesAdvancedFilters && hasAcceptedTerms;
+            } else if (filters.termsAcceptance === 'pending') {
                 matchesAdvancedFilters =
-                    matchesAdvancedFilters && created >= from;
+                    matchesAdvancedFilters && !hasAcceptedTerms;
             }
+        }
 
-            if (filters.registrationDateTo) {
-                const to = new Date(filters.registrationDateTo);
-                to.setHours(23, 59, 59, 999);
-                const created = new Date(u.created_at);
-                matchesAdvancedFilters =
-                    matchesAdvancedFilters && created <= to;
-            }
+        if (filters.role !== 'all') {
+            matchesAdvancedFilters =
+                matchesAdvancedFilters &&
+                ((filters.role === 'admin' && u.role === 'admin') ||
+                    (filters.role === 'student' && u.role === 'student'));
+        }
 
-            if (filters.lastLoginFrom && u.last_login_at) {
-                const from = new Date(filters.lastLoginFrom);
-                const lastLogin = new Date(u.last_login_at);
-                matchesAdvancedFilters =
-                    matchesAdvancedFilters && lastLogin >= from;
-            }
+        if (filters.registrationDateFrom) {
+            const from = new Date(filters.registrationDateFrom);
+            const created = new Date(u.created_at);
+            matchesAdvancedFilters = matchesAdvancedFilters && created >= from;
+        }
 
-            if (filters.lastLoginTo && u.last_login_at) {
-                const to = new Date(filters.lastLoginTo);
-                to.setHours(23, 59, 59, 999);
-                const lastLogin = new Date(u.last_login_at);
-                matchesAdvancedFilters =
-                    matchesAdvancedFilters && lastLogin <= to;
-            }
+        if (filters.registrationDateTo) {
+            const to = new Date(filters.registrationDateTo);
+            to.setHours(23, 59, 59, 999);
+            const created = new Date(u.created_at);
+            matchesAdvancedFilters = matchesAdvancedFilters && created <= to;
+        }
 
-            if (
-                filters.attemptsMin !== undefined &&
-                u.attempts_count < filters.attemptsMin
-            ) {
-                matchesAdvancedFilters = false;
-            }
+        if (filters.lastLoginFrom && u.last_login_at) {
+            const from = new Date(filters.lastLoginFrom);
+            const lastLogin = new Date(u.last_login_at);
+            matchesAdvancedFilters =
+                matchesAdvancedFilters && lastLogin >= from;
+        }
 
-            if (
-                filters.attemptsMax !== undefined &&
-                u.attempts_count > filters.attemptsMax
-            ) {
-                matchesAdvancedFilters = false;
-            }
+        if (filters.lastLoginTo && u.last_login_at) {
+            const to = new Date(filters.lastLoginTo);
+            to.setHours(23, 59, 59, 999);
+            const lastLogin = new Date(u.last_login_at);
+            matchesAdvancedFilters = matchesAdvancedFilters && lastLogin <= to;
+        }
 
-            return (
-                matchesSearch &&
-                matchesRole &&
-                matchesDeletedFilter &&
-                matchesAdvancedFilters
-            );
-        });
+        if (
+            filters.attemptsMin !== undefined &&
+            u.attempts_count < filters.attemptsMin
+        ) {
+            matchesAdvancedFilters = false;
+        }
+
+        if (
+            filters.attemptsMax !== undefined &&
+            u.attempts_count > filters.attemptsMax
+        ) {
+            matchesAdvancedFilters = false;
+        }
+
+        return (
+            matchesSearch &&
+            matchesRole &&
+            matchesDeletedFilter &&
+            matchesAdvancedFilters
+        );
+    });
 
     const startIndex = (currentPage - 1) * pageSize;
     const paginatedUsers = filteredUsers.slice(
@@ -393,8 +388,8 @@ export default function AdminUsersIndex({
     const complianceRate =
         stats.total_users > 0
             ? Math.round(
-                ((stats.terms_accepted_count || 0) / stats.total_users) * 100,
-            )
+                  ((stats.terms_accepted_count || 0) / stats.total_users) * 100,
+              )
             : 0;
 
     const columns: TableColumn<UserItem>[] = [
@@ -421,7 +416,7 @@ export default function AdminUsersIndex({
             render: (u) => (
                 <button
                     onClick={() => setSelectedUserModal(u)}
-                    className="text-left hover:underline cursor-pointer"
+                    className="cursor-pointer text-left hover:underline"
                 >
                     <span className="block text-xs leading-snug font-black text-foreground">
                         {u.name}
@@ -549,7 +544,8 @@ export default function AdminUsersIndex({
                                         setConfirmModal({
                                             isOpen: true,
                                             title: 'Permanently Delete Account?',
-                                            message: 'This will permanently delete this account. Cannot be undone!',
+                                            message:
+                                                'This will permanently delete this account. Cannot be undone!',
                                             confirmLabel: 'Delete',
                                             variant: 'danger',
                                             onConfirm: () => {
@@ -596,10 +592,11 @@ export default function AdminUsersIndex({
                                 <button
                                     onClick={() => handleToggleStatus(u)}
                                     disabled={u.id === currentUser.id}
-                                    className={`cursor-pointer rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted disabled:cursor-not-allowed disabled:opacity-30 ${u.is_active
+                                    className={`cursor-pointer rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted disabled:cursor-not-allowed disabled:opacity-30 ${
+                                        u.is_active
                                             ? 'hover:text-amber-600'
                                             : 'hover:text-emerald-600'
-                                        }`}
+                                    }`}
                                     title={
                                         u.is_active
                                             ? 'Deactivate account'
@@ -794,11 +791,12 @@ export default function AdminUsersIndex({
 
                 {/* 2.5. BULK ACTIONS PANEL */}
                 {selectedUserIds.size > 0 && (
-                    <div className="flex flex-col gap-3 rounded-xl border border-blue-100 bg-blue-50 p-4 dark:border-blue-900/30 dark:bg-blue-950/20 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="flex flex-col gap-3 rounded-xl border border-blue-100 bg-blue-50 p-4 sm:flex-row sm:items-center sm:justify-between dark:border-blue-900/30 dark:bg-blue-950/20">
                         <div className="flex items-center gap-3">
                             <CheckSquare className="size-5 text-blue-600 dark:text-blue-400" />
                             <span className="text-xs font-bold text-slate-700 dark:text-slate-300">
-                                {selectedUserIds.size} user{selectedUserIds.size !== 1 ? 's' : ''} selected
+                                {selectedUserIds.size} user
+                                {selectedUserIds.size !== 1 ? 's' : ''} selected
                             </span>
                         </div>
                         <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
@@ -815,7 +813,7 @@ export default function AdminUsersIndex({
                                 size="sm"
                                 onClick={() => handleBulkToggleStatus(true)}
                                 disabled={bulkActionLoading}
-                                className="text-xs gap-1.5"
+                                className="gap-1.5 text-xs"
                             >
                                 <CheckCircle className="size-3" />
                                 Activate
@@ -825,7 +823,7 @@ export default function AdminUsersIndex({
                                 size="sm"
                                 onClick={() => handleBulkToggleStatus(false)}
                                 disabled={bulkActionLoading}
-                                className="text-xs gap-1.5"
+                                className="gap-1.5 text-xs"
                             >
                                 <XCircle className="size-3" />
                                 Deactivate
@@ -835,7 +833,7 @@ export default function AdminUsersIndex({
                                 size="sm"
                                 onClick={handleBulkDelete}
                                 disabled={bulkActionLoading}
-                                className="text-xs gap-1.5"
+                                className="gap-1.5 text-xs"
                             >
                                 <Trash2 className="size-3" />
                                 Delete Selected
@@ -927,4 +925,3 @@ AdminUsersIndex.layout = {
         },
     ],
 };
-

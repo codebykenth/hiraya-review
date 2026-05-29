@@ -251,7 +251,6 @@ export default function AdminLearnCreate({
             if (err?.name === 'AbortError') {
                 setGenerationError('Generation canceled.');
             } else {
-                console.error(err);
                 const errMsg =
                     err.message ||
                     'A network error occurred during generation. Please verify your internet connection and try again.';
@@ -568,7 +567,7 @@ export default function AdminLearnCreate({
                                             setData(
                                                 'estimated_minutes',
                                                 parseInt(e.target.value, 10) ||
-                                                5,
+                                                    5,
                                             )
                                         }
                                         className="pl-10"
@@ -671,10 +670,11 @@ export default function AdminLearnCreate({
                                     onClick={() =>
                                         setData('is_published', true)
                                     }
-                                    className={`cursor-pointer rounded-lg py-2 text-xs font-black tracking-wider uppercase transition ${data.is_published
+                                    className={`cursor-pointer rounded-lg py-2 text-xs font-black tracking-wider uppercase transition ${
+                                        data.is_published
                                             ? 'bg-white text-slate-900 shadow-xs dark:bg-slate-950 dark:text-white'
                                             : 'dark:text-slate-450 text-slate-500 hover:text-slate-900 dark:hover:text-slate-200'
-                                        }`}
+                                    }`}
                                 >
                                     Published
                                 </button>
@@ -683,10 +683,11 @@ export default function AdminLearnCreate({
                                     onClick={() =>
                                         setData('is_published', false)
                                     }
-                                    className={`cursor-pointer rounded-lg py-2 text-xs font-black tracking-wider uppercase transition ${!data.is_published
+                                    className={`cursor-pointer rounded-lg py-2 text-xs font-black tracking-wider uppercase transition ${
+                                        !data.is_published
                                             ? 'bg-white text-slate-900 shadow-xs dark:bg-slate-950 dark:text-white'
                                             : 'dark:text-slate-450 text-slate-500 hover:text-slate-900 dark:hover:text-slate-200'
-                                        }`}
+                                    }`}
                                 >
                                     Draft
                                 </button>
@@ -740,8 +741,14 @@ export default function AdminLearnCreate({
                         ? 'Specify syllabus topics and let Gemini write a comprehensive, premium-formatted review tutorial.'
                         : 'Draft detailed review content manually, customize estimated time reading, and index categories.'
                 }
-                backUrl={adminLearnIndex().url}
-                backLabel="Back to Curator Dashboard"
+                backUrl={
+                    successMsg ? '/admin/learn/drafts' : adminLearnIndex().url
+                }
+                backLabel={
+                    successMsg
+                        ? 'Back to Drafts Review'
+                        : 'Back to Curator Dashboard'
+                }
                 activeTab={activeTab}
                 onTabChange={setActiveTab}
                 aiContent={aiContent}
