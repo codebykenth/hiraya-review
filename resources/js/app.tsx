@@ -5,6 +5,7 @@ import { initializeTheme } from '@/hooks/use-appearance';
 import AppLayout from '@/layouts/app-layout';
 import AuthLayout from '@/layouts/auth-layout';
 import SettingsLayout from '@/layouts/settings/layout';
+import { SupportWidget } from '@/components/support-widget';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Hiraya Review';
 
@@ -31,6 +32,7 @@ createInertiaApp({
             <TooltipProvider delayDuration={0}>
                 {app}
                 <Toaster />
+                <SupportWidget />
             </TooltipProvider>
         );
     },

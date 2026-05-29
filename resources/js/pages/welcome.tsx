@@ -451,7 +451,7 @@ export default function Welcome() {
                         />
 
                         <div className="mt-6 flex w-full flex-col gap-6">
-                            {/* Row 1: Mock Exams & AI Questions */}
+                            {/* Row 1: Mock Exams & Learn */}
                             <FeatureGrid
                                 reversed={false}
                                 cardOneBgPattern={true}
@@ -463,15 +463,15 @@ export default function Welcome() {
                                 cardOneTitle="Realistic Mock Exams"
                                 cardOneDescription="Experience the exact timing, format, and pressure of the actual civil service exam. Build stamina and confidence in our distraction-free testing interface."
                                 cardTwoIcon={
-                                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400">
-                                        <BrainCircuit className="h-6 w-6" />
+                                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 dark:bg-indigo-950/40 dark:text-indigo-400">
+                                        <BookOpen className="h-6 w-6" />
                                     </div>
                                 }
-                                cardTwoTitle="AI-Generated Questions"
-                                cardTwoDescription="Dynamic question pools that provide varied practice sets to help reinforce learning and skill development."
+                                cardTwoTitle="Conceptual Study Hub (Learn)"
+                                cardTwoDescription="Access concise, high-yield syllabus modules generated from core civil service subjects to lock in key concepts and terms."
                             />
 
-                            {/* Row 2: Analytics & Category Drills (Reversed) */}
+                            {/* Row 2: Category Drills & Analytics (History) */}
                             <FeatureGrid
                                 reversed={true}
                                 cardOneIcon={
@@ -479,7 +479,7 @@ export default function Welcome() {
                                         <Dumbbell className="h-6 w-6" />
                                     </div>
                                 }
-                                cardOneTitle="Targeted Category Drills"
+                                cardOneTitle="Targeted Practice Drills"
                                 cardOneDescription="Struggling with quantitative logic? Focus your efforts with specific drill sets designed to turn weak points into strengths."
                                 cardOneFooter={
                                     <div className="flex flex-wrap gap-2">
@@ -499,12 +499,31 @@ export default function Welcome() {
                                     </div>
                                 }
                                 cardTwoIcon={
-                                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400">
-                                        <BarChart3 className="h-6 w-6" />
+                                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-amber-50 text-amber-600 dark:bg-amber-950/40 dark:text-amber-400">
+                                        <History className="h-6 w-6" />
                                     </div>
                                 }
-                                cardTwoTitle="Deep Score Analytics"
-                                cardTwoDescription="Pinpoint your weaknesses with granular reports detailing performance by category, time-spent, and historical trends."
+                                cardTwoTitle="Attempt History & Analytics"
+                                cardTwoDescription="Pinpoint your weaknesses with granular reports detailing performance by category, time-spent, and review every single incorrect response."
+                            />
+
+                            {/* Row 3: Study Plan & AI Questions */}
+                            <FeatureGrid
+                                reversed={false}
+                                cardOneIcon={
+                                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-purple-50 text-purple-600 dark:bg-purple-950/40 dark:text-purple-400">
+                                        <Target className="h-6 w-6" />
+                                    </div>
+                                }
+                                cardOneTitle="Smart Study Plan"
+                                cardOneDescription="Generate a dynamic, customizable study schedule that maps out your topics day by day, preventing burnout and ensuring you cover the entire syllabus before exam day."
+                                cardTwoIcon={
+                                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400">
+                                        <BrainCircuit className="h-6 w-6" />
+                                    </div>
+                                }
+                                cardTwoTitle="AI-Generated Questions"
+                                cardTwoDescription="Dynamic question pools that provide varied practice sets to help reinforce learning and skill development."
                             />
                         </div>
                     </Section>

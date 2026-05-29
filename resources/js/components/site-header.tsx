@@ -22,6 +22,7 @@ export default function SiteHeader({
     onNavClick,
 }: SiteHeaderProps) {
     const { auth } = usePage<PageProps>().props;
+    const { url } = usePage();
     const [scrollProgress, setScrollProgress] = useState(0);
     const [showHeader, setShowHeader] = useState(true);
     const [lastScrollY, setLastScrollY] = useState(0);
@@ -68,7 +69,10 @@ export default function SiteHeader({
 
     // Compute navigation hrefs dynamically to handle cross-page anchoring correctly
     const getHref = (id: string, href: string) => {
-        if (typeof window !== 'undefined' && window.location.pathname === '/') {
+        // usePage().url gives us the current path consistently on both SSR and client
+        const isHomePage = url === '/' || url === '';
+        
+        if (isHomePage) {
             return href;
         }
 
@@ -111,10 +115,8 @@ export default function SiteHeader({
                             <ul className="flex gap-8 font-medium">
                                 {navLinks.map((link) => {
                                     const isLinkActive = activeNav === link.id;
-                                    const isHomeActive =
-                                        typeof window !== 'undefined' &&
-                                        window.location.pathname === '/' &&
-                                        isLinkActive;
+                                    const isHomePage = url === '/' || url === '';
+                                    const isHomeActive = isHomePage && isLinkActive;
 
                                     return (
                                         <li key={link.id}>
@@ -202,10 +204,8 @@ export default function SiteHeader({
                                     {navLinks.map((link) => {
                                         const isLinkActive =
                                             activeNav === link.id;
-                                        const isHomeActive =
-                                            typeof window !== 'undefined' &&
-                                            window.location.pathname === '/' &&
-                                            isLinkActive;
+                                        const isHomePage = url === '/' || url === '';
+                                        const isHomeActive = isHomePage && isLinkActive;
 
                                         return (
                                             <li key={link.id}>
