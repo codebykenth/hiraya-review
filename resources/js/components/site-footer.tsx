@@ -52,7 +52,7 @@ export default function Footer() {
                                 </span>
 
                                 <p className="text-xs font-medium leading-relaxed text-amber-950/80 dark:text-slate-300">
-                                    HirayaReview is an independent educational learning platform
+                                    Hiraya Review is an independent educational learning platform
                                     created solely for examination preparation and reviewer practice simulation.
                                     <strong>
                                         {' '}
@@ -81,7 +81,7 @@ export default function Footer() {
 
                     {/* Copyright */}
                     <div className="order-3 text-center md:order-1 md:text-left">
-                        © {currentYear} HirayaReview
+                        © {currentYear} Hiraya Review
                     </div>
 
                     {/* Footer Navigation */}
