@@ -26,12 +26,21 @@ class StudyScheduleController extends Controller
 
         $examDates = [];
         if (\Illuminate\Support\Facades\Schema::hasTable('exam_dates')) {
-            $examDates = \App\Models\ExamDate::where('is_active', true)
-                ->whereBetween('date', [$startDate, $endDate])
-                ->get()
-                ->pluck('date')
-                ->map(fn($date) => \Carbon\Carbon::parse($date)->format('Y-m-d'))
-                ->toArray();
+            $allExamDates = \Illuminate\Support\Facades\Cache::rememberForever('exam_dates.active', function () {
+                return \App\Models\ExamDate::where('is_active', true)
+                    ->get()
+                    ->pluck('date')
+                    ->map(fn($date) => \Carbon\Carbon::parse($date)->format('Y-m-d'))
+                    ->toArray();
+            });
+
+            // Filter for the requested month, though returning all is also fine
+            $examDates = array_filter($allExamDates, function($date) use ($startDate, $endDate) {
+                return $date >= $startDate->format('Y-m-d') && $date <= $endDate->format('Y-m-d');
+            });
+            
+            // Re-index array for JSON response
+            $examDates = array_values($examDates);
         }
 
         return response()->json([
@@ -43,7 +52,7 @@ class StudyScheduleController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'study_date' => 'required|date',
+            'study_date' => 'required|date|after_or_equal:today',
             'study_time' => 'nullable|date_format:H:i',
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
@@ -61,8 +70,20 @@ class StudyScheduleController extends Controller
     public function getSubcategories()
     {
         $subcategories = Subcategory::orderBy('name')->get(['id', 'name', 'category_id']);
+        $modules = \App\Models\LearnModule::where('is_published', true)
+            ->with(['subcategory:id,name', 'category:id,name'])
+            ->get(['id', 'title', 'slug', 'topic', 'subcategory_id', 'category_id']);
 
-        return response()->json(['subcategories' => $subcategories]);
+        return response()->json([
+            'subcategories' => $subcategories,
+            'modules' => $modules->map(fn($m) => [
+                'title' => $m->title,
+                'slug' => $m->slug,
+                'topic' => $m->topic,
+                'subcategory_name' => $m->subcategory?->name,
+                'category_name' => $m->category?->name,
+            ]),
+        ]);
     }
 
     public function destroyAll()

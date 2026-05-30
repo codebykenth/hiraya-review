@@ -3638,7 +3638,8 @@ export default function ExamIndex({
                         {/* 2. Main Question + Side Navigation Split */}
                         <div className="flex flex-1 gap-6 overflow-hidden">
                             {/* Left Question Body Column */}
-                            <div className="flex flex-1 flex-col overflow-y-auto rounded-xl border border-border bg-card p-6 shadow-xs">
+                            <div className="flex flex-1 flex-col rounded-xl border border-border bg-card shadow-xs overflow-hidden">
+                                <div className="flex-1 overflow-y-auto p-6 pr-5">
                                 {currentQuestion ? (
                                     <>
                                         <div className="mb-5 flex items-center justify-between border-b border-border pb-4">
@@ -3878,6 +3879,7 @@ export default function ExamIndex({
                                         </p>
                                     </div>
                                 )}
+                                </div>
                             </div>
 
                             {/* Right Column: Question Palette */}

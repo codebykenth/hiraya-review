@@ -223,7 +223,7 @@ export function UserDetailModal({
         <>
             <div className="fixed inset-0 z-100 flex animate-in items-center justify-center bg-slate-900/60 p-4 backdrop-blur-xs duration-200 fade-in">
                 <div
-                    className="relative max-h-[90vh] w-full max-w-2xl animate-in overflow-y-auto rounded-xl border border-slate-200 bg-white p-6 shadow-xl duration-205 zoom-in-95 dark:border-slate-800 dark:bg-slate-950"
+                    className="relative max-h-[90vh] w-full max-w-2xl animate-in overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl duration-205 zoom-in-95 dark:border-slate-800 dark:bg-slate-950 flex flex-col"
                     role="dialog"
                     aria-modal="true"
                 >
@@ -231,7 +231,7 @@ export function UserDetailModal({
                     <button
                         type="button"
                         onClick={onClose}
-                        className="absolute top-4 right-4 cursor-pointer rounded-lg p-1.5 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700 focus:outline-none dark:hover:bg-slate-900 dark:hover:text-slate-200"
+                        className="absolute top-4 right-4 cursor-pointer rounded-lg p-1.5 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700 focus:outline-none dark:hover:bg-slate-900 dark:hover:text-slate-200 z-10"
                         aria-label="Close dialog"
                     >
                         <svg
@@ -249,7 +249,8 @@ export function UserDetailModal({
                         </svg>
                     </button>
 
-                    {/* Header */}
+                    <div className="flex-1 overflow-y-auto p-6 pr-5">
+                        {/* Header */}
                     <div className="pr-6">
                         <h3 className="font-heading text-lg font-bold text-slate-900 dark:text-white">
                             User Details
@@ -467,9 +468,10 @@ export function UserDetailModal({
                             </>
                         )}
                     </div>
+                    </div>
 
                     {/* Footer Buttons */}
-                    <div className="mt-6 flex justify-end gap-3 border-t border-slate-100 pt-6 dark:border-slate-900">
+                    <div className="flex justify-end gap-3 border-t border-slate-100 p-6 pt-4 dark:border-slate-900 shrink-0">
                         <Button
                             variant="outline"
                             size="sm"

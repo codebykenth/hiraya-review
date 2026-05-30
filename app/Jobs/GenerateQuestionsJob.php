@@ -33,6 +33,7 @@ class GenerateQuestionsJob implements ShouldQueue
 
     public function handle(): void
     {
+        set_time_limit(300);
         $validated = $this->validated;
 
         $apiKey = config('services.gemini.key') ?: env('GEMINI_API_KEY');

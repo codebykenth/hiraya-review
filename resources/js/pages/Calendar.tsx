@@ -39,6 +39,14 @@ interface Subcategory {
     category_id: number;
 }
 
+interface LearnModule {
+    title: string;
+    slug: string;
+    topic: string;
+    subcategory_name?: string;
+    category_name?: string;
+}
+
 interface Suggestion {
     study_date: string;
     study_time: string;
@@ -70,6 +78,7 @@ export default function Calendar() {
     );
     const [examDates, setExamDates] = useState<string[]>([]);
     const [subcategories, setSubcategories] = useState<Subcategory[]>([]);
+    const [learnModules, setLearnModules] = useState<LearnModule[]>([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const [isResetModalOpen, setIsResetModalOpen] = useState(false);
@@ -149,6 +158,7 @@ export default function Calendar() {
                 const response = await fetch('/study-schedules/subcategories');
                 const data = await response.json();
                 setSubcategories(data.subcategories || []);
+                setLearnModules(data.modules || []);
             } catch {
                 setErrorMessage(
                     'Failed to load study subjects. Please try refreshing the page.',
@@ -425,6 +435,128 @@ export default function Calendar() {
         };
     };
 
+    const getSearchTerms = (title: string, description: string): string[] => {
+        const terms: string[] = [];
+
+        // 1. Extract subtopic from title (part after " - ")
+        let subtopic = title;
+        if (title.includes(' - ')) {
+            subtopic = title.split(' - ')[1].trim();
+        }
+        
+        // Remove prefix "Study: " if present
+        subtopic = subtopic.replace(/^Study:\s*/i, '');
+        
+        if (subtopic.length >= 2) {
+            terms.push(subtopic.toLowerCase());
+        }
+
+        // 2. Parse and split description
+        const descLower = (description || '').toLowerCase();
+        
+        // Extract acronyms in parentheses (e.g. "(LCM)")
+        const acronymMatches = descLower.matchAll(/\(([a-z0-9]{2,6})\)/gi);
+        for (const match of acronymMatches) {
+            terms.push(match[1].toLowerCase());
+        }
+
+        // Clean common introductory noise from description
+        let cleanedDesc = descLower;
+        const noisePrefixes = [
+            'focus on the proper application of',
+            'focus on translating',
+            'focus on calculating',
+            'focus on building',
+            'focus on structuring',
+            'focus on deductive and inductive',
+            'focus on',
+            'practice ensuring',
+            'practice identifying',
+            'practice finding',
+            'practice spotting',
+            'practice solving',
+            'practice tracing',
+            'practice',
+            'review rules for',
+            'review',
+            'identify',
+            'analyze',
+        ];
+        
+        for (const prefix of noisePrefixes) {
+            if (cleanedDesc.trim().startsWith(prefix)) {
+                cleanedDesc = cleanedDesc.trim().substring(prefix.length).trim();
+                break;
+            }
+        }
+
+        // Split by punctuation and conjunctions
+        const parts = cleanedDesc.split(/[\s,;]+and\s+|[\s,;]+or\s+|[\s,;]+&\s+|[,;.]+/);
+        
+        const broadStopWords = new Set([
+            'rules', 'numbers', 'operations', 'word', 'problems', 'tasks', 'relationships', 
+            'concept', 'concepts', 'issues', 'laws', 'etc', 'meaning', 'structure', 
+            'application', 'context', 'pairs', 'main', 'idea', 'clues', 'conclusions', 
+            'arguments', 'hypotheses', 'shapes', 'order', 'arithmetic', 'basic', 
+            'ability', 'general', 'information', 'clerical', 'verbal', 'analytical', 
+            'numerical', 'solving', 'identifying', 'finding', 'spotting'
+        ]);
+
+        for (let part of parts) {
+            part = part.trim();
+            if (part.length < 2) {
+                continue;
+            }
+            if (broadStopWords.has(part)) {
+                continue;
+            }
+            terms.push(part);
+        }
+
+        return Array.from(new Set(terms));
+    };
+
+    const isModuleRelated = (mod: LearnModule, title: string, description: string): boolean => {
+        const terms = getSearchTerms(title, description);
+        const modTitle = (mod.title || '').toLowerCase().trim();
+        const modTopic = (mod.topic || '').toLowerCase().trim();
+
+        for (const term of terms) {
+            let baseTerm = term;
+            if (baseTerm.endsWith('s') && !baseTerm.endsWith('ss')) {
+                baseTerm = baseTerm.slice(0, -1);
+            }
+
+            let patternStr = '';
+            if (/^\w/.test(baseTerm)) {
+                patternStr += '\\b';
+            }
+            patternStr += baseTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            if (/\w$/.test(baseTerm)) {
+                patternStr += 's?\\b';
+            }
+            const regex = new RegExp(patternStr, 'i');
+
+            if ((modTitle && regex.test(modTitle)) || (modTopic && regex.test(modTopic))) {
+                return true;
+            }
+        }
+
+        return false;
+    };
+
+    const getSuggestedModules = () => {
+        if (!formData.title.trim()) {
+            return [];
+        }
+
+        return learnModules
+            .filter((mod) => isModuleRelated(mod, formData.title, formData.description))
+            .slice(0, 3);
+    };
+
+    const suggestedModules = getSuggestedModules();
+
     const calendarDays = getCalendarDays();
     const weeks = [];
 
@@ -627,7 +759,7 @@ export default function Calendar() {
                                                     )}
                                                 {calendarDay.day}
                                             </span>
-                                            {calendarDay.isCurrentMonth && (
+                                            {calendarDay.isCurrentMonth && calendarDay.date >= todayStr && (
                                                 <button
                                                     onClick={() =>
                                                         openModal(
@@ -703,6 +835,7 @@ export default function Calendar() {
                                                                             /\[(.*?)\]\((.*?)\)/g;
                                                                         const links =
                                                                             [];
+                                                                        const existingUrls = new Set();
                                                                         let match;
 
                                                                         while (
@@ -718,6 +851,19 @@ export default function Calendar() {
                                                                                     url: match[2],
                                                                                 },
                                                                             );
+                                                                            existingUrls.add(match[2]);
+                                                                        }
+
+                                                                        // Automatically find matching learn modules for this item
+                                                                        for (const mod of learnModules) {
+                                                                            if (links.length >= 3) break; // Limit to 3 links total
+                                                                            const modUrl = `/learn/${mod.slug}`;
+                                                                            if (!existingUrls.has(modUrl)) {
+                                                                                if (isModuleRelated(mod, schedule.title, desc)) {
+                                                                                    links.push({ title: mod.title, url: modUrl, isAuto: true });
+                                                                                    existingUrls.add(modUrl);
+                                                                                }
+                                                                            }
                                                                         }
 
                                                                         // Remove the 'Links:' section and raw markdown links from the visible description
@@ -763,14 +909,14 @@ export default function Calendar() {
                                                                                                     }
                                                                                                     target="_blank"
                                                                                                     rel="noopener noreferrer"
-                                                                                                    className="inline-flex w-fit items-center rounded bg-white/50 px-1.5 py-1 text-xs font-bold text-blue-600 hover:text-blue-800"
+                                                                                                    className={`inline-flex w-fit items-center rounded px-1.5 py-1 text-xs font-bold ${l.isAuto ? 'bg-amber-50 text-amber-700 hover:text-amber-900' : 'bg-white/50 text-blue-600 hover:text-blue-800'}`}
                                                                                                     onClick={(
                                                                                                         e,
                                                                                                     ) =>
                                                                                                         e.stopPropagation()
                                                                                                     }
                                                                                                 >
-                                                                                                    📖
+                                                                                                    {l.isAuto ? '✨' : '📖'}
                                                                                                     Learn:{' '}
                                                                                                     {
                                                                                                         l.title
@@ -901,6 +1047,40 @@ export default function Calendar() {
                                     ))}
                                 </select>
                             </div>
+
+                            {suggestedModules.length > 0 && (
+                                <div className="mt-2 space-y-2 rounded-lg border border-blue-100 bg-blue-50/50 p-3">
+                                    <p className="flex items-center text-xs font-semibold text-blue-800">
+                                        <Lightbulb className="mr-1.5 h-3.5 w-3.5 text-amber-500" />
+                                        Suggested Learn Modules
+                                    </p>
+                                    <div className="flex flex-wrap gap-2">
+                                        {suggestedModules.map((mod) => (
+                                            <button
+                                                key={mod.slug}
+                                                type="button"
+                                                onClick={() => {
+                                                    const linkText = `[${mod.title}](/learn/${mod.slug})`;
+                                                    if (!formData.description.includes(linkText)) {
+                                                        const prefix = formData.description ? formData.description + '\n\n' : '';
+                                                        setFormData({
+                                                            ...formData,
+                                                            description: prefix + linkText
+                                                        });
+                                                    }
+                                                }}
+                                                className="inline-flex items-center rounded-full border border-blue-200 bg-white px-2.5 py-1 text-xs font-medium text-blue-700 shadow-sm hover:border-blue-300 hover:bg-blue-50 transition-colors"
+                                            >
+                                                <Plus className="mr-1 h-3 w-3" />
+                                                {mod.title}
+                                            </button>
+                                        ))}
+                                    </div>
+                                    <p className="text-[10px] text-slate-500">
+                                        Click to attach this module to your study notes.
+                                    </p>
+                                </div>
+                            )}
                         </div>
 
                         <DialogFooter>

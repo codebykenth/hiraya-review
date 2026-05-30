@@ -241,7 +241,18 @@ class StudyPlanAnalyzer
         
         $allModules = collect();
         if (\Illuminate\Support\Facades\Schema::hasTable('learn_modules')) {
-            $allModules = \App\Models\LearnModule::where('is_published', true)->get();
+            // Self-healing database cleanup for incorrect module topics
+            \App\Models\LearnModule::where('title', 'like', '%Number Series%')
+                ->where('topic', 'like', '%GCF%')
+                ->update(['topic' => 'Number Series']);
+                
+            \App\Models\LearnModule::where('title', 'like', '%PEMDAS%')
+                ->where('topic', 'like', '%Multiples and Factors%')
+                ->update(['topic' => 'PEMDAS and Fractions']);
+
+            $allModules = \App\Models\LearnModule::where('is_published', true)
+                ->with('subcategory')
+                ->get();
         }
 
         foreach ($weakAreas as $area) {
@@ -251,44 +262,19 @@ class StudyPlanAnalyzer
                 $titleText = $subtopic ? "Study: {$area['name']} - {$subtopic['title']}" : "Study: {$area['name']}";
                 $descText = $subtopic ? $subtopic['desc'] : $this->getSpecificTopics($area['name']);
 
-                // Find all matching modules
+                // Extract exact search terms for this study suggestion
+                $terms = $this->getSearchTerms($titleText, $descText);
+
+                // Find matching modules using precise search terms
                 $matchedModules = [];
                 foreach ($allModules as $mod) {
-                    $modTitle = trim($mod->title);
-                    $modTopic = trim($mod->topic ?: '');
-                    $topicParts = [];
-                    if ($modTopic) {
-                        $topicParts = preg_split('/[,&]| and |\s*\([^)]+\)\s*/i', $modTopic, -1, PREG_SPLIT_NO_EMPTY);
-                        if (preg_match_all('/\(([^)]+)\)/', $modTopic, $matches)) {
-                            $topicParts = array_merge($topicParts, $matches[1]);
-                        }
-                    }
-                    $searchText = $titleText . " " . $descText;
-                    
-                    $hasPartMatch = false;
-                    foreach ($topicParts as $part) {
-                        $part = trim($part);
-                        if (strlen($part) >= 3 && preg_match('/\b' . preg_quote($part, '/') . '\b/i', $searchText)) {
-                            $hasPartMatch = true;
-                            break;
-                        }
-                    }
-                    
-                    if (
-                        (stripos($descText, $modTitle) !== false) || 
-                        ($modTopic && preg_match('/\b' . preg_quote($modTopic, '/') . '\b/i', $descText)) ||
-                        ($modTopic && stripos($descText, $modTopic) !== false) ||
-                        (stripos($titleText, $modTitle) !== false) ||
-                        ($modTopic && stripos($titleText, $modTopic) !== false) ||
-                        $hasPartMatch
-                    ) {
+                    if ($this->isModuleRelatedToTerms($mod, $terms)) {
                         $matchedModules[] = [
                             'url' => "/learn/{$mod->slug}",
                             'title' => $mod->title,
                         ];
                     }
                 }
-
 
                 $suggestions[] = [
                     'id' => uniqid(),
@@ -466,6 +452,128 @@ class StudyPlanAnalyzer
     private function daysUntilExam(): int
     {
         return now()->diffInDays($this->getNextExamDate(), false);
+    }
+
+    /**
+     * Extract precise search terms/topics from title and description.
+     *
+     * @return array<int, string>
+     */
+    private function getSearchTerms(string $title, string $description): array
+    {
+        $terms = [];
+
+        // 1. Extract subtopic from title (part after " - ")
+        if (str_contains($title, ' - ')) {
+            $parts = explode(' - ', $title);
+            $subtopic = trim($parts[1]);
+        } else {
+            $subtopic = trim($title);
+        }
+        
+        // Remove prefix "Study: " if present
+        $subtopic = preg_replace('/^Study:\s*/i', '', $subtopic);
+        
+        if (strlen($subtopic) >= 2) {
+            $terms[] = strtolower($subtopic);
+        }
+
+        // 2. Parse and split description
+        $descLower = strtolower($description);
+        
+        // Extract acronyms in parentheses (e.g. "(LCM)")
+        if (preg_match_all('/\(([a-z0-9]{2,6})\)/i', $descLower, $matches)) {
+            foreach ($matches[1] as $acronym) {
+                $terms[] = strtolower($acronym);
+            }
+        }
+
+        // Clean common introductory noise from description
+        $cleanedDesc = $descLower;
+        $noisePrefixes = [
+            'focus on the proper application of',
+            'focus on translating',
+            'focus on calculating',
+            'focus on building',
+            'focus on structuring',
+            'focus on deductive and inductive',
+            'focus on',
+            'practice ensuring',
+            'practice identifying',
+            'practice finding',
+            'practice spotting',
+            'practice solving',
+            'practice tracing',
+            'practice',
+            'review rules for',
+            'review',
+            'identify',
+            'analyze',
+        ];
+        
+        foreach ($noisePrefixes as $prefix) {
+            if (str_starts_with(trim($cleanedDesc), $prefix)) {
+                $cleanedDesc = preg_replace('/^' . preg_quote($prefix, '/') . '\b/i', '', trim($cleanedDesc));
+                break;
+            }
+        }
+
+        // Split by punctuation and conjunctions
+        $parts = preg_split('/[\s,;]+and\s+|[\s,;]+or\s+|[\s,;]+&\s+|[,;.]+/', $cleanedDesc, -1, PREG_SPLIT_NO_EMPTY);
+        
+        $broadStopWords = [
+            'rules', 'numbers', 'operations', 'word', 'problems', 'tasks', 'relationships', 
+            'concept', 'concepts', 'issues', 'laws', 'etc', 'meaning', 'structure', 
+            'application', 'context', 'pairs', 'main', 'idea', 'clues', 'conclusions', 
+            'arguments', 'hypotheses', 'shapes', 'order', 'arithmetic', 'basic', 
+            'ability', 'general', 'information', 'clerical', 'verbal', 'analytical', 
+            'numerical', 'solving', 'identifying', 'finding', 'spotting'
+        ];
+
+        foreach ($parts as $part) {
+            $part = trim($part);
+            if (strlen($part) < 2) {
+                continue;
+            }
+            if (in_array($part, $broadStopWords)) {
+                continue;
+            }
+            $terms[] = $part;
+        }
+
+        return array_values(array_unique($terms));
+    }
+
+    private function isModuleRelatedToTerms(object $mod, array $terms): bool
+    {
+        $modTitle = strtolower(trim($mod->title ?? ''));
+        $modTopic = strtolower(trim($mod->topic ?? ''));
+
+        foreach ($terms as $term) {
+            $baseTerm = $term;
+            // Strip trailing s if it's not part of ss
+            if (str_ends_with($baseTerm, 's') && !str_ends_with($baseTerm, 'ss')) {
+                $baseTerm = substr($baseTerm, 0, -1);
+            }
+
+            // Build safe word boundary pattern with optional plural 's'
+            $pattern = '/';
+            if (preg_match('/^\w/', $baseTerm)) {
+                $pattern .= '\b';
+            }
+            $pattern .= preg_quote($baseTerm, '/');
+            if (preg_match('/\w$/', $baseTerm)) {
+                $pattern .= 's?\b';
+            }
+            $pattern .= '/i';
+
+            if (($modTitle !== '' && preg_match($pattern, $modTitle)) || 
+                ($modTopic !== '' && preg_match($pattern, $modTopic))) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
 
