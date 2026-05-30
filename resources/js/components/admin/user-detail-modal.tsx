@@ -223,7 +223,7 @@ export function UserDetailModal({
         <>
             <div className="fixed inset-0 z-100 flex animate-in items-center justify-center bg-slate-900/60 p-4 backdrop-blur-xs duration-200 fade-in">
                 <div
-                    className="relative max-h-[90vh] w-full max-w-2xl animate-in overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl duration-205 zoom-in-95 dark:border-slate-800 dark:bg-slate-950 flex flex-col"
+                    className="relative flex max-h-[90vh] w-full max-w-2xl animate-in flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl duration-205 zoom-in-95 dark:border-slate-800 dark:bg-slate-950"
                     role="dialog"
                     aria-modal="true"
                 >
@@ -231,7 +231,7 @@ export function UserDetailModal({
                     <button
                         type="button"
                         onClick={onClose}
-                        className="absolute top-4 right-4 cursor-pointer rounded-lg p-1.5 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700 focus:outline-none dark:hover:bg-slate-900 dark:hover:text-slate-200 z-10"
+                        className="absolute top-4 right-4 z-10 cursor-pointer rounded-lg p-1.5 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700 focus:outline-none dark:hover:bg-slate-900 dark:hover:text-slate-200"
                         aria-label="Close dialog"
                     >
                         <svg
@@ -251,227 +251,227 @@ export function UserDetailModal({
 
                     <div className="flex-1 overflow-y-auto p-6 pr-5">
                         {/* Header */}
-                    <div className="pr-6">
-                        <h3 className="font-heading text-lg font-bold text-slate-900 dark:text-white">
-                            User Details
-                        </h3>
-                        <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-                            Complete profile information for {user.name}
-                        </p>
-                    </div>
+                        <div className="pr-6">
+                            <h3 className="font-heading text-lg font-bold text-slate-900 dark:text-white">
+                                User Details
+                            </h3>
+                            <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                                Complete profile information for {user.name}
+                            </p>
+                        </div>
 
-                    {/* Status Badges */}
-                    <div className="mt-4 flex flex-wrap gap-2">
-                        {/* Account Status Badge */}
-                        {isDeleted ? (
-                            <div className="inline-flex items-center gap-1.5 rounded-md border border-rose-100 bg-rose-50 px-2.5 py-1 text-[9px] font-extrabold tracking-wide text-rose-700 uppercase dark:border-rose-900/30 dark:bg-rose-950/20 dark:text-rose-400">
-                                <Trash2 className="size-3" />
-                                Deleted
-                            </div>
-                        ) : isActive ? (
-                            <div className="inline-flex items-center gap-1.5 rounded-md border border-emerald-100 bg-emerald-50 px-2.5 py-1 text-[9px] font-extrabold tracking-wide text-emerald-700 uppercase dark:border-emerald-900/30 dark:bg-emerald-950/20 dark:text-emerald-400">
-                                <CheckCircle className="size-3" />
-                                Active
-                            </div>
-                        ) : (
-                            <div className="inline-flex items-center gap-1.5 rounded-md border border-amber-100 bg-amber-50 px-2.5 py-1 text-[9px] font-extrabold tracking-wide text-amber-700 uppercase dark:border-amber-900/30 dark:bg-amber-950/20 dark:text-amber-400">
-                                <XCircle className="size-3" />
-                                Inactive
-                            </div>
-                        )}
+                        {/* Status Badges */}
+                        <div className="mt-4 flex flex-wrap gap-2">
+                            {/* Account Status Badge */}
+                            {isDeleted ? (
+                                <div className="inline-flex items-center gap-1.5 rounded-md border border-rose-100 bg-rose-50 px-2.5 py-1 text-[9px] font-extrabold tracking-wide text-rose-700 uppercase dark:border-rose-900/30 dark:bg-rose-950/20 dark:text-rose-400">
+                                    <Trash2 className="size-3" />
+                                    Deleted
+                                </div>
+                            ) : isActive ? (
+                                <div className="inline-flex items-center gap-1.5 rounded-md border border-emerald-100 bg-emerald-50 px-2.5 py-1 text-[9px] font-extrabold tracking-wide text-emerald-700 uppercase dark:border-emerald-900/30 dark:bg-emerald-950/20 dark:text-emerald-400">
+                                    <CheckCircle className="size-3" />
+                                    Active
+                                </div>
+                            ) : (
+                                <div className="inline-flex items-center gap-1.5 rounded-md border border-amber-100 bg-amber-50 px-2.5 py-1 text-[9px] font-extrabold tracking-wide text-amber-700 uppercase dark:border-amber-900/30 dark:bg-amber-950/20 dark:text-amber-400">
+                                    <XCircle className="size-3" />
+                                    Inactive
+                                </div>
+                            )}
 
-                        {/* Role Badge */}
-                        {user.role === 'admin' ? (
-                            <div className="inline-flex items-center gap-1.5 rounded-md border border-indigo-100 bg-indigo-50 px-2.5 py-1 text-[9px] font-extrabold tracking-wide text-indigo-700 uppercase dark:border-indigo-900/30 dark:bg-indigo-950/20 dark:text-indigo-400">
-                                <Lock className="size-3" />
-                                Administrator
-                            </div>
-                        ) : (
-                            <div className="inline-flex items-center gap-1.5 rounded-md border border-emerald-100 bg-emerald-50 px-2.5 py-1 text-[9px] font-extrabold tracking-wide text-emerald-700 uppercase dark:border-emerald-900/30 dark:bg-emerald-950/20 dark:text-emerald-400">
-                                Student
-                            </div>
-                        )}
+                            {/* Role Badge */}
+                            {user.role === 'admin' ? (
+                                <div className="inline-flex items-center gap-1.5 rounded-md border border-indigo-100 bg-indigo-50 px-2.5 py-1 text-[9px] font-extrabold tracking-wide text-indigo-700 uppercase dark:border-indigo-900/30 dark:bg-indigo-950/20 dark:text-indigo-400">
+                                    <Lock className="size-3" />
+                                    Administrator
+                                </div>
+                            ) : (
+                                <div className="inline-flex items-center gap-1.5 rounded-md border border-emerald-100 bg-emerald-50 px-2.5 py-1 text-[9px] font-extrabold tracking-wide text-emerald-700 uppercase dark:border-emerald-900/30 dark:bg-emerald-950/20 dark:text-emerald-400">
+                                    Student
+                                </div>
+                            )}
 
-                        {/* Terms Acceptance Badge */}
-                        {termsAccepted ? (
-                            <div className="inline-flex items-center gap-1.5 rounded-md border border-blue-100 bg-blue-50 px-2.5 py-1 text-[9px] font-extrabold tracking-wide text-blue-700 uppercase dark:border-blue-900/30 dark:bg-blue-950/20 dark:text-blue-400">
-                                <CheckCircle className="size-3" />
-                                Terms Accepted
-                            </div>
-                        ) : (
-                            <div className="inline-flex items-center gap-1.5 rounded-md border border-amber-100 bg-amber-50 px-2.5 py-1 text-[9px] font-extrabold tracking-wide text-amber-700 uppercase dark:border-amber-900/30 dark:bg-amber-950/20 dark:text-amber-400">
-                                <XCircle className="size-3" />
-                                Pending
-                            </div>
-                        )}
-                    </div>
+                            {/* Terms Acceptance Badge */}
+                            {termsAccepted ? (
+                                <div className="inline-flex items-center gap-1.5 rounded-md border border-blue-100 bg-blue-50 px-2.5 py-1 text-[9px] font-extrabold tracking-wide text-blue-700 uppercase dark:border-blue-900/30 dark:bg-blue-950/20 dark:text-blue-400">
+                                    <CheckCircle className="size-3" />
+                                    Terms Accepted
+                                </div>
+                            ) : (
+                                <div className="inline-flex items-center gap-1.5 rounded-md border border-amber-100 bg-amber-50 px-2.5 py-1 text-[9px] font-extrabold tracking-wide text-amber-700 uppercase dark:border-amber-900/30 dark:bg-amber-950/20 dark:text-amber-400">
+                                    <XCircle className="size-3" />
+                                    Pending
+                                </div>
+                            )}
+                        </div>
 
-                    {/* Profile Details Grid */}
-                    <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
-                        {/* Name */}
-                        <div>
-                            <label className="text-[10px] font-bold text-slate-500 uppercase dark:text-slate-400">
-                                Full Name
-                            </label>
-                            <p className="mt-1 text-sm font-bold text-slate-900 dark:text-white">
-                                {user.name}
-                                {isCurrentUser && (
-                                    <span className="ml-2 inline-block rounded-sm bg-blue-100 px-1.5 text-[8px] font-extrabold text-blue-700 uppercase dark:bg-blue-900/30 dark:text-blue-400">
-                                        You
+                        {/* Profile Details Grid */}
+                        <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
+                            {/* Name */}
+                            <div>
+                                <label className="text-[10px] font-bold text-slate-500 uppercase dark:text-slate-400">
+                                    Full Name
+                                </label>
+                                <p className="mt-1 text-sm font-bold text-slate-900 dark:text-white">
+                                    {user.name}
+                                    {isCurrentUser && (
+                                        <span className="ml-2 inline-block rounded-sm bg-blue-100 px-1.5 text-[8px] font-extrabold text-blue-700 uppercase dark:bg-blue-900/30 dark:text-blue-400">
+                                            You
+                                        </span>
+                                    )}
+                                </p>
+                            </div>
+
+                            {/* Email */}
+                            <div>
+                                <label className="text-[10px] font-bold text-slate-500 uppercase dark:text-slate-400">
+                                    Email Address
+                                </label>
+                                <p className="mt-1 text-sm font-bold text-slate-900 dark:text-white">
+                                    {user.email}
+                                </p>
+                            </div>
+
+                            {/* Registration Date */}
+                            <div>
+                                <label className="text-[10px] font-bold text-slate-500 uppercase dark:text-slate-400">
+                                    Registered On
+                                </label>
+                                <div className="mt-1 flex items-center gap-2 text-sm text-slate-900 dark:text-white">
+                                    <Calendar className="size-4 text-blue-500" />
+                                    <span className="font-bold">
+                                        {formatDate(user.created_at)}
                                     </span>
-                                )}
-                            </p>
-                        </div>
+                                </div>
+                            </div>
 
-                        {/* Email */}
-                        <div>
-                            <label className="text-[10px] font-bold text-slate-500 uppercase dark:text-slate-400">
-                                Email Address
-                            </label>
-                            <p className="mt-1 text-sm font-bold text-slate-900 dark:text-white">
-                                {user.email}
-                            </p>
-                        </div>
+                            {/* Last Login */}
+                            <div>
+                                <label className="text-[10px] font-bold text-slate-500 uppercase dark:text-slate-400">
+                                    Last Login
+                                </label>
+                                <p className="mt-1 text-sm font-bold text-slate-900 dark:text-white">
+                                    {formatDate(user.last_login_at)}
+                                </p>
+                            </div>
 
-                        {/* Registration Date */}
-                        <div>
-                            <label className="text-[10px] font-bold text-slate-500 uppercase dark:text-slate-400">
-                                Registered On
-                            </label>
-                            <div className="mt-1 flex items-center gap-2 text-sm text-slate-900 dark:text-white">
-                                <Calendar className="size-4 text-blue-500" />
-                                <span className="font-bold">
-                                    {formatDate(user.created_at)}
-                                </span>
+                            {/* Terms Accepted Date */}
+                            <div>
+                                <label className="text-[10px] font-bold text-slate-500 uppercase dark:text-slate-400">
+                                    Terms Accepted
+                                </label>
+                                <p className="mt-1 text-sm font-bold text-slate-900 dark:text-white">
+                                    {termsAccepted
+                                        ? formatDate(user.terms_accepted_at)
+                                        : 'Not accepted'}
+                                </p>
+                            </div>
+
+                            {/* Mock Attempts */}
+                            <div>
+                                <label className="text-[10px] font-bold text-slate-500 uppercase dark:text-slate-400">
+                                    Mock Attempts
+                                </label>
+                                <p className="mt-1 text-sm font-bold text-slate-900 dark:text-white">
+                                    {user.attempts_count} exam
+                                    {user.attempts_count !== 1 ? 's' : ''}
+                                </p>
                             </div>
                         </div>
 
-                        {/* Last Login */}
-                        <div>
-                            <label className="text-[10px] font-bold text-slate-500 uppercase dark:text-slate-400">
-                                Last Login
-                            </label>
-                            <p className="mt-1 text-sm font-bold text-slate-900 dark:text-white">
-                                {formatDate(user.last_login_at)}
-                            </p>
-                        </div>
+                        {/* Action Buttons */}
+                        <div className="mt-6 flex flex-col gap-3 border-t border-slate-100 pt-6 dark:border-slate-900">
+                            {isDeleted ? (
+                                <>
+                                    {/* Deleted User Actions */}
+                                    <div className="grid grid-cols-2 gap-3">
+                                        <Button
+                                            variant="default"
+                                            size="sm"
+                                            onClick={handleRestore}
+                                            className="gap-2"
+                                        >
+                                            <RotateCcw className="size-3.5" />
+                                            Restore Account
+                                        </Button>
+                                        <Button
+                                            variant="destructive"
+                                            size="sm"
+                                            onClick={handleForceDelete}
+                                            className="gap-2"
+                                        >
+                                            <Trash2 className="size-3.5" />
+                                            Permanently Delete
+                                        </Button>
+                                    </div>
+                                </>
+                            ) : (
+                                <>
+                                    {/* Active User Actions */}
+                                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                                        {user.role === 'admin' ? (
+                                            <Button
+                                                variant="secondary"
+                                                size="sm"
+                                                onClick={handleDemote}
+                                                disabled={isCurrentUser}
+                                                className="gap-2"
+                                            >
+                                                <Unlock className="size-3.5" />
+                                                Demote to Student
+                                            </Button>
+                                        ) : (
+                                            <Button
+                                                variant="secondary"
+                                                size="sm"
+                                                onClick={handlePromote}
+                                                disabled={isCurrentUser}
+                                                className="gap-2"
+                                            >
+                                                <Lock className="size-3.5" />
+                                                Promote to Admin
+                                            </Button>
+                                        )}
 
-                        {/* Terms Accepted Date */}
-                        <div>
-                            <label className="text-[10px] font-bold text-slate-500 uppercase dark:text-slate-400">
-                                Terms Accepted
-                            </label>
-                            <p className="mt-1 text-sm font-bold text-slate-900 dark:text-white">
-                                {termsAccepted
-                                    ? formatDate(user.terms_accepted_at)
-                                    : 'Not accepted'}
-                            </p>
-                        </div>
+                                        <Button
+                                            variant="secondary"
+                                            size="sm"
+                                            onClick={handleToggleStatus}
+                                            disabled={isCurrentUser}
+                                            className="gap-2"
+                                        >
+                                            {isActive ? (
+                                                <>
+                                                    <XCircle className="size-3.5" />
+                                                    Deactivate
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <CheckCircle className="size-3.5" />
+                                                    Activate
+                                                </>
+                                            )}
+                                        </Button>
+                                    </div>
 
-                        {/* Mock Attempts */}
-                        <div>
-                            <label className="text-[10px] font-bold text-slate-500 uppercase dark:text-slate-400">
-                                Mock Attempts
-                            </label>
-                            <p className="mt-1 text-sm font-bold text-slate-900 dark:text-white">
-                                {user.attempts_count} exam
-                                {user.attempts_count !== 1 ? 's' : ''}
-                            </p>
-                        </div>
-                    </div>
-
-                    {/* Action Buttons */}
-                    <div className="mt-6 flex flex-col gap-3 border-t border-slate-100 pt-6 dark:border-slate-900">
-                        {isDeleted ? (
-                            <>
-                                {/* Deleted User Actions */}
-                                <div className="grid grid-cols-2 gap-3">
-                                    <Button
-                                        variant="default"
-                                        size="sm"
-                                        onClick={handleRestore}
-                                        className="gap-2"
-                                    >
-                                        <RotateCcw className="size-3.5" />
-                                        Restore Account
-                                    </Button>
                                     <Button
                                         variant="destructive"
                                         size="sm"
-                                        onClick={handleForceDelete}
-                                        className="gap-2"
-                                    >
-                                        <Trash2 className="size-3.5" />
-                                        Permanently Delete
-                                    </Button>
-                                </div>
-                            </>
-                        ) : (
-                            <>
-                                {/* Active User Actions */}
-                                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                                    {user.role === 'admin' ? (
-                                        <Button
-                                            variant="secondary"
-                                            size="sm"
-                                            onClick={handleDemote}
-                                            disabled={isCurrentUser}
-                                            className="gap-2"
-                                        >
-                                            <Unlock className="size-3.5" />
-                                            Demote to Student
-                                        </Button>
-                                    ) : (
-                                        <Button
-                                            variant="secondary"
-                                            size="sm"
-                                            onClick={handlePromote}
-                                            disabled={isCurrentUser}
-                                            className="gap-2"
-                                        >
-                                            <Lock className="size-3.5" />
-                                            Promote to Admin
-                                        </Button>
-                                    )}
-
-                                    <Button
-                                        variant="secondary"
-                                        size="sm"
-                                        onClick={handleToggleStatus}
+                                        onClick={handleDelete}
                                         disabled={isCurrentUser}
                                         className="gap-2"
                                     >
-                                        {isActive ? (
-                                            <>
-                                                <XCircle className="size-3.5" />
-                                                Deactivate
-                                            </>
-                                        ) : (
-                                            <>
-                                                <CheckCircle className="size-3.5" />
-                                                Activate
-                                            </>
-                                        )}
+                                        <Trash2 className="size-3.5" />
+                                        Delete Account
                                     </Button>
-                                </div>
-
-                                <Button
-                                    variant="destructive"
-                                    size="sm"
-                                    onClick={handleDelete}
-                                    disabled={isCurrentUser}
-                                    className="gap-2"
-                                >
-                                    <Trash2 className="size-3.5" />
-                                    Delete Account
-                                </Button>
-                            </>
-                        )}
-                    </div>
+                                </>
+                            )}
+                        </div>
                     </div>
 
                     {/* Footer Buttons */}
-                    <div className="flex justify-end gap-3 border-t border-slate-100 p-6 pt-4 dark:border-slate-900 shrink-0">
+                    <div className="flex shrink-0 justify-end gap-3 border-t border-slate-100 p-6 pt-4 dark:border-slate-900">
                         <Button
                             variant="outline"
                             size="sm"

@@ -4,11 +4,11 @@ import BrandName from '@/components/brand-name';
 export default function AppLogo() {
     return (
         <>
-            <div className="flex aspect-square size-14 items-center justify-center overflow-hidden rounded-md bg-transparent">
-                <AppLogoIcon className="size-14 object-contain" />
+            <div className="flex aspect-square size-10 items-center justify-center overflow-hidden rounded-md bg-transparent md:size-14">
+                <AppLogoIcon className="size-10 object-contain md:size-14" />
             </div>
-            <div className="grid flex-1 text-left text-xl">
-                <span className="truncate leading-tight font-semibold">
+            <div className="grid flex-1 text-left text-lg md:text-xl">
+                <span className="leading-tight font-semibold whitespace-nowrap">
                     <BrandName />
                 </span>
             </div>

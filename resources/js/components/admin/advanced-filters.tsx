@@ -107,12 +107,12 @@ export function AdvancedFilters({
     return (
         <div className="fixed inset-0 z-99 flex animate-in items-center justify-center bg-slate-900/60 p-4 backdrop-blur-xs duration-200 fade-in">
             <div
-                className="relative max-h-[90vh] w-full max-w-3xl animate-in overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl duration-205 zoom-in-95 dark:border-slate-800 dark:bg-slate-950 flex flex-col"
+                className="relative flex max-h-[90vh] w-full max-w-3xl animate-in flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl duration-205 zoom-in-95 dark:border-slate-800 dark:bg-slate-950"
                 role="dialog"
                 aria-modal="true"
             >
                 {/* Header */}
-                <div className="flex items-center justify-between border-b border-slate-100 bg-slate-50/50 p-6 dark:border-slate-900 dark:bg-slate-900/10 shrink-0">
+                <div className="flex shrink-0 items-center justify-between border-b border-slate-100 bg-slate-50/50 p-6 dark:border-slate-900 dark:bg-slate-900/10">
                     <div className="flex items-center gap-2">
                         <Filter className="size-5 text-slate-600 dark:text-slate-400" />
                         <h3 className="font-heading text-lg font-bold text-slate-900 dark:text-white">
@@ -130,7 +130,7 @@ export function AdvancedFilters({
                 </div>
 
                 {/* Content */}
-                <div className="flex-1 overflow-y-auto p-6 pr-5 space-y-6">
+                <div className="flex-1 space-y-6 overflow-y-auto p-6 pr-5">
                     {/* Account Status Filter */}
                     <div>
                         <label className="text-xs font-bold tracking-wide text-slate-700 uppercase dark:text-slate-300">
@@ -347,7 +347,7 @@ export function AdvancedFilters({
                 </div>
 
                 {/* Footer Actions */}
-                <div className="flex justify-between gap-3 border-t border-slate-100 bg-slate-50/50 p-6 dark:border-slate-900 dark:bg-slate-900/10 shrink-0">
+                <div className="flex shrink-0 justify-between gap-3 border-t border-slate-100 bg-slate-50/50 p-6 dark:border-slate-900 dark:bg-slate-900/10">
                     <Button
                         variant="outline"
                         size="sm"

@@ -145,8 +145,8 @@ export function StudySuggestionsModal({
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent className="max-h-[85vh] max-w-3xl overflow-hidden p-0 flex flex-col">
-                <DialogHeader className="p-6 pb-2 shrink-0">
+            <DialogContent className="flex max-h-[85vh] max-w-3xl flex-col overflow-hidden p-0">
+                <DialogHeader className="shrink-0 p-6 pb-2">
                     <div className="flex items-center justify-between">
                         <DialogTitle>Study Plan Suggestions</DialogTitle>
                         {onFilterChange && (
@@ -192,7 +192,7 @@ export function StudySuggestionsModal({
                     </div>
                 </DialogHeader>
 
-                <div className="flex-1 overflow-y-auto px-6 py-2 pr-5 space-y-4">
+                <div className="flex-1 space-y-4 overflow-y-auto px-6 py-2 pr-5">
                     {!selectedTrack ? (
                         <div className="flex flex-col items-center justify-center py-12 text-center">
                             <div className="mb-4 rounded-full bg-blue-50 p-4">
@@ -282,17 +282,37 @@ export function StudySuggestionsModal({
                                             <input
                                                 type="time"
                                                 value={setAllTime}
-                                                min={selectedTimeOfDay === 'Evening' ? '12:00' : undefined}
+                                                min={
+                                                    selectedTimeOfDay ===
+                                                    'Evening'
+                                                        ? '12:00'
+                                                        : undefined
+                                                }
                                                 onChange={(e) => {
-                                                    let newTime = e.target.value;
-                                                    if (newTime && selectedTimeOfDay === 'Evening') {
-                                                        const [hours, minutes] = newTime.split(':');
-                                                        let hr = parseInt(hours, 10);
+                                                    let newTime =
+                                                        e.target.value;
+
+                                                    if (
+                                                        newTime &&
+                                                        selectedTimeOfDay ===
+                                                            'Evening'
+                                                    ) {
+                                                        const [hours, minutes] =
+                                                            newTime.split(':');
+                                                        let hr = parseInt(
+                                                            hours,
+                                                            10,
+                                                        );
+
                                                         if (hr < 12) {
-                                                            hr = hr === 0 ? 12 : hr + 12;
+                                                            hr =
+                                                                hr === 0
+                                                                    ? 12
+                                                                    : hr + 12;
                                                             newTime = `${String(hr).padStart(2, '0')}:${minutes}`;
                                                         }
                                                     }
+
                                                     setSetAllTime(newTime);
 
                                                     if (newTime) {
@@ -312,104 +332,164 @@ export function StudySuggestionsModal({
                                             />
                                         </div>
                                     </div>
-                                    <div className="rounded-lg border border-slate-200 bg-slate-50 overflow-hidden">
-                                        <div className="max-h-64 overflow-y-auto p-3 pr-2.5 space-y-2">
-                                        {editableSuggestions.map(
-                                            (suggestion, idx) => (
-                                                <div
-                                                    key={idx}
-                                                    draggable
-                                                    onDragStart={(e) =>
-                                                        handleDragStart(e, idx)
-                                                    }
-                                                    onDragOver={(e) =>
-                                                        handleDragOver(e)
-                                                    }
-                                                    onDrop={(e) =>
-                                                        handleDrop(e, idx)
-                                                    }
-                                                    onDragEnd={handleDragEnd}
-                                                    className={`cursor-move rounded-lg border-l-4 border-blue-400 bg-white p-3 transition-colors ${
-                                                        draggedItemIndex === idx
-                                                            ? 'border-2 border-dashed opacity-50'
-                                                            : ''
-                                                    } hover:bg-slate-50`}
-                                                >
-                                                    <div className="flex items-start justify-between">
-                                                        <div className="flex-1">
-                                                            <p className="font-semibold text-slate-900">
-                                                                {
-                                                                    suggestion.title
-                                                                }
-                                                            </p>
-                                                            <p className="mt-1 flex items-center gap-2 text-sm text-slate-600">
-                                                                {new Date(
-                                                                    suggestion.study_date +
-                                                                        'T00:00:00',
-                                                                ).toLocaleDateString(
-                                                                    'en-US',
+                                    <div className="overflow-hidden rounded-lg border border-slate-200 bg-slate-50">
+                                        <div className="max-h-64 space-y-2 overflow-y-auto p-3 pr-2.5">
+                                            {editableSuggestions.map(
+                                                (suggestion, idx) => (
+                                                    <div
+                                                        key={idx}
+                                                        draggable
+                                                        onDragStart={(e) =>
+                                                            handleDragStart(
+                                                                e,
+                                                                idx,
+                                                            )
+                                                        }
+                                                        onDragOver={(e) =>
+                                                            handleDragOver(e)
+                                                        }
+                                                        onDrop={(e) =>
+                                                            handleDrop(e, idx)
+                                                        }
+                                                        onDragEnd={
+                                                            handleDragEnd
+                                                        }
+                                                        className={`cursor-move rounded-lg border-l-4 border-blue-400 bg-white p-3 transition-colors ${
+                                                            draggedItemIndex ===
+                                                            idx
+                                                                ? 'border-2 border-dashed opacity-50'
+                                                                : ''
+                                                        } hover:bg-slate-50`}
+                                                    >
+                                                        <div className="flex items-start justify-between">
+                                                            <div className="flex-1">
+                                                                <p className="font-semibold text-slate-900">
                                                                     {
-                                                                        month: 'short',
-                                                                        day: 'numeric',
-                                                                        weekday:
-                                                                            'short',
-                                                                    },
-                                                                )}{' '}
-                                                                at
-                                                                <input
-                                                                    type="time"
-                                                                    value={
-                                                                        suggestion.study_time
+                                                                        suggestion.title
                                                                     }
-                                                                    min={selectedTimeOfDay === 'Evening' ? '12:00' : undefined}
-                                                                    onChange={(
-                                                                        e,
-                                                                    ) => {
-                                                                        let newTime = e.target.value;
-                                                                        if (newTime && selectedTimeOfDay === 'Evening') {
-                                                                            const [hours, minutes] = newTime.split(':');
-                                                                            let hr = parseInt(hours, 10);
-                                                                            if (hr < 12) {
-                                                                                hr = hr === 0 ? 12 : hr + 12;
-                                                                                newTime = `${String(hr).padStart(2, '0')}:${minutes}`;
-                                                                            }
+                                                                </p>
+                                                                <p className="mt-1 flex items-center gap-2 text-sm text-slate-600">
+                                                                    {new Date(
+                                                                        suggestion.study_date +
+                                                                            'T00:00:00',
+                                                                    ).toLocaleDateString(
+                                                                        'en-US',
+                                                                        {
+                                                                            month: 'short',
+                                                                            day: 'numeric',
+                                                                            weekday:
+                                                                                'short',
+                                                                        },
+                                                                    )}{' '}
+                                                                    at
+                                                                    <input
+                                                                        type="time"
+                                                                        value={
+                                                                            suggestion.study_time
                                                                         }
-                                                                        const newSuggestions =
-                                                                            [
-                                                                                ...editableSuggestions,
-                                                                            ];
-                                                                        newSuggestions[
-                                                                            idx
-                                                                        ].study_time =
-                                                                            newTime;
-                                                                        setEditableSuggestions(
-                                                                            newSuggestions,
-                                                                        );
-                                                                    }}
-                                                                    className="rounded border border-slate-300 bg-white px-2 py-0.5 text-xs font-semibold text-slate-700 outline-none hover:bg-slate-50 focus:ring-2 focus:ring-blue-500"
-                                                                />
-                                                            </p>
-                                                            <p className="mt-1 line-clamp-2 text-xs text-slate-500">
-                                                                {
-                                                                    suggestion.description
-                                                                }
-                                                            </p>
-                                                            {suggestion.module_links &&
-                                                            suggestion
-                                                                .module_links
-                                                                .length > 0 ? (
-                                                                <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1">
-                                                                    {suggestion.module_links.map(
-                                                                        (
-                                                                            link,
-                                                                            lidx,
-                                                                        ) => (
-                                                                            <a
-                                                                                key={
-                                                                                    lidx
+                                                                        min={
+                                                                            selectedTimeOfDay ===
+                                                                            'Evening'
+                                                                                ? '12:00'
+                                                                                : undefined
+                                                                        }
+                                                                        onChange={(
+                                                                            e,
+                                                                        ) => {
+                                                                            let newTime =
+                                                                                e
+                                                                                    .target
+                                                                                    .value;
+
+                                                                            if (
+                                                                                newTime &&
+                                                                                selectedTimeOfDay ===
+                                                                                    'Evening'
+                                                                            ) {
+                                                                                const [
+                                                                                    hours,
+                                                                                    minutes,
+                                                                                ] =
+                                                                                    newTime.split(
+                                                                                        ':',
+                                                                                    );
+                                                                                let hr =
+                                                                                    parseInt(
+                                                                                        hours,
+                                                                                        10,
+                                                                                    );
+
+                                                                                if (
+                                                                                    hr <
+                                                                                    12
+                                                                                ) {
+                                                                                    hr =
+                                                                                        hr ===
+                                                                                        0
+                                                                                            ? 12
+                                                                                            : hr +
+                                                                                              12;
+                                                                                    newTime = `${String(hr).padStart(2, '0')}:${minutes}`;
                                                                                 }
+                                                                            }
+
+                                                                            const newSuggestions =
+                                                                                [
+                                                                                    ...editableSuggestions,
+                                                                                ];
+                                                                            newSuggestions[
+                                                                                idx
+                                                                            ].study_time =
+                                                                                newTime;
+                                                                            setEditableSuggestions(
+                                                                                newSuggestions,
+                                                                            );
+                                                                        }}
+                                                                        className="rounded border border-slate-300 bg-white px-2 py-0.5 text-xs font-semibold text-slate-700 outline-none hover:bg-slate-50 focus:ring-2 focus:ring-blue-500"
+                                                                    />
+                                                                </p>
+                                                                <p className="mt-1 line-clamp-2 text-xs text-slate-500">
+                                                                    {
+                                                                        suggestion.description
+                                                                    }
+                                                                </p>
+                                                                {suggestion.module_links &&
+                                                                suggestion
+                                                                    .module_links
+                                                                    .length >
+                                                                    0 ? (
+                                                                    <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1">
+                                                                        {suggestion.module_links.map(
+                                                                            (
+                                                                                link,
+                                                                                lidx,
+                                                                            ) => (
+                                                                                <a
+                                                                                    key={
+                                                                                        lidx
+                                                                                    }
+                                                                                    href={
+                                                                                        link.url
+                                                                                    }
+                                                                                    target="_blank"
+                                                                                    rel="noopener noreferrer"
+                                                                                    className="inline-flex items-center text-xs font-medium text-blue-600 hover:text-blue-800"
+                                                                                >
+                                                                                    📖
+                                                                                    Learn:{' '}
+                                                                                    {
+                                                                                        link.title
+                                                                                    }
+                                                                                </a>
+                                                                            ),
+                                                                        )}
+                                                                    </div>
+                                                                ) : (
+                                                                    suggestion.module_url && (
+                                                                        <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1">
+                                                                            <a
                                                                                 href={
-                                                                                    link.url
+                                                                                    suggestion.module_url
                                                                                 }
                                                                                 target="_blank"
                                                                                 rel="noopener noreferrer"
@@ -418,59 +498,39 @@ export function StudySuggestionsModal({
                                                                                 📖
                                                                                 Learn:{' '}
                                                                                 {
-                                                                                    link.title
+                                                                                    suggestion.module_title
                                                                                 }
                                                                             </a>
-                                                                        ),
-                                                                    )}
-                                                                </div>
-                                                            ) : (
-                                                                suggestion.module_url && (
-                                                                    <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1">
-                                                                        <a
-                                                                            href={
-                                                                                suggestion.module_url
-                                                                            }
-                                                                            target="_blank"
-                                                                            rel="noopener noreferrer"
-                                                                            className="inline-flex items-center text-xs font-medium text-blue-600 hover:text-blue-800"
-                                                                        >
-                                                                            📖
-                                                                            Learn:{' '}
-                                                                            {
-                                                                                suggestion.module_title
-                                                                            }
-                                                                        </a>
-                                                                    </div>
-                                                                )
-                                                            )}
-                                                        </div>
-                                                        <div className="ml-2 flex flex-col items-end gap-2">
-                                                            <button
-                                                                type="button"
-                                                                onClick={() =>
-                                                                    removeSuggestion(
-                                                                        idx,
+                                                                        </div>
                                                                     )
-                                                                }
-                                                                className="text-slate-400 transition-colors hover:text-red-500"
-                                                                title="Remove suggestion"
-                                                            >
-                                                                <X className="h-4 w-4" />
-                                                            </button>
-                                                            <span
-                                                                className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${suggestion.score < 75 ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'}`}
-                                                            >
-                                                                {
-                                                                    suggestion.score
-                                                                }
-                                                                %
-                                                            </span>
+                                                                )}
+                                                            </div>
+                                                            <div className="ml-2 flex flex-col items-end gap-2">
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() =>
+                                                                        removeSuggestion(
+                                                                            idx,
+                                                                        )
+                                                                    }
+                                                                    className="text-slate-400 transition-colors hover:text-red-500"
+                                                                    title="Remove suggestion"
+                                                                >
+                                                                    <X className="h-4 w-4" />
+                                                                </button>
+                                                                <span
+                                                                    className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${suggestion.score < 75 ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'}`}
+                                                                >
+                                                                    {
+                                                                        suggestion.score
+                                                                    }
+                                                                    %
+                                                                </span>
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                </div>
-                                            ),
-                                        )}
+                                                ),
+                                            )}
                                         </div>
                                     </div>
                                 </div>
@@ -490,7 +550,7 @@ export function StudySuggestionsModal({
                     )}
                 </div>
 
-                <DialogFooter className="p-6 pt-4 border-t border-slate-100 shrink-0">
+                <DialogFooter className="shrink-0 border-t border-slate-100 p-6 pt-4">
                     <Button variant="outline" onClick={onClose}>
                         <X className="mr-2 h-4 w-4" />
                         Cancel

@@ -440,22 +440,24 @@ export default function Calendar() {
 
         // 1. Extract subtopic from title (part after " - ")
         let subtopic = title;
+
         if (title.includes(' - ')) {
             subtopic = title.split(' - ')[1].trim();
         }
-        
+
         // Remove prefix "Study: " if present
         subtopic = subtopic.replace(/^Study:\s*/i, '');
-        
+
         if (subtopic.length >= 2) {
             terms.push(subtopic.toLowerCase());
         }
 
         // 2. Parse and split description
         const descLower = (description || '').toLowerCase();
-        
+
         // Extract acronyms in parentheses (e.g. "(LCM)")
         const acronymMatches = descLower.matchAll(/\(([a-z0-9]{2,6})\)/gi);
+
         for (const match of acronymMatches) {
             terms.push(match[1].toLowerCase());
         }
@@ -482,62 +484,114 @@ export default function Calendar() {
             'identify',
             'analyze',
         ];
-        
+
         for (const prefix of noisePrefixes) {
             if (cleanedDesc.trim().startsWith(prefix)) {
-                cleanedDesc = cleanedDesc.trim().substring(prefix.length).trim();
+                cleanedDesc = cleanedDesc
+                    .trim()
+                    .substring(prefix.length)
+                    .trim();
                 break;
             }
         }
 
         // Split by punctuation and conjunctions
-        const parts = cleanedDesc.split(/[\s,;]+and\s+|[\s,;]+or\s+|[\s,;]+&\s+|[,;.]+/);
-        
+        const parts = cleanedDesc.split(
+            /[\s,;]+and\s+|[\s,;]+or\s+|[\s,;]+&\s+|[,;.]+/,
+        );
+
         const broadStopWords = new Set([
-            'rules', 'numbers', 'operations', 'word', 'problems', 'tasks', 'relationships', 
-            'concept', 'concepts', 'issues', 'laws', 'etc', 'meaning', 'structure', 
-            'application', 'context', 'pairs', 'main', 'idea', 'clues', 'conclusions', 
-            'arguments', 'hypotheses', 'shapes', 'order', 'arithmetic', 'basic', 
-            'ability', 'general', 'information', 'clerical', 'verbal', 'analytical', 
-            'numerical', 'solving', 'identifying', 'finding', 'spotting'
+            'rules',
+            'numbers',
+            'operations',
+            'word',
+            'problems',
+            'tasks',
+            'relationships',
+            'concept',
+            'concepts',
+            'issues',
+            'laws',
+            'etc',
+            'meaning',
+            'structure',
+            'application',
+            'context',
+            'pairs',
+            'main',
+            'idea',
+            'clues',
+            'conclusions',
+            'arguments',
+            'hypotheses',
+            'shapes',
+            'order',
+            'arithmetic',
+            'basic',
+            'ability',
+            'general',
+            'information',
+            'clerical',
+            'verbal',
+            'analytical',
+            'numerical',
+            'solving',
+            'identifying',
+            'finding',
+            'spotting',
         ]);
 
         for (let part of parts) {
             part = part.trim();
+
             if (part.length < 2) {
                 continue;
             }
+
             if (broadStopWords.has(part)) {
                 continue;
             }
+
             terms.push(part);
         }
 
         return Array.from(new Set(terms));
     };
 
-    const isModuleRelated = (mod: LearnModule, title: string, description: string): boolean => {
+    const isModuleRelated = (
+        mod: LearnModule,
+        title: string,
+        description: string,
+    ): boolean => {
         const terms = getSearchTerms(title, description);
         const modTitle = (mod.title || '').toLowerCase().trim();
         const modTopic = (mod.topic || '').toLowerCase().trim();
 
         for (const term of terms) {
             let baseTerm = term;
+
             if (baseTerm.endsWith('s') && !baseTerm.endsWith('ss')) {
                 baseTerm = baseTerm.slice(0, -1);
             }
 
             let patternStr = '';
+
             if (/^\w/.test(baseTerm)) {
                 patternStr += '\\b';
             }
+
             patternStr += baseTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
             if (/\w$/.test(baseTerm)) {
                 patternStr += 's?\\b';
             }
+
             const regex = new RegExp(patternStr, 'i');
 
-            if ((modTitle && regex.test(modTitle)) || (modTopic && regex.test(modTopic))) {
+            if (
+                (modTitle && regex.test(modTitle)) ||
+                (modTopic && regex.test(modTopic))
+            ) {
                 return true;
             }
         }
@@ -551,7 +605,9 @@ export default function Calendar() {
         }
 
         return learnModules
-            .filter((mod) => isModuleRelated(mod, formData.title, formData.description))
+            .filter((mod) =>
+                isModuleRelated(mod, formData.title, formData.description),
+            )
             .slice(0, 3);
     };
 
@@ -584,7 +640,7 @@ export default function Calendar() {
 
                 <Card className="bg-white p-6">
                     {/* Header with navigation */}
-                    <div className="mb-6 flex items-center justify-between">
+                    <div className="mb-6 flex flex-col justify-between gap-4 md:flex-row md:items-center">
                         <div className="flex items-center gap-4">
                             <select
                                 value={currentDate.getMonth()}
@@ -655,40 +711,54 @@ export default function Calendar() {
                                 ))}
                             </select>
                         </div>
-                        <div className="flex items-center gap-2">
+                        <div className="flex w-full flex-wrap items-center gap-2 md:w-auto">
                             <Button
                                 variant="outline"
                                 onClick={() => setIsSuggestionsOpen(true)}
                                 disabled={isLoadingSuggestions}
-                                className="bg-amber-50 hover:bg-amber-100"
+                                className="flex-1 bg-amber-50 hover:bg-amber-100 md:flex-initial"
                             >
                                 <Lightbulb className="mr-2 h-4 w-4 text-amber-600" />
-                                {isLoadingSuggestions
-                                    ? 'Analyzing...'
-                                    : 'Suggest Study Plan'}
+                                <span className="hidden sm:inline">
+                                    {isLoadingSuggestions
+                                        ? 'Analyzing...'
+                                        : 'Suggest Study Plan'}
+                                </span>
+                                <span className="sm:hidden">
+                                    {isLoadingSuggestions
+                                        ? 'Suggesting...'
+                                        : 'Suggest'}
+                                </span>
                             </Button>
                             <Button
                                 variant="outline"
                                 onClick={() => setIsResetModalOpen(true)}
-                                className="border-red-200 bg-red-50 text-red-600 hover:bg-red-100"
+                                className="flex-1 border-red-200 bg-red-50 text-red-600 hover:bg-red-100 md:flex-initial"
                             >
                                 <Trash2 className="mr-2 h-4 w-4" />
-                                Reset Calendar
+                                <span className="hidden sm:inline">
+                                    Reset Calendar
+                                </span>
+                                <span className="sm:hidden">Reset</span>
                             </Button>
-                            <Button
-                                variant="outline"
-                                size="icon"
-                                onClick={previousMonth}
-                            >
-                                <ChevronLeft className="h-4 w-4" />
-                            </Button>
-                            <Button
-                                variant="outline"
-                                size="icon"
-                                onClick={nextMonth}
-                            >
-                                <ChevronRight className="h-4 w-4" />
-                            </Button>
+                            <div className="ml-auto flex items-center gap-1 md:ml-0">
+                                <Button
+                                    variant="outline"
+                                    size="icon"
+                                    onClick={previousMonth}
+                                    className="h-9 w-9"
+                                >
+                                    <ChevronLeft className="h-4 w-4" />
+                                </Button>
+                                <Button
+                                    variant="outline"
+                                    size="icon"
+                                    onClick={nextMonth}
+                                    className="h-9 w-9"
+                                >
+                                    <ChevronRight className="h-4 w-4" />
+                                </Button>
+                            </div>
                         </div>
                     </div>
 
@@ -759,19 +829,21 @@ export default function Calendar() {
                                                     )}
                                                 {calendarDay.day}
                                             </span>
-                                            {calendarDay.isCurrentMonth && calendarDay.date >= todayStr && (
-                                                <button
-                                                    onClick={() =>
-                                                        openModal(
-                                                            calendarDay.date,
-                                                        )
-                                                    }
-                                                    className="rounded p-1 hover:bg-blue-50"
-                                                    title="Add study item"
-                                                >
-                                                    <Plus className="h-4 w-4 text-blue-600" />
-                                                </button>
-                                            )}
+                                            {calendarDay.isCurrentMonth &&
+                                                calendarDay.date >=
+                                                    todayStr && (
+                                                    <button
+                                                        onClick={() =>
+                                                            openModal(
+                                                                calendarDay.date,
+                                                            )
+                                                        }
+                                                        className="rounded p-1 hover:bg-blue-50"
+                                                        title="Add study item"
+                                                    >
+                                                        <Plus className="h-4 w-4 text-blue-600" />
+                                                    </button>
+                                                )}
                                         </div>
 
                                         {/* Study items for this day */}
@@ -835,7 +907,8 @@ export default function Calendar() {
                                                                             /\[(.*?)\]\((.*?)\)/g;
                                                                         const links =
                                                                             [];
-                                                                        const existingUrls = new Set();
+                                                                        const existingUrls =
+                                                                            new Set();
                                                                         let match;
 
                                                                         while (
@@ -851,17 +924,44 @@ export default function Calendar() {
                                                                                     url: match[2],
                                                                                 },
                                                                             );
-                                                                            existingUrls.add(match[2]);
+                                                                            existingUrls.add(
+                                                                                match[2],
+                                                                            );
                                                                         }
 
                                                                         // Automatically find matching learn modules for this item
                                                                         for (const mod of learnModules) {
-                                                                            if (links.length >= 3) break; // Limit to 3 links total
+                                                                            if (
+                                                                                links.length >=
+                                                                                3
+                                                                            ) {
+                                                                                break;
+                                                                            } // Limit to 3 links total
+
                                                                             const modUrl = `/learn/${mod.slug}`;
-                                                                            if (!existingUrls.has(modUrl)) {
-                                                                                if (isModuleRelated(mod, schedule.title, desc)) {
-                                                                                    links.push({ title: mod.title, url: modUrl, isAuto: true });
-                                                                                    existingUrls.add(modUrl);
+
+                                                                            if (
+                                                                                !existingUrls.has(
+                                                                                    modUrl,
+                                                                                )
+                                                                            ) {
+                                                                                if (
+                                                                                    isModuleRelated(
+                                                                                        mod,
+                                                                                        schedule.title,
+                                                                                        desc,
+                                                                                    )
+                                                                                ) {
+                                                                                    links.push(
+                                                                                        {
+                                                                                            title: mod.title,
+                                                                                            url: modUrl,
+                                                                                            isAuto: true,
+                                                                                        },
+                                                                                    );
+                                                                                    existingUrls.add(
+                                                                                        modUrl,
+                                                                                    );
                                                                                 }
                                                                             }
                                                                         }
@@ -916,7 +1016,9 @@ export default function Calendar() {
                                                                                                         e.stopPropagation()
                                                                                                     }
                                                                                                 >
-                                                                                                    {l.isAuto ? '✨' : '📖'}
+                                                                                                    {l.isAuto
+                                                                                                        ? '✨'
+                                                                                                        : '📖'}
                                                                                                     Learn:{' '}
                                                                                                     {
                                                                                                         l.title
@@ -1061,15 +1163,26 @@ export default function Calendar() {
                                                 type="button"
                                                 onClick={() => {
                                                     const linkText = `[${mod.title}](/learn/${mod.slug})`;
-                                                    if (!formData.description.includes(linkText)) {
-                                                        const prefix = formData.description ? formData.description + '\n\n' : '';
+
+                                                    if (
+                                                        !formData.description.includes(
+                                                            linkText,
+                                                        )
+                                                    ) {
+                                                        const prefix =
+                                                            formData.description
+                                                                ? formData.description +
+                                                                  '\n\n'
+                                                                : '';
                                                         setFormData({
                                                             ...formData,
-                                                            description: prefix + linkText
+                                                            description:
+                                                                prefix +
+                                                                linkText,
                                                         });
                                                     }
                                                 }}
-                                                className="inline-flex items-center rounded-full border border-blue-200 bg-white px-2.5 py-1 text-xs font-medium text-blue-700 shadow-sm hover:border-blue-300 hover:bg-blue-50 transition-colors"
+                                                className="inline-flex items-center rounded-full border border-blue-200 bg-white px-2.5 py-1 text-xs font-medium text-blue-700 shadow-sm transition-colors hover:border-blue-300 hover:bg-blue-50"
                                             >
                                                 <Plus className="mr-1 h-3 w-3" />
                                                 {mod.title}
@@ -1077,7 +1190,8 @@ export default function Calendar() {
                                         ))}
                                     </div>
                                     <p className="text-[10px] text-slate-500">
-                                        Click to attach this module to your study notes.
+                                        Click to attach this module to your
+                                        study notes.
                                     </p>
                                 </div>
                             )}

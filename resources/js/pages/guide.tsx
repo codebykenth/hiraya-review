@@ -493,7 +493,23 @@ export default function Guide() {
             <AppLayout
                 breadcrumbs={[{ title: 'Reviewer Guide', href: '/guide' }]}
             >
-                <Head title="Reviewer Guide" />
+                <Head>
+                    <title>
+                        Ultimate CSE Preparation Guide | Hiraya Review
+                    </title>
+                    <meta
+                        name="description"
+                        content="Discover the best study strategies, time-management tips, and subject coverage breakdowns for the Professional and Subprofessional Civil Service Examinations."
+                    />
+                    <meta
+                        property="og:title"
+                        content="Ultimate CSE Preparation Guide | Hiraya Review"
+                    />
+                    <meta
+                        property="og:description"
+                        content="Discover the best study strategies, time-management tips, and subject coverage breakdowns for the Professional and Subprofessional Civil Service Examinations."
+                    />
+                </Head>
                 <div className="min-h-screen bg-slate-50/30 px-6 py-6 dark:bg-slate-950/20">
                     {content}
                 </div>
@@ -503,7 +519,21 @@ export default function Guide() {
 
     return (
         <>
-            <Head title="Reviewer Guide" />
+            <Head>
+                <title>Ultimate CSE Preparation Guide | Hiraya Review</title>
+                <meta
+                    name="description"
+                    content="Discover the best study strategies, time-management tips, and subject coverage breakdowns for the Professional and Subprofessional Civil Service Examinations."
+                />
+                <meta
+                    property="og:title"
+                    content="Ultimate CSE Preparation Guide | Hiraya Review"
+                />
+                <meta
+                    property="og:description"
+                    content="Discover the best study strategies, time-management tips, and subject coverage breakdowns for the Professional and Subprofessional Civil Service Examinations."
+                />
+            </Head>
             <div className="flex min-h-screen flex-col bg-slate-50/30 dark:bg-slate-950/20">
                 <SiteHeader activeNav="guide" />
                 <main className="flex-1 px-6 py-12">{content}</main>

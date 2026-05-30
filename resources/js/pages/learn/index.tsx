@@ -85,7 +85,23 @@ export default function LearnIndex({ modules, categories }: LearnIndexProps) {
 
     return (
         <>
-            <Head title="Learning Tutorials" />
+            <Head>
+                <title>
+                    Civil Service Study Hub & Syllabus Guides | Hiraya Review
+                </title>
+                <meta
+                    name="description"
+                    content="Access free, high-yield study modules and review guides covering Numerical, Verbal, Analytical, and Clerical topics for the Civil Service Exam."
+                />
+                <meta
+                    property="og:title"
+                    content="Civil Service Study Hub & Syllabus Guides | Hiraya Review"
+                />
+                <meta
+                    property="og:description"
+                    content="Access free, high-yield study modules and review guides covering Numerical, Verbal, Analytical, and Clerical topics for the Civil Service Exam."
+                />
+            </Head>
             <PageContainer>
                 {/* Header Banner */}
                 <PageHeader

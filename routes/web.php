@@ -12,6 +12,7 @@ use App\Http\Controllers\Settings\AcceptTermsController;
 use App\Http\Controllers\StudyScheduleController;
 use App\Http\Controllers\StudySuggestionController;
 use App\Http\Controllers\SupportController;
+use App\Http\Controllers\SitemapController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -23,6 +24,13 @@ Route::middleware('throttle:global-views')->group(function () {
     Route::inertia('support', 'legal/support')->name('support');
     Route::inertia('guide', 'guide')->name('guide');
     Route::get('exams', [ExamController::class, 'index'])->name('exams.index');
+
+    // Publicly accessible Learn Module routes (for advanced long-tail SEO crawl)
+    Route::get('learn', [LearnController::class, 'index'])->name('learn.index');
+    Route::get('learn/{slug}', [LearnController::class, 'show'])->name('learn.show');
+
+    // Dynamic XML Sitemap for Google Search Console
+    Route::get('sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
 
     Route::get('ping', fn () => response()->json([
         'status' => 'alive',
@@ -57,9 +65,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('drills', [ExamController::class, 'drills'])->name('drills.index');
         Route::get('history', [ExamController::class, 'history'])->name('history.index');
         Route::get('questions/drafts', [QuestionController::class, 'drafts'])->name('questions.drafts');
-        // Learn Module Views
-        Route::get('learn', [LearnController::class, 'index'])->name('learn.index');
-        Route::get('learn/{slug}', [LearnController::class, 'show'])->name('learn.show');
+
 
         // Admin Learn Module Views
         Route::get('admin/learn', [AdminLearnController::class, 'index'])->name('admin.learn.index');

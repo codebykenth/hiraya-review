@@ -63,15 +63,20 @@ export default function SiteHeader({
         { id: 'home', label: 'Home', href: '#' },
         { id: 'features', label: 'Features', href: '#features' },
         { id: 'path', label: 'Process', href: '#path' },
+        { id: 'learn', label: 'Study Hub', href: '/learn' },
         { id: 'guide', label: 'Reviewer Guide', href: '#guide' },
         { id: 'faq', label: 'FAQ', href: '#faq' },
     ];
 
     // Compute navigation hrefs dynamically to handle cross-page anchoring correctly
     const getHref = (id: string, href: string) => {
+        if (href.startsWith('/')) {
+            return href;
+        }
+
         // usePage().url gives us the current path consistently on both SSR and client
         const isHomePage = url === '/' || url === '';
-        
+
         if (isHomePage) {
             return href;
         }
@@ -103,7 +108,7 @@ export default function SiteHeader({
                     showHeader ? 'translate-y-0 shadow-sm' : '-translate-y-full'
                 }`}
             >
-                <nav className="container mx-auto flex items-center justify-between gap-4 px-6 py-4">
+                <nav className="container mx-auto flex items-center justify-between gap-2 px-4 py-3 md:gap-4 md:px-6 md:py-4">
                     <div className="flex items-center">
                         <Link href={home()} className="flex items-center gap-2">
                             <AppLogo />
@@ -114,9 +119,16 @@ export default function SiteHeader({
                         <div className="hidden md:block">
                             <ul className="flex gap-8 font-medium">
                                 {navLinks.map((link) => {
-                                    const isLinkActive = activeNav === link.id;
-                                    const isHomePage = url === '/' || url === '';
-                                    const isHomeActive = isHomePage && isLinkActive;
+                                    const isLinkActive =
+                                        activeNav === link.id ||
+                                        (link.id === 'learn' &&
+                                            url.startsWith('/learn'));
+                                    const isHomePage =
+                                        url === '/' || url === '';
+                                    const isHomeActive =
+                                        (link.id === 'learn' &&
+                                            url.startsWith('/learn')) ||
+                                        (isHomePage && isLinkActive);
 
                                     return (
                                         <li key={link.id}>
@@ -203,9 +215,15 @@ export default function SiteHeader({
                                 <ul className="flex flex-col gap-4 text-base font-semibold">
                                     {navLinks.map((link) => {
                                         const isLinkActive =
-                                            activeNav === link.id;
-                                        const isHomePage = url === '/' || url === '';
-                                        const isHomeActive = isHomePage && isLinkActive;
+                                            activeNav === link.id ||
+                                            (link.id === 'learn' &&
+                                                url.startsWith('/learn'));
+                                        const isHomePage =
+                                            url === '/' || url === '';
+                                        const isHomeActive =
+                                            (link.id === 'learn' &&
+                                                url.startsWith('/learn')) ||
+                                            (isHomePage && isLinkActive);
 
                                         return (
                                             <li key={link.id}>

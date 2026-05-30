@@ -3638,247 +3638,254 @@ export default function ExamIndex({
                         {/* 2. Main Question + Side Navigation Split */}
                         <div className="flex flex-1 gap-6 overflow-hidden">
                             {/* Left Question Body Column */}
-                            <div className="flex flex-1 flex-col rounded-xl border border-border bg-card shadow-xs overflow-hidden">
+                            <div className="flex flex-1 flex-col overflow-hidden rounded-xl border border-border bg-card shadow-xs">
                                 <div className="flex-1 overflow-y-auto p-6 pr-5">
-                                {currentQuestion ? (
-                                    <>
-                                        <div className="mb-5 flex items-center justify-between border-b border-border pb-4">
-                                            <span className="text-xs font-bold tracking-wider text-muted-foreground uppercase">
-                                                Question {currentIdx + 1} of{' '}
-                                                {activeQuestions.length}
-                                            </span>
-                                            <button
-                                                onClick={() => {
-                                                    setFlagged((prev) => ({
-                                                        ...prev,
-                                                        [currentIdx]:
-                                                            !prev[currentIdx],
-                                                    }));
-                                                }}
-                                                className={`flex cursor-pointer items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-bold transition ${
-                                                    flagged[currentIdx]
-                                                        ? 'border-rose-200 bg-rose-50 text-rose-600 dark:border-rose-900/40 dark:bg-rose-950/20 dark:text-rose-400'
-                                                        : 'border-border text-muted-foreground hover:bg-muted'
-                                                }`}
-                                            >
-                                                <Flag
-                                                    className={`size-3.5 ${flagged[currentIdx] ? 'fill-current' : ''}`}
-                                                />
-                                                {flagged[currentIdx]
-                                                    ? 'Flagged for Review'
-                                                    : 'Flag for Review'}
-                                            </button>
-                                        </div>
-
-                                        <div className="flex-1">
-                                            <div className="flex flex-wrap items-center gap-2">
-                                                <span className="rounded-md bg-blue-50/50 px-2 py-0.5 text-[9px] font-extrabold text-blue-600 dark:bg-blue-950/20 dark:text-blue-400">
-                                                    {currentQuestion.category}
+                                    {currentQuestion ? (
+                                        <>
+                                            <div className="mb-5 flex items-center justify-between border-b border-border pb-4">
+                                                <span className="text-xs font-bold tracking-wider text-muted-foreground uppercase">
+                                                    Question {currentIdx + 1} of{' '}
+                                                    {activeQuestions.length}
                                                 </span>
-                                                <span className="rounded-md bg-muted px-2 py-0.5 text-[9px] font-extrabold text-muted-foreground">
-                                                    {currentQuestion.subcategory ||
-                                                        'General Concepts'}
-                                                </span>
+                                                <button
+                                                    onClick={() => {
+                                                        setFlagged((prev) => ({
+                                                            ...prev,
+                                                            [currentIdx]:
+                                                                !prev[
+                                                                    currentIdx
+                                                                ],
+                                                        }));
+                                                    }}
+                                                    className={`flex cursor-pointer items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-bold transition ${
+                                                        flagged[currentIdx]
+                                                            ? 'border-rose-200 bg-rose-50 text-rose-600 dark:border-rose-900/40 dark:bg-rose-950/20 dark:text-rose-400'
+                                                            : 'border-border text-muted-foreground hover:bg-muted'
+                                                    }`}
+                                                >
+                                                    <Flag
+                                                        className={`size-3.5 ${flagged[currentIdx] ? 'fill-current' : ''}`}
+                                                    />
+                                                    {flagged[currentIdx]
+                                                        ? 'Flagged for Review'
+                                                        : 'Flag for Review'}
+                                                </button>
                                             </div>
 
-                                            <div className="mt-4">
-                                                {renderFormattedText(
-                                                    currentQuestion.stem,
-                                                    true,
-                                                )}
-                                            </div>
-
-                                            {/* Options */}
-                                            <div className="mt-8 grid grid-cols-1 gap-3 md:grid-cols-2">
-                                                {currentQuestion.options.map(
-                                                    (opt, idx) => {
-                                                        const letter =
-                                                            String.fromCharCode(
-                                                                65 + idx,
-                                                            );
-                                                        const isChosen =
-                                                            chosenOption ===
-                                                            idx;
-                                                        const isCorrectOption =
-                                                            idx ===
-                                                            currentQuestion.correct_option;
-                                                        const isDemographic =
-                                                            currentQuestion.isDemographic ||
-                                                            currentQuestion.category ===
-                                                                'Demographic Profile';
-
-                                                        let optionStyle =
-                                                            'border-border bg-background hover:bg-muted text-foreground';
-                                                        let badgeStyle =
-                                                            'bg-muted text-muted-foreground';
-
-                                                        if (isDemographic) {
-                                                            if (isChosen) {
-                                                                optionStyle =
-                                                                    'bg-blue-50/70 border-blue-200 text-blue-950 font-bold dark:bg-blue-950/20 dark:border-blue-900 dark:text-blue-300';
-                                                                badgeStyle =
-                                                                    'bg-blue-600 text-white';
-                                                            }
-                                                        } else if (
-                                                            isCorrectOption
-                                                        ) {
-                                                            optionStyle =
-                                                                'bg-emerald-50/70 border-emerald-200 text-emerald-950 font-bold dark:bg-emerald-950/20 dark:border-emerald-900 dark:text-emerald-300';
-                                                            badgeStyle =
-                                                                'bg-emerald-600 text-white';
-                                                        } else if (isChosen) {
-                                                            optionStyle =
-                                                                'bg-rose-50/70 border-rose-250 text-rose-950 font-bold dark:bg-rose-950/20 dark:border-rose-900 dark:text-rose-300';
-                                                            badgeStyle =
-                                                                'bg-rose-600 text-white';
-                                                        } else {
-                                                            optionStyle =
-                                                                'border-border bg-background hover:bg-muted text-foreground/60 opacity-60';
-                                                            badgeStyle =
-                                                                'bg-muted text-muted-foreground/60';
+                                            <div className="flex-1">
+                                                <div className="flex flex-wrap items-center gap-2">
+                                                    <span className="rounded-md bg-blue-50/50 px-2 py-0.5 text-[9px] font-extrabold text-blue-600 dark:bg-blue-950/20 dark:text-blue-400">
+                                                        {
+                                                            currentQuestion.category
                                                         }
+                                                    </span>
+                                                    <span className="rounded-md bg-muted px-2 py-0.5 text-[9px] font-extrabold text-muted-foreground">
+                                                        {currentQuestion.subcategory ||
+                                                            'General Concepts'}
+                                                    </span>
+                                                </div>
 
-                                                        return (
-                                                            <div
-                                                                key={idx}
-                                                                className="relative flex items-center"
-                                                            >
+                                                <div className="mt-4">
+                                                    {renderFormattedText(
+                                                        currentQuestion.stem,
+                                                        true,
+                                                    )}
+                                                </div>
+
+                                                {/* Options */}
+                                                <div className="mt-8 grid grid-cols-1 gap-3 md:grid-cols-2">
+                                                    {currentQuestion.options.map(
+                                                        (opt, idx) => {
+                                                            const letter =
+                                                                String.fromCharCode(
+                                                                    65 + idx,
+                                                                );
+                                                            const isChosen =
+                                                                chosenOption ===
+                                                                idx;
+                                                            const isCorrectOption =
+                                                                idx ===
+                                                                currentQuestion.correct_option;
+                                                            const isDemographic =
+                                                                currentQuestion.isDemographic ||
+                                                                currentQuestion.category ===
+                                                                    'Demographic Profile';
+
+                                                            let optionStyle =
+                                                                'border-border bg-background hover:bg-muted text-foreground';
+                                                            let badgeStyle =
+                                                                'bg-muted text-muted-foreground';
+
+                                                            if (isDemographic) {
+                                                                if (isChosen) {
+                                                                    optionStyle =
+                                                                        'bg-blue-50/70 border-blue-200 text-blue-950 font-bold dark:bg-blue-950/20 dark:border-blue-900 dark:text-blue-300';
+                                                                    badgeStyle =
+                                                                        'bg-blue-600 text-white';
+                                                                }
+                                                            } else if (
+                                                                isCorrectOption
+                                                            ) {
+                                                                optionStyle =
+                                                                    'bg-emerald-50/70 border-emerald-200 text-emerald-950 font-bold dark:bg-emerald-950/20 dark:border-emerald-900 dark:text-emerald-300';
+                                                                badgeStyle =
+                                                                    'bg-emerald-600 text-white';
+                                                            } else if (
+                                                                isChosen
+                                                            ) {
+                                                                optionStyle =
+                                                                    'bg-rose-50/70 border-rose-250 text-rose-950 font-bold dark:bg-rose-950/20 dark:border-rose-900 dark:text-rose-300';
+                                                                badgeStyle =
+                                                                    'bg-rose-600 text-white';
+                                                            } else {
+                                                                optionStyle =
+                                                                    'border-border bg-background hover:bg-muted text-foreground/60 opacity-60';
+                                                                badgeStyle =
+                                                                    'bg-muted text-muted-foreground/60';
+                                                            }
+
+                                                            return (
                                                                 <div
-                                                                    className={`flex w-full items-center justify-between rounded-xl border px-4 py-3 text-left transition ${optionStyle}`}
+                                                                    key={idx}
+                                                                    className="relative flex items-center"
                                                                 >
-                                                                    <div className="flex items-center gap-2.5">
-                                                                        <span
-                                                                            className={`inline-flex size-6 shrink-0 items-center justify-center rounded-lg text-xs font-bold ${badgeStyle}`}
-                                                                        >
-                                                                            {
-                                                                                letter
-                                                                            }
-                                                                        </span>
-                                                                        <span className="text-sm leading-tight">
-                                                                            {
-                                                                                opt
-                                                                            }
-                                                                        </span>
+                                                                    <div
+                                                                        className={`flex w-full items-center justify-between rounded-xl border px-4 py-3 text-left transition ${optionStyle}`}
+                                                                    >
+                                                                        <div className="flex items-center gap-2.5">
+                                                                            <span
+                                                                                className={`inline-flex size-6 shrink-0 items-center justify-center rounded-lg text-xs font-bold ${badgeStyle}`}
+                                                                            >
+                                                                                {
+                                                                                    letter
+                                                                                }
+                                                                            </span>
+                                                                            <span className="text-sm leading-tight">
+                                                                                {
+                                                                                    opt
+                                                                                }
+                                                                            </span>
+                                                                        </div>
+                                                                        {!isDemographic &&
+                                                                            isCorrectOption && (
+                                                                                <CheckCircle2 className="dark:text-emerald-450 size-4 shrink-0 text-emerald-600" />
+                                                                            )}
+                                                                        {!isDemographic &&
+                                                                            isChosen &&
+                                                                            !isCorrectOption && (
+                                                                                <X className="text-rose-650 dark:text-rose-450 size-4 shrink-0" />
+                                                                            )}
                                                                     </div>
-                                                                    {!isDemographic &&
-                                                                        isCorrectOption && (
-                                                                            <CheckCircle2 className="dark:text-emerald-450 size-4 shrink-0 text-emerald-600" />
-                                                                        )}
-                                                                    {!isDemographic &&
-                                                                        isChosen &&
-                                                                        !isCorrectOption && (
-                                                                            <X className="text-rose-650 dark:text-rose-450 size-4 shrink-0" />
-                                                                        )}
                                                                 </div>
-                                                            </div>
+                                                            );
+                                                        },
+                                                    )}
+                                                </div>
+
+                                                {(() => {
+                                                    const propositions =
+                                                        extractPropositions(
+                                                            currentQuestion.stem,
                                                         );
-                                                    },
-                                                )}
+                                                    const letterMap: Record<
+                                                        string,
+                                                        string
+                                                    > = {};
+
+                                                    propositions.forEach(
+                                                        (prop, idx) => {
+                                                            const newLetter =
+                                                                String.fromCharCode(
+                                                                    65 + idx,
+                                                                );
+                                                            letterMap[
+                                                                prop.letter
+                                                            ] = newLetter;
+                                                        },
+                                                    );
+
+                                                    return (
+                                                        <>
+                                                            {currentQuestion.explanation && (
+                                                                <div className="mt-6 rounded-xl border border-border bg-muted/60 p-4.5 text-xs leading-relaxed text-muted-foreground">
+                                                                    <span className="mb-2 block font-bold text-foreground">
+                                                                        Explanation
+                                                                        &amp;
+                                                                        Rationale:
+                                                                    </span>
+
+                                                                    {propositions.length >
+                                                                        0 && (
+                                                                        <div className="shadow-3xs mb-4 rounded-xl border border-border bg-background p-3">
+                                                                            <span className="mb-2 block font-heading text-[10px] font-black tracking-wider text-muted-foreground uppercase">
+                                                                                Proposition
+                                                                                Key:
+                                                                            </span>
+                                                                            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                                                                                {propositions.map(
+                                                                                    (
+                                                                                        prop,
+                                                                                        idx,
+                                                                                    ) => {
+                                                                                        const newLetter =
+                                                                                            String.fromCharCode(
+                                                                                                65 +
+                                                                                                    idx,
+                                                                                            );
+
+                                                                                        return (
+                                                                                            <div
+                                                                                                key={
+                                                                                                    idx
+                                                                                                }
+                                                                                                className="flex items-center gap-2 text-xs"
+                                                                                            >
+                                                                                                <span className="inline-flex size-5 items-center justify-center rounded border border-blue-100/60 bg-blue-50 font-mono text-[10px] font-black text-blue-700 dark:border-blue-900/40 dark:bg-blue-950/40 dark:text-blue-400">
+                                                                                                    {
+                                                                                                        newLetter
+                                                                                                    }
+                                                                                                </span>
+                                                                                                <span className="font-medium text-foreground">
+                                                                                                    {
+                                                                                                        prop.phrase
+                                                                                                    }
+                                                                                                </span>
+                                                                                            </div>
+                                                                                        );
+                                                                                    },
+                                                                                )}
+                                                                            </div>
+                                                                        </div>
+                                                                    )}
+
+                                                                    {renderFormattedText(
+                                                                        currentQuestion.explanation,
+                                                                        false,
+                                                                        letterMap,
+                                                                    )}
+                                                                </div>
+                                                            )}
+                                                        </>
+                                                    );
+                                                })()}
                                             </div>
 
-                                            {(() => {
-                                                const propositions =
-                                                    extractPropositions(
-                                                        currentQuestion.stem,
-                                                    );
-                                                const letterMap: Record<
-                                                    string,
-                                                    string
-                                                > = {};
-
-                                                propositions.forEach(
-                                                    (prop, idx) => {
-                                                        const newLetter =
-                                                            String.fromCharCode(
-                                                                65 + idx,
-                                                            );
-                                                        letterMap[prop.letter] =
-                                                            newLetter;
-                                                    },
-                                                );
-
-                                                return (
-                                                    <>
-                                                        {currentQuestion.explanation && (
-                                                            <div className="mt-6 rounded-xl border border-border bg-muted/60 p-4.5 text-xs leading-relaxed text-muted-foreground">
-                                                                <span className="mb-2 block font-bold text-foreground">
-                                                                    Explanation
-                                                                    &amp;
-                                                                    Rationale:
-                                                                </span>
-
-                                                                {propositions.length >
-                                                                    0 && (
-                                                                    <div className="shadow-3xs mb-4 rounded-xl border border-border bg-background p-3">
-                                                                        <span className="mb-2 block font-heading text-[10px] font-black tracking-wider text-muted-foreground uppercase">
-                                                                            Proposition
-                                                                            Key:
-                                                                        </span>
-                                                                        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-                                                                            {propositions.map(
-                                                                                (
-                                                                                    prop,
-                                                                                    idx,
-                                                                                ) => {
-                                                                                    const newLetter =
-                                                                                        String.fromCharCode(
-                                                                                            65 +
-                                                                                                idx,
-                                                                                        );
-
-                                                                                    return (
-                                                                                        <div
-                                                                                            key={
-                                                                                                idx
-                                                                                            }
-                                                                                            className="flex items-center gap-2 text-xs"
-                                                                                        >
-                                                                                            <span className="inline-flex size-5 items-center justify-center rounded border border-blue-100/60 bg-blue-50 font-mono text-[10px] font-black text-blue-700 dark:border-blue-900/40 dark:bg-blue-950/40 dark:text-blue-400">
-                                                                                                {
-                                                                                                    newLetter
-                                                                                                }
-                                                                                            </span>
-                                                                                            <span className="font-medium text-foreground">
-                                                                                                {
-                                                                                                    prop.phrase
-                                                                                                }
-                                                                                            </span>
-                                                                                        </div>
-                                                                                    );
-                                                                                },
-                                                                            )}
-                                                                        </div>
-                                                                    </div>
-                                                                )}
-
-                                                                {renderFormattedText(
-                                                                    currentQuestion.explanation,
-                                                                    false,
-                                                                    letterMap,
-                                                                )}
-                                                            </div>
-                                                        )}
-                                                    </>
-                                                );
-                                            })()}
+                                            <div className="mt-8 flex items-center justify-between border-t border-border pt-5">
+                                                {/* existing prev/back/next buttons */}
+                                            </div>
+                                        </>
+                                    ) : (
+                                        <div className="flex flex-col items-center justify-center py-20 text-center">
+                                            <HelpCircle className="mb-3 size-12 text-muted-foreground" />
+                                            <h3 className="text-base font-bold text-foreground">
+                                                No questions match filters
+                                            </h3>
+                                            <p className="mt-1 text-xs text-muted-foreground">
+                                                Try switching to a different
+                                                category or status pill.
+                                            </p>
                                         </div>
-
-                                        <div className="mt-8 flex items-center justify-between border-t border-border pt-5">
-                                            {/* existing prev/back/next buttons */}
-                                        </div>
-                                    </>
-                                ) : (
-                                    <div className="flex flex-col items-center justify-center py-20 text-center">
-                                        <HelpCircle className="mb-3 size-12 text-muted-foreground" />
-                                        <h3 className="text-base font-bold text-foreground">
-                                            No questions match filters
-                                        </h3>
-                                        <p className="mt-1 text-xs text-muted-foreground">
-                                            Try switching to a different
-                                            category or status pill.
-                                        </p>
-                                    </div>
-                                )}
+                                    )}
                                 </div>
                             </div>
 

@@ -1,4 +1,4 @@
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import {
     BookMarked,
     Calendar,
@@ -10,6 +10,7 @@ import { useEffect, useRef } from 'react';
 import { getCategoryStyles } from '@/components/curation-index-shell';
 import { LessonMarkdown } from '@/components/lesson-markdown';
 import { PageContainer } from '@/components/page-container';
+import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 
 interface LearnShowProps {
@@ -36,6 +37,8 @@ interface LearnShowProps {
 
 export default function LearnShow({ module, recommended }: LearnShowProps) {
     const progressRef = useRef<HTMLDivElement | null>(null);
+    const { auth } = usePage<{ auth: { user: any } }>().props;
+    const isLoggedIn = !!auth.user;
 
     useEffect(() => {
         let frameId = 0;
@@ -76,7 +79,16 @@ export default function LearnShow({ module, recommended }: LearnShowProps) {
 
     return (
         <>
-            <Head title={module.title} />
+            <Head>
+                <title>{`${module.title} | Hiraya Review`}</title>
+                <meta name="description" content={module.summary} />
+                <meta
+                    property="og:title"
+                    content={`${module.title} | Hiraya Review`}
+                />
+                <meta property="og:description" content={module.summary} />
+                <meta property="og:type" content="article" />
+            </Head>
 
             <div
                 ref={progressRef}
@@ -125,8 +137,52 @@ export default function LearnShow({ module, recommended }: LearnShowProps) {
                                 </div>
                             </div>
 
-                            <div className="mt-8 border-t border-border pt-7 text-foreground">
-                                <LessonMarkdown content={module.content} />
+                            <div className="relative mt-8 border-t border-border pt-7 text-foreground">
+                                {isLoggedIn ? (
+                                    <LessonMarkdown content={module.content} />
+                                ) : (
+                                    <div className="pointer-events-none relative max-h-[320px] overflow-hidden select-none">
+                                        <LessonMarkdown
+                                            content={module.content}
+                                        />
+                                        <div className="absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-white via-white/80 to-transparent dark:from-slate-900 dark:via-slate-900/80" />
+                                    </div>
+                                )}
+
+                                {!isLoggedIn && (
+                                    <div className="absolute inset-x-0 bottom-0 z-10 flex flex-col items-center justify-center bg-gradient-to-t from-white/95 via-white/90 to-transparent p-6 pt-32 text-center dark:from-slate-950/95 dark:via-slate-950/90">
+                                        <div className="max-w-2xl rounded-2xl border border-primary/20 bg-background/80 p-8 shadow-xl backdrop-blur-md">
+                                            <h3 className="font-heading text-xl font-black text-foreground">
+                                                Unlock Full Lesson for Free
+                                            </h3>
+                                            <p className="mt-3 text-sm leading-relaxed font-semibold text-muted-foreground">
+                                                Create a free account to read
+                                                this full lesson, unlock
+                                                realistic mock exams, and build
+                                                your smart study schedule.
+                                            </p>
+                                            <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
+                                                <Button
+                                                    asChild
+                                                    className="font-bold"
+                                                >
+                                                    <Link href="/register">
+                                                        Create Free Account
+                                                    </Link>
+                                                </Button>
+                                                <Button
+                                                    variant="outline"
+                                                    asChild
+                                                    className="font-bold"
+                                                >
+                                                    <Link href="/login">
+                                                        Log In
+                                                    </Link>
+                                                </Button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         </article>
                     </div>

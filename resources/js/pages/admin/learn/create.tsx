@@ -244,7 +244,8 @@ export default function AdminLearnCreate({
 
             if (genData.success) {
                 setSuccessMsg(
-                    genData.message || `Learning module generated successfully for "${targetTopic}"! It has been committed to database as a Draft.`,
+                    genData.message ||
+                        `Learning module generated successfully for "${targetTopic}"! It has been committed to database as a Draft.`,
                 );
             }
         } catch (err: any) {

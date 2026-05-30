@@ -35,6 +35,26 @@
 
     <link rel="icon" href="{{ asset('images/hiraya_logo_cropped.png') }}" type="image/png">
 
+    <!-- Global SEO & Social Sharing Fallbacks -->
+    <meta name="description" content="Ace the Philippine Civil Service Exam with confidence. Hiraya Review offers realistic Professional & Subprofessional mock exams, smart study plans, high-yield learning modules, and targeted drills. Free forever base access!">
+    <meta name="keywords" content="civil service exam reviewer, civil service exam reviewer {{ date('Y') }}, free civil service exam reviewer, cse reviewer professional, cse reviewer subprofessional, csc reviewer, civil service reviewer, hiraya review, hiraya cse reviewer, civil service mock exam">
+    <meta name="author" content="Hiraya Review">
+    <meta name="robots" content="index, follow">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://hirayareview.com">
+    <meta property="og:title" content="Hiraya Review - Civil Service Exam Reviewer">
+    <meta property="og:description" content="Ace the Philippine Civil Service Exam with confidence. Real mock tests, custom study plans, high-yield lessons, and targeted drills. Pass the CSE on your first attempt!">
+    <meta property="og:image" content="{{ asset('images/hero_image.png') }}">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://hirayareview.com">
+    <meta property="twitter:title" content="Hiraya Review - Civil Service Exam Reviewer">
+    <meta property="twitter:description" content="Ace the Philippine Civil Service Exam with confidence. Real mock tests, custom study plans, high-yield lessons, and targeted drills. Pass the CSE on your first attempt!">
+    <meta property="twitter:image" content="{{ asset('images/hero_image.png') }}">
+
     @fonts
 
     @viteReactRefresh
