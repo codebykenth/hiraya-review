@@ -218,7 +218,7 @@ export default function CreateQuestion({
             }
 
             setSuccessMsg(
-                'Questions generated successfully! They are saved as drafts and ready for review.',
+                resData.message || 'Questions generated successfully! They are saved as drafts and ready for review.',
             );
         } catch (err: any) {
             if (err?.name === 'AbortError') {
