@@ -16,7 +16,7 @@ export default function AppSidebarLayout({
     children,
     breadcrumbs = [],
 }: AppLayoutProps) {
-    const { auth } = usePage().props;
+    const { auth, pusher } = usePage().props as any;
     const { url } = usePage();
     const [isWaitingForAi, setIsWaitingForAi] = useState(() => {
         if (typeof window !== 'undefined') {
@@ -36,7 +36,7 @@ export default function AppSidebarLayout({
     }, []);
 
     useEffect(() => {
-        if (!auth.user || !isWaitingForAi) {
+        if (!auth.user || !isWaitingForAi || !pusher?.key) {
             return;
         }
 
@@ -44,15 +44,12 @@ export default function AppSidebarLayout({
         (window as any).Pusher = Pusher;
         const echo = new Echo({
             broadcaster: 'pusher',
-            key: import.meta.env.VITE_PUSHER_APP_KEY,
-            cluster: import.meta.env.VITE_PUSHER_APP_CLUSTER ?? 'ap1',
-            wsHost: import.meta.env.VITE_PUSHER_HOST
-                ? import.meta.env.VITE_PUSHER_HOST
-                : `ws-${import.meta.env.VITE_PUSHER_APP_CLUSTER}.pusher.com`,
-            wsPort: import.meta.env.VITE_PUSHER_PORT ?? 80,
-            wssPort: import.meta.env.VITE_PUSHER_PORT ?? 443,
-            forceTLS:
-                (import.meta.env.VITE_PUSHER_SCHEME ?? 'https') === 'https',
+            key: pusher.key,
+            cluster: pusher.cluster ?? 'ap1',
+            wsHost: pusher.host ? pusher.host : `ws-${pusher.cluster}.pusher.com`,
+            wsPort: pusher.port ?? 80,
+            wssPort: pusher.port ?? 443,
+            forceTLS: (pusher.scheme ?? 'https') === 'https',
             enabledTransports: ['ws', 'wss'],
         });
 
