@@ -221,11 +221,10 @@ export default function CreateQuestion({
             localStorage.setItem('waiting_for_ai', 'true');
             window.dispatchEvent(new Event('ai_generation_started'));
 
-            setSuccessMsg(
-                resData.message ||
-                    'Questions generated successfully! They are saved as drafts and ready for review.',
-            );
+            // Keep `isGenerating` true. The Pusher event will reset it.
         } catch (err: any) {
+            setIsGenerating(false);
+
             if (err?.name === 'AbortError') {
                 setErrorMsg('Generation canceled.');
             } else {
@@ -234,9 +233,6 @@ export default function CreateQuestion({
                         'An error occurred while generating questions.',
                 );
             }
-        } finally {
-            setIsGenerating(false);
-            generateAbortRef.current = null;
         }
     };
 
@@ -248,8 +244,21 @@ export default function CreateQuestion({
     };
 
     useEffect(() => {
+        const handleAiComplete = () => {
+            setIsGenerating(false);
+            setSuccessMsg(
+                'Questions generated successfully! They are saved as drafts and ready for review.',
+            );
+        };
+
+        window.addEventListener('ai_generation_completed', handleAiComplete);
+
         return () => {
             generateAbortRef.current?.abort();
+            window.removeEventListener(
+                'ai_generation_completed',
+                handleAiComplete,
+            );
         };
     }, []);
 

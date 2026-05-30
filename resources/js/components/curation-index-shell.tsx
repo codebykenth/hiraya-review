@@ -1,18 +1,10 @@
-import { Link, router } from '@inertiajs/react';
-import {
-    Search,
-    Sparkles,
-    FileText,
-    Database,
-    PenLine,
-    ChevronDown,
-} from 'lucide-react';
+import { Link } from '@inertiajs/react';
+import { Search, Sparkles, FileText, PenLine, ChevronDown } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
 import type { TableColumn } from '@/components/admin-table';
 import { AdminTable } from '@/components/admin-table';
 import { ConfirmModal } from '@/components/confirm-modal';
 import { PageContainer } from '@/components/page-container';
-import { ScopeSettingsModal } from '@/components/scope-settings-modal';
 import type { CategoryItem } from './drafts-review-shell';
 import { Button } from './ui/button';
 
@@ -145,14 +137,6 @@ export function CurationIndexShell<T>({
     const [currentPage, setCurrentPage] = useState(1);
     const pageSize = 10;
 
-    // Dynamic Syllabus Scope modal state variables
-    const [isScopeModalOpen, setIsScopeModalOpen] = useState(false);
-    const [newCategoryName, setNewCategoryName] = useState('');
-    const [selectedScopeCategory, setSelectedScopeCategory] = useState<
-        number | null
-    >(categories && categories.length > 0 ? categories[0].id : null);
-    const [newSubcategoryName, setNewSubcategoryName] = useState('');
-
     // Custom confirm modal state
     const [confirmModal, setConfirmModal] = useState<{
         isOpen: boolean;
@@ -169,89 +153,6 @@ export function CurationIndexShell<T>({
         variant: 'success',
         onConfirm: () => {},
     });
-
-    const handleAddCategory = (e: React.FormEvent) => {
-        e.preventDefault();
-
-        if (!newCategoryName.trim()) {
-            return;
-        }
-
-        router.post(
-            '/questions/categories',
-            {
-                name: newCategoryName,
-            },
-            {
-                preserveScroll: true,
-                onSuccess: () => {
-                    setNewCategoryName('');
-                },
-            },
-        );
-    };
-
-    const handleDeleteCategory = (catId: number) => {
-        setConfirmModal({
-            isOpen: true,
-            title: 'Delete Category?',
-            message:
-                'Are you sure you want to delete this category? This action cannot be undone and will permanently delete all of its mapped subcategories!',
-            confirmLabel: 'Delete Category',
-            variant: 'danger',
-            onConfirm: () => {
-                router.delete(`/questions/categories/${catId}`, {
-                    preserveScroll: true,
-                    onSuccess: () => {
-                        if (selectedScopeCategory === catId) {
-                            setSelectedScopeCategory(
-                                categories.find((c) => c.id !== catId)?.id ||
-                                    null,
-                            );
-                        }
-                    },
-                });
-            },
-        });
-    };
-
-    const handleAddSubcategory = (e: React.FormEvent) => {
-        e.preventDefault();
-
-        if (!selectedScopeCategory || !newSubcategoryName.trim()) {
-            return;
-        }
-
-        router.post(
-            '/questions/subcategories',
-            {
-                category_id: selectedScopeCategory,
-                name: newSubcategoryName,
-            },
-            {
-                preserveScroll: true,
-                onSuccess: () => {
-                    setNewSubcategoryName('');
-                },
-            },
-        );
-    };
-
-    const handleDeleteSubcategory = (subId: number) => {
-        setConfirmModal({
-            isOpen: true,
-            title: 'Delete Subcategory?',
-            message:
-                'Are you sure you want to delete this subcategory? This action cannot be undone.',
-            confirmLabel: 'Delete Subcategory',
-            variant: 'danger',
-            onConfirm: () => {
-                router.delete(`/questions/subcategories/${subId}`, {
-                    preserveScroll: true,
-                });
-            },
-        });
-    };
 
     const [itemToDelete, setItemToDelete] = useState<T | null>(null);
 
@@ -291,7 +192,7 @@ export function CurationIndexShell<T>({
     return (
         <PageContainer>
             {/* 1. CREATION ACTIONS CARDS */}
-            <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
                 {/* AI Generator Card */}
                 <div className="relative flex overflow-hidden rounded-2xl border border-border bg-card p-6 shadow-xs transition hover:shadow-md">
                     <div className="pointer-events-none absolute right-0 bottom-0 opacity-10">
@@ -352,49 +253,6 @@ export function CurationIndexShell<T>({
                                     New Entry
                                 </Button>
                             </Link>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Syllabus Scope Card */}
-                <div className="relative flex overflow-hidden rounded-2xl border border-border bg-card p-6 shadow-xs transition hover:shadow-md">
-                    <div className="pointer-events-none absolute right-0 bottom-0 opacity-10">
-                        <Database className="size-32 text-blue-300 dark:text-blue-900" />
-                    </div>
-                    <div className="z-10 flex items-start gap-4">
-                        <div className="text-blue-650 flex size-14 shrink-0 items-center justify-center rounded-2xl bg-blue-50 dark:bg-blue-950/20 dark:text-blue-400">
-                            <Database className="size-7" />
-                        </div>
-                        <div className="flex flex-col gap-2">
-                            <h3 className="text-lg font-bold text-foreground">
-                                Syllabus Scope Settings
-                            </h3>
-                            <p className="text-sm leading-relaxed text-muted-foreground">
-                                Configure exam categories & subcategories
-                                dynamically to instantly update AI prompting and
-                                filtering schemas.
-                            </p>
-                            <div className="mt-2">
-                                <Button
-                                    type="button"
-                                    variant="default"
-                                    size="sm"
-                                    onClick={() => {
-                                        if (
-                                            categories &&
-                                            categories.length > 0
-                                        ) {
-                                            setSelectedScopeCategory(
-                                                categories[0].id,
-                                            );
-                                        }
-
-                                        setIsScopeModalOpen(true);
-                                    }}
-                                >
-                                    Manage Scope
-                                </Button>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -565,25 +423,6 @@ export function CurationIndexShell<T>({
                     onPageChange={setCurrentPage}
                 />
             </div>
-
-            {/* Scope settings modal managed entirely internally */}
-            <ScopeSettingsModal
-                isOpen={isScopeModalOpen}
-                onClose={() => setIsScopeModalOpen(false)}
-                categories={categories}
-                selectedScopeCategory={selectedScopeCategory}
-                setSelectedScopeCategory={setSelectedScopeCategory}
-                newCategoryName={newCategoryName}
-                setNewCategoryName={setNewCategoryName}
-                newSubcategoryName={newSubcategoryName}
-                setNewSubcategoryName={setNewSubcategoryName}
-                handleAddCategory={handleAddCategory}
-                handleDeleteCategory={handleDeleteCategory}
-                handleAddSubcategory={handleAddSubcategory}
-                handleDeleteSubcategory={handleDeleteSubcategory}
-            />
-
-            {/* Confirm modal for delete actions managed entirely internally */}
             <ConfirmModal
                 isOpen={!!itemToDelete}
                 title={itemToDelete ? getDeleteTitle(itemToDelete) : ''}

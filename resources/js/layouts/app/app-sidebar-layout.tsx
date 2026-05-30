@@ -46,7 +46,9 @@ export default function AppSidebarLayout({
             broadcaster: 'pusher',
             key: pusher.key,
             cluster: pusher.cluster ?? 'ap1',
-            wsHost: pusher.host ? pusher.host : `ws-${pusher.cluster}.pusher.com`,
+            wsHost: pusher.host
+                ? pusher.host
+                : `ws-${pusher.cluster}.pusher.com`,
             wsPort: pusher.port ?? 80,
             wssPort: pusher.port ?? 443,
             forceTLS: (pusher.scheme ?? 'https') === 'https',
@@ -73,13 +75,24 @@ export default function AppSidebarLayout({
                 localStorage.removeItem('waiting_for_ai');
                 setIsWaitingForAi(false);
                 echo.disconnect();
+
+                // Notify forms that AI is done so they can update their loading state
+                window.dispatchEvent(new Event('ai_generation_completed'));
             },
         );
 
         return () => {
             echo.disconnect();
         };
-    }, [auth.user, isWaitingForAi]);
+    }, [
+        auth.user,
+        isWaitingForAi,
+        pusher?.cluster,
+        pusher?.host,
+        pusher?.key,
+        pusher?.port,
+        pusher?.scheme,
+    ]);
 
     if (!auth.user) {
         const activeNav = url.startsWith('/learn')

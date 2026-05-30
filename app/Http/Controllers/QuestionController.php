@@ -412,6 +412,26 @@ class QuestionController extends Controller
     }
 
     /**
+     * Update a dynamic category.
+     */
+    public function updateCategory(Request $request, Category $category)
+    {
+        $this->checkAdminAccess();
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:255|unique:categories,name,' . $category->id,
+        ]);
+
+        $category->update([
+            'name' => $validated['name'],
+            'slug' => Str::slug($validated['name']),
+        ]);
+        $this->clearCache();
+
+        return redirect()->back()->with('success', "Category updated successfully!");
+    }
+
+    /**
      * Delete a dynamic category.
      */
     public function destroyCategory(Category $category)
@@ -448,6 +468,26 @@ class QuestionController extends Controller
         $this->clearCache();
 
         return redirect()->back()->with('success', "Subcategory '{$subcategory->name}' has been added successfully!");
+    }
+
+    /**
+     * Update a dynamic subcategory.
+     */
+    public function updateSubcategory(Request $request, Subcategory $subcategory)
+    {
+        $this->checkAdminAccess();
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+        ]);
+
+        $subcategory->update([
+            'name' => $validated['name'],
+            'slug' => Str::slug($validated['name']),
+        ]);
+        $this->clearCache();
+
+        return redirect()->back()->with('success', "Subcategory updated successfully!");
     }
 
     /**

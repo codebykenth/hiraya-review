@@ -76,6 +76,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('history', [ExamController::class, 'history'])->name('history.index');
         Route::get('questions/drafts', [QuestionController::class, 'drafts'])->name('questions.drafts');
 
+        // Admin Syllabus Management
+        Route::get('admin/syllabus', [\App\Http\Controllers\AdminSyllabusController::class, 'index'])->name('admin.syllabus.index');
 
         // Admin Learn Module Views
         Route::get('admin/learn', [AdminLearnController::class, 'index'])->name('admin.learn.index');
@@ -119,8 +121,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         // Dynamic Scope Management Routes
         Route::post('questions/categories', [QuestionController::class, 'storeCategory'])->name('questions.categories.store');
+        Route::put('questions/categories/{category}', [QuestionController::class, 'updateCategory'])->name('questions.categories.update');
         Route::delete('questions/categories/{category}', [QuestionController::class, 'destroyCategory'])->name('questions.categories.destroy');
         Route::post('questions/subcategories', [QuestionController::class, 'storeSubcategory'])->name('questions.subcategories.store');
+        Route::put('questions/subcategories/{subcategory}', [QuestionController::class, 'updateSubcategory'])->name('questions.subcategories.update');
         Route::delete('questions/subcategories/{subcategory}', [QuestionController::class, 'destroySubcategory'])->name('questions.subcategories.destroy');
 
         // Question Resource Mutations

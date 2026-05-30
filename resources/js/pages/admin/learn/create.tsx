@@ -247,12 +247,11 @@ export default function AdminLearnCreate({
                 localStorage.setItem('waiting_for_ai', 'true');
                 window.dispatchEvent(new Event('ai_generation_started'));
 
-                setSuccessMsg(
-                    genData.message ||
-                        `Learning module generated successfully for "${targetTopic}"! It has been committed to database as a Draft.`,
-                );
+                // Keep `isGenerating` true. The Pusher event will reset it.
             }
         } catch (err: any) {
+            setIsGenerating(false);
+
             if (err?.name === 'AbortError') {
                 setGenerationError('Generation canceled.');
             } else {
@@ -261,9 +260,6 @@ export default function AdminLearnCreate({
                     'A network error occurred during generation. Please verify your internet connection and try again.';
                 setGenerationError(errMsg);
             }
-        } finally {
-            setIsGenerating(false);
-            generateAbortRef.current = null;
         }
     };
 
@@ -275,8 +271,21 @@ export default function AdminLearnCreate({
     };
 
     useEffect(() => {
+        const handleAiComplete = () => {
+            setIsGenerating(false);
+            setSuccessMsg(
+                `Learning module generated successfully! It has been committed to database as a Draft.`,
+            );
+        };
+
+        window.addEventListener('ai_generation_completed', handleAiComplete);
+
         return () => {
             generateAbortRef.current?.abort();
+            window.removeEventListener(
+                'ai_generation_completed',
+                handleAiComplete,
+            );
         };
     }, []);
 

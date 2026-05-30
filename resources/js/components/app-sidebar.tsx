@@ -5,13 +5,16 @@ import {
     FileQuestion,
     FileText,
     History,
-    LayoutGrid,
-    Shield,
+    LayoutDashboard,
+    Gauge,
     Sparkles,
     Target,
     ListChecks,
     Users,
+    UserCog,
+    Settings,
     Compass,
+    Database,
     Calendar as CalendarIcon,
 } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
@@ -50,7 +53,7 @@ const generalNavItems: NavItem[] = [
     {
         title: 'Dashboard',
         href: dashboard(),
-        icon: LayoutGrid,
+        icon: LayoutDashboard,
     },
     {
         title: 'Learn',
@@ -88,7 +91,7 @@ const adminNavItems: NavItem[] = [
     {
         title: 'Dashboard',
         href: adminDashboard(),
-        icon: Shield,
+        icon: Gauge,
     },
     {
         title: 'Questions',
@@ -129,14 +132,19 @@ const adminNavItems: NavItem[] = [
             {
                 title: 'User Management',
                 href: adminUsersIndex(),
-                icon: ListChecks,
+                icon: UserCog,
             },
         ],
     },
     {
         title: 'Settings',
-        icon: ListChecks,
+        icon: Settings,
         items: [
+            {
+                title: 'Syllabus Scope',
+                href: '/admin/syllabus',
+                icon: Database,
+            },
             {
                 title: 'Exam Dates',
                 href: '/admin/exam-dates',
