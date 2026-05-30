@@ -1,7 +1,13 @@
 import { BookOpen, CheckCircle2, HelpCircle, Lightbulb } from 'lucide-react';
 import React, { useCallback, useMemo, useState } from 'react';
 
-function RevealableAnswer({ answerContent, explanationContent }: { answerContent: React.ReactNode, explanationContent: React.ReactNode }) {
+function RevealableAnswer({
+    answerContent,
+    explanationContent,
+}: {
+    answerContent: React.ReactNode;
+    explanationContent: React.ReactNode;
+}) {
     const [isRevealed, setIsRevealed] = useState(false);
 
     if (!isRevealed) {
@@ -19,15 +25,13 @@ function RevealableAnswer({ answerContent, explanationContent }: { answerContent
     }
 
     return (
-        <div className="mt-3 ml-0 animate-in fade-in zoom-in-95 duration-200 md:ml-8">
+        <div className="mt-3 ml-0 animate-in duration-200 zoom-in-95 fade-in md:ml-8">
             <div className="flex items-start gap-3 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-base leading-7 font-bold text-emerald-900 dark:border-emerald-900/40 dark:bg-emerald-950/20 dark:text-emerald-200">
                 <CheckCircle2 className="mt-1 size-5 shrink-0" />
                 <span>{answerContent}</span>
             </div>
             {explanationContent && (
-                <div className="mt-2">
-                    {explanationContent}
-                </div>
+                <div className="mt-2">{explanationContent}</div>
             )}
         </div>
     );
@@ -653,13 +657,14 @@ export function LessonMarkdown({ content = '' }: LessonMarkdownProps) {
             }
 
             if (/^Answer:/i.test(trimmed)) {
-                let answerContent = parseLineContent(trimmed);
-                let explanationContent: React.ReactNode[] = [];
+                const answerContent = parseLineContent(trimmed);
+                const explanationContent: React.ReactNode[] = [];
                 let explanationEndIdx = idx;
 
                 // Look ahead to find Explanation
                 for (let j = idx + 1; j < lines.length && j <= idx + 5; j++) {
                     const nextTrimmed = cleanText(lines[j].trim());
+
                     if (/^Explanation:/i.test(nextTrimmed)) {
                         explanationContent.push(
                             <div
@@ -667,24 +672,34 @@ export function LessonMarkdown({ content = '' }: LessonMarkdownProps) {
                                 className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-base leading-8 text-slate-700 dark:border-slate-800 dark:bg-slate-900/60 dark:text-slate-300"
                             >
                                 {parseLineContent(nextTrimmed)}
-                            </div>
+                            </div>,
                         );
                         explanationEndIdx = j;
-                        
+
                         // Collect immediate following lines that might be part of the explanation
                         for (let k = j + 1; k < lines.length; k++) {
                             const extTrimmed = cleanText(lines[k].trim());
-                            if (extTrimmed !== '' && !/^[-*]\s+/.test(extTrimmed) && !/^\d+\.\s+/.test(extTrimmed) && !/^(Q\d+|Question|#)/i.test(extTrimmed)) {
+
+                            if (
+                                extTrimmed !== '' &&
+                                !/^[-*]\s+/.test(extTrimmed) &&
+                                !/^\d+\.\s+/.test(extTrimmed) &&
+                                !/^(Q\d+|Question|#)/i.test(extTrimmed)
+                            ) {
                                 explanationContent.push(
-                                    <div key={`explanation-ext-${k}`} className="mt-2 text-base leading-8 text-slate-700 dark:text-slate-300 px-4">
+                                    <div
+                                        key={`explanation-ext-${k}`}
+                                        className="mt-2 px-4 text-base leading-8 text-slate-700 dark:text-slate-300"
+                                    >
                                         {parseLineContent(extTrimmed)}
-                                    </div>
+                                    </div>,
                                 );
                                 explanationEndIdx = k;
                             } else if (extTrimmed !== '') {
                                 break;
                             }
                         }
+
                         break;
                     } else if (nextTrimmed !== '') {
                         break;
@@ -692,11 +707,15 @@ export function LessonMarkdown({ content = '' }: LessonMarkdownProps) {
                 }
 
                 rendered.push(
-                    <RevealableAnswer 
+                    <RevealableAnswer
                         key={`answer-block-${idx}`}
                         answerContent={answerContent}
-                        explanationContent={explanationContent.length > 0 ? explanationContent : null}
-                    />
+                        explanationContent={
+                            explanationContent.length > 0
+                                ? explanationContent
+                                : null
+                        }
+                    />,
                 );
 
                 idx = explanationEndIdx;
@@ -706,7 +725,7 @@ export function LessonMarkdown({ content = '' }: LessonMarkdownProps) {
             if (/^Explanation:/i.test(trimmed)) {
                 // Standalone explanation (if answer was missing)
                 rendered.push(
-                    <RevealableAnswer 
+                    <RevealableAnswer
                         key={`explanation-standalone-${idx}`}
                         answerContent="See Explanation"
                         explanationContent={
@@ -714,7 +733,7 @@ export function LessonMarkdown({ content = '' }: LessonMarkdownProps) {
                                 {parseLineContent(trimmed)}
                             </div>
                         }
-                    />
+                    />,
                 );
 
                 continue;

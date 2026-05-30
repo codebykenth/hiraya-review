@@ -995,10 +995,15 @@ export default function ExamIndex({
 
                         if (isDrillUrl && params.has('category_id')) {
                             localStorage.removeItem('active_exam_session');
+
                             return null;
                         }
 
-                        if (!isDrillUrl && session.drillCategoryId !== null && session.drillCategoryId !== undefined) {
+                        if (
+                            !isDrillUrl &&
+                            session.drillCategoryId !== null &&
+                            session.drillCategoryId !== undefined
+                        ) {
                             return null;
                         }
 
@@ -3031,7 +3036,7 @@ export default function ExamIndex({
 
                             {isTimed ? (
                                 <div
-                                    className={`shadow-3xs flex items-center gap-1.5 rounded-lg border px-2 sm:px-3 py-1.5 text-sm font-black ${
+                                    className={`shadow-3xs flex items-center gap-1.5 rounded-lg border px-2 py-1.5 text-sm font-black sm:px-3 ${
                                         timeLeft < 600
                                             ? 'animate-pulse border-rose-200 bg-rose-50 text-rose-700 dark:border-rose-900/30 dark:bg-rose-950/20 dark:text-rose-400'
                                             : 'border-border bg-background text-foreground'
@@ -3041,10 +3046,10 @@ export default function ExamIndex({
                                     {formatTime(timeLeft)}
                                 </div>
                             ) : (
-                                <div className="shadow-3xs flex items-center gap-1.5 rounded-lg border border-border bg-background px-2 sm:px-3 py-1.5 text-sm font-black text-foreground">
+                                <div className="shadow-3xs flex items-center gap-1.5 rounded-lg border border-border bg-background px-2 py-1.5 text-sm font-black text-foreground sm:px-3">
                                     <Timer className="size-4 animate-pulse text-emerald-500" />
                                     <span>{formatTime(timeLeft)}</span>
-                                    <span className="hidden md:inline ml-0.5 border-l border-border pl-1.5 text-[10px] font-bold text-muted-foreground">
+                                    <span className="ml-0.5 hidden border-l border-border pl-1.5 text-[10px] font-bold text-muted-foreground md:inline">
                                         Untimed
                                     </span>
                                 </div>

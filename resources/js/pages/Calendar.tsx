@@ -267,8 +267,12 @@ export default function Calendar() {
         setFormData({
             title: schedule.title,
             description: schedule.description || '',
-            study_time: schedule.study_time ? schedule.study_time.substring(0, 5) : '',
-            subcategory_id: schedule.subcategory_id ? schedule.subcategory_id.toString() : '',
+            study_time: schedule.study_time
+                ? schedule.study_time.substring(0, 5)
+                : '',
+            subcategory_id: schedule.subcategory_id
+                ? schedule.subcategory_id.toString()
+                : '',
         });
         setIsModalOpen(true);
     };
@@ -294,7 +298,10 @@ export default function Calendar() {
         setIsLoading(true);
 
         try {
-            const url = isEditMode && editScheduleId ? `/study-schedules/${editScheduleId}` : '/study-schedules';
+            const url =
+                isEditMode && editScheduleId
+                    ? `/study-schedules/${editScheduleId}`
+                    : '/study-schedules';
             const method = isEditMode ? 'PUT' : 'POST';
 
             const response = await fetch(url, {
@@ -318,7 +325,7 @@ export default function Calendar() {
             if (response.ok) {
                 const newSchedule = await response.json();
                 const updated = new Map(schedules);
-                
+
                 if (isEditMode) {
                     // Refresh from server since we just need to replace the old one
                     fetchSchedules();
@@ -327,12 +334,14 @@ export default function Calendar() {
                     updated.set(selectedDate, [...dateSchedules, newSchedule]);
                     setSchedules(updated);
                 }
-                
+
                 closeModal();
             }
         } catch {
             setErrorMessage(
-                isEditMode ? 'An error occurred while trying to update the study session. Please try again.' : 'An error occurred while trying to add the study session. Please try again.',
+                isEditMode
+                    ? 'An error occurred while trying to update the study session. Please try again.'
+                    : 'An error occurred while trying to add the study session. Please try again.',
             );
         } finally {
             setIsLoading(false);
@@ -746,7 +755,9 @@ export default function Calendar() {
                                 className="flex-1 bg-blue-600 text-white hover:bg-blue-700 md:flex-initial"
                             >
                                 <Plus className="mr-2 h-4 w-4" />
-                                <span className="hidden sm:inline">Add Session</span>
+                                <span className="hidden sm:inline">
+                                    Add Session
+                                </span>
                                 <span className="sm:hidden">Add</span>
                             </Button>
                             <Button
@@ -800,301 +811,346 @@ export default function Calendar() {
                     </div>
 
                     {/* Calendar grid wrapper for mobile */}
-                    <div className="md:hidden mb-2 text-xs text-slate-500 flex items-center justify-center gap-2 bg-slate-50 p-2 rounded-lg border border-slate-100">
-                        <span className="animate-pulse">←</span> Swipe horizontally to view full week <span className="animate-pulse">→</span>
+                    <div className="mb-2 flex items-center justify-center gap-2 rounded-lg border border-slate-100 bg-slate-50 p-2 text-xs text-slate-500 md:hidden">
+                        <span className="animate-pulse">←</span> Swipe
+                        horizontally to view full week{' '}
+                        <span className="animate-pulse">→</span>
                     </div>
                     <div className="overflow-x-auto pb-4">
                         <div className="min-w-[1024px]">
                             {/* Day headers */}
                             <div className="mb-2 grid grid-cols-7 gap-2">
-                                {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(
-                            (day) => (
-                                <div
-                                    key={day}
-                                    className="flex items-center justify-center font-semibold text-slate-600"
-                                >
-                                    {day}
-                                </div>
-                            ),
-                        )}
-                    </div>
-
-                    {/* Calendar grid */}
-                    <div className="space-y-2">
-                        {weeks.map((week, weekIndex) => (
-                            <div
-                                key={weekIndex}
-                                className="grid grid-cols-7 gap-2"
-                            >
-                                {week.map((calendarDay) => (
+                                {[
+                                    'Sun',
+                                    'Mon',
+                                    'Tue',
+                                    'Wed',
+                                    'Thu',
+                                    'Fri',
+                                    'Sat',
+                                ].map((day) => (
                                     <div
-                                        key={calendarDay.date}
-                                        className={`group relative flex min-h-24 flex-col rounded-lg border p-2 transition-all ${
-                                            calendarDay.isCurrentMonth && calendarDay.date >= todayStr 
-                                                ? 'hover:border-blue-300 hover:shadow-sm' 
-                                                : ''
-                                        } ${
-                                            examDates.includes(calendarDay.date)
-                                                ? 'border-red-400 bg-red-50'
-                                                : isToday(calendarDay.date)
-                                                  ? 'border-blue-400 bg-blue-50'
-                                                  : calendarDay.isCurrentMonth
-                                                    ? 'border-slate-200 bg-white'
-                                                    : 'border-slate-100 bg-slate-50 opacity-60'
-                                        }`}
+                                        key={day}
+                                        className="flex items-center justify-center font-semibold text-slate-600"
                                     >
-                                        <div className="flex items-center justify-between">
-                                            <span
-                                                className={`text-sm font-semibold ${
+                                        {day}
+                                    </div>
+                                ))}
+                            </div>
+
+                            {/* Calendar grid */}
+                            <div className="space-y-2">
+                                {weeks.map((week, weekIndex) => (
+                                    <div
+                                        key={weekIndex}
+                                        className="grid grid-cols-7 gap-2"
+                                    >
+                                        {week.map((calendarDay) => (
+                                            <div
+                                                key={calendarDay.date}
+                                                className={`group relative flex min-h-24 flex-col rounded-lg border p-2 transition-all ${
+                                                    calendarDay.isCurrentMonth &&
+                                                    calendarDay.date >= todayStr
+                                                        ? 'hover:border-blue-300 hover:shadow-sm'
+                                                        : ''
+                                                } ${
                                                     examDates.includes(
                                                         calendarDay.date,
                                                     )
-                                                        ? 'text-red-900'
+                                                        ? 'border-red-400 bg-red-50'
                                                         : isToday(
                                                                 calendarDay.date,
                                                             )
-                                                          ? 'text-blue-900'
+                                                          ? 'border-blue-400 bg-blue-50'
                                                           : calendarDay.isCurrentMonth
-                                                            ? 'text-slate-900'
-                                                            : 'text-slate-400'
+                                                            ? 'border-slate-200 bg-white'
+                                                            : 'border-slate-100 bg-slate-50 opacity-60'
                                                 }`}
                                             >
-                                                {examDates.includes(
-                                                    calendarDay.date,
-                                                ) && (
-                                                    <span className="mr-1 inline-block rounded-full bg-red-600 px-1.5 py-0.5 text-xs font-bold text-white">
-                                                        Exam Date
-                                                    </span>
-                                                )}
-                                                {isToday(calendarDay.date) &&
-                                                    !examDates.includes(
-                                                        calendarDay.date,
-                                                    ) && (
-                                                        <span className="mr-1 inline-block rounded-full bg-blue-600 px-1.5 py-0.5 text-xs font-bold text-white">
-                                                            Today
-                                                        </span>
-                                                    )}
-                                                {calendarDay.day}
-                                            </span>
-                                            {calendarDay.isCurrentMonth &&
-                                                calendarDay.date >=
-                                                    todayStr && (
-                                                    <button
-                                                        onClick={(e) => {
-                                                            e.stopPropagation();
-                                                            openModal(calendarDay.date);
-                                                        }}
-                                                        className="rounded p-1 opacity-100 transition-opacity hover:bg-blue-100 lg:opacity-0 lg:group-hover:opacity-100"
-                                                        title="Add study item"
+                                                <div className="flex items-center justify-between">
+                                                    <span
+                                                        className={`text-sm font-semibold ${
+                                                            examDates.includes(
+                                                                calendarDay.date,
+                                                            )
+                                                                ? 'text-red-900'
+                                                                : isToday(
+                                                                        calendarDay.date,
+                                                                    )
+                                                                  ? 'text-blue-900'
+                                                                  : calendarDay.isCurrentMonth
+                                                                    ? 'text-slate-900'
+                                                                    : 'text-slate-400'
+                                                        }`}
                                                     >
-                                                        <Plus className="h-4 w-4 text-blue-600" />
-                                                    </button>
-                                                )}
-                                        </div>
+                                                        {examDates.includes(
+                                                            calendarDay.date,
+                                                        ) && (
+                                                            <span className="mr-1 inline-block rounded-full bg-red-600 px-1.5 py-0.5 text-xs font-bold text-white">
+                                                                Exam Date
+                                                            </span>
+                                                        )}
+                                                        {isToday(
+                                                            calendarDay.date,
+                                                        ) &&
+                                                            !examDates.includes(
+                                                                calendarDay.date,
+                                                            ) && (
+                                                                <span className="mr-1 inline-block rounded-full bg-blue-600 px-1.5 py-0.5 text-xs font-bold text-white">
+                                                                    Today
+                                                                </span>
+                                                            )}
+                                                        {calendarDay.day}
+                                                    </span>
+                                                    {calendarDay.isCurrentMonth &&
+                                                        calendarDay.date >=
+                                                            todayStr && (
+                                                            <button
+                                                                onClick={(
+                                                                    e,
+                                                                ) => {
+                                                                    e.stopPropagation();
+                                                                    openModal(
+                                                                        calendarDay.date,
+                                                                    );
+                                                                }}
+                                                                className="rounded p-1 opacity-100 transition-opacity hover:bg-blue-100 lg:opacity-0 lg:group-hover:opacity-100"
+                                                                title="Add study item"
+                                                            >
+                                                                <Plus className="h-4 w-4 text-blue-600" />
+                                                            </button>
+                                                        )}
+                                                </div>
 
-                                        {/* Study items for this day */}
-                                        <div className="mt-2 flex-1 space-y-1 overflow-y-auto">
-                                            {calendarDay.schedules.map(
-                                                (schedule) => {
-                                                    const colors =
-                                                        getCategoryColors(
-                                                            schedule.title,
-                                                        );
+                                                {/* Study items for this day */}
+                                                <div className="mt-2 flex-1 space-y-1 overflow-y-auto">
+                                                    {calendarDay.schedules.map(
+                                                        (schedule) => {
+                                                            const colors =
+                                                                getCategoryColors(
+                                                                    schedule.title,
+                                                                );
 
-                                                    return (
-                                                        <div
-                                                            key={schedule.id}
-                                                            onClick={() => openEditModal(schedule, calendarDay.date)}
-                                                            className={`group relative rounded p-1.5 text-xs cursor-pointer hover:opacity-90 ${colors.bg} ${colors.text}`}
-                                                        >
-                                                            <div className="flex items-start justify-between gap-1">
-                                                                <div className="flex-1 min-w-0">
-                                                                    {schedule.study_time && (
-                                                                        <span
-                                                                            className={`mr-1.5 inline-block rounded-md bg-white/60 px-1.5 py-0.5 text-[10px] font-bold shadow-sm ${colors.time}`}
-                                                                        >
-                                                                            {schedule.study_time.substring(
-                                                                                0,
-                                                                                5,
-                                                                            )}
-                                                                        </span>
-                                                                    )}
-                                                                    <span className="leading-tight font-medium break-words">
-                                                                        {
-                                                                            schedule.title
-                                                                        }
-                                                                    </span>
-                                                                </div>
-                                                                <button
-                                                                    onClick={(e) => {
-                                                                        e.stopPropagation();
-                                                                        handleDeleteSchedule(
-                                                                            schedule.id,
-                                                                            calendarDay.date,
-                                                                        );
-                                                                    }}
-                                                                    className="ml-1 hidden shrink-0 rounded p-0.5 hover:bg-red-100 group-hover:block"
-                                                                    title="Delete"
-                                                                >
-                                                                    <Trash2 className="h-3 w-3 text-red-600" />
-                                                                </button>
-                                                            </div>
-                                                            {schedule.description && (
+                                                            return (
                                                                 <div
-                                                                    className={`mt-1 text-xs ${colors.desc}`}
+                                                                    key={
+                                                                        schedule.id
+                                                                    }
+                                                                    onClick={() =>
+                                                                        openEditModal(
+                                                                            schedule,
+                                                                            calendarDay.date,
+                                                                        )
+                                                                    }
+                                                                    className={`group relative cursor-pointer rounded p-1.5 text-xs hover:opacity-90 ${colors.bg} ${colors.text}`}
                                                                 >
-                                                                    {(() => {
-                                                                        const desc =
-                                                                            schedule.description.replace(
-                                                                                /^Score:\s*[0-9.]+%?\s*-\s*/,
-                                                                                '',
-                                                                            );
-
-                                                                        // Extract links anywhere in the description
-                                                                        const linkRegex =
-                                                                            /\[(.*?)\]\((.*?)\)/g;
-                                                                        const links =
-                                                                            [];
-                                                                        const existingUrls =
-                                                                            new Set();
-                                                                        let match;
-
-                                                                        while (
-                                                                            (match =
-                                                                                linkRegex.exec(
-                                                                                    desc,
-                                                                                )) !==
-                                                                            null
-                                                                        ) {
-                                                                            links.push(
+                                                                    <div className="flex items-start justify-between gap-1">
+                                                                        <div className="min-w-0 flex-1">
+                                                                            {schedule.study_time && (
+                                                                                <span
+                                                                                    className={`mr-1.5 inline-block rounded-md bg-white/60 px-1.5 py-0.5 text-[10px] font-bold shadow-sm ${colors.time}`}
+                                                                                >
+                                                                                    {schedule.study_time.substring(
+                                                                                        0,
+                                                                                        5,
+                                                                                    )}
+                                                                                </span>
+                                                                            )}
+                                                                            <span className="leading-tight font-medium break-words">
                                                                                 {
-                                                                                    title: match[1],
-                                                                                    url: match[2],
-                                                                                },
-                                                                            );
-                                                                            existingUrls.add(
-                                                                                match[2],
-                                                                            );
-                                                                        }
+                                                                                    schedule.title
+                                                                                }
+                                                                            </span>
+                                                                        </div>
+                                                                        <button
+                                                                            onClick={(
+                                                                                e,
+                                                                            ) => {
+                                                                                e.stopPropagation();
+                                                                                handleDeleteSchedule(
+                                                                                    schedule.id,
+                                                                                    calendarDay.date,
+                                                                                );
+                                                                            }}
+                                                                            className="ml-1 hidden shrink-0 rounded p-0.5 group-hover:block hover:bg-red-100"
+                                                                            title="Delete"
+                                                                        >
+                                                                            <Trash2 className="h-3 w-3 text-red-600" />
+                                                                        </button>
+                                                                    </div>
+                                                                    {schedule.description && (
+                                                                        <div
+                                                                            className={`mt-1 text-xs ${colors.desc}`}
+                                                                        >
+                                                                            {(() => {
+                                                                                const desc =
+                                                                                    schedule.description.replace(
+                                                                                        /^Score:\s*[0-9.]+%?\s*-\s*/,
+                                                                                        '',
+                                                                                    );
 
-                                                                        // Automatically find matching learn modules for this item
-                                                                        for (const mod of learnModules) {
-                                                                            if (
-                                                                                links.length >=
-                                                                                3
-                                                                            ) {
-                                                                                break;
-                                                                            } // Limit to 3 links total
+                                                                                // Extract links anywhere in the description
+                                                                                const linkRegex =
+                                                                                    /\[(.*?)\]\((.*?)\)/g;
+                                                                                const links =
+                                                                                    [];
+                                                                                const existingUrls =
+                                                                                    new Set();
+                                                                                let match;
 
-                                                                            const modUrl = `/learn/${mod.slug}`;
-
-                                                                            if (
-                                                                                !existingUrls.has(
-                                                                                    modUrl,
-                                                                                )
-                                                                            ) {
-                                                                                if (
-                                                                                    isModuleRelated(
-                                                                                        mod,
-                                                                                        schedule.title,
-                                                                                        desc,
-                                                                                    )
+                                                                                while (
+                                                                                    (match =
+                                                                                        linkRegex.exec(
+                                                                                            desc,
+                                                                                        )) !==
+                                                                                    null
                                                                                 ) {
                                                                                     links.push(
                                                                                         {
-                                                                                            title: mod.title,
-                                                                                            url: modUrl,
-                                                                                            isAuto: true,
+                                                                                            title: match[1],
+                                                                                            url: match[2],
                                                                                         },
                                                                                     );
                                                                                     existingUrls.add(
-                                                                                        modUrl,
+                                                                                        match[2],
                                                                                     );
                                                                                 }
-                                                                            }
-                                                                        }
 
-                                                                        // Remove the 'Links:' section and raw markdown links from the visible description
-                                                                        let mainText =
-                                                                            desc
-                                                                                .replace(
-                                                                                    /(?:\r?\n)+Links:[\s\S]*$/,
-                                                                                    '',
-                                                                                )
-                                                                                .trim();
-                                                                        // Fallback cleanup if the above doesn't catch it
-                                                                        mainText =
-                                                                            mainText
-                                                                                .replace(
-                                                                                    /\[(.*?)\]\((.*?)\)/g,
-                                                                                    '',
-                                                                                )
-                                                                                .trim();
+                                                                                // Automatically find matching learn modules for this item
+                                                                                for (const mod of learnModules) {
+                                                                                    if (
+                                                                                        links.length >=
+                                                                                        3
+                                                                                    ) {
+                                                                                        break;
+                                                                                    } // Limit to 3 links total
 
-                                                                        if (
-                                                                            links.length >
-                                                                            0
-                                                                        ) {
-                                                                            return (
-                                                                                <>
+                                                                                    const modUrl = `/learn/${mod.slug}`;
+
+                                                                                    if (
+                                                                                        !existingUrls.has(
+                                                                                            modUrl,
+                                                                                        )
+                                                                                    ) {
+                                                                                        if (
+                                                                                            isModuleRelated(
+                                                                                                mod,
+                                                                                                schedule.title,
+                                                                                                desc,
+                                                                                            )
+                                                                                        ) {
+                                                                                            links.push(
+                                                                                                {
+                                                                                                    title: mod.title,
+                                                                                                    url: modUrl,
+                                                                                                    isAuto: true,
+                                                                                                },
+                                                                                            );
+                                                                                            existingUrls.add(
+                                                                                                modUrl,
+                                                                                            );
+                                                                                        }
+                                                                                    }
+                                                                                }
+
+                                                                                // Remove the 'Links:' section and raw markdown links from the visible description
+                                                                                let mainText =
+                                                                                    desc
+                                                                                        .replace(
+                                                                                            /(?:\r?\n)+Links:[\s\S]*$/,
+                                                                                            '',
+                                                                                        )
+                                                                                        .trim();
+                                                                                // Fallback cleanup if the above doesn't catch it
+                                                                                mainText =
+                                                                                    mainText
+                                                                                        .replace(
+                                                                                            /\[(.*?)\]\((.*?)\)/g,
+                                                                                            '',
+                                                                                        )
+                                                                                        .trim();
+
+                                                                                if (
+                                                                                    links.length >
+                                                                                    0
+                                                                                ) {
+                                                                                    return (
+                                                                                        <>
+                                                                                            <p className="line-clamp-3">
+                                                                                                {
+                                                                                                    mainText
+                                                                                                }
+                                                                                            </p>
+                                                                                            <div className="mt-1.5 flex flex-col gap-1">
+                                                                                                {links.map(
+                                                                                                    (
+                                                                                                        l,
+                                                                                                        i,
+                                                                                                    ) => (
+                                                                                                        <a
+                                                                                                            key={
+                                                                                                                i
+                                                                                                            }
+                                                                                                            href={
+                                                                                                                l.url
+                                                                                                            }
+                                                                                                            target="_blank"
+                                                                                                            rel="noopener noreferrer"
+                                                                                                            className={`block w-full rounded px-1.5 py-1 text-[10px] font-bold break-words sm:text-xs ${l.isAuto ? 'bg-amber-50 text-amber-700 hover:text-amber-900' : 'bg-white/50 text-blue-600 hover:text-blue-800'}`}
+                                                                                                            onClick={(
+                                                                                                                e,
+                                                                                                            ) =>
+                                                                                                                e.stopPropagation()
+                                                                                                            }
+                                                                                                        >
+                                                                                                            {l.isAuto
+                                                                                                                ? '✨ '
+                                                                                                                : '📖 '}
+                                                                                                            Learn:{' '}
+                                                                                                            {
+                                                                                                                l.title
+                                                                                                            }
+                                                                                                        </a>
+                                                                                                    ),
+                                                                                                )}
+                                                                                            </div>
+                                                                                        </>
+                                                                                    );
+                                                                                }
+
+                                                                                return (
                                                                                     <p className="line-clamp-3">
                                                                                         {
                                                                                             mainText
                                                                                         }
                                                                                     </p>
-                                                                                    <div className="mt-1.5 flex flex-col gap-1">
-                                                                                        {links.map(
-                                                                                            (
-                                                                                                l,
-                                                                                                i,
-                                                                                            ) => (
-                                                                                                <a
-                                                                                                    key={i}
-                                                                                                    href={l.url}
-                                                                                                    target="_blank"
-                                                                                                    rel="noopener noreferrer"
-                                                                                                    className={`block w-full break-words rounded px-1.5 py-1 text-[10px] sm:text-xs font-bold ${l.isAuto ? 'bg-amber-50 text-amber-700 hover:text-amber-900' : 'bg-white/50 text-blue-600 hover:text-blue-800'}`}
-                                                                                                    onClick={(e) => e.stopPropagation()}
-                                                                                                >
-                                                                                                    {l.isAuto ? '✨ ' : '📖 '}
-                                                                                                    Learn: {l.title}
-                                                                                                </a>
-                                                                                            ),
-                                                                                        )}
-                                                                                    </div>
-                                                                                </>
-                                                                            );
-                                                                        }
-
-                                                                        return (
-                                                                            <p className="line-clamp-3">
-                                                                                {
-                                                                                    mainText
-                                                                                }
-                                                                            </p>
-                                                                        );
-                                                                    })()}
+                                                                                );
+                                                                            })()}
+                                                                        </div>
+                                                                    )}
                                                                 </div>
-                                                            )}
-                                                        </div>
-                                                    );
-                                                },
-                                            )}
-                                        </div>
+                                                            );
+                                                        },
+                                                    )}
+                                                </div>
+                                            </div>
+                                        ))}
                                     </div>
                                 ))}
                             </div>
-                        ))}
+                        </div>
                     </div>
-                </div>
-            </div>
-        </Card>
+                </Card>
 
                 {/* Add Study Modal */}
                 <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
                     <DialogContent>
                         <DialogHeader>
-                            <DialogTitle>{isEditMode ? 'Edit Study Item' : 'Add Study Item'}</DialogTitle>
+                            <DialogTitle>
+                                {isEditMode
+                                    ? 'Edit Study Item'
+                                    : 'Add Study Item'}
+                            </DialogTitle>
                             {selectedDate && (
                                 <p className="mt-2 text-sm text-slate-600">
                                     {new Date(
@@ -1243,7 +1299,13 @@ export default function Calendar() {
                                 onClick={handleAddStudy}
                                 disabled={isLoading || !formData.title.trim()}
                             >
-                                {isLoading ? (isEditMode ? 'Saving...' : 'Adding...') : (isEditMode ? 'Save Changes' : 'Add Study')}
+                                {isLoading
+                                    ? isEditMode
+                                        ? 'Saving...'
+                                        : 'Adding...'
+                                    : isEditMode
+                                      ? 'Save Changes'
+                                      : 'Add Study'}
                             </Button>
                         </DialogFooter>
                     </DialogContent>

@@ -278,8 +278,8 @@ export default function Welcome() {
                             {/* Left Column */}
                             <div className="flex flex-col items-start gap-6">
                                 <Badge className="inline-flex h-auto max-w-full items-start rounded-2xl border border-primary bg-primary/15 px-4 py-2 text-primary-foreground transition-colors hover:bg-primary/30 sm:items-center sm:rounded-full sm:py-1.5">
-                                    <Sparkles className="mr-2 mt-0.5 h-4 w-4 shrink-0 text-primary sm:mt-0" />
-                                    <span className="whitespace-normal text-left font-bold text-primary sm:text-center">
+                                    <Sparkles className="mt-0.5 mr-2 h-4 w-4 shrink-0 text-primary sm:mt-0" />
+                                    <span className="text-left font-bold whitespace-normal text-primary sm:text-center">
                                         Turning dreams into exam success through
                                         disciplined review.
                                     </span>

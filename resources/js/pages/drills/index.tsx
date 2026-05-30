@@ -274,8 +274,10 @@ export default function Drills({
 
     // Check if there are ANY filipino questions in this configuration
     const hasFilipinoQuestions = React.useMemo(() => {
-        if (!selectedCategory) return false;
-        
+        if (!selectedCategory) {
+            return false;
+        }
+
         return questions.some((q) => {
             const catMatch =
                 q.category
@@ -303,6 +305,7 @@ export default function Drills({
     // Automatically switch to English if Filipino is no longer available
     useEffect(() => {
         if (!hasFilipinoQuestions && language !== 'English') {
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setLanguage('English');
         }
     }, [hasFilipinoQuestions, language]);
@@ -744,7 +747,10 @@ export default function Drills({
                                 🌐 Language
                             </span>
                             <div className="flex flex-wrap gap-6">
-                                {(hasFilipinoQuestions ? ['English', 'Filipino', 'Both'] : ['English']).map((lang) => {
+                                {(hasFilipinoQuestions
+                                    ? ['English', 'Filipino', 'Both']
+                                    : ['English']
+                                ).map((lang) => {
                                     const isSelected = language === lang;
 
                                     return (

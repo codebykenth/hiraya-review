@@ -22,9 +22,12 @@ createInertiaApp({
         const pages = import.meta.glob('./pages/**/*.tsx', { eager: true });
         const OriginalComponent = (pages[`./pages/${name}.tsx`] as any).default;
 
-        const WrappedComponent: any = (props: any) => <OriginalComponent {...props} />;
+        const WrappedComponent: any = (props: any) => (
+            <OriginalComponent {...props} />
+        );
 
         let metadata: any = {};
+
         if (
             OriginalComponent.layout &&
             typeof OriginalComponent.layout === 'object' &&
@@ -69,6 +72,7 @@ createInertiaApp({
         WrappedComponent.layout = pageLayout;
 
         componentCache.set(name, WrappedComponent);
+
         return WrappedComponent;
     },
     strictMode: true,

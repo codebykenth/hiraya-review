@@ -114,6 +114,7 @@ export default function AdminUsersIndex({
         }
 
         const date = new Date(dateString);
+
         if (isNaN(date.getTime())) {
             return 'Never';
         }
