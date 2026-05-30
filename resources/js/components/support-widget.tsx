@@ -59,7 +59,7 @@ export function SupportWidget() {
                         <Coffee className="h-6 w-6 text-white" />
                     </Button>
                 </DialogTrigger>
-                <DialogContent className="sm:max-w-2xl">
+                <DialogContent className="max-h-[90dvh] overflow-y-auto sm:max-w-2xl">
                     <DialogHeader>
                         <DialogTitle className="text-xl">
                             Support {appName}
@@ -74,12 +74,12 @@ export function SupportWidget() {
                         </DialogDescription>
                     </DialogHeader>
                     <div className="grid gap-6 py-4">
-                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                            <div className="flex flex-col items-center gap-2">
-                                <div className="text-sm font-semibold">
+                        <div className="grid grid-cols-3 gap-2 sm:gap-4">
+                            <div className="flex flex-col items-center gap-1 sm:gap-2">
+                                <div className="text-center text-xs leading-tight font-semibold sm:text-sm">
                                     GCash
                                 </div>
-                                <div className="flex aspect-square w-full max-w-[150px] items-center justify-center rounded-md border bg-muted p-2">
+                                <div className="flex aspect-square w-full items-center justify-center rounded-md border bg-muted p-1 sm:p-2">
                                     <img
                                         src="/images/gcash-qr.png"
                                         alt="GCash QR Code"
@@ -92,16 +92,16 @@ export function SupportWidget() {
                                             );
                                         }}
                                     />
-                                    <span className="hidden text-xs text-muted-foreground">
+                                    <span className="hidden text-[10px] text-muted-foreground sm:text-xs">
                                         QR Code
                                     </span>
                                 </div>
                             </div>
-                            <div className="flex flex-col items-center gap-2">
-                                <div className="text-sm font-semibold">
+                            <div className="flex flex-col items-center gap-1 sm:gap-2">
+                                <div className="text-center text-xs leading-tight font-semibold sm:text-sm">
                                     Maya
                                 </div>
-                                <div className="flex aspect-square w-full max-w-[150px] items-center justify-center rounded-md border bg-muted p-2">
+                                <div className="flex aspect-square w-full items-center justify-center rounded-md border bg-muted p-1 sm:p-2">
                                     <img
                                         src="/images/maya-qr.png"
                                         alt="Maya QR Code"
@@ -114,16 +114,16 @@ export function SupportWidget() {
                                             );
                                         }}
                                     />
-                                    <span className="hidden text-xs text-muted-foreground">
+                                    <span className="hidden text-[10px] text-muted-foreground sm:text-xs">
                                         QR Code
                                     </span>
                                 </div>
                             </div>
-                            <div className="flex flex-col items-center gap-2">
-                                <div className="text-sm font-semibold">
+                            <div className="flex flex-col items-center gap-1 sm:gap-2">
+                                <div className="text-center text-xs leading-tight font-semibold sm:text-sm">
                                     Buy me a coffee
                                 </div>
-                                <div className="flex aspect-square w-full max-w-[150px] items-center justify-center rounded-md border bg-muted p-2">
+                                <div className="flex aspect-square w-full items-center justify-center rounded-md border bg-muted p-1 sm:p-2">
                                     <img
                                         src="/images/bmc-qr.png"
                                         alt="Buy Me A Coffee QR Code"
@@ -136,7 +136,7 @@ export function SupportWidget() {
                                             );
                                         }}
                                     />
-                                    <span className="hidden text-xs text-muted-foreground">
+                                    <span className="hidden text-[10px] text-muted-foreground sm:text-xs">
                                         QR Code
                                     </span>
                                 </div>

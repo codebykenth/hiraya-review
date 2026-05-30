@@ -277,9 +277,9 @@ export default function Welcome() {
                         <div className="grid grid-cols-1 items-center gap-12 md:grid-cols-2">
                             {/* Left Column */}
                             <div className="flex flex-col items-start gap-6">
-                                <Badge className="rounded-full border border-primary bg-primary/15 px-4 py-1.5 text-primary-foreground transition-colors hover:bg-primary/30">
-                                    <Sparkles className="mr-2 h-4 w-4 text-primary" />
-                                    <span className="font-bold text-primary">
+                                <Badge className="inline-flex h-auto max-w-full items-start rounded-2xl border border-primary bg-primary/15 px-4 py-2 text-primary-foreground transition-colors hover:bg-primary/30 sm:items-center sm:rounded-full sm:py-1.5">
+                                    <Sparkles className="mr-2 mt-0.5 h-4 w-4 shrink-0 text-primary sm:mt-0" />
+                                    <span className="whitespace-normal text-left font-bold text-primary sm:text-center">
                                         Turning dreams into exam success through
                                         disciplined review.
                                     </span>

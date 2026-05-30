@@ -1,5 +1,37 @@
 import { BookOpen, CheckCircle2, HelpCircle, Lightbulb } from 'lucide-react';
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
+
+function RevealableAnswer({ answerContent, explanationContent }: { answerContent: React.ReactNode, explanationContent: React.ReactNode }) {
+    const [isRevealed, setIsRevealed] = useState(false);
+
+    if (!isRevealed) {
+        return (
+            <div className="mt-4 ml-0 md:ml-8">
+                <button
+                    onClick={() => setIsRevealed(true)}
+                    className="flex cursor-pointer items-center gap-2 rounded-lg border border-blue-200 bg-blue-50 px-4 py-2.5 text-sm font-bold text-blue-700 transition-colors hover:bg-blue-100 dark:border-blue-900/50 dark:bg-blue-950/30 dark:text-blue-300 dark:hover:bg-blue-900/50"
+                >
+                    <HelpCircle className="size-4" />
+                    Reveal Answer & Explanation
+                </button>
+            </div>
+        );
+    }
+
+    return (
+        <div className="mt-3 ml-0 animate-in fade-in zoom-in-95 duration-200 md:ml-8">
+            <div className="flex items-start gap-3 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-base leading-7 font-bold text-emerald-900 dark:border-emerald-900/40 dark:bg-emerald-950/20 dark:text-emerald-200">
+                <CheckCircle2 className="mt-1 size-5 shrink-0" />
+                <span>{answerContent}</span>
+            </div>
+            {explanationContent && (
+                <div className="mt-2">
+                    {explanationContent}
+                </div>
+            )}
+        </div>
+    );
+}
 
 export interface LessonMarkdownProps {
     content: string;
@@ -464,7 +496,8 @@ export function LessonMarkdown({ content = '' }: LessonMarkdownProps) {
             );
         };
 
-        lines.forEach((rawLine, idx) => {
+        for (let idx = 0; idx < lines.length; idx++) {
+            const rawLine = lines[idx];
             const trimmed = cleanText(rawLine.trim());
 
             if (!trimmed.startsWith('|')) {
@@ -479,7 +512,7 @@ export function LessonMarkdown({ content = '' }: LessonMarkdownProps) {
                     />,
                 );
 
-                return;
+                continue;
             }
 
             if (trimmed.startsWith('|')) {
@@ -492,7 +525,7 @@ export function LessonMarkdown({ content = '' }: LessonMarkdownProps) {
                     );
 
                 if (cells.every((cell) => /^:?-{3,}:?$/.test(cell))) {
-                    return;
+                    continue;
                 }
 
                 if (tableHeaders.length === 0) {
@@ -501,7 +534,7 @@ export function LessonMarkdown({ content = '' }: LessonMarkdownProps) {
                     tableRows.push(cells);
                 }
 
-                return;
+                continue;
             }
 
             const headerMatch = trimmed.match(/^(#{1,6})\s+(.*)$/);
@@ -560,7 +593,7 @@ export function LessonMarkdown({ content = '' }: LessonMarkdownProps) {
                     );
                 }
 
-                return;
+                continue;
             }
 
             if (
@@ -584,7 +617,7 @@ export function LessonMarkdown({ content = '' }: LessonMarkdownProps) {
                     </div>,
                 );
 
-                return;
+                continue;
             }
 
             if (/^(Q\d+[:.)]|Question\s+\d*[:.)]?)/i.test(trimmed)) {
@@ -600,7 +633,7 @@ export function LessonMarkdown({ content = '' }: LessonMarkdownProps) {
                     </div>,
                 );
 
-                return;
+                continue;
             }
 
             if (/^[A-E][).]\s+/.test(trimmed)) {
@@ -616,34 +649,75 @@ export function LessonMarkdown({ content = '' }: LessonMarkdownProps) {
                     </div>,
                 );
 
-                return;
+                continue;
             }
 
             if (/^Answer:/i.test(trimmed)) {
+                let answerContent = parseLineContent(trimmed);
+                let explanationContent: React.ReactNode[] = [];
+                let explanationEndIdx = idx;
+
+                // Look ahead to find Explanation
+                for (let j = idx + 1; j < lines.length && j <= idx + 5; j++) {
+                    const nextTrimmed = cleanText(lines[j].trim());
+                    if (/^Explanation:/i.test(nextTrimmed)) {
+                        explanationContent.push(
+                            <div
+                                key={`explanation-${j}`}
+                                className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-base leading-8 text-slate-700 dark:border-slate-800 dark:bg-slate-900/60 dark:text-slate-300"
+                            >
+                                {parseLineContent(nextTrimmed)}
+                            </div>
+                        );
+                        explanationEndIdx = j;
+                        
+                        // Collect immediate following lines that might be part of the explanation
+                        for (let k = j + 1; k < lines.length; k++) {
+                            const extTrimmed = cleanText(lines[k].trim());
+                            if (extTrimmed !== '' && !/^[-*]\s+/.test(extTrimmed) && !/^\d+\.\s+/.test(extTrimmed) && !/^(Q\d+|Question|#)/i.test(extTrimmed)) {
+                                explanationContent.push(
+                                    <div key={`explanation-ext-${k}`} className="mt-2 text-base leading-8 text-slate-700 dark:text-slate-300 px-4">
+                                        {parseLineContent(extTrimmed)}
+                                    </div>
+                                );
+                                explanationEndIdx = k;
+                            } else if (extTrimmed !== '') {
+                                break;
+                            }
+                        }
+                        break;
+                    } else if (nextTrimmed !== '') {
+                        break;
+                    }
+                }
+
                 rendered.push(
-                    <div
-                        key={`answer-${idx}`}
-                        className="mt-3 ml-0 flex items-start gap-3 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-base leading-7 font-bold text-emerald-900 md:ml-8 dark:border-emerald-900/40 dark:bg-emerald-950/20 dark:text-emerald-200"
-                    >
-                        <CheckCircle2 className="mt-1 size-5 shrink-0" />
-                        <span>{parseLineContent(trimmed)}</span>
-                    </div>,
+                    <RevealableAnswer 
+                        key={`answer-block-${idx}`}
+                        answerContent={answerContent}
+                        explanationContent={explanationContent.length > 0 ? explanationContent : null}
+                    />
                 );
 
-                return;
+                idx = explanationEndIdx;
+                continue;
             }
 
             if (/^Explanation:/i.test(trimmed)) {
+                // Standalone explanation (if answer was missing)
                 rendered.push(
-                    <div
-                        key={`explanation-${idx}`}
-                        className="mt-2 ml-0 rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-base leading-8 text-slate-700 md:ml-8 dark:border-slate-800 dark:bg-slate-900/60 dark:text-slate-300"
-                    >
-                        {parseLineContent(trimmed)}
-                    </div>,
+                    <RevealableAnswer 
+                        key={`explanation-standalone-${idx}`}
+                        answerContent="See Explanation"
+                        explanationContent={
+                            <div className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-base leading-8 text-slate-700 dark:border-slate-800 dark:bg-slate-900/60 dark:text-slate-300">
+                                {parseLineContent(trimmed)}
+                            </div>
+                        }
+                    />
                 );
 
-                return;
+                continue;
             }
 
             if (/^[-*]\s+/.test(trimmed)) {
@@ -659,7 +733,7 @@ export function LessonMarkdown({ content = '' }: LessonMarkdownProps) {
                     </div>,
                 );
 
-                return;
+                continue;
             }
 
             if (/^\d+\.\s+/.test(trimmed)) {
@@ -680,13 +754,13 @@ export function LessonMarkdown({ content = '' }: LessonMarkdownProps) {
                     </div>,
                 );
 
-                return;
+                continue;
             }
 
             if (trimmed === '') {
                 rendered.push(<div key={`empty-${idx}`} className="h-3" />);
 
-                return;
+                continue;
             }
 
             rendered.push(
@@ -697,7 +771,7 @@ export function LessonMarkdown({ content = '' }: LessonMarkdownProps) {
                     {parseLineContent(trimmed)}
                 </p>,
             );
-        });
+        }
 
         flushTable('end');
 

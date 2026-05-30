@@ -991,6 +991,21 @@ export default function ExamIndex({
                         session.questionIds &&
                         session.questionIds.length > 0
                     ) {
+                        const isDrillUrl = params.get('drill') === 'true';
+
+                        if (isDrillUrl && params.has('category_id')) {
+                            localStorage.removeItem('active_exam_session');
+                            return null;
+                        }
+
+                        if (!isDrillUrl && session.drillCategoryId !== null && session.drillCategoryId !== undefined) {
+                            return null;
+                        }
+
+                        if (isDrillUrl && session.drillCategoryId === null) {
+                            return null;
+                        }
+
                         return session;
                     }
                 } catch {
@@ -2966,8 +2981,8 @@ export default function ExamIndex({
                 <Head title={`Live Simulation: ${details.title}`} />
                 <div className="fixed inset-0 z-50 flex animate-in flex-col bg-background duration-200 fade-in">
                     {/* TOP NAVBAR HEADER */}
-                    <div className="shadow-3xs flex h-16 items-center justify-between border-b border-border bg-card px-6">
-                        <div className="flex items-center gap-4">
+                    <div className="shadow-3xs flex h-16 items-center justify-between border-b border-border bg-card px-3 sm:px-6">
+                        <div className="flex items-center gap-2 sm:gap-4">
                             <button
                                 onClick={handleExitExam}
                                 className="rounded-lg p-1.5 text-muted-foreground transition hover:bg-accent"
@@ -2983,7 +2998,7 @@ export default function ExamIndex({
                         </div>
 
                         {activeQuestion && (
-                            <div className="flex items-center gap-3">
+                            <div className="flex items-center gap-2 sm:gap-3">
                                 <span className="hidden inline-flex items-center gap-1 rounded-full border border-blue-100/30 bg-blue-50/80 px-3 py-1 text-xs font-bold text-blue-600 sm:inline-flex dark:bg-blue-950/40 dark:text-blue-400">
                                     <BookOpen className="size-3" />
                                     {activeQuestion.category}
@@ -3016,7 +3031,7 @@ export default function ExamIndex({
 
                             {isTimed ? (
                                 <div
-                                    className={`shadow-3xs flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-black ${
+                                    className={`shadow-3xs flex items-center gap-1.5 rounded-lg border px-2 sm:px-3 py-1.5 text-sm font-black ${
                                         timeLeft < 600
                                             ? 'animate-pulse border-rose-200 bg-rose-50 text-rose-700 dark:border-rose-900/30 dark:bg-rose-950/20 dark:text-rose-400'
                                             : 'border-border bg-background text-foreground'
@@ -3026,10 +3041,10 @@ export default function ExamIndex({
                                     {formatTime(timeLeft)}
                                 </div>
                             ) : (
-                                <div className="shadow-3xs flex items-center gap-1.5 rounded-lg border border-border bg-background px-3 py-1.5 text-sm font-black text-foreground">
+                                <div className="shadow-3xs flex items-center gap-1.5 rounded-lg border border-border bg-background px-2 sm:px-3 py-1.5 text-sm font-black text-foreground">
                                     <Timer className="size-4 animate-pulse text-emerald-500" />
                                     <span>{formatTime(timeLeft)}</span>
-                                    <span className="ml-0.5 border-l border-border pl-1.5 text-[10px] font-bold text-muted-foreground">
+                                    <span className="hidden md:inline ml-0.5 border-l border-border pl-1.5 text-[10px] font-bold text-muted-foreground">
                                         Untimed
                                     </span>
                                 </div>

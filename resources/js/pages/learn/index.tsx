@@ -105,7 +105,7 @@ export default function LearnIndex({ modules, categories }: LearnIndexProps) {
             <PageContainer>
                 {/* Header Banner */}
                 <PageHeader
-                    title="CSE Study Hub"
+                    title="Study Hub"
                     description="Dive deep into core subjects, learn mental shortcuts, and master exam theories with our dedicated curated study guides."
                 />
 

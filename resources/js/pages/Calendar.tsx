@@ -713,6 +713,14 @@ export default function Calendar() {
                         </div>
                         <div className="flex w-full flex-wrap items-center gap-2 md:w-auto">
                             <Button
+                                onClick={() => openModal(todayStr)}
+                                className="flex-1 bg-blue-600 text-white hover:bg-blue-700 md:flex-initial"
+                            >
+                                <Plus className="mr-2 h-4 w-4" />
+                                <span className="hidden sm:inline">Add Session</span>
+                                <span className="sm:hidden">Add</span>
+                            </Button>
+                            <Button
                                 variant="outline"
                                 onClick={() => setIsSuggestionsOpen(true)}
                                 disabled={isLoadingSuggestions}
@@ -786,14 +794,23 @@ export default function Calendar() {
                                 {week.map((calendarDay) => (
                                     <div
                                         key={calendarDay.date}
-                                        className={`relative flex min-h-24 flex-col rounded-lg border p-2 ${
+                                        onClick={() => {
+                                            if (calendarDay.isCurrentMonth && calendarDay.date >= todayStr) {
+                                                openModal(calendarDay.date);
+                                            }
+                                        }}
+                                        className={`group relative flex min-h-24 flex-col rounded-lg border p-2 transition-all ${
+                                            calendarDay.isCurrentMonth && calendarDay.date >= todayStr 
+                                                ? 'cursor-pointer hover:border-blue-300 hover:shadow-sm' 
+                                                : ''
+                                        } ${
                                             examDates.includes(calendarDay.date)
                                                 ? 'border-red-400 bg-red-50'
                                                 : isToday(calendarDay.date)
                                                   ? 'border-blue-400 bg-blue-50'
                                                   : calendarDay.isCurrentMonth
                                                     ? 'border-slate-200 bg-white'
-                                                    : 'border-slate-100 bg-slate-50'
+                                                    : 'border-slate-100 bg-slate-50 opacity-60'
                                         }`}
                                     >
                                         <div className="flex items-center justify-between">
@@ -833,12 +850,11 @@ export default function Calendar() {
                                                 calendarDay.date >=
                                                     todayStr && (
                                                     <button
-                                                        onClick={() =>
-                                                            openModal(
-                                                                calendarDay.date,
-                                                            )
-                                                        }
-                                                        className="rounded p-1 hover:bg-blue-50"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            openModal(calendarDay.date);
+                                                        }}
+                                                        className="rounded p-1 opacity-100 transition-opacity hover:bg-blue-100 lg:opacity-0 lg:group-hover:opacity-100"
                                                         title="Add study item"
                                                     >
                                                         <Plus className="h-4 w-4 text-blue-600" />
@@ -879,13 +895,14 @@ export default function Calendar() {
                                                                     </span>
                                                                 </div>
                                                                 <button
-                                                                    onClick={() =>
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation();
                                                                         handleDeleteSchedule(
                                                                             schedule.id,
                                                                             calendarDay.date,
-                                                                        )
-                                                                    }
-                                                                    className="ml-1 hidden shrink-0 group-hover:block"
+                                                                        );
+                                                                    }}
+                                                                    className="ml-1 hidden shrink-0 rounded p-0.5 hover:bg-red-100 group-hover:block"
                                                                     title="Delete"
                                                                 >
                                                                     <Trash2 className="h-3 w-3 text-red-600" />

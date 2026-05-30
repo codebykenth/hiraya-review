@@ -272,6 +272,41 @@ export default function Drills({
         questionCount,
     ]);
 
+    // Check if there are ANY filipino questions in this configuration
+    const hasFilipinoQuestions = React.useMemo(() => {
+        if (!selectedCategory) return false;
+        
+        return questions.some((q) => {
+            const catMatch =
+                q.category
+                    .toLowerCase()
+                    .includes(selectedCategory.name.toLowerCase()) ||
+                selectedCategory.name
+                    .toLowerCase()
+                    .includes(q.category.toLowerCase());
+            const subcatMatch =
+                selectedSubcats.length === 0 ||
+                selectedSubcats.some(
+                    (subName) =>
+                        q.subcategory
+                            .toLowerCase()
+                            .includes(subName.toLowerCase()) ||
+                        subName
+                            .toLowerCase()
+                            .includes(q.subcategory.toLowerCase()),
+                );
+
+            return catMatch && subcatMatch && q.language === 'Filipino';
+        });
+    }, [questions, selectedCategory, selectedSubcats]);
+
+    // Automatically switch to English if Filipino is no longer available
+    useEffect(() => {
+        if (!hasFilipinoQuestions && language !== 'English') {
+            setLanguage('English');
+        }
+    }, [hasFilipinoQuestions, language]);
+
     // Strict 1-liner comment: Pre-select category, subcategories, language, and question count on retake
     useEffect(() => {
         if (categories && categories.length > 0) {
@@ -709,7 +744,7 @@ export default function Drills({
                                 🌐 Language
                             </span>
                             <div className="flex flex-wrap gap-6">
-                                {['English', 'Filipino', 'Both'].map((lang) => {
+                                {(hasFilipinoQuestions ? ['English', 'Filipino', 'Both'] : ['English']).map((lang) => {
                                     const isSelected = language === lang;
 
                                     return (
