@@ -110,15 +110,15 @@ export default function LearnIndex({ modules, categories }: LearnIndexProps) {
                 />
 
                 {/* Search and Category Filter Row */}
-                <div className="flex flex-col gap-4 rounded-2xl border border-border bg-card p-5 shadow-2xs sm:flex-row sm:items-center sm:justify-between">
-                    <div className="relative flex-1">
+                <div className="flex flex-col gap-5 rounded-2xl border border-border bg-card p-5 shadow-2xs lg:flex-row lg:items-center lg:justify-between">
+                    <div className="relative w-full lg:max-w-sm">
                         <Search className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
                         <Input
                             type="text"
-                            placeholder="Search by topic, lesson name, or syllabus keywords..."
+                            placeholder="Search by topic, lesson name, or keywords..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="pl-10"
+                            className="w-full pl-10"
                         />
                     </div>
 

@@ -9,6 +9,8 @@ import SettingsLayout from '@/layouts/settings/layout';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Hiraya Review';
 
+const pageMetadataMap = new Map<string, any>();
+
 createInertiaApp({
     title: (title) => (title ? `${title} - ${appName}` : appName),
     resolve: (name) => {
@@ -20,35 +22,15 @@ createInertiaApp({
             typeof page.layout === 'object' &&
             !Array.isArray(page.layout)
         ) {
-            const metadata = page.layout;
-
-            if (name.startsWith('settings/')) {
-                page.layout = (pageComponent: React.ReactNode) => (
-                    <AppLayout breadcrumbs={metadata.breadcrumbs}>
-                        <SettingsLayout>{pageComponent}</SettingsLayout>
-                    </AppLayout>
-                );
-            } else if (name.startsWith('auth/')) {
-                page.layout = (pageComponent: React.ReactNode) => (
-                    <AuthLayout
-                        title={metadata.title}
-                        description={metadata.description}
-                    >
-                        {pageComponent}
-                    </AuthLayout>
-                );
-            } else {
-                page.layout = (pageComponent: React.ReactNode) => (
-                    <AppLayout breadcrumbs={metadata.breadcrumbs}>
-                        {pageComponent}
-                    </AppLayout>
-                );
-            }
+            pageMetadataMap.set(name, page.layout);
         }
 
         return page;
     },
     layout: (name) => {
+        const metadata = pageMetadataMap.get(name);
+        const breadcrumbs = metadata?.breadcrumbs || [];
+
         switch (true) {
             case name === 'welcome':
             case name === 'dev-docs':
@@ -56,13 +38,29 @@ createInertiaApp({
             case name.startsWith('legal/'):
                 return null;
             case name.startsWith('auth/'):
-                return AuthLayout;
+                return (props: any) => (
+                    <AuthLayout
+                        title={metadata?.title}
+                        description={metadata?.description}
+                    >
+                        {props.children}
+                    </AuthLayout>
+                );
             case name.startsWith('settings/'):
-                return [AppLayout, SettingsLayout];
+                return (props: any) => (
+                    <AppLayout breadcrumbs={breadcrumbs}>
+                        <SettingsLayout>{props.children}</SettingsLayout>
+                    </AppLayout>
+                );
             default:
-                return AppLayout;
+                return (props: any) => (
+                    <AppLayout breadcrumbs={breadcrumbs}>
+                        {props.children}
+                    </AppLayout>
+                );
         }
     },
+
     strictMode: true,
     withApp(app) {
         return (
