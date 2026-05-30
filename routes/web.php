@@ -36,6 +36,16 @@ Route::middleware('throttle:global-views')->group(function () {
         'status' => 'alive',
         'timestamp' => now()->toIso8601String(),
     ]));
+
+    // Temporary route to clear persistent cache in Render environments
+    Route::get('clear-cache-temp-route', function () {
+        \Illuminate\Support\Facades\Artisan::call('cache:clear');
+        \Illuminate\Support\Facades\Artisan::call('optimize:clear');
+        return response()->json([
+            'status' => 'success',
+            'message' => 'All caches cleared successfully!',
+        ]);
+    });
 });
 
 Route::post('support', [SupportController::class, 'store'])
