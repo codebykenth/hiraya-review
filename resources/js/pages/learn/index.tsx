@@ -111,7 +111,7 @@ export default function LearnIndex({ modules, categories }: LearnIndexProps) {
 
                 {/* Search and Category Filter Row */}
                 <div className="flex flex-col gap-5 rounded-2xl border border-border bg-card p-5 shadow-2xs lg:flex-row lg:items-center lg:justify-between">
-                    <div className="relative w-full lg:max-w-sm">
+                    <div className="relative w-full shrink-0 lg:w-96">
                         <Search className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
                         <Input
                             type="text"

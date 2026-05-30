@@ -9,58 +9,67 @@ import SettingsLayout from '@/layouts/settings/layout';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Hiraya Review';
 
-const pageMetadataMap = new Map<string, any>();
+const componentCache = new Map<string, any>();
 
 createInertiaApp({
     title: (title) => (title ? `${title} - ${appName}` : appName),
     resolve: (name) => {
-        const pages = import.meta.glob('./pages/**/*.tsx', { eager: true });
-        const page = (pages[`./pages/${name}.tsx`] as any).default;
-
-        if (
-            page.layout &&
-            typeof page.layout === 'object' &&
-            !Array.isArray(page.layout)
-        ) {
-            pageMetadataMap.set(name, page.layout);
+        if (componentCache.has(name)) {
+            return componentCache.get(name);
         }
 
-        return page;
-    },
-    layout: (name) => {
-        const metadata = pageMetadataMap.get(name);
-        const breadcrumbs = metadata?.breadcrumbs || [];
+        const pages = import.meta.glob('./pages/**/*.tsx', { eager: true });
+        const OriginalComponent = (pages[`./pages/${name}.tsx`] as any).default;
 
-        switch (true) {
-            case name === 'welcome':
-            case name === 'dev-docs':
-            case name === 'guide':
-            case name.startsWith('legal/'):
-                return null;
-            case name.startsWith('auth/'):
-                return (props: any) => (
+        const WrappedComponent: any = (props: any) => <OriginalComponent {...props} />;
+
+        let metadata: any = {};
+        if (
+            OriginalComponent.layout &&
+            typeof OriginalComponent.layout === 'object' &&
+            !Array.isArray(OriginalComponent.layout)
+        ) {
+            metadata = OriginalComponent.layout;
+        }
+
+        const needsNoLayout =
+            name === 'welcome' ||
+            name === 'dev-docs' ||
+            name === 'guide' ||
+            name.startsWith('legal/');
+
+        let pageLayout: any = undefined;
+
+        if (!needsNoLayout) {
+            if (name.startsWith('settings/')) {
+                pageLayout = (page: any) => (
+                    <AppLayout breadcrumbs={metadata.breadcrumbs}>
+                        <SettingsLayout>{page}</SettingsLayout>
+                    </AppLayout>
+                );
+            } else if (name.startsWith('auth/')) {
+                pageLayout = (page: any) => (
                     <AuthLayout
-                        title={metadata?.title}
-                        description={metadata?.description}
+                        title={metadata.title}
+                        description={metadata.description}
                     >
-                        {props.children}
+                        {page}
                     </AuthLayout>
                 );
-            case name.startsWith('settings/'):
-                return (props: any) => (
-                    <AppLayout breadcrumbs={breadcrumbs}>
-                        <SettingsLayout>{props.children}</SettingsLayout>
+            } else {
+                pageLayout = (page: any) => (
+                    <AppLayout breadcrumbs={metadata.breadcrumbs}>
+                        {page}
                     </AppLayout>
                 );
-            default:
-                return (props: any) => (
-                    <AppLayout breadcrumbs={breadcrumbs}>
-                        {props.children}
-                    </AppLayout>
-                );
+            }
         }
-    },
 
+        WrappedComponent.layout = pageLayout;
+
+        componentCache.set(name, WrappedComponent);
+        return WrappedComponent;
+    },
     strictMode: true,
     withApp(app) {
         return (
