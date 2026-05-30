@@ -49,32 +49,84 @@ class LearnController extends Controller
         ]);
     }
 
-    /**
-     * Display the full details of a specific learning module.
-     */
     public function show(string $slug): Response
     {
         $isAdmin = auth()->user() && auth()->user()->role === 'admin';
 
         if ($isAdmin) {
             // Admins can see draft/unpublished modules in real-time without caching
-            $module = LearnModule::with(['category', 'subcategory', 'creator'])
+            $mod = LearnModule::with(['category', 'subcategory', 'creator'])
                 ->where('slug', $slug)
                 ->firstOrFail();
+            $module = [
+                'id' => $mod->id,
+                'category_id' => $mod->category_id,
+                'title' => $mod->title,
+                'slug' => $mod->slug,
+                'topic' => $mod->topic,
+                'summary' => $mod->summary,
+                'content' => $mod->content,
+                'estimated_minutes' => $mod->estimated_minutes,
+                'is_published' => (bool) $mod->is_published,
+                'category' => $mod->category?->name ?? 'General Info',
+                'subcategory' => $mod->subcategory?->name ?? 'Core Concepts',
+                'creator_name' => $mod->creator?->name ?? 'Expert Reviewer',
+                'updated_at' => $mod->updated_at?->format('M d, Y') ?? now()->format('M d, Y'),
+            ];
         } else {
             // General users fetch cached module details for blazing fast speeds
             $module = Cache::rememberForever("learn.module.show.{$slug}", function () use ($slug) {
-                return LearnModule::with(['category', 'subcategory', 'creator'])
+                $mod = LearnModule::with(['category', 'subcategory', 'creator'])
                     ->where('slug', $slug)
                     ->where('is_published', true)
                     ->firstOrFail();
+                return [
+                    'id' => $mod->id,
+                    'category_id' => $mod->category_id,
+                    'title' => $mod->title,
+                    'slug' => $mod->slug,
+                    'topic' => $mod->topic,
+                    'summary' => $mod->summary,
+                    'content' => $mod->content,
+                    'estimated_minutes' => $mod->estimated_minutes,
+                    'is_published' => (bool) $mod->is_published,
+                    'category' => $mod->category?->name ?? 'General Info',
+                    'subcategory' => $mod->subcategory?->name ?? 'Core Concepts',
+                    'creator_name' => $mod->creator?->name ?? 'Expert Reviewer',
+                    'updated_at' => $mod->updated_at?->format('M d, Y') ?? now()->format('M d, Y'),
+                ];
             });
         }
 
+        // Inline self-healing check to clear and rebuild corrupt stale cache entries
+        if (is_object($module) || !is_array($module)) {
+            Cache::forget("learn.module.show.{$slug}");
+            $mod = LearnModule::with(['category', 'subcategory', 'creator'])
+                ->where('slug', $slug)
+                ->where('is_published', true)
+                ->firstOrFail();
+            $module = [
+                'id' => $mod->id,
+                'category_id' => $mod->category_id,
+                'title' => $mod->title,
+                'slug' => $mod->slug,
+                'topic' => $mod->topic,
+                'summary' => $mod->summary,
+                'content' => $mod->content,
+                'estimated_minutes' => $mod->estimated_minutes,
+                'is_published' => (bool) $mod->is_published,
+                'category' => $mod->category?->name ?? 'General Info',
+                'subcategory' => $mod->subcategory?->name ?? 'Core Concepts',
+                'creator_name' => $mod->creator?->name ?? 'Expert Reviewer',
+                'updated_at' => $mod->updated_at?->format('M d, Y') ?? now()->format('M d, Y'),
+            ];
+            Cache::forever("learn.module.show.{$slug}", $module);
+        }
+
         // Fetch recommended lessons from cache
-        $recommended = Cache::rememberForever("learn.module.recommended.{$module->id}", function () use ($module) {
-            return LearnModule::where('category_id', $module->category_id)
-                ->where('id', '!=', $module->id)
+        $recommended = Cache::rememberForever("learn.module.recommended.{$module['id']}", function () use ($module) {
+            return LearnModule::where('category_id', $module['category_id'])
+                ->where('id', '!=', $module['id'])
                 ->where('is_published', true)
                 ->take(3)
                 ->get()
@@ -87,21 +139,25 @@ class LearnController extends Controller
                 })->toArray();
         });
 
+        if (is_object($recommended) || !is_array($recommended)) {
+            Cache::forget("learn.module.recommended.{$module['id']}");
+            $recommended = LearnModule::where('category_id', $module['category_id'])
+                ->where('id', '!=', $module['id'])
+                ->where('is_published', true)
+                ->take(3)
+                ->get()
+                ->map(function ($mod) {
+                    return [
+                        'title' => $mod->title,
+                        'slug' => $mod->slug,
+                        'estimated_minutes' => $mod->estimated_minutes,
+                    ];
+                })->toArray();
+            Cache::forever("learn.module.recommended.{$module['id']}", $recommended);
+        }
+
         return Inertia::render('learn/show', [
-            'module' => [
-                'id' => $module->id,
-                'title' => $module->title,
-                'slug' => $module->slug,
-                'topic' => $module->topic,
-                'summary' => $module->summary,
-                'content' => $module->content,
-                'estimated_minutes' => $module->estimated_minutes,
-                'is_published' => (bool) $module->is_published,
-                'category' => $module->category?->name ?? 'General Info',
-                'subcategory' => $module->subcategory?->name ?? 'Core Concepts',
-                'creator_name' => $module->creator?->name ?? 'Expert Reviewer',
-                'updated_at' => $module->updated_at->format('M d, Y'),
-            ],
+            'module' => $module,
             'recommended' => $recommended,
         ]);
     }
