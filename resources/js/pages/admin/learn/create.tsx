@@ -278,7 +278,12 @@ export default function AdminLearnCreate({
             );
         };
 
+        const handleAiFailed = () => {
+            setIsGenerating(false);
+        };
+
         window.addEventListener('ai_generation_completed', handleAiComplete);
+        window.addEventListener('ai_generation_failed', handleAiFailed);
 
         return () => {
             generateAbortRef.current?.abort();
@@ -286,6 +291,7 @@ export default function AdminLearnCreate({
                 'ai_generation_completed',
                 handleAiComplete,
             );
+            window.removeEventListener('ai_generation_failed', handleAiFailed);
         };
     }, []);
 

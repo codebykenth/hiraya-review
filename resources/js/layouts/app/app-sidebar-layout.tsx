@@ -55,9 +55,8 @@ export default function AppSidebarLayout({
             enabledTransports: ['ws', 'wss'],
         });
 
-        echo.private(`App.Models.User.${auth.user.id}`).listen(
-            'AiGenerationCompleted',
-            (e: any) => {
+        echo.private(`App.Models.User.${auth.user.id}`)
+            .listen('AiGenerationCompleted', (e: any) => {
                 toast.success(e.message, {
                     duration: 8000,
                     action: {
@@ -78,8 +77,20 @@ export default function AppSidebarLayout({
 
                 // Notify forms that AI is done so they can update their loading state
                 window.dispatchEvent(new Event('ai_generation_completed'));
-            },
-        );
+            })
+            .listen('AiGenerationFailed', (e: any) => {
+                toast.error(e.message, {
+                    duration: 8000,
+                });
+
+                // Disconnect and clean up on error
+                localStorage.removeItem('waiting_for_ai');
+                setIsWaitingForAi(false);
+                echo.disconnect();
+
+                // Dispatch failure event
+                window.dispatchEvent(new Event('ai_generation_failed'));
+            });
 
         return () => {
             echo.disconnect();

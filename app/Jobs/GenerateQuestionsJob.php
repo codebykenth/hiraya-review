@@ -39,6 +39,7 @@ class GenerateQuestionsJob implements ShouldQueue
         $apiKey = config('services.gemini.key') ?: env('GEMINI_API_KEY');
         if (! $apiKey) {
             Log::error('GenerateQuestionsJob: GEMINI_API_KEY is missing.');
+            \App\Events\AiGenerationFailed::dispatch($this->userId, 'API Key is missing.', 'questions');
             return;
         }
 
@@ -137,6 +138,7 @@ Language: {$validated['language']}
 
             if ($response->failed()) {
                 Log::error("GenerateQuestionsJob: API failed with status " . $response->status() . ": " . $response->body());
+                \App\Events\AiGenerationFailed::dispatch($this->userId, 'AI Generation failed. The API returned an error.', 'questions');
                 return;
             }
 
@@ -152,6 +154,7 @@ Language: {$validated['language']}
             $questions = json_decode($text, true);
             if (! $questions || ! is_array($questions)) {
                 Log::error('GenerateQuestionsJob: Invalid JSON structure. Raw output: ' . $text);
+                \App\Events\AiGenerationFailed::dispatch($this->userId, 'AI Generation failed. Invalid response format.', 'questions');
                 return;
             }
 
@@ -192,6 +195,7 @@ Language: {$validated['language']}
 
         } catch (\Exception $e) {
             Log::error('GenerateQuestionsJob: Error: ' . $e->getMessage() . "\nTrace: " . $e->getTraceAsString());
+            \App\Events\AiGenerationFailed::dispatch($this->userId, 'An unexpected error occurred during AI generation.', 'questions');
         }
     }
 }

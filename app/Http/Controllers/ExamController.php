@@ -101,6 +101,7 @@ class ExamController extends Controller
                         'category' => $q->subcategory?->category?->name ?? 'General Information',
                         'subcategory' => $q->subcategory?->name ?? '',
                         'language' => $q->language,
+                        'isDemographic' => $q->subcategory?->category?->is_demographic ?? false,
                     ];
                 })->toArray();
         });
@@ -568,6 +569,7 @@ class ExamController extends Controller
                         'category' => $q->subcategory?->category?->name ?? 'General Information',
                         'subcategory' => $q->subcategory?->name ?? '',
                         'language' => $q->language ?? 'English',
+                        'isDemographic' => $q->subcategory?->category?->is_demographic ?? false,
                     ];
                 })->toArray();
         });

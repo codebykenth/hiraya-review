@@ -22,6 +22,8 @@ export default function AdminSyllabusIndex({
         number | null
     >(categories && categories.length > 0 ? categories[0].id : null);
     const [newCategoryName, setNewCategoryName] = useState('');
+    const [newCategoryIsDemographic, setNewCategoryIsDemographic] =
+        useState(false);
     const [newSubcategoryName, setNewSubcategoryName] = useState('');
 
     // Edit states
@@ -61,10 +63,16 @@ export default function AdminSyllabusIndex({
 
         router.post(
             '/questions/categories',
-            { name: newCategoryName },
+            {
+                name: newCategoryName,
+                is_demographic: newCategoryIsDemographic,
+            },
             {
                 preserveScroll: true,
-                onSuccess: () => setNewCategoryName(''),
+                onSuccess: () => {
+                    setNewCategoryName('');
+                    setNewCategoryIsDemographic(false);
+                },
             },
         );
     };
@@ -197,24 +205,41 @@ export default function AdminSyllabusIndex({
 
                         <form
                             onSubmit={handleAddCategory}
-                            className="mb-4 flex gap-2"
+                            className="mb-4 flex flex-col gap-2"
                         >
-                            <input
-                                type="text"
-                                placeholder="Add new category..."
-                                value={newCategoryName}
-                                onChange={(e) =>
-                                    setNewCategoryName(e.target.value)
-                                }
-                                className="flex-1 rounded-xl border border-border bg-background px-3.5 py-2 text-sm font-semibold text-foreground transition focus:border-blue-500 focus:outline-none"
-                                required
-                            />
-                            <button
-                                type="submit"
-                                className="shadow-3xs inline-flex shrink-0 cursor-pointer items-center justify-center rounded-xl bg-blue-600 px-4 text-sm font-bold text-white transition hover:bg-blue-700 active:bg-blue-800"
-                            >
-                                <Plus className="size-4" />
-                            </button>
+                            <div className="flex gap-2">
+                                <input
+                                    type="text"
+                                    placeholder="Add new category..."
+                                    value={newCategoryName}
+                                    onChange={(e) =>
+                                        setNewCategoryName(e.target.value)
+                                    }
+                                    className="flex-1 rounded-xl border border-border bg-background px-3.5 py-2 text-sm font-semibold text-foreground transition focus:border-blue-500 focus:outline-none"
+                                    required
+                                />
+                                <button
+                                    type="submit"
+                                    className="shadow-3xs inline-flex shrink-0 cursor-pointer items-center justify-center rounded-xl bg-blue-600 px-4 text-sm font-bold text-white transition hover:bg-blue-700 active:bg-blue-800"
+                                >
+                                    <Plus className="size-4" />
+                                </button>
+                            </div>
+                            <label className="flex cursor-pointer items-center gap-2 self-start px-1 py-1 select-none">
+                                <input
+                                    type="checkbox"
+                                    checked={newCategoryIsDemographic}
+                                    onChange={(e) =>
+                                        setNewCategoryIsDemographic(
+                                            e.target.checked,
+                                        )
+                                    }
+                                    className="size-4 cursor-pointer rounded border-border text-blue-600 focus:ring-blue-500"
+                                />
+                                <span className="text-xs font-semibold text-muted-foreground">
+                                    Is demographic?
+                                </span>
+                            </label>
                         </form>
 
                         <div className="flex-1 space-y-2">

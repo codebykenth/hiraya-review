@@ -39,6 +39,7 @@ class GenerateLearnModuleJob implements ShouldQueue
         $apiKey = config('services.gemini.key') ?: env('GEMINI_API_KEY');
         if (! $apiKey) {
             Log::error('GenerateLearnModuleJob: GEMINI_API_KEY is missing.');
+            \App\Events\AiGenerationFailed::dispatch($this->userId, 'API Key is missing.', 'module');
             return;
         }
 
@@ -120,6 +121,7 @@ Topic: {$validated['topic']}
 
             if ($response->failed()) {
                 Log::error('GenerateLearnModuleJob: API failed: ' . $response->body());
+                \App\Events\AiGenerationFailed::dispatch($this->userId, 'AI Generation failed. The API returned an error.', 'module');
                 return;
             }
 
@@ -135,6 +137,7 @@ Topic: {$validated['topic']}
             $moduleData = json_decode($text, true);
             if (! $moduleData || ! isset($moduleData['content'])) {
                 Log::error('GenerateLearnModuleJob: Invalid JSON structure: ' . $text);
+                \App\Events\AiGenerationFailed::dispatch($this->userId, 'AI Generation failed. Invalid response format.', 'module');
                 return;
             }
 
@@ -181,6 +184,7 @@ Topic: {$validated['topic']}
 
         } catch (\Exception $e) {
             Log::error('GenerateLearnModuleJob: Error: ' . $e->getMessage() . "\n" . $e->getTraceAsString());
+            \App\Events\AiGenerationFailed::dispatch($this->userId, 'An unexpected error occurred during AI generation.', 'module');
         }
     }
 }

@@ -182,10 +182,7 @@ export function NavMain({
                     if (hasAttemptId) {
                         if (item.title === 'History') {
                             active = true;
-                        } else if (
-                            item.title === 'Exam' ||
-                            item.title === 'Practice'
-                        ) {
+                        } else {
                             active = false;
                         }
                     }

@@ -125,17 +125,17 @@ export default function CreateQuestion({
         }
     }, [aiCategory, aiSubcategory, cseCategoriesTree]);
 
-    // Manual Entry Form
-    const { data, setData, post, processing, errors, reset } = useForm({
-        stem: '',
-        category: defaultCategory,
-        subcategory: defaultSubcategory,
-        language: 'English',
-        options: ['', '', '', '', ''],
-        correct_option: 0,
-        explanation: '',
-        status: 'active' as 'active' | 'draft',
-    });
+    const { data, setData, post, processing, errors, reset, transform } =
+        useForm({
+            stem: '',
+            category: defaultCategory,
+            subcategory: defaultSubcategory,
+            language: 'English',
+            options: ['', '', '', '', ''],
+            correct_option: 0,
+            explanation: '',
+            status: 'active' as 'active' | 'draft',
+        });
 
     // Sync subcategories for Manual view
     useEffect(() => {
@@ -158,6 +158,12 @@ export default function CreateQuestion({
         setData('options', newOptions);
     };
 
+    const isDemographic = useMemo(() => {
+        const cat = categories.find((c) => c.name === data.category);
+
+        return cat?.is_demographic || data.category === 'Demographic Profile';
+    }, [data.category, categories]);
+
     const handleManualSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
@@ -165,7 +171,14 @@ export default function CreateQuestion({
             return;
         }
 
-        if (data.options.some((opt) => !opt.trim())) {
+        if (!isDemographic && data.options.some((opt) => !opt.trim())) {
+            return;
+        }
+
+        if (
+            isDemographic &&
+            data.options.filter((opt) => opt.trim()).length < 2
+        ) {
             return;
         }
 
@@ -176,6 +189,13 @@ export default function CreateQuestion({
             },
         });
     };
+
+    transform((data) => ({
+        ...data,
+        options: isDemographic
+            ? data.options.filter((opt) => opt.trim() !== '')
+            : data.options,
+    }));
 
     const handleGenerateAI = async () => {
         generateAbortRef.current?.abort();
@@ -251,7 +271,12 @@ export default function CreateQuestion({
             );
         };
 
+        const handleAiFailed = () => {
+            setIsGenerating(false);
+        };
+
         window.addEventListener('ai_generation_completed', handleAiComplete);
+        window.addEventListener('ai_generation_failed', handleAiFailed);
 
         return () => {
             generateAbortRef.current?.abort();
@@ -259,6 +284,7 @@ export default function CreateQuestion({
                 'ai_generation_completed',
                 handleAiComplete,
             );
+            window.removeEventListener('ai_generation_failed', handleAiFailed);
         };
     }, []);
 
@@ -555,9 +581,11 @@ export default function CreateQuestion({
                             <CheckCircle2 className="size-4.5 text-emerald-600" />
                             Answer Options
                         </h2>
-                        <span className="bg-blue-550/10 inline-flex rounded-md px-2 py-0.5 text-[10px] font-bold tracking-wider text-blue-700 uppercase">
-                            Mark 1 Correct Answer
-                        </span>
+                        {!isDemographic && (
+                            <span className="bg-blue-550/10 inline-flex rounded-md px-2 py-0.5 text-[10px] font-bold tracking-wider text-blue-700 uppercase">
+                                Mark 1 Correct Answer
+                            </span>
+                        )}
                     </div>
 
                     <div className="space-y-4">
@@ -570,20 +598,25 @@ export default function CreateQuestion({
                                         : 'border-border'
                                 }`}
                             >
-                                <label className="flex cursor-pointer items-center">
-                                    <input
-                                        type="radio"
-                                        name="correct_option"
-                                        checked={data.correct_option === idx}
-                                        onChange={() =>
-                                            setData('correct_option', idx)
-                                        }
-                                        className="size-5 cursor-pointer accent-emerald-600"
-                                    />
-                                </label>
+                                {!isDemographic && (
+                                    <label className="flex cursor-pointer items-center">
+                                        <input
+                                            type="radio"
+                                            name="correct_option"
+                                            checked={
+                                                data.correct_option === idx
+                                            }
+                                            onChange={() =>
+                                                setData('correct_option', idx)
+                                            }
+                                            className="size-5 cursor-pointer accent-emerald-600"
+                                        />
+                                    </label>
+                                )}
 
                                 <span
                                     className={`inline-flex size-7 shrink-0 items-center justify-center rounded-lg text-xs font-bold ${
+                                        !isDemographic &&
                                         data.correct_option === idx
                                             ? 'bg-emerald-600 text-white'
                                             : 'bg-muted text-muted-foreground'
@@ -600,49 +633,63 @@ export default function CreateQuestion({
                                     }
                                     placeholder={`Enter option ${String.fromCharCode(65 + idx)} content`}
                                     className="w-full bg-transparent text-sm font-semibold text-foreground placeholder:text-muted-foreground focus:outline-none"
-                                    required
+                                    required={!isDemographic || idx < 2}
                                 />
                             </div>
                         ))}
                     </div>
+                    {errors.options && (
+                        <p className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-red-600">
+                            <AlertCircle className="size-3.5" />
+                            {errors.options}
+                        </p>
+                    )}
+                    {errors.correct_option && (
+                        <p className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-red-600">
+                            <AlertCircle className="size-3.5" />
+                            {errors.correct_option}
+                        </p>
+                    )}
                 </div>
 
                 {/* Explanation Card */}
-                <div className="rounded-2xl border border-border bg-card p-6 shadow-xs">
-                    <h2 className="mb-4 border-b border-border pb-3 text-base font-bold text-foreground">
-                        Explanation & Rationale
-                    </h2>
+                {!isDemographic && (
+                    <div className="rounded-2xl border border-border bg-card p-6 shadow-xs">
+                        <h2 className="mb-4 border-b border-border pb-3 text-base font-bold text-foreground">
+                            Explanation & Rationale
+                        </h2>
 
-                    <div className="space-y-2">
-                        <label
-                            htmlFor="explanation"
-                            className="text-xs font-bold tracking-wider text-muted-foreground uppercase"
-                        >
-                            Provide the reasoning behind the correct answer
-                        </label>
-                        <textarea
-                            id="explanation"
-                            value={data.explanation}
-                            onChange={(e) =>
-                                setData('explanation', e.target.value)
-                            }
-                            rows={4}
-                            placeholder="Why is this the correct answer? Provide logic constraints, solution steps, or constitutional references..."
-                            className={`w-full rounded-xl border p-4 text-sm font-medium text-foreground transition placeholder:text-muted-foreground focus:bg-background focus:outline-none ${
-                                errors.explanation
-                                    ? 'border-red-500'
-                                    : 'border-slate-200 focus:border-blue-500'
-                            }`}
-                            required
-                        />
-                        {errors.explanation && (
-                            <p className="mt-1 inline-flex items-center gap-1 text-xs font-semibold text-red-600">
-                                <AlertCircle className="size-3.5" />
-                                {errors.explanation}
-                            </p>
-                        )}
+                        <div className="space-y-2">
+                            <label
+                                htmlFor="explanation"
+                                className="text-xs font-bold tracking-wider text-muted-foreground uppercase"
+                            >
+                                Provide the reasoning behind the correct answer
+                            </label>
+                            <textarea
+                                id="explanation"
+                                value={data.explanation}
+                                onChange={(e) =>
+                                    setData('explanation', e.target.value)
+                                }
+                                rows={4}
+                                placeholder="Why is this the correct answer? Provide logic constraints, solution steps, or constitutional references..."
+                                className={`w-full rounded-xl border p-4 text-sm font-medium text-foreground transition placeholder:text-muted-foreground focus:bg-background focus:outline-none ${
+                                    errors.explanation
+                                        ? 'border-red-500'
+                                        : 'border-slate-200 focus:border-blue-500'
+                                }`}
+                                required
+                            />
+                            {errors.explanation && (
+                                <p className="mt-1 inline-flex items-center gap-1 text-xs font-semibold text-red-600">
+                                    <AlertCircle className="size-3.5" />
+                                    {errors.explanation}
+                                </p>
+                            )}
+                        </div>
                     </div>
-                </div>
+                )}
             </div>
 
             {/* METADATA, ATTACHMENT & SUBMISSIONS (4/12 cols) */}
@@ -662,12 +709,22 @@ export default function CreateQuestion({
                         />
 
                         {/* Subcategory Select */}
-                        <SelectField
-                            label="Subcategory"
-                            value={data.subcategory}
-                            onValueChange={(val) => setData('subcategory', val)}
-                            options={cseCategoriesTree[data.category] || []}
-                        />
+                        <div className="flex flex-col gap-1">
+                            <SelectField
+                                label="Subcategory"
+                                value={data.subcategory}
+                                onValueChange={(val) =>
+                                    setData('subcategory', val)
+                                }
+                                options={cseCategoriesTree[data.category] || []}
+                            />
+                            {errors.subcategory && (
+                                <p className="mt-1 inline-flex items-center gap-1 text-[10px] font-semibold text-red-600">
+                                    <AlertCircle className="size-3" />
+                                    {errors.subcategory}
+                                </p>
+                            )}
+                        </div>
 
                         {/* Language Select */}
                         <SelectField

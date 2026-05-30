@@ -169,10 +169,10 @@ class StudyPlanAnalyzer
     private function getOverarchingCategory(string $areaName): string
     {
         $categoryMapping = [
-            'verbal ability' => ['verbal', 'word meaning', 'error recognition', 'sentence structure', 'reading comprehension', 'paragraph organization', 'sentence completion', 'word analogy', 'grammar', 'vocabulary'],
-            'analytical ability' => ['analytical', 'identifying assumptions', 'drawing conclusions', 'symbolic logic', 'abstract reasoning', 'logical reasoning'],
+            'verbal ability' => ['verbal', 'word meaning', 'error recognition', 'sentence structure', 'reading comprehension', 'paragraph organization', 'sentence completion', 'grammar', 'vocabulary'],
+            'analytical ability' => ['analytical', 'identifying assumptions', 'drawing conclusions', 'symbolic logic', 'abstract reasoning', 'logical reasoning', 'word analogy', 'data interpretation'],
             'clerical' => ['clerical', 'alphabetizing', 'spelling', 'filing'],
-            'numerical ability' => ['numerical', 'word problems', 'number sequence', 'basic operations', 'data interpretation', 'math'],
+            'numerical ability' => ['numerical', 'word problems', 'number sequence', 'basic operations', 'math'],
             'general information' => ['general information', 'philippine constitution', 'r.a. 6713', 'code of conduct', 'peace and human rights', 'environment management', 'environmental'],
         ];
 
@@ -190,10 +190,10 @@ class StudyPlanAnalyzer
     private function getTopicCountForArea(string $areaName): int
     {
         $categoryMapping = [
-            'verbal ability' => ['verbal', 'word meaning', 'error recognition', 'sentence structure', 'reading comprehension', 'paragraph organization', 'sentence completion', 'word analogy', 'grammar', 'vocabulary'],
-            'analytical ability' => ['analytical', 'identifying assumptions', 'drawing conclusions', 'symbolic logic', 'abstract reasoning', 'logical reasoning'],
+            'verbal ability' => ['verbal', 'word meaning', 'error recognition', 'sentence structure', 'reading comprehension', 'paragraph organization', 'sentence completion', 'grammar', 'vocabulary'],
+            'analytical ability' => ['analytical', 'identifying assumptions', 'drawing conclusions', 'symbolic logic', 'abstract reasoning', 'logical reasoning', 'word analogy', 'data interpretation'],
             'clerical' => ['clerical', 'alphabetizing', 'spelling', 'filing'],
-            'numerical ability' => ['numerical', 'word problems', 'number sequence', 'basic operations', 'data interpretation', 'math'],
+            'numerical ability' => ['numerical', 'word problems', 'number sequence', 'basic operations', 'math'],
             'general information' => ['general information', 'philippine constitution', 'r.a. 6713', 'code of conduct', 'peace and human rights', 'environment management', 'environmental'],
         ];
 
@@ -303,10 +303,10 @@ class StudyPlanAnalyzer
     private function getSubtopicForArea(string $areaName, int $index): ?array
     {
         $categoryMapping = [
-            'verbal ability' => ['verbal', 'word meaning', 'error recognition', 'sentence structure', 'reading comprehension', 'paragraph organization', 'sentence completion', 'word analogy', 'grammar', 'vocabulary'],
-            'analytical ability' => ['analytical', 'identifying assumptions', 'drawing conclusions', 'symbolic logic', 'abstract reasoning', 'logical reasoning'],
+            'verbal ability' => ['verbal', 'word meaning', 'error recognition', 'sentence structure', 'reading comprehension', 'paragraph organization', 'sentence completion', 'grammar', 'vocabulary'],
+            'analytical ability' => ['analytical', 'identifying assumptions', 'drawing conclusions', 'symbolic logic', 'abstract reasoning', 'logical reasoning', 'word analogy', 'data interpretation'],
             'clerical' => ['clerical', 'alphabetizing', 'spelling', 'filing'],
-            'numerical ability' => ['numerical', 'word problems', 'number sequence', 'basic operations', 'data interpretation', 'math'],
+            'numerical ability' => ['numerical', 'word problems', 'number sequence', 'basic operations', 'math'],
             'general information' => ['general information', 'philippine constitution', 'r.a. 6713', 'code of conduct', 'peace and human rights', 'environment management', 'environmental'],
         ];
 
@@ -347,6 +347,8 @@ class StudyPlanAnalyzer
                 ['title' => 'Cognitive Reasoning', 'desc' => 'Practice critical thinking and evaluating arguments or hypotheses.'],
                 ['title' => 'Symbolic Reasoning', 'desc' => 'Analyze patterns, symbols, and sequence translations.'],
                 ['title' => 'Abstract Reasoning', 'desc' => 'Identify non-verbal patterns, shapes, and spatial logic.'],
+                ['title' => 'Word Analogy', 'desc' => 'Identify relationships between words and solve corresponding pairs.'],
+                ['title' => 'Data Interpretation', 'desc' => 'Analyze and draw conclusions from tables, graphs, and statistical data.'],
             ],
             'clerical' => [
                 ['title' => 'Vocabulary and Spelling', 'desc' => 'Focus on correct word usage, spelling rules, and vocabulary building.'],

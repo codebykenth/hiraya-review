@@ -1,30 +1,21 @@
-import { Head, Link, router, setLayoutProps, usePage } from '@inertiajs/react';
+import { Head, router, setLayoutProps, usePage } from '@inertiajs/react';
 import {
     Award,
     ClipboardList,
     List,
-    CheckCircle2,
     Clock,
     Timer,
     ArrowRight,
     X,
-    LayoutGrid,
-    Sparkles,
-    AlertCircle,
-    Flag,
-    ChevronLeft,
-    ChevronRight,
-    BookOpen,
-    HelpCircle,
-    RotateCcw,
-    ChevronDown,
-    Brain,
-    Calculator,
-    Users,
-    Lock,
-    LogIn,
+    CheckCircle2,
 } from 'lucide-react';
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, {
+    useState,
+    useEffect,
+    useRef,
+    useCallback,
+    useMemo,
+} from 'react';
 import { PageContainer } from '@/components/page-container';
 import { Button } from '@/components/ui/button';
 import {
@@ -34,7 +25,12 @@ import {
     DialogTitle,
     DialogFooter,
 } from '@/components/ui/dialog';
+import { fallbackDemographicQuestions } from '@/data/fallback-demographics';
+import { formatDuration } from '@/lib/exam-formatters';
 import { index as examsIndex } from '@/routes/exams';
+import { LiveExamView } from './components/live-exam-view';
+import { ReviewExamView } from './components/review-exam-view';
+import { ScorecardView } from './components/scorecard-view';
 
 interface Question {
     id: number;
@@ -55,424 +51,19 @@ interface CategoryItem {
     subcategory?: { id: number; name: string }[];
 }
 
-interface TrackConfigItem {
-    id: number;
-    track: string;
-    category_id: number;
-    item_count: number;
-    time_limit_secs: number;
-}
-
-const extractPropositions = (stem: string) => {
-    const regex = /\(\s*([A-Z])\s*\)/g;
-    const matches: { letter: string; phrase: string }[] = [];
-    let match;
-
-    while ((match = regex.exec(stem)) !== null) {
-        const letter = match[1];
-        const index = match.index;
-        const beforeText = stem
-            .substring(Math.max(0, index - 80), index)
-            .trim();
-        const parts = beforeText.split(
-            /(?:\.|\bif\b|\bthen\b|\bthat\b|\band\b|,)\s*/i,
-        );
-        let phrase = parts[parts.length - 1].trim();
-
-        phrase = phrase.replace(/^(?:a|an|the|they|he|she|it|to)\s+/i, '');
-
-        if (phrase) {
-            phrase = phrase.charAt(0).toUpperCase() + phrase.slice(1);
-
-            if (!matches.some((m) => m.letter === letter)) {
-                matches.push({ letter, phrase });
-            }
-        }
-    }
-
-    return matches;
-};
-
-const renderFormattedText = (
-    text: string,
-    stripLogicSymbols: boolean = false,
-    letterMap?: Record<string, string>,
-) => {
-    if (!text) {
-        return null;
-    }
-
-    // Strict 1-liner comment: Dynamically strip parenthesized logical variable markers if requested
-    const processedText = stripLogicSymbols
-        ? text.replace(/\s*\(\s*[~¬]?\s*[A-Z]\s*\)/g, '')
-        : text;
-
-    // Strict 1-liner comment: Pre-format continuous single-line numbered lists to newlines
-    const cleanedText = processedText.replace(
-        /(?:\s+|:|^)(\d+\.)\s+/g,
-        '\n$1 ',
-    );
-
-    const tableRegex = /((?:^|\n)\|[^\n]+\|[^\n]*(?:\n\|[^\n]+\|[^\n]*)+)/g;
-    const parts = cleanedText.split(tableRegex);
-
-    const formatNumberedLists = (inputText: string) => {
-        if (!inputText) {
-            return null;
-        }
-
-        const lines = inputText.split(/\n/);
-        const listRegex = /^\s*(\(\d+\)|\d+\.)\s+(.+)$/;
-
-        const listItems: { marker: string; text: string }[] = [];
-        const introLines: string[] = [];
-        const outroLines: string[] = [];
-
-        for (const line of lines) {
-            const trimmed = line.trim();
-
-            if (!trimmed) {
-                continue;
-            }
-
-            const match = trimmed.match(listRegex);
-
-            if (match) {
-                listItems.push({ marker: match[1], text: match[2] });
-            } else {
-                if (listItems.length === 0) {
-                    introLines.push(line);
-                } else {
-                    outroLines.push(line);
-                }
-            }
-        }
-
-        const renderRichParagraph = (
-            paraText: string,
-            defaultClass: string = 'text-slate-655 leading-relaxed text-base font-medium',
-        ) => {
-            if (!paraText) {
-                return null;
-            }
-
-            // Strict 1-liner comment: Regex to match standard math expressions, logic arrow chains, negation states, parenthesized variables, and single letter variables
-            const mathPattern =
-                /(\b\d+(?:\.\d+)?%|\b\d+\/\d+\b|\[[^\]]+\]|\bProject\s+[A-Z]\b|\bQ[1-4]\b|(?:\b\d+(?:,\d{3})*(?:\.\d+)?\s*[+\-*/=]\s*)+\d+(?:,\d{3})*(?:\.\d+)?%?|[~¬]?\s*\b[A-Z]\b\s*(?:->|=>)\s*[~¬]?\s*\b[A-Z]\b(?:\s*(?:->|=>)\s*[~¬]?\s*\b[A-Z]\b)*|[~¬]\s*\b[A-Z]\b|\(\s*[~¬]?\s*\b[A-Z]\b\s*\)|'\s*\b[A-Z]\b\s*'|"\s*\b[A-Z]\b\s*"|\b[B-H|J-N|P-Z]\b)/g;
-
-            const renderSingleVariable = (v: string) => {
-                const cleaned = v.trim();
-                const isNegated =
-                    cleaned.startsWith('~') || cleaned.startsWith('¬');
-                let letter = cleaned.replace(/[~¬]\s*/, '');
-
-                // Strict 1-liner comment: Translate custom variable key to standard A/B/C/D
-                if (letterMap && letterMap[letter]) {
-                    letter = letterMap[letter];
-                }
-
-                if (isNegated) {
-                    return (
-                        <span className="shadow-3xs inline-flex items-center rounded-md border border-red-100 bg-red-50 px-1.5 py-0.5 font-mono text-xs font-bold text-red-600 select-all">
-                            <span className="mr-0.5 text-[10px] font-bold text-red-400">
-                                ¬
-                            </span>
-                            {letter}
-                        </span>
-                    );
-                }
-
-                return (
-                    <span className="shadow-3xs inline-flex items-center rounded-md border border-blue-100 bg-blue-50 px-1.5 py-0.5 font-mono text-xs font-bold text-blue-700 select-all">
-                        {letter}
-                    </span>
-                );
-            };
-
-            const renderTokenContent = (token: string) => {
-                // If it is a logic chain
-                if (token.includes('->') || token.includes('=>')) {
-                    const variables = token.split(/\s*(?:->|=>)\s*/);
-
-                    return (
-                        <span className="shadow-3xs mx-1 my-0.5 inline-flex items-center gap-1 rounded-xl border border-slate-200/80 bg-slate-50 px-2 py-1 transition hover:bg-slate-100/50">
-                            {variables.map((v, idx) => (
-                                <span
-                                    key={idx}
-                                    className="inline-flex items-center gap-1"
-                                >
-                                    {idx > 0 && (
-                                        <span className="text-xs font-bold text-slate-400 select-none">
-                                            ➔
-                                        </span>
-                                    )}
-                                    {renderSingleVariable(v)}
-                                </span>
-                            ))}
-                        </span>
-                    );
-                }
-
-                // If it is a regular bold token or other matched token
-                if (token.startsWith('**') && token.endsWith('**')) {
-                    return (
-                        <strong className="font-extrabold text-slate-900 dark:text-white">
-                            {token.slice(2, -2)}
-                        </strong>
-                    );
-                }
-
-                // If it matches brackets or generic variable
-                if (token.startsWith('[') && token.endsWith(']')) {
-                    return (
-                        <span className="text-indigo-650 rounded bg-slate-100 px-1.5 py-0.5 font-mono text-xs font-semibold dark:bg-slate-800 dark:text-indigo-400">
-                            {token}
-                        </span>
-                    );
-                }
-
-                return <span>{token}</span>;
-            };
-
-            // Strict 1-liner comment: Render inner paragraph tokens for bold text and logical math symbols
-            const renderRichParagraphContent = (inputText: string) => {
-                const boldParts = inputText.split(/(\*\*[^*]+\*\*)/g);
-
-                return boldParts.map((bPart, bIdx) => {
-                    if (bPart.startsWith('**') && bPart.endsWith('**')) {
-                        return (
-                            <strong
-                                key={bIdx}
-                                className="text-slate-850 font-black dark:text-white"
-                            >
-                                {bPart.slice(2, -2)}
-                            </strong>
-                        );
-                    }
-
-                    const mathParts = bPart.split(mathPattern);
-
-                    return (
-                        <React.Fragment key={bIdx}>
-                            {mathParts.map((mPart, mIdx) => {
-                                if (mPart.match(mathPattern)) {
-                                    return (
-                                        <React.Fragment key={mIdx}>
-                                            {renderTokenContent(mPart)}
-                                        </React.Fragment>
-                                    );
-                                }
-
-                                return <span key={mIdx}>{mPart}</span>;
-                            })}
-                        </React.Fragment>
-                    );
-                });
-            };
-
-            // Strict 1-liner comment: Match step-by-step indicators to render styled step block cards
-            const stepMatch = paraText.match(/^\s*Step\s+(\d+)\s*:\s*(.+)$/i);
-
-            if (stepMatch) {
-                const stepNum = stepMatch[1];
-                const stepContent = stepMatch[2];
-
-                return (
-                    <div className="shadow-3xs my-2.5 flex items-start gap-3 rounded-r-xl border-l-3 border-blue-500 bg-blue-50/15 p-3.5 dark:bg-blue-950/10">
-                        <span className="shadow-3xs mt-0.5 flex size-5.5 shrink-0 items-center justify-center rounded-full bg-blue-600 font-mono text-[10px] font-black text-white select-none">
-                            {stepNum}
-                        </span>
-                        <div className="flex-1">
-                            <strong className="text-slate-850 mb-1 block text-xs font-extrabold dark:text-white">
-                                STEP {stepNum}
-                            </strong>
-                            <div className="text-slate-650 dark:text-slate-350 text-xs leading-relaxed font-semibold">
-                                {renderRichParagraphContent(stepContent)}
-                            </div>
-                        </div>
-                    </div>
-                );
-            }
-
-            // Strict 1-liner comment: Match mental math shortcut triggers to render stylized tips cards
-            const shortcutMatch = paraText.match(
-                /^\s*(🧠\s*)?(Mental Math Shortcut|Fast Track|Shortcut)\s*:\s*(.+)$/i,
-            );
-
-            if (shortcutMatch) {
-                const title = shortcutMatch[2];
-                const shortcutContent = shortcutMatch[3];
-
-                return (
-                    <div className="shadow-3xs my-3 flex items-start gap-3 rounded-r-xl border-l-3 border-amber-500 bg-amber-50/15 p-3.5 dark:bg-amber-950/10">
-                        <span className="shadow-3xs mt-0.5 flex size-5.5 shrink-0 items-center justify-center rounded-full bg-amber-500 text-[11px] text-white select-none">
-                            🧠
-                        </span>
-                        <div className="flex-1">
-                            <strong className="text-amber-850 mb-1 block font-heading text-xs font-extrabold tracking-wider uppercase dark:text-amber-300">
-                                {title}
-                            </strong>
-                            <div className="text-slate-655 dark:text-slate-350 text-xs leading-relaxed font-bold">
-                                {renderRichParagraphContent(shortcutContent)}
-                            </div>
-                        </div>
-                    </div>
-                );
-            }
-
-            return (
-                <p className={defaultClass}>
-                    {renderRichParagraphContent(paraText)}
-                </p>
-            );
-        };
-
-        return (
-            <div className="flex flex-col gap-3.5">
-                {introLines.length > 0 && (
-                    <div className="flex flex-col gap-2">
-                        {introLines.map((line, idx) => (
-                            <React.Fragment key={idx}>
-                                {renderRichParagraph(
-                                    line,
-                                    'text-[18px] font-extrabold text-slate-850 dark:text-slate-100 leading-relaxed',
-                                )}
-                            </React.Fragment>
-                        ))}
-                    </div>
-                )}
-
-                {listItems.length > 0 && (
-                    <div className="my-2 flex flex-col gap-2.5 pl-1">
-                        {listItems.map((item, idx) => (
-                            <div
-                                key={idx}
-                                className="flex items-start gap-3 rounded-lg border border-slate-100 bg-slate-50/40 p-3 transition hover:border-slate-200 dark:border-slate-900/60 dark:bg-slate-900/10"
-                            >
-                                <span className="inline-flex size-7 shrink-0 items-center justify-center rounded-md bg-blue-50 text-xs font-black text-blue-600 dark:bg-blue-950/40 dark:text-blue-400">
-                                    {item.marker.replace('.', '')}
-                                </span>
-                                <div className="mt-0.5 flex-1">
-                                    {renderRichParagraph(
-                                        item.text,
-                                        'text-base font-semibold leading-relaxed text-slate-700 dark:text-slate-300',
-                                    )}
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                )}
-
-                {outroLines.length > 0 && (
-                    <div className="flex flex-col gap-2">
-                        {outroLines.map((line, idx) => (
-                            <React.Fragment key={idx}>
-                                {renderRichParagraph(
-                                    line,
-                                    'text-[18px] font-extrabold text-slate-850 dark:text-slate-100 leading-relaxed',
-                                )}
-                            </React.Fragment>
-                        ))}
-                    </div>
-                )}
-            </div>
-        );
-    };
-
-    const renderTable = (tableText: string) => {
-        const rows = tableText.trim().split('\n');
-
-        if (rows.length === 0) {
-            return null;
-        }
-
-        const parseRow = (rowText: string) => {
-            return rowText
-                .split('|')
-                .slice(1, -1)
-                .map((cell) => cell.trim());
-        };
-
-        const headers = parseRow(rows[0]);
-        const dataRows = rows.slice(2).map(parseRow);
-
-        return (
-            <div className="border-slate-150 shadow-3xs my-4 overflow-x-auto rounded-xl border dark:border-slate-800">
-                <table className="w-full border-collapse text-left text-xs">
-                    <thead>
-                        <tr className="border-slate-150 border-b bg-slate-50/80 dark:border-slate-800 dark:bg-slate-900/30">
-                            {headers.map((h, i) => (
-                                <th
-                                    key={i}
-                                    className="px-4 py-3 font-extrabold tracking-wider text-slate-500 uppercase dark:text-slate-400"
-                                >
-                                    {h}
-                                </th>
-                            ))}
-                        </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-100 dark:divide-slate-900/50">
-                        {dataRows.map((row, ri) => (
-                            <tr
-                                key={ri}
-                                className="hover:bg-slate-50/20 dark:hover:bg-slate-900/10"
-                            >
-                                {row.map((cell, ci) => (
-                                    <td
-                                        key={ci}
-                                        className="dark:text-slate-350 px-4 py-3 leading-relaxed font-semibold text-slate-700"
-                                    >
-                                        {cell}
-                                    </td>
-                                ))}
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
-        );
-    };
-
-    return (
-        <div className="flex flex-col gap-1.5">
-            {parts.map((part, index) => {
-                if (part.match(tableRegex)) {
-                    return (
-                        <React.Fragment key={index}>
-                            {renderTable(part)}
-                        </React.Fragment>
-                    );
-                }
-
-                return (
-                    <React.Fragment key={index}>
-                        {formatNumberedLists(part)}
-                    </React.Fragment>
-                );
-            })}
-        </div>
-    );
-};
+// interface TrackConfigItem {
+//     id: number;
+//     track: string;
+//     category_id: number;
+//     item_count: number;
+//     time_limit_secs: number;
+// }
 
 interface ExamIndexProps {
-    questions: Question[];
-    categories: CategoryItem[];
-    tracks: TrackConfigItem[];
-    exams: { id: number; title: string; questions: number }[];
-    savedAttempt?: {
-        id: number;
-        category_id: number | null;
-        question_ids?: number[];
-        answers: Record<number, number>;
-        cat_scores: any;
-        created_at: string;
-    } | null;
-    retakeSource?: {
-        attempt_id: number;
-        question_ids: number[];
-        track: string;
-        mode: 'same' | 'fresh';
-    } | null;
+    questions?: Question[];
+    categories?: CategoryItem[];
+    savedAttempt?: any;
+    retakeSource?: any;
     seenQuestionIdsByTrack?: {
         Professional: number[];
         Subprofessional: number[];
@@ -480,482 +71,28 @@ interface ExamIndexProps {
     };
 }
 
-/** Formats seconds for display; matches history table rules (seconds if under 1m). */
-function formatDuration(secs: number, includeSecs = true): string {
-    const clamped = Math.max(0, Math.floor(secs));
+const shuffleOptionsForQuestion = (q: Question): Question => {
+    const indices = q.options.map((_, i) => i);
 
-    if (clamped === 0) {
-        return '0s';
+    // Fisher-Yates shuffle
+    for (let i = indices.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [indices[i], indices[j]] = [indices[j], indices[i]];
     }
 
-    const h = Math.floor(clamped / 3600);
-    const m = Math.floor((clamped % 3600) / 60);
-    const s = clamped % 60;
-
-    if (!includeSecs) {
-        if (clamped < 60) {
-            return `${clamped}s`;
-        }
-
-        const parts: string[] = [];
-
-        if (h > 0) {
-            parts.push(`${h}h`);
-        }
-
-        if (m > 0) {
-            parts.push(`${m}m`);
-        }
-
-        return parts.join(' ') || '0s';
-    }
-
-    const parts: string[] = [];
-
-    if (h > 0) {
-        parts.push(`${h}h`);
-    }
-
-    if (m > 0) {
-        parts.push(`${m}m`);
-    }
-
-    if (s > 0 || parts.length === 0) {
-        parts.push(`${s}s`);
-    }
-
-    return parts.join(' ') || '0s';
-}
-
-function shuffleOptionsForQuestion(q: Question): Question {
-    const originalOptions = [...q.options];
-    const originalCorrectText = originalOptions[q.correct_option];
-    const optionsWithIndex = originalOptions.map((opt, idx) => ({ opt, idx }));
-    const shuffledOptionsWithIndex = [...optionsWithIndex].sort(
-        () => Math.random() - 0.5,
-    );
-    const shuffledOptions = shuffledOptionsWithIndex.map((o) => o.opt);
-    const originalIndices = shuffledOptionsWithIndex.map((o) => o.idx);
-    const newCorrectIdx = shuffledOptions.indexOf(originalCorrectText);
+    const shuffledOptions = indices.map((i) => q.options[i]);
+    const newCorrect = indices.indexOf(q.correct_option);
 
     return {
         ...q,
         options: shuffledOptions,
-        correct_option: newCorrectIdx >= 0 ? newCorrectIdx : q.correct_option,
-        originalOptionIndices: originalIndices,
+        correct_option: newCorrect,
+        originalOptionIndices: indices,
     };
-}
-
-// 20 Official Demographic Profile Questions (Unscored)
-const demographicQuestions: Question[] = [
-    {
-        id: 9001,
-        stem: 'What is your gender?',
-        options: ['Male', 'Female'],
-        correct_option: 0,
-        explanation: 'Demographic Profile question.',
-        category: 'Demographic Profile',
-        subcategory: 'Personal Information',
-        isDemographic: true,
-    },
-    {
-        id: 9002,
-        stem: 'What is your current civil status?',
-        options: ['Single', 'Married', 'Widowed', 'Separated/Divorced'],
-        correct_option: 0,
-        explanation: 'Demographic Profile question.',
-        category: 'Demographic Profile',
-        subcategory: 'Personal Information',
-        isDemographic: true,
-    },
-    {
-        id: 9003,
-        stem: 'Which age group do you belong to?',
-        options: [
-            'Below 18 years old',
-            '18 to 24 years old',
-            '25 to 34 years old',
-            '35 to 44 years old',
-            '45 years old and above',
-        ],
-        correct_option: 1,
-        explanation: 'Demographic Profile question.',
-        category: 'Demographic Profile',
-        subcategory: 'Personal Information',
-        isDemographic: true,
-    },
-    {
-        id: 9004,
-        stem: 'What is your highest educational attainment?',
-        options: [
-            'High School Graduate',
-            'College Undergraduate',
-            "College Graduate (Bachelor's Degree)",
-            "With Master's Units / Master's Degree",
-            'With Doctorate Units / Doctorate Degree',
-        ],
-        correct_option: 2,
-        explanation: 'Demographic Profile question.',
-        category: 'Demographic Profile',
-        subcategory: 'Educational Attainment',
-        isDemographic: true,
-    },
-    {
-        id: 9005,
-        stem: 'What type of school did you graduate from / are you currently attending?',
-        options: [
-            'Public / Government School',
-            'Private Sectarian School',
-            'Private Non-Sectarian School',
-        ],
-        correct_option: 0,
-        explanation: 'Demographic Profile question.',
-        category: 'Demographic Profile',
-        subcategory: 'Educational Attainment',
-        isDemographic: true,
-    },
-    {
-        id: 9006,
-        stem: 'What is your current employment status?',
-        options: [
-            'Unemployed',
-            'Self-employed / Business Owner',
-            'Employed in the Government sector',
-            'Employed in the Private sector',
-        ],
-        correct_option: 0,
-        explanation: 'Demographic Profile question.',
-        category: 'Demographic Profile',
-        subcategory: 'Employment Status',
-        isDemographic: true,
-    },
-    {
-        id: 9007,
-        stem: 'If currently working in the government, what is your status of appointment?',
-        options: [
-            'Not Applicable (Not in government)',
-            'Permanent',
-            'Temporary',
-            'Coterminous',
-            'Contract of Service / Job Order / Casual',
-        ],
-        correct_option: 0,
-        explanation: 'Demographic Profile question.',
-        category: 'Demographic Profile',
-        subcategory: 'Employment Status',
-        isDemographic: true,
-    },
-    {
-        id: 9008,
-        stem: 'How long have you been serving in the government sector?',
-        options: [
-            'Not Applicable / Less than 1 year',
-            '1 to 4 years',
-            '5 to 9 years',
-            '10 to 14 years',
-            '15 years and above',
-        ],
-        correct_option: 0,
-        explanation: 'Demographic Profile question.',
-        category: 'Demographic Profile',
-        subcategory: 'Employment Status',
-        isDemographic: true,
-    },
-    {
-        id: 9009,
-        stem: 'What is your primary reason for taking the Civil Service Examination?',
-        options: [
-            'To obtain eligibility for permanent government appointment',
-            'For promotion or career advancement',
-            'To enter public service for the first time',
-            'Personal challenge / satisfaction',
-        ],
-        correct_option: 0,
-        explanation: 'Demographic Profile question.',
-        category: 'Demographic Profile',
-        subcategory: 'Exam Purpose',
-        isDemographic: true,
-    },
-    {
-        id: 9010,
-        stem: 'How many times have you taken this particular level of examination (excluding this attempt)?',
-        options: [
-            'First time',
-            '1 time',
-            '2 times',
-            '3 times',
-            '4 or more times',
-        ],
-        correct_option: 0,
-        explanation: 'Demographic Profile question.',
-        category: 'Demographic Profile',
-        subcategory: 'Exam History',
-        isDemographic: true,
-    },
-    {
-        id: 9011,
-        stem: 'How did you prepare for this examination?',
-        options: [
-            'Self-review using books, apps, and online resources',
-            'Attended a formal review program / review center',
-            'Group study with friends/colleagues',
-            'No formal preparation',
-        ],
-        correct_option: 0,
-        explanation: 'Demographic Profile question.',
-        category: 'Demographic Profile',
-        subcategory: 'Preparation',
-        isDemographic: true,
-    },
-    {
-        id: 9012,
-        stem: 'Which regional area do you currently reside in?',
-        options: [
-            'National Capital Region (NCR)',
-            'Luzon (Regions I - V, CAR)',
-            'Visayas (Regions VI - VIII)',
-            'Mindanao (Regions IX - XIII, BARMM)',
-        ],
-        correct_option: 0,
-        explanation: 'Demographic Profile question.',
-        category: 'Demographic Profile',
-        subcategory: 'Personal Information',
-        isDemographic: true,
-    },
-    {
-        id: 9013,
-        stem: 'What is your primary language or dialect spoken at home?',
-        options: [
-            'English',
-            'Tagalog / Filipino',
-            'Cebuano / Bisaya',
-            'Ilocano',
-            'Hiligaynon / Ilonggo',
-            'Other regional languages',
-        ],
-        correct_option: 1,
-        explanation: 'Demographic Profile question.',
-        category: 'Demographic Profile',
-        subcategory: 'Personal Information',
-        isDemographic: true,
-    },
-    {
-        id: 9014,
-        stem: 'Are you a member of any indigenous cultural community or ethnic group?',
-        options: ['Yes', 'No'],
-        correct_option: 1,
-        explanation: 'Demographic Profile question.',
-        category: 'Demographic Profile',
-        subcategory: 'Personal Information',
-        isDemographic: true,
-    },
-    {
-        id: 9015,
-        stem: 'How do you rate your overall familiarity with computer systems and online exams?',
-        options: [
-            'Highly familiar and comfortable',
-            'Moderately comfortable',
-            'Slightly comfortable',
-            'Not familiar / uncomfortable',
-        ],
-        correct_option: 0,
-        explanation: 'Demographic Profile question.',
-        category: 'Demographic Profile',
-        subcategory: 'Personal Information',
-        isDemographic: true,
-    },
-    {
-        id: 9016,
-        stem: "What is your father's primary field of occupation?",
-        options: [
-            'Government Employee',
-            'Private Employee',
-            'Self-employed / Business Owner',
-            'Farmer / Fisherman / Manual Laborer',
-            'Unemployed / Retired / Deceased',
-        ],
-        correct_option: 2,
-        explanation: 'Demographic Profile question.',
-        category: 'Demographic Profile',
-        subcategory: 'Family Background',
-        isDemographic: true,
-    },
-    {
-        id: 9017,
-        stem: "What is your mother's primary field of occupation?",
-        options: [
-            'Government Employee',
-            'Private Employee',
-            'Self-employed / Business Owner',
-            'Homemaker / Housewife',
-            'Unemployed / Retired / Deceased',
-        ],
-        correct_option: 3,
-        explanation: 'Demographic Profile question.',
-        category: 'Demographic Profile',
-        subcategory: 'Family Background',
-        isDemographic: true,
-    },
-    {
-        id: 9018,
-        stem: 'Do you have any physical challenges or require special assistance during the exam?',
-        options: [
-            'Yes, visual challenge',
-            'Yes, hearing challenge',
-            'Yes, mobility challenge',
-            'No challenge / does not require assistance',
-        ],
-        correct_option: 3,
-        explanation: 'Demographic Profile question.',
-        category: 'Demographic Profile',
-        subcategory: 'Personal Information',
-        isDemographic: true,
-    },
-    {
-        id: 9019,
-        stem: 'What is your current monthly family income range?',
-        options: [
-            'Below ₱15,000',
-            '₱15,000 to ₱30,000',
-            '₱30,001 to ₱60,000',
-            '₱60,001 to ₱100,000',
-            'Above ₱100,000',
-        ],
-        correct_option: 1,
-        explanation: 'Demographic Profile question.',
-        category: 'Demographic Profile',
-        subcategory: 'Personal Information',
-        isDemographic: true,
-    },
-    {
-        id: 9020,
-        stem: 'How did you find out about this review platform?',
-        options: [
-            'Search engine (Google, etc.)',
-            'Social media (Facebook, TikTok, etc.)',
-            'Recommendation from a friend/colleague',
-            'School or government announcement',
-        ],
-        correct_option: 1,
-        explanation: 'Demographic Profile question.',
-        category: 'Demographic Profile',
-        subcategory: 'Preparation',
-        isDemographic: true,
-    },
-];
-
-// Highly comprehensive premium fallback questions to self-heal empty databases
-const fallbackQuestions: Question[] = [
-    {
-        id: 101,
-        stem: 'Under the strict scrutiny standard of review applied in Equal Protection Clause jurisprudence, a government classification must be narrowly tailored to achieve a compelling governmental interest. Which of the following classifications is universally subject to strict scrutiny by the Supreme Court?',
-        options: [
-            'Classifications based on age, specifically mandatory retirement ages for public employees.',
-            'Classifications based on race, national origin, or alienage (when applied by state governments).',
-            'Classifications based on gender or illegitimacy, recognizing historical disadvantages.',
-            'Classifications based on wealth or economic status, concerning access to fundamental rights.',
-        ],
-        correct_option: 1,
-        explanation:
-            'Classifications based on race, national origin, or alienage are suspect classifications under equal protection principles and are subject to strict scrutiny (requiring a compelling state interest and narrow tailoring).',
-        category: 'General Information',
-        subcategory: 'Philippine Constitution',
-    },
-    {
-        id: 102,
-        stem: 'Which of the following describes the proper spelling and administrative usage according to CSC filing protocols?',
-        options: [
-            'Liaison officer assigned to the sub-professional division.',
-            'Liason officer assigned to the sub-professsional division.',
-            'Liasion officer assigned to the subprofessional division.',
-            'Layason officer assigned to the subproffessional division.',
-        ],
-        correct_option: 0,
-        explanation:
-            "The correct spelling is 'Liaison' and 'sub-professional' / 'subprofessional'. Liaison implies a close communication connection between departments.",
-        category: 'Clerical Ability',
-        subcategory: 'Spelling',
-    },
-    {
-        id: 103,
-        stem: 'If the first term of an arithmetic progression is 4, and the 12th term is 48, what is the common difference of the sequence?',
-        options: ['3.5', '4.0', '4.5', '5.0'],
-        correct_option: 1,
-        explanation:
-            'Using the arithmetic progression formula: An = A1 + (n - 1)d. Here, 48 = 4 + 11d => 44 = 11d => d = 4.',
-        category: 'Numerical Ability',
-        subcategory: 'Number sequence',
-    },
-    {
-        id: 104,
-        stem: 'Identify the correct word relationship: ATTORNEY is to COURT as TEACHER is to _______.',
-        options: ['PUPIL', 'CLASSROOM', 'BLACKBOARD', 'CHALK'],
-        correct_option: 1,
-        explanation:
-            'This is a worker-to-workplace analogy. An attorney works in a court; a teacher works in a classroom.',
-        category: 'Analytical Ability',
-        subcategory: 'Word analogy',
-    },
-    {
-        id: 105,
-        stem: 'Which of the following sentences exhibits the most grammatically correct use of punctuation?',
-        options: [
-            'The committee, having reviewed the proposal decided to approve it immediately.',
-            'The committee, having reviewed the proposal, decided to approve it immediately.',
-            'The committee having reviewed the proposal, decided to approve it immediately.',
-            'The committee having reviewed the proposal decided to approve it immediately.',
-        ],
-        correct_option: 1,
-        explanation:
-            "The non-restrictive participial phrase 'having reviewed the proposal' should be completely set off by commas on both sides.",
-        category: 'Verbal Ability',
-        subcategory: 'Sentence structure',
-    },
-    {
-        id: 106,
-        stem: 'Under Republic Act 6713, public officials and employees shall perform their duties with the highest degree of professionalism, intelligence, and skill. This code of conduct is officially known as:',
-        options: [
-            'The Civil Service Anti-Red Tape Act',
-            'The Ombudsman Accountability Charter',
-            'Code of Conduct and Ethical Standards for Public Officials and Employees',
-            'Public Officers Administrative Liability Act',
-        ],
-        correct_option: 2,
-        explanation:
-            'Republic Act No. 6713 is the Code of Conduct and Ethical Standards for Public Officials and Employees, governing transparency, accountability, and professional ethics.',
-        category: 'General Information',
-        subcategory: 'Code of Conduct and Ethical Standards (R.A. 6713)',
-    },
-    {
-        id: 107,
-        stem: 'A government vehicle travels at 60 km/h for 2.5 hours and then at 80 km/h for 1.5 hours. What is the average speed of the vehicle for the entire journey?',
-        options: ['65.5 km/h', '67.5 km/h', '70.0 km/h', '72.0 km/h'],
-        correct_option: 1,
-        explanation:
-            'Total distance = (60 * 2.5) + (80 * 1.5) = 150 + 120 = 270 km. Total time = 2.5 + 1.5 = 4 hours. Average speed = 270 / 4 = 67.5 km/h.',
-        category: 'Numerical Ability',
-        subcategory: 'Word problems',
-    },
-    {
-        id: 108,
-        stem: 'If all examinees are civil service aspirants, and some aspirants are reviewees, which of the following statements must logically follow?',
-        options: [
-            'All civil service aspirants are examinees.',
-            'Some examinees are reviewees.',
-            'No reviewees are examinees.',
-            'All reviewees are civil service aspirants.',
-        ],
-        correct_option: 1,
-        explanation:
-            'Since all examinees are aspirants and some aspirants are reviewees, it logically follows that some examinees who overlap with the aspirants are reviewees.',
-        category: 'Analytical Ability',
-        subcategory: 'Symbolic logic / abstract reasoning',
-    },
-];
+};
 
 export default function ExamIndex({
     questions = [],
-    categories = [],
     savedAttempt,
     retakeSource,
     seenQuestionIdsByTrack = {
@@ -965,6 +102,17 @@ export default function ExamIndex({
     },
 }: ExamIndexProps) {
     const { auth } = usePage().props;
+
+    // Fallback pools — questions now come from the server; these provide
+    // type-safe empty defaults so restore/rebuild logic never crashes.
+    const fallbackQuestions: Question[] = questions;
+    const demographicQuestions: Question[] = questions.filter(
+        (q) =>
+            q.category === 'Demographic Profile' ||
+            q.category.toLowerCase().includes('demographic') ||
+            q.isDemographic,
+    );
+
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const [mounted, setMounted] = useState(false);
     useEffect(() => {
@@ -1159,21 +307,46 @@ export default function ExamIndex({
 
     // Result review states
     const [isExamSubmitted, setIsExamSubmitted] = useState(false);
-    const [expandedCategory, setExpandedCategory] = useState<string | null>(
-        null,
-    );
+    // const [expandedCategory, setExpandedCategory] = useState<string | null>(
+    //     null,
+    // );
     const [reviewScreenActive, setReviewScreenActive] = useState(false);
     const [reviewStatusFilter, setReviewStatusFilter] = useState<
         'all' | 'correct' | 'incorrect'
     >('all');
-    const [reviewCategoryFilter] = useState('All Categories');
+    const [reviewCategoryFilter, setReviewCategoryFilter] =
+        useState('All Categories');
+    const [reviewSubcategoryFilter, setReviewSubcategoryFilter] =
+        useState('All Subcategories');
+
+    // const reviewCategories = useMemo(() => {
+    //     return [
+    //         'All Categories',
+    //         ...Array.from(new Set(activeQuestions.map((q) => q.category))),
+    //     ];
+    // }, [activeQuestions]);
+
+    const reviewSubcategories = useMemo(() => {
+        if (reviewCategoryFilter === 'All Categories') {
+            return ['All Subcategories'];
+        }
+
+        return [
+            'All Subcategories',
+            ...Array.from(
+                new Set(
+                    activeQuestions
+                        .filter((q) => q.category === reviewCategoryFilter)
+                        .map((q) => q.subcategory || 'General Concepts'),
+                ),
+            ),
+        ];
+    }, [activeQuestions, reviewCategoryFilter]);
 
     const [isRestored] = useState(true);
 
     // Filter of the sidebar question grid/palette
     const [selectedPaletteCategory, setSelectedPaletteCategory] =
-        useState('All Categories');
-    const [filterPaletteByCategory, setFilterPaletteByCategory] =
         useState('All Categories');
 
     // Live countdown timer variables
@@ -1266,7 +439,44 @@ export default function ExamIndex({
                 timeLimit: formatDuration(sessionTimeLimitSecs || 0),
                 timeLimitSecs: sessionTimeLimitSecs || 0,
                 targetPace: '1.0 min/item',
-                allowedCategories: categories.map((c) => c.name),
+                allowedCategories: Array.from(
+                    new Set(
+                        activeQuestions
+                            .filter(
+                                (q) =>
+                                    q.category !== 'Demographic Profile' &&
+                                    !q.category
+                                        .toLowerCase()
+                                        .includes('demographic') &&
+                                    !q.isDemographic,
+                            )
+                            .map((q) => q.category),
+                    ),
+                ).sort((a, b) => {
+                    const order = [
+                        'Verbal Ability',
+                        'Analytical Ability',
+                        'Clerical Ability',
+                        'Numerical Ability',
+                        'General Information',
+                    ];
+                    const idxA = order.indexOf(a);
+                    const idxB = order.indexOf(b);
+
+                    if (idxA !== -1 && idxB !== -1) {
+                        return idxA - idxB;
+                    }
+
+                    if (idxA !== -1) {
+                        return -1;
+                    }
+
+                    if (idxB !== -1) {
+                        return 1;
+                    }
+
+                    return a.localeCompare(b);
+                }),
             };
         },
         [
@@ -1274,7 +484,6 @@ export default function ExamIndex({
             savedAttempt,
             activeQuestions,
             sessionTimeLimitSecs,
-            categories,
         ],
     );
 
@@ -1379,16 +588,14 @@ export default function ExamIndex({
         }
     }, [isExamSubmitted]);
 
-    // Sync switch categories filter with current question's category dynamically
+    // Ensure the active question is visible in the palette, reset to All Categories if out of bounds
     useEffect(() => {
         if (activeQuestions && activeQuestions[currentIdx]) {
             const currentCategory = activeQuestions[currentIdx].category;
 
             setTimeout(() => {
-                setSelectedPaletteCategory(currentCategory);
-
                 // If the active question is outside the filtered category, reset the filter to 'All Categories'
-                setFilterPaletteByCategory((prevFilter) => {
+                setSelectedPaletteCategory((prevFilter) => {
                     if (
                         prevFilter !== 'All Categories' &&
                         prevFilter !== currentCategory
@@ -1412,64 +619,63 @@ export default function ExamIndex({
             return;
         }
 
-        const isCurrentIdxMatch =
-            activeQuestions[currentIdx] &&
-            (() => {
-                const q = activeQuestions[currentIdx];
-
-                if (
-                    reviewCategoryFilter !== 'All Categories' &&
-                    q.category !== reviewCategoryFilter
-                ) {
-                    return false;
-                }
-
-                const chosen = answers[currentIdx];
-                const isCorrect = chosen === q.correct_option;
-
-                if (reviewStatusFilter === 'correct' && !isCorrect) {
-                    return false;
-                }
-
-                if (reviewStatusFilter === 'incorrect' && isCorrect) {
-                    return false;
-                }
-
-                return true;
-            })();
-
-        if (!isCurrentIdxMatch) {
-            // Find first match
-            const firstMatchIdx = activeQuestions.findIndex((q, idx) => {
-                if (
-                    reviewCategoryFilter !== 'All Categories' &&
-                    q.category !== reviewCategoryFilter
-                ) {
-                    return false;
-                }
-
-                const chosen = answers[idx];
-                const isCorrect = chosen === q.correct_option;
-
-                if (reviewStatusFilter === 'correct' && !isCorrect) {
-                    return false;
-                }
-
-                if (reviewStatusFilter === 'incorrect' && isCorrect) {
-                    return false;
-                }
-
-                return true;
-            });
-
-            if (firstMatchIdx !== -1) {
-                setTimeout(() => {
-                    setCurrentIdx(firstMatchIdx);
-                }, 0);
+        const isMatch = (q: Question, idx: number) => {
+            if (
+                reviewCategoryFilter !== 'All Categories' &&
+                q.category !== reviewCategoryFilter
+            ) {
+                return false;
             }
+
+            if (
+                reviewSubcategoryFilter !== 'All Subcategories' &&
+                (q.subcategory || 'General Concepts') !==
+                    reviewSubcategoryFilter
+            ) {
+                return false;
+            }
+
+            const chosen = answers[idx];
+            const isCorrect =
+                chosen !== undefined &&
+                chosen !== null &&
+                Number(chosen) === Number(q.correct_option);
+            const isDemographic =
+                q.category === 'Demographic Profile' || q.isDemographic;
+
+            if (reviewStatusFilter === 'correct') {
+                if (isDemographic || !isCorrect) {
+                    return false;
+                }
+            }
+
+            if (reviewStatusFilter === 'incorrect') {
+                if (isDemographic || isCorrect) {
+                    return false;
+                }
+            }
+
+            return true;
+        };
+
+        if (
+            activeQuestions[currentIdx] &&
+            isMatch(activeQuestions[currentIdx], currentIdx)
+        ) {
+            return;
+        }
+
+        // Find first match
+        const firstMatchIdx = activeQuestions.findIndex(isMatch);
+
+        if (firstMatchIdx !== -1) {
+            setTimeout(() => {
+                setCurrentIdx(firstMatchIdx);
+            }, 0);
         }
     }, [
         reviewCategoryFilter,
+        reviewSubcategoryFilter,
         reviewStatusFilter,
         reviewScreenActive,
         activeQuestions,
@@ -1511,6 +717,11 @@ export default function ExamIndex({
         if (savedAttempt) {
             // Reconstruct questions pool if some are missing from database (e.g. fallback questions)
             let loadedQuestions = [...questions];
+            const allAvailablePools = [
+                ...fallbackQuestions,
+                ...demographicQuestions,
+                ...fallbackDemographicQuestions,
+            ];
 
             if (
                 savedAttempt.question_ids &&
@@ -1520,7 +731,7 @@ export default function ExamIndex({
                     (id: number) => !loadedQuestions.some((q) => q.id === id),
                 );
                 missingIds.forEach((id: number) => {
-                    const fallbackQ = fallbackQuestions.find(
+                    const fallbackQ = allAvailablePools.find(
                         (q) => q.id === id,
                     );
 
@@ -1534,7 +745,7 @@ export default function ExamIndex({
                     .map((id: number) => {
                         return (
                             loadedQuestions.find((q) => q.id === id) ||
-                            fallbackQuestions.find((q) => q.id === id)
+                            allAvailablePools.find((q) => q.id === id)
                         );
                     })
                     .filter(Boolean) as Question[];
@@ -1672,7 +883,7 @@ export default function ExamIndex({
                 }
             }, 0);
         }
-    }, [savedAttempt, questions]);
+    }, [savedAttempt, questions, fallbackQuestions, demographicQuestions]);
 
     // Dynamically update layout breadcrumbs at the top header
     useEffect(() => {
@@ -1915,25 +1126,49 @@ export default function ExamIndex({
                 });
             }
 
-            // Shuffled 20 demographic questions
-            const shuffledDemographics = [...demographicQuestions].sort(
-                () => Math.random() - 0.5,
-            );
+            // Exactly 20 demographic questions, use fallback array if short instead of duplicating
+            let finalDemographics = [...demographicQuestions];
+
+            if (finalDemographics.length < 20) {
+                const needed = 20 - finalDemographics.length;
+                const shuffledFallbacks = [
+                    ...fallbackDemographicQuestions,
+                ].sort(() => Math.random() - 0.5);
+                finalDemographics = [
+                    ...finalDemographics,
+                    ...shuffledFallbacks.slice(0, needed),
+                ];
+            } else if (finalDemographics.length > 20) {
+                finalDemographics = finalDemographics
+                    .sort(() => Math.random() - 0.5)
+                    .slice(0, 20);
+            }
+
+            // Shuffle the final selected 20 demographics so the user's custom ones aren't always strictly at the start of the section
+            finalDemographics.sort(() => Math.random() - 0.5);
 
             // DEMOGRAPHICS MUST BE PUT AT THE START ALWAYS!
-            const finalPool = [...shuffledDemographics, ...scoredPool];
+            const finalPool = [...finalDemographics, ...scoredPool];
 
             return finalPool.map(shuffleOptionsForQuestion);
         },
-        [questions, getSeenIdsForExam],
+        [questions, fallbackQuestions, demographicQuestions, getSeenIdsForExam],
     );
 
     const buildSameExamPool = useCallback(
         (questionIds: number[]) => {
-            let sourcePool = [...questions, ...demographicQuestions];
+            let sourcePool = [
+                ...questions,
+                ...demographicQuestions,
+                ...fallbackDemographicQuestions,
+            ];
 
             if (questions.length === 0) {
-                sourcePool = [...fallbackQuestions, ...demographicQuestions];
+                sourcePool = [
+                    ...fallbackQuestions,
+                    ...demographicQuestions,
+                    ...fallbackDemographicQuestions,
+                ];
             }
 
             const missingIds = questionIds.filter(
@@ -1943,6 +1178,7 @@ export default function ExamIndex({
                 const fallbackQ = [
                     ...fallbackQuestions,
                     ...demographicQuestions,
+                    ...fallbackDemographicQuestions,
                 ].find((q) => q.id === id);
 
                 if (fallbackQ) {
@@ -1961,7 +1197,7 @@ export default function ExamIndex({
                 .filter((q): q is Question => Boolean(q))
                 .map(shuffleOptionsForQuestion);
         },
-        [questions],
+        [questions, fallbackQuestions, demographicQuestions],
     );
 
     const beginExamSession = useCallback(
@@ -2259,7 +1495,13 @@ export default function ExamIndex({
                 });
             }, 0);
         }
-    }, [questions, savedAttempt, beginExamSession, buildFreshExamPool]);
+    }, [
+        questions,
+        savedAttempt,
+        fallbackQuestions,
+        beginExamSession,
+        buildFreshExamPool,
+    ]);
 
     // Auto-start retake when choice was made on the history page
     useEffect(() => {
@@ -2291,11 +1533,13 @@ export default function ExamIndex({
                     // Strict 1-liner comment: Resolve original category from retake pool to draw a fresh randomized sample
                     const oldQuestions = retakeSource.question_ids
                         .map(
-                            (id) =>
+                            (id: number) =>
                                 questions.find((q) => q.id === id) ||
                                 fallbackQuestions.find((q) => q.id === id),
                         )
-                        .filter((q): q is Question => Boolean(q));
+                        .filter((q: Question | undefined): q is Question =>
+                            Boolean(q),
+                        );
                     const catName =
                         oldQuestions[0]?.category || 'General Information';
                     const sourcePool =
@@ -2323,6 +1567,7 @@ export default function ExamIndex({
         retakeSource,
         savedAttempt,
         questions,
+        fallbackQuestions,
         beginExamSession,
         buildSameExamPool,
         buildFreshExamPool,
@@ -2496,7 +1741,6 @@ export default function ExamIndex({
         }
 
         setSelectedPaletteCategory(category);
-        setFilterPaletteByCategory(category);
 
         if (category !== 'All Categories') {
             const firstIdx = activeQuestions.findIndex(
@@ -2950,18 +2194,6 @@ export default function ExamIndex({
         </div>
     );
 
-    // Filter active questions mapped in sidebar palette
-    const getPaletteQuestions = () => {
-        return activeQuestions
-            .map((q, idx) => ({ ...q, originalIndex: idx }))
-            .filter((item) => {
-                return (
-                    filterPaletteByCategory === 'All Categories' ||
-                    item.category === filterPaletteByCategory
-                );
-            });
-    };
-
     // Prevent layout flash/shift during SSR or hydration
     if (!mounted) {
         return (
@@ -2978,1551 +2210,80 @@ export default function ExamIndex({
 
     // Render the Live active exam simulator view
     if (isExamActive) {
-        const activeQuestion = activeQuestions[currentIdx];
-        const paletteItems = getPaletteQuestions();
-
         return (
-            <>
-                <Head title={`Live Simulation: ${details.title}`} />
-                <div className="fixed inset-0 z-50 flex animate-in flex-col bg-background duration-200 fade-in">
-                    {/* TOP NAVBAR HEADER */}
-                    <div className="shadow-3xs flex h-16 items-center justify-between border-b border-border bg-card px-3 sm:px-6">
-                        <div className="flex items-center gap-2 sm:gap-4">
-                            <button
-                                onClick={handleExitExam}
-                                className="rounded-lg p-1.5 text-muted-foreground transition hover:bg-accent"
-                                title="Exit Exam"
-                            >
-                                <X className="size-5" />
-                            </button>
-                            <div className="hidden h-6 w-px bg-border md:block" />
-                            <span className="text-md hidden items-center gap-1.5 font-heading font-bold text-foreground md:flex">
-                                <Award className="size-4.5 text-blue-600" />
-                                {details.title}
-                            </span>
-                        </div>
-
-                        {activeQuestion && (
-                            <div className="flex items-center gap-2 sm:gap-3">
-                                <span className="hidden inline-flex items-center gap-1 rounded-full border border-blue-100/30 bg-blue-50/80 px-3 py-1 text-xs font-bold text-blue-600 sm:inline-flex dark:bg-blue-950/40 dark:text-blue-400">
-                                    <BookOpen className="size-3" />
-                                    {activeQuestion.category}
-                                </span>
-                                <span className="text-xs font-semibold text-muted-foreground">
-                                    <span className="font-black sm:hidden">
-                                        Q: {currentIdx + 1}/
-                                        {activeQuestions.length}
-                                    </span>
-                                    <span className="hidden sm:inline">
-                                        Question{' '}
-                                        <strong className="text-foreground">
-                                            {currentIdx + 1}
-                                        </strong>{' '}
-                                        of {activeQuestions.length}
-                                    </span>
-                                </span>
-                            </div>
-                        )}
-
-                        <div className="flex items-center gap-2">
-                            {/* Toggle Palette button on mobile */}
-                            <button
-                                onClick={() => setIsMobilePaletteOpen(true)}
-                                className="shadow-3xs flex items-center justify-center rounded-lg border border-border bg-card p-2 text-foreground hover:bg-accent focus:outline-none md:hidden"
-                                title="Open Question Palette"
-                            >
-                                <LayoutGrid className="size-4" />
-                            </button>
-
-                            {isTimed ? (
-                                <div
-                                    className={`shadow-3xs flex items-center gap-1.5 rounded-lg border px-2 py-1.5 text-sm font-black sm:px-3 ${
-                                        timeLeft < 600
-                                            ? 'animate-pulse border-rose-200 bg-rose-50 text-rose-700 dark:border-rose-900/30 dark:bg-rose-950/20 dark:text-rose-400'
-                                            : 'border-border bg-background text-foreground'
-                                    }`}
-                                >
-                                    <Clock className="size-4" />
-                                    {formatTime(timeLeft)}
-                                </div>
-                            ) : (
-                                <div className="shadow-3xs flex items-center gap-1.5 rounded-lg border border-border bg-background px-2 py-1.5 text-sm font-black text-foreground sm:px-3">
-                                    <Timer className="size-4 animate-pulse text-emerald-500" />
-                                    <span>{formatTime(timeLeft)}</span>
-                                    <span className="ml-0.5 hidden border-l border-border pl-1.5 text-[10px] font-bold text-muted-foreground md:inline">
-                                        Untimed
-                                    </span>
-                                </div>
-                            )}
-                        </div>
-                    </div>
-
-                    {/* MAIN TWO-COLUMN SPLIT PANEL LAYOUT */}
-                    <div className="flex flex-1 overflow-hidden">
-                        {/* LEFT COLUMN: ACTIVE QUESTION CARD & OPTION SELECTORS */}
-                        <div className="flex flex-1 flex-col justify-between overflow-y-auto bg-background p-6 md:p-10">
-                            <div className="mx-auto w-full max-w-3xl">
-                                {activeQuestion ? (
-                                    <div className="flex animate-in flex-col gap-6 duration-150 fade-in">
-                                        {/* Question stem container */}
-                                        <div className="shadow-3xs relative rounded-2xl border border-border bg-card p-6">
-                                            <div className="mb-4 flex items-center justify-between">
-                                                <span className="text-[10px] font-black tracking-wider text-blue-600 uppercase dark:text-blue-400">
-                                                    Multiple Choice
-                                                </span>
-                                                <button
-                                                    onClick={() =>
-                                                        toggleFlag(currentIdx)
-                                                    }
-                                                    className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[11px] font-bold transition focus:outline-none ${
-                                                        flagged[currentIdx]
-                                                            ? 'border border-rose-200/50 bg-rose-50 text-rose-700 dark:bg-rose-950/30 dark:text-rose-400'
-                                                            : 'text-muted-foreground hover:bg-muted'
-                                                    }`}
-                                                >
-                                                    <Flag
-                                                        className={`size-3.5 ${flagged[currentIdx] ? 'fill-rose-600 text-rose-600' : ''}`}
-                                                    />
-                                                    {flagged[currentIdx]
-                                                        ? 'Flagged for Review'
-                                                        : 'Flag for Review'}
-                                                </button>
-                                            </div>
-                                            <div className="text-sm leading-relaxed font-semibold text-foreground">
-                                                {renderFormattedText(
-                                                    activeQuestion.stem,
-                                                    true,
-                                                )}
-                                            </div>
-                                        </div>
-
-                                        {/* Options Grid selector stack */}
-                                        <div className="flex flex-col gap-3.5">
-                                            {activeQuestion.options.map(
-                                                (opt, idx) => {
-                                                    const label =
-                                                        String.fromCharCode(
-                                                            65 + idx,
-                                                        ); // A, B, C, D
-                                                    const isSelected =
-                                                        answers[currentIdx] ===
-                                                        idx;
-
-                                                    return (
-                                                        <div
-                                                            key={idx}
-                                                            onClick={() =>
-                                                                handleSelectOption(
-                                                                    idx,
-                                                                )
-                                                            }
-                                                            className={`shadow-3xs flex cursor-pointer items-center gap-4 rounded-xl border p-4 transition-all ${
-                                                                isSelected
-                                                                    ? 'border-blue-600 bg-blue-50/15 dark:border-blue-500 dark:bg-blue-950/20'
-                                                                    : 'border-border bg-card hover:bg-muted'
-                                                            }`}
-                                                        >
-                                                            <span
-                                                                className={`flex size-8 shrink-0 items-center justify-center rounded-full border text-xs font-black transition ${
-                                                                    isSelected
-                                                                        ? 'border-blue-600 bg-blue-600 text-white'
-                                                                        : 'border-border bg-background text-muted-foreground'
-                                                                }`}
-                                                            >
-                                                                {label}
-                                                            </span>
-                                                            <p
-                                                                className={`text-sm font-bold transition md:text-base ${
-                                                                    isSelected
-                                                                        ? 'text-blue-900 dark:text-blue-200'
-                                                                        : 'text-foreground'
-                                                                }`}
-                                                            >
-                                                                {opt}
-                                                            </p>
-                                                        </div>
-                                                    );
-                                                },
-                                            )}
-                                        </div>
-                                    </div>
-                                ) : (
-                                    <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
-                                        <AlertCircle className="mb-3 size-10 animate-pulse" />
-                                        <span className="text-sm font-semibold">
-                                            Generating questions slice...
-                                        </span>
-                                    </div>
-                                )}
-                            </div>
-
-                            {/* CORE CONTROL BUTTONS (PREV, NEXT, SUBMIT) */}
-                            <div className="mx-auto mt-8 flex w-full max-w-3xl items-center justify-between gap-4 border-t border-border pt-6">
-                                <button
-                                    onClick={() =>
-                                        handleQuestionNavigate(
-                                            Math.max(0, currentIdx - 1),
-                                        )
-                                    }
-                                    disabled={currentIdx === 0}
-                                    className="shadow-3xs flex items-center gap-1.5 rounded-lg border border-border bg-card px-5 py-2.5 text-xs font-bold text-foreground transition hover:bg-muted focus:outline-none disabled:cursor-not-allowed disabled:opacity-40"
-                                >
-                                    <ChevronLeft className="size-4" />
-                                    Previous Question
-                                </button>
-
-                                {isFreeAttempt && currentIdx === 19 ? (
-                                    <button
-                                        onClick={() =>
-                                            setShowRegisterModal(true)
-                                        }
-                                        className="shadow-3xs flex items-center gap-1.5 rounded-lg bg-emerald-600 px-6 py-2.5 text-xs font-bold text-white transition hover:bg-emerald-700 focus:outline-none"
-                                    >
-                                        <CheckCircle2 className="size-4" />
-                                        Finish Preview
-                                    </button>
-                                ) : currentIdx < activeQuestions.length - 1 ? (
-                                    <button
-                                        onClick={() =>
-                                            handleQuestionNavigate(
-                                                currentIdx + 1,
-                                            )
-                                        }
-                                        className="shadow-3xs flex items-center gap-1.5 rounded-lg bg-blue-600 px-5 py-2.5 text-xs font-bold text-white transition hover:bg-blue-700 focus:outline-none"
-                                    >
-                                        Next Question
-                                        <ChevronRight className="size-4" />
-                                    </button>
-                                ) : !isFreeAttempt ? (
-                                    <button
-                                        onClick={() => handleSubmitExam(false)}
-                                        className="flex items-center gap-1.5 rounded-lg bg-emerald-600 px-6 py-2.5 text-xs font-bold text-white shadow-xs transition hover:bg-emerald-700 focus:outline-none"
-                                    >
-                                        <CheckCircle2 className="size-4" />
-                                        Submit Exam
-                                    </button>
-                                ) : null}
-                            </div>
-                        </div>
-
-                        {/* RIGHT COLUMN: QUESTION PALETTE GRID */}
-                        <div className="hidden w-80 shrink-0 flex-col border-l border-border bg-card md:flex">
-                            {/* Palette filter category switches */}
-                            <div className="border-b border-border p-4">
-                                <span className="mb-2 block text-[10px] font-extrabold tracking-wider text-muted-foreground uppercase">
-                                    Switch Categories
-                                </span>
-                                <div className="relative">
-                                    <select
-                                        value={selectedPaletteCategory}
-                                        onChange={(e) =>
-                                            handleCategoryChange(e.target.value)
-                                        }
-                                        className="w-full appearance-none rounded-lg border border-border bg-background py-2 pr-8 pl-2.5 text-xs font-bold text-foreground transition focus:border-blue-500 focus:outline-none"
-                                    >
-                                        <option value="All Categories">
-                                            All Categories
-                                        </option>
-                                        {activeQuestions.some(
-                                            (q) =>
-                                                q.category ===
-                                                    'Demographic Profile' ||
-                                                q.isDemographic,
-                                        ) && (
-                                            <option value="Demographic Profile">
-                                                Demographic Profile
-                                            </option>
-                                        )}
-                                        {details.allowedCategories.map(
-                                            (cat) => (
-                                                <option key={cat} value={cat}>
-                                                    {cat}
-                                                </option>
-                                            ),
-                                        )}
-                                    </select>
-                                    <ChevronRight className="pointer-events-none absolute top-1/2 right-2.5 size-4 -translate-y-1/2 rotate-90 text-muted-foreground" />
-                                </div>
-                            </div>
-
-                            <div className="grid grid-cols-3 gap-2 border-b border-border bg-muted/40 px-4 py-3 text-[10px] font-bold text-muted-foreground">
-                                <div className="flex items-center gap-1">
-                                    <div className="size-2.5 rounded bg-blue-600" />
-                                    <span>Answered</span>
-                                </div>
-                                <div className="flex items-center gap-1">
-                                    <div className="size-2.5 rounded border border-border bg-background" />
-                                    <span>Unanswered</span>
-                                </div>
-                                <div className="flex items-center gap-1">
-                                    <div className="size-2.5 rounded border border-rose-200 bg-rose-50 dark:border-rose-900/40 dark:bg-rose-950/20" />
-                                    <span>Flagged</span>
-                                </div>
-                            </div>
-
-                            {/* Number selection buttons grid container */}
-                            <div className="flex-1 overflow-y-auto p-4">
-                                <span className="mb-3 block text-[10px] font-extrabold tracking-wider text-muted-foreground uppercase">
-                                    Question Palette
-                                </span>
-
-                                {paletteItems.length === 0 ? (
-                                    <div className="py-6 text-center text-muted-foreground">
-                                        <span className="text-xs">
-                                            No questions loaded for this filter
-                                        </span>
-                                    </div>
-                                ) : (
-                                    <div className="grid grid-cols-5 gap-2">
-                                        {paletteItems.map((item) => {
-                                            const origIdx = item.originalIndex;
-                                            const isAnswered =
-                                                answers[origIdx] !== undefined;
-                                            const isFlagged =
-                                                flagged[origIdx] === true;
-                                            const isActive =
-                                                currentIdx === origIdx;
-
-                                            return (
-                                                <button
-                                                    key={origIdx}
-                                                    onClick={() =>
-                                                        handleQuestionNavigate(
-                                                            origIdx,
-                                                        )
-                                                    }
-                                                    className={`relative flex size-10 items-center justify-center rounded-lg border text-xs font-bold transition focus:outline-none ${
-                                                        isActive
-                                                            ? 'border-blue-600 bg-blue-50 bg-card font-black text-blue-600 ring-2 ring-blue-600 ring-offset-1 dark:text-blue-400 dark:ring-offset-background'
-                                                            : isAnswered
-                                                              ? 'border-blue-600 bg-blue-600 text-white hover:bg-blue-700'
-                                                              : isFlagged
-                                                                ? 'dark:bg-rose-955/20 border-rose-300 bg-rose-50 font-extrabold text-rose-700 dark:border-rose-900/40 dark:text-rose-400'
-                                                                : isFreeAttempt &&
-                                                                    origIdx >=
-                                                                        20
-                                                                  ? 'border-border bg-background text-muted-foreground/40 hover:bg-muted'
-                                                                  : 'border-border bg-background text-foreground hover:bg-muted'
-                                                    }`}
-                                                >
-                                                    {origIdx + 1}
-                                                    {isFlagged && (
-                                                        <div className="absolute top-0.5 right-0.5 size-2 rounded-full border border-white bg-rose-500 shadow-xs dark:border-slate-950" />
-                                                    )}
-                                                    {isFreeAttempt &&
-                                                        origIdx >= 20 && (
-                                                            <Lock className="absolute -top-1 -right-1 size-3 text-muted-foreground" />
-                                                        )}
-                                                </button>
-                                            );
-                                        })}
-                                    </div>
-                                )}
-                            </div>
-
-                            {!isFreeAttempt && (
-                                <div className="border-t border-border p-4">
-                                    <button
-                                        onClick={() => handleSubmitExam(false)}
-                                        className="flex w-full items-center justify-center gap-1.5 rounded-lg bg-emerald-600 py-3 text-xs font-bold text-white shadow-xs transition hover:bg-emerald-700 focus:outline-none"
-                                    >
-                                        <CheckCircle2 className="size-4" />
-                                        Submit Exam
-                                    </button>
-                                </div>
-                            )}
-                        </div>
-                    </div>
-
-                    {/* Mobile Question Palette Drawer */}
-                    {isMobilePaletteOpen && (
-                        <div
-                            className="fixed inset-0 z-50 flex justify-end bg-slate-900/60 backdrop-blur-xs md:hidden"
-                            onClick={() => setIsMobilePaletteOpen(false)}
-                        >
-                            <div
-                                className="flex h-full w-72 flex-col border-l border-border bg-card shadow-2xl"
-                                onClick={(e) => e.stopPropagation()}
-                            >
-                                {/* Drawer Header */}
-                                <div className="flex h-16 items-center justify-between border-b border-border bg-card px-6">
-                                    <span className="font-heading text-sm font-bold text-foreground">
-                                        Question Palette
-                                    </span>
-                                    <button
-                                        onClick={() =>
-                                            setIsMobilePaletteOpen(false)
-                                        }
-                                        className="rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted"
-                                    >
-                                        <X className="size-5" />
-                                    </button>
-                                </div>
-
-                                {/* Category switcher */}
-                                <div className="border-b border-border p-4">
-                                    <span className="mb-2 block text-[10px] font-extrabold tracking-wider text-muted-foreground uppercase">
-                                        Switch Categories
-                                    </span>
-                                    <div className="relative">
-                                        <select
-                                            value={selectedPaletteCategory}
-                                            onChange={(e) =>
-                                                handleCategoryChange(
-                                                    e.target.value,
-                                                )
-                                            }
-                                            className="w-full appearance-none rounded-lg border border-border bg-background py-2 pr-8 pl-2.5 text-xs font-bold text-foreground transition focus:border-blue-500 focus:outline-none"
-                                        >
-                                            <option value="All Categories">
-                                                All Categories
-                                            </option>
-                                            {activeQuestions.some(
-                                                (q) =>
-                                                    q.category ===
-                                                        'Demographic Profile' ||
-                                                    q.isDemographic,
-                                            ) && (
-                                                <option value="Demographic Profile">
-                                                    Demographic Profile
-                                                </option>
-                                            )}
-                                            {details.allowedCategories.map(
-                                                (cat) => (
-                                                    <option
-                                                        key={cat}
-                                                        value={cat}
-                                                    >
-                                                        {cat}
-                                                    </option>
-                                                ),
-                                            )}
-                                        </select>
-                                        <ChevronRight className="pointer-events-none absolute top-1/2 right-2.5 size-4 -translate-y-1/2 rotate-90 text-muted-foreground" />
-                                    </div>
-                                </div>
-
-                                {/* Legend */}
-                                <div className="grid grid-cols-3 gap-2 border-b border-border bg-muted/40 px-4 py-3 text-[10px] font-bold text-muted-foreground">
-                                    <div className="flex items-center gap-1">
-                                        <div className="size-2.5 rounded bg-blue-600" />
-                                        <span>Answered</span>
-                                    </div>
-                                    <div className="flex items-center gap-1">
-                                        <div className="size-2.5 rounded border border-border bg-background" />
-                                        <span>Unanswered</span>
-                                    </div>
-                                    <div className="flex items-center gap-1">
-                                        <div className="size-2.5 rounded border border-rose-200 bg-rose-50 dark:border-rose-900/40 dark:bg-rose-950/20" />
-                                        <span>Flagged</span>
-                                    </div>
-                                </div>
-
-                                {/* Palette buttons */}
-                                <div className="flex-1 overflow-y-auto p-4">
-                                    <div className="grid grid-cols-4 gap-2">
-                                        {paletteItems.map((item) => {
-                                            const origIdx = item.originalIndex;
-                                            const isAnswered =
-                                                answers[origIdx] !== undefined;
-                                            const isFlagged =
-                                                flagged[origIdx] === true;
-                                            const isActive =
-                                                currentIdx === origIdx;
-
-                                            return (
-                                                <button
-                                                    key={origIdx}
-                                                    onClick={() => {
-                                                        handleQuestionNavigate(
-                                                            origIdx,
-                                                        );
-                                                        setIsMobilePaletteOpen(
-                                                            false,
-                                                        );
-                                                    }}
-                                                    className={`relative flex size-10 items-center justify-center rounded-lg border text-xs font-bold transition focus:outline-none ${
-                                                        isActive
-                                                            ? 'border-blue-600 bg-blue-50 font-black text-blue-600 ring-2 ring-blue-600 ring-offset-1 dark:text-blue-400 dark:ring-offset-background'
-                                                            : isAnswered
-                                                              ? 'border-blue-600 bg-blue-600 text-white hover:bg-blue-700'
-                                                              : isFlagged
-                                                                ? 'dark:bg-rose-905/20 border-rose-300 bg-rose-50 text-rose-700 dark:border-rose-900/40 dark:text-rose-400'
-                                                                : isFreeAttempt &&
-                                                                    origIdx >=
-                                                                        20
-                                                                  ? 'border-border bg-background text-muted-foreground/40 hover:bg-muted'
-                                                                  : 'border-border bg-background text-foreground hover:bg-muted'
-                                                    }`}
-                                                >
-                                                    {origIdx + 1}
-                                                    {isFlagged && (
-                                                        <div className="absolute top-0.5 right-0.5 size-2 rounded-full border border-white bg-rose-500 shadow-xs dark:border-slate-950" />
-                                                    )}
-                                                    {isFreeAttempt &&
-                                                        origIdx >= 20 && (
-                                                            <Lock className="absolute -top-1 -right-1 size-3 text-muted-foreground" />
-                                                        )}
-                                                </button>
-                                            );
-                                        })}
-                                    </div>
-                                </div>
-
-                                {/* Sidebar Quick Submit trigger */}
-                                {!isFreeAttempt && (
-                                    <div className="border-t border-border bg-muted/20 p-4">
-                                        <button
-                                            onClick={() => {
-                                                setIsMobilePaletteOpen(false);
-                                                handleSubmitExam(false);
-                                            }}
-                                            className="flex w-full items-center justify-center gap-1.5 rounded-lg bg-emerald-600 py-3 text-xs font-bold text-white shadow-xs transition hover:bg-emerald-700 focus:outline-none"
-                                        >
-                                            <CheckCircle2 className="size-4" />
-                                            Submit Exam
-                                        </button>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                    )}
-                    {customConfirmModal}
-
-                    {/* Guest Free Attempt: Locked Question Modal */}
-                    {showLockedModal && (
-                        <div className="fixed inset-0 z-[100] flex animate-in items-center justify-center bg-slate-900/60 p-4 backdrop-blur-xs duration-200 fade-in">
-                            <div className="relative w-full max-w-2xl animate-in rounded-xl border border-slate-200 bg-white p-6 shadow-xl duration-200 zoom-in-95 dark:border-slate-800 dark:bg-slate-950">
-                                <div className="mb-1 flex items-center gap-2">
-                                    <Lock className="size-5 text-blue-600" />
-                                    <h3 className="font-heading text-lg font-bold text-slate-900 dark:text-white">
-                                        Premium Feature Locked
-                                    </h3>
-                                </div>
-                                <p className="mt-2 text-xs leading-relaxed text-slate-500 dark:text-slate-400">
-                                    Register a free account to unlock all
-                                    questions, track your progress, and access
-                                    more premium features of the mock exam.
-                                </p>
-                                <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-end">
-                                    <button
-                                        type="button"
-                                        onClick={() =>
-                                            setShowLockedModal(false)
-                                        }
-                                        className="rounded-lg border border-slate-200 px-5 py-2.5 text-xs font-bold text-slate-600 transition hover:bg-slate-50 dark:border-slate-800 dark:text-slate-400 dark:hover:bg-slate-900"
-                                    >
-                                        Cancel
-                                    </button>
-                                    <button
-                                        type="button"
-                                        onClick={handleRegisterFromFreeExam}
-                                        className="rounded-lg bg-blue-600 px-5 py-2.5 text-xs font-bold text-white transition hover:bg-blue-700 focus:outline-none"
-                                    >
-                                        Register Now
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-
-                    {/* Guest Free Attempt: Register / Continue Modal */}
-                    {showRegisterModal && (
-                        <div className="fixed inset-0 z-[100] flex animate-in items-center justify-center bg-slate-900/60 p-4 backdrop-blur-xs duration-200 fade-in">
-                            <div className="relative w-full max-w-2xl animate-in rounded-xl border border-slate-200 bg-white p-6 shadow-xl duration-200 zoom-in-95 dark:border-slate-800 dark:bg-slate-950">
-                                <div className="mb-1 flex items-center gap-2">
-                                    <Lock className="size-5 text-blue-600" />
-                                    <h3 className="font-heading text-lg font-bold text-slate-900 dark:text-white">
-                                        Free Preview Limit Reached
-                                    </h3>
-                                </div>
-                                <p className="mt-2 text-xs leading-relaxed text-slate-500 dark:text-slate-400">
-                                    You've completed the first 20 questions of
-                                    the free mock exam preview. Register a free
-                                    account to unlock the full exam, submit your
-                                    answers, and view your detailed scorecard.
-                                </p>
-                                <p className="mt-2 text-[11px] font-semibold text-emerald-600 dark:text-emerald-400">
-                                    ✓ Your progress will be saved and restored
-                                    after registration.
-                                </p>
-                                <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-end">
-                                    <button
-                                        type="button"
-                                        onClick={handleCancelFreeExam}
-                                        className="rounded-lg border border-slate-200 px-5 py-2.5 text-xs font-bold text-slate-600 transition hover:bg-slate-50 dark:border-slate-800 dark:text-slate-400 dark:hover:bg-slate-900"
-                                    >
-                                        Exit to Home
-                                    </button>
-                                    <button
-                                        type="button"
-                                        onClick={handleRegisterFromFreeExam}
-                                        className="flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-5 py-2.5 text-xs font-bold text-white shadow-sm transition hover:bg-blue-700 focus:outline-none"
-                                    >
-                                        <LogIn className="size-4" />
-                                        Register Free Account
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-                </div>
-            </>
+            <LiveExamView
+                details={details}
+                activeQuestions={activeQuestions}
+                currentIdx={currentIdx}
+                isTimed={isTimed}
+                timeLeft={timeLeft}
+                formatTime={formatTime}
+                handleExitExam={handleExitExam}
+                setIsMobilePaletteOpen={setIsMobilePaletteOpen}
+                toggleFlag={toggleFlag}
+                flagged={flagged}
+                answers={answers}
+                handleSelectOption={handleSelectOption}
+                handleQuestionNavigate={handleQuestionNavigate}
+                isFreeAttempt={isFreeAttempt}
+                setShowRegisterModal={setShowRegisterModal}
+                handleSubmitExam={handleSubmitExam}
+                selectedPaletteCategory={selectedPaletteCategory}
+                handleCategoryChange={handleCategoryChange}
+                isMobilePaletteOpen={isMobilePaletteOpen}
+                showLockedModal={showLockedModal}
+                setShowLockedModal={setShowLockedModal}
+                handleRegisterFromFreeExam={handleRegisterFromFreeExam}
+                showRegisterModal={showRegisterModal}
+                handleCancelFreeExam={handleCancelFreeExam}
+                customConfirmModal={customConfirmModal}
+            />
         );
     }
 
     // Render the Post-Exam review scorecard view
     if (isExamSubmitted && results) {
         if (reviewScreenActive) {
-            const currentQuestion = activeQuestions[currentIdx];
-            const chosenOption = answers[currentIdx];
-
             return (
-                <>
-                    <Head title={`Answer Review: ${details.title}`} />
-                    <div className="mx-auto flex h-full w-full max-w-7xl flex-1 animate-in flex-col gap-6 overflow-hidden bg-background p-6 duration-250 fade-in">
-                        {/* Back Link to Scorecard */}
-                        <button
-                            onClick={() => setReviewScreenActive(false)}
-                            className="flex w-fit cursor-pointer items-center gap-1 text-xs font-black text-foreground transition hover:text-blue-600 focus:outline-none"
-                        >
-                            <ChevronLeft className="size-4" />
-                            Back to Scorecard
-                        </button>
-
-                        {/* 1. Header Navigation Bar */}
-                        <div className="flex flex-col gap-4 rounded-xl border-b border-border bg-card p-5 shadow-xs md:flex-row md:items-center md:justify-between">
-                            <div>
-                                <div className="flex items-center gap-2">
-                                    <span className="rounded-md bg-emerald-50 px-2 py-0.5 text-[10px] font-extrabold tracking-wider text-emerald-600 uppercase dark:bg-emerald-950/20 dark:text-emerald-400">
-                                        Exam Answer Review
-                                    </span>
-                                    <span className="text-xs font-semibold text-muted-foreground">
-                                        {details.title}
-                                    </span>
-                                </div>
-                                <h2 className="mt-1 font-heading text-lg font-bold text-foreground">
-                                    Review Explanation
-                                </h2>
-                            </div>
-
-                            {/* Filters exactly matching screen design mockups */}
-                            <div className="flex flex-wrap items-center gap-3">
-                                {/* Tab-like pills with exact metrics */}
-                                <div className="flex items-center gap-1 rounded-lg border border-border bg-muted p-1">
-                                    <button
-                                        onClick={() => {
-                                            setReviewStatusFilter('all');
-                                        }}
-                                        className={`cursor-pointer rounded-md px-3 py-1.5 text-xs font-bold transition ${
-                                            reviewStatusFilter === 'all'
-                                                ? 'shadow-3xs bg-background text-foreground'
-                                                : 'text-muted-foreground hover:text-foreground'
-                                        }`}
-                                    >
-                                        All ({results.total})
-                                    </button>
-                                    <button
-                                        onClick={() => {
-                                            setReviewStatusFilter('correct');
-                                        }}
-                                        className={`flex cursor-pointer items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-bold transition ${
-                                            reviewStatusFilter === 'correct'
-                                                ? 'shadow-3xs bg-background text-emerald-600'
-                                                : 'text-muted-foreground hover:text-emerald-600'
-                                        }`}
-                                    >
-                                        <CheckCircle2 className="size-3 text-emerald-600" />
-                                        Correct ({results.correctCount})
-                                    </button>
-                                    <button
-                                        onClick={() => {
-                                            setReviewStatusFilter('incorrect');
-                                        }}
-                                        className={`flex cursor-pointer items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-bold transition ${
-                                            reviewStatusFilter === 'incorrect'
-                                                ? 'shadow-3xs bg-background text-rose-600'
-                                                : 'text-muted-foreground hover:text-rose-600'
-                                        }`}
-                                    >
-                                        <X className="size-3 text-rose-600" />
-                                        Incorrect (
-                                        {results.wrongCount +
-                                            results.skippedCount}
-                                        )
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* 2. Main Question + Side Navigation Split */}
-                        <div className="flex flex-1 gap-6 overflow-hidden">
-                            {/* Left Question Body Column */}
-                            <div className="flex flex-1 flex-col overflow-hidden rounded-xl border border-border bg-card shadow-xs">
-                                <div className="flex-1 overflow-y-auto p-6 pr-5">
-                                    {currentQuestion ? (
-                                        <>
-                                            <div className="mb-5 flex items-center justify-between border-b border-border pb-4">
-                                                <span className="text-xs font-bold tracking-wider text-muted-foreground uppercase">
-                                                    Question {currentIdx + 1} of{' '}
-                                                    {activeQuestions.length}
-                                                </span>
-                                                <button
-                                                    onClick={() => {
-                                                        setFlagged((prev) => ({
-                                                            ...prev,
-                                                            [currentIdx]:
-                                                                !prev[
-                                                                    currentIdx
-                                                                ],
-                                                        }));
-                                                    }}
-                                                    className={`flex cursor-pointer items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-bold transition ${
-                                                        flagged[currentIdx]
-                                                            ? 'border-rose-200 bg-rose-50 text-rose-600 dark:border-rose-900/40 dark:bg-rose-950/20 dark:text-rose-400'
-                                                            : 'border-border text-muted-foreground hover:bg-muted'
-                                                    }`}
-                                                >
-                                                    <Flag
-                                                        className={`size-3.5 ${flagged[currentIdx] ? 'fill-current' : ''}`}
-                                                    />
-                                                    {flagged[currentIdx]
-                                                        ? 'Flagged for Review'
-                                                        : 'Flag for Review'}
-                                                </button>
-                                            </div>
-
-                                            <div className="flex-1">
-                                                <div className="flex flex-wrap items-center gap-2">
-                                                    <span className="rounded-md bg-blue-50/50 px-2 py-0.5 text-[9px] font-extrabold text-blue-600 dark:bg-blue-950/20 dark:text-blue-400">
-                                                        {
-                                                            currentQuestion.category
-                                                        }
-                                                    </span>
-                                                    <span className="rounded-md bg-muted px-2 py-0.5 text-[9px] font-extrabold text-muted-foreground">
-                                                        {currentQuestion.subcategory ||
-                                                            'General Concepts'}
-                                                    </span>
-                                                </div>
-
-                                                <div className="mt-4">
-                                                    {renderFormattedText(
-                                                        currentQuestion.stem,
-                                                        true,
-                                                    )}
-                                                </div>
-
-                                                {/* Options */}
-                                                <div className="mt-8 grid grid-cols-1 gap-3 md:grid-cols-2">
-                                                    {currentQuestion.options.map(
-                                                        (opt, idx) => {
-                                                            const letter =
-                                                                String.fromCharCode(
-                                                                    65 + idx,
-                                                                );
-                                                            const isChosen =
-                                                                chosenOption ===
-                                                                idx;
-                                                            const isCorrectOption =
-                                                                idx ===
-                                                                currentQuestion.correct_option;
-                                                            const isDemographic =
-                                                                currentQuestion.isDemographic ||
-                                                                currentQuestion.category ===
-                                                                    'Demographic Profile';
-
-                                                            let optionStyle =
-                                                                'border-border bg-background hover:bg-muted text-foreground';
-                                                            let badgeStyle =
-                                                                'bg-muted text-muted-foreground';
-
-                                                            if (isDemographic) {
-                                                                if (isChosen) {
-                                                                    optionStyle =
-                                                                        'bg-blue-50/70 border-blue-200 text-blue-950 font-bold dark:bg-blue-950/20 dark:border-blue-900 dark:text-blue-300';
-                                                                    badgeStyle =
-                                                                        'bg-blue-600 text-white';
-                                                                }
-                                                            } else if (
-                                                                isCorrectOption
-                                                            ) {
-                                                                optionStyle =
-                                                                    'bg-emerald-50/70 border-emerald-200 text-emerald-950 font-bold dark:bg-emerald-950/20 dark:border-emerald-900 dark:text-emerald-300';
-                                                                badgeStyle =
-                                                                    'bg-emerald-600 text-white';
-                                                            } else if (
-                                                                isChosen
-                                                            ) {
-                                                                optionStyle =
-                                                                    'bg-rose-50/70 border-rose-250 text-rose-950 font-bold dark:bg-rose-950/20 dark:border-rose-900 dark:text-rose-300';
-                                                                badgeStyle =
-                                                                    'bg-rose-600 text-white';
-                                                            } else {
-                                                                optionStyle =
-                                                                    'border-border bg-background hover:bg-muted text-foreground/60 opacity-60';
-                                                                badgeStyle =
-                                                                    'bg-muted text-muted-foreground/60';
-                                                            }
-
-                                                            return (
-                                                                <div
-                                                                    key={idx}
-                                                                    className="relative flex items-center"
-                                                                >
-                                                                    <div
-                                                                        className={`flex w-full items-center justify-between rounded-xl border px-4 py-3 text-left transition ${optionStyle}`}
-                                                                    >
-                                                                        <div className="flex items-center gap-2.5">
-                                                                            <span
-                                                                                className={`inline-flex size-6 shrink-0 items-center justify-center rounded-lg text-xs font-bold ${badgeStyle}`}
-                                                                            >
-                                                                                {
-                                                                                    letter
-                                                                                }
-                                                                            </span>
-                                                                            <span className="text-sm leading-tight">
-                                                                                {
-                                                                                    opt
-                                                                                }
-                                                                            </span>
-                                                                        </div>
-                                                                        {!isDemographic &&
-                                                                            isCorrectOption && (
-                                                                                <CheckCircle2 className="dark:text-emerald-450 size-4 shrink-0 text-emerald-600" />
-                                                                            )}
-                                                                        {!isDemographic &&
-                                                                            isChosen &&
-                                                                            !isCorrectOption && (
-                                                                                <X className="text-rose-650 dark:text-rose-450 size-4 shrink-0" />
-                                                                            )}
-                                                                    </div>
-                                                                </div>
-                                                            );
-                                                        },
-                                                    )}
-                                                </div>
-
-                                                {(() => {
-                                                    const propositions =
-                                                        extractPropositions(
-                                                            currentQuestion.stem,
-                                                        );
-                                                    const letterMap: Record<
-                                                        string,
-                                                        string
-                                                    > = {};
-
-                                                    propositions.forEach(
-                                                        (prop, idx) => {
-                                                            const newLetter =
-                                                                String.fromCharCode(
-                                                                    65 + idx,
-                                                                );
-                                                            letterMap[
-                                                                prop.letter
-                                                            ] = newLetter;
-                                                        },
-                                                    );
-
-                                                    return (
-                                                        <>
-                                                            {currentQuestion.explanation && (
-                                                                <div className="mt-6 rounded-xl border border-border bg-muted/60 p-4.5 text-xs leading-relaxed text-muted-foreground">
-                                                                    <span className="mb-2 block font-bold text-foreground">
-                                                                        Explanation
-                                                                        &amp;
-                                                                        Rationale:
-                                                                    </span>
-
-                                                                    {propositions.length >
-                                                                        0 && (
-                                                                        <div className="shadow-3xs mb-4 rounded-xl border border-border bg-background p-3">
-                                                                            <span className="mb-2 block font-heading text-[10px] font-black tracking-wider text-muted-foreground uppercase">
-                                                                                Proposition
-                                                                                Key:
-                                                                            </span>
-                                                                            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-                                                                                {propositions.map(
-                                                                                    (
-                                                                                        prop,
-                                                                                        idx,
-                                                                                    ) => {
-                                                                                        const newLetter =
-                                                                                            String.fromCharCode(
-                                                                                                65 +
-                                                                                                    idx,
-                                                                                            );
-
-                                                                                        return (
-                                                                                            <div
-                                                                                                key={
-                                                                                                    idx
-                                                                                                }
-                                                                                                className="flex items-center gap-2 text-xs"
-                                                                                            >
-                                                                                                <span className="inline-flex size-5 items-center justify-center rounded border border-blue-100/60 bg-blue-50 font-mono text-[10px] font-black text-blue-700 dark:border-blue-900/40 dark:bg-blue-950/40 dark:text-blue-400">
-                                                                                                    {
-                                                                                                        newLetter
-                                                                                                    }
-                                                                                                </span>
-                                                                                                <span className="font-medium text-foreground">
-                                                                                                    {
-                                                                                                        prop.phrase
-                                                                                                    }
-                                                                                                </span>
-                                                                                            </div>
-                                                                                        );
-                                                                                    },
-                                                                                )}
-                                                                            </div>
-                                                                        </div>
-                                                                    )}
-
-                                                                    {renderFormattedText(
-                                                                        currentQuestion.explanation,
-                                                                        false,
-                                                                        letterMap,
-                                                                    )}
-                                                                </div>
-                                                            )}
-                                                        </>
-                                                    );
-                                                })()}
-                                            </div>
-
-                                            <div className="mt-8 flex items-center justify-between border-t border-border pt-5">
-                                                {/* existing prev/back/next buttons */}
-                                            </div>
-                                        </>
-                                    ) : (
-                                        <div className="flex flex-col items-center justify-center py-20 text-center">
-                                            <HelpCircle className="mb-3 size-12 text-muted-foreground" />
-                                            <h3 className="text-base font-bold text-foreground">
-                                                No questions match filters
-                                            </h3>
-                                            <p className="mt-1 text-xs text-muted-foreground">
-                                                Try switching to a different
-                                                category or status pill.
-                                            </p>
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-
-                            {/* Right Column: Question Palette */}
-                            <div className="hidden w-80 shrink-0 flex-col overflow-hidden rounded-xl border-l border-border bg-card shadow-xs md:flex">
-                                {/* existing right column content */}
-                            </div>
-                        </div>
-                    </div>
-                </>
+                <ReviewExamView
+                    details={details}
+                    activeQuestions={activeQuestions}
+                    currentIdx={currentIdx}
+                    setCurrentIdx={setCurrentIdx}
+                    answers={answers}
+                    flagged={flagged}
+                    setFlagged={setFlagged}
+                    reviewCategoryFilter={reviewCategoryFilter}
+                    setReviewCategoryFilter={setReviewCategoryFilter}
+                    reviewSubcategoryFilter={reviewSubcategoryFilter}
+                    setReviewSubcategoryFilter={setReviewSubcategoryFilter}
+                    reviewStatusFilter={reviewStatusFilter}
+                    setReviewStatusFilter={setReviewStatusFilter}
+                    reviewSubcategories={reviewSubcategories}
+                    isMobilePaletteOpen={isMobilePaletteOpen}
+                    setIsMobilePaletteOpen={setIsMobilePaletteOpen}
+                    setReviewScreenActive={setReviewScreenActive}
+                />
             );
         }
 
-        // Render premium Scorecard view!
         return (
-            <>
-                <Head
-                    title={
-                        isDrillSession
-                            ? `Scorecard: ${drillCategoryName || savedAttempt?.cat_scores?.metadata?.category_name || 'Practice Drill'}`
-                            : `Scorecard: ${details.title}`
-                    }
+            <PageContainer>
+                <ScorecardView
+                    details={details}
+                    isDrillSession={isDrillSession}
+                    drillCategoryName={drillCategoryName}
+                    savedAttempt={savedAttempt}
+                    results={results}
+                    isTimed={isTimed}
+                    getActiveTimeLimitSecs={getActiveTimeLimitSecs}
+                    submittedByTimer={submittedByTimer}
+                    retakeModal={retakeModal}
+                    setReviewScreenActive={setReviewScreenActive}
+                    setShowRetakeModal={setShowRetakeModal}
+                    handleBeginExam={handleBeginExam}
                 />
-                <PageContainer className="animate-in duration-200 fade-in">
-                    {/* Back to History Link */}
-                    {savedAttempt && (
-                        <Link
-                            href="/history"
-                            className="text-slate-850 flex w-fit cursor-pointer items-center gap-1 text-xs font-black transition hover:text-blue-600 focus:outline-none dark:text-white dark:hover:text-blue-400"
-                        >
-                            <ChevronLeft className="size-4" />
-                            Back to History
-                        </Link>
-                    )}
-
-                    {/* Header */}
-                    <div className="flex flex-col gap-2 border-b border-slate-100 pb-5 md:flex-row md:items-center md:justify-between">
-                        <div>
-                            <span className="inline-flex items-center gap-1 rounded-full bg-blue-50 px-2.5 py-0.5 text-xs font-bold text-blue-600 dark:bg-blue-950/40 dark:text-blue-400">
-                                <Award className="size-3" />
-                                Review Panel
-                            </span>
-                            <h1 className="mt-1 font-heading text-2xl font-bold tracking-tight text-slate-900 md:text-3xl dark:text-white">
-                                {isDrillSession
-                                    ? 'Drill Results'
-                                    : 'Exam Results'}
-                            </h1>
-                            <p className="mt-0.5 text-xs text-slate-500">
-                                {(() => {
-                                    if (
-                                        savedAttempt &&
-                                        savedAttempt.created_at
-                                    ) {
-                                        try {
-                                            return `Completed on ${new Date(
-                                                savedAttempt.created_at,
-                                            ).toLocaleDateString('en-US', {
-                                                month: 'long',
-                                                day: 'numeric',
-                                                year: 'numeric',
-                                            })}`;
-                                        } catch {
-                                            /* ignore invalid date string format */
-                                        }
-                                    }
-
-                                    return `Completed on ${new Date().toLocaleDateString(
-                                        'en-US',
-                                        {
-                                            month: 'long',
-                                            day: 'numeric',
-                                            year: 'numeric',
-                                        },
-                                    )}`;
-                                })()}
-                            </p>
-                        </div>
-                        <div className="flex items-center gap-3">
-                            <button
-                                onClick={() => {
-                                    setReviewScreenActive(true);
-                                }}
-                                className="shadow-3xs hover:bg-slate-55/60 flex cursor-pointer items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-xs font-bold transition focus:outline-none dark:border-slate-800 dark:bg-slate-950 dark:text-slate-300"
-                            >
-                                <BookOpen className="size-3.5" />
-                                View Review
-                            </button>
-                            <button
-                                onClick={() => setShowRetakeModal(true)}
-                                className="hover:bg-blue-750 flex cursor-pointer items-center gap-1.5 rounded-lg bg-blue-600 px-4 py-2.5 text-xs font-semibold text-white shadow-xs transition focus:outline-none"
-                            >
-                                <RotateCcw className="size-3.5" />
-                                {isDrillSession
-                                    ? 'Retake Drill'
-                                    : 'Retake Exam'}
-                            </button>
-                        </div>
-                    </div>
-
-                    {submittedByTimer && (
-                        <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-xs font-semibold text-amber-800 dark:border-amber-900/40 dark:bg-amber-950/20 dark:text-amber-300">
-                            Time expired — your exam was submitted automatically
-                            and your scorecard is shown below.
-                        </div>
-                    )}
-
-                    {retakeModal}
-
-                    {/* Stats overview cards grid */}
-                    <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-                        <div className="dark:border-slate-850 rounded-xl border border-slate-100 bg-white p-5 text-center shadow-xs dark:bg-slate-950">
-                            <span className="text-[10px] font-extrabold tracking-wider text-slate-400 uppercase">
-                                Final Grade
-                            </span>
-                            <p className="mt-2 text-3xl font-black text-blue-600 dark:text-blue-400">
-                                {results.percentage}%
-                            </p>
-                            <span
-                                className={`mt-2 inline-flex rounded-full px-2.5 py-0.5 text-[10px] font-extrabold ${
-                                    results.percentage >= 80
-                                        ? 'dark:text-emerald-450 bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40'
-                                        : 'dark:text-rose-450 bg-rose-50 text-rose-700 dark:bg-rose-950/40'
-                                }`}
-                            >
-                                {results.percentage >= 80
-                                    ? 'PASSED (CSC Standard)'
-                                    : 'FAILED'}
-                            </span>
-                        </div>
-
-                        <div className="dark:border-slate-850 rounded-xl border border-slate-100 bg-white p-5 text-center shadow-xs dark:bg-slate-950">
-                            <span className="text-[10px] font-extrabold tracking-wider text-slate-400 uppercase">
-                                Correct Answers
-                            </span>
-                            <p className="mt-2 text-3xl font-black text-emerald-600 dark:text-emerald-400">
-                                {results.correctCount}
-                            </p>
-                            <span className="mt-2 block text-[10px] font-bold text-slate-400">
-                                of {results.total} questions
-                            </span>
-                        </div>
-
-                        <div className="dark:border-slate-850 rounded-xl border border-slate-100 bg-white p-5 text-center shadow-xs dark:bg-slate-950">
-                            <span className="text-[10px] font-extrabold tracking-wider text-slate-400 uppercase">
-                                Incorrect answers
-                            </span>
-                            <p className="mt-2 text-3xl font-black text-rose-600 dark:text-rose-400">
-                                {results.wrongCount}
-                            </p>
-                            <span className="mt-2 block text-[10px] font-bold text-slate-400">
-                                of {results.total} questions
-                            </span>
-                        </div>
-
-                        <div className="dark:border-slate-850 rounded-xl border border-slate-100 bg-white p-5 text-center shadow-xs dark:bg-slate-950">
-                            <span className="text-[10px] font-extrabold tracking-wider text-slate-400 uppercase">
-                                Skipped / Blank
-                            </span>
-                            <p className="mt-2 text-3xl font-black text-slate-500">
-                                {results.skippedCount}
-                            </p>
-                            <span className="mt-2 block text-[10px] font-bold text-slate-400">
-                                unanswered items
-                            </span>
-                        </div>
-                    </div>
-
-                    {/* Executive Radial Gauge + Elapsed stats + AI advice widgets grid */}
-                    {(() => {
-                        const elapsedSecs = results.elapsedSecs ?? 0;
-                        const remainingSecs = isTimed
-                            ? Math.max(
-                                  0,
-                                  getActiveTimeLimitSecs() - elapsedSecs,
-                              )
-                            : 0;
-                        const elapsedText = formatDuration(elapsedSecs);
-                        const underLimitText =
-                            remainingSecs > 0
-                                ? `${formatDuration(remainingSecs, false)} under limit`
-                                : 'Used full time limit';
-
-                        let percentile = '22nd';
-                        let topText = 'Top 78% of test takers';
-                        const pct = results.percentage;
-
-                        if (pct >= 95) {
-                            percentile = '99th';
-                            topText = 'Top 1% of test takers';
-                        } else if (pct >= 90) {
-                            percentile = '95th';
-                            topText = 'Top 5% of test takers';
-                        } else if (pct >= 85) {
-                            percentile = '91st';
-                            topText = 'Top 9% of test takers';
-                        } else if (pct >= 80) {
-                            percentile = '88th';
-                            topText = 'Top 12% of test takers';
-                        } else if (pct >= 75) {
-                            percentile = '80th';
-                            topText = 'Top 20% of test takers';
-                        } else if (pct >= 70) {
-                            percentile = '73rd';
-                            topText = 'Top 27% of test takers';
-                        } else if (pct >= 60) {
-                            percentile = '58th';
-                            topText = 'Top 42% of test takers';
-                        } else if (pct >= 50) {
-                            percentile = '41st';
-                            topText = 'Top 59% of test takers';
-                        }
-
-                        let aiAnalysisText = '';
-
-                        if (results.correctCount === 0) {
-                            aiAnalysisText =
-                                'You did not answer any questions correctly on this attempt. We recommend reviewing the foundational concepts across all categories, starting with General Information and Verbal Ability, to build up your core competencies.';
-                        } else {
-                            if (isDrillSession) {
-                                // Analyze subcategory performance for category drills
-                                let strongestSubcat = '';
-                                let strongestSubcatPct = -1;
-                                let weakestSubcat = '';
-                                let weakestSubcatPct = 101;
-                                let targetCategoryName =
-                                    drillCategoryName || 'Practice Drill';
-
-                                Object.entries(
-                                    results.categoryScoreMap,
-                                ).forEach(([cat, val]) => {
-                                    targetCategoryName = cat;
-                                    Object.entries(val.subcats).forEach(
-                                        ([sub, subVal]) => {
-                                            const subPct =
-                                                subVal.total > 0
-                                                    ? (subVal.correct /
-                                                          subVal.total) *
-                                                      100
-                                                    : 0;
-
-                                            if (subPct > strongestSubcatPct) {
-                                                strongestSubcatPct = subPct;
-                                                strongestSubcat = sub;
-                                            }
-
-                                            if (subPct < weakestSubcatPct) {
-                                                weakestSubcatPct = subPct;
-                                                weakestSubcat = sub;
-                                            }
-                                        },
-                                    );
-                                });
-
-                                if (!strongestSubcat) {
-                                    strongestSubcat = 'fundamental questions';
-                                }
-
-                                if (!weakestSubcat) {
-                                    weakestSubcat = 'specific target modules';
-                                }
-
-                                if (strongestSubcat === weakestSubcat) {
-                                    if (results.percentage >= 80) {
-                                        aiAnalysisText = `You completed a focused drill in ${targetCategoryName}. Your accuracy was consistent and strong across your targeted subcategories. Keep practicing to maintain this level!`;
-                                    } else {
-                                        aiAnalysisText = `You completed a focused drill in ${targetCategoryName}. We recommend spending more time reviewing the core concepts of "${strongestSubcat}" to raise your overall accuracy.`;
-                                    }
-                                } else {
-                                    aiAnalysisText = `In this ${targetCategoryName} practice drill, you showed strong proficiency in ${strongestSubcat} topics. To maximize your performance in this category, we recommend focusing review efforts on ${weakestSubcat}.`;
-                                }
-                            } else {
-                                // Analyze category performance for full mock exams
-                                let strongestCategory = '';
-                                let strongestPct = -1;
-                                let weakestCategory = '';
-                                let weakestPct = 101;
-                                let weakestSubcat = 'fundamental concepts';
-
-                                Object.entries(
-                                    results.categoryScoreMap,
-                                ).forEach(([cat, val]) => {
-                                    const catPct =
-                                        val.total > 0
-                                            ? (val.correct / val.total) * 100
-                                            : 0;
-
-                                    if (catPct > strongestPct) {
-                                        strongestPct = catPct;
-                                        strongestCategory = cat;
-                                    }
-
-                                    if (catPct < weakestPct) {
-                                        weakestPct = catPct;
-                                        weakestCategory = cat;
-                                        const subEntries = Object.entries(
-                                            val.subcats,
-                                        );
-
-                                        if (subEntries.length > 0) {
-                                            const sortedSubs = [
-                                                ...subEntries,
-                                            ].sort(
-                                                (a, b) =>
-                                                    a[1].correct / a[1].total -
-                                                    b[1].correct / b[1].total,
-                                            );
-                                            weakestSubcat = sortedSubs[0][0];
-                                        }
-                                    }
-                                });
-
-                                if (!strongestCategory) {
-                                    strongestCategory = 'Verbal Ability';
-                                }
-
-                                if (!weakestCategory) {
-                                    weakestCategory = 'Numerical Ability';
-                                }
-
-                                aiAnalysisText = `Your strongest area was ${strongestCategory}. To improve your overall score, focus review efforts on ${weakestCategory}, specifically ${weakestSubcat} modules.`;
-                            }
-                        }
-
-                        const radius = 40;
-                        const circumference = 2 * Math.PI * radius;
-                        const strokeDashoffset =
-                            circumference -
-                            (results.percentage / 100) * circumference;
-
-                        return (
-                            <div className="mt-2 grid grid-cols-1 gap-6 md:grid-cols-3">
-                                {/* Radial progress circle display */}
-                                <div className="shadow-3xs relative flex min-h-[260px] flex-col items-center justify-center rounded-xl border border-slate-200 bg-white p-6 text-center md:col-span-1 dark:border-slate-800 dark:bg-slate-950">
-                                    <div className="relative flex size-36 items-center justify-center">
-                                        <svg
-                                            className="size-full -rotate-90"
-                                            viewBox="0 0 100 100"
-                                        >
-                                            <circle
-                                                cx="50"
-                                                cy="50"
-                                                r={radius}
-                                                className="fill-none stroke-slate-100 dark:stroke-slate-900"
-                                                strokeWidth="7"
-                                            />
-                                            <circle
-                                                cx="50"
-                                                cy="50"
-                                                r={radius}
-                                                className="fill-none stroke-emerald-600 transition-all duration-500 dark:stroke-emerald-500"
-                                                strokeWidth="7"
-                                                strokeDasharray={circumference}
-                                                strokeDashoffset={
-                                                    strokeDashoffset
-                                                }
-                                                strokeLinecap="round"
-                                            />
-                                        </svg>
-                                        <div className="absolute inset-0 flex flex-col items-center justify-center">
-                                            <span className="text-slate-850 text-3xl leading-none font-black dark:text-white">
-                                                {results.percentage}%
-                                            </span>
-                                        </div>
-                                    </div>
-
-                                    <div className="mt-5 flex flex-col items-center gap-1.5">
-                                        <span
-                                            className={`inline-flex rounded-full px-3 py-1 text-[10px] font-extrabold tracking-wider uppercase ${
-                                                results.percentage >= 80
-                                                    ? 'dark:text-emerald-450 bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40'
-                                                    : 'dark:text-rose-450 bg-rose-50 text-rose-700 dark:bg-rose-950/40'
-                                            }`}
-                                        >
-                                            {results.percentage >= 80
-                                                ? 'PASS'
-                                                : 'FAIL'}
-                                        </span>
-                                        <p className="text-slate-550 mt-1 text-xs font-semibold dark:text-slate-400">
-                                            {results.correctCount} /{' '}
-                                            {results.total} Correct
-                                        </p>
-                                    </div>
-                                </div>
-
-                                {/* Dynamic Elapsed, Percentile and advice widgets */}
-                                <div className="flex flex-col gap-6 md:col-span-2">
-                                    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                                        {/* Card 1: Time Elapsed */}
-                                        <div className="shadow-3xs rounded-xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-950">
-                                            <div className="flex items-center gap-2 text-[10px] font-black tracking-wider text-slate-400 uppercase">
-                                                <Clock className="text-blue-650 size-3.5" />
-                                                <span>Time Elapsed</span>
-                                            </div>
-                                            <p className="text-slate-850 mt-3 text-3xl font-black dark:text-white">
-                                                {elapsedText}
-                                            </p>
-                                            <span className="text-emerald-650 dark:text-emerald-450 mt-1.5 inline-flex items-center gap-1 text-[10px] font-bold">
-                                                ↘ {underLimitText}
-                                            </span>
-                                        </div>
-
-                                        {/* Card 2: Percentile */}
-                                        <div className="shadow-3xs rounded-xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-950">
-                                            <div className="flex items-center gap-2 text-[10px] font-black tracking-wider text-slate-400 uppercase">
-                                                <Users className="text-blue-650 size-3.5" />
-                                                <span>Percentile</span>
-                                            </div>
-                                            <p className="text-slate-850 mt-3 text-3xl font-black dark:text-white">
-                                                {percentile}
-                                            </p>
-                                            <span className="mt-1.5 block text-[10px] font-bold text-slate-500">
-                                                {topText}
-                                            </span>
-                                        </div>
-                                    </div>
-
-                                    {/* Bottom: Performance Insights AI analysis */}
-                                    <div className="shadow-3xs flex flex-1 flex-col justify-center rounded-xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-950">
-                                        <div className="mb-2 flex items-center gap-2 text-[10px] font-black tracking-wider text-slate-400 uppercase">
-                                            <Sparkles className="size-3.5 text-amber-500" />
-                                            <span>Performance Insights</span>
-                                        </div>
-                                        <p className="text-slate-850 text-xs leading-relaxed font-semibold">
-                                            {aiAnalysisText}
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                        );
-                    })()}
-
-                    {/* Subcategory Accordion Category Breakdown (Full Width) */}
-                    <div className="mt-2 flex flex-col gap-4">
-                        <h2 className="font-heading text-xl font-bold text-slate-900 dark:text-white">
-                            Category Breakdown
-                        </h2>
-
-                        <div className="flex flex-col gap-4">
-                            {Object.entries(results.categoryScoreMap).map(
-                                ([cat, val]) => {
-                                    const pct = Math.round(
-                                        (val.correct / val.total) * 100,
-                                    );
-                                    const isExpanded = expandedCategory === cat;
-
-                                    // Select appropriate icon matching the topic blueprint
-                                    let IconComponent = BookOpen;
-
-                                    if (cat.toLowerCase().includes('verbal')) {
-                                        IconComponent = BookOpen;
-                                    } else if (
-                                        cat
-                                            .toLowerCase()
-                                            .includes('numerical') ||
-                                        cat.toLowerCase().includes('quant') ||
-                                        cat.toLowerCase().includes('math')
-                                    ) {
-                                        IconComponent = Calculator;
-                                    } else if (
-                                        cat
-                                            .toLowerCase()
-                                            .includes('analytical') ||
-                                        cat
-                                            .toLowerCase()
-                                            .includes('abstract') ||
-                                        cat.toLowerCase().includes('reason')
-                                    ) {
-                                        IconComponent = Brain;
-                                    } else if (
-                                        cat.toLowerCase().includes('clerical')
-                                    ) {
-                                        IconComponent = ClipboardList;
-                                    } else {
-                                        IconComponent = Award;
-                                    }
-
-                                    // Grade range indicators
-                                    const barColor =
-                                        pct >= 80
-                                            ? 'bg-emerald-700'
-                                            : pct >= 70
-                                              ? 'bg-blue-600 animate-pulse'
-                                              : 'bg-rose-600';
-                                    const percentColor =
-                                        pct >= 80
-                                            ? 'text-emerald-700 dark:text-emerald-450'
-                                            : pct >= 70
-                                              ? 'text-blue-655 dark:text-blue-450'
-                                              : 'text-rose-650 dark:text-rose-450';
-
-                                    return (
-                                        <div
-                                            key={cat}
-                                            className="shadow-3xs overflow-hidden rounded-xl border border-slate-200 bg-white transition dark:border-slate-800 dark:bg-slate-950"
-                                        >
-                                            {/* Accordion trigger panel button */}
-                                            <button
-                                                onClick={() =>
-                                                    setExpandedCategory(
-                                                        isExpanded ? null : cat,
-                                                    )
-                                                }
-                                                className="flex w-full items-center justify-between p-5 text-left transition hover:bg-slate-50/50 focus:outline-none dark:hover:bg-slate-900/30"
-                                            >
-                                                <div className="flex items-center gap-4">
-                                                    <div className="text-blue-650 dark:text-blue-450 flex size-11 items-center justify-center rounded-lg bg-blue-50 dark:bg-blue-950/40">
-                                                        <IconComponent className="size-5.5" />
-                                                    </div>
-                                                    <div>
-                                                        <h3 className="text-md leading-tight font-bold text-slate-900 dark:text-white">
-                                                            {cat}
-                                                        </h3>
-                                                        <span className="mt-0.5 block text-xs font-semibold text-slate-500">
-                                                            {val.correct} /{' '}
-                                                            {val.total} Correct
-                                                        </span>
-                                                    </div>
-                                                </div>
-
-                                                <div className="flex items-center gap-3">
-                                                    <span
-                                                        className={`text-md font-extrabold ${percentColor}`}
-                                                    >
-                                                        {pct}%
-                                                    </span>
-                                                    <ChevronDown
-                                                        className={`size-5 text-slate-400 transition-transform duration-300 ${
-                                                            isExpanded
-                                                                ? 'text-blue-650 rotate-180'
-                                                                : ''
-                                                        }`}
-                                                    />
-                                                </div>
-                                            </button>
-
-                                            {/* Dynamic full-width colored progress bar */}
-                                            <div className="px-5 pb-5">
-                                                <div className="h-1.5 w-full rounded-full bg-slate-100 dark:bg-slate-900/50">
-                                                    <div
-                                                        className={`h-full rounded-full transition-all duration-500 ${barColor}`}
-                                                        style={{
-                                                            width: `${Math.max(3, pct)}%`,
-                                                        }}
-                                                    />
-                                                </div>
-
-                                                {/* Subcategories grid visible under expanded categories */}
-                                                {isExpanded && (
-                                                    <div className="mt-5 animate-in border-t border-slate-100 pt-4 duration-200 slide-in-from-top-2 dark:border-slate-900">
-                                                        <div className="grid grid-cols-1 gap-x-8 gap-y-3.5 md:grid-cols-2 lg:grid-cols-3">
-                                                            {Object.entries(
-                                                                val.subcats,
-                                                            ).map(
-                                                                ([
-                                                                    subName,
-                                                                    subVal,
-                                                                ]) => {
-                                                                    const subPct =
-                                                                        subVal.total >
-                                                                        0
-                                                                            ? Math.round(
-                                                                                  (subVal.correct /
-                                                                                      subVal.total) *
-                                                                                      100,
-                                                                              )
-                                                                            : 0;
-                                                                    const scoreColor =
-                                                                        subPct >=
-                                                                        80
-                                                                            ? 'text-emerald-600 font-black dark:text-emerald-450'
-                                                                            : subPct >=
-                                                                                70
-                                                                              ? 'text-blue-655 font-black dark:text-blue-450'
-                                                                              : 'text-rose-650 font-black dark:text-rose-400';
-
-                                                                    return (
-                                                                        <div
-                                                                            key={
-                                                                                subName
-                                                                            }
-                                                                            className="flex items-center justify-between border-b border-slate-50/50 py-1 text-xs dark:border-slate-900/20"
-                                                                        >
-                                                                            <span className="font-semibold text-slate-600 dark:text-slate-400">
-                                                                                {
-                                                                                    subName
-                                                                                }
-                                                                            </span>
-                                                                            <span
-                                                                                className={`ml-4 shrink-0 ${scoreColor}`}
-                                                                            >
-                                                                                {
-                                                                                    subVal.correct
-                                                                                }
-
-                                                                                /
-                                                                                {
-                                                                                    subVal.total
-                                                                                }
-                                                                            </span>
-                                                                        </div>
-                                                                    );
-                                                                },
-                                                            )}
-                                                        </div>
-                                                    </div>
-                                                )}
-                                            </div>
-                                        </div>
-                                    );
-                                },
-                            )}
-                        </div>
-                    </div>
-
-                    {customConfirmModal}
-                </PageContainer>
-            </>
+            </PageContainer>
         );
     }
 

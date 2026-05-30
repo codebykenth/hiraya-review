@@ -219,14 +219,16 @@ class QuestionController extends Controller
             return redirect()->route('questions.drafts')->with('success', "{$savedCount} approved questions committed successfully!");
         }
 
+        $isDemographic = Category::where('name', $request->input('category'))->value('is_demographic') ?? ($request->input('category') === 'Demographic Profile');
+
         $validated = $request->validate([
             'stem' => 'required|string',
             'category' => 'required|string',
-            'subcategory' => 'required|string',
+            'subcategory' => $isDemographic ? 'nullable|string' : 'required|string',
             'language' => 'required|string',
-            'options' => 'required|array|min:5|max:5',
-            'correct_option' => 'required|integer|min:0|max:4',
-            'explanation' => 'required|string',
+            'options' => $isDemographic ? 'required|array|min:2' : 'required|array|min:5|max:5',
+            'correct_option' => $isDemographic ? 'nullable|integer' : 'required|integer|min:0|max:4',
+            'explanation' => $isDemographic ? 'nullable|string' : 'required|string',
             'status' => 'required|in:active,draft',
         ]);
 
@@ -236,13 +238,15 @@ class QuestionController extends Controller
                 ['name' => $validated['category']]
             );
 
+            $subcategoryName = $validated['subcategory'] ?? $validated['category'];
+
             $subcategory = Subcategory::firstOrCreate(
                 [
                     'category_id' => $category->id,
-                    'slug' => Str::slug($validated['subcategory']),
+                    'slug' => Str::slug($subcategoryName),
                 ],
                 [
-                    'name' => $validated['subcategory'],
+                    'name' => $subcategoryName,
                     'language' => $validated['language'],
                 ]
             );
@@ -252,8 +256,8 @@ class QuestionController extends Controller
                 'language' => $validated['language'],
                 'stem' => $validated['stem'],
                 'options' => $validated['options'],
-                'correct_option' => (int) $validated['correct_option'],
-                'explanation' => $validated['explanation'],
+                'correct_option' => $validated['correct_option'] !== null ? (int) $validated['correct_option'] : -1,
+                'explanation' => $validated['explanation'] ?? '',
                 'created_by' => auth()->id() ?: (User::first()?->id ?: 1),
                 'status' => $validated['status'] === 'active' ? 'active' : 'draft',
             ]);
@@ -331,14 +335,16 @@ class QuestionController extends Controller
     {
         $question = Question::findOrFail($id);
 
+        $isDemographic = Category::where('name', $request->input('category'))->value('is_demographic') ?? ($request->input('category') === 'Demographic Profile');
+
         $validated = $request->validate([
             'category' => 'required|string',
-            'subcategory' => 'required|string',
+            'subcategory' => $isDemographic ? 'nullable|string' : 'required|string',
             'language' => 'required|string',
             'stem' => 'required|string',
-            'options' => 'required|array|min:4',
-            'correct_option' => 'required|integer',
-            'explanation' => 'required|string',
+            'options' => $isDemographic ? 'required|array|min:2' : 'required|array|min:4|max:5',
+            'correct_option' => $isDemographic ? 'nullable|integer' : 'required|integer',
+            'explanation' => $isDemographic ? 'nullable|string' : 'required|string',
             'status' => 'required|string|in:active,draft',
         ]);
 
@@ -350,11 +356,13 @@ class QuestionController extends Controller
             'sort_order' => 1,
         ]);
 
+        $subcategoryName = $validated['subcategory'] ?? $validated['category'];
+
         $subcategory = Subcategory::firstOrCreate([
             'category_id' => $category->id,
-            'name' => $validated['subcategory'],
+            'name' => $subcategoryName,
         ], [
-            'slug' => Str::slug($validated['subcategory']),
+            'slug' => Str::slug($subcategoryName),
             'language' => $validated['language'],
             'sort_order' => 1,
         ]);
@@ -364,8 +372,8 @@ class QuestionController extends Controller
             'language' => $validated['language'],
             'stem' => $validated['stem'],
             'options' => $validated['options'],
-            'correct_option' => (int) $validated['correct_option'],
-            'explanation' => $validated['explanation'],
+            'correct_option' => $validated['correct_option'] !== null ? (int) $validated['correct_option'] : -1,
+            'explanation' => $validated['explanation'] ?? '',
             'status' => $validated['status'] === 'active' ? 'active' : 'draft',
         ]);
 
@@ -398,12 +406,13 @@ class QuestionController extends Controller
 
         $validated = $request->validate([
             'name' => 'required|string|max:255|unique:categories,name',
+            'is_demographic' => 'nullable|boolean',
         ]);
 
         $category = Category::create([
             'name' => $validated['name'],
             'slug' => Str::slug($validated['name']),
-            'is_demographic' => false,
+            'is_demographic' => $validated['is_demographic'] ?? false,
             'sort_order' => Category::count() + 1,
         ]);
         $this->clearCache();

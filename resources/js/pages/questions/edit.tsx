@@ -90,7 +90,7 @@ export default function QuestionEdit({
     );
 
     // Main Form Setup
-    const { data, setData, put, processing, errors } = useForm({
+    const { data, setData, put, processing, errors, transform } = useForm({
         category: selectedCategoryName,
         subcategory: selectedSubcategoryName,
         language: question.language || 'English',
@@ -125,10 +125,40 @@ export default function QuestionEdit({
         setData('options', nextOpts);
     };
 
+    const isDemographic = (() => {
+        const cat = categories.find((c) => c.name === data.category);
+
+        return (
+            cat?.subcategory?.some(
+                (s) =>
+                    s.name === data.subcategory &&
+                    cat?.name === 'Demographic Profile',
+            ) ||
+            data.category === 'Demographic Profile' ||
+            (cat as any)?.is_demographic
+        );
+    })();
+
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+
+        if (isDemographic && data.options.filter((o) => o.trim()).length < 2) {
+            return;
+        }
+
+        if (!isDemographic && data.options.some((o) => !o.trim())) {
+            return;
+        }
+
         put(questionsUpdate(question.id).url);
     };
+
+    transform((data) => ({
+        ...data,
+        options: isDemographic
+            ? data.options.filter((opt) => opt.trim() !== '')
+            : data.options,
+    }));
 
     const activeSubcategories = cseCategoriesTree[selectedCategoryName] || [];
 
@@ -235,30 +265,36 @@ export default function QuestionEdit({
                 {/* Distractor Choices */}
                 <div>
                     <label className="mb-2 block text-[10px] font-extrabold text-slate-400 uppercase">
-                        Distractor Options & Correct Choice
+                        {isDemographic
+                            ? 'Options'
+                            : 'Distractor Options & Correct Choice'}
                     </label>
                     <div className="space-y-3">
                         {data.options.map((option, idx) => (
                             <div
                                 key={idx}
                                 className={`flex items-center gap-3.5 rounded-xl border p-3 transition duration-200 ${
+                                    !isDemographic &&
                                     data.correct_option === idx
                                         ? 'border-emerald-250 dark:border-emerald-850 bg-emerald-50/20 dark:bg-emerald-950/10'
                                         : 'border-border'
                                 }`}
                             >
-                                <input
-                                    type="radio"
-                                    name="correct_option"
-                                    checked={data.correct_option === idx}
-                                    onChange={() =>
-                                        setData('correct_option', idx)
-                                    }
-                                    className="size-4.5 cursor-pointer accent-emerald-600"
-                                />
+                                {!isDemographic && (
+                                    <input
+                                        type="radio"
+                                        name="correct_option"
+                                        checked={data.correct_option === idx}
+                                        onChange={() =>
+                                            setData('correct_option', idx)
+                                        }
+                                        className="size-4.5 cursor-pointer accent-emerald-600"
+                                    />
+                                )}
 
                                 <span
                                     className={`inline-flex size-6.5 shrink-0 items-center justify-center rounded-lg text-[10px] font-black ${
+                                        !isDemographic &&
                                         data.correct_option === idx
                                             ? 'bg-emerald-600 text-white'
                                             : 'bg-muted text-muted-foreground'
@@ -275,7 +311,7 @@ export default function QuestionEdit({
                                     }
                                     placeholder={`Option ${String.fromCharCode(65 + idx)} distractor text...`}
                                     className="w-full bg-transparent text-xs font-semibold text-foreground placeholder:text-muted-foreground focus:outline-none"
-                                    required
+                                    required={!isDemographic || idx < 2}
                                 />
                             </div>
                         ))}
@@ -288,28 +324,32 @@ export default function QuestionEdit({
                 </div>
 
                 {/* Explanation */}
-                <div>
-                    <label className="mb-1 block text-[10px] font-extrabold text-muted-foreground uppercase">
-                        Cognitive Explanation & Rationale
-                    </label>
-                    <textarea
-                        value={data.explanation}
-                        rows={5}
-                        onChange={(e) => setData('explanation', e.target.value)}
-                        placeholder="Explain solution steps, logic chains, spelling constraints, or mental shortcuts..."
-                        className={`w-full rounded-xl border bg-background p-3 text-xs font-semibold text-foreground focus:border-blue-500 focus:outline-none ${
-                            errors.explanation
-                                ? 'border-red-500'
-                                : 'border-border'
-                        }`}
-                        required
-                    />
-                    {errors.explanation && (
-                        <span className="mt-1 block text-[10px] font-medium text-red-600">
-                            {errors.explanation}
-                        </span>
-                    )}
-                </div>
+                {!isDemographic && (
+                    <div>
+                        <label className="mb-1 block text-[10px] font-extrabold text-muted-foreground uppercase">
+                            Cognitive Explanation & Rationale
+                        </label>
+                        <textarea
+                            value={data.explanation}
+                            rows={5}
+                            onChange={(e) =>
+                                setData('explanation', e.target.value)
+                            }
+                            placeholder="Explain solution steps, logic chains, spelling constraints, or mental shortcuts..."
+                            className={`w-full rounded-xl border bg-background p-3 text-xs font-semibold text-foreground focus:border-blue-500 focus:outline-none ${
+                                errors.explanation
+                                    ? 'border-red-500'
+                                    : 'border-border'
+                            }`}
+                            required
+                        />
+                        {errors.explanation && (
+                            <span className="mt-1 block text-[10px] font-medium text-red-600">
+                                {errors.explanation}
+                            </span>
+                        )}
+                    </div>
+                )}
             </CurationEditShell>
         </>
     );
