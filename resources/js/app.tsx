@@ -6,6 +6,7 @@ import { initializeTheme } from '@/hooks/use-appearance';
 import AppLayout from '@/layouts/app-layout';
 import AuthLayout from '@/layouts/auth-layout';
 import SettingsLayout from '@/layouts/settings/layout';
+// Echo initialization moved to specific components to save connections
 
 const appName = import.meta.env.VITE_APP_NAME || 'Hiraya Review';
 

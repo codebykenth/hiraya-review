@@ -217,6 +217,10 @@ export default function CreateQuestion({
                 );
             }
 
+            // Signal the layout to open the Pusher connection while waiting
+            localStorage.setItem('waiting_for_ai', 'true');
+            window.dispatchEvent(new Event('ai_generation_started'));
+
             setSuccessMsg(
                 resData.message ||
                     'Questions generated successfully! They are saved as drafts and ready for review.',

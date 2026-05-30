@@ -140,6 +140,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::middleware('throttle:global-mutations')->group(function () {
         Route::post('study-schedules', [StudyScheduleController::class, 'store'])->name('study-schedules.store');
         Route::delete('study-schedules/reset', [StudyScheduleController::class, 'destroyAll'])->name('study-schedules.destroyAll');
+        Route::put('study-schedules/{studySchedule}', [StudyScheduleController::class, 'update'])->name('study-schedules.update');
         Route::delete('study-schedules/{studySchedule}', [StudyScheduleController::class, 'destroy'])->name('study-schedules.destroy');
         Route::post('study-suggestions/apply', [StudySuggestionController::class, 'applySuggestions'])->name('study-suggestions.apply');
     });

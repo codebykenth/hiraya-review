@@ -1,4 +1,4 @@
-﻿import { Head, router, usePage } from '@inertiajs/react';
+import { Head, router, usePage } from '@inertiajs/react';
 import {
     Search,
     Shield,
@@ -114,6 +114,9 @@ export default function AdminUsersIndex({
         }
 
         const date = new Date(dateString);
+        if (isNaN(date.getTime())) {
+            return 'Never';
+        }
 
         return date.toLocaleDateString('en-US', {
             year: 'numeric',

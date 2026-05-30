@@ -89,6 +89,8 @@ export default function Calendar() {
         study_time: '',
         subcategory_id: '',
     });
+    const [isEditMode, setIsEditMode] = useState(false);
+    const [editScheduleId, setEditScheduleId] = useState<number | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [isSuggestionsOpen, setIsSuggestionsOpen] = useState(false);
     const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
@@ -247,6 +249,8 @@ export default function Calendar() {
 
     const openModal = (date: string) => {
         setSelectedDate(date);
+        setIsEditMode(false);
+        setEditScheduleId(null);
         setFormData({
             title: '',
             description: '',
@@ -256,9 +260,24 @@ export default function Calendar() {
         setIsModalOpen(true);
     };
 
+    const openEditModal = (schedule: StudySchedule, date: string) => {
+        setSelectedDate(date);
+        setIsEditMode(true);
+        setEditScheduleId(schedule.id);
+        setFormData({
+            title: schedule.title,
+            description: schedule.description || '',
+            study_time: schedule.study_time ? schedule.study_time.substring(0, 5) : '',
+            subcategory_id: schedule.subcategory_id ? schedule.subcategory_id.toString() : '',
+        });
+        setIsModalOpen(true);
+    };
+
     const closeModal = () => {
         setIsModalOpen(false);
         setSelectedDate(null);
+        setIsEditMode(false);
+        setEditScheduleId(null);
         setFormData({
             title: '',
             description: '',
@@ -275,8 +294,11 @@ export default function Calendar() {
         setIsLoading(true);
 
         try {
-            const response = await fetch('/study-schedules', {
-                method: 'POST',
+            const url = isEditMode && editScheduleId ? `/study-schedules/${editScheduleId}` : '/study-schedules';
+            const method = isEditMode ? 'PUT' : 'POST';
+
+            const response = await fetch(url, {
+                method,
                 headers: {
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN':
@@ -296,14 +318,21 @@ export default function Calendar() {
             if (response.ok) {
                 const newSchedule = await response.json();
                 const updated = new Map(schedules);
-                const dateSchedules = updated.get(selectedDate) || [];
-                updated.set(selectedDate, [...dateSchedules, newSchedule]);
-                setSchedules(updated);
+                
+                if (isEditMode) {
+                    // Refresh from server since we just need to replace the old one
+                    fetchSchedules();
+                } else {
+                    const dateSchedules = updated.get(selectedDate) || [];
+                    updated.set(selectedDate, [...dateSchedules, newSchedule]);
+                    setSchedules(updated);
+                }
+                
                 closeModal();
             }
         } catch {
             setErrorMessage(
-                'An error occurred while trying to add the study session. Please try again.',
+                isEditMode ? 'An error occurred while trying to update the study session. Please try again.' : 'An error occurred while trying to add the study session. Please try again.',
             );
         } finally {
             setIsLoading(false);
@@ -770,9 +799,15 @@ export default function Calendar() {
                         </div>
                     </div>
 
-                    {/* Day headers */}
-                    <div className="mb-2 grid grid-cols-7 gap-2">
-                        {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(
+                    {/* Calendar grid wrapper for mobile */}
+                    <div className="md:hidden mb-2 text-xs text-slate-500 flex items-center justify-center gap-2 bg-slate-50 p-2 rounded-lg border border-slate-100">
+                        <span className="animate-pulse">←</span> Swipe horizontally to view full week <span className="animate-pulse">→</span>
+                    </div>
+                    <div className="overflow-x-auto pb-4">
+                        <div className="min-w-[1024px]">
+                            {/* Day headers */}
+                            <div className="mb-2 grid grid-cols-7 gap-2">
+                                {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(
                             (day) => (
                                 <div
                                     key={day}
@@ -794,14 +829,9 @@ export default function Calendar() {
                                 {week.map((calendarDay) => (
                                     <div
                                         key={calendarDay.date}
-                                        onClick={() => {
-                                            if (calendarDay.isCurrentMonth && calendarDay.date >= todayStr) {
-                                                openModal(calendarDay.date);
-                                            }
-                                        }}
                                         className={`group relative flex min-h-24 flex-col rounded-lg border p-2 transition-all ${
                                             calendarDay.isCurrentMonth && calendarDay.date >= todayStr 
-                                                ? 'cursor-pointer hover:border-blue-300 hover:shadow-sm' 
+                                                ? 'hover:border-blue-300 hover:shadow-sm' 
                                                 : ''
                                         } ${
                                             examDates.includes(calendarDay.date)
@@ -874,10 +904,11 @@ export default function Calendar() {
                                                     return (
                                                         <div
                                                             key={schedule.id}
-                                                            className={`group relative rounded p-1.5 text-xs ${colors.bg} ${colors.text}`}
+                                                            onClick={() => openEditModal(schedule, calendarDay.date)}
+                                                            className={`group relative rounded p-1.5 text-xs cursor-pointer hover:opacity-90 ${colors.bg} ${colors.text}`}
                                                         >
                                                             <div className="flex items-start justify-between gap-1">
-                                                                <div className="flex-1">
+                                                                <div className="flex-1 min-w-0">
                                                                     {schedule.study_time && (
                                                                         <span
                                                                             className={`mr-1.5 inline-block rounded-md bg-white/60 px-1.5 py-0.5 text-[10px] font-bold shadow-sm ${colors.time}`}
@@ -1018,28 +1049,15 @@ export default function Calendar() {
                                                                                                 i,
                                                                                             ) => (
                                                                                                 <a
-                                                                                                    key={
-                                                                                                        i
-                                                                                                    }
-                                                                                                    href={
-                                                                                                        l.url
-                                                                                                    }
+                                                                                                    key={i}
+                                                                                                    href={l.url}
                                                                                                     target="_blank"
                                                                                                     rel="noopener noreferrer"
-                                                                                                    className={`inline-flex w-fit items-center rounded px-1.5 py-1 text-xs font-bold ${l.isAuto ? 'bg-amber-50 text-amber-700 hover:text-amber-900' : 'bg-white/50 text-blue-600 hover:text-blue-800'}`}
-                                                                                                    onClick={(
-                                                                                                        e,
-                                                                                                    ) =>
-                                                                                                        e.stopPropagation()
-                                                                                                    }
+                                                                                                    className={`block w-full break-words rounded px-1.5 py-1 text-[10px] sm:text-xs font-bold ${l.isAuto ? 'bg-amber-50 text-amber-700 hover:text-amber-900' : 'bg-white/50 text-blue-600 hover:text-blue-800'}`}
+                                                                                                    onClick={(e) => e.stopPropagation()}
                                                                                                 >
-                                                                                                    {l.isAuto
-                                                                                                        ? '✨'
-                                                                                                        : '📖'}
-                                                                                                    Learn:{' '}
-                                                                                                    {
-                                                                                                        l.title
-                                                                                                    }
+                                                                                                    {l.isAuto ? '✨ ' : '📖 '}
+                                                                                                    Learn: {l.title}
                                                                                                 </a>
                                                                                             ),
                                                                                         )}
@@ -1068,13 +1086,15 @@ export default function Calendar() {
                             </div>
                         ))}
                     </div>
-                </Card>
+                </div>
+            </div>
+        </Card>
 
                 {/* Add Study Modal */}
                 <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
                     <DialogContent>
                         <DialogHeader>
-                            <DialogTitle>Add Study Item</DialogTitle>
+                            <DialogTitle>{isEditMode ? 'Edit Study Item' : 'Add Study Item'}</DialogTitle>
                             {selectedDate && (
                                 <p className="mt-2 text-sm text-slate-600">
                                     {new Date(
@@ -1223,7 +1243,7 @@ export default function Calendar() {
                                 onClick={handleAddStudy}
                                 disabled={isLoading || !formData.title.trim()}
                             >
-                                {isLoading ? 'Adding...' : 'Add Study'}
+                                {isLoading ? (isEditMode ? 'Saving...' : 'Adding...') : (isEditMode ? 'Save Changes' : 'Add Study')}
                             </Button>
                         </DialogFooter>
                     </DialogContent>

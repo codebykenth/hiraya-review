@@ -254,7 +254,7 @@ export default function Welcome() {
     return (
         <>
             <Head>
-                <title>{`Civil Service Exam Reviewer ${new Date().getFullYear()} | Hiraya Review`}</title>
+                <title>{`Civil Service Exam Reviewer ${new Date().getFullYear()}`}</title>
                 <meta
                     name="description"
                     content="Ace the Philippine Civil Service Exam with confidence. Hiraya Review offers realistic Professional & Subprofessional mock exams, smart study plans, high-yield learning modules, and targeted drills. Free forever base access!"

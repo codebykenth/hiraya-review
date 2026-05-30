@@ -243,6 +243,10 @@ export default function AdminLearnCreate({
             const genData = await response.json();
 
             if (genData.success) {
+                // Signal the layout to open the Pusher connection while waiting
+                localStorage.setItem('waiting_for_ai', 'true');
+                window.dispatchEvent(new Event('ai_generation_started'));
+                
                 setSuccessMsg(
                     genData.message ||
                         `Learning module generated successfully for "${targetTopic}"! It has been committed to database as a Draft.`,

@@ -188,6 +188,8 @@ Language: {$validated['language']}
             Cache::forget('questions.active');
             Cache::forget('categories.tree');
 
+            \App\Events\AiGenerationCompleted::dispatch($this->userId, 'Questions generation completed! Check your drafts.', 'questions');
+
         } catch (\Exception $e) {
             Log::error('GenerateQuestionsJob: Error: ' . $e->getMessage() . "\nTrace: " . $e->getTraceAsString());
         }

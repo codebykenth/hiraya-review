@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Auth\Events\Login;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
 
@@ -33,6 +35,12 @@ class AppServiceProvider extends ServiceProvider
         if (app()->environment(['development', 'production'])) {
             URL::forceScheme('https');
         }
+
+        Event::listen(function (Login $event) {
+            if ($event->user instanceof User) {
+                $event->user->forceFill(['last_login_at' => now()])->save();
+            }
+        });
 
         RateLimiter::for('ai-generation', function (Request $request) {
             if (! app()->isProduction()) {

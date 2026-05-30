@@ -51,4 +51,8 @@ return [
         'redirect' => env('GOOGLE_REDIRECT'),
     ],
 
+    'support' => [
+        'test_rate_limit' => env('SUPPORT_TEST_RATE_LIMIT', false),
+    ],
+
 ];

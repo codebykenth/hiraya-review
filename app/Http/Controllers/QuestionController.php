@@ -144,7 +144,7 @@ class QuestionController extends Controller
         return response()->json([
             'success' => true,
             'queued' => true,
-            'message' => 'Questions generation has been queued! They will appear in your drafts once completed.'
+            'message' => 'Generation is running in the background. Please wait 1-2 minutes before checking your drafts. It is not available immediately.'
         ]);
     }
 

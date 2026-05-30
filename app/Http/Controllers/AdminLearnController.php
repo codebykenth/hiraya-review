@@ -307,7 +307,7 @@ class AdminLearnController extends Controller
         return response()->json([
             'success' => true,
             'queued' => true,
-            'message' => 'Module generation has been queued! It will appear in your drafts once completed.'
+            'message' => 'Generation is running in the background. Please wait 1-2 minutes before checking your drafts. It is not available immediately.'
         ]);
     }
 

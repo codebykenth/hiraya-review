@@ -67,6 +67,30 @@ class StudyScheduleController extends Controller
         return response()->json($schedule, 201);
     }
 
+    public function update(Request $request, StudySchedule $studySchedule)
+    {
+        if ($studySchedule->user_id !== Auth::id()) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        $validated = $request->validate([
+            'study_date' => 'required|date',
+            'study_time' => 'nullable|date_format:H:i:s,H:i',
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'subcategory_id' => 'nullable|exists:subcategories,id',
+        ]);
+
+        // Fix time format validation edge cases depending on H:i:s or H:i input
+        if (isset($validated['study_time']) && strlen($validated['study_time']) === 5) {
+            $validated['study_time'] .= ':00';
+        }
+
+        $studySchedule->update($validated);
+
+        return response()->json($studySchedule);
+    }
+
     public function getSubcategories()
     {
         $subcategories = Subcategory::orderBy('name')->get(['id', 'name', 'category_id']);

@@ -177,6 +177,8 @@ Topic: {$validated['topic']}
             Cache::forget('learn.modules.published');
             Cache::forget('categories.tree');
 
+            \App\Events\AiGenerationCompleted::dispatch($this->userId, 'Learning module generation completed! Check your drafts.', 'module');
+
         } catch (\Exception $e) {
             Log::error('GenerateLearnModuleJob: Error: ' . $e->getMessage() . "\n" . $e->getTraceAsString());
         }
