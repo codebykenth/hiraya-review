@@ -102,10 +102,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Mutation / Write Endpoints (Rate limited to 30 requests/minute to prevent SQL injection flood & form spam DDoS)
     Route::middleware('throttle:global-mutations')->group(function () {
         Route::post('exams/attempts', [ExamController::class, 'storeAttempt'])->name('exams.attempts.store');
+        Route::post('exams/attempts/bulk-delete', [ExamController::class, 'bulkDestroyAttempts'])->name('exams.attempts.bulkDestroy');
         Route::delete('exams/attempts/{attempt}', [ExamController::class, 'destroyAttempt'])->name('exams.attempts.destroy');
 
         // Admin Learn Module Mutations
         Route::post('admin/learn', [AdminLearnController::class, 'store'])->name('admin.learn.store');
+        Route::post('admin/learn/bulk-delete', [AdminLearnController::class, 'bulkDestroy'])->name('admin.learn.bulkDestroy');
         Route::put('admin/learn/{id}', [AdminLearnController::class, 'update'])->name('admin.learn.update');
         Route::delete('admin/learn/{id}', [AdminLearnController::class, 'destroy'])->name('admin.learn.destroy');
 
@@ -130,6 +132,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         // Question Resource Mutations
         Route::post('questions', [QuestionController::class, 'store'])->name('questions.store');
+        Route::post('questions/bulk-delete', [QuestionController::class, 'bulkDestroy'])->name('questions.bulkDestroy');
         Route::put('questions/{question}', [QuestionController::class, 'update'])->name('questions.update');
         Route::delete('questions/{question}', [QuestionController::class, 'destroy'])->name('questions.destroy');
     });

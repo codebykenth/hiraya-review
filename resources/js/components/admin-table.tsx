@@ -1,5 +1,6 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import { generatePaginationLinks } from '@/lib/utils';
 
 export interface TableColumn<T> {
@@ -29,6 +30,13 @@ export interface AdminTableProps<T> {
     title?: string;
     legend?: LegendItem[];
     onPageChange?: (page: number) => void;
+
+    // Bulk actions
+    selectedIds?: number[];
+    onSelectAll?: (checked: boolean, allIds: number[]) => void;
+    onSelectOne?: (id: number, checked: boolean) => void;
+    bulkActionRender?: (selectedIds: number[]) => React.ReactNode;
+    getItemId?: (item: T) => number;
 }
 
 export function AdminTable<T>({
@@ -41,6 +49,11 @@ export function AdminTable<T>({
     title,
     legend,
     onPageChange,
+    selectedIds = [],
+    onSelectAll,
+    onSelectOne,
+    bulkActionRender,
+    getItemId,
 }: AdminTableProps<T>) {
     const tableRef = React.useRef<HTMLDivElement>(null);
     const totalPages = Math.ceil(totalItems / pageSize);
@@ -50,14 +63,20 @@ export function AdminTable<T>({
             onPageChange(page);
             setTimeout(() => {
                 if (tableRef.current) {
-                    tableRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    tableRef.current.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start',
+                    });
                 }
             }, 50);
         }
     };
 
     return (
-        <div ref={tableRef} className="scroll-m-24 overflow-hidden rounded-xl border border-slate-100 bg-white shadow-xs dark:border-slate-900 dark:bg-slate-950">
+        <div
+            ref={tableRef}
+            className="scroll-m-24 overflow-hidden rounded-xl border border-slate-100 bg-white shadow-xs dark:border-slate-900 dark:bg-slate-950"
+        >
             {/* Card Header with Title and Action Legend Key matching attempt history style */}
             {(title || (legend && legend.length > 0)) && (
                 <div className="flex flex-col gap-3 border-b border-slate-100 bg-slate-50/20 p-5 sm:flex-row sm:items-center sm:justify-between dark:border-slate-900 dark:bg-slate-900/10">
@@ -133,10 +152,36 @@ export function AdminTable<T>({
                 </div>
             )}
 
+            {bulkActionRender &&
+                selectedIds.length > 0 &&
+                bulkActionRender(selectedIds)}
+
             <div className="overflow-x-auto">
                 <table className="w-full min-w-[800px] border-collapse text-left text-xs">
                     <thead>
                         <tr className="border-b border-slate-100 bg-slate-50/50 text-[11px] font-bold tracking-wider text-slate-400 uppercase dark:border-slate-900 dark:bg-slate-900/40">
+                            {getItemId && (
+                                <th className="w-12 px-6 py-4">
+                                    <Checkbox
+                                        checked={
+                                            data.length > 0 &&
+                                            selectedIds.length > 0 &&
+                                            data.every((item) =>
+                                                selectedIds.includes(
+                                                    getItemId(item),
+                                                ),
+                                            )
+                                        }
+                                        onCheckedChange={(checked) =>
+                                            onSelectAll?.(
+                                                !!checked,
+                                                data.map(getItemId),
+                                            )
+                                        }
+                                        aria-label="Select all"
+                                    />
+                                </th>
+                            )}
                             {columns.map((col, idx) => (
                                 <th
                                     key={idx}
@@ -151,7 +196,9 @@ export function AdminTable<T>({
                         {data.length === 0 ? (
                             <tr>
                                 <td
-                                    colSpan={columns.length}
+                                    colSpan={
+                                        columns.length + (getItemId ? 1 : 0)
+                                    }
                                     className="px-6 py-16 text-center"
                                 >
                                     <div className="flex flex-col items-center justify-center">
@@ -179,21 +226,45 @@ export function AdminTable<T>({
                                 </td>
                             </tr>
                         ) : (
-                            data.map((item, rowIdx) => (
-                                <tr
-                                    key={rowIdx}
-                                    className="transition hover:bg-slate-50/40 dark:hover:bg-slate-900/10"
-                                >
-                                    {columns.map((col, colIdx) => (
-                                        <td
-                                            key={colIdx}
-                                            className={`px-6 py-4.5 ${col.className || ''}`}
-                                        >
-                                            {col.render(item)}
-                                        </td>
-                                    ))}
-                                </tr>
-                            ))
+                            data.map((item, rowIdx) => {
+                                const id = getItemId ? getItemId(item) : null;
+                                const isSelected =
+                                    id !== null
+                                        ? selectedIds.includes(id)
+                                        : false;
+
+                                return (
+                                    <tr
+                                        key={id !== null ? id : rowIdx}
+                                        className={`transition hover:bg-slate-50/40 dark:hover:bg-slate-900/10 ${isSelected ? 'bg-blue-50/30 dark:bg-blue-950/20' : ''}`}
+                                    >
+                                        {getItemId && id !== null && (
+                                            <td className="px-6 py-4.5">
+                                                <Checkbox
+                                                    checked={isSelected}
+                                                    onCheckedChange={(
+                                                        checked,
+                                                    ) =>
+                                                        onSelectOne?.(
+                                                            id,
+                                                            !!checked,
+                                                        )
+                                                    }
+                                                    aria-label={`Select row ${id}`}
+                                                />
+                                            </td>
+                                        )}
+                                        {columns.map((col, colIdx) => (
+                                            <td
+                                                key={colIdx}
+                                                className={`px-6 py-4.5 ${col.className || ''}`}
+                                            >
+                                                {col.render(item)}
+                                            </td>
+                                        ))}
+                                    </tr>
+                                );
+                            })
                         )}
                     </tbody>
                 </table>
@@ -224,7 +295,9 @@ export function AdminTable<T>({
                                 variant="outline"
                                 size="sm"
                                 disabled={currentPage === 1}
-                                onClick={() => handlePageChange(currentPage - 1)}
+                                onClick={() =>
+                                    handlePageChange(currentPage - 1)
+                                }
                                 className="shadow-3xs dark:text-slate-350 dark:hover:bg-slate-850 h-8 cursor-pointer px-3 text-xs font-bold focus:outline-none dark:border-slate-800 dark:bg-slate-900"
                             >
                                 Previous
@@ -255,7 +328,9 @@ export function AdminTable<T>({
                                             isActive ? 'default' : 'outline'
                                         }
                                         size="sm"
-                                        onClick={() => handlePageChange(pageNum)}
+                                        onClick={() =>
+                                            handlePageChange(pageNum)
+                                        }
                                         className={`size-8 cursor-pointer p-0 text-xs font-black transition focus:outline-none ${
                                             isActive
                                                 ? 'shadow-3xs bg-blue-600 text-white hover:bg-blue-700'
@@ -271,7 +346,9 @@ export function AdminTable<T>({
                                 variant="outline"
                                 size="sm"
                                 disabled={currentPage === totalPages}
-                                onClick={() => handlePageChange(currentPage + 1)}
+                                onClick={() =>
+                                    handlePageChange(currentPage + 1)
+                                }
                                 className="shadow-3xs dark:text-slate-350 dark:hover:bg-slate-850 h-8 cursor-pointer px-3 text-xs font-bold focus:outline-none dark:border-slate-800 dark:bg-slate-900"
                             >
                                 Next

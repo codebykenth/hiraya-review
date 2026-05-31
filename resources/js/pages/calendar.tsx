@@ -7,6 +7,7 @@ import {
     Lightbulb,
 } from 'lucide-react';
 import { useEffect, useState, useRef, useCallback } from 'react';
+import { ConfirmModal } from '@/components/confirm-modal';
 import { PageContainer } from '@/components/page-container';
 import { PageHeader } from '@/components/page-header';
 import { StudySuggestionsModal } from '@/components/study-suggestions-modal';
@@ -21,7 +22,12 @@ import {
     DialogFooter,
     DialogClose,
 } from '@/components/ui/dialog';
-import { ConfirmModal } from '@/components/confirm-modal';
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from '@/components/ui/tooltip';
 
 interface StudySchedule {
     id: number;
@@ -710,7 +716,7 @@ export default function Calendar() {
                     className="mb-8"
                 />
 
-                <Card className="border-border bg-white p-6 shadow-sm dark:bg-slate-950 sm:p-6">
+                <Card className="border-border bg-white p-6 shadow-sm sm:p-6 dark:bg-slate-950">
                     {/* Header with navigation */}
                     <div className="mb-6 flex flex-col justify-between gap-4 md:flex-row md:items-center">
                         <div className="flex items-center gap-4">
@@ -832,7 +838,9 @@ export default function Calendar() {
                                                             .querySelector(
                                                                 'meta[name="csrf-token"]',
                                                             )
-                                                            ?.getAttribute('content') || '',
+                                                            ?.getAttribute(
+                                                                'content',
+                                                            ) || '',
                                                 },
                                             }).then(() => {
                                                 monthCacheRef.current.clear();
@@ -966,20 +974,36 @@ export default function Calendar() {
                                                     {calendarDay.isCurrentMonth &&
                                                         calendarDay.date >=
                                                             todayStr && (
-                                                            <button
-                                                                onClick={(
-                                                                    e,
-                                                                ) => {
-                                                                    e.stopPropagation();
-                                                                    openModal(
-                                                                        calendarDay.date,
-                                                                    );
-                                                                }}
-                                                                className="rounded p-1 opacity-100 transition-opacity hover:bg-blue-100 lg:opacity-0 lg:group-hover:opacity-100 dark:hover:bg-blue-900/30"
-                                                                title="Add study item"
+                                                            <TooltipProvider
+                                                                delayDuration={
+                                                                    150
+                                                                }
                                                             >
-                                                                <Plus className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-                                                            </button>
+                                                                <Tooltip>
+                                                                    <TooltipTrigger
+                                                                        asChild
+                                                                    >
+                                                                        <button
+                                                                            onClick={(
+                                                                                e,
+                                                                            ) => {
+                                                                                e.stopPropagation();
+                                                                                openModal(
+                                                                                    calendarDay.date,
+                                                                                );
+                                                                            }}
+                                                                            className="rounded p-1 opacity-100 transition-opacity hover:bg-blue-100 lg:opacity-0 lg:group-hover:opacity-100 dark:hover:bg-blue-900/30"
+                                                                        >
+                                                                            <Plus className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                                                                        </button>
+                                                                    </TooltipTrigger>
+                                                                    <TooltipContent>
+                                                                        Add
+                                                                        study
+                                                                        item
+                                                                    </TooltipContent>
+                                                                </Tooltip>
+                                                            </TooltipProvider>
                                                         )}
                                                 </div>
 
@@ -1009,7 +1033,7 @@ export default function Calendar() {
                                                                         <div className="min-w-0 flex-1">
                                                                             {schedule.study_time && (
                                                                                 <span
-                                                                                    className={`mr-1.5 inline-block rounded-md bg-white/60 dark:bg-black/20 px-1.5 py-0.5 text-[10px] font-bold shadow-sm ${colors.time}`}
+                                                                                    className={`mr-1.5 inline-block rounded-md bg-white/60 px-1.5 py-0.5 text-[10px] font-bold shadow-sm dark:bg-black/20 ${colors.time}`}
                                                                                 >
                                                                                     {schedule.study_time.substring(
                                                                                         0,
@@ -1023,21 +1047,35 @@ export default function Calendar() {
                                                                                 }
                                                                             </span>
                                                                         </div>
-                                                                        <button
-                                                                            onClick={(
-                                                                                e,
-                                                                            ) => {
-                                                                                e.stopPropagation();
-                                                                                handleDeleteSchedule(
-                                                                                    schedule.id,
-                                                                                    calendarDay.date,
-                                                                                );
-                                                                            }}
-                                                                            className="ml-1 hidden shrink-0 rounded p-0.5 group-hover:block hover:bg-red-100"
-                                                                            title="Delete"
+                                                                        <TooltipProvider
+                                                                            delayDuration={
+                                                                                150
+                                                                            }
                                                                         >
-                                                                            <Trash2 className="h-3 w-3 text-red-600" />
-                                                                        </button>
+                                                                            <Tooltip>
+                                                                                <TooltipTrigger
+                                                                                    asChild
+                                                                                >
+                                                                                    <button
+                                                                                        onClick={(
+                                                                                            e,
+                                                                                        ) => {
+                                                                                            e.stopPropagation();
+                                                                                            handleDeleteSchedule(
+                                                                                                schedule.id,
+                                                                                                calendarDay.date,
+                                                                                            );
+                                                                                        }}
+                                                                                        className="ml-1 hidden shrink-0 rounded p-0.5 group-hover:block hover:bg-red-100"
+                                                                                    >
+                                                                                        <Trash2 className="h-3 w-3 text-red-600" />
+                                                                                    </button>
+                                                                                </TooltipTrigger>
+                                                                                <TooltipContent>
+                                                                                    Delete
+                                                                                </TooltipContent>
+                                                                            </Tooltip>
+                                                                        </TooltipProvider>
                                                                     </div>
                                                                     {schedule.description && (
                                                                         <div

@@ -27,6 +27,12 @@ import { ConfirmModal } from '@/components/confirm-modal';
 import { PageContainer } from '@/components/page-container';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from '@/components/ui/tooltip';
 import { index as adminUsersIndex } from '@/routes/admin/users';
 
 interface UserItem {
@@ -519,111 +525,170 @@ export default function AdminUsersIndex({
 
                 return (
                     <div className="flex items-center justify-end gap-1.5">
-                        {isDeleted ? (
-                            <>
-                                <button
-                                    onClick={() => {
-                                        setConfirmModal({
-                                            isOpen: true,
-                                            title: 'Restore User Account?',
-                                            message: `Restore ${u.name}'s account?`,
-                                            confirmLabel: 'Restore',
-                                            variant: 'success',
-                                            onConfirm: () => {
-                                                router.post(
-                                                    `/admin/users/${u.id}/restore`,
-                                                    {},
-                                                    { preserveScroll: true },
-                                                );
-                                            },
-                                        });
-                                    }}
-                                    className="cursor-pointer rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted hover:text-emerald-600"
-                                    title="Restore account"
-                                >
-                                    <RotateCcw className="size-4" />
-                                </button>
-                                <button
-                                    onClick={() => {
-                                        setConfirmModal({
-                                            isOpen: true,
-                                            title: 'Permanently Delete Account?',
-                                            message:
-                                                'This will permanently delete this account. Cannot be undone!',
-                                            confirmLabel: 'Delete',
-                                            variant: 'danger',
-                                            onConfirm: () => {
-                                                router.post(
-                                                    `/admin/users/${u.id}/force-delete`,
-                                                    {},
-                                                    { preserveScroll: true },
-                                                );
-                                            },
-                                        });
-                                    }}
-                                    className="cursor-pointer rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted hover:text-red-600"
-                                    title="Permanently delete"
-                                >
-                                    <Trash2 className="size-4" />
-                                </button>
-                            </>
-                        ) : (
-                            <>
-                                {u.role === 'admin' ? (
-                                    <button
-                                        onClick={() =>
-                                            handleRoleChange(u, 'student')
-                                        }
-                                        disabled={u.id === currentUser.id}
-                                        className="cursor-pointer rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted hover:text-emerald-600 disabled:cursor-not-allowed disabled:opacity-30"
-                                        title="Demote to Student"
-                                    >
-                                        <Unlock className="size-4" />
-                                    </button>
-                                ) : (
-                                    <button
-                                        onClick={() =>
-                                            handleRoleChange(u, 'admin')
-                                        }
-                                        disabled={u.id === currentUser.id}
-                                        className="cursor-pointer rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted hover:text-indigo-600 disabled:cursor-not-allowed disabled:opacity-30"
-                                        title="Promote to Admin"
-                                    >
-                                        <Lock className="size-4" />
-                                    </button>
-                                )}
+                        <TooltipProvider delayDuration={150}>
+                            {isDeleted ? (
+                                <>
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <button
+                                                onClick={() => {
+                                                    setConfirmModal({
+                                                        isOpen: true,
+                                                        title: 'Restore User Account?',
+                                                        message: `Restore ${u.name}'s account?`,
+                                                        confirmLabel: 'Restore',
+                                                        variant: 'success',
+                                                        onConfirm: () => {
+                                                            router.post(
+                                                                `/admin/users/${u.id}/restore`,
+                                                                {},
+                                                                {
+                                                                    preserveScroll: true,
+                                                                },
+                                                            );
+                                                        },
+                                                    });
+                                                }}
+                                                className="cursor-pointer rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted hover:text-emerald-600"
+                                            >
+                                                <RotateCcw className="size-4" />
+                                            </button>
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                            Restore account
+                                        </TooltipContent>
+                                    </Tooltip>
 
-                                <button
-                                    onClick={() => handleToggleStatus(u)}
-                                    disabled={u.id === currentUser.id}
-                                    className={`cursor-pointer rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted disabled:cursor-not-allowed disabled:opacity-30 ${
-                                        u.is_active
-                                            ? 'hover:text-amber-600'
-                                            : 'hover:text-emerald-600'
-                                    }`}
-                                    title={
-                                        u.is_active
-                                            ? 'Deactivate account'
-                                            : 'Activate account'
-                                    }
-                                >
-                                    {u.is_active ? (
-                                        <XCircle className="size-4" />
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <button
+                                                onClick={() => {
+                                                    setConfirmModal({
+                                                        isOpen: true,
+                                                        title: 'Permanently Delete Account?',
+                                                        message:
+                                                            'This will permanently delete this account. Cannot be undone!',
+                                                        confirmLabel: 'Delete',
+                                                        variant: 'danger',
+                                                        onConfirm: () => {
+                                                            router.post(
+                                                                `/admin/users/${u.id}/force-delete`,
+                                                                {},
+                                                                {
+                                                                    preserveScroll: true,
+                                                                },
+                                                            );
+                                                        },
+                                                    });
+                                                }}
+                                                className="cursor-pointer rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted hover:text-red-600"
+                                            >
+                                                <Trash2 className="size-4" />
+                                            </button>
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                            Permanently delete
+                                        </TooltipContent>
+                                    </Tooltip>
+                                </>
+                            ) : (
+                                <>
+                                    {u.role === 'admin' ? (
+                                        <Tooltip>
+                                            <TooltipTrigger asChild>
+                                                <button
+                                                    onClick={() =>
+                                                        handleRoleChange(
+                                                            u,
+                                                            'student',
+                                                        )
+                                                    }
+                                                    disabled={
+                                                        u.id === currentUser.id
+                                                    }
+                                                    className="cursor-pointer rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted hover:text-emerald-600 disabled:cursor-not-allowed disabled:opacity-30"
+                                                >
+                                                    <Unlock className="size-4" />
+                                                </button>
+                                            </TooltipTrigger>
+                                            <TooltipContent>
+                                                Demote to Student
+                                            </TooltipContent>
+                                        </Tooltip>
                                     ) : (
-                                        <CheckCircle className="size-4" />
+                                        <Tooltip>
+                                            <TooltipTrigger asChild>
+                                                <button
+                                                    onClick={() =>
+                                                        handleRoleChange(
+                                                            u,
+                                                            'admin',
+                                                        )
+                                                    }
+                                                    disabled={
+                                                        u.id === currentUser.id
+                                                    }
+                                                    className="cursor-pointer rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted hover:text-indigo-600 disabled:cursor-not-allowed disabled:opacity-30"
+                                                >
+                                                    <Lock className="size-4" />
+                                                </button>
+                                            </TooltipTrigger>
+                                            <TooltipContent>
+                                                Promote to Admin
+                                            </TooltipContent>
+                                        </Tooltip>
                                     )}
-                                </button>
 
-                                <button
-                                    onClick={() => handleDeleteUser(u)}
-                                    disabled={u.id === currentUser.id}
-                                    className="cursor-pointer rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted hover:text-red-600 disabled:cursor-not-allowed disabled:opacity-30"
-                                    title="Delete account"
-                                >
-                                    <Trash2 className="size-4" />
-                                </button>
-                            </>
-                        )}
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <button
+                                                onClick={() =>
+                                                    handleToggleStatus(u)
+                                                }
+                                                disabled={
+                                                    u.id === currentUser.id
+                                                }
+                                                className={`cursor-pointer rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted disabled:cursor-not-allowed disabled:opacity-30 ${
+                                                    u.is_active
+                                                        ? 'hover:text-amber-600'
+                                                        : 'hover:text-emerald-600'
+                                                }`}
+                                            >
+                                                {u.is_active ? (
+                                                    <XCircle className="size-4" />
+                                                ) : (
+                                                    <CheckCircle className="size-4" />
+                                                )}
+                                            </button>
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                            {u.is_active
+                                                ? 'Deactivate account'
+                                                : 'Activate account'}
+                                        </TooltipContent>
+                                    </Tooltip>
+
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <button
+                                                onClick={() =>
+                                                    handleDeleteUser(u)
+                                                }
+                                                disabled={
+                                                    u.id === currentUser.id
+                                                }
+                                                className="cursor-pointer rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted hover:text-red-600 disabled:cursor-not-allowed disabled:opacity-30"
+                                            >
+                                                <Trash2 className="size-4" />
+                                            </button>
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                            Delete account
+                                        </TooltipContent>
+                                    </Tooltip>
+                                </>
+                            )}
+                        </TooltipProvider>
                     </div>
                 );
             },

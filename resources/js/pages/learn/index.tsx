@@ -86,8 +86,12 @@ export default function LearnIndex({ modules, categories }: LearnIndexProps) {
     const groupedModules = Object.entries(
         filteredModules.reduce(
             (acc, mod) => {
-                if (!acc[mod.category]) acc[mod.category] = [];
+                if (!acc[mod.category]) {
+                    acc[mod.category] = [];
+                }
+
                 acc[mod.category].push(mod);
+
                 return acc;
             },
             {} as Record<string, LearnModule[]>,
@@ -95,9 +99,19 @@ export default function LearnIndex({ modules, categories }: LearnIndexProps) {
     ).sort(([a], [b]) => {
         const indexA = categories.findIndex((c) => c.name === a);
         const indexB = categories.findIndex((c) => c.name === b);
-        if (indexA === -1 && indexB === -1) return a.localeCompare(b);
-        if (indexA === -1) return 1;
-        if (indexB === -1) return -1;
+
+        if (indexA === -1 && indexB === -1) {
+            return a.localeCompare(b);
+        }
+
+        if (indexA === -1) {
+            return 1;
+        }
+
+        if (indexB === -1) {
+            return -1;
+        }
+
         return indexA - indexB;
     });
 
@@ -185,9 +199,14 @@ export default function LearnIndex({ modules, categories }: LearnIndexProps) {
                             };
 
                             return (
-                                <section key={categoryName} className="flex flex-col gap-5">
+                                <section
+                                    key={categoryName}
+                                    className="flex flex-col gap-5"
+                                >
                                     <h2 className="flex items-center gap-3 border-b border-border pb-3 font-heading text-xl font-black text-foreground">
-                                        <span className={`size-3 rounded-full border ${colors.bg} ${colors.border}`} />
+                                        <span
+                                            className={`size-3 rounded-full border ${colors.bg} ${colors.border}`}
+                                        />
                                         {categoryName}
                                     </h2>
                                     <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -207,7 +226,9 @@ export default function LearnIndex({ modules, categories }: LearnIndexProps) {
                                                                 {mod.category}
                                                             </span>
                                                             <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[9px] font-bold text-muted-foreground dark:bg-slate-900">
-                                                                {mod.subcategory}
+                                                                {
+                                                                    mod.subcategory
+                                                                }
                                                             </span>
                                                         </div>
 
@@ -217,7 +238,10 @@ export default function LearnIndex({ modules, categories }: LearnIndexProps) {
 
                                                         <div className="mt-2.5 flex items-center gap-1.5 text-[10px] font-bold text-muted-foreground uppercase">
                                                             <Tag className="size-3" />
-                                                            <span>Topic: {mod.topic}</span>
+                                                            <span>
+                                                                Topic:{' '}
+                                                                {mod.topic}
+                                                            </span>
                                                         </div>
 
                                                         <p className="mt-3 line-clamp-3 text-xs leading-relaxed text-muted-foreground">
@@ -230,7 +254,10 @@ export default function LearnIndex({ modules, categories }: LearnIndexProps) {
                                                         <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                                                             <Clock className="size-3.5" />
                                                             <span>
-                                                                {mod.estimated_minutes} min read
+                                                                {
+                                                                    mod.estimated_minutes
+                                                                }{' '}
+                                                                min read
                                                             </span>
                                                         </div>
 

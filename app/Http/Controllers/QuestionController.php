@@ -398,6 +398,27 @@ class QuestionController extends Controller
     }
 
     /**
+     * Bulk delete questions.
+     */
+    public function bulkDestroy(Request $request)
+    {
+        $validated = $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'integer|exists:questions,id',
+        ]);
+
+        Question::whereIn('id', $validated['ids'])->delete();
+
+        $this->clearCache();
+
+        if (request()->wantsJson()) {
+            return response()->json(['success' => true]);
+        }
+
+        return redirect()->route('questions.index')->with('success', 'Selected questions deleted successfully!');
+    }
+
+    /**
      * Store a new dynamic category.
      */
     public function storeCategory(Request $request)

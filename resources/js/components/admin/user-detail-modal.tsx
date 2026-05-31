@@ -221,7 +221,7 @@ export function UserDetailModal({
 
     return (
         <>
-            <div 
+            <div
                 className="fixed inset-0 z-100 flex animate-in items-center justify-center bg-slate-900/60 p-4 backdrop-blur-xs duration-200 fade-in"
                 onClick={onClose}
             >

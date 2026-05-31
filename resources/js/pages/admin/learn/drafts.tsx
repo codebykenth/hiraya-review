@@ -14,6 +14,12 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from '@/components/ui/tooltip';
+import {
     index as adminLearnIndex,
     drafts as adminLearnDrafts,
     store as adminLearnStore,
@@ -201,42 +207,68 @@ export default function DraftsLearnList({
 
                             {/* Card Actions toolbar */}
                             <div className="flex items-center gap-1.5">
-                                <button
-                                    type="button"
-                                    onClick={() => toggleApproveDraft(m.id)}
-                                    className={`cursor-pointer rounded-lg border p-1.5 transition ${
-                                        m.approved
-                                            ? 'border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-900/40 dark:bg-emerald-950/20 dark:text-emerald-400'
-                                            : 'border-border bg-card text-muted-foreground hover:text-foreground'
-                                    }`}
-                                    title={
-                                        m.approved
-                                            ? 'Approved (Click to Unapprove)'
-                                            : 'Mark Approved'
-                                    }
-                                >
-                                    <Check className="size-4" />
-                                </button>
-                                <button
-                                    type="button"
-                                    onClick={() => toggleEditDraft(m.id)}
-                                    className={`cursor-pointer rounded-lg border p-1.5 transition ${
-                                        m.isEditing
-                                            ? 'border-blue-200 bg-blue-50 text-blue-700 dark:border-blue-900/40 dark:bg-blue-950/20 dark:text-blue-400'
-                                            : 'border-border bg-card text-muted-foreground hover:text-foreground'
-                                    }`}
-                                    title="Edit Lesson Content Inline"
-                                >
-                                    <Edit3 className="size-4" />
-                                </button>
-                                <button
-                                    type="button"
-                                    onClick={() => deleteDraft(m.id)}
-                                    className="hover:text-red-650 cursor-pointer rounded-lg border border-border bg-card p-1.5 text-muted-foreground transition hover:border-red-200 dark:hover:text-red-500"
-                                    title="Delete Draft Module"
-                                >
-                                    <X className="size-4" />
-                                </button>
+                                <TooltipProvider delayDuration={150}>
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <button
+                                                type="button"
+                                                onClick={() =>
+                                                    toggleApproveDraft(m.id)
+                                                }
+                                                className={`cursor-pointer rounded-lg border p-1.5 transition ${
+                                                    m.approved
+                                                        ? 'border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-900/40 dark:bg-emerald-950/20 dark:text-emerald-400'
+                                                        : 'border-border bg-card text-muted-foreground hover:text-foreground'
+                                                }`}
+                                            >
+                                                <Check className="size-4" />
+                                            </button>
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                            {m.approved
+                                                ? 'Approved (Click to Unapprove)'
+                                                : 'Mark Approved'}
+                                        </TooltipContent>
+                                    </Tooltip>
+
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <button
+                                                type="button"
+                                                onClick={() =>
+                                                    toggleEditDraft(m.id)
+                                                }
+                                                className={`cursor-pointer rounded-lg border p-1.5 transition ${
+                                                    m.isEditing
+                                                        ? 'border-blue-200 bg-blue-50 text-blue-700 dark:border-blue-900/40 dark:bg-blue-950/20 dark:text-blue-400'
+                                                        : 'border-border bg-card text-muted-foreground hover:text-foreground'
+                                                }`}
+                                            >
+                                                <Edit3 className="size-4" />
+                                            </button>
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                            Edit Lesson Content Inline
+                                        </TooltipContent>
+                                    </Tooltip>
+
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <button
+                                                type="button"
+                                                onClick={() =>
+                                                    deleteDraft(m.id)
+                                                }
+                                                className="hover:text-red-650 cursor-pointer rounded-lg border border-border bg-card p-1.5 text-muted-foreground transition hover:border-red-200 dark:hover:text-red-500"
+                                            >
+                                                <X className="size-4" />
+                                            </button>
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                            Delete Draft Module
+                                        </TooltipContent>
+                                    </Tooltip>
+                                </TooltipProvider>
                             </div>
                         </div>
 

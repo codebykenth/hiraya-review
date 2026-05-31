@@ -291,6 +291,25 @@ class AdminLearnController extends Controller
         return redirect()->route('admin.learn.index')->with('success', 'Learning module deleted successfully!');
     }
 
+    /**
+     * Bulk delete learning modules.
+     */
+    public function bulkDestroy(Request $request): RedirectResponse
+    {
+        $this->checkAdminAccess();
+
+        $validated = $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'integer|exists:learn_modules,id',
+        ]);
+
+        LearnModule::whereIn('id', $validated['ids'])->delete();
+
+        $this->clearCache();
+
+        return redirect()->route('admin.learn.index')->with('success', 'Selected learning modules deleted successfully!');
+    }
+
     public function generate(Request $request)
     {
         $this->checkAdminAccess();

@@ -16,6 +16,12 @@ import {
 } from 'lucide-react';
 import React from 'react';
 import QuestionPalettePanel from '@/components/question-palette-panel';
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from '@/components/ui/tooltip';
 import { renderFormattedText } from '@/lib/exam-formatters';
 
 interface Question {
@@ -95,13 +101,19 @@ export function LiveExamView({
                 {/* TOP NAVBAR HEADER */}
                 <div className="shadow-3xs flex h-16 items-center justify-between border-b border-border bg-card px-3 sm:px-6">
                     <div className="flex items-center gap-2 sm:gap-4">
-                        <button
-                            onClick={handleExitExam}
-                            className="rounded-lg p-1.5 text-muted-foreground transition hover:bg-accent"
-                            title="Exit Exam"
-                        >
-                            <X className="size-5" />
-                        </button>
+                        <TooltipProvider delayDuration={150}>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <button
+                                        onClick={handleExitExam}
+                                        className="rounded-lg p-1.5 text-muted-foreground transition hover:bg-accent"
+                                    >
+                                        <X className="size-5" />
+                                    </button>
+                                </TooltipTrigger>
+                                <TooltipContent>Exit Exam</TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
                         <div className="hidden h-6 w-px bg-border md:block" />
                         <span className="text-md hidden items-center gap-1.5 font-heading font-bold text-foreground md:flex">
                             <Award className="size-4.5 text-blue-600" />
@@ -152,13 +164,23 @@ export function LiveExamView({
                             </div>
                         )}
 
-                        <button
-                            onClick={() => setIsMobilePaletteOpen(true)}
-                            className="shadow-3xs flex cursor-pointer items-center justify-center rounded-lg bg-blue-600 p-2 text-white transition hover:bg-blue-700 focus:outline-none lg:hidden"
-                            title="Open Question Palette"
-                        >
-                            <LayoutGrid className="size-4" />
-                        </button>
+                        <TooltipProvider delayDuration={150}>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <button
+                                        onClick={() =>
+                                            setIsMobilePaletteOpen(true)
+                                        }
+                                        className="shadow-3xs flex cursor-pointer items-center justify-center rounded-lg bg-blue-600 p-2 text-white transition hover:bg-blue-700 focus:outline-none lg:hidden"
+                                    >
+                                        <LayoutGrid className="size-4" />
+                                    </button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    Open Question Palette
+                                </TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
                     </div>
                 </div>
 
@@ -348,11 +370,11 @@ export function LiveExamView({
 
                 {/* Guest Free Attempt: Locked Question Modal */}
                 {showLockedModal && (
-                    <div 
+                    <div
                         className="fixed inset-0 z-[100] flex animate-in items-center justify-center bg-slate-900/60 p-4 backdrop-blur-xs duration-200 fade-in"
                         onClick={() => setShowLockedModal(false)}
                     >
-                        <div 
+                        <div
                             className="relative w-full max-w-2xl animate-in rounded-xl border border-slate-200 bg-white p-6 shadow-xl duration-200 zoom-in-95 dark:border-slate-800 dark:bg-slate-950"
                             onClick={(e) => e.stopPropagation()}
                         >
@@ -389,11 +411,11 @@ export function LiveExamView({
 
                 {/* Guest Free Attempt: Register / Continue Modal */}
                 {showRegisterModal && (
-                    <div 
+                    <div
                         className="fixed inset-0 z-[100] flex animate-in items-center justify-center bg-slate-900/60 p-4 backdrop-blur-xs duration-200 fade-in"
                         onClick={() => setShowRegisterModal(false)}
                     >
-                        <div 
+                        <div
                             className="relative w-full max-w-2xl animate-in rounded-xl border border-slate-200 bg-white p-6 shadow-xl duration-200 zoom-in-95 dark:border-slate-800 dark:bg-slate-950"
                             onClick={(e) => e.stopPropagation()}
                         >

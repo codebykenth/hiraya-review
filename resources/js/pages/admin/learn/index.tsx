@@ -7,6 +7,12 @@ import {
 } from '@/components/curation-index-shell';
 import type { CategoryItem } from '@/components/drafts-review-shell';
 import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from '@/components/ui/tooltip';
+import {
     index as adminLearnIndex,
     create as adminLearnCreate,
     edit as adminLearnEdit,
@@ -95,28 +101,44 @@ export default function AdminLearnIndex({
             className: 'w-28 text-right pr-8',
             render: (mod) => (
                 <div className="flex items-center justify-end gap-1.5">
-                    <Link
-                        href={learnShow(mod.slug).url}
-                        className="rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted hover:text-foreground"
-                        title="Student Preview"
-                    >
-                        <Eye className="size-4" />
-                    </Link>
-                    <Link
-                        href={adminLearnEdit(mod.id).url}
-                        className="rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted hover:text-blue-600"
-                        title="Edit details"
-                    >
-                        <Edit2 className="size-4" />
-                    </Link>
-                    <button
-                        type="button"
-                        onClick={() => confirmDelete(mod)}
-                        className="cursor-pointer rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted hover:text-red-600"
-                        title="Delete module"
-                    >
-                        <Trash2 className="size-4" />
-                    </button>
+                    <TooltipProvider delayDuration={150}>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Link
+                                    href={learnShow(mod.slug).url}
+                                    className="rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted hover:text-foreground"
+                                >
+                                    <Eye className="size-4" />
+                                </Link>
+                            </TooltipTrigger>
+                            <TooltipContent>Student Preview</TooltipContent>
+                        </Tooltip>
+
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Link
+                                    href={adminLearnEdit(mod.id).url}
+                                    className="rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted hover:text-blue-600"
+                                >
+                                    <Edit2 className="size-4" />
+                                </Link>
+                            </TooltipTrigger>
+                            <TooltipContent>Edit details</TooltipContent>
+                        </Tooltip>
+
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <button
+                                    type="button"
+                                    onClick={() => confirmDelete(mod)}
+                                    className="cursor-pointer rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted hover:text-red-600"
+                                >
+                                    <Trash2 className="size-4" />
+                                </button>
+                            </TooltipTrigger>
+                            <TooltipContent>Delete module</TooltipContent>
+                        </Tooltip>
+                    </TooltipProvider>
                 </div>
             ),
         },
@@ -176,6 +198,15 @@ export default function AdminLearnIndex({
                     `Are you sure you want to permanently delete the learning module "${mod.title}"? This action cannot be undone.`
                 }
                 deleteConfirmLabel="Delete Module"
+                onBulkDeleteConfirm={(ids) => {
+                    router.post(
+                        '/admin/learn/bulk-delete',
+                        { ids },
+                        {
+                            preserveScroll: true,
+                        },
+                    );
+                }}
             />
         </>
     );

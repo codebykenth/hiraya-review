@@ -329,6 +329,7 @@ export function LessonMarkdown({ content = '' }: LessonMarkdownProps) {
                 if (!str) {
                     return [];
                 }
+
                 // Strictly require double asterisks for bold to avoid swallowing multiplication signs
                 const boldRegex = /\*\*([^*]+?)\*\*/g;
                 const parts: React.ReactNode[] = [];
@@ -337,7 +338,11 @@ export function LessonMarkdown({ content = '' }: LessonMarkdownProps) {
 
                 while ((match = boldRegex.exec(str)) !== null) {
                     if (match.index > lastIdx) {
-                        parts.push(formatMathInline(str.substring(lastIdx, match.index)));
+                        parts.push(
+                            formatMathInline(
+                                str.substring(lastIdx, match.index),
+                            ),
+                        );
                     }
 
                     parts.push(
@@ -455,28 +460,35 @@ export function LessonMarkdown({ content = '' }: LessonMarkdownProps) {
         let ladderLines: string[] = [];
 
         const flushLadder = (key: string) => {
-            if (ladderLines.length === 0) return;
+            if (ladderLines.length === 0) {
+                return;
+            }
 
             rendered.push(
-                <div key={`ladder-${key}`} className="my-8 flex flex-col font-mono text-xl tracking-widest font-black text-slate-800 dark:text-slate-200">
+                <div
+                    key={`ladder-${key}`}
+                    className="my-8 flex flex-col font-mono text-xl font-black tracking-widest text-slate-800 dark:text-slate-200"
+                >
                     {ladderLines.map((line, i) => {
                         const parts = line.split('|');
                         const divisor = parts[0]?.trim();
                         const numbers = parts[1]?.trim();
                         const isLast = i === ladderLines.length - 1;
-                        
+
                         return (
                             <div key={i} className="flex items-center">
-                                <div className="w-12 text-right text-blue-600 dark:text-blue-400 shrink-0">
+                                <div className="w-12 shrink-0 text-right text-blue-600 dark:text-blue-400">
                                     {divisor}
                                 </div>
-                                <div className={`px-4 py-2 ml-3 ${!isLast ? 'border-b-2 border-l-2 border-slate-800 dark:border-slate-200' : 'border-l-2 border-transparent'}`}>
+                                <div
+                                    className={`ml-3 px-4 py-2 ${!isLast ? 'border-b-2 border-l-2 border-slate-800 dark:border-slate-200' : 'border-l-2 border-transparent'}`}
+                                >
                                     {numbers}
                                 </div>
                             </div>
                         );
                     })}
-                </div>
+                </div>,
             );
             ladderLines = [];
         };
@@ -548,7 +560,10 @@ export function LessonMarkdown({ content = '' }: LessonMarkdownProps) {
             }
 
             if (inLadderBlock) {
-                if (trimmed) ladderLines.push(rawLine.trim());
+                if (trimmed) {
+                    ladderLines.push(rawLine.trim());
+                }
+
                 continue;
             }
 

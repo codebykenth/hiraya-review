@@ -4,11 +4,8 @@ import {
     ChevronDown,
     Calendar,
     Clock,
-    XCircle,
-    RotateCcw,
     BookOpen,
     Trash2,
-    X,
 } from 'lucide-react';
 import React, { useState } from 'react';
 import {
@@ -16,10 +13,12 @@ import {
     StatusBadge,
     ScoreProgress,
 } from '@/components/attempt-components';
+import { ConfirmModal } from '@/components/confirm-modal';
 import { PageContainer } from '@/components/page-container';
 import { PageHeader } from '@/components/page-header';
-import { ConfirmModal } from '@/components/confirm-modal';
+import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import {
     Tooltip,
@@ -87,6 +86,7 @@ export default function HistoryPage({
         filters.track || 'All Tracks',
     );
     const [selectedDate, setSelectedDate] = useState(filters.date || '30');
+    const [selectedIds, setSelectedIds] = useState<number[]>([]);
 
     // Custom confirm modal state
     const [confirmModal, setConfirmModal] = useState<{
@@ -122,6 +122,46 @@ export default function HistoryPage({
         });
     };
 
+    const handleSelectAll = (checked: boolean) => {
+        if (checked) {
+            setSelectedIds(attempts.map((att) => att.id));
+        } else {
+            setSelectedIds([]);
+        }
+    };
+
+    const handleSelectOne = (id: number, checked: boolean) => {
+        if (checked) {
+            setSelectedIds((prev) => [...prev, id]);
+        } else {
+            setSelectedIds((prev) => prev.filter((i) => i !== id));
+        }
+    };
+
+    const handleBulkDelete = () => {
+        if (selectedIds.length === 0) {
+            return;
+        }
+
+        setConfirmModal({
+            isOpen: true,
+            title: 'Delete Selected Attempts?',
+            message: `Are you sure you want to delete ${selectedIds.length} attempt records? This action cannot be undone.`,
+            confirmLabel: 'Delete All',
+            variant: 'danger',
+            onConfirm: () => {
+                router.post(
+                    '/exams/attempts/bulk-delete',
+                    { ids: selectedIds },
+                    {
+                        preserveScroll: true,
+                        onSuccess: () => setSelectedIds([]),
+                    },
+                );
+            },
+        });
+    };
+
     // Handle instant filter update via Inertia router
     const updateFilters = (
         newSearch: string,
@@ -139,6 +179,7 @@ export default function HistoryPage({
             {
                 preserveState: true,
                 replace: true,
+                onSuccess: () => setSelectedIds([]),
             },
         );
     };
@@ -266,10 +307,40 @@ export default function HistoryPage({
                         </div>
                     </div>
 
+                    {selectedIds.length > 0 && (
+                        <div className="flex items-center justify-between border-b border-border bg-blue-50/50 px-6 py-2 dark:bg-blue-950/10">
+                            <span className="text-xs font-bold text-blue-700 dark:text-blue-400">
+                                {selectedIds.length} selected
+                            </span>
+                            <Button
+                                variant="destructive"
+                                size="sm"
+                                className="h-7 text-[10px]"
+                                onClick={handleBulkDelete}
+                            >
+                                <Trash2 className="mr-1.5 size-3" />
+                                Delete Selected
+                            </Button>
+                        </div>
+                    )}
+
                     <div className="overflow-x-auto">
                         <table className="w-full border-collapse text-left">
                             <thead>
                                 <tr className="border-b border-border bg-slate-50/50 text-[10px] font-black tracking-wider text-muted-foreground uppercase dark:bg-slate-900/30">
+                                    <th className="w-12 px-6 py-4">
+                                        <Checkbox
+                                            checked={
+                                                attempts.length > 0 &&
+                                                selectedIds.length ===
+                                                    attempts.length
+                                            }
+                                            onCheckedChange={(checked) =>
+                                                handleSelectAll(!!checked)
+                                            }
+                                            aria-label="Select all"
+                                        />
+                                    </th>
                                     <th className="px-6 py-4">Date & Time</th>
                                     <th className="px-6 py-4">Track</th>
                                     <th className="px-6 py-4">Category</th>
@@ -287,7 +358,7 @@ export default function HistoryPage({
                                 {attempts.length === 0 ? (
                                     <tr>
                                         <td
-                                            colSpan={7}
+                                            colSpan={8}
                                             className="px-6 py-20 text-center"
                                         >
                                             <div className="mx-auto flex max-w-2xl flex-col items-center justify-center">
@@ -319,8 +390,26 @@ export default function HistoryPage({
                                         return (
                                             <tr
                                                 key={att.id}
-                                                className="transition hover:bg-slate-50/20 dark:hover:bg-slate-900/10"
+                                                className={`transition hover:bg-slate-50/20 dark:hover:bg-slate-900/10 ${selectedIds.includes(att.id) ? 'bg-blue-50/30 dark:bg-blue-950/20' : ''}`}
                                             >
+                                                {/* CHECKBOX */}
+                                                <td className="px-6 py-4.5">
+                                                    <Checkbox
+                                                        checked={selectedIds.includes(
+                                                            att.id,
+                                                        )}
+                                                        onCheckedChange={(
+                                                            checked,
+                                                        ) =>
+                                                            handleSelectOne(
+                                                                att.id,
+                                                                !!checked,
+                                                            )
+                                                        }
+                                                        aria-label={`Select attempt ${att.id}`}
+                                                    />
+                                                </td>
+
                                                 {/* DATE & TIME */}
                                                 <td className="px-6 py-4.5 whitespace-nowrap">
                                                     <div className="text-xs leading-normal font-black text-foreground">
@@ -376,7 +465,6 @@ export default function HistoryPage({
                                                 {/* ACTIONS */}
                                                 <td className="px-6 py-4.5 pr-8 text-right whitespace-nowrap">
                                                     <div className="flex items-center justify-end gap-2">
-
                                                         <Tooltip>
                                                             <TooltipTrigger
                                                                 asChild
@@ -442,14 +530,16 @@ export default function HistoryPage({
                     </div>
 
                     {/* 4. FOOTER PAGINATION CONTROL */}
-                    {attempts.length > 0 && (
+                    {pagination.total > 0 && (
                         <div className="flex flex-col items-center justify-between gap-3 border-t border-border px-6 py-4 sm:flex-row">
                             <span className="text-xs font-bold text-muted-foreground">
                                 Showing{' '}
                                 <strong className="text-foreground">
-                                    {(pagination.current_page - 1) *
-                                        pagination.per_page +
-                                        1}
+                                    {attempts.length > 0
+                                        ? (pagination.current_page - 1) *
+                                              pagination.per_page +
+                                          1
+                                        : 0}
                                 </strong>{' '}
                                 to{' '}
                                 <strong className="text-foreground">
@@ -563,7 +653,6 @@ export default function HistoryPage({
                 </Card>
             </PageContainer>
 
-
             {/* Unified confirmation modal component */}
             <ConfirmModal
                 isOpen={confirmModal.isOpen}
@@ -571,7 +660,9 @@ export default function HistoryPage({
                 message={confirmModal.message}
                 confirmLabel={confirmModal.confirmLabel}
                 variant={confirmModal.variant}
-                onClose={() => setConfirmModal((prev) => ({ ...prev, isOpen: false }))}
+                onClose={() =>
+                    setConfirmModal((prev) => ({ ...prev, isOpen: false }))
+                }
                 onConfirm={confirmModal.onConfirm}
             />
         </TooltipProvider>

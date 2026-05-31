@@ -302,6 +302,12 @@ class ExamController extends Controller
         $page = (int) $request->input('page', 1);
         $perPage = 4;
         $totalItems = $attempts->count();
+        $lastPage = max(1, ceil($totalItems / $perPage));
+
+        // Auto-redirect if page is out of bounds (e.g. after deleting the last items on a page)
+        if ($page > $lastPage && $totalItems > 0) {
+            return redirect()->route('history.index', array_merge($request->query(), ['page' => $lastPage]));
+        }
 
         $paginatedAttempts = $attempts->slice(($page - 1) * $perPage, $perPage)->values()->toArray();
 
@@ -658,5 +664,21 @@ class ExamController extends Controller
         $attempt->delete();
 
         return redirect()->back()->with('success', 'Attempt record deleted successfully!');
+    }
+    /**
+     * Delete multiple exam attempt records.
+     */
+    public function bulkDestroyAttempts(Request $request)
+    {
+        $validated = $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'integer|exists:exam_attempts,id',
+        ]);
+
+        ExamAttempt::whereIn('id', $validated['ids'])
+            ->where('user_id', auth()->id())
+            ->delete();
+
+        return redirect()->back()->with('success', 'Selected attempt records deleted successfully!');
     }
 }

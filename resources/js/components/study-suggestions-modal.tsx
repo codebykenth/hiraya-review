@@ -8,6 +8,12 @@ import {
     DialogTitle,
     DialogFooter,
 } from '@/components/ui/dialog';
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from '@/components/ui/tooltip';
 
 interface ModuleLink {
     url: string;
@@ -508,18 +514,33 @@ export function StudySuggestionsModal({
                                                                 )}
                                                             </div>
                                                             <div className="ml-2 flex flex-col items-end gap-2">
-                                                                <button
-                                                                    type="button"
-                                                                    onClick={() =>
-                                                                        removeSuggestion(
-                                                                            idx,
-                                                                        )
+                                                                <TooltipProvider
+                                                                    delayDuration={
+                                                                        150
                                                                     }
-                                                                    className="text-slate-400 transition-colors hover:text-red-500"
-                                                                    title="Remove suggestion"
                                                                 >
-                                                                    <X className="h-4 w-4" />
-                                                                </button>
+                                                                    <Tooltip>
+                                                                        <TooltipTrigger
+                                                                            asChild
+                                                                        >
+                                                                            <button
+                                                                                type="button"
+                                                                                onClick={() =>
+                                                                                    removeSuggestion(
+                                                                                        idx,
+                                                                                    )
+                                                                                }
+                                                                                className="text-slate-400 transition-colors hover:text-red-500"
+                                                                            >
+                                                                                <X className="h-4 w-4" />
+                                                                            </button>
+                                                                        </TooltipTrigger>
+                                                                        <TooltipContent>
+                                                                            Remove
+                                                                            suggestion
+                                                                        </TooltipContent>
+                                                                    </Tooltip>
+                                                                </TooltipProvider>
                                                                 <span
                                                                     className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${suggestion.score < 75 ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400' : 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'}`}
                                                                 >

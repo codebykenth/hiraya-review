@@ -1,11 +1,5 @@
 import { Head, Link } from '@inertiajs/react';
-import {
-    Award,
-    BookOpen,
-    ChevronLeft,
-    RotateCcw,
-    ArrowRight,
-} from 'lucide-react';
+import { Award, BookOpen, ChevronLeft, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { formatDuration } from '@/lib/exam-formatters';
 
@@ -263,7 +257,6 @@ export function ScorecardView({
                     your scorecard is shown below.
                 </div>
             )}
-
 
             {results &&
                 (() => {

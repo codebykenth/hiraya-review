@@ -7,6 +7,12 @@ import {
 } from '@/components/curation-index-shell';
 import type { CategoryItem } from '@/components/drafts-review-shell';
 import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from '@/components/ui/tooltip';
+import {
     index as questionsIndex,
     create as questionsCreate,
     edit as questionsEdit,
@@ -89,28 +95,44 @@ export default function QuestionsIndex({
             className: 'w-28 text-right pr-8',
             render: (q) => (
                 <div className="flex items-center justify-end gap-1.5">
-                    <Link
-                        href={questionsShow(q.id).url}
-                        className="cursor-pointer rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted hover:text-blue-600"
-                        title="View details"
-                    >
-                        <Eye className="size-4" />
-                    </Link>
-                    <Link
-                        href={questionsEdit(q.id).url}
-                        className="cursor-pointer rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted hover:text-blue-600"
-                        title="Edit question"
-                    >
-                        <Edit2 className="size-4" />
-                    </Link>
-                    <button
-                        type="button"
-                        onClick={() => confirmDelete(q)}
-                        className="cursor-pointer rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted hover:text-red-600"
-                        title="Delete question"
-                    >
-                        <Trash2 className="size-4" />
-                    </button>
+                    <TooltipProvider delayDuration={150}>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Link
+                                    href={questionsShow(q.id).url}
+                                    className="cursor-pointer rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted hover:text-blue-600"
+                                >
+                                    <Eye className="size-4" />
+                                </Link>
+                            </TooltipTrigger>
+                            <TooltipContent>View details</TooltipContent>
+                        </Tooltip>
+
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Link
+                                    href={questionsEdit(q.id).url}
+                                    className="cursor-pointer rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted hover:text-blue-600"
+                                >
+                                    <Edit2 className="size-4" />
+                                </Link>
+                            </TooltipTrigger>
+                            <TooltipContent>Edit question</TooltipContent>
+                        </Tooltip>
+
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <button
+                                    type="button"
+                                    onClick={() => confirmDelete(q)}
+                                    className="cursor-pointer rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted hover:text-red-600"
+                                >
+                                    <Trash2 className="size-4" />
+                                </button>
+                            </TooltipTrigger>
+                            <TooltipContent>Delete question</TooltipContent>
+                        </Tooltip>
+                    </TooltipProvider>
                 </div>
             ),
         },
@@ -168,6 +190,15 @@ export default function QuestionsIndex({
                     'Are you sure you want to delete this question? This action cannot be undone and will permanently remove it from all database records.'
                 }
                 deleteConfirmLabel="Delete Question"
+                onBulkDeleteConfirm={(ids) => {
+                    router.post(
+                        '/questions/bulk-delete',
+                        { ids },
+                        {
+                            preserveScroll: true,
+                        },
+                    );
+                }}
             />
         </>
     );

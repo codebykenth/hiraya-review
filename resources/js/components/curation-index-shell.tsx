@@ -1,5 +1,12 @@
 import { Link } from '@inertiajs/react';
-import { Search, Sparkles, FileText, PenLine, ChevronDown } from 'lucide-react';
+import {
+    Search,
+    Sparkles,
+    FileText,
+    PenLine,
+    ChevronDown,
+    Trash2,
+} from 'lucide-react';
 import React, { useState, useEffect } from 'react';
 import type { TableColumn } from '@/components/admin-table';
 import { AdminTable } from '@/components/admin-table';
@@ -62,6 +69,9 @@ export interface CurationIndexShellProps<T> {
     getDeleteTitle: (item: T) => string;
     getDeleteMessage: (item: T) => string;
     deleteConfirmLabel: string;
+
+    // Bulk Delete
+    onBulkDeleteConfirm?: (ids: number[]) => void;
 }
 
 export function CurationIndexShell<T>({
@@ -80,6 +90,7 @@ export function CurationIndexShell<T>({
     getDeleteTitle,
     getDeleteMessage,
     deleteConfirmLabel,
+    onBulkDeleteConfirm,
 }: CurationIndexShellProps<T>) {
     const [searchTerm, setSearchTerm] = useState('');
     const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
@@ -155,6 +166,41 @@ export function CurationIndexShell<T>({
     });
 
     const [itemToDelete, setItemToDelete] = useState<T | null>(null);
+    const [selectedIds, setSelectedIds] = useState<number[]>([]);
+
+    const handleSelectAll = (checked: boolean, allIds: number[]) => {
+        if (checked) {
+            setSelectedIds(allIds);
+        } else {
+            setSelectedIds([]);
+        }
+    };
+
+    const handleSelectOne = (id: number, checked: boolean) => {
+        if (checked) {
+            setSelectedIds((prev) => [...prev, id]);
+        } else {
+            setSelectedIds((prev) => prev.filter((i) => i !== id));
+        }
+    };
+
+    const handleBulkDelete = () => {
+        if (selectedIds.length === 0 || !onBulkDeleteConfirm) {
+            return;
+        }
+
+        setConfirmModal({
+            isOpen: true,
+            title: 'Delete Selected Items?',
+            message: `Are you sure you want to delete ${selectedIds.length} items? This action cannot be undone.`,
+            confirmLabel: 'Delete All',
+            variant: 'danger',
+            onConfirm: () => {
+                onBulkDeleteConfirm(selectedIds);
+                setSelectedIds([]);
+            },
+        });
+    };
 
     const filteredItems = items.filter((item) => {
         const matchesSearch = searchMatcher(item, debouncedSearchTerm);
@@ -400,6 +446,34 @@ export function CurationIndexShell<T>({
                     columns={resolvedColumns}
                     title={tableTitle}
                     legend={tableLegend}
+                    getItemId={(item: any) => item.id}
+                    selectedIds={selectedIds}
+                    onSelectAll={
+                        onBulkDeleteConfirm ? handleSelectAll : undefined
+                    }
+                    onSelectOne={
+                        onBulkDeleteConfirm ? handleSelectOne : undefined
+                    }
+                    bulkActionRender={
+                        onBulkDeleteConfirm
+                            ? (selected) => (
+                                  <div className="flex items-center justify-between border-b border-border bg-blue-50/50 px-6 py-2 dark:bg-blue-950/10">
+                                      <span className="text-xs font-bold text-blue-700 dark:text-blue-400">
+                                          {selected.length} selected
+                                      </span>
+                                      <Button
+                                          variant="destructive"
+                                          size="sm"
+                                          className="h-7 text-[10px]"
+                                          onClick={handleBulkDelete}
+                                      >
+                                          <Trash2 className="mr-1.5 size-3" />
+                                          Delete Selected
+                                      </Button>
+                                  </div>
+                              )
+                            : undefined
+                    }
                     emptyState={{
                         icon: tableEmptyState.icon,
                         title: tableEmptyState.title,

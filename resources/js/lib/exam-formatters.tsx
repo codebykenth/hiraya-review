@@ -46,10 +46,16 @@ export const extractPropositions = (stem: string) => {
 };
 
 export const formatMathInline = (text: string) => {
-    if (typeof text !== 'string') return text;
+    if (typeof text !== 'string') {
+        return text;
+    }
+
     // Split by fraction (e.g. 1/2 or 1 / 2) or superscript (e.g. ^2, ^-3, ^n)
     const parts = text.split(/(\b\d+\s*\/\s*\d+\b|\^[-a-zA-Z0-9]+)/);
-    if (parts.length === 1) return text;
+
+    if (parts.length === 1) {
+        return text;
+    }
 
     return (
         <>
@@ -62,10 +68,15 @@ export const formatMathInline = (text: string) => {
                             </sup>
                         );
                     }
+
                     if (part.includes('/')) {
                         const [num, den] = part.split('/').map((s) => s.trim());
+
                         return (
-                            <span key={idx} className="mx-1 inline-flex flex-col text-center align-middle leading-none">
+                            <span
+                                key={idx}
+                                className="mx-1 inline-flex flex-col text-center align-middle leading-none"
+                            >
                                 <span className="block border-b border-slate-500 px-0.5 pb-[2px] text-[0.8em] font-bold dark:border-slate-400">
                                     {num}
                                 </span>
@@ -76,6 +87,7 @@ export const formatMathInline = (text: string) => {
                         );
                     }
                 }
+
                 return <React.Fragment key={idx}>{part}</React.Fragment>;
             })}
         </>
@@ -231,7 +243,11 @@ export const renderFormattedText = (
                                 );
                             }
 
-                            return <span key={mIdx}>{formatMathInline(mPart)}</span>;
+                            return (
+                                <span key={mIdx}>
+                                    {formatMathInline(mPart)}
+                                </span>
+                            );
                         })}
                     </>
                 );

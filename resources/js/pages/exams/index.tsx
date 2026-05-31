@@ -1,5 +1,4 @@
 import { router, setLayoutProps, usePage } from '@inertiajs/react';
-import { X } from 'lucide-react';
 import React, {
     useState,
     useEffect,
@@ -7,6 +6,7 @@ import React, {
     useCallback,
     useMemo,
 } from 'react';
+import { ConfirmModal } from '@/components/confirm-modal';
 import { PageContainer } from '@/components/page-container';
 import { Button } from '@/components/ui/button';
 import {
@@ -23,7 +23,6 @@ import { LiveExamView } from './components/live-exam-view';
 import { ReviewExamView } from './components/review-exam-view';
 import { ScorecardView } from './components/scorecard-view';
 import { SetupExamView } from './components/setup-exam-view';
-import { ConfirmModal } from '@/components/confirm-modal';
 
 interface Question {
     id: number;
@@ -79,7 +78,6 @@ const shuffleOptionsForQuestion = (q: Question): Question => {
 export default function ExamIndex({
     questions = [],
     savedAttempt,
-    retakeSource,
     seenQuestionIdsByTrack = {
         Professional: [],
         Subprofessional: [],
@@ -1134,51 +1132,6 @@ export default function ExamIndex({
         [questions, fallbackQuestions, demographicQuestions, getSeenIdsForExam],
     );
 
-    const buildSameExamPool = useCallback(
-        (questionIds: number[]) => {
-            let sourcePool = [
-                ...questions,
-                ...demographicQuestions,
-                ...fallbackDemographicQuestions,
-            ];
-
-            if (questions.length === 0) {
-                sourcePool = [
-                    ...fallbackQuestions,
-                    ...demographicQuestions,
-                    ...fallbackDemographicQuestions,
-                ];
-            }
-
-            const missingIds = questionIds.filter(
-                (id) => !sourcePool.some((q) => q.id === id),
-            );
-            missingIds.forEach((id) => {
-                const fallbackQ = [
-                    ...fallbackQuestions,
-                    ...demographicQuestions,
-                    ...fallbackDemographicQuestions,
-                ].find((q) => q.id === id);
-
-                if (fallbackQ) {
-                    sourcePool = [...sourcePool, fallbackQ];
-                }
-            });
-
-            return questionIds
-                .map(
-                    (id) =>
-                        sourcePool.find((q) => q.id === id) ||
-                        [...fallbackQuestions, ...demographicQuestions].find(
-                            (q) => q.id === id,
-                        ),
-                )
-                .filter((q): q is Question => Boolean(q))
-                .map(shuffleOptionsForQuestion);
-        },
-        [questions, fallbackQuestions, demographicQuestions],
-    );
-
     const beginExamSession = useCallback(
         (examPool: Question[], examId: number | null) => {
             const specs = getSimulationDetails(examId);
@@ -1881,7 +1834,9 @@ export default function ExamIndex({
             message={confirmModal.message}
             confirmLabel={confirmModal.confirmLabel}
             variant={confirmModal.variant}
-            onClose={() => setConfirmModal((prev) => ({ ...prev, isOpen: false }))}
+            onClose={() =>
+                setConfirmModal((prev) => ({ ...prev, isOpen: false }))
+            }
             onConfirm={confirmModal.onConfirm}
         />
     );
@@ -1970,7 +1925,6 @@ export default function ExamIndex({
                     isTimed={isTimed}
                     getActiveTimeLimitSecs={getActiveTimeLimitSecs}
                     submittedByTimer={submittedByTimer}
-
                     setReviewScreenActive={setReviewScreenActive}
                     handleBeginExam={handleBeginExam}
                 />

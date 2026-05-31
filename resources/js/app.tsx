@@ -51,7 +51,9 @@ createInertiaApp({
 
         // Find the matching page case-insensitively to prevent Windows/Linux case mismatch issues
         const targetPath = `./pages/${name}.tsx`.toLowerCase();
-        const actualPath = Object.keys(pages).find(key => key.toLowerCase() === targetPath);
+        const actualPath = Object.keys(pages).find(
+            (key) => key.toLowerCase() === targetPath,
+        );
 
         if (!actualPath) {
             throw new Error(`Page component not found: ${name}`);

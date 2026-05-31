@@ -5,6 +5,12 @@ import { ConfirmModal } from '@/components/confirm-modal';
 import { PageContainer } from '@/components/page-container';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from '@/components/ui/tooltip';
 
 interface ExamDate {
     id: number;
@@ -310,45 +316,75 @@ export default function AdminExamDatesIndex({ examDates }: Props) {
                                                 </td>
                                                 <td className="px-4 py-3 text-right">
                                                     <div className="flex justify-end gap-2">
-                                                        <button
-                                                            onClick={() =>
-                                                                handleToggleStatus(
-                                                                    exam,
-                                                                )
-                                                            }
-                                                            className={`rounded-md p-1.5 hover:bg-muted ${exam.is_active ? 'text-amber-600' : 'text-emerald-600'}`}
-                                                            title={
-                                                                exam.is_active
-                                                                    ? 'Deactivate'
-                                                                    : 'Activate'
-                                                            }
+                                                        <TooltipProvider
+                                                            delayDuration={150}
                                                         >
-                                                            {exam.is_active ? (
-                                                                <XCircle className="h-4 w-4" />
-                                                            ) : (
-                                                                <CheckCircle className="h-4 w-4" />
-                                                            )}
-                                                        </button>
-                                                        <button
-                                                            onClick={() =>
-                                                                handleEdit(exam)
-                                                            }
-                                                            className="rounded-md p-1.5 text-blue-600 hover:bg-blue-50"
-                                                            title="Edit"
-                                                        >
-                                                            <Edit2 className="h-4 w-4" />
-                                                        </button>
-                                                        <button
-                                                            onClick={() =>
-                                                                handleDelete(
-                                                                    exam.id,
-                                                                )
-                                                            }
-                                                            className="rounded-md p-1.5 text-red-600 hover:bg-red-50"
-                                                            title="Delete"
-                                                        >
-                                                            <Trash2 className="h-4 w-4" />
-                                                        </button>
+                                                            <Tooltip>
+                                                                <TooltipTrigger
+                                                                    asChild
+                                                                >
+                                                                    <button
+                                                                        onClick={() =>
+                                                                            handleToggleStatus(
+                                                                                exam,
+                                                                            )
+                                                                        }
+                                                                        className={`rounded-md p-1.5 hover:bg-muted ${exam.is_active ? 'text-amber-600' : 'text-emerald-600'}`}
+                                                                    >
+                                                                        {exam.is_active ? (
+                                                                            <XCircle className="h-4 w-4" />
+                                                                        ) : (
+                                                                            <CheckCircle className="h-4 w-4" />
+                                                                        )}
+                                                                    </button>
+                                                                </TooltipTrigger>
+                                                                <TooltipContent>
+                                                                    {exam.is_active
+                                                                        ? 'Deactivate'
+                                                                        : 'Activate'}
+                                                                </TooltipContent>
+                                                            </Tooltip>
+
+                                                            <Tooltip>
+                                                                <TooltipTrigger
+                                                                    asChild
+                                                                >
+                                                                    <button
+                                                                        onClick={() =>
+                                                                            handleEdit(
+                                                                                exam,
+                                                                            )
+                                                                        }
+                                                                        className="rounded-md p-1.5 text-blue-600 hover:bg-blue-50"
+                                                                    >
+                                                                        <Edit2 className="h-4 w-4" />
+                                                                    </button>
+                                                                </TooltipTrigger>
+                                                                <TooltipContent>
+                                                                    Edit
+                                                                </TooltipContent>
+                                                            </Tooltip>
+
+                                                            <Tooltip>
+                                                                <TooltipTrigger
+                                                                    asChild
+                                                                >
+                                                                    <button
+                                                                        onClick={() =>
+                                                                            handleDelete(
+                                                                                exam.id,
+                                                                            )
+                                                                        }
+                                                                        className="rounded-md p-1.5 text-red-600 hover:bg-red-50"
+                                                                    >
+                                                                        <Trash2 className="h-4 w-4" />
+                                                                    </button>
+                                                                </TooltipTrigger>
+                                                                <TooltipContent>
+                                                                    Delete
+                                                                </TooltipContent>
+                                                            </Tooltip>
+                                                        </TooltipProvider>
                                                     </div>
                                                 </td>
                                             </tr>
