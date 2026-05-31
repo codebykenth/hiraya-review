@@ -43,6 +43,36 @@ class LearnController extends Controller
             }])->orderBy('sort_order')->get()->toArray();
         });
 
+        if (auth()->check()) {
+            $attempts = \App\Models\ExamAttempt::where('user_id', auth()->id())
+                ->orderByDesc('created_at')
+                ->get();
+
+            if ($attempts->isNotEmpty()) {
+                $analyzer = app(\App\Services\StudyPlanAnalyzer::class);
+                $weakAreas = $analyzer->identifyWeakAreas($attempts);
+
+                if ($weakAreas->isNotEmpty()) {
+                    $weakCategoryNames = $weakAreas->pluck('category')->toArray();
+
+                    usort($categories, function($a, $b) use ($weakCategoryNames) {
+                        $posA = array_search($a['name'], $weakCategoryNames);
+                        $posB = array_search($b['name'], $weakCategoryNames);
+
+                        if ($posA !== false && $posB !== false) {
+                            return $posA <=> $posB;
+                        } elseif ($posA !== false) {
+                            return -1;
+                        } elseif ($posB !== false) {
+                            return 1;
+                        } else {
+                            return ($a['sort_order'] ?? 0) <=> ($b['sort_order'] ?? 0);
+                        }
+                    });
+                }
+            }
+        }
+
         return Inertia::render('learn/index', [
             'modules' => $modules,
             'categories' => $categories,

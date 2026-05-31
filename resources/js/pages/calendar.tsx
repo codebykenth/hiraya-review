@@ -21,6 +21,7 @@ import {
     DialogFooter,
     DialogClose,
 } from '@/components/ui/dialog';
+import { ConfirmModal } from '@/components/confirm-modal';
 
 interface StudySchedule {
     id: number;
@@ -82,7 +83,21 @@ export default function Calendar() {
     const [learnModules, setLearnModules] = useState<LearnModule[]>([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
-    const [isResetModalOpen, setIsResetModalOpen] = useState(false);
+    const [confirmModal, setConfirmModal] = useState<{
+        isOpen: boolean;
+        title: string;
+        message: string;
+        confirmLabel: string;
+        variant: 'danger' | 'success' | 'info';
+        onConfirm: () => void;
+    }>({
+        isOpen: false,
+        title: '',
+        message: '',
+        confirmLabel: '',
+        variant: 'danger',
+        onConfirm: () => {},
+    });
     const [selectedDate, setSelectedDate] = useState<string | null>(null);
     const [formData, setFormData] = useState({
         title: '',
@@ -355,32 +370,46 @@ export default function Calendar() {
     };
 
     const handleDeleteSchedule = async (scheduleId: number, date: string) => {
-        try {
-            const response = await fetch(`/study-schedules/${scheduleId}`, {
-                method: 'DELETE',
-                headers: {
-                    'X-CSRF-TOKEN':
-                        document
-                            .querySelector('meta[name="csrf-token"]')
-                            ?.getAttribute('content') || '',
-                },
-            });
+        setConfirmModal({
+            isOpen: true,
+            title: 'Delete Study Session',
+            message: 'Are you sure you want to delete this study session?',
+            confirmLabel: 'Delete',
+            variant: 'danger',
+            onConfirm: async () => {
+                try {
+                    const response = await fetch(
+                        `/study-schedules/${scheduleId}`,
+                        {
+                            method: 'DELETE',
+                            headers: {
+                                'X-CSRF-TOKEN':
+                                    document
+                                        .querySelector(
+                                            'meta[name="csrf-token"]',
+                                        )
+                                        ?.getAttribute('content') || '',
+                            },
+                        },
+                    );
 
-            if (response.ok) {
-                monthCacheRef.current.clear();
-                const updated = new Map(schedules);
-                const dateSchedules = updated.get(date) || [];
-                updated.set(
-                    date,
-                    dateSchedules.filter((s) => s.id !== scheduleId),
-                );
-                setSchedules(updated);
-            }
-        } catch {
-            setErrorMessage(
-                'Failed to delete the study session. Please check your connection and try again.',
-            );
-        }
+                    if (response.ok) {
+                        monthCacheRef.current.clear();
+                        const updated = new Map(schedules);
+                        const dateSchedules = updated.get(date) || [];
+                        updated.set(
+                            date,
+                            dateSchedules.filter((s) => s.id !== scheduleId),
+                        );
+                        setSchedules(updated);
+                    }
+                } catch {
+                    setErrorMessage(
+                        'Failed to delete the study session. Please check your connection and try again.',
+                    );
+                }
+            },
+        });
     };
 
     const applySuggestions = async (suggestionsToApply: Suggestion[]) => {
@@ -422,10 +451,10 @@ export default function Calendar() {
 
         if (t.includes('verbal')) {
             return {
-                bg: 'bg-indigo-100',
-                text: 'text-indigo-900',
-                time: 'text-indigo-700',
-                desc: 'text-indigo-800',
+                bg: 'bg-indigo-100 dark:bg-indigo-900/40',
+                text: 'text-indigo-900 dark:text-indigo-100',
+                time: 'text-indigo-700 dark:text-indigo-300',
+                desc: 'text-indigo-800 dark:text-indigo-200',
             };
         }
 
@@ -435,19 +464,19 @@ export default function Calendar() {
             t.includes('pemdas')
         ) {
             return {
-                bg: 'bg-emerald-100',
-                text: 'text-emerald-900',
-                time: 'text-emerald-700',
-                desc: 'text-emerald-800',
+                bg: 'bg-emerald-100 dark:bg-emerald-900/40',
+                text: 'text-emerald-900 dark:text-emerald-100',
+                time: 'text-emerald-700 dark:text-emerald-300',
+                desc: 'text-emerald-800 dark:text-emerald-200',
             };
         }
 
         if (t.includes('analytical') || t.includes('logic')) {
             return {
-                bg: 'bg-amber-100',
-                text: 'text-amber-900',
-                time: 'text-amber-700',
-                desc: 'text-amber-800',
+                bg: 'bg-amber-100 dark:bg-amber-900/40',
+                text: 'text-amber-900 dark:text-amber-100',
+                time: 'text-amber-700 dark:text-amber-300',
+                desc: 'text-amber-800 dark:text-amber-200',
             };
         }
 
@@ -457,27 +486,27 @@ export default function Calendar() {
             t.includes('alphabetizing')
         ) {
             return {
-                bg: 'bg-purple-100',
-                text: 'text-purple-900',
-                time: 'text-purple-700',
-                desc: 'text-purple-800',
+                bg: 'bg-purple-100 dark:bg-purple-900/40',
+                text: 'text-purple-900 dark:text-purple-100',
+                time: 'text-purple-700 dark:text-purple-300',
+                desc: 'text-purple-800 dark:text-purple-200',
             };
         }
 
         if (t.includes('general info') || t.includes('constitution')) {
             return {
-                bg: 'bg-rose-100',
-                text: 'text-rose-900',
-                time: 'text-rose-700',
-                desc: 'text-rose-800',
+                bg: 'bg-rose-100 dark:bg-rose-900/40',
+                text: 'text-rose-900 dark:text-rose-100',
+                time: 'text-rose-700 dark:text-rose-300',
+                desc: 'text-rose-800 dark:text-rose-200',
             };
         }
 
         return {
-            bg: 'bg-blue-100',
-            text: 'text-blue-900',
-            time: 'text-blue-700',
-            desc: 'text-blue-800',
+            bg: 'bg-blue-100 dark:bg-blue-900/40',
+            text: 'text-blue-900 dark:text-blue-100',
+            time: 'text-blue-700 dark:text-blue-300',
+            desc: 'text-blue-800 dark:text-blue-200',
         };
     };
 
@@ -681,7 +710,7 @@ export default function Calendar() {
                     className="mb-8"
                 />
 
-                <Card className="bg-white p-6">
+                <Card className="border-border bg-white p-6 shadow-sm dark:bg-slate-950 sm:p-6">
                     {/* Header with navigation */}
                     <div className="mb-6 flex flex-col justify-between gap-4 md:flex-row md:items-center">
                         <div className="flex items-center gap-4">
@@ -696,7 +725,7 @@ export default function Calendar() {
                                         ),
                                     );
                                 }}
-                                className="cursor-pointer appearance-none rounded border-none bg-transparent py-1 pr-6 pl-2 text-xl font-semibold text-slate-900 outline-none hover:bg-slate-50 focus:ring-2 focus:ring-blue-500"
+                                className="cursor-pointer appearance-none rounded border-none bg-transparent py-1 pr-6 pl-2 text-xl font-semibold text-slate-900 outline-none hover:bg-slate-50 focus:ring-2 focus:ring-blue-500 dark:text-slate-100 dark:hover:bg-slate-900"
                                 style={{
                                     backgroundImage:
                                         'url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%231e293b%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E")',
@@ -735,7 +764,7 @@ export default function Calendar() {
                                         ),
                                     );
                                 }}
-                                className="cursor-pointer appearance-none rounded border-none bg-transparent py-1 pr-6 pl-2 text-xl font-semibold text-slate-900 outline-none hover:bg-slate-50 focus:ring-2 focus:ring-blue-500"
+                                className="cursor-pointer appearance-none rounded border-none bg-transparent py-1 pr-6 pl-2 text-xl font-semibold text-slate-900 outline-none hover:bg-slate-50 focus:ring-2 focus:ring-blue-500 dark:text-slate-100 dark:hover:bg-slate-900"
                                 style={{
                                     backgroundImage:
                                         'url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%231e293b%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E")',
@@ -785,7 +814,34 @@ export default function Calendar() {
                             </Button>
                             <Button
                                 variant="outline"
-                                onClick={() => setIsResetModalOpen(true)}
+                                onClick={() => {
+                                    setConfirmModal({
+                                        isOpen: true,
+                                        title: 'Reset Calendar',
+                                        message:
+                                            'Are you sure you want to delete all study sessions from your calendar? This action cannot be undone.',
+                                        confirmLabel: 'Yes, Delete All',
+                                        variant: 'danger',
+                                        onConfirm: () => {
+                                            setIsLoading(true);
+                                            fetch('/study-schedules/reset', {
+                                                method: 'DELETE',
+                                                headers: {
+                                                    'X-CSRF-TOKEN':
+                                                        document
+                                                            .querySelector(
+                                                                'meta[name="csrf-token"]',
+                                                            )
+                                                            ?.getAttribute('content') || '',
+                                                },
+                                            }).then(() => {
+                                                monthCacheRef.current.clear();
+                                                fetchSchedules(true);
+                                                setIsLoading(false);
+                                            });
+                                        },
+                                    });
+                                }}
                                 className="flex-1 border-red-200 bg-red-50 text-red-600 hover:bg-red-100 md:flex-initial"
                             >
                                 <Trash2 className="mr-2 h-4 w-4" />
@@ -816,7 +872,7 @@ export default function Calendar() {
                     </div>
 
                     {/* Calendar grid wrapper for mobile */}
-                    <div className="mb-2 flex items-center justify-center gap-2 rounded-lg border border-slate-100 bg-slate-50 p-2 text-xs text-slate-500 md:hidden">
+                    <div className="mb-2 flex items-center justify-center gap-2 rounded-lg border border-slate-100 bg-slate-50 p-2 text-xs text-slate-500 md:hidden dark:border-slate-800 dark:bg-slate-900/50 dark:text-slate-400">
                         <span className="animate-pulse">←</span> Swipe
                         horizontally to view full week{' '}
                         <span className="animate-pulse">→</span>
@@ -836,7 +892,7 @@ export default function Calendar() {
                                 ].map((day) => (
                                     <div
                                         key={day}
-                                        className="flex items-center justify-center font-semibold text-slate-600"
+                                        className="flex items-center justify-center font-semibold text-slate-600 dark:text-slate-400"
                                     >
                                         {day}
                                     </div>
@@ -862,14 +918,14 @@ export default function Calendar() {
                                                     examDates.includes(
                                                         calendarDay.date,
                                                     )
-                                                        ? 'border-red-400 bg-red-50'
+                                                        ? 'border-red-400 bg-red-50 dark:border-red-900/50 dark:bg-red-950/20'
                                                         : isToday(
                                                                 calendarDay.date,
                                                             )
-                                                          ? 'border-blue-400 bg-blue-50'
+                                                          ? 'border-blue-400 bg-blue-50 dark:border-blue-800 dark:bg-blue-900/20'
                                                           : calendarDay.isCurrentMonth
-                                                            ? 'border-slate-200 bg-white'
-                                                            : 'border-slate-100 bg-slate-50 opacity-60'
+                                                            ? 'border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900'
+                                                            : 'border-slate-100 bg-slate-50 opacity-60 dark:border-slate-800 dark:bg-slate-900/50'
                                                 }`}
                                             >
                                                 <div className="flex items-center justify-between">
@@ -878,14 +934,14 @@ export default function Calendar() {
                                                             examDates.includes(
                                                                 calendarDay.date,
                                                             )
-                                                                ? 'text-red-900'
+                                                                ? 'text-red-900 dark:text-red-400'
                                                                 : isToday(
                                                                         calendarDay.date,
                                                                     )
-                                                                  ? 'text-blue-900'
+                                                                  ? 'text-blue-900 dark:text-blue-400'
                                                                   : calendarDay.isCurrentMonth
-                                                                    ? 'text-slate-900'
-                                                                    : 'text-slate-400'
+                                                                    ? 'text-slate-900 dark:text-slate-100'
+                                                                    : 'text-slate-400 dark:text-slate-500'
                                                         }`}
                                                     >
                                                         {examDates.includes(
@@ -919,10 +975,10 @@ export default function Calendar() {
                                                                         calendarDay.date,
                                                                     );
                                                                 }}
-                                                                className="rounded p-1 opacity-100 transition-opacity hover:bg-blue-100 lg:opacity-0 lg:group-hover:opacity-100"
+                                                                className="rounded p-1 opacity-100 transition-opacity hover:bg-blue-100 lg:opacity-0 lg:group-hover:opacity-100 dark:hover:bg-blue-900/30"
                                                                 title="Add study item"
                                                             >
-                                                                <Plus className="h-4 w-4 text-blue-600" />
+                                                                <Plus className="h-4 w-4 text-blue-600 dark:text-blue-400" />
                                                             </button>
                                                         )}
                                                 </div>
@@ -953,7 +1009,7 @@ export default function Calendar() {
                                                                         <div className="min-w-0 flex-1">
                                                                             {schedule.study_time && (
                                                                                 <span
-                                                                                    className={`mr-1.5 inline-block rounded-md bg-white/60 px-1.5 py-0.5 text-[10px] font-bold shadow-sm ${colors.time}`}
+                                                                                    className={`mr-1.5 inline-block rounded-md bg-white/60 dark:bg-black/20 px-1.5 py-0.5 text-[10px] font-bold shadow-sm ${colors.time}`}
                                                                                 >
                                                                                     {schedule.study_time.substring(
                                                                                         0,
@@ -1099,7 +1155,7 @@ export default function Calendar() {
                                                                                                             href={
                                                                                                                 l.url
                                                                                                             }
-                                                                                                            className={`block w-full rounded px-1.5 py-1 text-[10px] font-bold break-words sm:text-xs ${l.isAuto ? 'bg-amber-50 text-amber-700 hover:text-amber-900' : 'bg-white/50 text-blue-600 hover:text-blue-800'}`}
+                                                                                                            className={`block w-full rounded px-1.5 py-1 text-[10px] font-bold break-words sm:text-xs ${l.isAuto ? 'bg-amber-50 text-amber-700 hover:text-amber-900 dark:bg-amber-900/40 dark:text-amber-400 dark:hover:text-amber-300' : 'bg-white/50 text-blue-700 hover:text-blue-900 dark:bg-blue-900/40 dark:text-blue-300 dark:hover:text-blue-200'}`}
                                                                                                             onClick={(
                                                                                                                 e,
                                                                                                             ) =>
@@ -1155,7 +1211,7 @@ export default function Calendar() {
                                     : 'Add Study Item'}
                             </DialogTitle>
                             {selectedDate && (
-                                <p className="mt-2 text-sm text-slate-600">
+                                <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
                                     {new Date(
                                         selectedDate + 'T00:00:00',
                                     ).toLocaleDateString('en-US', {
@@ -1169,7 +1225,7 @@ export default function Calendar() {
 
                         <div className="space-y-4 py-4">
                             <div>
-                                <label className="block text-sm font-medium text-slate-900">
+                                <label className="block text-sm font-medium text-slate-900 dark:text-slate-200">
                                     What will you study?
                                 </label>
                                 <input
@@ -1182,12 +1238,12 @@ export default function Calendar() {
                                             title: e.target.value,
                                         })
                                     }
-                                    className="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 placeholder-slate-400 focus:border-blue-500 focus:outline-none"
+                                    className="mt-2 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 placeholder-slate-400 focus:border-blue-500 focus:outline-none dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100 dark:placeholder-slate-500"
                                 />
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-slate-900">
+                                <label className="block text-sm font-medium text-slate-900 dark:text-slate-200">
                                     Details (optional)
                                 </label>
                                 <textarea
@@ -1200,15 +1256,15 @@ export default function Calendar() {
                                         })
                                     }
                                     rows={3}
-                                    className="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 placeholder-slate-400 focus:border-blue-500 focus:outline-none"
+                                    className="mt-2 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 placeholder-slate-400 focus:border-blue-500 focus:outline-none dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100 dark:placeholder-slate-500"
                                 />
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-slate-900">
+                                <label className="block text-sm font-medium text-slate-900 dark:text-slate-100">
                                     Study Time (optional)
                                 </label>
-                                <div className="mt-2">
+                                <div className="mt-2 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 focus:border-blue-500 focus:outline-none dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100">
                                     <TimePicker
                                         value={formData.study_time}
                                         onChange={(time) =>
@@ -1222,7 +1278,7 @@ export default function Calendar() {
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-slate-900">
+                                <label className="block text-sm font-medium text-slate-900 dark:text-slate-200">
                                     Subject (optional)
                                 </label>
                                 <select
@@ -1233,7 +1289,7 @@ export default function Calendar() {
                                             subcategory_id: e.target.value,
                                         })
                                     }
-                                    className="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 focus:border-blue-500 focus:outline-none"
+                                    className="mt-2 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 focus:border-blue-500 focus:outline-none dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
                                 >
                                     <option value="">
                                         Select a subject...
@@ -1314,55 +1370,18 @@ export default function Calendar() {
                     </DialogContent>
                 </Dialog>
 
-                {/* Reset Calendar Modal */}
-                <Dialog
-                    open={isResetModalOpen}
-                    onOpenChange={setIsResetModalOpen}
-                >
-                    <DialogContent>
-                        <DialogHeader>
-                            <DialogTitle className="text-red-600">
-                                Reset Calendar
-                            </DialogTitle>
-                            <p className="mt-2 text-sm text-slate-600">
-                                Are you sure you want to delete all study
-                                sessions from your calendar? This action cannot
-                                be undone.
-                            </p>
-                        </DialogHeader>
-                        <DialogFooter>
-                            <DialogClose asChild>
-                                <Button variant="outline">Cancel</Button>
-                            </DialogClose>
-                            <Button
-                                className="bg-red-600 text-white hover:bg-red-700"
-                                onClick={() => {
-                                    setIsLoading(true);
-                                    fetch('/study-schedules/reset', {
-                                        method: 'DELETE',
-                                        headers: {
-                                            'X-CSRF-TOKEN':
-                                                document
-                                                    .querySelector(
-                                                        'meta[name="csrf-token"]',
-                                                    )
-                                                    ?.getAttribute('content') ||
-                                                '',
-                                        },
-                                    }).then(() => {
-                                        monthCacheRef.current.clear();
-                                        fetchSchedules(true);
-                                        setIsResetModalOpen(false);
-                                        setIsLoading(false);
-                                    });
-                                }}
-                                disabled={isLoading}
-                            >
-                                {isLoading ? 'Deleting...' : 'Yes, Delete All'}
-                            </Button>
-                        </DialogFooter>
-                    </DialogContent>
-                </Dialog>
+                {/* Confirm Modal */}
+                <ConfirmModal
+                    isOpen={confirmModal.isOpen}
+                    title={confirmModal.title}
+                    message={confirmModal.message}
+                    confirmLabel={confirmModal.confirmLabel}
+                    variant={confirmModal.variant}
+                    onClose={() =>
+                        setConfirmModal((prev) => ({ ...prev, isOpen: false }))
+                    }
+                    onConfirm={confirmModal.onConfirm}
+                />
 
                 {/* Error Modal */}
                 <Dialog

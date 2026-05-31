@@ -92,22 +92,22 @@ export function TimePicker({ value, onChange }: TimePickerProps) {
             <button
                 type="button"
                 onClick={() => setShowPicker(!showPicker)}
-                className="w-full rounded-lg border border-slate-300 px-3 py-2 text-center font-semibold text-slate-900 hover:bg-slate-50 focus:border-blue-500 focus:outline-none"
+                className="w-full rounded-lg border border-slate-300 px-3 py-2 text-center font-semibold text-slate-900 hover:bg-slate-50 focus:border-blue-500 focus:outline-none dark:border-slate-700 dark:text-slate-100 dark:hover:bg-slate-900"
             >
                 {displayTime}
             </button>
 
             {showPicker && (
-                <div className="absolute top-full right-0 left-0 z-10 mt-2 rounded-lg border border-slate-300 bg-white p-4 shadow-lg">
+                <div className="absolute top-full right-0 left-0 z-10 mt-2 rounded-lg border border-slate-300 bg-white p-4 shadow-lg dark:border-slate-700 dark:bg-slate-950">
                     <div className="flex items-center justify-center gap-4">
                         {/* Hours */}
                         <div className="flex flex-col items-center gap-2">
                             <button
                                 type="button"
                                 onClick={incrementHour}
-                                className="rounded p-1 hover:bg-slate-100"
+                                className="rounded p-1 hover:bg-slate-100 dark:hover:bg-slate-900"
                             >
-                                <ChevronUp className="h-5 w-5 text-slate-600" />
+                                <ChevronUp className="h-5 w-5 text-slate-600 dark:text-slate-400" />
                             </button>
                             <input
                                 type="number"
@@ -119,18 +119,18 @@ export function TimePicker({ value, onChange }: TimePickerProps) {
                                         parseInt(e.target.value) || 1,
                                     )
                                 }
-                                className="h-12 w-16 rounded border border-slate-300 text-center text-lg font-semibold focus:border-blue-500 focus:outline-none"
+                                className="h-12 w-16 rounded border border-slate-300 bg-white text-center text-lg font-semibold focus:border-blue-500 focus:outline-none dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
                             />
                             <button
                                 type="button"
                                 onClick={decrementHour}
-                                className="rounded p-1 hover:bg-slate-100"
+                                className="rounded p-1 hover:bg-slate-100 dark:hover:bg-slate-900"
                             >
-                                <ChevronDown className="h-5 w-5 text-slate-600" />
+                                <ChevronDown className="h-5 w-5 text-slate-600 dark:text-slate-400" />
                             </button>
                         </div>
 
-                        <div className="text-2xl font-bold text-slate-600">
+                        <div className="text-2xl font-bold text-slate-600 dark:text-slate-400">
                             :
                         </div>
 
@@ -139,9 +139,9 @@ export function TimePicker({ value, onChange }: TimePickerProps) {
                             <button
                                 type="button"
                                 onClick={incrementMinute}
-                                className="rounded p-1 hover:bg-slate-100"
+                                className="rounded p-1 hover:bg-slate-100 dark:hover:bg-slate-900"
                             >
-                                <ChevronUp className="h-5 w-5 text-slate-600" />
+                                <ChevronUp className="h-5 w-5 text-slate-600 dark:text-slate-400" />
                             </button>
                             <input
                                 type="number"
@@ -153,19 +153,19 @@ export function TimePicker({ value, onChange }: TimePickerProps) {
                                         parseInt(e.target.value) || 0,
                                     )
                                 }
-                                className="h-12 w-16 rounded border border-slate-300 text-center text-lg font-semibold focus:border-blue-500 focus:outline-none"
+                                className="h-12 w-16 rounded border border-slate-300 bg-white text-center text-lg font-semibold focus:border-blue-500 focus:outline-none dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
                             />
                             <button
                                 type="button"
                                 onClick={decrementMinute}
-                                className="rounded p-1 hover:bg-slate-100"
+                                className="rounded p-1 hover:bg-slate-100 dark:hover:bg-slate-900"
                             >
-                                <ChevronDown className="h-5 w-5 text-slate-600" />
+                                <ChevronDown className="h-5 w-5 text-slate-600 dark:text-slate-400" />
                             </button>
                         </div>
 
                         {/* Period */}
-                        <div className="flex flex-col items-center gap-2 border-l border-slate-300 pl-4">
+                        <div className="flex flex-col items-center gap-2 border-l border-slate-300 pl-4 dark:border-slate-700">
                             <button
                                 type="button"
                                 onClick={() =>
@@ -173,11 +173,11 @@ export function TimePicker({ value, onChange }: TimePickerProps) {
                                         period === 'AM' ? 'PM' : 'AM',
                                     )
                                 }
-                                className="rounded px-3 py-1 font-semibold hover:bg-slate-100"
+                                className="rounded px-3 py-1 font-semibold hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-900"
                             >
                                 {period === 'AM' ? '↓' : '↑'}
                             </button>
-                            <div className="text-lg font-bold text-slate-900">
+                            <div className="text-lg font-bold text-slate-900 dark:text-slate-100">
                                 {period}
                             </div>
                             <button
@@ -187,7 +187,7 @@ export function TimePicker({ value, onChange }: TimePickerProps) {
                                         period === 'AM' ? 'PM' : 'AM',
                                     )
                                 }
-                                className="rounded px-3 py-1 font-semibold hover:bg-slate-100"
+                                className="rounded px-3 py-1 font-semibold hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-900"
                             >
                                 {period === 'AM' ? '↓' : '↑'}
                             </button>
@@ -201,7 +201,7 @@ export function TimePicker({ value, onChange }: TimePickerProps) {
                                 onChange('');
                                 setShowPicker(false);
                             }}
-                            className="flex-1 rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+                            className="flex-1 rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-900"
                         >
                             Clear
                         </button>

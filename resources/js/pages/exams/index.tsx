@@ -23,6 +23,7 @@ import { LiveExamView } from './components/live-exam-view';
 import { ReviewExamView } from './components/review-exam-view';
 import { ScorecardView } from './components/scorecard-view';
 import { SetupExamView } from './components/setup-exam-view';
+import { ConfirmModal } from '@/components/confirm-modal';
 
 interface Question {
     id: number;
@@ -667,16 +668,10 @@ export default function ExamIndex({
         answers,
     ]);
 
-    const [showRetakeModal, setShowRetakeModal] = useState(false);
     const [submittedByTimer, setSubmittedByTimer] = useState(false);
     const [lastStoredAttemptId, setLastStoredAttemptId] = useState<
         number | null
     >(null);
-    const [pendingRetake, setPendingRetake] = useState<{
-        attemptId: number;
-        questionIds: number[];
-        examId: number | null;
-    } | null>(null);
 
     const [results, setResults] = useState<{
         score: number;
@@ -1209,126 +1204,9 @@ export default function ExamIndex({
             setReviewScreenActive(false);
             setResults(null);
             setSubmittedByTimer(false);
-            setShowRetakeModal(false);
         },
         [getSimulationDetails],
     );
-
-    const getRetakeContext = () => {
-        if (pendingRetake) {
-            return pendingRetake;
-        }
-
-        if (savedAttempt?.question_ids?.length) {
-            const meta = savedAttempt.cat_scores?.metadata || {};
-            const examId = meta.track === 'Subprofessional' ? 2 : 1;
-
-            return {
-                attemptId: savedAttempt.id,
-                questionIds: savedAttempt.question_ids,
-                examId,
-            };
-        }
-
-        if (lastStoredAttemptId && activeQuestions.length > 0) {
-            return {
-                attemptId: lastStoredAttemptId,
-                questionIds: activeQuestions.map((q) => q.id),
-                examId: selectedExamId,
-            };
-        }
-
-        return null;
-    };
-
-    const handleRetakeSame = () => {
-        const ctx = getRetakeContext();
-
-        if (!ctx || ctx.questionIds.length === 0) {
-            return;
-        }
-
-        const originalIsTimed = savedAttempt
-            ? savedAttempt.cat_scores?.metadata?.is_timed !== false
-            : isTimed;
-        beginExamSession(buildSameExamPool(ctx.questionIds), ctx.examId);
-        setIsTimed(originalIsTimed);
-
-        if (!originalIsTimed) {
-            setSessionTimeLimitSecs(0);
-            setTimeLeft(0);
-            timeLeftRef.current = 0;
-        }
-    };
-
-    const handleRetakeFresh = () => {
-        const ctx = getRetakeContext();
-
-        if (!ctx) {
-            return;
-        }
-
-        const originalIsTimed = savedAttempt
-            ? savedAttempt.cat_scores?.metadata?.is_timed !== false
-            : isTimed;
-
-        let finalPool = [];
-
-        if (ctx.examId === null || ctx.examId > 2) {
-            // For custom drills, select fresh randomized questions from the same category config
-            const catName =
-                drillCategoryName?.replace(' Practice', '') ||
-                savedAttempt?.cat_scores?.metadata?.category_name ||
-                'General Information';
-            const sourcePool =
-                questions.length > 0 ? questions : fallbackQuestions;
-            const pool = sourcePool.filter((q) => {
-                const catMatch =
-                    q.category.toLowerCase().includes(catName.toLowerCase()) ||
-                    catName.toLowerCase().includes(q.category.toLowerCase());
-                const subcatMatch =
-                    drillSubcategories.length === 0 ||
-                    drillSubcategories.some(
-                        (subName) =>
-                            q.subcategory
-                                .toLowerCase()
-                                .includes(subName.toLowerCase()) ||
-                            subName
-                                .toLowerCase()
-                                .includes(q.subcategory.toLowerCase()),
-                    );
-
-                let langMatch = true;
-
-                if (drillLanguage === 'English') {
-                    langMatch = q.language === 'English' || !q.language;
-                } else if (drillLanguage === 'Filipino') {
-                    langMatch = q.language === 'Filipino';
-                }
-
-                return catMatch && subcatMatch && langMatch;
-            });
-            const shuffled = [...pool].sort(() => Math.random() - 0.5);
-            const countLimit =
-                drillQuestionCount === 'all'
-                    ? shuffled.length
-                    : Number(drillQuestionCount || 30);
-            finalPool = shuffled
-                .slice(0, Math.min(countLimit, shuffled.length))
-                .map(shuffleOptionsForQuestion);
-        } else {
-            finalPool = buildFreshExamPool(ctx.examId);
-        }
-
-        beginExamSession(finalPool, ctx.examId);
-        setIsTimed(originalIsTimed);
-
-        if (!originalIsTimed) {
-            setSessionTimeLimitSecs(0);
-            setTimeLeft(0);
-            timeLeftRef.current = 0;
-        }
-    };
 
     // Initialize the active exam session and randomize dynamic questions set
     const handleBeginExam = () => {
@@ -1469,7 +1347,6 @@ export default function ExamIndex({
                 setReviewScreenActive(false);
                 setResults(null);
                 setSubmittedByTimer(false);
-                setShowRetakeModal(false);
 
                 setLayoutProps({
                     breadcrumbs: [
@@ -1484,76 +1361,6 @@ export default function ExamIndex({
         savedAttempt,
         fallbackQuestions,
         beginExamSession,
-        buildFreshExamPool,
-    ]);
-
-    // Auto-start retake when choice was made on the history page
-    useEffect(() => {
-        if (!retakeSource?.mode || savedAttempt) {
-            return;
-        }
-
-        const isDrill = retakeSource.track === 'Drill';
-        const examId = isDrill
-            ? null
-            : retakeSource.track === 'Subprofessional'
-              ? 2
-              : 1;
-
-        setTimeout(() => {
-            setPendingRetake({
-                attemptId: retakeSource.attempt_id,
-                questionIds: retakeSource.question_ids,
-                examId,
-            });
-
-            if (retakeSource.mode === 'same') {
-                beginExamSession(
-                    buildSameExamPool(retakeSource.question_ids),
-                    examId,
-                );
-            } else {
-                if (isDrill) {
-                    // Strict 1-liner comment: Resolve original category from retake pool to draw a fresh randomized sample
-                    const oldQuestions = retakeSource.question_ids
-                        .map(
-                            (id: number) =>
-                                questions.find((q) => q.id === id) ||
-                                fallbackQuestions.find((q) => q.id === id),
-                        )
-                        .filter((q: Question | undefined): q is Question =>
-                            Boolean(q),
-                        );
-                    const catName =
-                        oldQuestions[0]?.category || 'General Information';
-                    const sourcePool =
-                        questions.length > 0 ? questions : fallbackQuestions;
-                    const pool = sourcePool.filter(
-                        (q) => q.category === catName,
-                    );
-                    const shuffled = [...pool].sort(() => Math.random() - 0.5);
-                    const countLimit = retakeSource.question_ids.length;
-                    const freshPool = shuffled
-                        .slice(0, countLimit)
-                        .map(shuffleOptionsForQuestion);
-                    beginExamSession(freshPool, null);
-                } else {
-                    beginExamSession(buildFreshExamPool(examId), examId);
-                }
-            }
-        }, 0);
-
-        const url = new URL(window.location.href);
-        url.searchParams.delete('retake_same');
-        url.searchParams.delete('retake_fresh');
-        window.history.replaceState({}, '', url.toString());
-    }, [
-        retakeSource,
-        savedAttempt,
-        questions,
-        fallbackQuestions,
-        beginExamSession,
-        buildSameExamPool,
         buildFreshExamPool,
     ]);
 
@@ -1611,7 +1418,6 @@ export default function ExamIndex({
                 setReviewScreenActive(false);
                 setResults(null);
                 setSubmittedByTimer(false);
-                setShowRetakeModal(false);
             }, 0);
         } catch {
             localStorage.removeItem('pending_free_exam');
@@ -2051,7 +1857,6 @@ export default function ExamIndex({
                     setIsExamActive(false);
                     setIsExamSubmitted(false);
                     setResults(null);
-                    setShowRetakeModal(false);
                 },
             });
 
@@ -2067,121 +1872,18 @@ export default function ExamIndex({
         setIsExamActive(false);
         setIsExamSubmitted(false);
         setResults(null);
-        setShowRetakeModal(false);
     };
 
-    const retakeModal = showRetakeModal && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 p-4">
-            <div className="w-full max-w-2xl rounded-xl border border-slate-200 bg-white p-6 shadow-lg dark:border-slate-800 dark:bg-slate-950">
-                <h3 className="font-heading text-lg font-bold text-slate-900 dark:text-white">
-                    {isDrillSession ? 'Retake Drill' : 'Retake Exam'}
-                </h3>
-                <p className="mt-2 text-xs leading-relaxed text-slate-500 dark:text-slate-400">
-                    Choose whether to practice the same questions again or
-                    generate a new randomized set.
-                </p>
-                <div className="mt-5 flex flex-col gap-3">
-                    <button
-                        type="button"
-                        onClick={handleRetakeSame}
-                        className="flex w-full cursor-pointer flex-col items-start rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-left transition hover:border-blue-300 hover:bg-blue-50/50 dark:border-slate-800 dark:bg-slate-900 dark:hover:border-blue-800"
-                    >
-                        <span className="text-xs font-black text-slate-900 dark:text-white">
-                            Same question set
-                        </span>
-                        <span className="mt-1 text-[11px] text-slate-500 dark:text-slate-400">
-                            Repeat the exact questions from this attempt
-                            (questions and choices reshuffled).
-                        </span>
-                    </button>
-                    <button
-                        type="button"
-                        onClick={handleRetakeFresh}
-                        className="flex w-full cursor-pointer flex-col items-start rounded-lg border border-blue-200 bg-blue-50/40 px-4 py-3 text-left transition hover:border-blue-400 hover:bg-blue-50 dark:border-blue-900/40 dark:bg-blue-950/20"
-                    >
-                        <span className="text-xs font-black text-blue-700 dark:text-blue-400">
-                            Fresh question set
-                        </span>
-                        <span className="mt-1 text-[11px] text-slate-500 dark:text-slate-400">
-                            Unused questions first for this track; reuses
-                            earlier ones only when the bank runs out.
-                        </span>
-                    </button>
-                </div>
-                <button
-                    type="button"
-                    onClick={() => setShowRetakeModal(false)}
-                    className="mt-4 w-full rounded-lg border border-slate-200 px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-50 dark:border-slate-800 dark:text-slate-400"
-                >
-                    Cancel
-                </button>
-            </div>
-        </div>
-    );
-
-    const customConfirmModal = confirmModal.isOpen && (
-        <div className="fixed inset-0 z-[100] flex animate-in items-center justify-center bg-slate-900/60 p-4 backdrop-blur-xs duration-200 fade-in">
-            <div
-                className="relative w-full max-w-2xl animate-in rounded-xl border border-slate-200 bg-white p-6 shadow-xl duration-205 zoom-in-95 dark:border-slate-800 dark:bg-slate-950"
-                role="dialog"
-                aria-modal="true"
-            >
-                {/* Close Button */}
-                <button
-                    type="button"
-                    onClick={() =>
-                        setConfirmModal((prev) => ({ ...prev, isOpen: false }))
-                    }
-                    className="absolute top-4 right-4 rounded-lg p-1.5 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700 focus:outline-none dark:hover:bg-slate-900 dark:hover:text-slate-200"
-                    aria-label="Close dialog"
-                >
-                    <X className="size-4.5" />
-                </button>
-
-                <div className="flex flex-col gap-1 pr-6">
-                    <h3 className="font-heading text-lg font-bold text-slate-900 dark:text-white">
-                        {confirmModal.title}
-                    </h3>
-                    <p className="text-slate-550 dark:text-slate-450 mt-2.5 text-xs leading-relaxed whitespace-pre-line">
-                        {confirmModal.message}
-                    </p>
-                </div>
-
-                <div className="mt-6 flex justify-end gap-3">
-                    <button
-                        type="button"
-                        onClick={() =>
-                            setConfirmModal((prev) => ({
-                                ...prev,
-                                isOpen: false,
-                            }))
-                        }
-                        className="text-slate-655 dark:text-slate-350 cursor-pointer rounded-lg border border-slate-200 bg-white px-4.5 py-2 text-xs font-bold transition hover:bg-slate-50 focus:outline-none dark:border-slate-800 dark:bg-slate-950 dark:hover:bg-slate-900"
-                    >
-                        Cancel
-                    </button>
-                    <button
-                        type="button"
-                        onClick={() => {
-                            setConfirmModal((prev) => ({
-                                ...prev,
-                                isOpen: false,
-                            }));
-                            confirmModal.onConfirm();
-                        }}
-                        className={`shadow-3xs cursor-pointer rounded-lg px-4.5 py-2 text-xs font-bold text-white transition focus:outline-none ${
-                            confirmModal.variant === 'danger'
-                                ? 'bg-rose-600 hover:bg-rose-700 active:bg-rose-800'
-                                : confirmModal.variant === 'success'
-                                  ? 'bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800'
-                                  : 'bg-blue-600 hover:bg-blue-700 active:bg-blue-800'
-                        }`}
-                    >
-                        {confirmModal.confirmLabel}
-                    </button>
-                </div>
-            </div>
-        </div>
+    const customConfirmModal = (
+        <ConfirmModal
+            isOpen={confirmModal.isOpen}
+            title={confirmModal.title}
+            message={confirmModal.message}
+            confirmLabel={confirmModal.confirmLabel}
+            variant={confirmModal.variant}
+            onClose={() => setConfirmModal((prev) => ({ ...prev, isOpen: false }))}
+            onConfirm={confirmModal.onConfirm}
+        />
     );
 
     // Prevent layout flash/shift during SSR or hydration
@@ -2268,9 +1970,8 @@ export default function ExamIndex({
                     isTimed={isTimed}
                     getActiveTimeLimitSecs={getActiveTimeLimitSecs}
                     submittedByTimer={submittedByTimer}
-                    retakeModal={retakeModal}
+
                     setReviewScreenActive={setReviewScreenActive}
-                    setShowRetakeModal={setShowRetakeModal}
                     handleBeginExam={handleBeginExam}
                 />
             </PageContainer>

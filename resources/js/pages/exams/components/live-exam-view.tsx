@@ -348,8 +348,14 @@ export function LiveExamView({
 
                 {/* Guest Free Attempt: Locked Question Modal */}
                 {showLockedModal && (
-                    <div className="fixed inset-0 z-[100] flex animate-in items-center justify-center bg-slate-900/60 p-4 backdrop-blur-xs duration-200 fade-in">
-                        <div className="relative w-full max-w-2xl animate-in rounded-xl border border-slate-200 bg-white p-6 shadow-xl duration-200 zoom-in-95 dark:border-slate-800 dark:bg-slate-950">
+                    <div 
+                        className="fixed inset-0 z-[100] flex animate-in items-center justify-center bg-slate-900/60 p-4 backdrop-blur-xs duration-200 fade-in"
+                        onClick={() => setShowLockedModal(false)}
+                    >
+                        <div 
+                            className="relative w-full max-w-2xl animate-in rounded-xl border border-slate-200 bg-white p-6 shadow-xl duration-200 zoom-in-95 dark:border-slate-800 dark:bg-slate-950"
+                            onClick={(e) => e.stopPropagation()}
+                        >
                             <div className="mb-1 flex items-center gap-2">
                                 <Lock className="size-5 text-blue-600" />
                                 <h3 className="font-heading text-lg font-bold text-slate-900 dark:text-white">
@@ -383,8 +389,14 @@ export function LiveExamView({
 
                 {/* Guest Free Attempt: Register / Continue Modal */}
                 {showRegisterModal && (
-                    <div className="fixed inset-0 z-[100] flex animate-in items-center justify-center bg-slate-900/60 p-4 backdrop-blur-xs duration-200 fade-in">
-                        <div className="relative w-full max-w-2xl animate-in rounded-xl border border-slate-200 bg-white p-6 shadow-xl duration-200 zoom-in-95 dark:border-slate-800 dark:bg-slate-950">
+                    <div 
+                        className="fixed inset-0 z-[100] flex animate-in items-center justify-center bg-slate-900/60 p-4 backdrop-blur-xs duration-200 fade-in"
+                        onClick={() => setShowRegisterModal(false)}
+                    >
+                        <div 
+                            className="relative w-full max-w-2xl animate-in rounded-xl border border-slate-200 bg-white p-6 shadow-xl duration-200 zoom-in-95 dark:border-slate-800 dark:bg-slate-950"
+                            onClick={(e) => e.stopPropagation()}
+                        >
                             <div className="mb-1 flex items-center gap-2">
                                 <Lock className="size-5 text-blue-600" />
                                 <h3 className="font-heading text-lg font-bold text-slate-900 dark:text-white">

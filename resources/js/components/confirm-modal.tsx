@@ -55,11 +55,15 @@ export function ConfirmModal({
     const config = getButtonConfig();
 
     return (
-        <div className="fixed inset-0 z-[100] flex animate-in items-center justify-center bg-slate-900/60 p-4 backdrop-blur-xs duration-200 fade-in">
+        <div
+            className="fixed inset-0 z-[100] flex animate-in items-center justify-center bg-slate-900/60 p-4 backdrop-blur-xs duration-200 fade-in"
+            onClick={onClose}
+        >
             <div
                 className="relative w-full max-w-2xl animate-in rounded-xl border border-slate-200 bg-white p-6 shadow-xl duration-205 zoom-in-95 dark:border-slate-800 dark:bg-slate-950"
                 role="dialog"
                 aria-modal="true"
+                onClick={(e) => e.stopPropagation()}
             >
                 {/* Close Button */}
                 <button
@@ -91,7 +95,7 @@ export function ConfirmModal({
                         variant="outline"
                         size="sm"
                         onClick={onClose}
-                        className="dark:text-slate-350 h-9 cursor-pointer px-4.5 text-xs font-bold focus:outline-none dark:border-slate-800 dark:bg-slate-950 dark:hover:bg-slate-900"
+                        className="h-9 cursor-pointer px-4.5 text-xs font-bold focus:outline-none dark:border-slate-800 dark:bg-slate-950 dark:text-slate-300 dark:hover:bg-slate-900 dark:hover:text-slate-100"
                     >
                         {cancelLabel}
                     </Button>

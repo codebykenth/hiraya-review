@@ -18,9 +18,7 @@ interface ScorecardViewProps {
     isTimed: boolean;
     getActiveTimeLimitSecs: () => number;
     submittedByTimer: boolean;
-    retakeModal: React.ReactNode;
     setReviewScreenActive: (val: boolean) => void;
-    setShowRetakeModal: (val: boolean) => void;
     handleBeginExam: () => void;
 }
 
@@ -33,9 +31,7 @@ export function ScorecardView({
     isTimed,
     getActiveTimeLimitSecs,
     submittedByTimer,
-    retakeModal,
     setReviewScreenActive,
-    setShowRetakeModal,
 }: ScorecardViewProps) {
     const elapsedSecs = results?.elapsedSecs ?? 0;
     const remainingSecs = isTimed
@@ -258,13 +254,6 @@ export function ScorecardView({
                     >
                         <BookOpen className="size-3.5" /> View Review
                     </button>
-                    <button
-                        onClick={() => setShowRetakeModal(true)}
-                        className="hover:bg-blue-750 flex cursor-pointer items-center gap-1.5 rounded-lg bg-blue-600 px-4 py-2.5 text-xs font-semibold text-white shadow-xs transition focus:outline-none"
-                    >
-                        <RotateCcw className="size-3.5" />{' '}
-                        {isDrillSession ? 'Retake Drill' : 'Retake Exam'}
-                    </button>
                 </div>
             </div>
 
@@ -275,7 +264,6 @@ export function ScorecardView({
                 </div>
             )}
 
-            {retakeModal}
 
             {results &&
                 (() => {

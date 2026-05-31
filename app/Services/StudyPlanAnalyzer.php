@@ -58,7 +58,7 @@ class StudyPlanAnalyzer
         ];
     }
 
-    private function identifyWeakAreas(Collection $attempts): Collection
+    public function identifyWeakAreas(Collection $attempts): Collection
     {
         $categoryScores = [];
 

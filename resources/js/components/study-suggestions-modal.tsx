@@ -162,7 +162,7 @@ export function StudySuggestionsModal({
                                             selectedTopicsPerDay,
                                         )
                                     }
-                                    className="h-9 rounded-md border border-slate-200 bg-white px-3 text-sm text-slate-900 focus:border-blue-500 focus:outline-none"
+                                    className="h-9 rounded-md border border-slate-200 bg-white px-3 text-sm text-slate-900 focus:border-blue-500 focus:outline-none dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100"
                                 >
                                     <option value="">Select Exam Type</option>
                                     <option value="All">All Exams</option>
@@ -183,7 +183,7 @@ export function StudySuggestionsModal({
                                             selectedTopicsPerDay,
                                         )
                                     }
-                                    className="h-9 rounded-md border border-slate-200 bg-white px-3 text-sm text-slate-900 focus:border-blue-500 focus:outline-none"
+                                    className="h-9 rounded-md border border-slate-200 bg-white px-3 text-sm text-slate-900 focus:border-blue-500 focus:outline-none dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100"
                                 >
                                     <option value="Morning">Morning</option>
                                     <option value="Afternoon">Afternoon</option>
@@ -197,13 +197,13 @@ export function StudySuggestionsModal({
                 <div className="flex-1 space-y-4 overflow-y-auto px-6 py-2 pr-5">
                     {!selectedTrack ? (
                         <div className="flex flex-col items-center justify-center py-12 text-center">
-                            <div className="mb-4 rounded-full bg-blue-50 p-4">
+                            <div className="mb-4 rounded-full bg-blue-50 p-4 dark:bg-blue-950/30">
                                 <span className="text-3xl">🔍</span>
                             </div>
-                            <h3 className="text-lg font-semibold text-slate-900">
+                            <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
                                 Select Exam Type
                             </h3>
-                            <p className="mt-2 max-w-2xl text-sm text-slate-600">
+                            <p className="mt-2 max-w-2xl text-sm text-slate-600 dark:text-slate-400">
                                 Please select an exam type from the dropdown
                                 above to analyze your performance and generate a
                                 personalized study plan.
@@ -216,11 +216,11 @@ export function StudySuggestionsModal({
                     ) : (
                         <>
                             {/* Exam Info */}
-                            <div className="rounded-lg border border-blue-200 bg-blue-50 p-4">
-                                <p className="text-sm font-semibold text-blue-900">
+                            <div className="rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-900/50 dark:bg-blue-950/20">
+                                <p className="text-sm font-semibold text-blue-900 dark:text-blue-200">
                                     Civil Service Exam: {examDateStr}
                                 </p>
-                                <p className="mt-1 text-sm text-blue-700">
+                                <p className="mt-1 text-sm text-blue-700 dark:text-blue-300">
                                     {daysUntilExam} days remaining to prepare
                                 </p>
                             </div>
@@ -228,20 +228,20 @@ export function StudySuggestionsModal({
                             {/* Weak Areas */}
                             {weakAreas.length > 0 && (
                                 <div>
-                                    <h3 className="mb-3 font-semibold text-slate-900">
+                                    <h3 className="mb-3 font-semibold text-slate-900 dark:text-slate-100">
                                         📊 Topic Performance
                                     </h3>
                                     <div className="space-y-2">
                                         {weakAreas.map((area, idx) => (
                                             <div
                                                 key={idx}
-                                                className="flex items-center justify-between rounded-lg border border-slate-200 bg-white p-3 hover:bg-slate-50"
+                                                className="flex items-center justify-between rounded-lg border border-slate-200 bg-white p-3 hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900 dark:hover:bg-slate-800/80"
                                             >
                                                 <div>
-                                                    <p className="font-medium text-slate-900">
+                                                    <p className="font-medium text-slate-900 dark:text-slate-200">
                                                         {area.name}
                                                     </p>
-                                                    <p className="text-sm text-slate-600">
+                                                    <p className="text-sm text-slate-600 dark:text-slate-400">
                                                         Current Score:{' '}
                                                         {area.score}% •{' '}
                                                         {area.sessions} study
@@ -253,11 +253,11 @@ export function StudySuggestionsModal({
                                                 </div>
                                                 <div className="text-right">
                                                     <div
-                                                        className={`text-lg font-bold ${area.score < 75 ? 'text-red-600' : 'text-green-600'}`}
+                                                        className={`text-lg font-bold ${area.score < 75 ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'}`}
                                                     >
                                                         {area.score}%
                                                     </div>
-                                                    <div className="text-xs text-slate-500">
+                                                    <div className="text-xs text-slate-500 dark:text-slate-400">
                                                         {area.score < 75
                                                             ? 'Below target'
                                                             : 'On track'}
@@ -273,12 +273,12 @@ export function StudySuggestionsModal({
                             {suggestions.length > 0 && (
                                 <div>
                                     <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                                        <h3 className="font-semibold text-slate-900">
+                                        <h3 className="font-semibold text-slate-900 dark:text-slate-100">
                                             📅 Suggested Study Schedule (
                                             {suggestions.length} sessions)
                                         </h3>
                                         <div className="flex items-center gap-2 self-start sm:self-auto">
-                                            <label className="text-xs font-medium whitespace-nowrap text-slate-600">
+                                            <label className="text-xs font-medium whitespace-nowrap text-slate-600 dark:text-slate-300">
                                                 Set all to:
                                             </label>
                                             <input
@@ -330,11 +330,11 @@ export function StudySuggestionsModal({
                                                         );
                                                     }
                                                 }}
-                                                className="rounded border border-slate-300 bg-white px-2 py-1 text-xs font-semibold text-slate-700 outline-none hover:bg-slate-50 focus:ring-2 focus:ring-blue-500"
+                                                className="rounded border border-slate-300 bg-white px-2 py-1 text-xs font-semibold text-slate-700 outline-none hover:bg-slate-50 focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100 dark:hover:bg-slate-900"
                                             />
                                         </div>
                                     </div>
-                                    <div className="overflow-hidden rounded-lg border border-slate-200 bg-slate-50">
+                                    <div className="overflow-hidden rounded-lg border border-slate-200 bg-slate-50 dark:border-slate-800 dark:bg-slate-900/50">
                                         <div className="max-h-64 space-y-2 overflow-y-auto p-3 pr-2.5">
                                             {editableSuggestions.map(
                                                 (suggestion, idx) => (
@@ -356,21 +356,21 @@ export function StudySuggestionsModal({
                                                         onDragEnd={
                                                             handleDragEnd
                                                         }
-                                                        className={`cursor-move rounded-lg border-l-4 border-blue-400 bg-white p-3 transition-colors ${
+                                                        className={`cursor-move rounded-lg border-l-4 border-blue-400 bg-white p-3 transition-colors dark:border-blue-500 dark:bg-slate-900 ${
                                                             draggedItemIndex ===
                                                             idx
                                                                 ? 'border-2 border-dashed opacity-50'
                                                                 : ''
-                                                        } hover:bg-slate-50`}
+                                                        } hover:bg-slate-50 dark:hover:bg-slate-800/80`}
                                                     >
                                                         <div className="flex items-start justify-between">
                                                             <div className="flex-1">
-                                                                <p className="font-semibold text-slate-900">
+                                                                <p className="font-semibold text-slate-900 dark:text-slate-100">
                                                                     {
                                                                         suggestion.title
                                                                     }
                                                                 </p>
-                                                                <p className="mt-1 flex flex-wrap items-center gap-2 text-sm text-slate-600">
+                                                                <p className="mt-1 flex flex-wrap items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
                                                                     {new Date(
                                                                         suggestion.study_date +
                                                                             'T00:00:00',
@@ -447,10 +447,10 @@ export function StudySuggestionsModal({
                                                                                 newSuggestions,
                                                                             );
                                                                         }}
-                                                                        className="rounded border border-slate-300 bg-white px-2 py-0.5 text-xs font-semibold text-slate-700 outline-none hover:bg-slate-50 focus:ring-2 focus:ring-blue-500"
+                                                                        className="rounded border border-slate-300 bg-white px-2 py-0.5 text-xs font-semibold text-slate-700 outline-none hover:bg-slate-50 focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100 dark:hover:bg-slate-900"
                                                                     />
                                                                 </p>
-                                                                <p className="mt-1 line-clamp-2 text-xs text-slate-500">
+                                                                <p className="mt-1 line-clamp-2 text-xs text-slate-500 dark:text-slate-400">
                                                                     {
                                                                         suggestion.description
                                                                     }
@@ -475,7 +475,7 @@ export function StudySuggestionsModal({
                                                                                     }
                                                                                     target="_blank"
                                                                                     rel="noopener noreferrer"
-                                                                                    className="inline-flex items-center text-xs font-medium text-blue-600 hover:text-blue-800"
+                                                                                    className="inline-flex items-center text-xs font-medium text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
                                                                                 >
                                                                                     📖
                                                                                     Learn:{' '}
@@ -495,7 +495,7 @@ export function StudySuggestionsModal({
                                                                                 }
                                                                                 target="_blank"
                                                                                 rel="noopener noreferrer"
-                                                                                className="inline-flex items-center text-xs font-medium text-blue-600 hover:text-blue-800"
+                                                                                className="inline-flex items-center text-xs font-medium text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
                                                                             >
                                                                                 📖
                                                                                 Learn:{' '}
@@ -521,7 +521,7 @@ export function StudySuggestionsModal({
                                                                     <X className="h-4 w-4" />
                                                                 </button>
                                                                 <span
-                                                                    className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${suggestion.score < 75 ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'}`}
+                                                                    className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${suggestion.score < 75 ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400' : 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'}`}
                                                                 >
                                                                     {
                                                                         suggestion.score
@@ -539,8 +539,8 @@ export function StudySuggestionsModal({
                             )}
 
                             {editableSuggestions.length === 0 && (
-                                <div className="rounded-lg border border-amber-200 bg-amber-50 p-4">
-                                    <p className="text-sm text-amber-700">
+                                <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 dark:border-amber-900 dark:bg-amber-950/30">
+                                    <p className="text-sm text-amber-700 dark:text-amber-400">
                                         ℹ️ No exam data found for this
                                         selection. Please complete some practice
                                         exams to get personalized study
@@ -552,7 +552,7 @@ export function StudySuggestionsModal({
                     )}
                 </div>
 
-                <DialogFooter className="shrink-0 border-t border-slate-100 p-6 pt-4">
+                <DialogFooter className="shrink-0 border-t border-slate-100 p-6 pt-4 dark:border-slate-800">
                     <Button variant="outline" onClick={onClose}>
                         <X className="mr-2 h-4 w-4" />
                         Cancel

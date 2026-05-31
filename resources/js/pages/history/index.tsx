@@ -18,6 +18,7 @@ import {
 } from '@/components/attempt-components';
 import { PageContainer } from '@/components/page-container';
 import { PageHeader } from '@/components/page-header';
+import { ConfirmModal } from '@/components/confirm-modal';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import {
@@ -86,7 +87,6 @@ export default function HistoryPage({
         filters.track || 'All Tracks',
     );
     const [selectedDate, setSelectedDate] = useState(filters.date || '30');
-    const [retakeTarget, setRetakeTarget] = useState<Attempt | null>(null);
 
     // Custom confirm modal state
     const [confirmModal, setConfirmModal] = useState<{
@@ -104,11 +104,6 @@ export default function HistoryPage({
         variant: 'success',
         onConfirm: () => {},
     });
-
-    // Strict 1-liner comment: Open same/fresh choice modal for all exam and drill retakes from history
-    const handleRetakeClick = (att: Attempt) => {
-        setRetakeTarget(att);
-    };
 
     // Strict 1-liner comment: Safely prompt and dispatch DELETE request to remove user attempt record
     const handleDeleteAttempt = (id: number) => {
@@ -251,14 +246,7 @@ export default function HistoryPage({
                             <span className="text-muted-foreground/80">
                                 Legend:
                             </span>
-                            <div className="flex items-center gap-1.5 rounded-lg border border-amber-100 bg-amber-50/50 px-2 py-1 dark:border-amber-900/20 dark:bg-amber-950/10">
-                                <span className="border-amber-250 flex size-5.5 items-center justify-center rounded-md border bg-amber-100 text-amber-700 dark:border-amber-900/30 dark:bg-amber-950/20 dark:text-amber-400">
-                                    <RotateCcw className="size-3" />
-                                </span>
-                                <span className="text-amber-800 dark:text-amber-300">
-                                    Retake Test
-                                </span>
-                            </div>
+
                             <div className="flex items-center gap-1.5 rounded-lg border border-blue-100 bg-blue-50/50 px-2 py-1 dark:border-blue-900/20 dark:bg-blue-950/10">
                                 <span className="border-blue-250 flex size-5.5 items-center justify-center rounded-md border bg-blue-100 text-blue-700 dark:border-blue-900/30 dark:bg-blue-950/20 dark:text-blue-400">
                                     <BookOpen className="size-3" />
@@ -388,36 +376,6 @@ export default function HistoryPage({
                                                 {/* ACTIONS */}
                                                 <td className="px-6 py-4.5 pr-8 text-right whitespace-nowrap">
                                                     <div className="flex items-center justify-end gap-2">
-                                                        <Tooltip>
-                                                            <TooltipTrigger
-                                                                asChild
-                                                            >
-                                                                <button
-                                                                    type="button"
-                                                                    onClick={() =>
-                                                                        handleRetakeClick(
-                                                                            att,
-                                                                        )
-                                                                    }
-                                                                    className="dark:hover:text-amber-305 flex size-8 cursor-pointer items-center justify-center rounded-lg border border-amber-200 bg-amber-50 text-amber-700 shadow-2xs transition hover:bg-amber-100 hover:text-amber-800 focus:outline-none dark:border-amber-900/30 dark:bg-amber-950/20 dark:text-amber-400 dark:hover:bg-amber-900/30"
-                                                                >
-                                                                    <RotateCcw className="size-3.5" />
-                                                                    <span className="sr-only">
-                                                                        Retake
-                                                                        Test
-                                                                    </span>
-                                                                </button>
-                                                            </TooltipTrigger>
-                                                            <TooltipContent
-                                                                side="top"
-                                                                className="max-w-2xl"
-                                                            >
-                                                                <span>
-                                                                    Retake
-                                                                    Attempt
-                                                                </span>
-                                                            </TooltipContent>
-                                                        </Tooltip>
 
                                                         <Tooltip>
                                                             <TooltipTrigger
@@ -605,147 +563,17 @@ export default function HistoryPage({
                 </Card>
             </PageContainer>
 
-            {/* Retake Options Modal */}
-            {retakeTarget && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-xs transition-opacity duration-300">
-                    <div className="w-full max-w-2xl animate-in rounded-2xl border border-border bg-card p-6 shadow-2xl duration-200 zoom-in-95 fade-in">
-                        <div className="mb-4 flex items-start justify-between">
-                            <div>
-                                <h3 className="font-heading text-lg font-black text-foreground">
-                                    Retake Exam Options
-                                </h3>
-                                <p className="mt-1 text-xs font-bold text-muted-foreground">
-                                    Choose how you want to retake your{' '}
-                                    {retakeTarget.track} attempt.
-                                </p>
-                            </div>
-                            <button
-                                onClick={() => setRetakeTarget(null)}
-                                className="rounded-lg p-1.5 text-slate-400 transition hover:bg-slate-50 hover:text-slate-600 dark:hover:bg-slate-900 dark:hover:text-slate-200"
-                            >
-                                <XCircle className="size-5" />
-                            </button>
-                        </div>
 
-                        <div className="flex flex-col gap-3">
-                            <button
-                                onClick={() => {
-                                    router.visit(
-                                        `/exams?retake_same=${retakeTarget.id}`,
-                                    );
-                                    setRetakeTarget(null);
-                                }}
-                                className="flex flex-col gap-1.5 rounded-xl border border-blue-100 bg-blue-50/20 p-4 text-left transition hover:border-blue-300 hover:bg-blue-50/50 dark:border-blue-900/30 dark:bg-blue-950/10 dark:hover:bg-blue-950/20"
-                            >
-                                <span className="text-sm font-extrabold text-blue-700 dark:text-blue-400">
-                                    🔄 Retake Same Questions
-                                </span>
-                                <span className="text-xs leading-normal font-medium text-muted-foreground">
-                                    Test your memory and mastery by answering
-                                    the exact same set of {retakeTarget.total}{' '}
-                                    questions.
-                                </span>
-                            </button>
-
-                            <button
-                                onClick={() => {
-                                    router.visit(
-                                        `/exams?retake_fresh=${retakeTarget.id}`,
-                                    );
-                                    setRetakeTarget(null);
-                                }}
-                                className="flex flex-col gap-1.5 rounded-xl border border-border bg-card p-4 text-left transition hover:border-blue-300 hover:bg-slate-50"
-                            >
-                                <span className="text-sm font-extrabold text-foreground">
-                                    ✨ Retake Fresh Questions
-                                </span>
-                                <span className="text-xs leading-normal font-medium text-muted-foreground">
-                                    Generate a brand-new, randomized set of
-                                    questions for the {retakeTarget.track}{' '}
-                                    track.
-                                </span>
-                            </button>
-                        </div>
-
-                        <div className="mt-5 flex justify-end">
-                            <button
-                                onClick={() => setRetakeTarget(null)}
-                                className="dark:text-slate-350 rounded-lg border border-slate-200 px-4 py-2 text-xs font-black text-slate-700 transition hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-slate-900"
-                            >
-                                Cancel
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
-            {/* Custom confirmation dialog modal matching global visual standard */}
-            {confirmModal.isOpen && (
-                <div className="fixed inset-0 z-[100] flex animate-in items-center justify-center bg-slate-900/60 p-4 backdrop-blur-xs duration-200 fade-in">
-                    <div
-                        className="relative w-full max-w-2xl animate-in rounded-xl border border-border bg-card p-6 shadow-xl duration-205 zoom-in-95"
-                        role="dialog"
-                        aria-modal="true"
-                    >
-                        {/* Close Button */}
-                        <button
-                            type="button"
-                            onClick={() =>
-                                setConfirmModal((prev) => ({
-                                    ...prev,
-                                    isOpen: false,
-                                }))
-                            }
-                            className="absolute top-4 right-4 rounded-lg p-1.5 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700 focus:outline-none dark:hover:bg-slate-900 dark:hover:text-slate-200"
-                            aria-label="Close dialog"
-                        >
-                            <X className="size-4.5" />
-                        </button>
-
-                        <div className="flex flex-col gap-1 pr-6">
-                            <h3 className="font-heading text-lg font-bold text-foreground">
-                                {confirmModal.title}
-                            </h3>
-                            <p className="mt-2.5 text-xs leading-relaxed whitespace-pre-line text-muted-foreground">
-                                {confirmModal.message}
-                            </p>
-                        </div>
-
-                        <div className="mt-6 flex justify-end gap-3">
-                            <button
-                                type="button"
-                                onClick={() =>
-                                    setConfirmModal((prev) => ({
-                                        ...prev,
-                                        isOpen: false,
-                                    }))
-                                }
-                                className="cursor-pointer rounded-lg border border-border bg-white px-4.5 py-2 text-xs font-bold text-muted-foreground transition hover:bg-slate-50 focus:outline-none dark:bg-slate-900"
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                type="button"
-                                onClick={() => {
-                                    setConfirmModal((prev) => ({
-                                        ...prev,
-                                        isOpen: false,
-                                    }));
-                                    confirmModal.onConfirm();
-                                }}
-                                className={`shadow-3xs cursor-pointer rounded-lg px-4.5 py-2 text-xs font-bold text-white transition focus:outline-none ${
-                                    confirmModal.variant === 'danger'
-                                        ? 'bg-rose-600 hover:bg-rose-700 active:bg-rose-800'
-                                        : confirmModal.variant === 'success'
-                                          ? 'bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800'
-                                          : 'bg-blue-600 hover:bg-blue-700 active:bg-blue-800'
-                                }`}
-                            >
-                                {confirmModal.confirmLabel}
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
+            {/* Unified confirmation modal component */}
+            <ConfirmModal
+                isOpen={confirmModal.isOpen}
+                title={confirmModal.title}
+                message={confirmModal.message}
+                confirmLabel={confirmModal.confirmLabel}
+                variant={confirmModal.variant}
+                onClose={() => setConfirmModal((prev) => ({ ...prev, isOpen: false }))}
+                onConfirm={confirmModal.onConfirm}
+            />
         </TooltipProvider>
     );
 }
