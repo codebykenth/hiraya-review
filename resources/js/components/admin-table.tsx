@@ -1,5 +1,6 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
+import { generatePaginationLinks } from '@/lib/utils';
 
 export interface TableColumn<T> {
     header: string;
@@ -217,32 +218,42 @@ export function AdminTable<T>({
                                 Previous
                             </Button>
 
-                            {Array.from({ length: totalPages }).map(
-                                (_, idx) => {
-                                    const pageNum = idx + 1;
-                                    const isActive = pageNum === currentPage;
-
+                            {generatePaginationLinks(
+                                currentPage,
+                                totalPages,
+                            ).map((item, idx) => {
+                                if (item === '...') {
                                     return (
-                                        <Button
-                                            key={pageNum}
-                                            variant={
-                                                isActive ? 'default' : 'outline'
-                                            }
-                                            size="sm"
-                                            onClick={() =>
-                                                onPageChange(pageNum)
-                                            }
-                                            className={`size-8 cursor-pointer p-0 text-xs font-black transition focus:outline-none ${
-                                                isActive
-                                                    ? 'shadow-3xs bg-blue-600 text-white hover:bg-blue-700'
-                                                    : 'dark:text-slate-350 dark:hover:bg-slate-850 border-slate-200 bg-white text-slate-700 dark:border-slate-800 dark:bg-slate-900'
-                                            }`}
+                                        <span
+                                            key={`ellipsis-${idx}`}
+                                            className="px-1 text-slate-400 dark:text-slate-500"
                                         >
-                                            {pageNum}
-                                        </Button>
+                                            ...
+                                        </span>
                                     );
-                                },
-                            )}
+                                }
+
+                                const pageNum = item as number;
+                                const isActive = pageNum === currentPage;
+
+                                return (
+                                    <Button
+                                        key={pageNum}
+                                        variant={
+                                            isActive ? 'default' : 'outline'
+                                        }
+                                        size="sm"
+                                        onClick={() => onPageChange(pageNum)}
+                                        className={`size-8 cursor-pointer p-0 text-xs font-black transition focus:outline-none ${
+                                            isActive
+                                                ? 'shadow-3xs bg-blue-600 text-white hover:bg-blue-700'
+                                                : 'dark:text-slate-350 dark:hover:bg-slate-850 border-slate-200 bg-white text-slate-700 dark:border-slate-800 dark:bg-slate-900'
+                                        }`}
+                                    >
+                                        {pageNum}
+                                    </Button>
+                                );
+                            })}
 
                             <Button
                                 variant="outline"

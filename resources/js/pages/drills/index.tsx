@@ -1,4 +1,4 @@
-import { Head, setLayoutProps, router } from '@inertiajs/react';
+import { Head, setLayoutProps, router, usePage } from '@inertiajs/react';
 import {
     BookOpen,
     Brain,
@@ -108,6 +108,7 @@ export default function Drills({
     // ----------------------------------------------------
     // State Variables
     // ----------------------------------------------------
+    const { url } = usePage();
     const [viewState, setViewState] = useState<'hub' | 'config'>('hub');
     const [selectedCategory, setSelectedCategory] = useState<Category | null>(
         null,
@@ -313,7 +314,9 @@ export default function Drills({
     // Strict 1-liner comment: Pre-select category, subcategories, language, and question count on retake
     useEffect(() => {
         if (categories && categories.length > 0) {
-            const params = new URLSearchParams(window.location.search);
+            const params = new URLSearchParams(
+                url.includes('?') ? url.split('?')[1] : '',
+            );
             const catParam = params.get('category');
             const totalParam = params.get('total');
             const langParam = params.get('language');
@@ -357,7 +360,7 @@ export default function Drills({
                 return () => clearTimeout(timer);
             }
         }
-    }, [categories, handleCategoryClick]);
+    }, [categories, handleCategoryClick, url]);
 
     const toggleSubcat = (subcatName: string) => {
         if (isRetakeConfig) {

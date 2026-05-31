@@ -190,6 +190,23 @@ class ExamController extends Controller
             'cat_scores' => 'required|array',
         ]);
 
+        $answers = $validated['answers'];
+        $answeredCount = count(array_filter($answers, function($answer) {
+            return $answer !== null && $answer !== '';
+        }));
+        
+        $totalQuestions = count($validated['question_ids']);
+        $completionRate = $totalQuestions > 0 ? ($answeredCount / $totalQuestions) * 100 : 0;
+
+        // Ignore empty or dummy attempts (less than 50% answered)
+        if ($completionRate < 50) {
+            return response()->json([
+                'success' => true,
+                'attempt_id' => null,
+                'message' => 'Dummy attempt ignored.',
+            ]);
+        }
+
         $attempt = ExamAttempt::create([
             'user_id' => auth()->id(),
             'category_id' => $validated['category_id'],
@@ -307,13 +324,34 @@ class ExamController extends Controller
     /**
      * Render the user dashboard with real performance metrics.
      */
-    public function dashboard()
+    public function dashboard(Request $request)
     {
         $userId = auth()->id();
-        $attempts = ExamAttempt::where('user_id', $userId)
-            ->latest()
-            ->get();
+        $trackFilter = $request->query('track', 'Professional');
+        $runsFilter = $request->query('runs', '6'); // Default to 6 runs
 
+        // Fetch user attempts
+        $query = ExamAttempt::where('user_id', $userId)->latest();
+        $allAttempts = $query->get();
+
+        $filteredAttempts = collect();
+        foreach ($allAttempts as $attempt) {
+            $meta = $attempt->cat_scores['metadata'] ?? [];
+            $track = $meta['track'] ?? 'Drill';
+            if ($attempt->category_id !== null && !isset($meta['track'])) {
+                $track = 'Drill';
+            }
+
+            if ($trackFilter === 'All' || $track === $trackFilter) {
+                $filteredAttempts->push($attempt);
+            }
+        }
+
+        if ($runsFilter !== 'all') {
+            $filteredAttempts = $filteredAttempts->take((int) $runsFilter);
+        }
+
+        $attempts = $filteredAttempts;
         $totalExams = $attempts->count();
 
         $avgScore = 0;
@@ -335,6 +373,7 @@ class ExamController extends Controller
         if ($totalExams > 0) {
             $totalScoreSum = 0;
             $passCount = 0;
+            $mockExamCount = 0;
 
             foreach ($attempts as $attempt) {
                 $meta = $attempt->cat_scores['metadata'] ?? [];
@@ -342,9 +381,17 @@ class ExamController extends Controller
                 $total = $meta['total_questions'] ?? count($attempt->question_ids);
                 $percentage = $total > 0 ? round(($correct / $total) * 100) : 0;
                 $totalScoreSum += $percentage;
+                
+                $track = $meta['track'] ?? 'Drill';
+                if ($attempt->category_id !== null && !isset($meta['track'])) {
+                    $track = 'Drill';
+                }
 
-                if ($percentage >= 80) {
-                    $passCount++;
+                if ($track !== 'Drill') {
+                    $mockExamCount++;
+                    if ($percentage >= 80) {
+                        $passCount++;
+                    }
                 }
 
                 $totalDurationSecs += (int) ($meta['duration_secs'] ?? 0);
@@ -377,7 +424,7 @@ class ExamController extends Controller
             }
 
             $avgScore = round($totalScoreSum / $totalExams);
-            $passingRate = round(($passCount / $totalExams) * 100);
+            $passingRate = $mockExamCount > 0 ? round(($passCount / $mockExamCount) * 100) : 0;
 
             // Calculate total practice duration text
             $hours = floor($totalDurationSecs / 3600);
@@ -396,7 +443,8 @@ class ExamController extends Controller
                 $avgDurationText = "{$avgSeconds}s";
             }
 
-            $lastAttempts = $attempts->take(6)->reverse();
+            // Reverse back so oldest in the selected window is first in the chart
+            $lastAttempts = $attempts->reverse();
             $chartData = [];
             $attemptIdx = 1;
             foreach ($lastAttempts as $attempt) {
@@ -461,6 +509,14 @@ class ExamController extends Controller
                 $color = 'bg-amber-600 dark:bg-amber-500';
             }
 
+            // Only show in diagnosticsummary the clerical if it is drill or subprof and for analytical show it only when prof or drill.
+            if ($catName === 'Clerical Ability' && $trackFilter === 'Professional') {
+                continue;
+            }
+            if ($catName === 'Analytical Ability' && $trackFilter === 'Subprofessional') {
+                continue;
+            }
+
             $formattedCategories[] = [
                 'name' => str_replace(' Ability', '', str_replace(' Information', '', $catName)),
                 'percentage' => $pct,
@@ -486,6 +542,10 @@ class ExamController extends Controller
 
         return Inertia::render('dashboard', [
             'stats' => [
+                'filters' => [
+                    'track' => $trackFilter,
+                    'runs' => $runsFilter,
+                ],
                 'avgScore' => $avgScore,
                 'totalExams' => $totalExams,
                 'strongestArea' => str_replace(' Ability', '', str_replace(' Information', '', $strongestArea)),

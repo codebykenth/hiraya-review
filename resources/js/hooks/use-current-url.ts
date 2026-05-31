@@ -3,18 +3,18 @@ import { usePage } from '@inertiajs/react';
 import { toUrl } from '@/lib/utils';
 
 export type IsCurrentUrlFn = (
-    urlToCheck: NonNullable<InertiaLinkProps['href']>,
+    urlToCheck: NonNullable<InertiaLinkProps['href'] | { url: string }>,
     currentUrl?: string,
     startsWith?: boolean,
 ) => boolean;
 
 export type IsCurrentOrParentUrlFn = (
-    urlToCheck: NonNullable<InertiaLinkProps['href']>,
+    urlToCheck: NonNullable<InertiaLinkProps['href'] | { url: string }>,
     currentUrl?: string,
 ) => boolean;
 
 export type WhenCurrentUrlFn = <TIfTrue, TIfFalse = null>(
-    urlToCheck: NonNullable<InertiaLinkProps['href']>,
+    urlToCheck: NonNullable<InertiaLinkProps['href'] | { url: string }>,
     ifTrue: TIfTrue,
     ifFalse?: TIfFalse,
 ) => TIfTrue | TIfFalse;
@@ -36,7 +36,7 @@ export function useCurrentUrl(): UseCurrentUrlReturn {
     ).pathname;
 
     const isCurrentUrl: IsCurrentUrlFn = (
-        urlToCheck: NonNullable<InertiaLinkProps['href']>,
+        urlToCheck: NonNullable<InertiaLinkProps['href'] | { url: string }>,
         currentUrl?: string,
         startsWith: boolean = false,
     ) => {
@@ -60,14 +60,14 @@ export function useCurrentUrl(): UseCurrentUrlReturn {
     };
 
     const isCurrentOrParentUrl: IsCurrentOrParentUrlFn = (
-        urlToCheck: NonNullable<InertiaLinkProps['href']>,
+        urlToCheck: NonNullable<InertiaLinkProps['href'] | { url: string }>,
         currentUrl?: string,
     ) => {
         return isCurrentUrl(urlToCheck, currentUrl, true);
     };
 
     const whenCurrentUrl: WhenCurrentUrlFn = <TIfTrue, TIfFalse = null>(
-        urlToCheck: NonNullable<InertiaLinkProps['href']>,
+        urlToCheck: NonNullable<InertiaLinkProps['href'] | { url: string }>,
         ifTrue: TIfTrue,
         ifFalse: TIfFalse = null as TIfFalse,
     ): TIfTrue | TIfFalse => {

@@ -1,6 +1,5 @@
 import { Head, Link, usePage } from '@inertiajs/react';
 import {
-    Compass,
     BookOpen,
     ClipboardList,
     History,
@@ -14,6 +13,7 @@ import {
     Info,
 } from 'lucide-react';
 import { useState } from 'react';
+import { PageHeader } from '@/components/page-header';
 import SiteFooter from '@/components/site-footer';
 import SiteHeader from '@/components/site-header';
 import { Button } from '@/components/ui/button';
@@ -167,20 +167,12 @@ export default function Guide() {
     const content = (
         <div className="mx-auto max-w-6xl space-y-8">
             {/* Header section */}
-            <div className="flex items-center gap-4 border-b border-border pb-6">
-                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                    <Compass className="h-6 w-6" />
-                </div>
-                <div>
-                    <h1 className="font-heading text-3xl font-bold tracking-tight text-foreground md:text-4xl">
-                        Civil Service Exam Reviewer Guide
-                    </h1>
-                    <p className="mt-1.5 text-sm text-muted-foreground">
-                        Learn how to streamline your preparation process,
-                        navigate exam structures, and maximize your passing
-                        odds.
-                    </p>
-                </div>
+            <div className="flex items-start gap-4 border-b border-border pb-6 md:items-center">
+                <PageHeader
+                    title="Civil Service Exam Reviewer Guide"
+                    description="Learn how to streamline your preparation process, navigate exam structures, and maximize your passing odds."
+                    className="flex-1"
+                />
             </div>
 
             {/* Navigation Tabs */}

@@ -85,29 +85,29 @@ export default function Footer() {
 
                     {/* Footer Navigation */}
                     <div className="order-1 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 md:order-2">
-                        <a
+                        <Link
                             href="/terms"
                             className="inline-flex items-center gap-1.5 underline decoration-border underline-offset-4 transition hover:text-foreground hover:decoration-foreground"
                         >
                             <Scale className="size-3.5" />
                             Terms of Service
-                        </a>
+                        </Link>
 
-                        <a
+                        <Link
                             href="/privacy"
                             className="inline-flex items-center gap-1.5 underline decoration-border underline-offset-4 transition hover:text-foreground hover:decoration-foreground"
                         >
                             <ShieldCheck className="size-3.5" />
                             Privacy Policy
-                        </a>
+                        </Link>
 
-                        <a
+                        <Link
                             href="/support"
                             className="inline-flex items-center gap-1.5 underline decoration-border underline-offset-4 transition hover:text-foreground hover:decoration-foreground"
                         >
                             <Mail className="size-3.5" />
                             Contact Support
-                        </a>
+                        </Link>
                     </div>
 
                     {/* Creator Credit */}

@@ -6,8 +6,8 @@ import {
     RotateCcw,
     ArrowRight,
 } from 'lucide-react';
-import { formatDuration } from '@/lib/exam-formatters';
 import { Button } from '@/components/ui/button';
+import { formatDuration } from '@/lib/exam-formatters';
 
 interface ScorecardViewProps {
     details: any;
@@ -46,36 +46,6 @@ export function ScorecardView({
         remainingSecs > 0
             ? `${formatDuration(remainingSecs, false)} under limit`
             : 'Used full time limit';
-
-    let percentile = '22nd';
-    let topText = 'Top 78% of test takers';
-    const pct = results?.percentage || 0;
-
-    if (pct >= 95) {
-        percentile = '99th';
-        topText = 'Top 1% of test takers';
-    } else if (pct >= 90) {
-        percentile = '95th';
-        topText = 'Top 5% of test takers';
-    } else if (pct >= 85) {
-        percentile = '91st';
-        topText = 'Top 9% of test takers';
-    } else if (pct >= 80) {
-        percentile = '88th';
-        topText = 'Top 12% of test takers';
-    } else if (pct >= 75) {
-        percentile = '80th';
-        topText = 'Top 20% of test takers';
-    } else if (pct >= 70) {
-        percentile = '73rd';
-        topText = 'Top 27% of test takers';
-    } else if (pct >= 60) {
-        percentile = '58th';
-        topText = 'Top 42% of test takers';
-    } else if (pct >= 50) {
-        percentile = '41st';
-        topText = 'Top 59% of test takers';
-    }
 
     let aiAnalysisText = '';
 
@@ -230,9 +200,6 @@ export function ScorecardView({
 
     const radius = 40;
     const circumference = 2 * Math.PI * radius;
-    const strokeDashoffset = results
-        ? circumference - (results.percentage / 100) * circumference
-        : circumference;
 
     return (
         <div className="animate-in duration-200 fade-in">
@@ -265,17 +232,17 @@ export function ScorecardView({
                         Completed on{' '}
                         {savedAttempt?.created_at
                             ? new Date(
-                                savedAttempt.created_at,
-                            ).toLocaleDateString('en-US', {
-                                month: 'long',
-                                day: 'numeric',
-                                year: 'numeric',
-                            })
+                                  savedAttempt.created_at,
+                              ).toLocaleDateString('en-US', {
+                                  month: 'long',
+                                  day: 'numeric',
+                                  year: 'numeric',
+                              })
                             : new Date().toLocaleDateString('en-US', {
-                                month: 'long',
-                                day: 'numeric',
-                                year: 'numeric',
-                            })}
+                                  month: 'long',
+                                  day: 'numeric',
+                                  year: 'numeric',
+                              })}
                     </p>
                 </div>
                 <div className="flex items-center gap-3">
@@ -304,203 +271,219 @@ export function ScorecardView({
 
             {retakeModal}
 
-            {results && (
-                <div className="mt-4 grid grid-cols-1 items-start gap-4 lg:grid-cols-12">
-                    <div className="flex flex-col gap-4 lg:col-span-3">
-                        <div className="shadow-3xs relative flex flex-col items-center justify-center rounded-xl border border-slate-200 bg-white p-5 text-center dark:border-slate-800 dark:bg-slate-950">
-                            <div className="relative flex size-36 items-center justify-center">
-                                <svg
-                                    className="size-full -rotate-90"
-                                    viewBox="0 0 100 100"
-                                >
-                                    <circle
-                                        cx="50"
-                                        cy="50"
-                                        r={radius}
-                                        className="fill-none stroke-slate-100 dark:stroke-slate-900"
-                                        strokeWidth="7"
-                                    />
-                                    <circle
-                                        cx="50"
-                                        cy="50"
-                                        r={radius}
-                                        className="fill-none stroke-emerald-600 transition-all duration-500 dark:stroke-emerald-500"
-                                        strokeWidth="7"
-                                        strokeDasharray={circumference}
-                                        strokeDashoffset={strokeDashoffset}
-                                        strokeLinecap="round"
-                                    />
-                                </svg>
-                                <div className="absolute inset-0 flex flex-col items-center justify-center">
-                                    <span className="text-slate-850 text-3xl leading-none font-black dark:text-white">
-                                        {results.percentage}%
-                                    </span>
-                                </div>
-                            </div>
-                            <div className="mt-4 flex flex-col items-center gap-1.5">
-                                <span
-                                    className={`inline-flex rounded-full px-3 py-1 text-[10px] font-extrabold tracking-wider uppercase ${results.percentage >= 80 ? 'dark:text-emerald-450 bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40' : 'dark:text-rose-450 bg-rose-50 text-rose-700 dark:bg-rose-950/40'}`}
-                                >
-                                    {results.percentage >= 80
-                                        ? 'PASSED'
-                                        : 'FAILED'}
-                                </span>
-                                <p className="text-slate-550 mt-1 text-xs font-semibold dark:text-slate-400">
-                                    Final Grade
-                                </p>
-                            </div>
-                        </div>
+            {results &&
+                (() => {
+                    const exactPercentage =
+                        results.total > 0
+                            ? (results.correctCount / results.total) * 100
+                            : 0;
+                    const formattedPercentage = (
+                        Math.trunc(exactPercentage * 100) / 100
+                    ).toFixed(2);
+                    const strokeDashoffsetExact =
+                        circumference - (exactPercentage / 100) * circumference;
 
-                        <div className="grid grid-cols-2 gap-3">
-                            <div className="dark:border-slate-850 flex flex-col items-center justify-center rounded-xl border border-slate-100 bg-white p-3 text-center shadow-xs dark:bg-slate-950">
-                                <span className="text-[9px] font-extrabold tracking-wider text-slate-400 uppercase">
-                                    Correct
-                                </span>
-                                <p className="mt-1 text-xl font-black text-emerald-600 dark:text-emerald-400">
-                                    {results.correctCount}
-                                </p>
-                                <span className="mt-0.5 text-[9px] font-bold text-slate-400">
-                                    of {results.total}
-                                </span>
-                            </div>
-                            <div className="dark:border-slate-850 flex flex-col items-center justify-center rounded-xl border border-slate-100 bg-white p-3 text-center shadow-xs dark:bg-slate-950">
-                                <span className="text-[9px] font-extrabold tracking-wider text-slate-400 uppercase">
-                                    Incorrect
-                                </span>
-                                <p className="mt-1 text-xl font-black text-rose-600 dark:text-rose-400">
-                                    {results.wrongCount}
-                                </p>
-                                <span className="mt-0.5 text-[9px] font-bold text-slate-400">
-                                    of {results.total}
-                                </span>
-                            </div>
-                            <div className="dark:border-slate-850 flex flex-col items-center justify-center rounded-xl border border-slate-100 bg-white p-3 text-center shadow-xs dark:bg-slate-950">
-                                <span className="text-[9px] font-extrabold tracking-wider text-slate-400 uppercase">
-                                    Skipped
-                                </span>
-                                <p className="mt-1 text-xl font-black text-slate-500">
-                                    {results.skippedCount}
-                                </p>
-                                <span className="mt-0.5 text-[9px] font-bold text-slate-400">
-                                    unanswered
-                                </span>
-                            </div>
-                            <div className="dark:border-slate-850 flex flex-col items-center justify-center rounded-xl border border-slate-100 bg-white p-3 text-center shadow-xs dark:bg-slate-950">
-                                <span className="text-[9px] font-extrabold tracking-wider text-slate-400 uppercase">
-                                    Time
-                                </span>
-                                <p className="mt-1 text-xl font-black text-blue-600 dark:text-blue-400">
-                                    {elapsedText}
-                                </p>
-                                <span className="mt-0.5 w-full truncate px-1 text-[9px] font-bold text-slate-400">
-                                    {underLimitText}
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="flex flex-col gap-3 lg:col-span-6">
-                        <h2 className="font-heading text-lg font-bold text-slate-900 dark:text-white">
-                            Category Breakdown
-                        </h2>
-                        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                            {Object.entries(results.categoryScoreMap || {}).map(
-                                ([cat, val]: [string, any]) => {
-                                    const catPct =
-                                        val.total > 0
-                                            ? Math.round(
-                                                (val.correct / val.total) *
-                                                100,
-                                            )
-                                            : 0;
-
-                                    return (
-                                        <div
-                                            key={cat}
-                                            className="rounded-xl border border-border bg-card p-4 transition-all duration-300 hover:shadow-md"
-                                        >
-                                            <div className="mb-2 flex items-center justify-between">
-                                                <span className="text-xs font-black tracking-wider text-foreground uppercase">
-                                                    {cat}
-                                                </span>
-                                                <span
-                                                    className={`rounded-md px-1.5 py-0.5 text-[10px] font-bold ${catPct >= 75 ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400' : catPct >= 50 ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/30 dark:text-amber-400' : 'bg-rose-50 text-rose-700 dark:bg-rose-950/30 dark:text-rose-400'}`}
+                    return (
+                        <div className="mt-4 flex flex-col gap-4">
+                            <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-xs sm:p-5 md:p-6 dark:border-slate-800 dark:bg-slate-950">
+                                {/* Top Section: Circle & Categories */}
+                                <div className="flex flex-row items-center gap-4 sm:gap-8">
+                                    {/* Circle Percentage */}
+                                    <div className="flex w-28 shrink-0 flex-col items-center sm:w-64 lg:w-72">
+                                        <div className="relative flex flex-col items-center justify-center">
+                                            <div className="relative flex size-24 items-center justify-center sm:size-40">
+                                                <svg
+                                                    className="size-full -rotate-90"
+                                                    viewBox="0 0 100 100"
                                                 >
-                                                    {catPct}%
-                                                </span>
-                                            </div>
-                                            <div className="flex items-center gap-2">
-                                                <div className="h-1.5 flex-1 rounded-full bg-muted">
-                                                    <div
-                                                        className={`h-1.5 rounded-full transition-all duration-1000 ${catPct >= 75 ? 'bg-emerald-500' : catPct >= 50 ? 'bg-amber-500' : 'bg-rose-500'}`}
-                                                        style={{
-                                                            width: `${catPct}%`,
-                                                        }}
+                                                    <circle
+                                                        cx="50"
+                                                        cy="50"
+                                                        r={radius}
+                                                        className="fill-none stroke-slate-100 dark:stroke-slate-900"
+                                                        strokeWidth="7"
                                                     />
+                                                    <circle
+                                                        cx="50"
+                                                        cy="50"
+                                                        r={radius}
+                                                        className="fill-none stroke-emerald-600 transition-all duration-500 dark:stroke-emerald-500"
+                                                        strokeWidth="7"
+                                                        strokeDasharray={
+                                                            circumference
+                                                        }
+                                                        strokeDashoffset={
+                                                            strokeDashoffsetExact
+                                                        }
+                                                        strokeLinecap="round"
+                                                    />
+                                                </svg>
+                                                <div className="absolute inset-0 flex flex-col items-center justify-center">
+                                                    <span className="text-slate-850 text-xl leading-none font-black sm:text-3xl dark:text-white">
+                                                        {formattedPercentage}%
+                                                    </span>
                                                 </div>
-                                                <span className="text-[10px] font-bold text-muted-foreground">
-                                                    {val.correct}/{val.total}
+                                            </div>
+                                            <div className="mt-2 flex flex-col items-center gap-1 sm:mt-4 sm:gap-1.5">
+                                                <span
+                                                    className={`inline-flex rounded-full px-2 py-0.5 text-[8px] font-extrabold tracking-wider uppercase sm:px-3 sm:py-1 sm:text-[10px] ${exactPercentage >= 80 ? 'dark:text-emerald-450 bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40' : 'dark:text-rose-450 bg-rose-50 text-rose-700 dark:bg-rose-950/40'}`}
+                                                >
+                                                    {exactPercentage >= 80
+                                                        ? 'PASSED'
+                                                        : 'FAILED'}
                                                 </span>
+                                                <p className="text-slate-550 mt-0.5 text-center text-[10px] leading-tight font-semibold sm:mt-1 sm:text-xs dark:text-slate-400">
+                                                    Final Grade
+                                                </p>
                                             </div>
                                         </div>
-                                    );
-                                },
-                            )}
-                        </div>
+                                    </div>
 
-                        <div className="mt-4 rounded-xl border border-blue-100/50 bg-blue-50/50 p-5 dark:border-blue-900/30 dark:bg-blue-950/20">
-                            <h3 className="mb-2 flex items-center gap-1.5 font-heading text-sm font-bold text-blue-900 dark:text-blue-300">
-                                <Award className="size-4" /> AI Performance
-                                Analysis
-                            </h3>
-                            <p className="text-xs leading-relaxed text-blue-800/80 dark:text-blue-200/70">
-                                {aiAnalysisText}
-                            </p>
-                        </div>
-                    </div>
+                                    {/* Category Breakdown */}
+                                    <div className="flex w-full flex-1 flex-col">
+                                        <div className="flex flex-col gap-2 sm:gap-3">
+                                            {Object.entries(
+                                                results.categoryScoreMap || {},
+                                            ).map(
+                                                ([cat, val]: [string, any]) => {
+                                                    const catExactPct =
+                                                        val.total > 0
+                                                            ? (val.correct /
+                                                                  val.total) *
+                                                              100
+                                                            : 0;
+                                                    const catFormattedPct = (
+                                                        Math.trunc(
+                                                            catExactPct * 100,
+                                                        ) / 100
+                                                    ).toFixed(2);
 
-                    <div className="flex flex-col gap-4 lg:col-span-3">
-                        <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-xs dark:border-slate-800 dark:bg-slate-950">
-                            <h3 className="mb-3 font-heading text-sm font-bold text-slate-900 dark:text-white">
-                                Percentile Ranking
-                            </h3>
-                            <div className="flex items-baseline gap-2">
-                                <span className="text-2xl font-black text-blue-600 dark:text-blue-400">
-                                    {percentile}
-                                </span>
-                                <span className="text-[10px] font-bold tracking-wide text-slate-500 uppercase">
-                                    Percentile
-                                </span>
+                                                    return (
+                                                        <div
+                                                            key={cat}
+                                                            className="rounded-xl border border-border bg-card p-2.5 transition-all duration-300 hover:shadow-sm sm:p-3.5"
+                                                        >
+                                                            <div className="mb-1.5 flex items-center justify-between sm:mb-2">
+                                                                <span className="truncate pr-2 text-[9px] font-black tracking-wider text-foreground uppercase sm:text-xs">
+                                                                    {cat}
+                                                                </span>
+                                                                <span
+                                                                    className={`rounded-md px-1 py-0.5 text-[8px] font-bold sm:px-1.5 sm:text-[10px] ${catExactPct >= 75 ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400' : catExactPct >= 50 ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/30 dark:text-amber-400' : 'bg-rose-50 text-rose-700 dark:bg-rose-950/30 dark:text-rose-400'}`}
+                                                                >
+                                                                    {
+                                                                        catFormattedPct
+                                                                    }
+                                                                    %
+                                                                </span>
+                                                            </div>
+                                                            <div className="flex items-center gap-1.5 sm:gap-2">
+                                                                <div className="h-1 flex-1 rounded-full bg-muted sm:h-1.5">
+                                                                    <div
+                                                                        className={`h-1 rounded-full transition-all duration-1000 sm:h-1.5 ${catExactPct >= 75 ? 'bg-emerald-500' : catExactPct >= 50 ? 'bg-amber-500' : 'bg-rose-500'}`}
+                                                                        style={{
+                                                                            width: `${catExactPct}%`,
+                                                                        }}
+                                                                    />
+                                                                </div>
+                                                                <span className="w-6 text-right text-[8px] font-bold text-muted-foreground sm:w-8 sm:text-[10px]">
+                                                                    {
+                                                                        val.correct
+                                                                    }
+                                                                    /{val.total}
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    );
+                                                },
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Bottom Section: 4 Stat Boxes */}
+                                <div className="mt-4 grid w-full grid-cols-2 gap-3 border-t border-slate-100 pt-4 sm:grid-cols-4 dark:border-slate-800">
+                                    <div className="dark:border-slate-850 flex flex-col items-center justify-center rounded-xl border border-slate-100 bg-slate-50/50 p-4 text-center dark:bg-slate-900/50">
+                                        <span className="text-[10px] font-extrabold tracking-wider text-slate-400 uppercase">
+                                            Correct
+                                        </span>
+                                        <p className="mt-1.5 text-xl font-black text-emerald-600 dark:text-emerald-400">
+                                            {results.correctCount}
+                                        </p>
+                                        <span className="mt-1 text-[10px] font-bold text-slate-400">
+                                            of {results.total}
+                                        </span>
+                                    </div>
+                                    <div className="dark:border-slate-850 flex flex-col items-center justify-center rounded-xl border border-slate-100 bg-slate-50/50 p-4 text-center dark:bg-slate-900/50">
+                                        <span className="text-[10px] font-extrabold tracking-wider text-slate-400 uppercase">
+                                            Incorrect
+                                        </span>
+                                        <p className="mt-1.5 text-xl font-black text-rose-600 dark:text-rose-400">
+                                            {results.wrongCount}
+                                        </p>
+                                        <span className="mt-1 text-[10px] font-bold text-slate-400">
+                                            of {results.total}
+                                        </span>
+                                    </div>
+                                    <div className="dark:border-slate-850 flex flex-col items-center justify-center rounded-xl border border-slate-100 bg-slate-50/50 p-4 text-center dark:bg-slate-900/50">
+                                        <span className="text-[10px] font-extrabold tracking-wider text-slate-400 uppercase">
+                                            Skipped
+                                        </span>
+                                        <p className="mt-1.5 text-xl font-black text-slate-500">
+                                            {results.skippedCount}
+                                        </p>
+                                        <span className="mt-1 text-[10px] font-bold text-slate-400">
+                                            unanswered
+                                        </span>
+                                    </div>
+                                    <div className="dark:border-slate-850 flex flex-col items-center justify-center rounded-xl border border-slate-100 bg-slate-50/50 p-4 text-center dark:bg-slate-900/50">
+                                        <span className="text-[10px] font-extrabold tracking-wider text-slate-400 uppercase">
+                                            Time
+                                        </span>
+                                        <p className="mt-1.5 text-xl font-black text-blue-600 dark:text-blue-400">
+                                            {elapsedText}
+                                        </p>
+                                        <span className="mt-1 w-full truncate px-1 text-[10px] font-bold text-slate-400">
+                                            {underLimitText}
+                                        </span>
+                                    </div>
+                                </div>
                             </div>
-                            <p className="mt-2 text-xs text-slate-500">
-                                {topText}
-                            </p>
-                            <div className="mt-3 flex h-2 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-slate-900">
-                                <div
-                                    className="h-full bg-gradient-to-r from-blue-400 to-indigo-600 transition-all duration-1000"
-                                    style={{ width: `${pct}%` }}
-                                />
+
+                            <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+                                <div className="flex flex-col gap-4 lg:col-span-2">
+                                    <div className="rounded-xl border border-blue-100/50 bg-blue-50/50 p-5 dark:border-blue-900/30 dark:bg-blue-950/20">
+                                        <h3 className="mb-2 flex items-center gap-1.5 font-heading text-sm font-bold text-blue-900 dark:text-blue-300">
+                                            <Award className="size-4" />{' '}
+                                            Performance Analysis
+                                        </h3>
+                                        <p className="text-xs leading-relaxed text-blue-800/80 dark:text-blue-200/70">
+                                            {aiAnalysisText}
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div className="flex flex-col gap-4">
+                                    <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-xs dark:border-slate-800 dark:bg-slate-950">
+                                        <h3 className="mb-3 font-heading text-sm font-bold text-slate-900 dark:text-white">
+                                            Next Steps
+                                        </h3>
+                                        <p className="mb-4 text-xs text-slate-500">
+                                            Based on your performance, we
+                                            recommend taking another drill
+                                            focused on your weak areas.
+                                        </p>
+                                        <Link href={'/drills'}>
+                                            <Button className="w-full bg-accent text-foreground hover:bg-accent/80">
+                                                Start Custom Drill{' '}
+                                                <ArrowRight className="ml-1 size-3" />
+                                            </Button>
+                                        </Link>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-
-                        <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-xs dark:border-slate-800 dark:bg-slate-950">
-                            <h3 className="mb-3 font-heading text-sm font-bold text-slate-900 dark:text-white">
-                                Next Steps
-                            </h3>
-                            <p className="mb-4 text-xs text-slate-500">
-                                Based on your performance, we recommend taking
-                                another drill focused on your weak areas.
-                            </p>
-                            <Link href={"/drills"}>
-                                <Button className='bg-accent text-foreground hover:bg-accent/80'>
-                                     Start Custom Drill{' '}
-                                    <ArrowRight className="size-3" />
-                                </Button>
-                            </Link>
-                        </div>
-                    </div>
-                </div>
-            )}
+                    );
+                })()}
         </div>
     );
 }

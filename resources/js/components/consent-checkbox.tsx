@@ -1,3 +1,4 @@
+import { Link } from '@inertiajs/react';
 import { Checkbox } from '@/components/ui/checkbox';
 
 export default function ConsentCheckbox({
@@ -25,23 +26,19 @@ export default function ConsentCheckbox({
                 className="cursor-pointer text-sm leading-relaxed text-slate-600 dark:text-slate-400"
             >
                 I have read and agree to the{' '}
-                <a
+                <Link
                     href="/terms"
-                    target="_blank"
-                    rel="noopener noreferrer"
                     className="font-medium text-blue-600 underline underline-offset-2 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300"
                 >
                     Terms of Service
-                </a>{' '}
+                </Link>{' '}
                 and{' '}
-                <a
+                <Link
                     href="/privacy"
-                    target="_blank"
-                    rel="noopener noreferrer"
                     className="font-medium text-blue-600 underline underline-offset-2 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300"
                 >
                     Privacy Policy
-                </a>
+                </Link>
                 .
             </label>
         </div>

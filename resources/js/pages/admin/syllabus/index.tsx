@@ -3,6 +3,7 @@ import { Database, Plus, Trash2, Edit2, X, Check } from 'lucide-react';
 import React, { useState } from 'react';
 import { ConfirmModal } from '@/components/confirm-modal';
 import { PageContainer } from '@/components/page-container';
+import { PageHeader } from '@/components/page-header';
 
 interface CategoryItem {
     id: number;
@@ -175,17 +176,12 @@ export default function AdminSyllabusIndex({
         <PageContainer>
             <Head title="Syllabus Scope Settings" />
 
-            <div className="mb-8 flex flex-col gap-2">
-                <h1 className="text-3xl font-black text-foreground">
-                    Syllabus Scope Settings
-                </h1>
-                <p className="max-w-2xl text-sm leading-relaxed text-muted-foreground">
-                    Customize your exam blueprint and automatically tune the AI
-                    review material writer. All categories and subcategories
-                    defined here are synchronized across both the question bank
-                    and the learning modules.
-                </p>
-            </div>
+            <PageHeader
+                title="Syllabus Scope Settings"
+                description="Customize your exam blueprint and automatically tune the AI review material writer. All categories and subcategories defined here are synchronized across both the question bank and the learning modules."
+                className="mb-8 flex flex-col gap-2"
+                descriptionClassName="max-w-2xl text-sm leading-relaxed text-muted-foreground"
+            />
 
             <div className="flex h-[650px] w-full flex-col overflow-hidden rounded-3xl border border-border bg-card shadow-sm">
                 <div className="flex items-center justify-between border-b border-border bg-muted/50 px-6 py-4.5">

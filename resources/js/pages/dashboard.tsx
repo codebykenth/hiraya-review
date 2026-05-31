@@ -17,6 +17,7 @@ import {
     ScoreProgress,
 } from '@/components/attempt-components';
 import { PageContainer } from '@/components/page-container';
+import { PageHeader } from '@/components/page-header';
 import { Card } from '@/components/ui/card';
 import { dashboard } from '@/routes';
 import { index as drillsIndex } from '@/routes/drills';
@@ -56,6 +57,10 @@ interface DashboardProps {
         totalDuration: string;
         avgDuration: string;
         totalQuestionsSolved: number;
+        filters?: {
+            track: string;
+            runs: string;
+        };
     } | null;
 }
 
@@ -65,9 +70,19 @@ export default function Dashboard({ stats }: DashboardProps) {
     const firstName = auth?.user?.name ? auth.user.name.split(' ')[0] : 'User';
     const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
     const [isOpen, setIsOpen] = useState(false);
-    const [selectedFilter, setSelectedFilter] = useState<
-        '6' | '12' | 'exams' | 'drills'
-    >('6');
+    const [isRunsOpen, setIsRunsOpen] = useState(false);
+
+    // Read active filters from backend or fallback
+    const currentTrack = stats?.filters?.track || 'Professional';
+    const currentRuns = stats?.filters?.runs || '6';
+
+    const updateFilter = (key: 'track' | 'runs', value: string) => {
+        router.get(
+            dashboard().url,
+            { track: currentTrack, runs: currentRuns, [key]: value },
+            { preserveState: true, preserveScroll: true, replace: true },
+        );
+    };
 
     // Redirect to exams page if a pending free exam session exists after registration
     useEffect(() => {
@@ -180,29 +195,7 @@ export default function Dashboard({ stats }: DashboardProps) {
     const isDemoMode = !stats || stats.totalExams === 0;
     const chartData = activeStats.chartData || defaultStats.chartData;
 
-    // Filter/slice the dynamic chart data points based on filter state
-    const filteredChartData = (() => {
-        let items = [...chartData];
-
-        if (selectedFilter === 'exams') {
-            items = items.filter((dp) =>
-                dp.track.toLowerCase().includes('exam'),
-            );
-        } else if (selectedFilter === 'drills') {
-            items = items.filter((dp) =>
-                dp.track.toLowerCase().includes('drill'),
-            );
-        }
-
-        const limitCount =
-            selectedFilter === '12'
-                ? 12
-                : selectedFilter === '6'
-                  ? 6
-                  : items.length;
-
-        return items.slice(-limitCount);
-    })();
+    const filteredChartData = [...chartData];
 
     const chartWidth = 800;
     const chartHeight = 260;
@@ -253,19 +246,23 @@ export default function Dashboard({ stats }: DashboardProps) {
             <PageContainer>
                 {/* Greeting Header & Main Action Controls */}
                 <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-                    <div>
-                        <h1 className="font-heading text-3xl font-bold tracking-tight text-slate-900 md:text-4xl dark:text-white">
-                            Welcome back,
-                            <br />
-                            <span className="font-extrabold text-blue-600 dark:text-blue-400">
-                                {firstName}
-                            </span>
-                        </h1>
-                        <p className="mt-2 text-sm text-slate-500 md:text-base dark:text-slate-400">
-                            Let's continue your preparation for the Civil
-                            Service Exam.
-                        </p>
-                    </div>
+                    <PageHeader
+                        title={
+                            <>
+                                Welcome back,
+                                <br />
+                                <span className="font-extrabold text-blue-600 dark:text-blue-400">
+                                    {firstName}
+                                </span>
+                            </>
+                        }
+                        description={
+                            <>
+                                Let's continue your preparation for the Civil
+                                Service Exam.
+                            </>
+                        }
+                    />
                     <div className="flex flex-col items-stretch gap-3 sm:items-end">
                         <div className="flex flex-wrap gap-2">
                             <Link
@@ -289,6 +286,110 @@ export default function Dashboard({ stats }: DashboardProps) {
                             >
                                 Start Subprofessional Exam
                             </Link>
+                        </div>
+                        {/* Overall Dashboard Filters */}
+                        <div className="mt-2 flex flex-wrap items-center justify-end gap-2 sm:mt-0">
+                            <div className="relative">
+                                <button
+                                    onClick={() => setIsOpen(!isOpen)}
+                                    className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-bold text-slate-700 shadow-sm transition hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-300 dark:hover:bg-slate-900"
+                                >
+                                    {currentTrack === 'All'
+                                        ? 'All Tracks'
+                                        : currentTrack}
+                                    <ChevronDown className="size-3.5" />
+                                </button>
+                                {isOpen && (
+                                    <>
+                                        <div
+                                            className="fixed inset-0 z-10"
+                                            onClick={() => setIsOpen(false)}
+                                        />
+                                        <div className="absolute right-0 z-20 mt-2 w-48 origin-top-right rounded-lg border border-slate-200 bg-white p-1 shadow-lg ring-1 ring-black/5 focus:outline-none dark:border-slate-800 dark:bg-slate-950">
+                                            {[
+                                                'All',
+                                                'Professional',
+                                                'Subprofessional',
+                                                'Drill',
+                                            ].map((opt) => (
+                                                <button
+                                                    key={opt}
+                                                    onClick={() => {
+                                                        updateFilter(
+                                                            'track',
+                                                            opt,
+                                                        );
+                                                        setIsOpen(false);
+                                                    }}
+                                                    className={`flex w-full items-center rounded-md px-3 py-2 text-left text-xs transition ${
+                                                        currentTrack === opt
+                                                            ? 'bg-blue-50 font-bold text-blue-600 dark:bg-blue-950/40 dark:text-blue-400'
+                                                            : 'text-slate-700 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-900'
+                                                    }`}
+                                                >
+                                                    {opt === 'All'
+                                                        ? 'All Tracks'
+                                                        : opt}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </>
+                                )}
+                            </div>
+                            <div className="relative">
+                                <button
+                                    onClick={() => setIsRunsOpen(!isRunsOpen)}
+                                    className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-bold text-slate-700 shadow-sm transition hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-300 dark:hover:bg-slate-900"
+                                >
+                                    {currentRuns === 'all'
+                                        ? 'All Runs'
+                                        : `Last ${currentRuns} Runs`}
+                                    <ChevronDown className="size-3.5" />
+                                </button>
+                                {isRunsOpen && (
+                                    <>
+                                        <div
+                                            className="fixed inset-0 z-10"
+                                            onClick={() => setIsRunsOpen(false)}
+                                        />
+                                        <div className="absolute right-0 z-20 mt-2 w-36 origin-top-right rounded-lg border border-slate-200 bg-white p-1 shadow-lg ring-1 ring-black/5 focus:outline-none dark:border-slate-800 dark:bg-slate-950">
+                                            {[
+                                                {
+                                                    value: '6',
+                                                    label: 'Last 6 Runs',
+                                                },
+                                                {
+                                                    value: '12',
+                                                    label: 'Last 12 Runs',
+                                                },
+                                                {
+                                                    value: 'all',
+                                                    label: 'All Runs',
+                                                },
+                                            ].map((opt) => (
+                                                <button
+                                                    key={opt.value}
+                                                    onClick={() => {
+                                                        updateFilter(
+                                                            'runs',
+                                                            opt.value,
+                                                        );
+                                                        setIsRunsOpen(false);
+                                                    }}
+                                                    className={`flex w-full items-center rounded-md px-3 py-2 text-left text-xs transition ${
+                                                        currentRuns ===
+                                                        opt.value
+                                                            ? 'bg-blue-50 font-bold text-blue-600 dark:bg-blue-950/40 dark:text-blue-400'
+                                                            : 'text-slate-700 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-900'
+                                                    }`}
+                                                >
+                                                    {opt.label}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </>
+                                )}
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -426,67 +527,6 @@ export default function Dashboard({ stats }: DashboardProps) {
                                         details.
                                     </div>
                                 </div>
-                            </div>
-                            <div className="relative">
-                                <button
-                                    onClick={() => setIsOpen(!isOpen)}
-                                    className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-bold text-slate-700 shadow-sm transition hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-300 dark:hover:bg-slate-900"
-                                >
-                                    {selectedFilter === '6' && 'Last 6 Runs'}
-                                    {selectedFilter === '12' && 'Last 12 Runs'}
-                                    {selectedFilter === 'exams' &&
-                                        'Mock Exams Only'}
-                                    {selectedFilter === 'drills' &&
-                                        'Custom Drills Only'}
-                                    <ChevronDown className="size-3.5" />
-                                </button>
-
-                                {isOpen && (
-                                    <>
-                                        <div
-                                            className="fixed inset-0 z-10"
-                                            onClick={() => setIsOpen(false)}
-                                        />
-                                        <div className="absolute right-0 z-20 mt-2 w-48 origin-top-right rounded-lg border border-slate-200 bg-white p-1 shadow-lg ring-1 ring-black/5 focus:outline-none dark:border-slate-800 dark:bg-slate-950">
-                                            {[
-                                                {
-                                                    value: '6',
-                                                    label: 'Last 6 Runs',
-                                                },
-                                                {
-                                                    value: '12',
-                                                    label: 'Last 12 Runs',
-                                                },
-                                                {
-                                                    value: 'exams',
-                                                    label: 'Mock Exams Only',
-                                                },
-                                                {
-                                                    value: 'drills',
-                                                    label: 'Custom Drills Only',
-                                                },
-                                            ].map((opt) => (
-                                                <button
-                                                    key={opt.value}
-                                                    onClick={() => {
-                                                        setSelectedFilter(
-                                                            opt.value as any,
-                                                        );
-                                                        setIsOpen(false);
-                                                    }}
-                                                    className={`flex w-full items-center rounded-md px-3 py-2 text-left text-xs transition ${
-                                                        selectedFilter ===
-                                                        opt.value
-                                                            ? 'bg-blue-50 font-bold text-blue-600 dark:bg-blue-950/40 dark:text-blue-400'
-                                                            : 'text-slate-700 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-900'
-                                                    }`}
-                                                >
-                                                    {opt.label}
-                                                </button>
-                                            ))}
-                                        </div>
-                                    </>
-                                )}
                             </div>
                         </div>
 

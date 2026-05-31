@@ -1,4 +1,4 @@
-import { router } from '@inertiajs/react';
+import { router, Link } from '@inertiajs/react';
 import { useCallback, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -65,14 +65,12 @@ export default function AcceptTermsModal({ isOpen }: Props) {
                                     responsible for maintaining account
                                     confidentiality and all activities under
                                     your account.{' '}
-                                    <a
+                                    <Link
                                         href="/terms"
-                                        target="_blank"
-                                        rel="noopener noreferrer"
                                         className="text-blue-600 underline dark:text-blue-400"
                                     >
                                         Read full terms of service →
-                                    </a>
+                                    </Link>
                                 </p>
                             </div>
 
@@ -85,14 +83,12 @@ export default function AcceptTermsModal({ isOpen }: Props) {
                                     provide and improve our services. Your data
                                     is protected and will not be shared with
                                     third parties without consent.{' '}
-                                    <a
+                                    <Link
                                         href="/privacy"
-                                        target="_blank"
-                                        rel="noopener noreferrer"
                                         className="text-blue-600 underline dark:text-blue-400"
                                     >
                                         Read full privacy policy →
-                                    </a>
+                                    </Link>
                                 </p>
                             </div>
 

@@ -1,4 +1,5 @@
-import { createInertiaApp } from '@inertiajs/react';
+import { createInertiaApp, router } from '@inertiajs/react';
+import { toast } from 'sonner';
 import { SupportWidget } from '@/components/support-widget';
 import { Toaster } from '@/components/ui/sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
@@ -11,6 +12,33 @@ import SettingsLayout from '@/layouts/settings/layout';
 const appName = import.meta.env.VITE_APP_NAME || 'Hiraya Review';
 
 const componentCache = new Map<string, any>();
+
+// Global error handlers for Inertia requests
+router.on('error', (errors) => {
+    // Form validation errors
+    if (Object.keys(errors).length > 0) {
+        toast.error('Validation Error', {
+            description:
+                'Please check the form inputs for errors before proceeding.',
+        });
+    }
+});
+
+router.on('networkError', () => {
+    // e.g. server down or no internet
+    toast.error('Network Error', {
+        description:
+            'Unable to communicate with the server. Please check your connection.',
+    });
+});
+
+router.on('httpException', () => {
+    // Non-200, non-validation responses (403, 500, etc)
+    toast.error('Unexpected Error', {
+        description:
+            'The server returned an error while processing your request.',
+    });
+});
 
 createInertiaApp({
     title: (title) => (title ? `${title} - ${appName}` : appName),
@@ -40,6 +68,7 @@ createInertiaApp({
             name === 'welcome' ||
             name === 'dev-docs' ||
             name === 'guide' ||
+            name === 'error' ||
             name.startsWith('legal/');
 
         let pageLayout: any = undefined;

@@ -70,7 +70,7 @@ class AdminDashboardController extends Controller
                 // Get correct counts and totals from metadata or fallbacks
                 $correct = $meta['correct_count'] ?? 0;
                 $total = $meta['total_questions'] ?? count($attempt->question_ids ?? []);
-                $percentage = $total > 0 ? round(($correct / $total) * 100) : 0;
+                $percentage = $total > 0 ? round(($correct / $total) * 100, 2) : 0;
 
                 // Build a descriptive track or category name
                 $trackName = $meta['track'] ?? null;

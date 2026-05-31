@@ -135,7 +135,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Study Schedule Routes
     Route::middleware('throttle:global-views')->group(function () {
-        Route::get('calendar', fn () => Inertia::render('Calendar'))->name('calendar.index');
+        Route::get('calendar', fn () => Inertia::render('calendar'))->name('calendar.index');
         Route::get('study-schedules', [StudyScheduleController::class, 'index'])->name('study-schedules.index');
         Route::get('study-schedules/subcategories', [StudyScheduleController::class, 'getSubcategories'])->name('study-schedules.subcategories');
         Route::get('study-suggestions', [StudySuggestionController::class, 'getSuggestions'])->name('study-suggestions.get');
@@ -155,3 +155,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 
 require __DIR__.'/settings.php';
+
+Route::fallback(function () {
+    return \Inertia\Inertia::render('error', [
+        'status' => 404,
+    ])
+    ->toResponse(request())
+    ->setStatusCode(404);
+})->middleware('web');

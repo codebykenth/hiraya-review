@@ -124,7 +124,7 @@ export default function AdminLearnIndex({
 
     return (
         <>
-            <Head title="Learn Curation" />
+            <Head title="Module Management" />
 
             <CurationIndexShell<LearnModule>
                 items={modules}
@@ -185,7 +185,7 @@ export default function AdminLearnIndex({
 AdminLearnIndex.layout = {
     breadcrumbs: [
         {
-            title: 'Learn Management',
+            title: 'Module Management',
             href: adminLearnIndex().url,
         },
     ],

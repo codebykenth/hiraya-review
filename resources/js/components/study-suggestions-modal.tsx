@@ -146,11 +146,13 @@ export function StudySuggestionsModal({
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
             <DialogContent className="flex max-h-[85vh] max-w-3xl flex-col overflow-hidden p-0">
-                <DialogHeader className="shrink-0 p-6 pb-2">
-                    <div className="flex items-center justify-between">
-                        <DialogTitle>Study Plan Suggestions</DialogTitle>
+                <DialogHeader className="shrink-0 p-6 pr-12 pb-4 sm:pb-2">
+                    <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
+                        <DialogTitle className="text-left text-xl leading-tight">
+                            Study Plan Suggestions
+                        </DialogTitle>
                         {onFilterChange && (
-                            <div className="flex gap-2">
+                            <div className="flex flex-wrap items-center gap-2">
                                 <select
                                     value={selectedTrack}
                                     onChange={(e) =>
@@ -270,13 +272,13 @@ export function StudySuggestionsModal({
                             {/* Study Plan Preview */}
                             {suggestions.length > 0 && (
                                 <div>
-                                    <div className="mb-3 flex items-center justify-between">
+                                    <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                                         <h3 className="font-semibold text-slate-900">
                                             📅 Suggested Study Schedule (
                                             {suggestions.length} sessions)
                                         </h3>
-                                        <div className="flex items-center gap-2">
-                                            <label className="text-xs font-medium text-slate-600">
+                                        <div className="flex items-center gap-2 self-start sm:self-auto">
+                                            <label className="text-xs font-medium whitespace-nowrap text-slate-600">
                                                 Set all to:
                                             </label>
                                             <input
@@ -368,7 +370,7 @@ export function StudySuggestionsModal({
                                                                         suggestion.title
                                                                     }
                                                                 </p>
-                                                                <p className="mt-1 flex items-center gap-2 text-sm text-slate-600">
+                                                                <p className="mt-1 flex flex-wrap items-center gap-2 text-sm text-slate-600">
                                                                     {new Date(
                                                                         suggestion.study_date +
                                                                             'T00:00:00',

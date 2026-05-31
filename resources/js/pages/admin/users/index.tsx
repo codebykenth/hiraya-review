@@ -47,7 +47,7 @@ interface StatsSummary {
     total_admins: number;
     total_students: number;
     total_attempts: number;
-    terms_accepted_count?: number;
+    total_terms_accepted?: number;
 }
 
 interface AdminUsersIndexProps {
@@ -392,7 +392,7 @@ export default function AdminUsersIndex({
     const complianceRate =
         stats.total_users > 0
             ? Math.round(
-                  ((stats.terms_accepted_count || 0) / stats.total_users) * 100,
+                  ((stats.total_terms_accepted || 0) / stats.total_users) * 100,
               )
             : 0;
 
@@ -632,7 +632,7 @@ export default function AdminUsersIndex({
 
     return (
         <>
-            <Head title="User Management" />
+            <Head title="Users" />
 
             <PageContainer>
                 {/* 1. METRICS DASHBOARD CARDS */}
@@ -924,7 +924,7 @@ export default function AdminUsersIndex({
 AdminUsersIndex.layout = {
     breadcrumbs: [
         {
-            title: 'User Management',
+            title: 'Users',
             href: adminUsersIndex().url,
         },
     ],

@@ -10,6 +10,7 @@ import {
     Activity,
 } from 'lucide-react';
 import { PageContainer } from '@/components/page-container';
+import { PageHeader } from '@/components/page-header';
 import { Card } from '@/components/ui/card';
 import {
     index as questionsIndex,
@@ -74,24 +75,30 @@ export default function AdminDashboard({
             <PageContainer>
                 {/* 1. WELCOME & BANNER */}
                 <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                    <div>
+                    <div className="flex flex-col gap-1.5">
                         <div className="flex items-center gap-2">
                             <span className="inline-flex items-center gap-1 rounded-full bg-blue-50 px-2.5 py-0.5 text-xs font-bold text-blue-600 dark:bg-blue-950/40 dark:text-blue-400">
                                 <Shield className="size-3" />
                                 System Administrator
                             </span>
                         </div>
-                        <h1 className="mt-1 font-heading text-3xl font-bold tracking-tight text-slate-900 md:text-4xl dark:text-white">
-                            Welcome back,{' '}
-                            <span className="font-extrabold text-blue-600 dark:text-blue-400">
-                                {adminName}
-                            </span>
-                        </h1>
-                        <p className="mt-2 text-xs text-slate-500 md:text-sm dark:text-slate-400">
-                            Monitor examinee results, verify generated test
-                            parameters, and audit the dynamic syllabus blueprint
-                            models.
-                        </p>
+                        <PageHeader
+                            title={
+                                <>
+                                    Welcome back,{' '}
+                                    <span className="font-extrabold text-blue-600 dark:text-blue-400">
+                                        {adminName}
+                                    </span>
+                                </>
+                            }
+                            description={
+                                <>
+                                    Monitor examinee results, verify generated
+                                    test parameters, and audit the dynamic
+                                    syllabus blueprint models.
+                                </>
+                            }
+                        />
                     </div>
                     <div className="flex items-center gap-3">
                         <Link

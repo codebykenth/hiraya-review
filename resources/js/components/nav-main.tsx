@@ -109,7 +109,7 @@ export function NavMain({
                                     isActive={hasActiveChild && !isOpen}
                                     tooltip={{ children: item.title }}
                                     className={cn(
-                                        'flex w-full cursor-pointer items-center justify-between transition-all duration-200 hover:bg-slate-100/80 dark:hover:bg-slate-900/60',
+                                        'flex w-full cursor-pointer items-center justify-between transition-all duration-200',
                                         hasActiveChild &&
                                             'font-bold text-blue-700 dark:text-blue-300',
                                     )}

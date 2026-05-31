@@ -1,4 +1,4 @@
-import { Head } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import {
     ChevronLeft,
     ChevronRight,
@@ -6,8 +6,9 @@ import {
     Trash2,
     Lightbulb,
 } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { PageContainer } from '@/components/page-container';
+import { PageHeader } from '@/components/page-header';
 import { StudySuggestionsModal } from '@/components/study-suggestions-modal';
 import { TimePicker } from '@/components/time-picker';
 import { Button } from '@/components/ui/button';
@@ -101,44 +102,37 @@ export default function Calendar() {
     const [selectedTrack, setSelectedTrack] = useState('');
     const [selectedTimeOfDay, setSelectedTimeOfDay] = useState('Evening');
     const [topicsPerDay, setTopicsPerDay] = useState(1);
+    const monthCacheRef = useRef<Map<string, any>>(new Map());
 
-    const fetchSchedules = async () => {
-        const year = currentDate.getFullYear();
-        const month = currentDate.getMonth() + 1;
+    const fetchSchedules = useCallback(
+        async (forceRefetch = false) => {
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth() + 1;
+            const cacheKey = `${year}-${month}`;
 
-        try {
-            const response = await fetch(
-                `/study-schedules?year=${year}&month=${month}`,
-            );
-            const data = await response.json();
+            if (!forceRefetch && monthCacheRef.current.has(cacheKey)) {
+                const data = monthCacheRef.current.get(cacheKey);
+                const schedulesMap = new Map<string, StudySchedule[]>();
 
-            const schedulesMap = new Map<string, StudySchedule[]>();
+                if (data.schedules) {
+                    Object.entries(data.schedules).forEach(([date, items]) => {
+                        schedulesMap.set(date, items as StudySchedule[]);
+                    });
+                }
 
-            if (data.schedules) {
-                Object.entries(data.schedules).forEach(([date, items]) => {
-                    schedulesMap.set(date, items as StudySchedule[]);
-                });
+                setSchedules(schedulesMap);
+                setExamDates(data.examDates || []);
+
+                return;
             }
 
-            setSchedules(schedulesMap);
-            setExamDates(data.examDates || []);
-        } catch {
-            setErrorMessage(
-                'Failed to load your study schedules. Please try refreshing the page.',
-            );
-        }
-    };
-
-    useEffect(() => {
-        const year = currentDate.getFullYear();
-        const month = currentDate.getMonth() + 1;
-
-        (async () => {
             try {
                 const response = await fetch(
                     `/study-schedules?year=${year}&month=${month}`,
                 );
                 const data = await response.json();
+
+                monthCacheRef.current.set(cacheKey, data);
 
                 const schedulesMap = new Map<string, StudySchedule[]>();
 
@@ -155,19 +149,30 @@ export default function Calendar() {
                     'Failed to load your study schedules. Please try refreshing the page.',
                 );
             }
+        },
+        [currentDate],
+    );
 
-            try {
-                const response = await fetch('/study-schedules/subcategories');
-                const data = await response.json();
-                setSubcategories(data.subcategories || []);
-                setLearnModules(data.modules || []);
-            } catch {
-                setErrorMessage(
-                    'Failed to load study subjects. Please try refreshing the page.',
-                );
-            }
-        })();
-    }, [currentDate]);
+    useEffect(() => {
+        fetchSchedules();
+
+        if (subcategories.length === 0) {
+            (async () => {
+                try {
+                    const response = await fetch(
+                        '/study-schedules/subcategories',
+                    );
+                    const data = await response.json();
+                    setSubcategories(data.subcategories || []);
+                    setLearnModules(data.modules || []);
+                } catch {
+                    setErrorMessage(
+                        'Failed to load study subjects. Please try refreshing the page.',
+                    );
+                }
+            })();
+        }
+    }, [currentDate, fetchSchedules, subcategories.length]);
 
     const daysInMonth = (date: Date) => {
         return new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
@@ -323,12 +328,13 @@ export default function Calendar() {
             });
 
             if (response.ok) {
+                monthCacheRef.current.clear();
                 const newSchedule = await response.json();
                 const updated = new Map(schedules);
 
                 if (isEditMode) {
                     // Refresh from server since we just need to replace the old one
-                    fetchSchedules();
+                    fetchSchedules(true);
                 } else {
                     const dateSchedules = updated.get(selectedDate) || [];
                     updated.set(selectedDate, [...dateSchedules, newSchedule]);
@@ -361,6 +367,7 @@ export default function Calendar() {
             });
 
             if (response.ok) {
+                monthCacheRef.current.clear();
                 const updated = new Map(schedules);
                 const dateSchedules = updated.get(date) || [];
                 updated.set(
@@ -393,7 +400,8 @@ export default function Calendar() {
             });
 
             if (response.ok) {
-                await fetchSchedules();
+                monthCacheRef.current.clear();
+                await fetchSchedules(true);
                 setIsSuggestionsOpen(false);
             } else {
                 const errorData = await response.json();
@@ -665,16 +673,13 @@ export default function Calendar() {
 
     return (
         <>
-            <Head title="Study Calendar" />
+            <Head title="Study Plan" />
             <PageContainer>
-                <div className="mb-8">
-                    <h1 className="text-4xl font-bold text-slate-900">
-                        Study Calendar
-                    </h1>
-                    <p className="mt-2 text-slate-600">
-                        Plan your study sessions by clicking on a date
-                    </p>
-                </div>
+                <PageHeader
+                    title="Study Plan"
+                    description="Plan your study sessions by clicking on a date"
+                    className="mb-8"
+                />
 
                 <Card className="bg-white p-6">
                     {/* Header with navigation */}
@@ -1087,15 +1092,13 @@ export default function Calendar() {
                                                                                                         l,
                                                                                                         i,
                                                                                                     ) => (
-                                                                                                        <a
+                                                                                                        <Link
                                                                                                             key={
                                                                                                                 i
                                                                                                             }
                                                                                                             href={
                                                                                                                 l.url
                                                                                                             }
-                                                                                                            target="_blank"
-                                                                                                            rel="noopener noreferrer"
                                                                                                             className={`block w-full rounded px-1.5 py-1 text-[10px] font-bold break-words sm:text-xs ${l.isAuto ? 'bg-amber-50 text-amber-700 hover:text-amber-900' : 'bg-white/50 text-blue-600 hover:text-blue-800'}`}
                                                                                                             onClick={(
                                                                                                                 e,
@@ -1110,7 +1113,7 @@ export default function Calendar() {
                                                                                                             {
                                                                                                                 l.title
                                                                                                             }
-                                                                                                        </a>
+                                                                                                        </Link>
                                                                                                     ),
                                                                                                 )}
                                                                                             </div>
@@ -1347,7 +1350,8 @@ export default function Calendar() {
                                                 '',
                                         },
                                     }).then(() => {
-                                        fetchSchedules();
+                                        monthCacheRef.current.clear();
+                                        fetchSchedules(true);
                                         setIsResetModalOpen(false);
                                         setIsLoading(false);
                                     });

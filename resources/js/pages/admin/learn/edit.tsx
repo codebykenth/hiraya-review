@@ -118,7 +118,7 @@ export default function AdminLearnEdit({
                 title="Edit Study Module"
                 description="Update the lesson title, syllabus categorization, preview summaries, or core Markdown content material."
                 backUrl={adminLearnIndex().url}
-                backLabel="Back to Learn Management"
+                backLabel="Back to Module Management"
                 headerTitle="Edit Module Details"
                 headerIcon={BookOpen}
                 statusLabel="Publish Status"
@@ -258,7 +258,7 @@ export default function AdminLearnEdit({
 AdminLearnEdit.layout = {
     breadcrumbs: [
         {
-            title: 'Learn Management',
+            title: 'Module Management',
             href: adminLearnIndex().url,
         },
         {

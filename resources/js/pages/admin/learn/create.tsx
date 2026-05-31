@@ -781,7 +781,7 @@ export default function AdminLearnCreate({
 AdminLearnCreate.layout = {
     breadcrumbs: [
         {
-            title: 'Learn Management',
+            title: 'Module Management',
             href: adminLearnIndex().url,
         },
         {

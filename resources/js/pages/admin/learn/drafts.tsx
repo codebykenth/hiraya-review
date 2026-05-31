@@ -143,7 +143,7 @@ export default function DraftsLearnList({
 
     return (
         <>
-            <Head title="Learn Drafts Review" />
+            <Head title="Drafts Review" />
 
             <DraftsReviewShell<DraftModule>
                 title="Syllabus Drafts Reviewer"
@@ -429,11 +429,11 @@ export default function DraftsLearnList({
 DraftsLearnList.layout = {
     breadcrumbs: [
         {
-            title: 'Learn Management',
+            title: 'Module Management',
             href: adminLearnIndex().url,
         },
         {
-            title: 'Learn Drafts Review',
+            title: 'Drafts Review',
             href: adminLearnDrafts().url,
         },
     ],

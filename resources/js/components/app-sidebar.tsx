@@ -11,7 +11,6 @@ import {
     Target,
     ListChecks,
     Users,
-    UserCog,
     Settings,
     Compass,
     Database,
@@ -56,17 +55,22 @@ const generalNavItems: NavItem[] = [
         icon: LayoutDashboard,
     },
     {
+        title: 'Study Plan',
+        href: calendarIndex(),
+        icon: CalendarIcon,
+    },
+    {
         title: 'Learn',
         href: learnIndex(),
         icon: BookOpen,
     },
     {
-        title: 'Practice Drill',
+        title: 'Practice Drills',
         href: drillsIndex(),
         icon: Target,
     },
     {
-        title: 'Mock Exam',
+        title: 'Mock Exams',
         href: examsIndex(),
         icon: ClipboardList,
     },
@@ -74,11 +78,6 @@ const generalNavItems: NavItem[] = [
         title: 'History',
         href: historyIndex(),
         icon: History,
-    },
-    {
-        title: 'Study Plan',
-        href: calendarIndex(),
-        icon: CalendarIcon,
     },
     {
         title: 'Reviewer Guide',
@@ -110,11 +109,11 @@ const adminNavItems: NavItem[] = [
         ],
     },
     {
-        title: 'Learn',
+        title: 'Modules',
         icon: BookOpen,
         items: [
             {
-                title: 'Learn Management',
+                title: 'Module Management',
                 href: adminLearnIndex(),
                 icon: Sparkles,
             },
@@ -127,14 +126,8 @@ const adminNavItems: NavItem[] = [
     },
     {
         title: 'Users',
+        href: adminUsersIndex(),
         icon: Users,
-        items: [
-            {
-                title: 'User Management',
-                href: adminUsersIndex(),
-                icon: UserCog,
-            },
-        ],
     },
     {
         title: 'Settings',

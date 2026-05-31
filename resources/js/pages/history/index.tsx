@@ -26,6 +26,7 @@ import {
     TooltipContent,
     TooltipProvider,
 } from '@/components/ui/tooltip';
+import { generatePaginationLinks } from '@/lib/utils';
 import { index as historyIndex } from '@/routes/history';
 
 interface Attempt {
@@ -167,12 +168,12 @@ export default function HistoryPage({
 
     return (
         <TooltipProvider>
-            <Head title="Attempt History" />
+            <Head title="History" />
 
             <PageContainer>
                 {/* 1. HEADER SECTION */}
                 <PageHeader
-                    title="Attempt History"
+                    title="History"
                     description="Review your past performance, analyze detailed score breakdowns, and identify specific areas for improvement across all your exam tracks."
                     descriptionClassName="text-sm text-muted-foreground max-w-3xl leading-relaxed"
                     className="flex flex-col gap-1"
@@ -530,10 +531,22 @@ export default function HistoryPage({
                                 </button>
 
                                 {/* Page Numbers list */}
-                                {Array.from({
-                                    length: pagination.last_page,
-                                }).map((_, idx) => {
-                                    const pageNum = idx + 1;
+                                {generatePaginationLinks(
+                                    pagination.current_page,
+                                    pagination.last_page,
+                                ).map((item, idx) => {
+                                    if (item === '...') {
+                                        return (
+                                            <span
+                                                key={`ellipsis-${idx}`}
+                                                className="px-1 text-muted-foreground"
+                                            >
+                                                ...
+                                            </span>
+                                        );
+                                    }
+
+                                    const pageNum = item as number;
                                     const isActive =
                                         pageNum === pagination.current_page;
 
@@ -552,7 +565,7 @@ export default function HistoryPage({
                                                     { preserveState: true },
                                                 )
                                             }
-                                            className={`shadow-3xs size-8 rounded-lg text-xs font-black transition focus:outline-none ${
+                                            className={`shadow-3xs size-8 cursor-pointer rounded-lg text-xs font-black transition focus:outline-none ${
                                                 isActive
                                                     ? 'bg-blue-600 text-white'
                                                     : 'border border-border bg-white text-muted-foreground hover:bg-slate-50 dark:bg-slate-900 dark:hover:bg-slate-800 dark:hover:text-white'

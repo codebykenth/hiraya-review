@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
 import { PageContainer } from '@/components/page-container';
+import { generatePaginationLinks } from '@/lib/utils';
 import { Button } from './ui/button';
 
 export interface BaseDraftItem {
@@ -463,32 +464,42 @@ export function DraftsReviewShell<T extends BaseDraftItem>({
                                             Previous
                                         </button>
 
-                                        {Array.from({ length: totalPages }).map(
-                                            (_, idx) => {
-                                                const pageNum = idx + 1;
-                                                const isActive =
-                                                    pageNum === currentPage;
-
+                                        {generatePaginationLinks(
+                                            currentPage,
+                                            totalPages,
+                                        ).map((item, idx) => {
+                                            if (item === '...') {
                                                 return (
-                                                    <button
-                                                        key={pageNum}
-                                                        type="button"
-                                                        onClick={() =>
-                                                            setCurrentPage(
-                                                                pageNum,
-                                                            )
-                                                        }
-                                                        className={`shadow-3xs size-8 cursor-pointer rounded-lg text-xs font-black transition focus:outline-none ${
-                                                            isActive
-                                                                ? 'bg-blue-600 text-white'
-                                                                : 'border border-border bg-card text-foreground hover:bg-muted'
-                                                        }`}
+                                                    <span
+                                                        key={`ellipsis-${idx}`}
+                                                        className="px-1 text-muted-foreground"
                                                     >
-                                                        {pageNum}
-                                                    </button>
+                                                        ...
+                                                    </span>
                                                 );
-                                            },
-                                        )}
+                                            }
+
+                                            const pageNum = item as number;
+                                            const isActive =
+                                                pageNum === currentPage;
+
+                                            return (
+                                                <button
+                                                    key={pageNum}
+                                                    type="button"
+                                                    onClick={() =>
+                                                        setCurrentPage(pageNum)
+                                                    }
+                                                    className={`shadow-3xs size-8 cursor-pointer rounded-lg text-xs font-black transition focus:outline-none ${
+                                                        isActive
+                                                            ? 'bg-blue-600 text-white'
+                                                            : 'border border-border bg-card text-foreground hover:bg-muted'
+                                                    }`}
+                                                >
+                                                    {pageNum}
+                                                </button>
+                                            );
+                                        })}
 
                                         <button
                                             type="button"
