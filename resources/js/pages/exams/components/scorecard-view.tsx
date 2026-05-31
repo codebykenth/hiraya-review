@@ -164,7 +164,7 @@ export function ScorecardView({
                     const catPct =
                         val.total > 0 ? (val.correct / val.total) * 100 : 0;
 
-                    if (catPct < 60 && cat !== strongestCategory) {
+                    if (catPct < 80 && cat !== strongestCategory) {
                         weakCategories.push(cat);
                     }
                 },
@@ -178,22 +178,23 @@ export function ScorecardView({
                 weakestCategory = 'Numerical Ability';
             }
 
-            if (strongestPct < 50 && strongestPct !== -1) {
-                // The user did poorly across the board
-                const otherWeakList = weakCategories
-                    .filter((c) => c !== weakestCategory)
+            const formattedStrongestPct = (Math.trunc(strongestPct * 100) / 100).toFixed(2);
+
+            if (strongestPct < 80 && strongestPct !== -1) {
+                // The user did poorly across the board (all below passing grade)
+                const otherSubjectsToStudy = [...weakCategories.filter((c) => c !== weakestCategory), strongestCategory]
                     .join(', ')
-                    .replace(/, ([^,]*)$/, ' and $1');
-                aiAnalysisText = `While ${strongestCategory} was your highest scoring area (${Math.round(strongestPct)}%), your results indicate a need for comprehensive review across all subjects. We recommend prioritizing ${weakestCategory} (specifically ${weakestSubcat}) before moving on to ${otherWeakList || 'other categories'}.`;
+                    .replace(/, ([^,]*)$/, ', and finally $1');
+                aiAnalysisText = `While ${strongestCategory} was your highest scoring area (${formattedStrongestPct}%), your results indicate a need for comprehensive review across all subjects to reach the 80% passing grade. We recommend prioritizing ${weakestCategory} (specifically ${weakestSubcat}) before moving on to ${otherSubjectsToStudy}.`;
             } else if (weakCategories.length > 1) {
                 const allWeakList = weakCategories
                     .join(', ')
                     .replace(/, ([^,]*)$/, ' and $1');
-                aiAnalysisText = `Your strongest area was ${strongestCategory} (${Math.round(strongestPct)}%). You have multiple areas needing improvement, specifically ${allWeakList}. Focus your initial review efforts heavily on ${weakestCategory}, particularly the ${weakestSubcat} modules.`;
+                aiAnalysisText = `Your strongest area was ${strongestCategory} (${formattedStrongestPct}%). You have multiple areas needing improvement, specifically ${allWeakList}. Focus your initial review efforts heavily on ${weakestCategory}, particularly the ${weakestSubcat} modules.`;
             } else if (weakCategories.length === 1) {
-                aiAnalysisText = `Your strongest area was ${strongestCategory} (${Math.round(strongestPct)}%). To improve your overall score, focus your review efforts on ${weakestCategory}, specifically the ${weakestSubcat} modules.`;
+                aiAnalysisText = `Your strongest area was ${strongestCategory} (${formattedStrongestPct}%). To improve your overall score, focus your review efforts on ${weakestCategory}, specifically the ${weakestSubcat} modules.`;
             } else {
-                aiAnalysisText = `Great job! Your strongest area was ${strongestCategory} (${Math.round(strongestPct)}%). While all your category scores are solid, you can further perfect your overall score by reviewing ${weakestCategory}, specifically ${weakestSubcat}.`;
+                aiAnalysisText = `Great job! Your strongest area was ${strongestCategory} (${formattedStrongestPct}%). While all your category scores are solid, you can further perfect your overall score by reviewing ${weakestCategory}, specifically ${weakestSubcat}.`;
             }
         }
     }
@@ -368,7 +369,7 @@ export function ScorecardView({
                                                                     {cat}
                                                                 </span>
                                                                 <span
-                                                                    className={`rounded-md px-1 py-0.5 text-[8px] font-bold sm:px-1.5 sm:text-[10px] ${catExactPct >= 75 ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400' : catExactPct >= 50 ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/30 dark:text-amber-400' : 'bg-rose-50 text-rose-700 dark:bg-rose-950/30 dark:text-rose-400'}`}
+                                                                    className={`rounded-md px-1 py-0.5 text-[8px] font-bold sm:px-1.5 sm:text-[10px] ${catExactPct >= 80 ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400' : 'bg-rose-50 text-rose-700 dark:bg-rose-950/30 dark:text-rose-400'}`}
                                                                 >
                                                                     {
                                                                         catFormattedPct
@@ -379,7 +380,7 @@ export function ScorecardView({
                                                             <div className="flex items-center gap-1.5 sm:gap-2">
                                                                 <div className="h-1 flex-1 rounded-full bg-muted sm:h-1.5">
                                                                     <div
-                                                                        className={`h-1 rounded-full transition-all duration-1000 sm:h-1.5 ${catExactPct >= 75 ? 'bg-emerald-500' : catExactPct >= 50 ? 'bg-amber-500' : 'bg-rose-500'}`}
+                                                                        className={`h-1 rounded-full transition-all duration-1000 sm:h-1.5 ${catExactPct >= 80 ? 'bg-emerald-500' : 'bg-rose-500'}`}
                                                                         style={{
                                                                             width: `${catExactPct}%`,
                                                                         }}
@@ -473,9 +474,9 @@ export function ScorecardView({
                                             focused on your weak areas.
                                         </p>
                                         <Link href={'/drills'}>
-                                            <Button className="w-full bg-accent text-foreground hover:bg-accent/80">
+                                            <Button className="w-full shadow-sm">
                                                 Start Custom Drill{' '}
-                                                <ArrowRight className="ml-1 size-3" />
+                                                <ArrowRight className="ml-1 size-3.5" />
                                             </Button>
                                         </Link>
                                     </div>

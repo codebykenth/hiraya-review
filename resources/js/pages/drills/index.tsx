@@ -410,9 +410,11 @@ export default function Drills({
                     description="Select a category below to focus your practice. Each drill module is designed to target specific cognitive areas required for civil service examinations."
                 />
 
-                {categories.length > 0 ? (
+                {categories.filter(c => c.name.toLowerCase() !== 'demographic').length > 0 ? (
                     <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                        {categories.map((cat) => {
+                        {categories
+                            .filter(c => c.name.toLowerCase() !== 'demographic')
+                            .map((cat) => {
                             const meta = categoryMeta[cat.name] || {
                                 icon: Brain,
                                 bgColor: 'bg-slate-600',

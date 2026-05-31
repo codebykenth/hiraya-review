@@ -35,7 +35,7 @@ export default function About() {
 
     return (
         <div className="flex min-h-screen flex-col bg-slate-50 dark:bg-[#0a0a0a]">
-            <Head title="About Us - Hiraya Review" />
+            <Head title="About - Hiraya Review" />
             <SiteHeader activeNav="home" />
 
             <main className="flex-1">

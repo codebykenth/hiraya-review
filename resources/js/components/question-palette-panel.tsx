@@ -238,9 +238,9 @@ export default function QuestionPalettePanel({
                         if (mode === 'review') {
                             if (
                                 reviewSubcategoryFilter !==
-                                    'All Subcategories' &&
+                                'All Subcategories' &&
                                 (q.subcategory || 'General Concepts') !==
-                                    reviewSubcategoryFilter
+                                reviewSubcategoryFilter
                             ) {
                                 isFilteredOut = true;
                             }
@@ -271,7 +271,7 @@ export default function QuestionPalettePanel({
 
                             return (
                                 <button
-                                    key={q.id || idx}
+                                    key={`${q.id || 'q'}-${idx}`}
                                     onClick={() => {
                                         onNavigate(idx);
 
@@ -280,19 +280,18 @@ export default function QuestionPalettePanel({
                                         }
                                     }}
                                     disabled={isFilteredOut}
-                                    className={`relative flex aspect-square cursor-pointer items-center justify-center rounded-lg border text-xs font-bold transition focus:outline-none ${
-                                        isFilteredOut
+                                    className={`relative flex aspect-square cursor-pointer items-center justify-center rounded-lg border text-xs font-bold transition focus:outline-none ${isFilteredOut
                                             ? 'cursor-not-allowed border-border bg-background text-muted-foreground opacity-20 grayscale'
                                             : isActive
-                                              ? 'border-blue-600 bg-blue-50 bg-card font-black text-blue-600 ring-2 ring-blue-600 ring-offset-1 dark:text-blue-400 dark:ring-offset-background'
-                                              : isAnswered
-                                                ? 'border-blue-600 bg-blue-600 text-white hover:bg-blue-700'
-                                                : isFlagged
-                                                  ? 'dark:bg-rose-955/20 border-rose-300 bg-rose-50 font-extrabold text-rose-700 dark:border-rose-900/40 dark:text-rose-400'
-                                                  : isFreeAttempt && idx >= 20
-                                                    ? 'border-border bg-background text-muted-foreground/40 hover:bg-muted'
-                                                    : 'border-border bg-background text-foreground hover:bg-muted'
-                                    }`}
+                                                ? 'border-blue-600 bg-blue-50 bg-card font-black text-blue-600 ring-2 ring-blue-600 ring-offset-1 dark:text-blue-400 dark:ring-offset-background'
+                                                : isAnswered
+                                                    ? 'border-blue-600 bg-blue-600 text-white hover:bg-blue-700'
+                                                    : isFlagged
+                                                        ? 'dark:bg-rose-955/20 border-rose-300 bg-rose-50 font-extrabold text-rose-700 dark:border-rose-900/40 dark:text-rose-400'
+                                                        : isFreeAttempt && idx >= 20
+                                                            ? 'border-border bg-background text-muted-foreground/40 hover:bg-muted'
+                                                            : 'border-border bg-background text-foreground hover:bg-muted'
+                                        }`}
                                 >
                                     {idx + 1}
                                     {isFlagged && (
@@ -328,8 +327,8 @@ export default function QuestionPalettePanel({
                             bgColor = isSkipped
                                 ? 'border border-border bg-slate-100 text-slate-400 dark:bg-slate-800 dark:text-slate-500'
                                 : isCorrect
-                                  ? 'border border-emerald-200 bg-emerald-100 text-emerald-700 dark:border-emerald-900/50 dark:bg-emerald-900/50 dark:text-emerald-400'
-                                  : 'border border-rose-200 bg-rose-100 text-rose-700 dark:border-rose-900/50 dark:bg-rose-900/50 dark:text-rose-400';
+                                    ? 'border border-emerald-200 bg-emerald-100 text-emerald-700 dark:border-emerald-900/50 dark:bg-emerald-900/50 dark:text-emerald-400'
+                                    : 'border border-rose-200 bg-rose-100 text-rose-700 dark:border-rose-900/50 dark:bg-rose-900/50 dark:text-rose-400';
                         }
 
                         if (currentIdx === idx) {
@@ -339,7 +338,7 @@ export default function QuestionPalettePanel({
 
                         return (
                             <button
-                                key={q.id || idx}
+                                key={`${q.id || 'q'}-${idx}`}
                                 onClick={() => {
                                     onNavigate(idx);
 

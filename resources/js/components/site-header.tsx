@@ -61,7 +61,7 @@ export default function SiteHeader({
 
     const navLinks = [
         { id: 'home', label: 'Home', href: '#' },
-        { id: 'about', label: 'About Us', href: '/about' },
+        { id: 'about', label: 'About', href: '/about' },
         { id: 'features', label: 'Features', href: '#features' },
         { id: 'path', label: 'Process', href: '#path' },
         { id: 'learn', label: 'Study Hub', href: '/learn' },

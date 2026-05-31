@@ -131,14 +131,6 @@ export function LiveExamView({
                     )}
 
                     <div className="flex items-center gap-2">
-                        <button
-                            onClick={() => setIsMobilePaletteOpen(true)}
-                            className="shadow-3xs flex items-center justify-center rounded-lg border border-border bg-card p-2 text-foreground hover:bg-accent focus:outline-none md:hidden"
-                            title="Open Question Palette"
-                        >
-                            <LayoutGrid className="size-4" />
-                        </button>
-
                         {isTimed ? (
                             <div
                                 className={`shadow-3xs flex items-center gap-1.5 rounded-lg border px-2 py-1.5 text-sm font-black sm:px-3 ${
@@ -159,6 +151,14 @@ export function LiveExamView({
                                 </span>
                             </div>
                         )}
+
+                        <button
+                            onClick={() => setIsMobilePaletteOpen(true)}
+                            className="shadow-3xs flex cursor-pointer items-center justify-center rounded-lg bg-blue-600 p-2 text-white hover:bg-blue-700 transition focus:outline-none lg:hidden"
+                            title="Open Question Palette"
+                        >
+                            <LayoutGrid className="size-4" />
+                        </button>
                     </div>
                 </div>
 

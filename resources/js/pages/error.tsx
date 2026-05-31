@@ -8,6 +8,9 @@ import {
     FileQuestion,
 } from 'lucide-react';
 import React from 'react';
+import SiteHeader from '@/components/site-header';
+import SiteFooter from '@/components/site-footer';
+import AppLayout from '@/layouts/app-layout';
 
 interface ErrorPageProps {
     status: number;
@@ -47,43 +50,60 @@ export default function ErrorPage({ status }: ErrorPageProps) {
         ),
     }[status] || <AlertCircle className="mx-auto size-24 text-slate-400" />;
 
-    return (
-        <>
-            <Head title={title} />
-            <div className="flex min-h-[80vh] flex-col items-center justify-center px-4 py-16 sm:px-6 lg:px-8">
-                <div className="mx-auto w-full max-w-2xl text-center">
-                    <div className="mb-8">{icon}</div>
+    const content = (
+        <div className="flex min-h-[80vh] flex-col items-center justify-center px-4 py-16 sm:px-6 lg:px-8">
+            <div className="mx-auto w-full max-w-2xl text-center">
+                <div className="mb-8">{icon}</div>
 
-                    <h1 className="font-heading text-4xl font-black tracking-tight text-slate-900 sm:text-5xl dark:text-white">
-                        {title}
-                    </h1>
+                <h1 className="font-heading text-4xl font-black tracking-tight text-slate-900 sm:text-5xl dark:text-white">
+                    {title}
+                </h1>
 
-                    <p className="mt-4 text-base leading-relaxed text-slate-600 sm:text-lg dark:text-slate-400">
-                        {description}
-                    </p>
+                <p className="mt-4 text-base leading-relaxed text-slate-600 sm:text-lg dark:text-slate-400">
+                    {description}
+                </p>
 
-                    <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
-                        <button
-                            onClick={() => window.history.back()}
-                            className="inline-flex w-full items-center justify-center gap-2 rounded-xl border-2 border-slate-200 bg-transparent px-6 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 sm:w-auto dark:border-slate-800 dark:text-slate-300 dark:hover:bg-slate-800/50"
+                <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
+                    <button
+                        onClick={() => window.history.back()}
+                        className="inline-flex w-full items-center justify-center gap-2 rounded-xl border-2 border-slate-200 bg-transparent px-6 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 sm:w-auto dark:border-slate-800 dark:text-slate-300 dark:hover:bg-slate-800/50"
+                    >
+                        <ArrowLeft className="size-4" />
+                        Go Back
+                    </button>
+
+                    {auth?.user && (
+                        <Link
+                            href="/dashboard"
+                            className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700 focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2 sm:w-auto"
                         >
-                            <ArrowLeft className="size-4" />
-                            Go Back
-                        </button>
-
-                        {auth?.user && (
-                            <Link
-                                href="/dashboard"
-                                className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700 focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2 sm:w-auto"
-                            >
-                                <Home className="size-4" />
-                                Back to Home
-                            </Link>
-                        )}
-                    </div>
+                            <Home className="size-4" />
+                            Back to Home
+                        </Link>
+                    )}
                 </div>
             </div>
-        </>
+        </div>
+    );
+
+    if (auth?.user) {
+        return (
+            <AppLayout>
+                <Head title={title} />
+                {content}
+            </AppLayout>
+        );
+    }
+
+    return (
+        <div className="flex min-h-screen flex-col bg-slate-50 dark:bg-[#0a0a0a]">
+            <SiteHeader />
+            <Head title={title} />
+            <main className="flex-1">
+                {content}
+            </main>
+            <SiteFooter />
+        </div>
     );
 }
 
