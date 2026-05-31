@@ -125,6 +125,16 @@ export function DraftsReviewShell<T extends BaseDraftItem>({
     const [filterSubcategory, setFilterSubcategory] = useState<string>('all');
     const [currentPage, setCurrentPage] = useState(1);
     const pageSize = 5;
+    const tableRef = React.useRef<HTMLDivElement>(null);
+
+    const handlePageChange = (page: number) => {
+        setCurrentPage(page);
+        setTimeout(() => {
+            if (tableRef.current) {
+                tableRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }, 50);
+    };
 
     useEffect(() => {
         const handler = setTimeout(() => {
@@ -373,7 +383,7 @@ export function DraftsReviewShell<T extends BaseDraftItem>({
             )}
 
             {/* 3. DRAFT STREAM WORKSPACE */}
-            <div className="mt-6 flex flex-col gap-6">
+            <div ref={tableRef} className="scroll-m-24 mt-6 flex flex-col gap-6">
                 {items.length === 0 ? (
                     /* COMPLETELY EMPTY SYSTEM-WIDE DRAFTS STATE */
                     <div className="flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-border bg-card p-16 text-center">
@@ -455,9 +465,7 @@ export function DraftsReviewShell<T extends BaseDraftItem>({
                                             type="button"
                                             disabled={currentPage === 1}
                                             onClick={() =>
-                                                setCurrentPage((prev) =>
-                                                    Math.max(1, prev - 1),
-                                                )
+                                                handlePageChange(Math.max(1, currentPage - 1))
                                             }
                                             className="shadow-3xs cursor-pointer rounded-lg border border-border bg-card px-3 py-1.5 text-xs font-bold text-foreground transition hover:bg-muted focus:outline-none disabled:cursor-not-allowed disabled:opacity-40"
                                         >
@@ -488,7 +496,7 @@ export function DraftsReviewShell<T extends BaseDraftItem>({
                                                     key={pageNum}
                                                     type="button"
                                                     onClick={() =>
-                                                        setCurrentPage(pageNum)
+                                                        handlePageChange(pageNum)
                                                     }
                                                     className={`shadow-3xs size-8 cursor-pointer rounded-lg text-xs font-black transition focus:outline-none ${
                                                         isActive
@@ -507,12 +515,7 @@ export function DraftsReviewShell<T extends BaseDraftItem>({
                                                 currentPage === totalPages
                                             }
                                             onClick={() =>
-                                                setCurrentPage((prev) =>
-                                                    Math.min(
-                                                        totalPages,
-                                                        prev + 1,
-                                                    ),
-                                                )
+                                                handlePageChange(Math.min(totalPages, currentPage + 1))
                                             }
                                             className="shadow-3xs cursor-pointer rounded-lg border border-border bg-card px-3 py-1.5 text-xs font-bold text-foreground transition hover:bg-muted focus:outline-none disabled:cursor-not-allowed disabled:opacity-40"
                                         >

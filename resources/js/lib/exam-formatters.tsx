@@ -45,6 +45,43 @@ export const extractPropositions = (stem: string) => {
     return matches;
 };
 
+export const formatMathInline = (text: string) => {
+    if (typeof text !== 'string') return text;
+    // Split by fraction (e.g. 1/2 or 1 / 2) or superscript (e.g. ^2, ^-3, ^n)
+    const parts = text.split(/(\b\d+\s*\/\s*\d+\b|\^[-a-zA-Z0-9]+)/);
+    if (parts.length === 1) return text;
+
+    return (
+        <>
+            {parts.map((part, idx) => {
+                if (idx % 2 === 1) {
+                    if (part.startsWith('^')) {
+                        return (
+                            <sup key={idx} className="font-semibold">
+                                {part.substring(1)}
+                            </sup>
+                        );
+                    }
+                    if (part.includes('/')) {
+                        const [num, den] = part.split('/').map((s) => s.trim());
+                        return (
+                            <span key={idx} className="mx-1 inline-flex flex-col text-center align-middle leading-none">
+                                <span className="block border-b border-slate-500 px-0.5 pb-[2px] text-[0.8em] font-bold dark:border-slate-400">
+                                    {num}
+                                </span>
+                                <span className="block px-0.5 pt-[2px] text-[0.8em] font-bold">
+                                    {den}
+                                </span>
+                            </span>
+                        );
+                    }
+                }
+                return <React.Fragment key={idx}>{part}</React.Fragment>;
+            })}
+        </>
+    );
+};
+
 export const renderFormattedText = (
     text: string,
     stripLogicSymbols: boolean = false,
@@ -175,7 +212,7 @@ export const renderFormattedText = (
 
                 return (
                     <span className="font-semibold text-slate-800">
-                        {token}
+                        {formatMathInline(token)}
                     </span>
                 );
             };
@@ -194,7 +231,7 @@ export const renderFormattedText = (
                                 );
                             }
 
-                            return <span key={mIdx}>{mPart}</span>;
+                            return <span key={mIdx}>{formatMathInline(mPart)}</span>;
                         })}
                     </>
                 );
@@ -352,7 +389,7 @@ export const renderFormattedText = (
                                         key={ci}
                                         className="dark:text-slate-350 px-4 py-3 leading-relaxed font-semibold text-slate-700"
                                     >
-                                        {cell}
+                                        {formatMathInline(cell)}
                                     </td>
                                 ))}
                             </tr>

@@ -42,10 +42,22 @@ export function AdminTable<T>({
     legend,
     onPageChange,
 }: AdminTableProps<T>) {
+    const tableRef = React.useRef<HTMLDivElement>(null);
     const totalPages = Math.ceil(totalItems / pageSize);
 
+    const handlePageChange = (page: number) => {
+        if (onPageChange) {
+            onPageChange(page);
+            setTimeout(() => {
+                if (tableRef.current) {
+                    tableRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }, 50);
+        }
+    };
+
     return (
-        <div className="overflow-hidden rounded-xl border border-slate-100 bg-white shadow-xs dark:border-slate-900 dark:bg-slate-950">
+        <div ref={tableRef} className="scroll-m-24 overflow-hidden rounded-xl border border-slate-100 bg-white shadow-xs dark:border-slate-900 dark:bg-slate-950">
             {/* Card Header with Title and Action Legend Key matching attempt history style */}
             {(title || (legend && legend.length > 0)) && (
                 <div className="flex flex-col gap-3 border-b border-slate-100 bg-slate-50/20 p-5 sm:flex-row sm:items-center sm:justify-between dark:border-slate-900 dark:bg-slate-900/10">
@@ -212,7 +224,7 @@ export function AdminTable<T>({
                                 variant="outline"
                                 size="sm"
                                 disabled={currentPage === 1}
-                                onClick={() => onPageChange(currentPage - 1)}
+                                onClick={() => handlePageChange(currentPage - 1)}
                                 className="shadow-3xs dark:text-slate-350 dark:hover:bg-slate-850 h-8 cursor-pointer px-3 text-xs font-bold focus:outline-none dark:border-slate-800 dark:bg-slate-900"
                             >
                                 Previous
@@ -243,7 +255,7 @@ export function AdminTable<T>({
                                             isActive ? 'default' : 'outline'
                                         }
                                         size="sm"
-                                        onClick={() => onPageChange(pageNum)}
+                                        onClick={() => handlePageChange(pageNum)}
                                         className={`size-8 cursor-pointer p-0 text-xs font-black transition focus:outline-none ${
                                             isActive
                                                 ? 'shadow-3xs bg-blue-600 text-white hover:bg-blue-700'
@@ -259,7 +271,7 @@ export function AdminTable<T>({
                                 variant="outline"
                                 size="sm"
                                 disabled={currentPage === totalPages}
-                                onClick={() => onPageChange(currentPage + 1)}
+                                onClick={() => handlePageChange(currentPage + 1)}
                                 className="shadow-3xs dark:text-slate-350 dark:hover:bg-slate-850 h-8 cursor-pointer px-3 text-xs font-bold focus:outline-none dark:border-slate-800 dark:bg-slate-900"
                             >
                                 Next

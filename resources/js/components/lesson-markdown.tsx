@@ -1,5 +1,6 @@
 import { BookOpen, CheckCircle2, HelpCircle, Lightbulb } from 'lucide-react';
 import React, { useCallback, useMemo, useState } from 'react';
+import { formatMathInline } from '@/lib/exam-formatters';
 
 function RevealableAnswer({
     answerContent,
@@ -52,18 +53,18 @@ const cleanText = (value: string): string =>
         .replaceAll('\\cdot', '*')
         .replaceAll('\\div', '/')
         .replaceAll('\\pm', '+/-')
-        .replaceAll('\\leq', '<=')
-        .replaceAll('\\geq', '>=')
-        .replaceAll('\\le', '<=')
-        .replaceAll('\\ge', '>=')
-        .replaceAll('\\neq', '!=')
-        .replaceAll('\\approx', 'approx.')
-        .replaceAll('\\pi', 'pi')
-        .replaceAll('\\infty', 'infinity')
-        .replaceAll('\\deg', ' degrees')
-        .replaceAll('\\alpha', 'alpha')
-        .replaceAll('\\beta', 'beta')
-        .replaceAll('\\theta', 'theta')
+        .replace(/\\leq\b/g, '<=')
+        .replace(/\\geq\b/g, '>=')
+        .replace(/\\le\b/g, '<=')
+        .replace(/\\ge\b/g, '>=')
+        .replace(/\\neq\b/g, '!=')
+        .replace(/\\approx\b/g, 'approx.')
+        .replace(/\\pi\b/g, 'pi')
+        .replace(/\\infty\b/g, 'infinity')
+        .replace(/\\deg\b/g, ' degrees')
+        .replace(/\\alpha\b/g, 'alpha')
+        .replace(/\\beta\b/g, 'beta')
+        .replace(/\\theta\b/g, 'theta')
         .replaceAll('\\*', '*')
         .replaceAll('\\_', '_')
         .replaceAll('\\`', '`')
@@ -89,7 +90,8 @@ const cleanText = (value: string): string =>
         .replaceAll('â‰ˆ', 'approx.')
         .replaceAll('Ï€', 'pi')
         .replaceAll('âˆž', 'infinity')
-        .replaceAll('Â°', ' degrees')
+        .replaceAll('°', ' degrees')
+        .replaceAll(' * ', ' × ')
         .replace(/\s{2,}/g, ' ')
         .trim();
 
@@ -327,15 +329,15 @@ export function LessonMarkdown({ content = '' }: LessonMarkdownProps) {
                 if (!str) {
                     return [];
                 }
-
-                const boldRegex = /\*+([^*]+?)\*+/g;
+                // Strictly require double asterisks for bold to avoid swallowing multiplication signs
+                const boldRegex = /\*\*([^*]+?)\*\*/g;
                 const parts: React.ReactNode[] = [];
                 let lastIdx = 0;
                 let match;
 
                 while ((match = boldRegex.exec(str)) !== null) {
                     if (match.index > lastIdx) {
-                        parts.push(str.substring(lastIdx, match.index));
+                        parts.push(formatMathInline(str.substring(lastIdx, match.index)));
                     }
 
                     parts.push(
@@ -343,17 +345,17 @@ export function LessonMarkdown({ content = '' }: LessonMarkdownProps) {
                             key={`${keyPrefix}-bold-${match.index}`}
                             className="font-extrabold text-slate-950 dark:text-white"
                         >
-                            {match[1].trim()}
+                            {formatMathInline(match[1].trim())}
                         </strong>,
                     );
                     lastIdx = boldRegex.lastIndex;
                 }
 
                 if (lastIdx < str.length) {
-                    parts.push(str.substring(lastIdx));
+                    parts.push(formatMathInline(str.substring(lastIdx)));
                 }
 
-                return parts.length > 0 ? parts : [str];
+                return parts.length > 0 ? parts : [formatMathInline(str)];
             };
 
             while (i < normalized.length) {
@@ -443,12 +445,41 @@ export function LessonMarkdown({ content = '' }: LessonMarkdownProps) {
         const normalizedContent = content
             .replace(/\r\n/g, '\n')
             .replace(/\\r\\n/g, '\n')
-            .replace(/\\n/g, '\n')
-            .replace(/\\r/g, '\n');
+            .replace(/\\n/g, '\n');
         const lines = normalizedContent.split('\n');
         const rendered: React.ReactNode[] = [];
         let tableHeaders: string[] = [];
         let tableRows: string[][] = [];
+
+        let inLadderBlock = false;
+        let ladderLines: string[] = [];
+
+        const flushLadder = (key: string) => {
+            if (ladderLines.length === 0) return;
+
+            rendered.push(
+                <div key={`ladder-${key}`} className="my-8 flex flex-col font-mono text-xl tracking-widest font-black text-slate-800 dark:text-slate-200">
+                    {ladderLines.map((line, i) => {
+                        const parts = line.split('|');
+                        const divisor = parts[0]?.trim();
+                        const numbers = parts[1]?.trim();
+                        const isLast = i === ladderLines.length - 1;
+                        
+                        return (
+                            <div key={i} className="flex items-center">
+                                <div className="w-12 text-right text-blue-600 dark:text-blue-400 shrink-0">
+                                    {divisor}
+                                </div>
+                                <div className={`px-4 py-2 ml-3 ${!isLast ? 'border-b-2 border-l-2 border-slate-800 dark:border-slate-200' : 'border-l-2 border-transparent'}`}>
+                                    {numbers}
+                                </div>
+                            </div>
+                        );
+                    })}
+                </div>
+            );
+            ladderLines = [];
+        };
 
         const flushTable = (key: string) => {
             if (tableHeaders.length === 0) {
@@ -503,6 +534,23 @@ export function LessonMarkdown({ content = '' }: LessonMarkdownProps) {
         for (let idx = 0; idx < lines.length; idx++) {
             const rawLine = lines[idx];
             const trimmed = cleanText(rawLine.trim());
+
+            if (/^```\s*ladder/i.test(trimmed)) {
+                inLadderBlock = true;
+                flushTable(String(idx));
+                continue;
+            }
+
+            if (inLadderBlock && /^```/i.test(trimmed)) {
+                inLadderBlock = false;
+                flushLadder(String(idx));
+                continue;
+            }
+
+            if (inLadderBlock) {
+                if (trimmed) ladderLines.push(rawLine.trim());
+                continue;
+            }
 
             if (!trimmed.startsWith('|')) {
                 flushTable(String(idx));
@@ -793,6 +841,7 @@ export function LessonMarkdown({ content = '' }: LessonMarkdownProps) {
         }
 
         flushTable('end');
+        flushLadder('end');
 
         return rendered;
     }, [content, parseLineContent]);

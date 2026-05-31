@@ -83,6 +83,24 @@ export default function LearnIndex({ modules, categories }: LearnIndexProps) {
         return matchesQuery && matchesCategory;
     });
 
+    const groupedModules = Object.entries(
+        filteredModules.reduce(
+            (acc, mod) => {
+                if (!acc[mod.category]) acc[mod.category] = [];
+                acc[mod.category].push(mod);
+                return acc;
+            },
+            {} as Record<string, LearnModule[]>,
+        ),
+    ).sort(([a], [b]) => {
+        const indexA = categories.findIndex((c) => c.name === a);
+        const indexB = categories.findIndex((c) => c.name === b);
+        if (indexA === -1 && indexB === -1) return a.localeCompare(b);
+        if (indexA === -1) return 1;
+        if (indexB === -1) return -1;
+        return indexA - indexB;
+    });
+
     return (
         <>
             <Head>
@@ -157,9 +175,9 @@ export default function LearnIndex({ modules, categories }: LearnIndexProps) {
 
                 {/* Modules Grid */}
                 {filteredModules.length > 0 ? (
-                    <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-                        {filteredModules.map((mod) => {
-                            const colors = categoryColors[mod.category] || {
+                    <div className="flex flex-col gap-12">
+                        {groupedModules.map(([categoryName, groupMods]) => {
+                            const colors = categoryColors[categoryName] || {
                                 bg: 'bg-slate-50 dark:bg-slate-800/40',
                                 text: 'text-muted-foreground',
                                 border: 'border-border',
@@ -167,56 +185,65 @@ export default function LearnIndex({ modules, categories }: LearnIndexProps) {
                             };
 
                             return (
-                                <Link
-                                    key={mod.id}
-                                    href={`/learn/${mod.slug}`}
-                                    className="group block"
-                                >
-                                    <Card className="flex h-full flex-col justify-between overflow-hidden p-6 transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-md">
-                                        <div>
-                                            {/* Badges row */}
-                                            <div className="flex flex-wrap items-center gap-2">
-                                                <span
-                                                    className={`rounded-full border px-2.5 py-0.5 text-[9px] font-extrabold tracking-wide uppercase ${colors.bg} ${colors.text} ${colors.border}`}
-                                                >
-                                                    {mod.category}
-                                                </span>
-                                                <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[9px] font-bold text-muted-foreground dark:bg-slate-900">
-                                                    {mod.subcategory}
-                                                </span>
-                                            </div>
+                                <section key={categoryName} className="flex flex-col gap-5">
+                                    <h2 className="flex items-center gap-3 border-b border-border pb-3 font-heading text-xl font-black text-foreground">
+                                        <span className={`size-3 rounded-full border ${colors.bg} ${colors.border}`} />
+                                        {categoryName}
+                                    </h2>
+                                    <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+                                        {groupMods.map((mod) => (
+                                            <Link
+                                                key={mod.id}
+                                                href={`/learn/${mod.slug}`}
+                                                className="group block"
+                                            >
+                                                <Card className="flex h-full flex-col justify-between overflow-hidden p-6 transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-md">
+                                                    <div>
+                                                        {/* Badges row */}
+                                                        <div className="flex flex-wrap items-center gap-2">
+                                                            <span
+                                                                className={`rounded-full border px-2.5 py-0.5 text-[9px] font-extrabold tracking-wide uppercase ${colors.bg} ${colors.text} ${colors.border}`}
+                                                            >
+                                                                {mod.category}
+                                                            </span>
+                                                            <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[9px] font-bold text-muted-foreground dark:bg-slate-900">
+                                                                {mod.subcategory}
+                                                            </span>
+                                                        </div>
 
-                                            <h3 className="mt-5 font-heading text-lg leading-snug font-bold text-foreground transition group-hover:text-blue-600 dark:group-hover:text-blue-400">
-                                                {mod.title}
-                                            </h3>
+                                                        <h3 className="mt-5 font-heading text-lg leading-snug font-bold text-foreground transition group-hover:text-blue-600 dark:group-hover:text-blue-400">
+                                                            {mod.title}
+                                                        </h3>
 
-                                            <div className="mt-2.5 flex items-center gap-1.5 text-[10px] font-bold text-muted-foreground uppercase">
-                                                <Tag className="size-3" />
-                                                <span>Topic: {mod.topic}</span>
-                                            </div>
+                                                        <div className="mt-2.5 flex items-center gap-1.5 text-[10px] font-bold text-muted-foreground uppercase">
+                                                            <Tag className="size-3" />
+                                                            <span>Topic: {mod.topic}</span>
+                                                        </div>
 
-                                            <p className="mt-3 line-clamp-3 text-xs leading-relaxed text-muted-foreground">
-                                                {mod.summary}
-                                            </p>
-                                        </div>
+                                                        <p className="mt-3 line-clamp-3 text-xs leading-relaxed text-muted-foreground">
+                                                            {mod.summary}
+                                                        </p>
+                                                    </div>
 
-                                        {/* Action Footing */}
-                                        <div className="mt-6 flex items-center justify-between border-t border-border pt-4">
-                                            <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                                                <Clock className="size-3.5" />
-                                                <span>
-                                                    {mod.estimated_minutes} min
-                                                    read
-                                                </span>
-                                            </div>
+                                                    {/* Action Footing */}
+                                                    <div className="mt-6 flex items-center justify-between border-t border-border pt-4">
+                                                        <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                                                            <Clock className="size-3.5" />
+                                                            <span>
+                                                                {mod.estimated_minutes} min read
+                                                            </span>
+                                                        </div>
 
-                                            <span className="dark:text-blue-450 flex items-center gap-1 text-xs font-black text-blue-600 transition-all group-hover:gap-2">
-                                                Start Lesson
-                                                <ArrowRight className="size-3.5" />
-                                            </span>
-                                        </div>
-                                    </Card>
-                                </Link>
+                                                        <span className="dark:text-blue-450 flex items-center gap-1 text-xs font-black text-blue-600 transition-all group-hover:gap-2">
+                                                            Start Lesson
+                                                            <ArrowRight className="size-3.5" />
+                                                        </span>
+                                                    </div>
+                                                </Card>
+                                            </Link>
+                                        ))}
+                                    </div>
+                                </section>
                             );
                         })}
                     </div>
