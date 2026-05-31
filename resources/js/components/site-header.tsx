@@ -109,7 +109,7 @@ export default function SiteHeader({
                     showHeader ? 'translate-y-0 shadow-sm' : '-translate-y-full'
                 }`}
             >
-                <nav className="container mx-auto flex items-center justify-between gap-2 px-4 py-3 xl:gap-4 lg:px-6 lg:py-4">
+                <nav className="container mx-auto flex items-center justify-between gap-2 px-4 py-3 lg:px-6 lg:py-4 xl:gap-4">
                     <div className="flex items-center">
                         <Link href={home()} className="flex items-center gap-2">
                             <AppLogo />
@@ -122,13 +122,17 @@ export default function SiteHeader({
                                 {navLinks.map((link) => {
                                     const isLinkActive =
                                         activeNav === link.id ||
-                                        (link.id === 'learn' && url.startsWith('/learn')) ||
-                                        (link.id === 'about' && url.startsWith('/about'));
+                                        (link.id === 'learn' &&
+                                            url.startsWith('/learn')) ||
+                                        (link.id === 'about' &&
+                                            url.startsWith('/about'));
                                     const isHomePage =
                                         url === '/' || url === '';
                                     const isHomeActive =
-                                        (link.id === 'learn' && url.startsWith('/learn')) ||
-                                        (link.id === 'about' && url.startsWith('/about')) ||
+                                        (link.id === 'learn' &&
+                                            url.startsWith('/learn')) ||
+                                        (link.id === 'about' &&
+                                            url.startsWith('/about')) ||
                                         (isHomePage && isLinkActive);
 
                                     return (
@@ -217,13 +221,17 @@ export default function SiteHeader({
                                     {navLinks.map((link) => {
                                         const isLinkActive =
                                             activeNav === link.id ||
-                                            (link.id === 'learn' && url.startsWith('/learn')) ||
-                                            (link.id === 'about' && url.startsWith('/about'));
+                                            (link.id === 'learn' &&
+                                                url.startsWith('/learn')) ||
+                                            (link.id === 'about' &&
+                                                url.startsWith('/about'));
                                         const isHomePage =
                                             url === '/' || url === '';
                                         const isHomeActive =
-                                            (link.id === 'learn' && url.startsWith('/learn')) ||
-                                            (link.id === 'about' && url.startsWith('/about')) ||
+                                            (link.id === 'learn' &&
+                                                url.startsWith('/learn')) ||
+                                            (link.id === 'about' &&
+                                                url.startsWith('/about')) ||
                                             (isHomePage && isLinkActive);
 
                                         return (

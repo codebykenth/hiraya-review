@@ -49,8 +49,8 @@ export default function Support() {
                                     Contact Support
                                 </h1>
                                 <p className="mt-1.5 text-sm text-muted-foreground">
-                                    Have a question or feedback? Hiraya Review is here to
-                                    help you succeed.
+                                    Have a question or feedback? Hiraya Review
+                                    is here to help you succeed.
                                 </p>
                             </div>
                         </div>
@@ -83,11 +83,11 @@ export default function Support() {
                                             Unofficial Portal Note
                                         </h3>
                                         <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
-                                            Please note that Hiraya Review cannot answer
-                                            official Civil Service Commission
-                                            schedule or processing questions.
-                                            Contact the CSC directly for exam
-                                            filing dates.
+                                            Please note that Hiraya Review
+                                            cannot answer official Civil Service
+                                            Commission schedule or processing
+                                            questions. Contact the CSC directly
+                                            for exam filing dates.
                                         </p>
                                     </div>
                                 </Card>
@@ -106,9 +106,9 @@ export default function Support() {
                                             </h2>
                                             <p className="animate-fade-in mt-2 max-w-2xl text-sm text-muted-foreground">
                                                 Thanks for reaching out,{' '}
-                                                {submittedData?.name}. Hiraya Review will
-                                                review your message and reply
-                                                via email at{' '}
+                                                {submittedData?.name}. Hiraya
+                                                Review will review your message
+                                                and reply via email at{' '}
                                                 {submittedData?.email} within 24
                                                 hours.
                                             </p>

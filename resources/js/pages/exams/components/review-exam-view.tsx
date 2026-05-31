@@ -82,7 +82,9 @@ export function ReviewExamView({
                             className="flex cursor-pointer items-center gap-1.5 rounded-lg text-xs font-black text-muted-foreground transition hover:text-blue-600 focus:outline-none"
                         >
                             <ChevronLeft className="size-4" />
-                            <span className="hidden sm:inline-block">Back to Scorecard</span>
+                            <span className="hidden sm:inline-block">
+                                Back to Scorecard
+                            </span>
                         </button>
                         <div className="h-4 w-px bg-border" />
                         <span className="rounded-md bg-emerald-50 px-2 py-0.5 text-[10px] font-extrabold tracking-wider text-emerald-600 uppercase dark:bg-emerald-950/20 dark:text-emerald-400">
@@ -109,10 +111,15 @@ export function ReviewExamView({
                                                     {currentQuestion.category}
                                                 </span>
                                                 <span className="rounded-md bg-muted px-2 py-0.5 text-[9px] font-extrabold text-muted-foreground">
-                                                    {currentQuestion.subcategory || 'General Concepts'}
+                                                    {currentQuestion.subcategory ||
+                                                        'General Concepts'}
                                                 </span>
                                                 <button
-                                                    onClick={() => setIsMobilePaletteOpen(true)}
+                                                    onClick={() =>
+                                                        setIsMobilePaletteOpen(
+                                                            true,
+                                                        )
+                                                    }
                                                     className="flex cursor-pointer items-center gap-1.5 rounded-lg bg-blue-600 px-2.5 py-1 text-[10px] font-bold text-white shadow-sm transition hover:bg-blue-700 focus:outline-none lg:hidden"
                                                 >
                                                     <LayoutGrid className="size-3" />
@@ -121,131 +128,212 @@ export function ReviewExamView({
                                             </div>
                                             <div className="flex items-center gap-3">
                                                 <span className="text-[10px] font-black tracking-wider text-muted-foreground uppercase">
-                                                    Question {currentIdx + 1} of {activeQuestions.length}
+                                                    Question {currentIdx + 1} of{' '}
+                                                    {activeQuestions.length}
                                                 </span>
                                                 <button
-                                                    onClick={() => setFlagged((prev) => ({ ...prev, [currentIdx]: !prev[currentIdx] }))}
+                                                    onClick={() =>
+                                                        setFlagged((prev) => ({
+                                                            ...prev,
+                                                            [currentIdx]:
+                                                                !prev[
+                                                                    currentIdx
+                                                                ],
+                                                        }))
+                                                    }
                                                     className={`inline-flex cursor-pointer items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[11px] font-bold transition focus:outline-none ${
                                                         flagged[currentIdx]
                                                             ? 'border border-rose-200/50 bg-rose-50 text-rose-700 dark:bg-rose-950/30 dark:text-rose-400'
                                                             : 'text-muted-foreground hover:bg-muted'
                                                     }`}
                                                 >
-                                                    <Flag className={`size-3.5 ${flagged[currentIdx] ? 'fill-rose-600 text-rose-600' : ''}`} />
-                                                    {flagged[currentIdx] ? 'Flagged for Review' : 'Flag for Review'}
+                                                    <Flag
+                                                        className={`size-3.5 ${flagged[currentIdx] ? 'fill-rose-600 text-rose-600' : ''}`}
+                                                    />
+                                                    {flagged[currentIdx]
+                                                        ? 'Flagged for Review'
+                                                        : 'Flag for Review'}
                                                 </button>
                                             </div>
                                         </div>
-                                        <div className="text-sm font-semibold leading-relaxed text-foreground">
-                                            {renderFormattedText(currentQuestion.stem, true)}
+                                        <div className="text-sm leading-relaxed font-semibold text-foreground">
+                                            {renderFormattedText(
+                                                currentQuestion.stem,
+                                                true,
+                                            )}
                                         </div>
                                     </div>
 
                                     {/* Options Grid */}
                                     <div className="flex flex-col gap-3.5">
-                                        {currentQuestion.options.map((opt, idx) => {
-                                            const letter = String.fromCharCode(65 + idx);
-                                            const isChosen = chosenOption !== undefined && chosenOption !== null && Number(chosenOption) === idx;
-                                            const isCorrectOption = idx === currentQuestion.correct_option;
-                                            const isDemographic = currentQuestion.isDemographic || currentQuestion.category === 'Demographic Profile';
+                                        {currentQuestion.options.map(
+                                            (opt, idx) => {
+                                                const letter =
+                                                    String.fromCharCode(
+                                                        65 + idx,
+                                                    );
+                                                const isChosen =
+                                                    chosenOption !==
+                                                        undefined &&
+                                                    chosenOption !== null &&
+                                                    Number(chosenOption) ===
+                                                        idx;
+                                                const isCorrectOption =
+                                                    idx ===
+                                                    currentQuestion.correct_option;
+                                                const isDemographic =
+                                                    currentQuestion.isDemographic ||
+                                                    currentQuestion.category ===
+                                                        'Demographic Profile';
 
-                                            let optionStyle = 'border-border bg-card hover:bg-muted text-foreground';
-                                            let badgeStyle = 'border-border bg-background text-muted-foreground';
+                                                let optionStyle =
+                                                    'border-border bg-card hover:bg-muted text-foreground';
+                                                let badgeStyle =
+                                                    'border-border bg-background text-muted-foreground';
 
-                                            if (isDemographic) {
-                                                if (isChosen) {
-                                                    optionStyle = 'bg-blue-50/15 border-blue-600 text-blue-950 font-bold dark:bg-blue-950/20 dark:border-blue-500 dark:text-blue-200';
-                                                    badgeStyle = 'border-blue-600 bg-blue-600 text-white';
+                                                if (isDemographic) {
+                                                    if (isChosen) {
+                                                        optionStyle =
+                                                            'bg-blue-50/15 border-blue-600 text-blue-950 font-bold dark:bg-blue-950/20 dark:border-blue-500 dark:text-blue-200';
+                                                        badgeStyle =
+                                                            'border-blue-600 bg-blue-600 text-white';
+                                                    }
+                                                } else if (isCorrectOption) {
+                                                    optionStyle =
+                                                        'bg-emerald-50/20 border-emerald-500 text-emerald-950 font-bold dark:bg-emerald-950/20 dark:border-emerald-500 dark:text-emerald-300';
+                                                    badgeStyle =
+                                                        'border-emerald-600 bg-emerald-600 text-white';
+                                                } else if (isChosen) {
+                                                    optionStyle =
+                                                        'bg-rose-50/20 border-rose-500 text-rose-950 font-bold dark:bg-rose-950/20 dark:border-rose-500 dark:text-rose-300';
+                                                    badgeStyle =
+                                                        'border-rose-600 bg-rose-600 text-white';
+                                                } else {
+                                                    optionStyle =
+                                                        'border-border bg-card hover:bg-muted text-foreground/60 opacity-80';
+                                                    badgeStyle =
+                                                        'border-border bg-background text-muted-foreground/60';
                                                 }
-                                            } else if (isCorrectOption) {
-                                                optionStyle = 'bg-emerald-50/20 border-emerald-500 text-emerald-950 font-bold dark:bg-emerald-950/20 dark:border-emerald-500 dark:text-emerald-300';
-                                                badgeStyle = 'border-emerald-600 bg-emerald-600 text-white';
-                                            } else if (isChosen) {
-                                                optionStyle = 'bg-rose-50/20 border-rose-500 text-rose-950 font-bold dark:bg-rose-950/20 dark:border-rose-500 dark:text-rose-300';
-                                                badgeStyle = 'border-rose-600 bg-rose-600 text-white';
-                                            } else {
-                                                optionStyle = 'border-border bg-card hover:bg-muted text-foreground/60 opacity-80';
-                                                badgeStyle = 'border-border bg-background text-muted-foreground/60';
-                                            }
 
-                                            return (
-                                                <div
-                                                    key={idx}
-                                                    className={`shadow-3xs flex items-center gap-4 rounded-xl border p-4 transition-all ${optionStyle}`}
-                                                >
-                                                    <span className={`flex size-8 shrink-0 items-center justify-center rounded-full border text-xs font-black transition ${badgeStyle}`}>
-                                                        {letter}
-                                                    </span>
-                                                    <div className="flex flex-1 items-center justify-between">
-                                                        <p className="text-sm font-bold transition md:text-base">
-                                                            {opt}
-                                                        </p>
-                                                        {!isDemographic && isCorrectOption && (
-                                                            <div className="flex shrink-0 items-center gap-1.5 pl-3">
-                                                                {isChosen && (
-                                                                    <span className="hidden text-[9px] font-black tracking-wider text-emerald-700 uppercase sm:inline-block dark:text-emerald-400">
-                                                                        Your Answer
-                                                                    </span>
+                                                return (
+                                                    <div
+                                                        key={idx}
+                                                        className={`shadow-3xs flex items-center gap-4 rounded-xl border p-4 transition-all ${optionStyle}`}
+                                                    >
+                                                        <span
+                                                            className={`flex size-8 shrink-0 items-center justify-center rounded-full border text-xs font-black transition ${badgeStyle}`}
+                                                        >
+                                                            {letter}
+                                                        </span>
+                                                        <div className="flex flex-1 items-center justify-between">
+                                                            <p className="text-sm font-bold transition md:text-base">
+                                                                {opt}
+                                                            </p>
+                                                            {!isDemographic &&
+                                                                isCorrectOption && (
+                                                                    <div className="flex shrink-0 items-center gap-1.5 pl-3">
+                                                                        {isChosen && (
+                                                                            <span className="hidden text-[9px] font-black tracking-wider text-emerald-700 uppercase sm:inline-block dark:text-emerald-400">
+                                                                                Your
+                                                                                Answer
+                                                                            </span>
+                                                                        )}
+                                                                        <CheckCircle2 className="dark:text-emerald-450 size-5 text-emerald-600" />
+                                                                    </div>
                                                                 )}
-                                                                <CheckCircle2 className="size-5 text-emerald-600 dark:text-emerald-450" />
-                                                            </div>
-                                                        )}
-                                                        {!isDemographic && isChosen && !isCorrectOption && (
-                                                            <div className="flex shrink-0 items-center gap-1.5 pl-3">
-                                                                <span className="hidden text-[9px] font-black tracking-wider text-rose-700 uppercase sm:inline-block dark:text-rose-400">
-                                                                    Your Answer
-                                                                </span>
-                                                                <X className="size-5 text-rose-650 dark:text-rose-450" />
-                                                            </div>
-                                                        )}
+                                                            {!isDemographic &&
+                                                                isChosen &&
+                                                                !isCorrectOption && (
+                                                                    <div className="flex shrink-0 items-center gap-1.5 pl-3">
+                                                                        <span className="hidden text-[9px] font-black tracking-wider text-rose-700 uppercase sm:inline-block dark:text-rose-400">
+                                                                            Your
+                                                                            Answer
+                                                                        </span>
+                                                                        <X className="text-rose-650 dark:text-rose-450 size-5" />
+                                                                    </div>
+                                                                )}
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            );
-                                        })}
+                                                );
+                                            },
+                                        )}
                                     </div>
 
                                     {/* Explanation Block */}
                                     {(() => {
-                                        const propositions = extractPropositions(currentQuestion.stem);
-                                        const letterMap: Record<string, string> = {};
+                                        const propositions =
+                                            extractPropositions(
+                                                currentQuestion.stem,
+                                            );
+                                        const letterMap: Record<
+                                            string,
+                                            string
+                                        > = {};
 
                                         propositions.forEach((prop, idx) => {
-                                            const newLetter = String.fromCharCode(65 + idx);
+                                            const newLetter =
+                                                String.fromCharCode(65 + idx);
                                             letterMap[prop.letter] = newLetter;
                                         });
 
                                         return (
                                             <>
                                                 {currentQuestion.explanation && (
-                                                    <div className="mt-2 rounded-2xl border border-border bg-muted/60 p-5 text-sm leading-relaxed text-muted-foreground shadow-3xs">
+                                                    <div className="shadow-3xs mt-2 rounded-2xl border border-border bg-muted/60 p-5 text-sm leading-relaxed text-muted-foreground">
                                                         <span className="mb-2 block font-bold text-foreground">
-                                                            Explanation &amp; Rationale:
+                                                            Explanation &amp;
+                                                            Rationale:
                                                         </span>
 
-                                                        {propositions.length > 0 && (
+                                                        {propositions.length >
+                                                            0 && (
                                                             <div className="shadow-3xs mb-4 rounded-xl border border-border bg-background p-4">
                                                                 <span className="mb-2 block font-heading text-[10px] font-black tracking-wider text-muted-foreground uppercase">
-                                                                    Proposition Key:
+                                                                    Proposition
+                                                                    Key:
                                                                 </span>
                                                                 <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-                                                                    {propositions.map((prop, idx) => {
-                                                                        const newLetter = String.fromCharCode(65 + idx);
-                                                                        return (
-                                                                            <div key={idx} className="flex items-center gap-2 text-xs">
-                                                                                <span className="inline-flex size-5 items-center justify-center rounded border border-blue-100/60 bg-blue-50 font-mono text-[10px] font-black text-blue-700 dark:border-blue-900/40 dark:bg-blue-950/40 dark:text-blue-400">
-                                                                                    {newLetter}
-                                                                                </span>
-                                                                                <span className="font-medium text-foreground">
-                                                                                    {prop.phrase}
-                                                                                </span>
-                                                                            </div>
-                                                                        );
-                                                                    })}
+                                                                    {propositions.map(
+                                                                        (
+                                                                            prop,
+                                                                            idx,
+                                                                        ) => {
+                                                                            const newLetter =
+                                                                                String.fromCharCode(
+                                                                                    65 +
+                                                                                        idx,
+                                                                                );
+
+                                                                            return (
+                                                                                <div
+                                                                                    key={
+                                                                                        idx
+                                                                                    }
+                                                                                    className="flex items-center gap-2 text-xs"
+                                                                                >
+                                                                                    <span className="inline-flex size-5 items-center justify-center rounded border border-blue-100/60 bg-blue-50 font-mono text-[10px] font-black text-blue-700 dark:border-blue-900/40 dark:bg-blue-950/40 dark:text-blue-400">
+                                                                                        {
+                                                                                            newLetter
+                                                                                        }
+                                                                                    </span>
+                                                                                    <span className="font-medium text-foreground">
+                                                                                        {
+                                                                                            prop.phrase
+                                                                                        }
+                                                                                    </span>
+                                                                                </div>
+                                                                            );
+                                                                        },
+                                                                    )}
                                                                 </div>
                                                             </div>
                                                         )}
 
-                                                        {renderFormattedText(currentQuestion.explanation, false, letterMap)}
+                                                        {renderFormattedText(
+                                                            currentQuestion.explanation,
+                                                            false,
+                                                            letterMap,
+                                                        )}
                                                     </div>
                                                 )}
                                             </>
@@ -255,8 +343,13 @@ export function ReviewExamView({
                             ) : (
                                 <div className="flex flex-col items-center justify-center py-20 text-center">
                                     <HelpCircle className="mb-3 size-12 text-muted-foreground" />
-                                    <h3 className="text-base font-bold text-foreground">No questions match filters</h3>
-                                    <p className="mt-1 text-xs text-muted-foreground">Try switching to a different category or status pill.</p>
+                                    <h3 className="text-base font-bold text-foreground">
+                                        No questions match filters
+                                    </h3>
+                                    <p className="mt-1 text-xs text-muted-foreground">
+                                        Try switching to a different category or
+                                        status pill.
+                                    </p>
                                 </div>
                             )}
                         </div>
@@ -266,37 +359,118 @@ export function ReviewExamView({
                             <button
                                 onClick={() => {
                                     const prevIdx = (() => {
-                                        for (let i = currentIdx - 1; i >= 0; i--) {
+                                        for (
+                                            let i = currentIdx - 1;
+                                            i >= 0;
+                                            i--
+                                        ) {
                                             const q = activeQuestions[i];
-                                            const isDemographic = q.category === 'Demographic Profile' || q.isDemographic;
+                                            const isDemographic =
+                                                q.category ===
+                                                    'Demographic Profile' ||
+                                                q.isDemographic;
                                             const chosen = answers[i];
-                                            const isCorrect = chosen !== undefined && chosen !== null && Number(chosen) === Number(q.correct_option);
+                                            const isCorrect =
+                                                chosen !== undefined &&
+                                                chosen !== null &&
+                                                Number(chosen) ===
+                                                    Number(q.correct_option);
 
-                                            if (reviewCategoryFilter !== 'All Categories' && q.category !== reviewCategoryFilter) continue;
-                                            if (reviewSubcategoryFilter !== 'All Subcategories' && (q.subcategory || 'General Concepts') !== reviewSubcategoryFilter) continue;
-                                            if (reviewStatusFilter === 'correct' && (isDemographic || !isCorrect)) continue;
-                                            if (reviewStatusFilter === 'incorrect' && (isDemographic || isCorrect)) continue;
-                                            
+                                            if (
+                                                reviewCategoryFilter !==
+                                                    'All Categories' &&
+                                                q.category !==
+                                                    reviewCategoryFilter
+                                            ) {
+                                                continue;
+                                            }
+
+                                            if (
+                                                reviewSubcategoryFilter !==
+                                                    'All Subcategories' &&
+                                                (q.subcategory ||
+                                                    'General Concepts') !==
+                                                    reviewSubcategoryFilter
+                                            ) {
+                                                continue;
+                                            }
+
+                                            if (
+                                                reviewStatusFilter ===
+                                                    'correct' &&
+                                                (isDemographic || !isCorrect)
+                                            ) {
+                                                continue;
+                                            }
+
+                                            if (
+                                                reviewStatusFilter ===
+                                                    'incorrect' &&
+                                                (isDemographic || isCorrect)
+                                            ) {
+                                                continue;
+                                            }
+
                                             return i;
                                         }
+
                                         return -1;
                                     })();
-                                    if (prevIdx !== -1) setCurrentIdx(prevIdx);
+
+                                    if (prevIdx !== -1) {
+                                        setCurrentIdx(prevIdx);
+                                    }
                                 }}
                                 disabled={(() => {
                                     for (let i = currentIdx - 1; i >= 0; i--) {
                                         const q = activeQuestions[i];
-                                        const isDemographic = q.category === 'Demographic Profile' || q.isDemographic;
+                                        const isDemographic =
+                                            q.category ===
+                                                'Demographic Profile' ||
+                                            q.isDemographic;
                                         const chosen = answers[i];
-                                        const isCorrect = chosen !== undefined && chosen !== null && Number(chosen) === Number(q.correct_option);
+                                        const isCorrect =
+                                            chosen !== undefined &&
+                                            chosen !== null &&
+                                            Number(chosen) ===
+                                                Number(q.correct_option);
 
-                                        if (reviewCategoryFilter !== 'All Categories' && q.category !== reviewCategoryFilter) continue;
-                                        if (reviewSubcategoryFilter !== 'All Subcategories' && (q.subcategory || 'General Concepts') !== reviewSubcategoryFilter) continue;
-                                        if (reviewStatusFilter === 'correct' && (isDemographic || !isCorrect)) continue;
-                                        if (reviewStatusFilter === 'incorrect' && (isDemographic || isCorrect)) continue;
-                                        
+                                        if (
+                                            reviewCategoryFilter !==
+                                                'All Categories' &&
+                                            q.category !== reviewCategoryFilter
+                                        ) {
+                                            continue;
+                                        }
+
+                                        if (
+                                            reviewSubcategoryFilter !==
+                                                'All Subcategories' &&
+                                            (q.subcategory ||
+                                                'General Concepts') !==
+                                                reviewSubcategoryFilter
+                                        ) {
+                                            continue;
+                                        }
+
+                                        if (
+                                            reviewStatusFilter === 'correct' &&
+                                            (isDemographic || !isCorrect)
+                                        ) {
+                                            continue;
+                                        }
+
+                                        if (
+                                            reviewStatusFilter ===
+                                                'incorrect' &&
+                                            (isDemographic || isCorrect)
+                                        ) {
+                                            continue;
+                                        }
+
                                         return false;
                                     }
+
                                     return true;
                                 })()}
                                 className="flex cursor-pointer items-center gap-2 rounded-lg border border-border bg-background px-4 py-2 text-xs font-bold text-foreground transition hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50"
@@ -308,37 +482,122 @@ export function ReviewExamView({
                             <button
                                 onClick={() => {
                                     const nextIdx = (() => {
-                                        for (let i = currentIdx + 1; i < activeQuestions.length; i++) {
+                                        for (
+                                            let i = currentIdx + 1;
+                                            i < activeQuestions.length;
+                                            i++
+                                        ) {
                                             const q = activeQuestions[i];
-                                            const isDemographic = q.category === 'Demographic Profile' || q.isDemographic;
+                                            const isDemographic =
+                                                q.category ===
+                                                    'Demographic Profile' ||
+                                                q.isDemographic;
                                             const chosen = answers[i];
-                                            const isCorrect = chosen !== undefined && chosen !== null && Number(chosen) === Number(q.correct_option);
+                                            const isCorrect =
+                                                chosen !== undefined &&
+                                                chosen !== null &&
+                                                Number(chosen) ===
+                                                    Number(q.correct_option);
 
-                                            if (reviewCategoryFilter !== 'All Categories' && q.category !== reviewCategoryFilter) continue;
-                                            if (reviewSubcategoryFilter !== 'All Subcategories' && (q.subcategory || 'General Concepts') !== reviewSubcategoryFilter) continue;
-                                            if (reviewStatusFilter === 'correct' && (isDemographic || !isCorrect)) continue;
-                                            if (reviewStatusFilter === 'incorrect' && (isDemographic || isCorrect)) continue;
-                                            
+                                            if (
+                                                reviewCategoryFilter !==
+                                                    'All Categories' &&
+                                                q.category !==
+                                                    reviewCategoryFilter
+                                            ) {
+                                                continue;
+                                            }
+
+                                            if (
+                                                reviewSubcategoryFilter !==
+                                                    'All Subcategories' &&
+                                                (q.subcategory ||
+                                                    'General Concepts') !==
+                                                    reviewSubcategoryFilter
+                                            ) {
+                                                continue;
+                                            }
+
+                                            if (
+                                                reviewStatusFilter ===
+                                                    'correct' &&
+                                                (isDemographic || !isCorrect)
+                                            ) {
+                                                continue;
+                                            }
+
+                                            if (
+                                                reviewStatusFilter ===
+                                                    'incorrect' &&
+                                                (isDemographic || isCorrect)
+                                            ) {
+                                                continue;
+                                            }
+
                                             return i;
                                         }
+
                                         return -1;
                                     })();
-                                    if (nextIdx !== -1) setCurrentIdx(nextIdx);
+
+                                    if (nextIdx !== -1) {
+                                        setCurrentIdx(nextIdx);
+                                    }
                                 }}
                                 disabled={(() => {
-                                    for (let i = currentIdx + 1; i < activeQuestions.length; i++) {
+                                    for (
+                                        let i = currentIdx + 1;
+                                        i < activeQuestions.length;
+                                        i++
+                                    ) {
                                         const q = activeQuestions[i];
-                                        const isDemographic = q.category === 'Demographic Profile' || q.isDemographic;
+                                        const isDemographic =
+                                            q.category ===
+                                                'Demographic Profile' ||
+                                            q.isDemographic;
                                         const chosen = answers[i];
-                                        const isCorrect = chosen !== undefined && chosen !== null && Number(chosen) === Number(q.correct_option);
+                                        const isCorrect =
+                                            chosen !== undefined &&
+                                            chosen !== null &&
+                                            Number(chosen) ===
+                                                Number(q.correct_option);
 
-                                        if (reviewCategoryFilter !== 'All Categories' && q.category !== reviewCategoryFilter) continue;
-                                        if (reviewSubcategoryFilter !== 'All Subcategories' && (q.subcategory || 'General Concepts') !== reviewSubcategoryFilter) continue;
-                                        if (reviewStatusFilter === 'correct' && (isDemographic || !isCorrect)) continue;
-                                        if (reviewStatusFilter === 'incorrect' && (isDemographic || isCorrect)) continue;
-                                        
+                                        if (
+                                            reviewCategoryFilter !==
+                                                'All Categories' &&
+                                            q.category !== reviewCategoryFilter
+                                        ) {
+                                            continue;
+                                        }
+
+                                        if (
+                                            reviewSubcategoryFilter !==
+                                                'All Subcategories' &&
+                                            (q.subcategory ||
+                                                'General Concepts') !==
+                                                reviewSubcategoryFilter
+                                        ) {
+                                            continue;
+                                        }
+
+                                        if (
+                                            reviewStatusFilter === 'correct' &&
+                                            (isDemographic || !isCorrect)
+                                        ) {
+                                            continue;
+                                        }
+
+                                        if (
+                                            reviewStatusFilter ===
+                                                'incorrect' &&
+                                            (isDemographic || isCorrect)
+                                        ) {
+                                            continue;
+                                        }
+
                                         return false;
                                     }
+
                                     return true;
                                 })()}
                                 className="flex cursor-pointer items-center gap-2 rounded-lg border border-border bg-background px-4 py-2 text-xs font-bold text-foreground transition hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50"
@@ -365,8 +624,12 @@ export function ReviewExamView({
                         allowedCategories={details.allowedCategories}
                         reviewStatusFilter={reviewStatusFilter}
                         reviewSubcategoryFilter={reviewSubcategoryFilter}
-                        onReviewStatusChange={(status) => setReviewStatusFilter(status)}
-                        onReviewSubcategoryChange={(subcat) => setReviewSubcategoryFilter(subcat)}
+                        onReviewStatusChange={(status) =>
+                            setReviewStatusFilter(status)
+                        }
+                        onReviewSubcategoryChange={(subcat) =>
+                            setReviewSubcategoryFilter(subcat)
+                        }
                         reviewSubcategories={reviewSubcategories}
                         isMobile={false}
                     />
@@ -389,8 +652,12 @@ export function ReviewExamView({
                         allowedCategories={details.allowedCategories}
                         reviewStatusFilter={reviewStatusFilter}
                         reviewSubcategoryFilter={reviewSubcategoryFilter}
-                        onReviewStatusChange={(status) => setReviewStatusFilter(status)}
-                        onReviewSubcategoryChange={(subcat) => setReviewSubcategoryFilter(subcat)}
+                        onReviewStatusChange={(status) =>
+                            setReviewStatusFilter(status)
+                        }
+                        onReviewSubcategoryChange={(subcat) =>
+                            setReviewSubcategoryFilter(subcat)
+                        }
                         reviewSubcategories={reviewSubcategories}
                         isMobile={true}
                         onCloseMobile={() => setIsMobilePaletteOpen(false)}

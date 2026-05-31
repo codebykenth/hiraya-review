@@ -8,8 +8,8 @@ import {
     FileQuestion,
 } from 'lucide-react';
 import React from 'react';
-import SiteHeader from '@/components/site-header';
 import SiteFooter from '@/components/site-footer';
+import SiteHeader from '@/components/site-header';
 import AppLayout from '@/layouts/app-layout';
 
 interface ErrorPageProps {
@@ -99,9 +99,7 @@ export default function ErrorPage({ status }: ErrorPageProps) {
         <div className="flex min-h-screen flex-col bg-slate-50 dark:bg-[#0a0a0a]">
             <SiteHeader />
             <Head title={title} />
-            <main className="flex-1">
-                {content}
-            </main>
+            <main className="flex-1">{content}</main>
             <SiteFooter />
         </div>
     );

@@ -178,11 +178,16 @@ export function ScorecardView({
                 weakestCategory = 'Numerical Ability';
             }
 
-            const formattedStrongestPct = (Math.trunc(strongestPct * 100) / 100).toFixed(2);
+            const formattedStrongestPct = (
+                Math.trunc(strongestPct * 100) / 100
+            ).toFixed(2);
 
             if (strongestPct < 80 && strongestPct !== -1) {
                 // The user did poorly across the board (all below passing grade)
-                const otherSubjectsToStudy = [...weakCategories.filter((c) => c !== weakestCategory), strongestCategory]
+                const otherSubjectsToStudy = [
+                    ...weakCategories.filter((c) => c !== weakestCategory),
+                    strongestCategory,
+                ]
                     .join(', ')
                     .replace(/, ([^,]*)$/, ', and finally $1');
                 aiAnalysisText = `While ${strongestCategory} was your highest scoring area (${formattedStrongestPct}%), your results indicate a need for comprehensive review across all subjects to reach the 80% passing grade. We recommend prioritizing ${weakestCategory} (specifically ${weakestSubcat}) before moving on to ${otherSubjectsToStudy}.`;

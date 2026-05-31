@@ -79,10 +79,11 @@ export default function AcceptTermsModal({ isOpen }: Props) {
                                     Privacy Policy
                                 </h3>
                                 <p className="text-xs leading-relaxed">
-                                    Hiraya Review collects and processes personal data to
-                                    provide and improve the services. Your data
-                                    is protected and will not be shared with
-                                    third parties without consent.{' '}
+                                    Hiraya Review collects and processes
+                                    personal data to provide and improve the
+                                    services. Your data is protected and will
+                                    not be shared with third parties without
+                                    consent.{' '}
                                     <Link
                                         href="/privacy"
                                         className="text-blue-600 underline dark:text-blue-400"

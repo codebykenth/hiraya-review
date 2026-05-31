@@ -34,11 +34,10 @@ export default function Terms() {
                                 </h2>
                                 <p className="text-sm text-muted-foreground">
                                     By accessing or using the Hiraya Review
-                                    portal, you agree to comply with
-                                    and be bound by these Terms of Service. If
-                                    you do not agree with any part of these
-                                    terms, you must not access or use the
-                                    platform.
+                                    portal, you agree to comply with and be
+                                    bound by these Terms of Service. If you do
+                                    not agree with any part of these terms, you
+                                    must not access or use the platform.
                                 </p>
                             </section>
 
@@ -52,8 +51,9 @@ export default function Terms() {
                                     question generation, and score analytics
                                     tailored for the Philippine Civil Service
                                     Exam (Professional and Sub-Professional
-                                    levels). Hiraya Review provides both free base resources
-                                    and customizable exam simulators.
+                                    levels). Hiraya Review provides both free
+                                    base resources and customizable exam
+                                    simulators.
                                 </p>
                             </section>
 
@@ -63,13 +63,13 @@ export default function Terms() {
                                 </h2>
                                 <p className="text-rose-650 text-sm font-semibold text-foreground text-muted-foreground dark:text-rose-400">
                                     This platform is an independent study
-                                    resource. Hiraya Review is not officially connected
-                                    to, endorsed by, or affiliated with the
-                                    Civil Service Commission (CSC) of the
-                                    Philippines. Hiraya Review does not guarantee passing
-                                    scores on actual CSC examinations; all
-                                    material is intended for practice and
-                                    education only.
+                                    resource. Hiraya Review is not officially
+                                    connected to, endorsed by, or affiliated
+                                    with the Civil Service Commission (CSC) of
+                                    the Philippines. Hiraya Review does not
+                                    guarantee passing scores on actual CSC
+                                    examinations; all material is intended for
+                                    practice and education only.
                                 </p>
                             </section>
 
@@ -92,9 +92,10 @@ export default function Terms() {
                                         login credentials secure.
                                     </li>
                                     <li>
-                                        Hiraya Review reserves the right to suspend accounts
-                                        that show signs of automated bot abuse,
-                                        scraping, or commercial resale.
+                                        Hiraya Review reserves the right to
+                                        suspend accounts that show signs of
+                                        automated bot abuse, scraping, or
+                                        commercial resale.
                                     </li>
                                 </ul>
                             </section>
@@ -104,13 +105,14 @@ export default function Terms() {
                                     5. Fair Use & Prohibited Acts
                                 </h2>
                                 <p className="text-sm text-muted-foreground">
-                                    Hiraya Review's question bank and study materials are
-                                    protected by intellectual property
-                                    guidelines. You are prohibited from using
-                                    web-scrapers, spiders, or automated scripts
-                                    to download or clone Hiraya Review's practice sets for
-                                    commercial use. Standard manual study and
-                                    personal mock testing are fully permitted.
+                                    Hiraya Review's question bank and study
+                                    materials are protected by intellectual
+                                    property guidelines. You are prohibited from
+                                    using web-scrapers, spiders, or automated
+                                    scripts to download or clone Hiraya Review's
+                                    practice sets for commercial use. Standard
+                                    manual study and personal mock testing are
+                                    fully permitted.
                                 </p>
                             </section>
 
@@ -119,16 +121,16 @@ export default function Terms() {
                                     6. Modifications and Termination of Service
                                 </h2>
                                 <p className="text-sm text-muted-foreground">
-                                    Hiraya Review reserves the right to modify, suspend,
-                                    discontinue, or completely close this
-                                    project and terminate the service (or any
-                                    portion thereof) at any time, for any
+                                    Hiraya Review reserves the right to modify,
+                                    suspend, discontinue, or completely close
+                                    this project and terminate the service (or
+                                    any portion thereof) at any time, for any
                                     reason, with or without prior notice, and
                                     without any form of liability to you. As a
-                                    free educational platform, you agree that Hiraya Review
-                                    has no obligation to maintain, host, or
-                                    guarantee continuous availability of the
-                                    platform or your historical practice
+                                    free educational platform, you agree that
+                                    Hiraya Review has no obligation to maintain,
+                                    host, or guarantee continuous availability
+                                    of the platform or your historical practice
                                     metrics.
                                 </p>
                             </section>

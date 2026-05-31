@@ -234,9 +234,9 @@ export default function LearnIndex({ modules, categories }: LearnIndexProps) {
                             No Learning Modules Available
                         </h3>
                         <p className="mx-auto mt-2 max-w-2xl text-xs leading-relaxed text-muted-foreground">
-                            Hiraya Review is currently designing bite-sized conceptual
-                            lessons, strategy guides, and detailed category
-                            rationales.
+                            Hiraya Review is currently designing bite-sized
+                            conceptual lessons, strategy guides, and detailed
+                            category rationales.
                         </p>
                     </div>
                 ) : (

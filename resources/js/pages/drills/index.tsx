@@ -410,69 +410,73 @@ export default function Drills({
                     description="Select a category below to focus your practice. Each drill module is designed to target specific cognitive areas required for civil service examinations."
                 />
 
-                {categories.filter(c => c.name.toLowerCase() !== 'demographic').length > 0 ? (
+                {categories.filter(
+                    (c) => c.name.toLowerCase() !== 'demographic',
+                ).length > 0 ? (
                     <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                         {categories
-                            .filter(c => c.name.toLowerCase() !== 'demographic')
+                            .filter(
+                                (c) => c.name.toLowerCase() !== 'demographic',
+                            )
                             .map((cat) => {
-                            const meta = categoryMeta[cat.name] || {
-                                icon: Brain,
-                                bgColor: 'bg-slate-600',
-                                description:
-                                    'Master your skills in this civil service exam practice module.',
-                            };
-                            const CardIcon = meta.icon;
-                            const actualCount = questions.filter(
-                                (q) =>
-                                    q.category
-                                        .toLowerCase()
-                                        .includes(cat.name.toLowerCase()) ||
-                                    cat.name
-                                        .toLowerCase()
-                                        .includes(q.category.toLowerCase()),
-                            ).length;
+                                const meta = categoryMeta[cat.name] || {
+                                    icon: Brain,
+                                    bgColor: 'bg-slate-600',
+                                    description:
+                                        'Master your skills in this civil service exam practice module.',
+                                };
+                                const CardIcon = meta.icon;
+                                const actualCount = questions.filter(
+                                    (q) =>
+                                        q.category
+                                            .toLowerCase()
+                                            .includes(cat.name.toLowerCase()) ||
+                                        cat.name
+                                            .toLowerCase()
+                                            .includes(q.category.toLowerCase()),
+                                ).length;
 
-                            return (
-                                <Card
-                                    key={cat.id}
-                                    onClick={() =>
-                                        handleCategoryClick(cat.name)
-                                    }
-                                    className="group relative flex cursor-pointer flex-col justify-between overflow-hidden p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-md"
-                                >
-                                    <div>
-                                        <div className="flex items-start justify-between">
-                                            <div
-                                                className={`rounded-xl ${meta.bgColor} p-3 text-white shadow-xs`}
-                                            >
-                                                <CardIcon className="size-6" />
+                                return (
+                                    <Card
+                                        key={cat.id}
+                                        onClick={() =>
+                                            handleCategoryClick(cat.name)
+                                        }
+                                        className="group relative flex cursor-pointer flex-col justify-between overflow-hidden p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-md"
+                                    >
+                                        <div>
+                                            <div className="flex items-start justify-between">
+                                                <div
+                                                    className={`rounded-xl ${meta.bgColor} p-3 text-white shadow-xs`}
+                                                >
+                                                    <CardIcon className="size-6" />
+                                                </div>
+                                                <span className="rounded-full bg-slate-100 px-2.5 py-1 text-[10px] font-extrabold text-muted-foreground dark:bg-slate-800">
+                                                    📝 {actualCount} Qs
+                                                </span>
                                             </div>
-                                            <span className="rounded-full bg-slate-100 px-2.5 py-1 text-[10px] font-extrabold text-muted-foreground dark:bg-slate-800">
-                                                📝 {actualCount} Qs
-                                            </span>
+
+                                            <h3 className="mt-5 font-heading text-xl font-bold text-foreground transition group-hover:text-blue-600 dark:group-hover:text-blue-400">
+                                                {cat.name}
+                                            </h3>
+                                            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                                                {meta.description}
+                                            </p>
                                         </div>
 
-                                        <h3 className="mt-5 font-heading text-xl font-bold text-foreground transition group-hover:text-blue-600 dark:group-hover:text-blue-400">
-                                            {cat.name}
-                                        </h3>
-                                        <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                                            {meta.description}
-                                        </p>
-                                    </div>
-
-                                    <div className="mt-6 flex flex-wrap gap-1.5">
-                                        {cat.subcategory.map((sub) => (
-                                            <span
-                                                key={sub.id}
-                                                className="rounded-lg border border-border bg-slate-50/50 px-2 py-0.5 text-xs font-semibold text-muted-foreground dark:bg-slate-900/40"
-                                            >
-                                                {sub.name}
-                                            </span>
-                                        ))}
-                                    </div>
-                                </Card>
-                            );
-                        })}
+                                        <div className="mt-6 flex flex-wrap gap-1.5">
+                                            {cat.subcategory.map((sub) => (
+                                                <span
+                                                    key={sub.id}
+                                                    className="rounded-lg border border-border bg-slate-50/50 px-2 py-0.5 text-xs font-semibold text-muted-foreground dark:bg-slate-900/40"
+                                                >
+                                                    {sub.name}
+                                                </span>
+                                            ))}
+                                        </div>
+                                    </Card>
+                                );
+                            })}
                     </div>
                 ) : (
                     <div className="flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-border bg-card py-20 text-center shadow-sm">
@@ -487,9 +491,9 @@ export default function Drills({
                             No Practice Drills Available
                         </h3>
                         <p className="mx-auto mt-2 max-w-2xl text-xs leading-relaxed text-muted-foreground">
-                            Practice drill modules are coming soon! Hiraya Review is
-                            currently compiling comprehensive exam question
-                            banks.
+                            Practice drill modules are coming soon! Hiraya
+                            Review is currently compiling comprehensive exam
+                            question banks.
                         </p>
                     </div>
                 )}

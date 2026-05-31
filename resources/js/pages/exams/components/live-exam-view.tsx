@@ -154,7 +154,7 @@ export function LiveExamView({
 
                         <button
                             onClick={() => setIsMobilePaletteOpen(true)}
-                            className="shadow-3xs flex cursor-pointer items-center justify-center rounded-lg bg-blue-600 p-2 text-white hover:bg-blue-700 transition focus:outline-none lg:hidden"
+                            className="shadow-3xs flex cursor-pointer items-center justify-center rounded-lg bg-blue-600 p-2 text-white transition hover:bg-blue-700 focus:outline-none lg:hidden"
                             title="Open Question Palette"
                         >
                             <LayoutGrid className="size-4" />
