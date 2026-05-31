@@ -19,6 +19,7 @@ use Inertia\Inertia;
 // Public page views — rate limited to prevent scraping & DDoS floods
 Route::middleware('throttle:global-views')->group(function () {
     Route::inertia('/', 'welcome')->name('home');
+    Route::inertia('about', 'about')->name('about');
     Route::inertia('privacy', 'legal/privacy')->name('privacy');
     Route::inertia('terms', 'legal/terms')->name('terms');
     Route::inertia('support', 'legal/support')->name('support');

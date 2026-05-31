@@ -107,11 +107,11 @@ export default function Welcome() {
         },
         {
             question: `Is the question bank updated for the ${new Date().getFullYear()} exam syllabus?`,
-            answer: 'Yes! We continuously update our question database to align with the latest CSC announcements, coverage patterns, and historical question profiles.',
+            answer: 'Yes! Hiraya Review continuously updates its question database to align with the latest CSC announcements, coverage patterns, and historical question profiles.',
         },
         {
             question: 'Can I use the platform for free?',
-            answer: 'Absolutely. We offer free access to our foundation study tracks and basic question pools.',
+            answer: 'Absolutely. Hiraya Review offers free access to its foundation study tracks and basic question pools.',
         },
     ];
 

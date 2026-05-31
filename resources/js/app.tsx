@@ -67,6 +67,7 @@ createInertiaApp({
         const needsNoLayout =
             name === 'welcome' ||
             name === 'dev-docs' ||
+            name === 'about' ||
             name === 'guide' ||
             name === 'error' ||
             name.startsWith('legal/');

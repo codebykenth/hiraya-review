@@ -485,7 +485,7 @@ export default function Drills({
                             No Practice Drills Available
                         </h3>
                         <p className="mx-auto mt-2 max-w-2xl text-xs leading-relaxed text-muted-foreground">
-                            Practice drill modules are coming soon! We are
+                            Practice drill modules are coming soon! Hiraya Review is
                             currently compiling comprehensive exam question
                             banks.
                         </p>

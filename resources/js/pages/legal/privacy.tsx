@@ -33,22 +33,22 @@ export default function Privacy() {
                                     1. Introduction
                                 </h2>
                                 <p className="text-sm text-muted-foreground">
-                                    Welcome to our Civil Service Exam Reviewer
-                                    portal. We value your privacy and are
+                                    Welcome to the Hiraya Review
+                                    portal. Hiraya Review values your privacy and is
                                     committed to protecting your personal data.
-                                    This Privacy Policy outlines how we collect,
-                                    use, and safeguard your information when you
-                                    use our platform for your CSE preparation.
+                                    This Privacy Policy outlines how Hiraya Review collects,
+                                    uses, and safeguards your information when you
+                                    use the platform for your CSE preparation.
                                 </p>
                             </section>
 
                             <section className="space-y-3">
                                 <h2 className="text-xl font-bold text-foreground">
-                                    2. Information We Collect
+                                    2. Information Hiraya Review Collects
                                 </h2>
                                 <p className="text-sm text-muted-foreground">
-                                    To provide our mock exams, custom study
-                                    logs, and AI analytics, we collect:
+                                    To provide mock exams, custom study
+                                    logs, and AI analytics, Hiraya Review collects:
                                 </p>
                                 <ul className="list-disc space-y-2 pl-5 text-sm text-muted-foreground">
                                     <li>
@@ -57,14 +57,14 @@ export default function Privacy() {
                                         create a native account.
                                     </li>
                                     <li>
-                                        <strong>Social Sign-In Data:</strong> We
-                                        offer third-party authentication via
+                                        <strong>Social Sign-In Data:</strong> Hiraya Review
+                                        offers third-party authentication via
                                         Google and Facebook. When you use Google
-                                        or Facebook to sign in, we receive and
+                                        or Facebook to sign in, Hiraya Review receives and
                                         securely store basic profile details
                                         (such as your name, email address, and
                                         profile picture) to personalize your
-                                        account and metrics dashboard. We will
+                                        account and metrics dashboard. Hiraya Review will
                                         never post or publish to your social
                                         feed.
                                     </li>
@@ -88,10 +88,10 @@ export default function Privacy() {
 
                             <section className="space-y-3">
                                 <h2 className="text-xl font-bold text-foreground">
-                                    3. How We Use Your Information
+                                    3. How Hiraya Review Uses Your Information
                                 </h2>
                                 <p className="text-sm text-muted-foreground">
-                                    We use the gathered information to:
+                                    Hiraya Review uses the gathered information to:
                                 </p>
                                 <ul className="list-disc space-y-1 pl-5 text-sm text-muted-foreground">
                                     <li>
@@ -109,7 +109,7 @@ export default function Privacy() {
                                         with most.
                                     </li>
                                     <li>
-                                        Protect our database from scraping and
+                                        Protect the database from scraping and
                                         DDoS attacks.
                                     </li>
                                 </ul>
@@ -120,10 +120,10 @@ export default function Privacy() {
                                     4. Data Sharing & Security
                                 </h2>
                                 <p className="text-sm text-muted-foreground">
-                                    We do not sell, rent, or trade your personal
+                                    Hiraya Review does not sell, rent, or trade your personal
                                     data with third parties. Your account
                                     records and score history are fully
-                                    confidential. We utilize standard SSL/TLS
+                                    confidential. Hiraya Review utilizes standard SSL/TLS
                                     encryption and strict Laravel Sanctum
                                     sessions to guarantee that your profile
                                     remains secure.

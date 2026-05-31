@@ -49,7 +49,7 @@ export default function Support() {
                                     Contact Support
                                 </h1>
                                 <p className="mt-1.5 text-sm text-muted-foreground">
-                                    Have a question or feedback? We are here to
+                                    Have a question or feedback? Hiraya Review is here to
                                     help you succeed.
                                 </p>
                             </div>
@@ -69,7 +69,7 @@ export default function Support() {
                                         <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
                                             Found a buggy question or want to
                                             suggest an explanation improvement?
-                                            Contact us directly.
+                                            Contact Hiraya Review directly.
                                         </p>
                                     </div>
                                 </Card>
@@ -83,7 +83,7 @@ export default function Support() {
                                             Unofficial Portal Note
                                         </h3>
                                         <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
-                                            Please note that we cannot answer
+                                            Please note that Hiraya Review cannot answer
                                             official Civil Service Commission
                                             schedule or processing questions.
                                             Contact the CSC directly for exam
@@ -106,7 +106,7 @@ export default function Support() {
                                             </h2>
                                             <p className="animate-fade-in mt-2 max-w-2xl text-sm text-muted-foreground">
                                                 Thanks for reaching out,{' '}
-                                                {submittedData?.name}. We will
+                                                {submittedData?.name}. Hiraya Review will
                                                 review your message and reply
                                                 via email at{' '}
                                                 {submittedData?.email} within 24
@@ -219,7 +219,7 @@ export default function Support() {
                                                             e.target.value,
                                                         )
                                                     }
-                                                    placeholder="How can we help you? Please describe your request or question in detail..."
+                                                    placeholder="How can Hiraya Review help you? Please describe your request or question in detail..."
                                                     className={`w-full rounded-lg border bg-white px-4 py-2.5 text-sm text-foreground transition focus:border-blue-500 focus:outline-none dark:bg-slate-900 ${
                                                         errors.message
                                                             ? 'border-red-500'

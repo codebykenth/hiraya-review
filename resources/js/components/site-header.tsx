@@ -61,6 +61,7 @@ export default function SiteHeader({
 
     const navLinks = [
         { id: 'home', label: 'Home', href: '#' },
+        { id: 'about', label: 'About Us', href: '/about' },
         { id: 'features', label: 'Features', href: '#features' },
         { id: 'path', label: 'Process', href: '#path' },
         { id: 'learn', label: 'Study Hub', href: '/learn' },
@@ -108,7 +109,7 @@ export default function SiteHeader({
                     showHeader ? 'translate-y-0 shadow-sm' : '-translate-y-full'
                 }`}
             >
-                <nav className="container mx-auto flex items-center justify-between gap-2 px-4 py-3 lg:gap-4 lg:px-6 lg:py-4">
+                <nav className="container mx-auto flex items-center justify-between gap-2 px-4 py-3 xl:gap-4 lg:px-6 lg:py-4">
                     <div className="flex items-center">
                         <Link href={home()} className="flex items-center gap-2">
                             <AppLogo />
@@ -116,18 +117,18 @@ export default function SiteHeader({
                     </div>
 
                     {!auth.user && (
-                        <div className="hidden lg:block">
-                            <ul className="flex gap-8 font-medium">
+                        <div className="hidden xl:block">
+                            <ul className="flex gap-6 font-medium">
                                 {navLinks.map((link) => {
                                     const isLinkActive =
                                         activeNav === link.id ||
-                                        (link.id === 'learn' &&
-                                            url.startsWith('/learn'));
+                                        (link.id === 'learn' && url.startsWith('/learn')) ||
+                                        (link.id === 'about' && url.startsWith('/about'));
                                     const isHomePage =
                                         url === '/' || url === '';
                                     const isHomeActive =
-                                        (link.id === 'learn' &&
-                                            url.startsWith('/learn')) ||
+                                        (link.id === 'learn' && url.startsWith('/learn')) ||
+                                        (link.id === 'about' && url.startsWith('/about')) ||
                                         (isHomePage && isLinkActive);
 
                                     return (
@@ -155,7 +156,7 @@ export default function SiteHeader({
                         </div>
                     )}
 
-                    <div className="hidden items-center gap-4 lg:flex">
+                    <div className="hidden items-center gap-4 xl:flex">
                         {auth.user ? (
                             <Link
                                 href={dashboard()}
@@ -186,7 +187,7 @@ export default function SiteHeader({
                         <ThemeToggle />
                     </div>
 
-                    <div className="flex items-center gap-2 lg:hidden">
+                    <div className="flex items-center gap-2 xl:hidden">
                         <ThemeToggle />
                         <button
                             onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -203,7 +204,7 @@ export default function SiteHeader({
                 </nav>
 
                 <div
-                    className={`absolute top-full right-0 left-0 z-40 transform border-b border-slate-200 bg-white/95 backdrop-blur-lg transition-all duration-300 ease-in-out lg:hidden dark:border-slate-800 dark:bg-black/95 ${
+                    className={`absolute top-full right-0 left-0 z-40 transform border-b border-slate-200 bg-white/95 backdrop-blur-lg transition-all duration-300 ease-in-out xl:hidden dark:border-slate-800 dark:bg-black/95 ${
                         isMenuOpen
                             ? 'translate-y-0 opacity-100'
                             : 'pointer-events-none -translate-y-10 opacity-0'
@@ -216,13 +217,13 @@ export default function SiteHeader({
                                     {navLinks.map((link) => {
                                         const isLinkActive =
                                             activeNav === link.id ||
-                                            (link.id === 'learn' &&
-                                                url.startsWith('/learn'));
+                                            (link.id === 'learn' && url.startsWith('/learn')) ||
+                                            (link.id === 'about' && url.startsWith('/about'));
                                         const isHomePage =
                                             url === '/' || url === '';
                                         const isHomeActive =
-                                            (link.id === 'learn' &&
-                                                url.startsWith('/learn')) ||
+                                            (link.id === 'learn' && url.startsWith('/learn')) ||
+                                            (link.id === 'about' && url.startsWith('/about')) ||
                                             (isHomePage && isLinkActive);
 
                                         return (

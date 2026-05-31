@@ -60,8 +60,8 @@ export default function AcceptTermsModal({ isOpen }: Props) {
                                     Terms of Service
                                 </h3>
                                 <p className="text-xs leading-relaxed">
-                                    By using our service, you agree to comply
-                                    with our terms and policies. You are
+                                    By using Hiraya Review, you agree to comply
+                                    with the terms and policies. You are
                                     responsible for maintaining account
                                     confidentiality and all activities under
                                     your account.{' '}
@@ -79,8 +79,8 @@ export default function AcceptTermsModal({ isOpen }: Props) {
                                     Privacy Policy
                                 </h3>
                                 <p className="text-xs leading-relaxed">
-                                    We collect and process personal data to
-                                    provide and improve our services. Your data
+                                    Hiraya Review collects and processes personal data to
+                                    provide and improve the services. Your data
                                     is protected and will not be shared with
                                     third parties without consent.{' '}
                                     <Link
