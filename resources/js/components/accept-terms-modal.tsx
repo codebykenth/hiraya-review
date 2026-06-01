@@ -45,7 +45,7 @@ export default function AcceptTermsModal({ isOpen }: Props) {
     return (
         <Dialog open={isOpen} onOpenChange={() => {}}>
             <DialogContent
-                className="max-w-md"
+                className="max-w-2xl"
                 onPointerDownOutside={(e) => e.preventDefault()}
             >
                 <DialogHeader>

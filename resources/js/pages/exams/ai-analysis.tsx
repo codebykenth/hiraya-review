@@ -255,7 +255,7 @@ export default function AiAnalysisReport({
                         <h3 className="text-xl font-bold text-slate-900 dark:text-white">
                             AI Diagnostic Report Locked
                         </h3>
-                        <p className="mt-2 max-w-md text-sm text-slate-500 dark:text-slate-400">
+                        <p className="mt-2 max-w-2xl text-sm text-slate-500 dark:text-slate-400">
                             We need at least one exam attempt to analyze your
                             scores, identify weak areas, and generate your
                             predictive analysis.
@@ -298,7 +298,7 @@ export default function AiAnalysisReport({
                         <h3 className="text-xl font-bold text-slate-900 dark:text-white">
                             AI Diagnostic Report Failed
                         </h3>
-                        <p className="text-slate-550 mt-2 max-w-md text-sm dark:text-slate-400">
+                        <p className="text-slate-550 mt-2 max-w-2xl text-sm dark:text-slate-400">
                             {errorMessage ||
                                 'Our AI systems are currently highly loaded or rate-limited across all fallbacks. Please try again.'}
                         </p>
@@ -870,7 +870,7 @@ export default function AiAnalysisReport({
             {/* System Under Heavy Load Modal */}
             {isOverloadModalOpen && (
                 <div className="animate-fade-in fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-sm">
-                    <div className="relative w-full max-w-lg animate-in overflow-hidden rounded-3xl border border-slate-200/80 bg-white p-6 shadow-2xl transition-all duration-200 zoom-in-95 fade-in dark:border-slate-800 dark:bg-slate-900">
+                    <div className="relative w-full max-w-2xl animate-in overflow-hidden rounded-3xl border border-slate-200/80 bg-white p-6 shadow-2xl transition-all duration-200 zoom-in-95 fade-in dark:border-slate-800 dark:bg-slate-900">
                         {/* Decorative Background */}
                         <div className="pointer-events-none absolute -top-24 -right-24 h-48 w-48 rounded-full bg-amber-500/5 blur-3xl" />
 

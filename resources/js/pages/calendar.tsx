@@ -838,10 +838,18 @@ export default function Calendar() {
                                         {week.map((calendarDay) => (
                                             <div
                                                 key={calendarDay.date}
+                                                onClick={() => {
+                                                    if (
+                                                        calendarDay.isCurrentMonth &&
+                                                        calendarDay.date >= todayStr
+                                                    ) {
+                                                        openModal(calendarDay.date);
+                                                    }
+                                                }}
                                                 className={`group relative flex min-h-24 flex-col rounded-lg border p-2 transition-all ${
                                                     calendarDay.isCurrentMonth &&
                                                     calendarDay.date >= todayStr
-                                                        ? 'hover:border-blue-300 hover:shadow-sm'
+                                                        ? 'cursor-pointer hover:border-blue-300 hover:shadow-sm'
                                                         : ''
                                                 } ${
                                                     examDates.includes(
@@ -942,12 +950,13 @@ export default function Calendar() {
                                                                     key={
                                                                         schedule.id
                                                                     }
-                                                                    onClick={() =>
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation();
                                                                         openEditModal(
                                                                             schedule,
                                                                             calendarDay.date,
-                                                                        )
-                                                                    }
+                                                                        );
+                                                                    }}
                                                                     className={`group relative cursor-pointer rounded p-1.5 text-xs hover:opacity-90 ${colors.bg} ${colors.text}`}
                                                                 >
                                                                     <div className="flex items-start justify-between gap-1">
@@ -1347,7 +1356,7 @@ export default function Calendar() {
                     open={!!errorMessage}
                     onOpenChange={(open) => !open && setErrorMessage(null)}
                 >
-                    <DialogContent className="max-w-md">
+                    <DialogContent className="max-w-2xl">
                         <DialogHeader>
                             <DialogTitle className="text-red-600">
                                 Error

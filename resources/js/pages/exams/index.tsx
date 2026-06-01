@@ -1948,7 +1948,7 @@ export default function ExamIndex({
                 open={!!errorMessage}
                 onOpenChange={(open) => !open && setErrorMessage(null)}
             >
-                <DialogContent className="max-w-md">
+                <DialogContent className="max-w-2xl">
                     <DialogHeader>
                         <DialogTitle className="text-red-600">
                             Error

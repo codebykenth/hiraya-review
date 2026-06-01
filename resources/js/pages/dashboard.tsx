@@ -98,6 +98,17 @@ export default function Dashboard({ stats, aiAnalysis }: DashboardProps) {
         }
     }, []);
 
+    // Dismiss active score history tooltip when clicking outside the chart
+    useEffect(() => {
+        const handleBodyClick = () => {
+            setHoveredIdx(null);
+        };
+        document.body.addEventListener('click', handleBodyClick);
+        return () => {
+            document.body.removeEventListener('click', handleBodyClick);
+        };
+    }, []);
+
     const defaultStats = {
         avgScore: 84,
         totalExams: 12,
@@ -541,234 +552,255 @@ export default function Dashboard({ stats, aiAnalysis }: DashboardProps) {
                         </div>
 
                         {/* Interactive SVG line chart visualization */}
-                        <div className="relative w-full rounded-xl border border-slate-200 bg-gradient-to-b from-slate-50 to-white p-3 dark:border-slate-800/70 dark:from-slate-900/30 dark:to-slate-950">
-                            {/* Detailed HTML absolute glassmorphic tooltip card */}
-                            {hoveredIdx !== null &&
-                                filteredChartData[hoveredIdx] &&
-                                filteredChartData[hoveredIdx].track !==
-                                    'No Data' && (
-                                    <div
-                                        className="pointer-events-none absolute z-10 -translate-x-1/2 -translate-y-full rounded-lg border border-blue-200/50 bg-white/95 p-3 shadow-xl backdrop-blur-sm transition-all duration-150 dark:border-slate-800/50 dark:bg-slate-950/95"
-                                        style={{
-                                            left: `${(points[hoveredIdx].x / chartWidth) * 100}%`,
-                                            top: `${(points[hoveredIdx].y / chartHeight) * 100 - 8}%`,
-                                        }}
-                                    >
-                                        <div className="flex min-w-[130px] flex-col gap-1">
-                                            <span className="text-[10px] font-extrabold tracking-wide text-blue-600 uppercase dark:text-blue-400">
-                                                {
-                                                    filteredChartData[
-                                                        hoveredIdx
-                                                    ].track
-                                                }
-                                            </span>
-                                            <div className="flex items-baseline justify-between gap-3">
-                                                <span className="text-sm font-black text-slate-800 dark:text-white">
+                        <div className="relative w-full overflow-x-auto rounded-xl border border-slate-200 bg-gradient-to-b from-slate-50 to-white p-3 dark:border-slate-800/70 dark:from-slate-900/30 dark:to-slate-950">
+                            <div className="min-w-[600px] md:min-w-0">
+                                {/* Detailed HTML absolute glassmorphic tooltip card */}
+                                {hoveredIdx !== null &&
+                                    filteredChartData[hoveredIdx] &&
+                                    filteredChartData[hoveredIdx].track !==
+                                        'No Data' && (
+                                        <div
+                                            className="pointer-events-none absolute z-10 -translate-x-1/2 -translate-y-full rounded-lg border border-blue-200/50 bg-white/95 p-3 shadow-xl backdrop-blur-sm transition-all duration-150 dark:border-slate-800/50 dark:bg-slate-950/95"
+                                            style={{
+                                                left: `${(points[hoveredIdx].x / chartWidth) * 100}%`,
+                                                top: `${(points[hoveredIdx].y / chartHeight) * 100 - 8}%`,
+                                            }}
+                                        >
+                                            <div className="flex min-w-[130px] flex-col gap-1">
+                                                <span className="text-[10px] font-extrabold tracking-wide text-blue-600 uppercase dark:text-blue-400">
                                                     {
                                                         filteredChartData[
                                                             hoveredIdx
-                                                        ].score
+                                                        ].track
                                                     }
-                                                    %
                                                 </span>
-                                                <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">
+                                                <div className="flex items-baseline justify-between gap-3">
+                                                    <span className="text-sm font-black text-slate-800 dark:text-white">
+                                                        {
+                                                            filteredChartData[
+                                                                hoveredIdx
+                                                            ].score
+                                                        }
+                                                        %
+                                                    </span>
+                                                    <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">
+                                                        {
+                                                            filteredChartData[
+                                                                hoveredIdx
+                                                            ].detail
+                                                        }
+                                                    </span>
+                                                </div>
+                                                <span className="text-[9px] text-slate-400">
+                                                    Date:{' '}
                                                     {
                                                         filteredChartData[
                                                             hoveredIdx
-                                                        ].detail
+                                                        ].date
                                                     }
                                                 </span>
                                             </div>
-                                            <span className="text-[9px] text-slate-400">
-                                                Date:{' '}
-                                                {
-                                                    filteredChartData[
-                                                        hoveredIdx
-                                                    ].date
-                                                }
-                                            </span>
                                         </div>
-                                    </div>
-                                )}
+                                    )}
 
-                            <svg
-                                className="h-auto w-full"
-                                viewBox={`0 0 ${chartWidth} ${chartHeight}`}
-                            >
-                                <defs>
-                                    <pattern
-                                        id="grid"
-                                        width="40"
-                                        height="20"
-                                        patternUnits="userSpaceOnUse"
-                                    >
-                                        <path
-                                            d="M 40 0 L 0 0 0 20"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            strokeWidth="0.5"
-                                            className="text-blue-100/40 dark:text-slate-800/40"
-                                        />
-                                    </pattern>
-                                    <linearGradient
-                                        id="chartGradient"
-                                        x1="0"
-                                        y1="0"
-                                        x2="0"
-                                        y2="1"
-                                    >
-                                        <stop
-                                            offset="0%"
-                                            stopColor="#2563eb"
-                                            stopOpacity="0.2"
-                                        />
-                                        <stop
-                                            offset="100%"
-                                            stopColor="#2563eb"
-                                            stopOpacity="0.0"
-                                        />
-                                    </linearGradient>
-                                </defs>
-
-                                {/* Background grid mesh */}
-                                <rect
-                                    width={chartWidth}
-                                    height={chartHeight}
-                                    fill="url(#grid)"
-                                />
-
-                                {/* Render clean guide metrics */}
-                                {[0, 25, 50, 75, 100].map((level) => {
-                                    const y =
-                                        chartHeight -
-                                        chartPadding -
-                                        (level *
-                                            (chartHeight - chartPadding * 2)) /
-                                            100;
-
-                                    return (
-                                        <g key={level}>
-                                            <line
-                                                x1={chartPaddingLeft}
-                                                y1={y}
-                                                x2={
-                                                    chartWidth -
-                                                    chartPaddingRight
-                                                }
-                                                y2={y}
+                                <svg
+                                    className="h-auto w-full"
+                                    viewBox={`0 0 ${chartWidth} ${chartHeight}`}
+                                >
+                                    <defs>
+                                        <pattern
+                                            id="grid"
+                                            width="40"
+                                            height="20"
+                                            patternUnits="userSpaceOnUse"
+                                        >
+                                            <path
+                                                d="M 40 0 L 0 0 0 20"
+                                                fill="none"
                                                 stroke="currentColor"
                                                 strokeWidth="0.5"
-                                                className="text-blue-100/30 dark:text-slate-800/30"
-                                                strokeDasharray="4 4"
+                                                className="text-blue-100/40 dark:text-slate-800/40"
                                             />
-                                            <text
-                                                x={chartPaddingLeft - 8}
-                                                y={y + 3}
-                                                textAnchor="end"
-                                                fontSize="9"
-                                                fontWeight="bold"
-                                                className="fill-slate-400 dark:fill-slate-500"
-                                            >
-                                                {level}%
-                                            </text>
-                                        </g>
-                                    );
-                                })}
+                                        </pattern>
+                                        <linearGradient
+                                            id="chartGradient"
+                                            x1="0"
+                                            y1="0"
+                                            x2="0"
+                                            y2="1"
+                                        >
+                                            <stop
+                                                offset="0%"
+                                                stopColor="#2563eb"
+                                                stopOpacity="0.2"
+                                            />
+                                            <stop
+                                                offset="100%"
+                                                stopColor="#2563eb"
+                                                stopOpacity="0.0"
+                                            />
+                                        </linearGradient>
+                                    </defs>
 
-                                {points.length > 0 && (
-                                    <>
-                                        <path
-                                            d={areaD}
-                                            fill="url(#chartGradient)"
-                                        />
-                                        <path
-                                            d={pathD}
-                                            fill="none"
-                                            stroke="#2563eb"
-                                            strokeWidth="2.5"
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                        />
-                                    </>
-                                )}
+                                    {/* Background grid mesh */}
+                                    <rect
+                                        width={chartWidth}
+                                        height={chartHeight}
+                                        fill="url(#grid)"
+                                    />
 
-                                {points.length === 0 && (
-                                    <text
-                                        x={chartWidth / 2}
-                                        y={chartHeight / 2}
-                                        textAnchor="middle"
-                                        fontSize="11"
-                                        fontWeight="semibold"
-                                        className="fill-slate-400 dark:fill-slate-500"
-                                    >
-                                        No matched attempts found.
-                                    </text>
-                                )}
+                                    {/* Render clean guide metrics */}
+                                    {[0, 25, 50, 75, 100].map((level) => {
+                                        const y =
+                                            chartHeight -
+                                            chartPadding -
+                                            (level *
+                                                (chartHeight - chartPadding * 2)) /
+                                                100;
 
-                                {points.map((p, idx) => (
-                                    <g key={idx}>
-                                        {/* Outer glowing focus indicator on hover */}
-                                        {hoveredIdx === idx && (
+                                        return (
+                                            <g key={level}>
+                                                <line
+                                                    x1={chartPaddingLeft}
+                                                    y1={y}
+                                                    x2={
+                                                        chartWidth -
+                                                        chartPaddingRight
+                                                    }
+                                                    y2={y}
+                                                    stroke="currentColor"
+                                                    strokeWidth="0.5"
+                                                    className="text-blue-100/30 dark:text-slate-800/30"
+                                                    strokeDasharray="4 4"
+                                                />
+                                                <text
+                                                    x={chartPaddingLeft - 8}
+                                                    y={y + 3}
+                                                    textAnchor="end"
+                                                    fontSize="9"
+                                                    fontWeight="bold"
+                                                    className="fill-slate-400 dark:fill-slate-500"
+                                                >
+                                                    {level}%
+                                                </text>
+                                            </g>
+                                        );
+                                    })}
+
+                                    {points.length > 0 && (
+                                        <>
+                                            <path
+                                                d={areaD}
+                                                fill="url(#chartGradient)"
+                                            />
+                                            <path
+                                                d={pathD}
+                                                fill="none"
+                                                stroke="#2563eb"
+                                                strokeWidth="2.5"
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                            />
+                                        </>
+                                    )}
+
+                                    {points.length === 0 && (
+                                        <text
+                                            x={chartWidth / 2}
+                                            y={chartHeight / 2}
+                                            textAnchor="middle"
+                                            fontSize="11"
+                                            fontWeight="semibold"
+                                            className="fill-slate-400 dark:fill-slate-500"
+                                        >
+                                            No matched attempts found.
+                                        </text>
+                                    )}
+
+                                    {points.map((p, idx) => (
+                                        <g key={idx}>
+                                            {/* Outer glowing focus indicator on hover */}
+                                            {hoveredIdx === idx && (
+                                                <circle
+                                                    cx={p.x}
+                                                    cy={p.y}
+                                                    r="9"
+                                                    fill="#2563eb"
+                                                    fillOpacity="0.15"
+                                                    className="animate-pulse"
+                                                />
+                                            )}
                                             <circle
                                                 cx={p.x}
                                                 cy={p.y}
-                                                r="9"
-                                                fill="#2563eb"
-                                                fillOpacity="0.15"
-                                                className="animate-pulse"
+                                                r={hoveredIdx === idx ? '6' : '4.5'}
+                                                fill="#ffffff"
+                                                stroke="#2563eb"
+                                                strokeWidth={
+                                                    hoveredIdx === idx ? '3' : '2'
+                                                }
+                                                className="cursor-pointer transition-all duration-150"
+                                                onMouseEnter={() =>
+                                                    setHoveredIdx(idx)
+                                                }
+                                                onMouseLeave={() =>
+                                                    setHoveredIdx(null)
+                                                }
                                             />
-                                        )}
-                                        <circle
-                                            cx={p.x}
-                                            cy={p.y}
-                                            r={hoveredIdx === idx ? '6' : '4.5'}
-                                            fill="#ffffff"
-                                            stroke="#2563eb"
-                                            strokeWidth={
-                                                hoveredIdx === idx ? '3' : '2'
-                                            }
-                                            className="cursor-pointer transition-all duration-150"
-                                            onMouseEnter={() =>
-                                                setHoveredIdx(idx)
-                                            }
-                                            onMouseLeave={() =>
-                                                setHoveredIdx(null)
-                                            }
-                                        />
 
-                                        {/* Score tag text inside SVG */}
-                                        {idx === points.length - 1 &&
-                                            hoveredIdx === null && (
-                                                <text
-                                                    x={p.x - 15}
-                                                    y={p.y - 12}
-                                                    fontSize="11"
-                                                    fontWeight="bold"
-                                                    fill="#2563eb"
-                                                    className="dark:fill-blue-400"
-                                                >
-                                                    {
-                                                        filteredChartData[idx]
-                                                            .score
-                                                    }
-                                                    %
-                                                </text>
-                                            )}
+                                            {/* Score tag text inside SVG */}
+                                            {idx === points.length - 1 &&
+                                                hoveredIdx === null && (
+                                                    <text
+                                                        x={p.x - 15}
+                                                        y={p.y - 12}
+                                                        fontSize="11"
+                                                        fontWeight="bold"
+                                                        fill="#2563eb"
+                                                        className="dark:fill-blue-400"
+                                                    >
+                                                        {
+                                                            filteredChartData[idx]
+                                                                .score
+                                                        }
+                                                        %
+                                                    </text>
+                                                )}
 
-                                        {/* Dynamic X-Axis label dates */}
-                                        <text
-                                            x={p.x}
-                                            y={chartHeight - 4}
-                                            textAnchor="middle"
-                                            fontSize="9"
-                                            fontWeight="bold"
-                                            className="fill-slate-400 dark:fill-slate-500"
-                                        >
-                                            {filteredChartData[idx].date}
-                                        </text>
-                                    </g>
-                                ))}
-                            </svg>
+                                            {/* Dynamic X-Axis label dates */}
+                                            <text
+                                                x={p.x}
+                                                y={chartHeight - 4}
+                                                textAnchor="middle"
+                                                fontSize="10"
+                                                fontWeight="bold"
+                                                className="cursor-pointer fill-slate-400 hover:fill-blue-600 dark:fill-slate-500 dark:hover:fill-blue-400"
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    setHoveredIdx(hoveredIdx === idx ? null : idx);
+                                                }}
+                                            >
+                                                {filteredChartData[idx].date}
+                                            </text>
+
+                                            {/* Larger invisible overlay for easier tapping on mobile */}
+                                            <circle
+                                                cx={p.x}
+                                                cy={p.y}
+                                                r="20"
+                                                fill="transparent"
+                                                className="cursor-pointer"
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    setHoveredIdx(hoveredIdx === idx ? null : idx);
+                                                }}
+                                                onMouseEnter={() => setHoveredIdx(idx)}
+                                                onMouseLeave={() => setHoveredIdx(null)}
+                                            />
+                                        </g>
+                                    ))}
+                                </svg>
+                            </div>
                         </div>
 
                         {/* Recent Attempts Table/List filling the empty space */}
