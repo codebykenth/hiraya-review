@@ -1,19 +1,18 @@
 <?php
 
-use App\Models\User;
-use App\Models\Category;
-use App\Models\Subcategory;
-use App\Models\Question;
-use App\Models\ExamAttempt;
-use App\Models\UserAiAnalysis;
 use App\Jobs\GenerateUserAnalysisJob;
+use App\Models\Category;
+use App\Models\ExamAttempt;
+use App\Models\Question;
+use App\Models\Subcategory;
+use App\Models\User;
+use App\Models\UserAiAnalysis;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Bus;
 
 test('GenerateUserAnalysisJob calculates subtopic stats and maps subcategory IDs correctly', function () {
     // 1. Setup User and Categories
     $user = User::factory()->create();
-    
+
     $category = Category::create([
         'name' => 'Numerical Ability',
         'slug' => 'numerical-ability',
@@ -34,28 +33,34 @@ test('GenerateUserAnalysisJob calculates subtopic stats and maps subcategory IDs
     // 2. Setup Questions
     $q1 = Question::create([
         'subcategory_id' => $subcategory1->id,
-        'question_text' => 'What is 1/2 + 1/4?',
+        'stem' => 'What is 1/2 + 1/4?',
         'options' => ['A' => '3/4', 'B' => '1/2', 'C' => '1/4', 'D' => '1'],
-        'correct_option' => 'A',
+        'correct_option' => 0,
+        'created_by' => $user->id,
+        'explanation' => 'Some explanation',
+        'status' => 'active',
     ]);
 
     $q2 = Question::create([
         'subcategory_id' => $subcategory2->id,
-        'question_text' => 'What is 0.5 + 0.25?',
+        'stem' => 'What is 0.5 + 0.25?',
         'options' => ['A' => '0.75', 'B' => '0.5', 'C' => '0.25', 'D' => '1'],
-        'correct_option' => 'A',
+        'correct_option' => 0,
+        'created_by' => $user->id,
+        'explanation' => 'Some explanation',
+        'status' => 'active',
     ]);
 
     // 3. Setup Exam Attempt with Answers
-    // q1 is correct (A), q2 is incorrect (B)
+    // q1 is correct (0), q2 is incorrect (1)
     $attempt = ExamAttempt::create([
         'user_id' => $user->id,
         'category_id' => $category->id,
         'question_ids' => [$q1->id, $q2->id],
-        'answers' => [$q1->id => 'A', $q2->id => 'B'],
+        'answers' => [$q1->id => 0, $q2->id => 1],
         'cat_scores' => [
             'categoryScoreMap' => [
-                'Numerical Ability' => ['correct' => 1, 'total' => 2]
+                'Numerical Ability' => ['correct' => 1, 'total' => 2],
             ],
             'metadata' => [
                 'track' => 'Drill',
@@ -94,7 +99,7 @@ test('GenerateUserAnalysisJob calculates subtopic stats and maps subcategory IDs
                                     'rating' => 'Satisfactory',
                                     'color' => 'amber',
                                     'insight' => 'Scored 50% on decimal and fraction drills.',
-                                ]
+                                ],
                             ],
                             'timeline_prediction' => [
                                 'current_stage' => 'Practice Stage',
@@ -107,7 +112,7 @@ test('GenerateUserAnalysisJob calculates subtopic stats and maps subcategory IDs
                                     'difficulty_level' => 'Medium',
                                     'reason_for_struggle' => 'Incorrect option chosen.',
                                     'coaching_tip' => 'Draw visual decimal grids.',
-                                ]
+                                ],
                             ],
                             'personalized_7_day_plan' => [
                                 [
@@ -115,13 +120,13 @@ test('GenerateUserAnalysisJob calculates subtopic stats and maps subcategory IDs
                                     'focus_topic' => 'Decimals',
                                     'activity' => 'Review decimal addition',
                                     'subcategory_id' => $subcategory2->id,
-                                ]
-                            ]
-                        ])
-                    ]
-                ]
-            ]
-        ], 200)
+                                ],
+                            ],
+                        ]),
+                    ],
+                ],
+            ],
+        ], 200),
     ]);
 
     // Set temporary environment keys so model attempts do not skip

@@ -2,6 +2,8 @@
 
 namespace App\Jobs;
 
+use App\Events\AiGenerationCompleted;
+use App\Events\AiGenerationFailed;
 use App\Models\Category;
 use App\Models\Question;
 use App\Models\Subcategory;
@@ -20,10 +22,13 @@ class GenerateQuestionsJob implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public $timeout = 300;
+
     public $tries = 3;
 
     protected $validated;
+
     protected $userId;
+
     protected $primaryModel;
 
     public function __construct(array $validated, int $userId, string $primaryModel = 'llama-3.3-70b-versatile')
@@ -41,7 +46,8 @@ class GenerateQuestionsJob implements ShouldQueue
         $apiKey = config('services.gemini.key') ?: env('GEMINI_API_KEY');
         if (! $apiKey) {
             Log::error('GenerateQuestionsJob: GEMINI_API_KEY is missing.');
-            \App\Events\AiGenerationFailed::dispatch($this->userId, 'API Key is missing.', 'questions');
+            AiGenerationFailed::dispatch($this->userId, 'API Key is missing.', 'questions');
+
             return;
         }
 
@@ -84,7 +90,7 @@ Output format:
 Category: {$validated['category']}
 Subcategory: {$validated['subcategory']}
 Language: {$validated['language']}
-" . (!empty($validated['prompt']) ? "Additional Context/Directives: {$validated['prompt']}" : '');
+".(! empty($validated['prompt']) ? "Additional Context/Directives: {$validated['prompt']}" : '');
 
         try {
             $resultText = null;
@@ -92,9 +98,10 @@ Language: {$validated['language']}
             $firstAttemptFailed = false;
 
             // Define closures for both API calls
-            $attemptGemini = function($model = 'gemini-3.5-flash') use ($apiKey, $systemPrompt, $userPrompt, &$resultText, &$errorMsg) {
+            $attemptGemini = function ($model = 'gemini-3.5-flash') use ($apiKey, $systemPrompt, $userPrompt, &$resultText, &$errorMsg) {
                 if (! $apiKey) {
-                    $errorMsg = "GEMINI_API_KEY is missing.";
+                    $errorMsg = 'GEMINI_API_KEY is missing.';
+
                     return false;
                 }
                 try {
@@ -102,7 +109,7 @@ Language: {$validated['language']}
                         'x-goog-api-key' => $apiKey,
                         'Content-Type' => 'application/json',
                     ])->timeout(300)->post(
-                        'https://generativelanguage.googleapis.com/v1beta/models/' . $model . ':generateContent',
+                        'https://generativelanguage.googleapis.com/v1beta/models/'.$model.':generateContent',
                         [
                             'system_instruction' => [
                                 'parts' => [['text' => $systemPrompt]],
@@ -152,21 +159,25 @@ Language: {$validated['language']}
                     if ($response->successful()) {
                         $result = $response->json();
                         $resultText = $result['candidates'][0]['content']['parts'][0]['text'] ?? '';
+
                         return true;
                     } else {
-                        $errorMsg = "Gemini API failed with status " . $response->status() . ": " . $response->body();
+                        $errorMsg = 'Gemini API failed with status '.$response->status().': '.$response->body();
+
                         return false;
                     }
                 } catch (\Exception $e) {
-                    $errorMsg = "Gemini Exception: " . $e->getMessage();
+                    $errorMsg = 'Gemini Exception: '.$e->getMessage();
+
                     return false;
                 }
             };
 
-            $attemptGroq = function($model) use ($systemPrompt, $userPrompt, &$resultText, &$errorMsg) {
+            $attemptGroq = function ($model) use ($systemPrompt, $userPrompt, &$resultText, &$errorMsg) {
                 $groqKey = config('services.groq.key') ?: env('GROQ_API_KEY');
                 if (! $groqKey) {
-                    $errorMsg = "GROQ_API_KEY is missing.";
+                    $errorMsg = 'GROQ_API_KEY is missing.';
+
                     return false;
                 }
 
@@ -185,13 +196,16 @@ Language: {$validated['language']}
                     if ($groqResponse->successful()) {
                         $result = $groqResponse->json();
                         $resultText = $result['choices'][0]['message']['content'] ?? '';
+
                         return true;
                     } else {
-                        $errorMsg = "Groq API failed with status " . $groqResponse->status() . ": " . $groqResponse->body();
+                        $errorMsg = 'Groq API failed with status '.$groqResponse->status().': '.$groqResponse->body();
+
                         return false;
                     }
                 } catch (\Exception $e) {
-                    $errorMsg = "Groq Exception: " . $e->getMessage();
+                    $errorMsg = 'Groq Exception: '.$e->getMessage();
+
                     return false;
                 }
             };
@@ -201,65 +215,66 @@ Language: {$validated['language']}
             $geminiModels = ['gemini-2.5-flash', 'gemini-1.5-flash'];
 
             $primaryIsGemini = str_starts_with($this->primaryModel, 'gemini');
-            
+
             $geminiChain = array_unique(array_merge([$this->primaryModel], $geminiModels));
             $groqChain = array_unique(array_merge([$this->primaryModel], $groqModels));
 
             // Clean chains to keep only relevant models
-            $geminiChain = array_values(array_filter($geminiChain, fn($m) => str_starts_with($m, 'gemini')));
-            $groqChain = array_values(array_filter($groqChain, fn($m) => !str_starts_with($m, 'gemini')));
+            $geminiChain = array_values(array_filter($geminiChain, fn ($m) => str_starts_with($m, 'gemini')));
+            $groqChain = array_values(array_filter($groqChain, fn ($m) => ! str_starts_with($m, 'gemini')));
 
             $success = false;
 
             if ($primaryIsGemini) {
                 // Try Gemini first
                 foreach ($geminiChain as $model) {
-                    Log::info("GenerateQuestionsJob: Attempting Gemini model: " . $model);
+                    Log::info('GenerateQuestionsJob: Attempting Gemini model: '.$model);
                     if ($attemptGemini($model)) {
                         $success = true;
                         break;
                     }
-                    Log::warning("GenerateQuestionsJob: Gemini model " . $model . " failed: " . $errorMsg);
+                    Log::warning('GenerateQuestionsJob: Gemini model '.$model.' failed: '.$errorMsg);
                 }
-                
+
                 // Fallback to Groq
-                if (!$success) {
+                if (! $success) {
                     foreach ($groqChain as $model) {
-                        Log::info("GenerateQuestionsJob: Attempting Groq fallback model: " . $model);
+                        Log::info('GenerateQuestionsJob: Attempting Groq fallback model: '.$model);
                         if ($attemptGroq($model)) {
                             $success = true;
                             break;
                         }
-                        Log::warning("GenerateQuestionsJob: Groq model " . $model . " failed: " . $errorMsg);
+                        Log::warning('GenerateQuestionsJob: Groq model '.$model.' failed: '.$errorMsg);
                     }
                 }
             } else {
                 // Try Groq first
                 foreach ($groqChain as $model) {
-                    Log::info("GenerateQuestionsJob: Attempting Groq model: " . $model);
+                    Log::info('GenerateQuestionsJob: Attempting Groq model: '.$model);
                     if ($attemptGroq($model)) {
                         $success = true;
                         break;
                     }
-                    Log::warning("GenerateQuestionsJob: Groq model " . $model . " failed: " . $errorMsg);
+                    Log::warning('GenerateQuestionsJob: Groq model '.$model.' failed: '.$errorMsg);
                 }
 
                 // Fallback to Gemini
-                if (!$success) {
+                if (! $success) {
                     foreach ($geminiChain as $model) {
-                        Log::info("GenerateQuestionsJob: Attempting Gemini fallback model: " . $model);
+                        Log::info('GenerateQuestionsJob: Attempting Gemini fallback model: '.$model);
                         if ($attemptGemini($model)) {
                             $success = true;
                             break;
                         }
-                        Log::warning("GenerateQuestionsJob: Gemini model " . $model . " failed: " . $errorMsg);
+                        Log::warning('GenerateQuestionsJob: Gemini model '.$model.' failed: '.$errorMsg);
                     }
                 }
             }
 
-            if (!$success) {
-                Log::error("GenerateQuestionsJob: All AI generation models failed.");
-                \App\Events\AiGenerationFailed::dispatch($this->userId, 'AI Generation failed across all primary and fallback free models.', 'questions');
+            if (! $success) {
+                Log::error('GenerateQuestionsJob: All AI generation models failed.');
+                AiGenerationFailed::dispatch($this->userId, 'AI Generation failed across all primary and fallback free models.', 'questions');
+
                 return;
             }
 
@@ -273,8 +288,9 @@ Language: {$validated['language']}
 
             $questions = json_decode($text, true);
             if (! $questions || ! is_array($questions)) {
-                Log::error('GenerateQuestionsJob: Invalid JSON structure. Raw output: ' . $text);
-                \App\Events\AiGenerationFailed::dispatch($this->userId, 'AI Generation failed. Invalid response format.', 'questions');
+                Log::error('GenerateQuestionsJob: Invalid JSON structure. Raw output: '.$text);
+                AiGenerationFailed::dispatch($this->userId, 'AI Generation failed. Invalid response format.', 'questions');
+
                 return;
             }
 
@@ -311,11 +327,11 @@ Language: {$validated['language']}
             Cache::forget('questions.active');
             Cache::forget('categories.tree');
 
-            \App\Events\AiGenerationCompleted::dispatch($this->userId, 'Questions generation completed! Check your drafts.', 'questions');
+            AiGenerationCompleted::dispatch($this->userId, 'Questions generation completed! Check your drafts.', 'questions');
 
         } catch (\Exception $e) {
-            Log::error('GenerateQuestionsJob: Error: ' . $e->getMessage() . "\nTrace: " . $e->getTraceAsString());
-            \App\Events\AiGenerationFailed::dispatch($this->userId, 'An unexpected error occurred during AI generation.', 'questions');
+            Log::error('GenerateQuestionsJob: Error: '.$e->getMessage()."\nTrace: ".$e->getTraceAsString());
+            AiGenerationFailed::dispatch($this->userId, 'An unexpected error occurred during AI generation.', 'questions');
         }
     }
 }

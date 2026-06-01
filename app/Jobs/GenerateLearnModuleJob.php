@@ -2,6 +2,8 @@
 
 namespace App\Jobs;
 
+use App\Events\AiGenerationCompleted;
+use App\Events\AiGenerationFailed;
 use App\Models\Category;
 use App\Models\LearnModule;
 use App\Models\Subcategory;
@@ -20,10 +22,13 @@ class GenerateLearnModuleJob implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public $timeout = 300;
+
     public $tries = 3;
 
     protected $validated;
+
     protected $userId;
+
     protected $primaryModel;
 
     public function __construct(array $validated, int $userId, string $primaryModel = 'llama-3.3-70b-versatile')
@@ -41,7 +46,8 @@ class GenerateLearnModuleJob implements ShouldQueue
         $apiKey = config('services.gemini.key') ?: env('GEMINI_API_KEY');
         if (! $apiKey) {
             Log::error('GenerateLearnModuleJob: GEMINI_API_KEY is missing.');
-            \App\Events\AiGenerationFailed::dispatch($this->userId, 'API Key is missing.', 'module');
+            AiGenerationFailed::dispatch($this->userId, 'API Key is missing.', 'module');
+
             return;
         }
 
@@ -86,16 +92,17 @@ JSON Output schema:
 Category: {$validated['category']}
 Subcategory: {$validated['subcategory']}
 Topic: {$validated['topic']}
-" . (!empty($validated['prompt']) ? "Additional Directives: {$validated['prompt']}" : '');
+".(! empty($validated['prompt']) ? "Additional Directives: {$validated['prompt']}" : '');
 
         try {
             $resultText = null;
             $errorMsg = null;
             $firstAttemptFailed = false;
 
-            $attemptGemini = function($model = 'gemini-3.5-flash') use ($apiKey, $systemPrompt, $userPrompt, &$resultText, &$errorMsg) {
+            $attemptGemini = function ($model = 'gemini-3.5-flash') use ($apiKey, $systemPrompt, $userPrompt, &$resultText, &$errorMsg) {
                 if (! $apiKey) {
-                    $errorMsg = "GEMINI_API_KEY is missing.";
+                    $errorMsg = 'GEMINI_API_KEY is missing.';
+
                     return false;
                 }
                 try {
@@ -103,7 +110,7 @@ Topic: {$validated['topic']}
                         'x-goog-api-key' => $apiKey,
                         'Content-Type' => 'application/json',
                     ])->timeout(300)->post(
-                        'https://generativelanguage.googleapis.com/v1beta/models/' . $model . ':generateContent',
+                        'https://generativelanguage.googleapis.com/v1beta/models/'.$model.':generateContent',
                         [
                             'system_instruction' => [
                                 'parts' => [['text' => $systemPrompt]],
@@ -134,21 +141,25 @@ Topic: {$validated['topic']}
                     if ($response->successful()) {
                         $result = $response->json();
                         $resultText = $result['candidates'][0]['content']['parts'][0]['text'] ?? '';
+
                         return true;
                     } else {
-                        $errorMsg = "Gemini API failed with status " . $response->status() . ": " . $response->body();
+                        $errorMsg = 'Gemini API failed with status '.$response->status().': '.$response->body();
+
                         return false;
                     }
                 } catch (\Exception $e) {
-                    $errorMsg = "Gemini Exception: " . $e->getMessage();
+                    $errorMsg = 'Gemini Exception: '.$e->getMessage();
+
                     return false;
                 }
             };
 
-            $attemptGroq = function($model) use ($systemPrompt, $userPrompt, &$resultText, &$errorMsg) {
+            $attemptGroq = function ($model) use ($systemPrompt, $userPrompt, &$resultText, &$errorMsg) {
                 $groqKey = config('services.groq.key') ?: env('GROQ_API_KEY');
                 if (! $groqKey) {
-                    $errorMsg = "GROQ_API_KEY is missing.";
+                    $errorMsg = 'GROQ_API_KEY is missing.';
+
                     return false;
                 }
 
@@ -168,13 +179,16 @@ Topic: {$validated['topic']}
                     if ($groqResponse->successful()) {
                         $result = $groqResponse->json();
                         $resultText = $result['choices'][0]['message']['content'] ?? '';
+
                         return true;
                     } else {
-                        $errorMsg = "Groq API failed with status " . $groqResponse->status() . ": " . $groqResponse->body();
+                        $errorMsg = 'Groq API failed with status '.$groqResponse->status().': '.$groqResponse->body();
+
                         return false;
                     }
                 } catch (\Exception $e) {
-                    $errorMsg = "Groq Exception: " . $e->getMessage();
+                    $errorMsg = 'Groq Exception: '.$e->getMessage();
+
                     return false;
                 }
             };
@@ -184,65 +198,66 @@ Topic: {$validated['topic']}
             $geminiModels = ['gemini-2.5-flash', 'gemini-1.5-flash'];
 
             $primaryIsGemini = str_starts_with($this->primaryModel, 'gemini');
-            
+
             $geminiChain = array_unique(array_merge([$this->primaryModel], $geminiModels));
             $groqChain = array_unique(array_merge([$this->primaryModel], $groqModels));
 
             // Clean chains to keep only relevant models
-            $geminiChain = array_values(array_filter($geminiChain, fn($m) => str_starts_with($m, 'gemini')));
-            $groqChain = array_values(array_filter($groqChain, fn($m) => !str_starts_with($m, 'gemini')));
+            $geminiChain = array_values(array_filter($geminiChain, fn ($m) => str_starts_with($m, 'gemini')));
+            $groqChain = array_values(array_filter($groqChain, fn ($m) => ! str_starts_with($m, 'gemini')));
 
             $success = false;
 
             if ($primaryIsGemini) {
                 // Try Gemini first
                 foreach ($geminiChain as $model) {
-                    Log::info("GenerateLearnModuleJob: Attempting Gemini model: " . $model);
+                    Log::info('GenerateLearnModuleJob: Attempting Gemini model: '.$model);
                     if ($attemptGemini($model)) {
                         $success = true;
                         break;
                     }
-                    Log::warning("GenerateLearnModuleJob: Gemini model " . $model . " failed: " . $errorMsg);
+                    Log::warning('GenerateLearnModuleJob: Gemini model '.$model.' failed: '.$errorMsg);
                 }
-                
+
                 // Fallback to Groq
-                if (!$success) {
+                if (! $success) {
                     foreach ($groqChain as $model) {
-                        Log::info("GenerateLearnModuleJob: Attempting Groq fallback model: " . $model);
+                        Log::info('GenerateLearnModuleJob: Attempting Groq fallback model: '.$model);
                         if ($attemptGroq($model)) {
                             $success = true;
                             break;
                         }
-                        Log::warning("GenerateLearnModuleJob: Groq model " . $model . " failed: " . $errorMsg);
+                        Log::warning('GenerateLearnModuleJob: Groq model '.$model.' failed: '.$errorMsg);
                     }
                 }
             } else {
                 // Try Groq first
                 foreach ($groqChain as $model) {
-                    Log::info("GenerateLearnModuleJob: Attempting Groq model: " . $model);
+                    Log::info('GenerateLearnModuleJob: Attempting Groq model: '.$model);
                     if ($attemptGroq($model)) {
                         $success = true;
                         break;
                     }
-                    Log::warning("GenerateLearnModuleJob: Groq model " . $model . " failed: " . $errorMsg);
+                    Log::warning('GenerateLearnModuleJob: Groq model '.$model.' failed: '.$errorMsg);
                 }
 
                 // Fallback to Gemini
-                if (!$success) {
+                if (! $success) {
                     foreach ($geminiChain as $model) {
-                        Log::info("GenerateLearnModuleJob: Attempting Gemini fallback model: " . $model);
+                        Log::info('GenerateLearnModuleJob: Attempting Gemini fallback model: '.$model);
                         if ($attemptGemini($model)) {
                             $success = true;
                             break;
                         }
-                        Log::warning("GenerateLearnModuleJob: Gemini model " . $model . " failed: " . $errorMsg);
+                        Log::warning('GenerateLearnModuleJob: Gemini model '.$model.' failed: '.$errorMsg);
                     }
                 }
             }
 
-            if (!$success) {
-                Log::error("GenerateLearnModuleJob: All AI generation models failed.");
-                \App\Events\AiGenerationFailed::dispatch($this->userId, 'AI Generation failed across all primary and fallback free models.', 'module');
+            if (! $success) {
+                Log::error('GenerateLearnModuleJob: All AI generation models failed.');
+                AiGenerationFailed::dispatch($this->userId, 'AI Generation failed across all primary and fallback free models.', 'module');
+
                 return;
             }
 
@@ -256,8 +271,9 @@ Topic: {$validated['topic']}
 
             $moduleData = json_decode($text, true);
             if (! $moduleData || ! isset($moduleData['content'])) {
-                Log::error('GenerateLearnModuleJob: Invalid JSON structure: ' . $text);
-                \App\Events\AiGenerationFailed::dispatch($this->userId, 'AI Generation failed. Invalid response format.', 'module');
+                Log::error('GenerateLearnModuleJob: Invalid JSON structure: '.$text);
+                AiGenerationFailed::dispatch($this->userId, 'AI Generation failed. Invalid response format.', 'module');
+
                 return;
             }
 
@@ -281,7 +297,7 @@ Topic: {$validated['topic']}
             $originalSlug = $slug;
             $count = 1;
             while (LearnModule::where('slug', $slug)->exists()) {
-                $slug = $originalSlug . '-' . $count++;
+                $slug = $originalSlug.'-'.$count++;
             }
 
             LearnModule::create([
@@ -300,11 +316,11 @@ Topic: {$validated['topic']}
             Cache::forget('learn.modules.published');
             Cache::forget('categories.tree');
 
-            \App\Events\AiGenerationCompleted::dispatch($this->userId, 'Learning module generation completed! Check your drafts.', 'module');
+            AiGenerationCompleted::dispatch($this->userId, 'Learning module generation completed! Check your drafts.', 'module');
 
         } catch (\Exception $e) {
-            Log::error('GenerateLearnModuleJob: Error: ' . $e->getMessage() . "\n" . $e->getTraceAsString());
-            \App\Events\AiGenerationFailed::dispatch($this->userId, 'An unexpected error occurred during AI generation.', 'module');
+            Log::error('GenerateLearnModuleJob: Error: '.$e->getMessage()."\n".$e->getTraceAsString());
+            AiGenerationFailed::dispatch($this->userId, 'An unexpected error occurred during AI generation.', 'module');
         }
     }
 }

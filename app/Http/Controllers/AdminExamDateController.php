@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\ExamDate;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Inertia\Inertia;
 
 class AdminExamDateController extends Controller
@@ -11,9 +12,9 @@ class AdminExamDateController extends Controller
     public function index()
     {
         $examDates = ExamDate::orderBy('date', 'desc')->get();
-        
+
         return Inertia::render('admin/exam-dates/index', [
-            'examDates' => $examDates
+            'examDates' => $examDates,
         ]);
     }
 
@@ -31,7 +32,7 @@ class AdminExamDateController extends Controller
             'is_active' => $validated['is_active'] ?? true,
         ]);
 
-        \Illuminate\Support\Facades\Cache::forget('exam_dates.active');
+        Cache::forget('exam_dates.active');
 
         return redirect()->back()->with('success', 'Exam date added successfully.');
     }
@@ -39,7 +40,7 @@ class AdminExamDateController extends Controller
     public function update(Request $request, ExamDate $examDate)
     {
         $validated = $request->validate([
-            'date' => 'required|date|unique:exam_dates,date,' . $examDate->id,
+            'date' => 'required|date|unique:exam_dates,date,'.$examDate->id,
             'description' => 'required|string|max:255',
             'is_active' => 'boolean',
         ]);
@@ -50,7 +51,7 @@ class AdminExamDateController extends Controller
             'is_active' => $request->has('is_active') ? $validated['is_active'] : $examDate->is_active,
         ]);
 
-        \Illuminate\Support\Facades\Cache::forget('exam_dates.active');
+        Cache::forget('exam_dates.active');
 
         return redirect()->back()->with('success', 'Exam date updated successfully.');
     }
@@ -58,7 +59,8 @@ class AdminExamDateController extends Controller
     public function destroy(ExamDate $examDate)
     {
         $examDate->delete();
-        \Illuminate\Support\Facades\Cache::forget('exam_dates.active');
+        Cache::forget('exam_dates.active');
+
         return redirect()->back()->with('success', 'Exam date deleted successfully.');
     }
 }

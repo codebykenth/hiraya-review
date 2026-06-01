@@ -1,7 +1,7 @@
 <?php
 
-use App\Models\User;
 use App\Models\StudySchedule;
+use App\Models\User;
 
 it('generates study suggestions based on weak exam areas', function () {
     $user = User::factory()->create();
@@ -74,4 +74,3 @@ it('requires authentication for suggestion endpoints', function () {
     ]);
     expect($response->status())->toBe(401); // Unauthenticated
 });
-

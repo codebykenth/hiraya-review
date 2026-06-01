@@ -3,16 +3,18 @@
 use App\Http\Controllers\AdminDashboardController;
 use App\Http\Controllers\AdminExamDateController;
 use App\Http\Controllers\AdminLearnController;
+use App\Http\Controllers\AdminSyllabusController;
 use App\Http\Controllers\AdminUserController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ExamController;
 use App\Http\Controllers\LearnController;
 use App\Http\Controllers\QuestionController;
 use App\Http\Controllers\Settings\AcceptTermsController;
+use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\StudyScheduleController;
 use App\Http\Controllers\StudySuggestionController;
 use App\Http\Controllers\SupportController;
-use App\Http\Controllers\SitemapController;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -40,8 +42,9 @@ Route::middleware('throttle:global-views')->group(function () {
 
     // Temporary route to clear persistent cache in Render environments
     Route::get('clear-cache-temp-route', function () {
-        \Illuminate\Support\Facades\Artisan::call('cache:clear');
-        \Illuminate\Support\Facades\Artisan::call('optimize:clear');
+        Artisan::call('cache:clear');
+        Artisan::call('optimize:clear');
+
         return response()->json([
             'status' => 'success',
             'message' => 'All caches cleared successfully!',
@@ -79,7 +82,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('questions/drafts', [QuestionController::class, 'drafts'])->name('questions.drafts');
 
         // Admin Syllabus Management
-        Route::get('admin/syllabus', [\App\Http\Controllers\AdminSyllabusController::class, 'index'])->name('admin.syllabus.index');
+        Route::get('admin/syllabus', [AdminSyllabusController::class, 'index'])->name('admin.syllabus.index');
 
         // Admin Learn Module Views
         Route::get('admin/learn', [AdminLearnController::class, 'index'])->name('admin.learn.index');
@@ -162,9 +165,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 require __DIR__.'/settings.php';
 
 Route::fallback(function () {
-    return \Inertia\Inertia::render('error', [
+    return Inertia::render('error', [
         'status' => 404,
     ])
-    ->toResponse(request())
-    ->setStatusCode(404);
+        ->toResponse(request())
+        ->setStatusCode(404);
 })->middleware('web');

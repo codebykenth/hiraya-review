@@ -2,13 +2,19 @@
 
 namespace App\Jobs;
 
+use App\Events\AiGenerationCompleted;
+use App\Events\AiGenerationFailed;
+use App\Models\Category;
 use App\Models\ExamAttempt;
+use App\Models\Question;
+use App\Models\Subcategory;
 use App\Models\UserAiAnalysis;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -17,6 +23,7 @@ class GenerateUserAnalysisJob implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public $timeout = 300;
+
     public $tries = 3;
 
     public function __construct(
@@ -32,7 +39,8 @@ class GenerateUserAnalysisJob implements ShouldQueue
         $geminiKey = config('services.gemini.key') ?: env('GEMINI_API_KEY');
         if (! $groqKey && ! $geminiKey) {
             Log::error('GenerateUserAnalysisJob: Both GROQ_API_KEY and GEMINI_API_KEY are missing.');
-            event(new \App\Events\AiGenerationFailed($this->userId, 'analysis', 'analysis'));
+            event(new AiGenerationFailed($this->userId, 'analysis', 'analysis'));
+
             return;
         }
 
@@ -48,7 +56,7 @@ class GenerateUserAnalysisJob implements ShouldQueue
         $mockExamCount = 0;
         $passCount = 0;
 
-        $categoriesMap = \App\Models\Category::all()->keyBy('id');
+        $categoriesMap = Category::all()->keyBy('id');
 
         $categoryTotals = [
             'Verbal Ability' => ['correct' => 0, 'total' => 0],
@@ -63,10 +71,10 @@ class GenerateUserAnalysisJob implements ShouldQueue
             $correct = $meta['correct_count'] ?? 0;
             $total = $meta['total_questions'] ?? count($attempt->question_ids);
             $percentage = $total > 0 ? round(($correct / $total) * 100) : 0;
-            
+
             $scores[] = $percentage;
             $totalScoreSum += $percentage;
-            
+
             $track = $meta['track'] ?? 'Drill';
             if ($attempt->category_id !== null && ! isset($meta['track'])) {
                 $track = 'Drill';
@@ -78,7 +86,7 @@ class GenerateUserAnalysisJob implements ShouldQueue
                     $passCount++;
                 }
             }
-            
+
             $scoreMap = $attempt->cat_scores['categoryScoreMap'] ?? [];
             if (! empty($scoreMap)) {
                 foreach ($scoreMap as $catName => $scoreData) {
@@ -148,7 +156,7 @@ class GenerateUserAnalysisJob implements ShouldQueue
                 $categoryBreakdown[$catName] = [
                     'correct' => $data['correct'],
                     'total' => $data['total'],
-                    'percentage' => round(($data['correct'] / $data['total']) * 100) . '%',
+                    'percentage' => round(($data['correct'] / $data['total']) * 100).'%',
                 ];
             }
         }
@@ -164,8 +172,8 @@ class GenerateUserAnalysisJob implements ShouldQueue
         $allQuestionIds = array_unique($allQuestionIds);
 
         $questionsMap = [];
-        if (!empty($allQuestionIds)) {
-            $questionsMap = \App\Models\Question::whereIn('id', $allQuestionIds)
+        if (! empty($allQuestionIds)) {
+            $questionsMap = Question::whereIn('id', $allQuestionIds)
                 ->with('subcategory')
                 ->get()
                 ->keyBy('id');
@@ -177,7 +185,7 @@ class GenerateUserAnalysisJob implements ShouldQueue
                 continue;
             }
             foreach ($attempt->question_ids as $qId) {
-                if (!isset($questionsMap[$qId])) {
+                if (! isset($questionsMap[$qId])) {
                     continue;
                 }
                 $q = $questionsMap[$qId];
@@ -185,7 +193,7 @@ class GenerateUserAnalysisJob implements ShouldQueue
                 $userAns = $answers[$qId] ?? null;
                 $isCorrect = ($userAns === $q->correct_option);
 
-                if (!isset($subtopicStats[$subcatName])) {
+                if (! isset($subtopicStats[$subcatName])) {
                     $subtopicStats[$subcatName] = ['correct' => 0, 'total' => 0];
                 }
                 $subtopicStats[$subcatName]['total']++;
@@ -204,7 +212,7 @@ class GenerateUserAnalysisJob implements ShouldQueue
         }
 
         // Fetch available subcategories in the system database with parent categories
-        $availableSubcategories = \App\Models\Subcategory::with('category')->get()->map(fn($s) => [
+        $availableSubcategories = Subcategory::with('category')->get()->map(fn ($s) => [
             'id' => $s->id,
             'name' => $s->name,
             'category_name' => $s->category?->name,
@@ -227,10 +235,10 @@ CRITICAL ACCURACY RULES:
 - Total Attempts: {$totalAttempts}
 - Average Score: {$avgScore}%
 - Passing Rate (Full Mock Exams): {$passingRate}%
-- Score Trend (oldest to newest): " . json_encode($scores) . "
-- Per-category accuracy breakdown across all attempts: " . json_encode($categoryBreakdown) . "
-- Detailed subtopic performance (actual answers): " . json_encode($subtopicBreakdown) . "
-- Available subcategories in our database: " . json_encode($availableSubcategories) . "
+- Score Trend (oldest to newest): ".json_encode($scores).'
+- Per-category accuracy breakdown across all attempts: '.json_encode($categoryBreakdown).'
+- Detailed subtopic performance (actual answers): '.json_encode($subtopicBreakdown).'
+- Available subcategories in our database: '.json_encode($availableSubcategories)."
 
 Expected JSON response schema:
 {
@@ -293,9 +301,10 @@ Expected JSON response schema:
             $resultText = null;
             $errorMsg = null;
 
-            $attemptGemini = function($model = 'gemini-3.5-flash') use ($geminiKey, $systemPrompt, $userPrompt, &$resultText, &$errorMsg) {
+            $attemptGemini = function ($model = 'gemini-3.5-flash') use ($geminiKey, $systemPrompt, $userPrompt, &$resultText, &$errorMsg) {
                 if (! $geminiKey) {
-                    $errorMsg = "GEMINI_API_KEY is missing.";
+                    $errorMsg = 'GEMINI_API_KEY is missing.';
+
                     return false;
                 }
                 try {
@@ -303,7 +312,7 @@ Expected JSON response schema:
                         'x-goog-api-key' => $geminiKey,
                         'Content-Type' => 'application/json',
                     ])->timeout(300)->post(
-                        'https://generativelanguage.googleapis.com/v1beta/models/' . $model . ':generateContent',
+                        'https://generativelanguage.googleapis.com/v1beta/models/'.$model.':generateContent',
                         [
                             'system_instruction' => [
                                 'parts' => [['text' => $systemPrompt]],
@@ -336,7 +345,7 @@ Expected JSON response schema:
                                                 'completion_pace' => ['type' => 'STRING'],
                                                 'mock_pass_confidence' => ['type' => 'STRING'],
                                             ],
-                                            'required' => ['estimated_exam_score', 'days_to_readiness', 'completion_pace', 'mock_pass_confidence']
+                                            'required' => ['estimated_exam_score', 'days_to_readiness', 'completion_pace', 'mock_pass_confidence'],
                                         ],
                                         'subject_mastery' => [
                                             'type' => 'ARRAY',
@@ -348,8 +357,8 @@ Expected JSON response schema:
                                                     'color' => ['type' => 'STRING'],
                                                     'insight' => ['type' => 'STRING'],
                                                 ],
-                                                'required' => ['subject', 'rating', 'color', 'insight']
-                                            ]
+                                                'required' => ['subject', 'rating', 'color', 'insight'],
+                                            ],
                                         ],
                                         'timeline_prediction' => [
                                             'type' => 'OBJECT',
@@ -358,7 +367,7 @@ Expected JSON response schema:
                                                 'milestone_prediction' => ['type' => 'STRING'],
                                                 'potential_score_improvement' => ['type' => 'STRING'],
                                             ],
-                                            'required' => ['current_stage', 'milestone_prediction', 'potential_score_improvement']
+                                            'required' => ['current_stage', 'milestone_prediction', 'potential_score_improvement'],
                                         ],
                                         'remediation_matrix' => [
                                             'type' => 'ARRAY',
@@ -370,8 +379,8 @@ Expected JSON response schema:
                                                     'reason_for_struggle' => ['type' => 'STRING'],
                                                     'coaching_tip' => ['type' => 'STRING'],
                                                 ],
-                                                'required' => ['subtopic', 'difficulty_level', 'reason_for_struggle', 'coaching_tip']
-                                            ]
+                                                'required' => ['subtopic', 'difficulty_level', 'reason_for_struggle', 'coaching_tip'],
+                                            ],
                                         ],
                                         'personalized_7_day_plan' => [
                                             'type' => 'ARRAY',
@@ -383,8 +392,8 @@ Expected JSON response schema:
                                                     'activity' => ['type' => 'STRING'],
                                                     'subcategory_id' => ['type' => 'INTEGER'],
                                                 ],
-                                                'required' => ['day', 'focus_topic', 'activity']
-                                            ]
+                                                'required' => ['day', 'focus_topic', 'activity'],
+                                            ],
                                         ],
                                         'long_term_roadmap' => [
                                             'type' => 'ARRAY',
@@ -395,37 +404,41 @@ Expected JSON response schema:
                                                     'focus' => ['type' => 'STRING'],
                                                     'milestone' => ['type' => 'STRING'],
                                                 ],
-                                                'required' => ['phase', 'focus', 'milestone']
-                                            ]
-                                        ]
+                                                'required' => ['phase', 'focus', 'milestone'],
+                                            ],
+                                        ],
                                     ],
                                     'required' => [
-                                        'pass_probability', 'verdict', 'trend', 'strengths', 
-                                        'critical_weaknesses', 'priority_action', 'recommended_modules', 
-                                        'encouragement'
-                                    ]
-                                ]
-                            ]
+                                        'pass_probability', 'verdict', 'trend', 'strengths',
+                                        'critical_weaknesses', 'priority_action', 'recommended_modules',
+                                        'encouragement',
+                                    ],
+                                ],
+                            ],
                         ]
                     );
 
                     if ($response->successful()) {
                         $result = $response->json();
                         $resultText = $result['candidates'][0]['content']['parts'][0]['text'] ?? '';
+
                         return true;
                     } else {
-                        $errorMsg = "Gemini API failed with status " . $response->status() . ": " . $response->body();
+                        $errorMsg = 'Gemini API failed with status '.$response->status().': '.$response->body();
+
                         return false;
                     }
                 } catch (\Exception $e) {
-                    $errorMsg = "Gemini Exception: " . $e->getMessage();
+                    $errorMsg = 'Gemini Exception: '.$e->getMessage();
+
                     return false;
                 }
             };
 
-            $attemptGroq = function($model) use ($groqKey, $systemPrompt, $userPrompt, &$resultText, &$errorMsg) {
+            $attemptGroq = function ($model) use ($groqKey, $systemPrompt, $userPrompt, &$resultText, &$errorMsg) {
                 if (! $groqKey) {
-                    $errorMsg = "GROQ_API_KEY is missing.";
+                    $errorMsg = 'GROQ_API_KEY is missing.';
+
                     return false;
                 }
                 try {
@@ -444,13 +457,16 @@ Expected JSON response schema:
                     if ($groqResponse->successful()) {
                         $result = $groqResponse->json();
                         $resultText = $result['choices'][0]['message']['content'] ?? '';
+
                         return true;
                     } else {
-                        $errorMsg = "Groq API failed with status " . $groqResponse->status() . ": " . $groqResponse->body();
+                        $errorMsg = 'Groq API failed with status '.$groqResponse->status().': '.$groqResponse->body();
+
                         return false;
                     }
                 } catch (\Exception $e) {
-                    $errorMsg = "Groq Exception: " . $e->getMessage();
+                    $errorMsg = 'Groq Exception: '.$e->getMessage();
+
                     return false;
                 }
             };
@@ -463,29 +479,30 @@ Expected JSON response schema:
 
             // Try Groq first for analysis as standard
             foreach ($groqModels as $model) {
-                Log::info("GenerateUserAnalysisJob: Attempting Groq model: " . $model);
+                Log::info('GenerateUserAnalysisJob: Attempting Groq model: '.$model);
                 if ($attemptGroq($model)) {
                     $success = true;
                     break;
                 }
-                Log::warning("GenerateUserAnalysisJob: Groq model " . $model . " failed: " . $errorMsg);
+                Log::warning('GenerateUserAnalysisJob: Groq model '.$model.' failed: '.$errorMsg);
             }
 
             // Fallback to Gemini
-            if (!$success) {
+            if (! $success) {
                 foreach ($geminiModels as $model) {
-                    Log::info("GenerateUserAnalysisJob: Attempting Gemini fallback model: " . $model);
+                    Log::info('GenerateUserAnalysisJob: Attempting Gemini fallback model: '.$model);
                     if ($attemptGemini($model)) {
                         $success = true;
                         break;
                     }
-                    Log::warning("GenerateUserAnalysisJob: Gemini model " . $model . " failed: " . $errorMsg);
+                    Log::warning('GenerateUserAnalysisJob: Gemini model '.$model.' failed: '.$errorMsg);
                 }
             }
 
-            if (!$success) {
-                Log::error("GenerateUserAnalysisJob: All AI generation models failed.");
-                event(new \App\Events\AiGenerationFailed($this->userId, 'analysis', 'analysis'));
+            if (! $success) {
+                Log::error('GenerateUserAnalysisJob: All AI generation models failed.');
+                event(new AiGenerationFailed($this->userId, 'analysis', 'analysis'));
+
                 return;
             }
 
@@ -506,18 +523,19 @@ Expected JSON response schema:
                     ]
                 );
 
-                event(new \App\Events\AiGenerationCompleted($this->userId, 'analysis', 'analysis'));
+                event(new AiGenerationCompleted($this->userId, 'analysis', 'analysis'));
+
                 return;
             }
 
             Log::error('GenerateUserAnalysisJob: API failed or returned invalid JSON structure.');
-            event(new \App\Events\AiGenerationFailed($this->userId, 'analysis', 'analysis'));
+            event(new AiGenerationFailed($this->userId, 'analysis', 'analysis'));
 
         } catch (\Exception $e) {
-            Log::error('GenerateUserAnalysisJob Exception: ' . $e->getMessage());
-            event(new \App\Events\AiGenerationFailed($this->userId, 'analysis', 'analysis'));
+            Log::error('GenerateUserAnalysisJob Exception: '.$e->getMessage());
+            event(new AiGenerationFailed($this->userId, 'analysis', 'analysis'));
         } finally {
-            \Illuminate\Support\Facades\Cache::forget("ai-analysis-generating-{$this->userId}");
+            Cache::forget("ai-analysis-generating-{$this->userId}");
         }
     }
 }

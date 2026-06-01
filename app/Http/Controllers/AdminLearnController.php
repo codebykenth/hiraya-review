@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\GenerateLearnModuleJob;
 use App\Models\Category;
 use App\Models\LearnModule;
 use App\Models\Subcategory;
@@ -11,8 +12,6 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
-use App\Jobs\GenerateLearnModuleJob;
-
 
 class AdminLearnController extends Controller
 {
@@ -327,7 +326,7 @@ class AdminLearnController extends Controller
         return response()->json([
             'success' => true,
             'queued' => true,
-            'message' => 'Generation is running in the background. Please wait 1-2 minutes before checking your drafts. It is not available immediately.'
+            'message' => 'Generation is running in the background. Please wait 1-2 minutes before checking your drafts. It is not available immediately.',
         ]);
     }
 

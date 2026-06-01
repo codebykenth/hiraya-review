@@ -3,10 +3,12 @@
 namespace App\Services;
 
 use App\Models\ExamAttempt;
-use App\Models\StudySchedule;
+use App\Models\ExamDate;
+use App\Models\LearnModule;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Schema;
 
 class StudyPlanAnalyzer
 {
@@ -22,9 +24,10 @@ class StudyPlanAnalyzer
             $attempts = $attempts->filter(function ($attempt) use ($track) {
                 $meta = $attempt->cat_scores['metadata'] ?? [];
                 $attemptTrack = $meta['track'] ?? 'Drill';
-                if ($attempt->category_id !== null && !isset($meta['track'])) {
+                if ($attempt->category_id !== null && ! isset($meta['track'])) {
                     $attemptTrack = 'Drill';
                 }
+
                 return strtolower($attemptTrack) === strtolower($track);
             });
         }
@@ -33,7 +36,7 @@ class StudyPlanAnalyzer
             return [
                 'suggestions' => [],
                 'weak_areas' => [],
-                'days_until_exam' => $this->daysUntilExam()
+                'days_until_exam' => $this->daysUntilExam(),
             ];
         }
 
@@ -43,7 +46,7 @@ class StudyPlanAnalyzer
             return [
                 'suggestions' => [],
                 'weak_areas' => [],
-                'days_until_exam' => $this->daysUntilExam()
+                'days_until_exam' => $this->daysUntilExam(),
             ];
         }
 
@@ -86,7 +89,7 @@ class StudyPlanAnalyzer
 
                 $hasSubcats = isset($categoryData['subcats']) && is_array($categoryData['subcats']) && count($categoryData['subcats']) > 0;
 
-                if (!$hasSubcats && isset($categoryData['correct'], $categoryData['total'])) {
+                if (! $hasSubcats && isset($categoryData['correct'], $categoryData['total'])) {
                     if ($categoryData['total'] > 0) {
                         $percentage = ($categoryData['correct'] / $categoryData['total']) * 100;
                         if (! isset($categoryScores[$categoryName])) {
@@ -101,7 +104,7 @@ class StudyPlanAnalyzer
                         if (is_array($subcatScore) && isset($subcatScore['correct'], $subcatScore['total'])) {
                             if ($subcatScore['total'] > 0) {
                                 $percentage = ($subcatScore['correct'] / $subcatScore['total']) * 100;
-                                $key = (string)$subcatName;
+                                $key = (string) $subcatName;
                                 if (! isset($categoryScores[$key])) {
                                     $categoryScores[$key] = [];
                                 }
@@ -128,7 +131,7 @@ class StudyPlanAnalyzer
         $categoryAverages = [];
         foreach ($averages as $area => $score) {
             $category = $this->getOverarchingCategory($area);
-            if (!isset($categoryAverages[$category])) {
+            if (! isset($categoryAverages[$category])) {
                 $categoryAverages[$category] = ['score' => 0, 'count' => 0];
             }
             $categoryAverages[$category]['score'] += $score;
@@ -140,16 +143,16 @@ class StudyPlanAnalyzer
             $avgScore = $data['score'] / $data['count'];
             $weakCategories[] = [
                 'name' => ucwords($category),
-                'score' => round($avgScore, 1)
+                'score' => round($avgScore, 1),
             ];
         }
 
-        usort($weakCategories, fn($a, $b) => $a['score'] <=> $b['score']);
+        usort($weakCategories, fn ($a, $b) => $a['score'] <=> $b['score']);
 
         return collect($weakCategories)
             ->map(function ($cat) {
                 $maxTopics = $this->getTopicCountForArea($cat['name']);
-                
+
                 if ($cat['score'] < 50) {
                     $sessions = $maxTopics;
                 } elseif ($cat['score'] < 75) {
@@ -224,33 +227,33 @@ class StudyPlanAnalyzer
         $examDate = $this->getNextExamDate();
 
         $totalSessions = $weakAreas->sum('sessions');
-        
+
         // Automatically determine the optimal topics per day to ensure ALL sessions are completed before the exam date
         if ($daysUntilExam > 0) {
             $topicsPerDay = max(1, (int) ceil($totalSessions / $daysUntilExam));
         } else {
             $topicsPerDay = max(1, $totalSessions); // If exam is today, schedule everything today
         }
-        
+
         $totalDaysNeeded = ceil($totalSessions / $topicsPerDay);
         $daysPerSession = max(1, intval($daysUntilExam / max(1, $totalDaysNeeded)));
 
         $currentDate = $startDate->copy();
         $sessionCount = 0;
         $dailyCount = 0;
-        
+
         $allModules = collect();
-        if (\Illuminate\Support\Facades\Schema::hasTable('learn_modules')) {
+        if (Schema::hasTable('learn_modules')) {
             // Self-healing database cleanup for incorrect module topics
-            \App\Models\LearnModule::where('title', 'like', '%Number Series%')
+            LearnModule::where('title', 'like', '%Number Series%')
                 ->where('topic', 'like', '%GCF%')
                 ->update(['topic' => 'Number Series']);
-                
-            \App\Models\LearnModule::where('title', 'like', '%PEMDAS%')
+
+            LearnModule::where('title', 'like', '%PEMDAS%')
                 ->where('topic', 'like', '%Multiples and Factors%')
                 ->update(['topic' => 'PEMDAS and Fractions']);
 
-            $allModules = \App\Models\LearnModule::where('is_published', true)
+            $allModules = LearnModule::where('is_published', true)
                 ->with('subcategory')
                 ->get();
         }
@@ -258,7 +261,7 @@ class StudyPlanAnalyzer
         foreach ($weakAreas as $area) {
             for ($i = 0; $i < $area['sessions']; $i++) {
                 $subtopic = $this->getSubtopicForArea($area['name'], $i);
-                
+
                 $titleText = $subtopic ? "Study: {$area['name']} - {$subtopic['title']}" : "Study: {$area['name']}";
                 $descText = $subtopic ? $subtopic['desc'] : $this->getSpecificTopics($area['name']);
 
@@ -320,7 +323,7 @@ class StudyPlanAnalyzer
             }
         }
 
-        if (!$matchedCategory) {
+        if (! $matchedCategory) {
             return null;
         }
 
@@ -438,8 +441,8 @@ class StudyPlanAnalyzer
 
     private function getNextExamDate(): Carbon
     {
-        if (\Illuminate\Support\Facades\Schema::hasTable('exam_dates')) {
-            $examDate = \App\Models\ExamDate::where('is_active', true)
+        if (Schema::hasTable('exam_dates')) {
+            $examDate = ExamDate::where('is_active', true)
                 ->where('date', '>', now())
                 ->orderBy('date')
                 ->first();
@@ -447,7 +450,7 @@ class StudyPlanAnalyzer
                 return Carbon::parse($examDate->date);
             }
         }
-        
+
         return Carbon::parse(self::EXAM_DATE);
     }
 
@@ -472,17 +475,17 @@ class StudyPlanAnalyzer
         } else {
             $subtopic = trim($title);
         }
-        
+
         // Remove prefix "Study: " if present
         $subtopic = preg_replace('/^Study:\s*/i', '', $subtopic);
-        
+
         if (strlen($subtopic) >= 2) {
             $terms[] = strtolower($subtopic);
         }
 
         // 2. Parse and split description
         $descLower = strtolower($description);
-        
+
         // Extract acronyms in parentheses (e.g. "(LCM)")
         if (preg_match_all('/\(([a-z0-9]{2,6})\)/i', $descLower, $matches)) {
             foreach ($matches[1] as $acronym) {
@@ -512,24 +515,24 @@ class StudyPlanAnalyzer
             'identify',
             'analyze',
         ];
-        
+
         foreach ($noisePrefixes as $prefix) {
             if (str_starts_with(trim($cleanedDesc), $prefix)) {
-                $cleanedDesc = preg_replace('/^' . preg_quote($prefix, '/') . '\b/i', '', trim($cleanedDesc));
+                $cleanedDesc = preg_replace('/^'.preg_quote($prefix, '/').'\b/i', '', trim($cleanedDesc));
                 break;
             }
         }
 
         // Split by punctuation and conjunctions
         $parts = preg_split('/[\s,;]+and\s+|[\s,;]+or\s+|[\s,;]+&\s+|[,;.]+/', $cleanedDesc, -1, PREG_SPLIT_NO_EMPTY);
-        
+
         $broadStopWords = [
-            'rules', 'numbers', 'operations', 'word', 'problems', 'tasks', 'relationships', 
-            'concept', 'concepts', 'issues', 'laws', 'etc', 'meaning', 'structure', 
-            'application', 'context', 'pairs', 'main', 'idea', 'clues', 'conclusions', 
-            'arguments', 'hypotheses', 'shapes', 'order', 'arithmetic', 'basic', 
-            'ability', 'general', 'information', 'clerical', 'verbal', 'analytical', 
-            'numerical', 'solving', 'identifying', 'finding', 'spotting'
+            'rules', 'numbers', 'operations', 'word', 'problems', 'tasks', 'relationships',
+            'concept', 'concepts', 'issues', 'laws', 'etc', 'meaning', 'structure',
+            'application', 'context', 'pairs', 'main', 'idea', 'clues', 'conclusions',
+            'arguments', 'hypotheses', 'shapes', 'order', 'arithmetic', 'basic',
+            'ability', 'general', 'information', 'clerical', 'verbal', 'analytical',
+            'numerical', 'solving', 'identifying', 'finding', 'spotting',
         ];
 
         foreach ($parts as $part) {
@@ -554,7 +557,7 @@ class StudyPlanAnalyzer
         foreach ($terms as $term) {
             $baseTerm = $term;
             // Strip trailing s if it's not part of ss
-            if (str_ends_with($baseTerm, 's') && !str_ends_with($baseTerm, 'ss')) {
+            if (str_ends_with($baseTerm, 's') && ! str_ends_with($baseTerm, 'ss')) {
                 $baseTerm = substr($baseTerm, 0, -1);
             }
 
@@ -569,7 +572,7 @@ class StudyPlanAnalyzer
             }
             $pattern .= '/i';
 
-            if (($modTitle !== '' && preg_match($pattern, $modTitle)) || 
+            if (($modTitle !== '' && preg_match($pattern, $modTitle)) ||
                 ($modTopic !== '' && preg_match($pattern, $modTopic))) {
                 return true;
             }
@@ -578,4 +581,3 @@ class StudyPlanAnalyzer
         return false;
     }
 }
-

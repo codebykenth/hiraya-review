@@ -2,16 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\StudySchedule;
 use App\Services\StudyPlanAnalyzer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Models\StudySchedule;
 
 class StudySuggestionController extends Controller
 {
-    public function __construct(private StudyPlanAnalyzer $analyzer)
-    {
-    }
+    public function __construct(private StudyPlanAnalyzer $analyzer) {}
 
     public function getSuggestions(Request $request)
     {
@@ -40,11 +38,11 @@ class StudySuggestionController extends Controller
 
         foreach ($validated['suggestions'] as $suggestion) {
             $desc = $suggestion['description'] ?? '';
-            
-            if (!empty($suggestion['module_links']) && is_array($suggestion['module_links'])) {
+
+            if (! empty($suggestion['module_links']) && is_array($suggestion['module_links'])) {
                 $desc .= "\n\nLinks:";
                 foreach ($suggestion['module_links'] as $link) {
-                    $desc .= " [" . $link['title'] . "](" . $link['url'] . ")";
+                    $desc .= ' ['.$link['title'].']('.$link['url'].')';
                 }
             }
 
@@ -63,9 +61,8 @@ class StudySuggestionController extends Controller
         }
 
         return response()->json([
-            'message' => count($created) . ' study sessions added to your calendar',
+            'message' => count($created).' study sessions added to your calendar',
             'count' => count($created),
         ], 201);
     }
 }
-

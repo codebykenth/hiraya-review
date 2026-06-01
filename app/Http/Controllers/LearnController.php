@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
+use App\Models\ExamAttempt;
 use App\Models\LearnModule;
+use App\Services\StudyPlanAnalyzer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Inertia\Inertia;
@@ -44,18 +46,18 @@ class LearnController extends Controller
         });
 
         if (auth()->check()) {
-            $attempts = \App\Models\ExamAttempt::where('user_id', auth()->id())
+            $attempts = ExamAttempt::where('user_id', auth()->id())
                 ->orderByDesc('created_at')
                 ->get();
 
             if ($attempts->isNotEmpty()) {
-                $analyzer = app(\App\Services\StudyPlanAnalyzer::class);
+                $analyzer = app(StudyPlanAnalyzer::class);
                 $weakAreas = $analyzer->identifyWeakAreas($attempts);
 
                 if ($weakAreas->isNotEmpty()) {
                     $weakCategoryNames = $weakAreas->pluck('category')->toArray();
 
-                    usort($categories, function($a, $b) use ($weakCategoryNames) {
+                    usort($categories, function ($a, $b) use ($weakCategoryNames) {
                         $posA = array_search($a['name'], $weakCategoryNames);
                         $posB = array_search($b['name'], $weakCategoryNames);
 
@@ -110,6 +112,7 @@ class LearnController extends Controller
                     ->where('slug', $slug)
                     ->where('is_published', true)
                     ->firstOrFail();
+
                 return [
                     'id' => $mod->id,
                     'category_id' => $mod->category_id,
@@ -129,7 +132,7 @@ class LearnController extends Controller
         }
 
         // Inline self-healing check to clear and rebuild corrupt stale cache entries
-        if (is_object($module) || !is_array($module)) {
+        if (is_object($module) || ! is_array($module)) {
             Cache::forget("learn.module.show.{$slug}");
             $mod = LearnModule::with(['category', 'subcategory', 'creator'])
                 ->where('slug', $slug)
@@ -169,7 +172,7 @@ class LearnController extends Controller
                 })->toArray();
         });
 
-        if (is_object($recommended) || !is_array($recommended)) {
+        if (is_object($recommended) || ! is_array($recommended)) {
             Cache::forget("learn.module.recommended.{$module['id']}");
             $recommended = LearnModule::where('category_id', $module['category_id'])
                 ->where('id', '!=', $module['id'])

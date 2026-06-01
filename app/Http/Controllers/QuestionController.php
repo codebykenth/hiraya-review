@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\GenerateQuestionsJob;
 use App\Models\Category;
 use App\Models\Question;
 use App\Models\Subcategory;
@@ -11,7 +12,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
-use App\Jobs\GenerateQuestionsJob;
 
 class QuestionController extends Controller
 {
@@ -145,7 +145,7 @@ class QuestionController extends Controller
         return response()->json([
             'success' => true,
             'queued' => true,
-            'message' => 'Generation is running in the background. Please wait 1-2 minutes before checking your drafts. It is not available immediately.'
+            'message' => 'Generation is running in the background. Please wait 1-2 minutes before checking your drafts. It is not available immediately.',
         ]);
     }
 
@@ -450,7 +450,7 @@ class QuestionController extends Controller
         $this->checkAdminAccess();
 
         $validated = $request->validate([
-            'name' => 'required|string|max:255|unique:categories,name,' . $category->id,
+            'name' => 'required|string|max:255|unique:categories,name,'.$category->id,
         ]);
 
         $category->update([
@@ -459,7 +459,7 @@ class QuestionController extends Controller
         ]);
         $this->clearCache();
 
-        return redirect()->back()->with('success', "Category updated successfully!");
+        return redirect()->back()->with('success', 'Category updated successfully!');
     }
 
     /**
@@ -518,7 +518,7 @@ class QuestionController extends Controller
         ]);
         $this->clearCache();
 
-        return redirect()->back()->with('success', "Subcategory updated successfully!");
+        return redirect()->back()->with('success', 'Subcategory updated successfully!');
     }
 
     /**

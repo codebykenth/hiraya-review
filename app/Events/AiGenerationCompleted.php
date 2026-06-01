@@ -2,7 +2,6 @@
 
 namespace App\Events;
 
-use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
@@ -14,7 +13,9 @@ class AiGenerationCompleted implements ShouldBroadcastNow
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public $userId;
+
     public $message;
+
     public $type;
 
     public function __construct($userId, $message, $type = 'questions')
@@ -27,7 +28,7 @@ class AiGenerationCompleted implements ShouldBroadcastNow
     public function broadcastOn(): array
     {
         return [
-            new PrivateChannel('App.Models.User.' . $this->userId),
+            new PrivateChannel('App.Models.User.'.$this->userId),
         ];
     }
 
@@ -36,6 +37,7 @@ class AiGenerationCompleted implements ShouldBroadcastNow
         if ($this->type === 'analysis' || $this->message === 'analysis') {
             return 'ai-analysis-ready';
         }
+
         return 'App\Events\AiGenerationCompleted';
     }
 }

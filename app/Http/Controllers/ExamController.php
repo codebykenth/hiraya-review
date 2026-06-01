@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\GenerateUserAnalysisJob;
 use App\Models\Category;
 use App\Models\ExamAttempt;
 use App\Models\Question;
+use App\Models\StudySchedule;
 use App\Models\TrackConfig;
 use App\Models\UserAiAnalysis;
-use App\Jobs\GenerateUserAnalysisJob;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Inertia\Inertia;
@@ -193,10 +194,10 @@ class ExamController extends Controller
         ]);
 
         $answers = $validated['answers'];
-        $answeredCount = count(array_filter($answers, function($answer) {
+        $answeredCount = count(array_filter($answers, function ($answer) {
             return $answer !== null && $answer !== '';
         }));
-        
+
         $totalQuestions = count($validated['question_ids']);
         $completionRate = $totalQuestions > 0 ? ($answeredCount / $totalQuestions) * 100 : 0;
 
@@ -346,7 +347,7 @@ class ExamController extends Controller
         foreach ($allAttempts as $attempt) {
             $meta = $attempt->cat_scores['metadata'] ?? [];
             $track = $meta['track'] ?? 'Drill';
-            if ($attempt->category_id !== null && !isset($meta['track'])) {
+            if ($attempt->category_id !== null && ! isset($meta['track'])) {
                 $track = 'Drill';
             }
 
@@ -389,9 +390,9 @@ class ExamController extends Controller
                 $total = $meta['total_questions'] ?? count($attempt->question_ids);
                 $percentage = $total > 0 ? round(($correct / $total) * 100) : 0;
                 $totalScoreSum += $percentage;
-                
+
                 $track = $meta['track'] ?? 'Drill';
-                if ($attempt->category_id !== null && !isset($meta['track'])) {
+                if ($attempt->category_id !== null && ! isset($meta['track'])) {
                     $track = 'Drill';
                 }
 
@@ -558,26 +559,26 @@ class ExamController extends Controller
         if ($latestAttemptId) {
             $generatedToday = $analysis && $analysis->updated_at->isToday();
 
-            if (!$analysis || (!$generatedToday && $analysis->last_exam_attempt_id !== $latestAttemptId)) {
+            if (! $analysis || (! $generatedToday && $analysis->last_exam_attempt_id !== $latestAttemptId)) {
                 // No analysis yet, OR: new exam exists AND not yet generated today
                 $cacheKey = "ai-analysis-generating-{$userId}";
-                if (!Cache::has($cacheKey)) {
+                if (! Cache::has($cacheKey)) {
                     Cache::put($cacheKey, true, 60);
                     GenerateUserAnalysisJob::dispatchAfterResponse($userId, $latestAttemptId);
                 }
                 $analysisStatus = 'generating';
             } else {
                 // Serve cached: generated today already, or no new exam since last analysis
-            $analysisStatus = 'ready';
+                $analysisStatus = 'ready';
                 $analysisData = $analysis->analysis_json;
             }
         }
 
         if ($analysisStatus === 'ready' && $analysisData) {
-            if (!empty($analysisData['strengths'])) {
+            if (! empty($analysisData['strengths'])) {
                 $strongestArea = $analysisData['strengths'][0];
             }
-            if (!empty($analysisData['critical_weaknesses'])) {
+            if (! empty($analysisData['critical_weaknesses'])) {
                 $weakestArea = $analysisData['critical_weaknesses'][0];
             }
         }
@@ -601,8 +602,8 @@ class ExamController extends Controller
             ],
             'aiAnalysis' => [
                 'status' => $analysisStatus, // 'no_data' | 'generating' | 'ready'
-                'data'   => $analysisData,
-            ]
+                'data' => $analysisData,
+            ],
         ]);
     }
 
@@ -624,16 +625,16 @@ class ExamController extends Controller
                 Cache::forget($cacheKey);
             }
 
-            if (!$analysis) {
-                if (!Cache::has($cacheKey)) {
+            if (! $analysis) {
+                if (! Cache::has($cacheKey)) {
                     Cache::put($cacheKey, true, 60);
                     GenerateUserAnalysisJob::dispatchAfterResponse($userId, $latestAttemptId);
                 }
                 $status = 'generating';
             } else {
                 $generatedToday = $analysis->updated_at->isToday();
-                if ($request->has('retry') || (!$generatedToday && $analysis->last_exam_attempt_id !== $latestAttemptId)) {
-                    if (!Cache::has($cacheKey)) {
+                if ($request->has('retry') || (! $generatedToday && $analysis->last_exam_attempt_id !== $latestAttemptId)) {
+                    if (! Cache::has($cacheKey)) {
                         Cache::put($cacheKey, true, 60);
                         GenerateUserAnalysisJob::dispatchAfterResponse($userId, $latestAttemptId);
                     }
@@ -645,10 +646,10 @@ class ExamController extends Controller
             }
         }
 
-        $existingSchedules = \App\Models\StudySchedule::where('user_id', $userId)
+        $existingSchedules = StudySchedule::where('user_id', $userId)
             ->where('study_date', '>=', now()->startOfDay())
             ->get()
-            ->map(fn($s) => [
+            ->map(fn ($s) => [
                 'study_date' => $s->study_date->format('Y-m-d'),
                 'title' => $s->title,
                 'subcategory_id' => $s->subcategory_id,
@@ -761,6 +762,7 @@ class ExamController extends Controller
 
         return redirect()->back()->with('success', 'Attempt record deleted successfully!');
     }
+
     /**
      * Delete multiple exam attempt records.
      */

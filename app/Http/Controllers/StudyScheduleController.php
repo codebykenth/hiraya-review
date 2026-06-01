@@ -2,10 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ExamDate;
+use App\Models\LearnModule;
 use App\Models\StudySchedule;
 use App\Models\Subcategory;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Schema;
 
 class StudyScheduleController extends Controller
 {
@@ -25,20 +30,20 @@ class StudyScheduleController extends Controller
             });
 
         $examDates = [];
-        if (\Illuminate\Support\Facades\Schema::hasTable('exam_dates')) {
-            $allExamDates = \Illuminate\Support\Facades\Cache::rememberForever('exam_dates.active', function () {
-                return \App\Models\ExamDate::where('is_active', true)
+        if (Schema::hasTable('exam_dates')) {
+            $allExamDates = Cache::rememberForever('exam_dates.active', function () {
+                return ExamDate::where('is_active', true)
                     ->get()
                     ->pluck('date')
-                    ->map(fn($date) => \Carbon\Carbon::parse($date)->format('Y-m-d'))
+                    ->map(fn ($date) => Carbon::parse($date)->format('Y-m-d'))
                     ->toArray();
             });
 
             // Filter for the requested month, though returning all is also fine
-            $examDates = array_filter($allExamDates, function($date) use ($startDate, $endDate) {
+            $examDates = array_filter($allExamDates, function ($date) use ($startDate, $endDate) {
                 return $date >= $startDate->format('Y-m-d') && $date <= $endDate->format('Y-m-d');
             });
-            
+
             // Re-index array for JSON response
             $examDates = array_values($examDates);
         }
@@ -60,7 +65,7 @@ class StudyScheduleController extends Controller
         ]);
 
         $existing = StudySchedule::where('user_id', Auth::id())
-            ->where('study_date', $validated['study_date'])
+            ->whereDate('study_date', $validated['study_date'])
             ->where('title', $validated['title'])
             ->first();
 
@@ -103,13 +108,13 @@ class StudyScheduleController extends Controller
     public function getSubcategories()
     {
         $subcategories = Subcategory::orderBy('name')->get(['id', 'name', 'category_id']);
-        $modules = \App\Models\LearnModule::where('is_published', true)
+        $modules = LearnModule::where('is_published', true)
             ->with(['subcategory:id,name', 'category:id,name'])
             ->get(['id', 'title', 'slug', 'topic', 'subcategory_id', 'category_id']);
 
         return response()->json([
             'subcategories' => $subcategories,
-            'modules' => $modules->map(fn($m) => [
+            'modules' => $modules->map(fn ($m) => [
                 'title' => $m->title,
                 'slug' => $m->slug,
                 'topic' => $m->topic,
@@ -122,6 +127,7 @@ class StudyScheduleController extends Controller
     public function destroyAll()
     {
         StudySchedule::where('user_id', Auth::id())->delete();
+
         return response()->json(null, 204);
     }
 

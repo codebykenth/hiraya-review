@@ -28,7 +28,7 @@ class SitemapController extends Controller
 
         foreach ($staticRoutes as $path => $meta) {
             $urls[] = [
-                'loc' => $baseUrl . $path,
+                'loc' => $baseUrl.$path,
                 'priority' => $meta['priority'],
                 'changefreq' => $meta['changefreq'],
                 'lastmod' => now()->startOfDay()->toAtomString(),
@@ -42,7 +42,7 @@ class SitemapController extends Controller
 
         foreach ($modules as $module) {
             $urls[] = [
-                'loc' => $baseUrl . '/learn/' . $module->slug,
+                'loc' => $baseUrl.'/learn/'.$module->slug,
                 'priority' => '0.8',
                 'changefreq' => 'weekly',
                 'lastmod' => $module->updated_at->toAtomString(),
@@ -52,13 +52,13 @@ class SitemapController extends Controller
         // Build XML
         $xml = '<?xml version="1.0" encoding="UTF-8"?>';
         $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
-        
+
         foreach ($urls as $url) {
             $xml .= '<url>';
-            $xml .= '<loc>' . htmlspecialchars($url['loc']) . '</loc>';
-            $xml .= '<lastmod>' . $url['lastmod'] . '</lastmod>';
-            $xml .= '<changefreq>' . $url['changefreq'] . '</changefreq>';
-            $xml .= '<priority>' . $url['priority'] . '</priority>';
+            $xml .= '<loc>'.htmlspecialchars($url['loc']).'</loc>';
+            $xml .= '<lastmod>'.$url['lastmod'].'</lastmod>';
+            $xml .= '<changefreq>'.$url['changefreq'].'</changefreq>';
+            $xml .= '<priority>'.$url['priority'].'</priority>';
             $xml .= '</url>';
         }
 

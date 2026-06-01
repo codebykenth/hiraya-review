@@ -1,9 +1,9 @@
 <?php
 
-use App\Models\User;
-use App\Models\ExamAttempt;
-use App\Models\UserAiAnalysis;
 use App\Jobs\GenerateUserAnalysisJob;
+use App\Models\ExamAttempt;
+use App\Models\User;
+use App\Models\UserAiAnalysis;
 use Illuminate\Support\Facades\Bus;
 use Inertia\Testing\AssertableInertia as Assert;
 
@@ -26,7 +26,7 @@ test('dashboard status is no_data if user has no exam attempts', function () {
 
     $response = $this->get(route('dashboard'));
     $response->assertOk();
-    
+
     $response->assertInertia(fn (Assert $page) => $page
         ->component('dashboard')
         ->has('aiAnalysis', fn (Assert $page) => $page
