@@ -151,7 +151,7 @@ export const renderFormattedText = (
 
         const renderRichParagraph = (
             paraText: string,
-            defaultClass: string = 'text-slate-655 leading-relaxed text-base font-medium',
+            defaultClass: string = 'text-slate-600 dark:text-slate-300 leading-relaxed text-base font-medium',
         ) => {
             if (!paraText) {
                 return null;
@@ -295,7 +295,7 @@ export const renderFormattedText = (
                             <strong className="text-amber-850 mb-1 block font-heading text-xs font-extrabold tracking-wider uppercase dark:text-amber-300">
                                 {title}
                             </strong>
-                            <div className="text-slate-655 dark:text-slate-350 text-xs leading-relaxed font-bold">
+                            <div className="dark:text-slate-350 text-xs leading-relaxed font-bold text-slate-600">
                                 {renderRichParagraphContent(shortcutContent)}
                             </div>
                         </div>

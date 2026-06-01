@@ -75,7 +75,7 @@ export default function Support() {
                                 </Card>
 
                                 <Card className="space-y-4 p-6">
-                                    <div className="dark:text-rose-455 flex h-10 w-10 items-center justify-center rounded-lg bg-rose-50 text-rose-600 dark:bg-rose-950/40">
+                                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-rose-50 text-rose-600 dark:bg-rose-950/40 dark:text-rose-400">
                                         <ShieldAlert className="h-5 w-5" />
                                     </div>
                                     <div>

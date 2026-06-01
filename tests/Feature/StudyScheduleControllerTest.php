@@ -129,3 +129,26 @@ test('unauthenticated user cannot create study schedule', function () {
 
     $response->assertRedirect('/login');
 });
+
+test('creating duplicate study schedule returns existing schedule and does not duplicate', function () {
+    $user = User::factory()->create();
+    $date = now()->format('Y-m-d');
+
+    $s1 = StudySchedule::create([
+        'user_id' => $user->id,
+        'study_date' => $date,
+        'title' => 'Duplicate Study',
+        'description' => 'First one',
+    ]);
+
+    $response = $this->actingAs($user)->post('/study-schedules', [
+        'study_date' => $date,
+        'title' => 'Duplicate Study',
+        'description' => 'Second one',
+    ]);
+
+    $response->assertStatus(200);
+    $response->assertJsonPath('id', $s1->id);
+
+    $this->assertEquals(1, StudySchedule::where('user_id', $user->id)->count());
+});

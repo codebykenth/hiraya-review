@@ -72,6 +72,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // View / Read Endpoints (Rate limited to 120 requests/minute to block scrapers & view flood DDoS)
     Route::middleware('throttle:global-views')->group(function () {
         Route::get('dashboard', [ExamController::class, 'dashboard'])->name('dashboard');
+        Route::get('dashboard/ai-analysis', [ExamController::class, 'aiAnalysisReport'])->name('dashboard.ai-analysis');
         Route::get('admin/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
         Route::get('drills', [ExamController::class, 'drills'])->name('drills.index');
         Route::get('history', [ExamController::class, 'history'])->name('history.index');

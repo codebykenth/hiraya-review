@@ -59,6 +59,15 @@ class StudyScheduleController extends Controller
             'subcategory_id' => 'nullable|exists:subcategories,id',
         ]);
 
+        $existing = StudySchedule::where('user_id', Auth::id())
+            ->where('study_date', $validated['study_date'])
+            ->where('title', $validated['title'])
+            ->first();
+
+        if ($existing) {
+            return response()->json($existing, 200);
+        }
+
         $schedule = StudySchedule::create([
             'user_id' => Auth::id(),
             ...$validated,

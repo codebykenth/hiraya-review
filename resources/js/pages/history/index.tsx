@@ -471,7 +471,7 @@ export default function HistoryPage({
                                                             >
                                                                 <Link
                                                                     href={`/exams?attempt_id=${att.id}`}
-                                                                    className="dark:hover:text-blue-305 flex size-8 cursor-pointer items-center justify-center rounded-lg border border-blue-200 bg-blue-50 text-blue-700 shadow-2xs transition hover:bg-blue-100 hover:text-blue-800 focus:outline-none dark:border-blue-900/30 dark:bg-blue-950/20 dark:text-blue-400 dark:hover:bg-blue-900/30"
+                                                                    className="flex size-8 cursor-pointer items-center justify-center rounded-lg border border-blue-200 bg-blue-50 text-blue-700 shadow-2xs transition hover:bg-blue-100 hover:text-blue-800 focus:outline-none dark:border-blue-900/30 dark:bg-blue-950/20 dark:text-blue-400 dark:hover:bg-blue-900/30 dark:hover:text-blue-300"
                                                                 >
                                                                     <BookOpen className="size-3.5" />
                                                                     <span className="sr-only">
@@ -502,7 +502,7 @@ export default function HistoryPage({
                                                                             att.id,
                                                                         )
                                                                     }
-                                                                    className="dark:hover:text-red-305 flex size-8 cursor-pointer items-center justify-center rounded-lg border border-red-200 bg-red-50 text-red-700 shadow-2xs transition hover:bg-red-100 hover:text-red-800 focus:outline-none dark:border-red-900/30 dark:bg-red-950/20 dark:text-red-400 dark:hover:bg-red-900/30"
+                                                                    className="flex size-8 cursor-pointer items-center justify-center rounded-lg border border-red-200 bg-red-50 text-red-700 shadow-2xs transition hover:bg-red-100 hover:text-red-800 focus:outline-none dark:border-red-900/30 dark:bg-red-950/20 dark:text-red-400 dark:hover:bg-red-900/30 dark:hover:text-red-300"
                                                                 >
                                                                     <Trash2 className="size-3.5" />
                                                                     <span className="sr-only">

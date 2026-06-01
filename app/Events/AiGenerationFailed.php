@@ -30,4 +30,12 @@ class AiGenerationFailed implements ShouldBroadcastNow
             new PrivateChannel('App.Models.User.' . $this->userId),
         ];
     }
+
+    public function broadcastAs(): string
+    {
+        if ($this->type === 'analysis' || $this->message === 'analysis') {
+            return 'ai-analysis-failed';
+        }
+        return 'App\Events\AiGenerationFailed';
+    }
 }

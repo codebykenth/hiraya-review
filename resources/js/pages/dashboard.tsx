@@ -11,6 +11,7 @@ import {
     Info,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import AiReadinessCard from '@/components/ai-readiness-card';
 import {
     TrackBadge,
     StatusBadge,
@@ -62,9 +63,13 @@ interface DashboardProps {
             runs: string;
         };
     } | null;
+    aiAnalysis?: {
+        status: 'no_data' | 'generating' | 'ready';
+        data: any | null;
+    };
 }
 
-export default function Dashboard({ stats }: DashboardProps) {
+export default function Dashboard({ stats, aiAnalysis }: DashboardProps) {
     // Access Inertia shared props to greet the user dynamically
     const { auth } = usePage().props;
     const firstName = auth?.user?.name ? auth.user.name.split(' ')[0] : 'User';
@@ -498,6 +503,11 @@ export default function Dashboard({ stats }: DashboardProps) {
                             </span>
                         </div>
                     </div>
+                </div>
+
+                {/* AI Readiness Card */}
+                <div className="mt-6">
+                    <AiReadinessCard aiAnalysis={aiAnalysis} />
                 </div>
 
                 {/* Score Trends & Category breakdown container layout */}

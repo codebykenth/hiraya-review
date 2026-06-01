@@ -179,27 +179,71 @@ Topic: {$validated['topic']}
                 }
             };
 
-            // Attempt primary model
-            if (!str_starts_with($this->primaryModel, 'gemini')) {
-                if (!$attemptGroq($this->primaryModel)) {
-                    Log::warning("GenerateLearnModuleJob: Groq (" . $this->primaryModel . ") failed, attempting Gemini fallback. Reason: " . $errorMsg);
-                    $firstAttemptFailed = true;
-                    if (!$attemptGemini('gemini-3.5-flash')) {
-                        Log::error("GenerateLearnModuleJob: Gemini fallback also failed: " . $errorMsg);
-                        \App\Events\AiGenerationFailed::dispatch($this->userId, 'AI Generation failed on both primary and fallback APIs.', 'module');
-                        return;
+            // Define fallback lists of free models (ordered from best to worst)
+            $groqModels = ['llama-3.3-70b-versatile', 'gemma2-9b-it', 'mixtral-8x7b-32768', 'llama-3.1-8b-instant'];
+            $geminiModels = ['gemini-2.5-flash', 'gemini-1.5-flash'];
+
+            $primaryIsGemini = str_starts_with($this->primaryModel, 'gemini');
+            
+            $geminiChain = array_unique(array_merge([$this->primaryModel], $geminiModels));
+            $groqChain = array_unique(array_merge([$this->primaryModel], $groqModels));
+
+            // Clean chains to keep only relevant models
+            $geminiChain = array_values(array_filter($geminiChain, fn($m) => str_starts_with($m, 'gemini')));
+            $groqChain = array_values(array_filter($groqChain, fn($m) => !str_starts_with($m, 'gemini')));
+
+            $success = false;
+
+            if ($primaryIsGemini) {
+                // Try Gemini first
+                foreach ($geminiChain as $model) {
+                    Log::info("GenerateLearnModuleJob: Attempting Gemini model: " . $model);
+                    if ($attemptGemini($model)) {
+                        $success = true;
+                        break;
+                    }
+                    Log::warning("GenerateLearnModuleJob: Gemini model " . $model . " failed: " . $errorMsg);
+                }
+                
+                // Fallback to Groq
+                if (!$success) {
+                    foreach ($groqChain as $model) {
+                        Log::info("GenerateLearnModuleJob: Attempting Groq fallback model: " . $model);
+                        if ($attemptGroq($model)) {
+                            $success = true;
+                            break;
+                        }
+                        Log::warning("GenerateLearnModuleJob: Groq model " . $model . " failed: " . $errorMsg);
                     }
                 }
             } else {
-                if (!$attemptGemini($this->primaryModel)) {
-                    Log::warning("GenerateLearnModuleJob: Gemini (" . $this->primaryModel . ") failed, attempting Groq fallback. Reason: " . $errorMsg);
-                    $firstAttemptFailed = true;
-                    if (!$attemptGroq('llama-3.3-70b-versatile')) {
-                        Log::error("GenerateLearnModuleJob: Groq fallback also failed: " . $errorMsg);
-                        \App\Events\AiGenerationFailed::dispatch($this->userId, 'AI Generation failed on both primary and fallback APIs.', 'module');
-                        return;
+                // Try Groq first
+                foreach ($groqChain as $model) {
+                    Log::info("GenerateLearnModuleJob: Attempting Groq model: " . $model);
+                    if ($attemptGroq($model)) {
+                        $success = true;
+                        break;
+                    }
+                    Log::warning("GenerateLearnModuleJob: Groq model " . $model . " failed: " . $errorMsg);
+                }
+
+                // Fallback to Gemini
+                if (!$success) {
+                    foreach ($geminiChain as $model) {
+                        Log::info("GenerateLearnModuleJob: Attempting Gemini fallback model: " . $model);
+                        if ($attemptGemini($model)) {
+                            $success = true;
+                            break;
+                        }
+                        Log::warning("GenerateLearnModuleJob: Gemini model " . $model . " failed: " . $errorMsg);
                     }
                 }
+            }
+
+            if (!$success) {
+                Log::error("GenerateLearnModuleJob: All AI generation models failed.");
+                \App\Events\AiGenerationFailed::dispatch($this->userId, 'AI Generation failed across all primary and fallback free models.', 'module');
+                return;
             }
 
             $text = $resultText;

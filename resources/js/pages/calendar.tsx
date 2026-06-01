@@ -10,7 +10,6 @@ import { useEffect, useState, useRef, useCallback } from 'react';
 import { ConfirmModal } from '@/components/confirm-modal';
 import { PageContainer } from '@/components/page-container';
 import { PageHeader } from '@/components/page-header';
-import { StudySuggestionsModal } from '@/components/study-suggestions-modal';
 import { TimePicker } from '@/components/time-picker';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -55,23 +54,6 @@ interface LearnModule {
     category_name?: string;
 }
 
-interface Suggestion {
-    study_date: string;
-    study_time: string;
-    title: string;
-    description: string;
-    area_name: string;
-    score: number;
-    module_url?: string;
-    module_title?: string;
-}
-
-interface WeakArea {
-    name: string;
-    score: number;
-    sessions: number;
-}
-
 interface CalendarDay {
     date: string;
     day: number;
@@ -114,15 +96,6 @@ export default function Calendar() {
     const [isEditMode, setIsEditMode] = useState(false);
     const [editScheduleId, setEditScheduleId] = useState<number | null>(null);
     const [isLoading, setIsLoading] = useState(false);
-    const [isSuggestionsOpen, setIsSuggestionsOpen] = useState(false);
-    const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
-    const [weakAreas, setWeakAreas] = useState<WeakArea[]>([]);
-    const [daysUntilExam, setDaysUntilExam] = useState(0);
-    const [examDateStr, setExamDateStr] = useState('TBA');
-    const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
-    const [selectedTrack, setSelectedTrack] = useState('');
-    const [selectedTimeOfDay, setSelectedTimeOfDay] = useState('Evening');
-    const [topicsPerDay, setTopicsPerDay] = useState(1);
     const monthCacheRef = useRef<Map<string, any>>(new Map());
 
     const fetchSchedules = useCallback(
@@ -416,40 +389,6 @@ export default function Calendar() {
                 }
             },
         });
-    };
-
-    const applySuggestions = async (suggestionsToApply: Suggestion[]) => {
-        try {
-            const response = await fetch('/study-suggestions/apply', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN':
-                        document
-                            .querySelector('meta[name="csrf-token"]')
-                            ?.getAttribute('content') || '',
-                },
-                body: JSON.stringify({
-                    suggestions: suggestionsToApply,
-                }),
-            });
-
-            if (response.ok) {
-                monthCacheRef.current.clear();
-                await fetchSchedules(true);
-                setIsSuggestionsOpen(false);
-            } else {
-                const errorData = await response.json();
-                setErrorMessage(
-                    'Could not apply schedule: ' +
-                        (errorData.message || 'Unknown validation error.'),
-                );
-            }
-        } catch {
-            setErrorMessage(
-                'Failed to connect to the server while applying your schedule. Please try again.',
-            );
-        }
     };
 
     const getCategoryColors = (title: string) => {
@@ -799,24 +738,6 @@ export default function Calendar() {
                                     Add Session
                                 </span>
                                 <span className="sm:hidden">Add</span>
-                            </Button>
-                            <Button
-                                variant="outline"
-                                onClick={() => setIsSuggestionsOpen(true)}
-                                disabled={isLoadingSuggestions}
-                                className="flex-1 bg-amber-50 hover:bg-amber-100 md:flex-initial"
-                            >
-                                <Lightbulb className="mr-2 h-4 w-4 text-amber-600" />
-                                <span className="hidden sm:inline">
-                                    {isLoadingSuggestions
-                                        ? 'Analyzing...'
-                                        : 'Suggest Study Plan'}
-                                </span>
-                                <span className="sm:hidden">
-                                    {isLoadingSuggestions
-                                        ? 'Suggesting...'
-                                        : 'Suggest'}
-                                </span>
                             </Button>
                             <Button
                                 variant="outline"
@@ -1445,46 +1366,6 @@ export default function Calendar() {
                         </DialogFooter>
                     </DialogContent>
                 </Dialog>
-
-                {/* Study Suggestions Modal */}
-                <StudySuggestionsModal
-                    isOpen={isSuggestionsOpen}
-                    onClose={() => setIsSuggestionsOpen(false)}
-                    suggestions={suggestions}
-                    weakAreas={weakAreas}
-                    daysUntilExam={daysUntilExam}
-                    examDateStr={examDateStr}
-                    onApply={applySuggestions}
-                    isLoading={isLoadingSuggestions}
-                    selectedTrack={selectedTrack}
-                    selectedTimeOfDay={selectedTimeOfDay}
-                    selectedTopicsPerDay={topicsPerDay}
-                    onFilterChange={(track, timeOfDay, topicsCount) => {
-                        setSelectedTrack(track);
-                        setSelectedTimeOfDay(timeOfDay);
-                        setTopicsPerDay(topicsCount);
-                        setIsLoadingSuggestions(true);
-                        fetch(
-                            `/study-suggestions?track=${track}&time_of_day=${timeOfDay}&topics_per_day=${topicsCount}`,
-                        )
-                            .then((res) => res.json())
-                            .then((data) => {
-                                setSuggestions(data.suggestions || []);
-                                setWeakAreas(data.weak_areas || []);
-                                setDaysUntilExam(data.days_until_exam || 0);
-
-                                if (data.exam_date) {
-                                    setExamDateStr(data.exam_date);
-                                }
-                            })
-                            .catch(() =>
-                                setErrorMessage(
-                                    'Failed to fetch updated suggestions based on your filters.',
-                                ),
-                            )
-                            .finally(() => setIsLoadingSuggestions(false));
-                    }}
-                />
             </PageContainer>
         </>
     );

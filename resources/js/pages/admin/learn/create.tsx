@@ -62,7 +62,9 @@ export default function AdminLearnCreate({
     // AI Generation States
     const [aiTopic, setAiTopic] = useState(initialTopic);
     const [aiPrompt, setAiPrompt] = useState('');
-    const [aiPrimaryModel, setAiPrimaryModel] = useState('llama-3.3-70b-versatile');
+    const [aiPrimaryModel, setAiPrimaryModel] = useState(
+        'llama-3.3-70b-versatile',
+    );
     const [isGenerating, setIsGenerating] = useState(false);
     const [generationError, setGenerationError] = useState<string | null>(null);
     const [successMsg, setSuccessMsg] = useState<string | null>(null);
@@ -370,23 +372,74 @@ export default function AdminLearnCreate({
                             disabled={isGenerating}
                             onValueChange={setAiPrimaryModel}
                             options={[
-                                { value: 'llama-3.3-70b-versatile', label: 'Groq LLaMA 3.3 70B (Versatile)' },
-                                { value: 'openai/gpt-oss-120b', label: 'Groq GPT-OSS 120B' },
-                                { value: 'gemini-2.0-pro-exp', label: 'Google Gemini 2.0 Pro (Exp)' },
-                                { value: 'gemini-1.5-pro', label: 'Google Gemini 1.5 Pro' },
-                                { value: 'gemini-3.5-flash', label: 'Google Gemini 3.5 Flash' },
-                                { value: 'gemini-2.0-flash-thinking-exp', label: 'Google Gemini 2.0 Flash Thinking' },
-                                { value: 'gemini-2.0-flash', label: 'Google Gemini 2.0 Flash' },
-                                { value: 'qwen/qwen3-32b', label: 'Groq Qwen 3 32B' },
-                                { value: 'openai/gpt-oss-20b', label: 'Groq GPT-OSS 20B' },
-                                { value: 'meta-llama/llama-4-scout-17b-16e-instruct', label: 'Groq LLaMA 4 Scout 17B' },
-                                { value: 'gemini-1.5-flash', label: 'Google Gemini 1.5 Flash' },
-                                { value: 'gemini-1.5-flash-8b', label: 'Google Gemini 1.5 Flash 8B' },
-                                { value: 'llama-3.1-8b-instant', label: 'Groq LLaMA 3.1 8B (Instant)' },
-                                { value: 'allam-2-7b', label: 'Groq Allam 2 7B' },
-                                { value: 'canopylabs/orpheus-v1-english', label: 'Groq Orpheus v1 English' },
-                                { value: 'groq/compound', label: 'Groq Compound' },
-                                { value: 'groq/compound-mini', label: 'Groq Compound Mini' },
+                                {
+                                    value: 'llama-3.3-70b-versatile',
+                                    label: 'Groq LLaMA 3.3 70B (Versatile)',
+                                },
+                                {
+                                    value: 'openai/gpt-oss-120b',
+                                    label: 'Groq GPT-OSS 120B',
+                                },
+                                {
+                                    value: 'gemini-2.0-pro-exp',
+                                    label: 'Google Gemini 2.0 Pro (Exp)',
+                                },
+                                {
+                                    value: 'gemini-1.5-pro',
+                                    label: 'Google Gemini 1.5 Pro',
+                                },
+                                {
+                                    value: 'gemini-3.5-flash',
+                                    label: 'Google Gemini 3.5 Flash',
+                                },
+                                {
+                                    value: 'gemini-2.0-flash-thinking-exp',
+                                    label: 'Google Gemini 2.0 Flash Thinking',
+                                },
+                                {
+                                    value: 'gemini-2.0-flash',
+                                    label: 'Google Gemini 2.0 Flash',
+                                },
+                                {
+                                    value: 'qwen/qwen3-32b',
+                                    label: 'Groq Qwen 3 32B',
+                                },
+                                {
+                                    value: 'openai/gpt-oss-20b',
+                                    label: 'Groq GPT-OSS 20B',
+                                },
+                                {
+                                    value: 'meta-llama/llama-4-scout-17b-16e-instruct',
+                                    label: 'Groq LLaMA 4 Scout 17B',
+                                },
+                                {
+                                    value: 'gemini-1.5-flash',
+                                    label: 'Google Gemini 1.5 Flash',
+                                },
+                                {
+                                    value: 'gemini-1.5-flash-8b',
+                                    label: 'Google Gemini 1.5 Flash 8B',
+                                },
+                                {
+                                    value: 'llama-3.1-8b-instant',
+                                    label: 'Groq LLaMA 3.1 8B (Instant)',
+                                },
+                                {
+                                    value: 'allam-2-7b',
+                                    label: 'Groq Allam 2 7B',
+                                },
+                                {
+                                    value: 'canopylabs/orpheus-v1-english',
+                                    label: 'Groq Orpheus v1 English',
+                                },
+                                {
+                                    value: 'groq/compound',
+                                    label: 'Groq Compound',
+                                },
+                                {
+                                    value: 'groq/compound-mini',
+                                    label: 'Groq Compound Mini',
+                                },
                             ]}
                         />
 
@@ -494,7 +547,7 @@ export default function AdminLearnCreate({
                         AI Lesson Writer
                     </h2>
 
-                    <div className="text-slate-305 space-y-4 text-xs leading-relaxed font-semibold">
+                    <div className="space-y-4 text-xs leading-relaxed font-semibold text-slate-300">
                         <div className="flex gap-3.5">
                             <BookOpen className="mt-0.5 size-4 shrink-0 text-emerald-400" />
                             <div>
@@ -606,7 +659,7 @@ export default function AdminLearnCreate({
                                     Estimated Minutes Read
                                 </label>
                                 <div className="relative">
-                                    <Clock className="text-slate-455 absolute top-1/2 left-3 z-10 size-4 -translate-y-1/2" />
+                                    <Clock className="absolute top-1/2 left-3 z-10 size-4 -translate-y-1/2 text-slate-400" />
                                     <Input
                                         type="number"
                                         min={1}

@@ -67,15 +67,50 @@ const categoryColors: Record<
 };
 
 export default function LearnIndex({ modules, categories }: LearnIndexProps) {
-    const [searchQuery, setSearchQuery] = useState('');
+    const [searchQuery, setSearchQuery] = useState(() => {
+        if (typeof window !== 'undefined') {
+            const params = new URLSearchParams(window.location.search);
+
+            return params.get('search') || '';
+        }
+
+        return '';
+    });
     const [selectedCategory, setSelectedCategory] = useState<string>('all');
 
     // Strict 1-liner comment: Filter lessons based on active category and query keywords
     const filteredModules = modules.filter((mod) => {
-        const matchesQuery =
-            mod.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            mod.topic.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            mod.summary.toLowerCase().includes(searchQuery.toLowerCase());
+        const queryLower = searchQuery.toLowerCase().trim();
+        let matchesQuery = true;
+
+        if (queryLower) {
+            const titleLower = mod.title.toLowerCase();
+            const topicLower = mod.topic.toLowerCase();
+            const summaryLower = mod.summary.toLowerCase();
+
+            // 1. Direct full phrase match (highest relevance)
+            const fullMatch =
+                titleLower.includes(queryLower) ||
+                topicLower.includes(queryLower) ||
+                summaryLower.includes(queryLower);
+
+            if (fullMatch) {
+                matchesQuery = true;
+            } else {
+                // 2. Split words match fallback (matches any word in the query of length > 2)
+                const queryWords = queryLower
+                    .split(/\s+/)
+                    .filter((word) => word.length > 2);
+                matchesQuery =
+                    queryWords.length > 0 &&
+                    queryWords.some(
+                        (word) =>
+                            titleLower.includes(word) ||
+                            topicLower.includes(word) ||
+                            summaryLower.includes(word),
+                    );
+            }
+        }
 
         const matchesCategory =
             selectedCategory === 'all' || mod.category === selectedCategory;

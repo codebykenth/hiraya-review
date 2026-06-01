@@ -89,7 +89,7 @@ export function ScoreProgress({
         ? 'text-emerald-700 dark:text-emerald-450'
         : isFail
           ? 'text-rose-650 dark:text-rose-400'
-          : 'text-blue-655 dark:text-blue-450';
+          : 'text-blue-600 dark:text-blue-450';
 
     const scoreBarColor = isPass
         ? 'bg-emerald-600'

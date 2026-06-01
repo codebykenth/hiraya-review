@@ -331,7 +331,8 @@ export function LessonMarkdown({ content = '' }: LessonMarkdownProps) {
                 }
 
                 // Match **bold** OR *italic* with word boundaries to prevent matching math 2*3*4
-                const formatRegex = /(\*\*([^*]+?)\*\*)|(^|\W)\*([^\s*](?:[^*]*?[^\s*])?)\*(?=\W|$)/g;
+                const formatRegex =
+                    /(\*\*([^*]+?)\*\*)|(^|\W)\*([^\s*](?:[^*]*?[^\s*])?)\*(?=\W|$)/g;
                 const parts: React.ReactNode[] = [];
                 let lastIdx = 0;
                 let match;
@@ -361,17 +362,17 @@ export function LessonMarkdown({ content = '' }: LessonMarkdownProps) {
                         if (match[3]) {
                             parts.push(formatMathInline(match[3]));
                         }
-                        
+
                         parts.push(
                             <em
                                 key={`${keyPrefix}-italic-${match.index}`}
-                                className="italic text-slate-900 dark:text-slate-100"
+                                className="text-slate-900 italic dark:text-slate-100"
                             >
                                 {formatMathInline(match[4].trim())}
                             </em>,
                         );
                     }
-                    
+
                     lastIdx = formatRegex.lastIndex;
                 }
 

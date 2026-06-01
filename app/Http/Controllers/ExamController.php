@@ -6,6 +6,8 @@ use App\Models\Category;
 use App\Models\ExamAttempt;
 use App\Models\Question;
 use App\Models\TrackConfig;
+use App\Models\UserAiAnalysis;
+use App\Jobs\GenerateUserAnalysisJob;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Inertia\Inertia;
@@ -546,6 +548,40 @@ class ExamController extends Controller
             }
         }
 
+        $analysis = UserAiAnalysis::where('user_id', $userId)->first();
+        $latestAttemptId = ExamAttempt::where('user_id', $userId)
+            ->latest()->value('id');
+
+        $analysisStatus = 'no_data';
+        $analysisData = null;
+
+        if ($latestAttemptId) {
+            $generatedToday = $analysis && $analysis->updated_at->isToday();
+
+            if (!$analysis || (!$generatedToday && $analysis->last_exam_attempt_id !== $latestAttemptId)) {
+                // No analysis yet, OR: new exam exists AND not yet generated today
+                $cacheKey = "ai-analysis-generating-{$userId}";
+                if (!Cache::has($cacheKey)) {
+                    Cache::put($cacheKey, true, 60);
+                    GenerateUserAnalysisJob::dispatchAfterResponse($userId, $latestAttemptId);
+                }
+                $analysisStatus = 'generating';
+            } else {
+                // Serve cached: generated today already, or no new exam since last analysis
+            $analysisStatus = 'ready';
+                $analysisData = $analysis->analysis_json;
+            }
+        }
+
+        if ($analysisStatus === 'ready' && $analysisData) {
+            if (!empty($analysisData['strengths'])) {
+                $strongestArea = $analysisData['strengths'][0];
+            }
+            if (!empty($analysisData['critical_weaknesses'])) {
+                $weakestArea = $analysisData['critical_weaknesses'][0];
+            }
+        }
+
         return Inertia::render('dashboard', [
             'stats' => [
                 'filters' => [
@@ -563,6 +599,66 @@ class ExamController extends Controller
                 'avgDuration' => $avgDurationText,
                 'totalQuestionsSolved' => $totalQuestionsSolved,
             ],
+            'aiAnalysis' => [
+                'status' => $analysisStatus, // 'no_data' | 'generating' | 'ready'
+                'data'   => $analysisData,
+            ]
+        ]);
+    }
+
+    /**
+     * Render the highly comprehensive predictive AI Diagnostic Report page.
+     */
+    public function aiAnalysisReport(Request $request)
+    {
+        $userId = auth()->id();
+        $analysis = UserAiAnalysis::where('user_id', $userId)->first();
+        $latestAttemptId = ExamAttempt::where('user_id', $userId)->latest()->value('id');
+
+        $status = 'no_data';
+        $data = null;
+
+        if ($latestAttemptId) {
+            $cacheKey = "ai-analysis-generating-{$userId}";
+            if ($request->has('retry')) {
+                Cache::forget($cacheKey);
+            }
+
+            if (!$analysis) {
+                if (!Cache::has($cacheKey)) {
+                    Cache::put($cacheKey, true, 60);
+                    GenerateUserAnalysisJob::dispatchAfterResponse($userId, $latestAttemptId);
+                }
+                $status = 'generating';
+            } else {
+                $generatedToday = $analysis->updated_at->isToday();
+                if ($request->has('retry') || (!$generatedToday && $analysis->last_exam_attempt_id !== $latestAttemptId)) {
+                    if (!Cache::has($cacheKey)) {
+                        Cache::put($cacheKey, true, 60);
+                        GenerateUserAnalysisJob::dispatchAfterResponse($userId, $latestAttemptId);
+                    }
+                    $status = 'generating';
+                } else {
+                    $status = 'ready';
+                    $data = $analysis->analysis_json;
+                }
+            }
+        }
+
+        $existingSchedules = \App\Models\StudySchedule::where('user_id', $userId)
+            ->where('study_date', '>=', now()->startOfDay())
+            ->get()
+            ->map(fn($s) => [
+                'study_date' => $s->study_date->format('Y-m-d'),
+                'title' => $s->title,
+                'subcategory_id' => $s->subcategory_id,
+            ]);
+
+        return Inertia::render('exams/ai-analysis', [
+            'status' => $status,
+            'data' => $data,
+            'isLocal' => app()->environment('local'),
+            'existingSchedules' => $existingSchedules,
         ]);
     }
 
