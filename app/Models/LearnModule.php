@@ -8,6 +8,20 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class LearnModule extends Model
 {
     /**
+     * The "booted" method of the model.
+     */
+    protected static function booted(): void
+    {
+        static::saved(function () {
+            \Illuminate\Support\Facades\Cache::forget('sitemap_xml');
+        });
+
+        static::deleted(function () {
+            \Illuminate\Support\Facades\Cache::forget('sitemap_xml');
+        });
+    }
+
+    /**
      * The attributes that are mass assignable.
      *
      * @var array<int, string>

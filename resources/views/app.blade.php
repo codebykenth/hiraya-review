@@ -34,6 +34,7 @@
     </style>
 
     <link rel="icon" href="{{ asset('images/hiraya_logo_cropped.png') }}" type="image/png">
+    <link rel="canonical" href="{{ request()->url() }}">
 
     <!-- Global SEO & Social Sharing Fallbacks -->
     <meta name="description" content="Ace the Philippine Civil Service Exam with confidence. Hiraya Review offers realistic Professional & Subprofessional mock exams, smart study plans, high-yield learning modules, and targeted drills. Free forever base access!">

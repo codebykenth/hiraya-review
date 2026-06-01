@@ -251,6 +251,45 @@ export default function Welcome() {
         },
     ];
 
+    const websiteSchema = {
+        '@context': 'https://schema.org',
+        '@type': 'WebSite',
+        'name': 'Hiraya Review',
+        'alternateName': 'Civil Service Exam Reviewer',
+        'url': 'https://hirayareview.com',
+        'description': 'Ace the Philippine Civil Service Exam with confidence. Real mock tests, custom study plans, high-yield lessons, and targeted drills.',
+        'potentialAction': {
+            '@type': 'SearchAction',
+            'target': 'https://hirayareview.com/learn?search={search_term_string}',
+            'query-input': 'required name=search_term_string'
+        }
+    };
+
+    const courseSchema = {
+        '@context': 'https://schema.org',
+        '@type': 'Course',
+        'name': `Civil Service Exam Reviewer ${new Date().getFullYear()}`,
+        'description': 'Ace the Philippine Civil Service Exam (Professional & Subprofessional levels) with interactive mock tests, smart study plans, and targeted drills.',
+        'provider': {
+            '@type': 'EducationalOrganization',
+            'name': 'Hiraya Review',
+            'sameAs': 'https://hirayareview.com'
+        }
+    };
+
+    const faqSchema = {
+        '@context': 'https://schema.org',
+        '@type': 'FAQPage',
+        'mainEntity': faqs.map((faq) => ({
+            '@type': 'Question',
+            'name': faq.question,
+            'acceptedAnswer': {
+                '@type': 'Answer',
+                'text': faq.answer
+            }
+        }))
+    };
+
     return (
         <>
             <Head>
@@ -267,6 +306,15 @@ export default function Welcome() {
                     property="og:description"
                     content="Ace the Philippine Civil Service Exam with confidence. Real mock tests, custom study plans, high-yield lessons, and targeted drills. Pass the CSE on your first attempt!"
                 />
+                <script type="application/ld+json">
+                    {JSON.stringify(websiteSchema)}
+                </script>
+                <script type="application/ld+json">
+                    {JSON.stringify(courseSchema)}
+                </script>
+                <script type="application/ld+json">
+                    {JSON.stringify(faqSchema)}
+                </script>
             </Head>
 
             <div className="">
