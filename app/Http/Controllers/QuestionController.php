@@ -137,9 +137,10 @@ class QuestionController extends Controller
             'count' => 'required|integer|min:1|max:10',
             'language' => 'required|string',
             'prompt' => 'nullable|string',
+            'primary_model' => 'nullable|string',
         ]);
 
-        GenerateQuestionsJob::dispatchAfterResponse($validated, auth()->id() ?: (User::first()?->id ?: 1));
+        GenerateQuestionsJob::dispatchAfterResponse($validated, auth()->id() ?: (User::first()?->id ?: 1), $validated['primary_model'] ?? 'llama-3.3-70b-versatile');
 
         return response()->json([
             'success' => true,

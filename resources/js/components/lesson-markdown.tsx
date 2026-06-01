@@ -322,7 +322,7 @@ export function LessonMarkdown({ content = '' }: LessonMarkdownProps) {
             const result: React.ReactNode[] = [];
             let i = 0;
 
-            const parseBoldOnly = (
+            const parseFormatting = (
                 str: string,
                 keyPrefix: string,
             ): React.ReactNode[] => {
@@ -330,13 +330,13 @@ export function LessonMarkdown({ content = '' }: LessonMarkdownProps) {
                     return [];
                 }
 
-                // Strictly require double asterisks for bold to avoid swallowing multiplication signs
-                const boldRegex = /\*\*([^*]+?)\*\*/g;
+                // Match **bold** OR *italic* with word boundaries to prevent matching math 2*3*4
+                const formatRegex = /(\*\*([^*]+?)\*\*)|(^|\W)\*([^\s*](?:[^*]*?[^\s*])?)\*(?=\W|$)/g;
                 const parts: React.ReactNode[] = [];
                 let lastIdx = 0;
                 let match;
 
-                while ((match = boldRegex.exec(str)) !== null) {
+                while ((match = formatRegex.exec(str)) !== null) {
                     if (match.index > lastIdx) {
                         parts.push(
                             formatMathInline(
@@ -345,15 +345,34 @@ export function LessonMarkdown({ content = '' }: LessonMarkdownProps) {
                         );
                     }
 
-                    parts.push(
-                        <strong
-                            key={`${keyPrefix}-bold-${match.index}`}
-                            className="font-extrabold text-slate-950 dark:text-white"
-                        >
-                            {formatMathInline(match[1].trim())}
-                        </strong>,
-                    );
-                    lastIdx = boldRegex.lastIndex;
+                    if (match[1]) {
+                        // Bold match
+                        parts.push(
+                            <strong
+                                key={`${keyPrefix}-bold-${match.index}`}
+                                className="font-extrabold text-slate-950 dark:text-white"
+                            >
+                                {formatMathInline(match[2].trim())}
+                            </strong>,
+                        );
+                    } else if (match[4]) {
+                        // Italic match
+                        // Push the leading boundary character (match[3]) as normal text
+                        if (match[3]) {
+                            parts.push(formatMathInline(match[3]));
+                        }
+                        
+                        parts.push(
+                            <em
+                                key={`${keyPrefix}-italic-${match.index}`}
+                                className="italic text-slate-900 dark:text-slate-100"
+                            >
+                                {formatMathInline(match[4].trim())}
+                            </em>,
+                        );
+                    }
+                    
+                    lastIdx = formatRegex.lastIndex;
                 }
 
                 if (lastIdx < str.length) {
@@ -410,7 +429,7 @@ export function LessonMarkdown({ content = '' }: LessonMarkdownProps) {
                 const nextMathIdx =
                     nextDollar === -1 ? normalized.length : nextDollar;
                 result.push(
-                    ...parseBoldOnly(
+                    ...parseFormatting(
                         normalized.substring(i, nextMathIdx),
                         `plain-${i}`,
                     ),

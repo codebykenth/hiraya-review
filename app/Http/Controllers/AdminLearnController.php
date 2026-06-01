@@ -319,9 +319,10 @@ class AdminLearnController extends Controller
             'subcategory' => 'required|string',
             'topic' => 'required|string|max:255',
             'prompt' => 'nullable|string',
+            'primary_model' => 'nullable|string',
         ]);
 
-        GenerateLearnModuleJob::dispatchAfterResponse($validated, auth()->id() ?: 1);
+        GenerateLearnModuleJob::dispatchAfterResponse($validated, auth()->id() ?: 1, $validated['primary_model'] ?? 'llama-3.3-70b-versatile');
 
         return response()->json([
             'success' => true,

@@ -62,6 +62,7 @@ export default function AdminLearnCreate({
     // AI Generation States
     const [aiTopic, setAiTopic] = useState(initialTopic);
     const [aiPrompt, setAiPrompt] = useState('');
+    const [aiPrimaryModel, setAiPrimaryModel] = useState('llama-3.3-70b-versatile');
     const [isGenerating, setIsGenerating] = useState(false);
     const [generationError, setGenerationError] = useState<string | null>(null);
     const [successMsg, setSuccessMsg] = useState<string | null>(null);
@@ -229,6 +230,7 @@ export default function AdminLearnCreate({
                     subcategory: selectedSubcategoryName,
                     topic: targetTopic,
                     prompt: aiPrompt,
+                    primary_model: aiPrimaryModel,
                 }),
             });
 
@@ -361,6 +363,33 @@ export default function AdminLearnCreate({
                             />
                         </div>
 
+                        {/* Model Select */}
+                        <SelectField
+                            label="Primary AI Model"
+                            value={aiPrimaryModel}
+                            disabled={isGenerating}
+                            onValueChange={setAiPrimaryModel}
+                            options={[
+                                { value: 'llama-3.3-70b-versatile', label: 'Groq LLaMA 3.3 70B (Versatile)' },
+                                { value: 'openai/gpt-oss-120b', label: 'Groq GPT-OSS 120B' },
+                                { value: 'gemini-2.0-pro-exp', label: 'Google Gemini 2.0 Pro (Exp)' },
+                                { value: 'gemini-1.5-pro', label: 'Google Gemini 1.5 Pro' },
+                                { value: 'gemini-3.5-flash', label: 'Google Gemini 3.5 Flash' },
+                                { value: 'gemini-2.0-flash-thinking-exp', label: 'Google Gemini 2.0 Flash Thinking' },
+                                { value: 'gemini-2.0-flash', label: 'Google Gemini 2.0 Flash' },
+                                { value: 'qwen/qwen3-32b', label: 'Groq Qwen 3 32B' },
+                                { value: 'openai/gpt-oss-20b', label: 'Groq GPT-OSS 20B' },
+                                { value: 'meta-llama/llama-4-scout-17b-16e-instruct', label: 'Groq LLaMA 4 Scout 17B' },
+                                { value: 'gemini-1.5-flash', label: 'Google Gemini 1.5 Flash' },
+                                { value: 'gemini-1.5-flash-8b', label: 'Google Gemini 1.5 Flash 8B' },
+                                { value: 'llama-3.1-8b-instant', label: 'Groq LLaMA 3.1 8B (Instant)' },
+                                { value: 'allam-2-7b', label: 'Groq Allam 2 7B' },
+                                { value: 'canopylabs/orpheus-v1-english', label: 'Groq Orpheus v1 English' },
+                                { value: 'groq/compound', label: 'Groq Compound' },
+                                { value: 'groq/compound-mini', label: 'Groq Compound Mini' },
+                            ]}
+                        />
+
                         {/* Directives */}
                         <div className="text-slate-750 flex flex-col gap-1.5 text-xs font-bold dark:text-slate-400">
                             <label className="text-xs font-bold tracking-wider text-muted-foreground uppercase">
@@ -462,7 +491,7 @@ export default function AdminLearnCreate({
 
                     <h2 className="mb-4 inline-flex w-full items-center gap-2 border-b border-white/10 pb-4.5 text-base font-extrabold tracking-tight">
                         <Cpu className="size-4.5 text-blue-400" />
-                        Gemini Lesson Writer
+                        AI Lesson Writer
                     </h2>
 
                     <div className="text-slate-305 space-y-4 text-xs leading-relaxed font-semibold">

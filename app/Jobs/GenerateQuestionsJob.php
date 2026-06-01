@@ -24,11 +24,13 @@ class GenerateQuestionsJob implements ShouldQueue
 
     protected $validated;
     protected $userId;
+    protected $primaryModel;
 
-    public function __construct(array $validated, int $userId)
+    public function __construct(array $validated, int $userId, string $primaryModel = 'llama-3.3-70b-versatile')
     {
         $this->validated = $validated;
         $this->userId = $userId;
+        $this->primaryModel = $primaryModel;
     }
 
     public function handle(): void
@@ -85,65 +87,139 @@ Language: {$validated['language']}
 " . (!empty($validated['prompt']) ? "Additional Context/Directives: {$validated['prompt']}" : '');
 
         try {
-            $response = Http::withHeaders([
-                'x-goog-api-key' => $apiKey,
-                'Content-Type' => 'application/json',
-            ])->timeout(300)->post(
-                'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent',
-                [
-                    'system_instruction' => [
-                        'parts' => [['text' => $systemPrompt]],
-                    ],
-                    'contents' => [
+            $resultText = null;
+            $errorMsg = null;
+            $firstAttemptFailed = false;
+
+            // Define closures for both API calls
+            $attemptGemini = function($model = 'gemini-3.5-flash') use ($apiKey, $systemPrompt, $userPrompt, &$resultText, &$errorMsg) {
+                if (! $apiKey) {
+                    $errorMsg = "GEMINI_API_KEY is missing.";
+                    return false;
+                }
+                try {
+                    $response = Http::withHeaders([
+                        'x-goog-api-key' => $apiKey,
+                        'Content-Type' => 'application/json',
+                    ])->timeout(300)->post(
+                        'https://generativelanguage.googleapis.com/v1beta/models/' . $model . ':generateContent',
                         [
-                            'parts' => [['text' => $userPrompt]],
-                        ],
-                    ],
-                    'generationConfig' => [
-                        'temperature' => 0.7,
-                        'topP' => 0.9,
-                        'responseMimeType' => 'application/json',
-                        'responseSchema' => [
-                            'type' => 'ARRAY',
-                            'items' => [
-                                'type' => 'OBJECT',
-                                'properties' => [
-                                    'stem' => [
-                                        'type' => 'STRING',
-                                        'description' => 'The question stem or scenario. If it includes a data table, represent it beautifully as a formatted text/markdown table.',
-                                    ],
-                                    'category' => ['type' => 'STRING'],
-                                    'subcategory' => ['type' => 'STRING'],
-                                    'options' => [
-                                        'type' => 'ARRAY',
-                                        'minItems' => 5,
-                                        'maxItems' => 5,
-                                        'items' => ['type' => 'STRING'],
-                                    ],
-                                    'correct_option' => ['type' => 'INTEGER'],
-                                    'explanation' => [
-                                        'type' => 'STRING',
-                                        'description' => 'A detailed explanation of the steps leading to the correct option.',
+                            'system_instruction' => [
+                                'parts' => [['text' => $systemPrompt]],
+                            ],
+                            'contents' => [
+                                [
+                                    'parts' => [['text' => $userPrompt]],
+                                ],
+                            ],
+                            'generationConfig' => [
+                                'temperature' => 0.7,
+                                'topP' => 0.9,
+                                'responseMimeType' => 'application/json',
+                                'responseSchema' => [
+                                    'type' => 'ARRAY',
+                                    'items' => [
+                                        'type' => 'OBJECT',
+                                        'properties' => [
+                                            'stem' => [
+                                                'type' => 'STRING',
+                                                'description' => 'The question stem or scenario. If it includes a data table, represent it beautifully as a formatted text/markdown table.',
+                                            ],
+                                            'category' => ['type' => 'STRING'],
+                                            'subcategory' => ['type' => 'STRING'],
+                                            'options' => [
+                                                'type' => 'ARRAY',
+                                                'minItems' => 5,
+                                                'maxItems' => 5,
+                                                'items' => ['type' => 'STRING'],
+                                            ],
+                                            'correct_option' => ['type' => 'INTEGER'],
+                                            'explanation' => [
+                                                'type' => 'STRING',
+                                                'description' => 'A detailed explanation of the steps leading to the correct option.',
+                                            ],
+                                        ],
+                                        'required' => ['stem', 'category', 'subcategory', 'options', 'correct_option', 'explanation'],
                                     ],
                                 ],
-                                'required' => ['stem', 'category', 'subcategory', 'options', 'correct_option', 'explanation'],
+                                'thinkingConfig' => [
+                                    'thinkingLevel' => 'high',
+                                ],
                             ],
-                        ],
-                        'thinkingConfig' => [
-                            'thinkingLevel' => 'high',
-                        ],
-                    ],
-                ]
-            );
+                        ]
+                    );
 
-            if ($response->failed()) {
-                Log::error("GenerateQuestionsJob: API failed with status " . $response->status() . ": " . $response->body());
-                \App\Events\AiGenerationFailed::dispatch($this->userId, 'AI Generation failed. The API returned an error.', 'questions');
-                return;
+                    if ($response->successful()) {
+                        $result = $response->json();
+                        $resultText = $result['candidates'][0]['content']['parts'][0]['text'] ?? '';
+                        return true;
+                    } else {
+                        $errorMsg = "Gemini API failed with status " . $response->status() . ": " . $response->body();
+                        return false;
+                    }
+                } catch (\Exception $e) {
+                    $errorMsg = "Gemini Exception: " . $e->getMessage();
+                    return false;
+                }
+            };
+
+            $attemptGroq = function($model) use ($systemPrompt, $userPrompt, &$resultText, &$errorMsg) {
+                $groqKey = config('services.groq.key') ?: env('GROQ_API_KEY');
+                if (! $groqKey) {
+                    $errorMsg = "GROQ_API_KEY is missing.";
+                    return false;
+                }
+
+                try {
+                    $groqResponse = Http::withToken($groqKey)
+                        ->timeout(300)
+                        ->post('https://api.groq.com/openai/v1/chat/completions', [
+                            'model' => $model,
+                            'messages' => [
+                                ['role' => 'system', 'content' => $systemPrompt],
+                                ['role' => 'user', 'content' => $userPrompt],
+                            ],
+                            'temperature' => 0.7,
+                        ]);
+
+                    if ($groqResponse->successful()) {
+                        $result = $groqResponse->json();
+                        $resultText = $result['choices'][0]['message']['content'] ?? '';
+                        return true;
+                    } else {
+                        $errorMsg = "Groq API failed with status " . $groqResponse->status() . ": " . $groqResponse->body();
+                        return false;
+                    }
+                } catch (\Exception $e) {
+                    $errorMsg = "Groq Exception: " . $e->getMessage();
+                    return false;
+                }
+            };
+
+            // Attempt primary model
+            if (!str_starts_with($this->primaryModel, 'gemini')) {
+                if (!$attemptGroq($this->primaryModel)) {
+                    Log::warning("GenerateQuestionsJob: Groq (" . $this->primaryModel . ") failed, attempting Gemini fallback. Reason: " . $errorMsg);
+                    $firstAttemptFailed = true;
+                    if (!$attemptGemini('gemini-3.5-flash')) {
+                        Log::error("GenerateQuestionsJob: Gemini fallback also failed: " . $errorMsg);
+                        \App\Events\AiGenerationFailed::dispatch($this->userId, 'AI Generation failed on both primary and fallback APIs.', 'questions');
+                        return;
+                    }
+                }
+            } else {
+                if (!$attemptGemini($this->primaryModel)) {
+                    Log::warning("GenerateQuestionsJob: Gemini (" . $this->primaryModel . ") failed, attempting Groq fallback. Reason: " . $errorMsg);
+                    $firstAttemptFailed = true;
+                    if (!$attemptGroq('llama-3.3-70b-versatile')) {
+                        Log::error("GenerateQuestionsJob: Groq fallback also failed: " . $errorMsg);
+                        \App\Events\AiGenerationFailed::dispatch($this->userId, 'AI Generation failed on both primary and fallback APIs.', 'questions');
+                        return;
+                    }
+                }
             }
 
-            $result = $response->json();
-            $text = $result['candidates'][0]['content']['parts'][0]['text'] ?? '';
+            $text = $resultText;
 
             $text = trim($text);
             if (str_starts_with($text, '```')) {

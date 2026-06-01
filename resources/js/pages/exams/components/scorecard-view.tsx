@@ -456,13 +456,14 @@ export function ScorecardView({
                                         </h3>
                                         <p className="mb-4 text-xs text-slate-500">
                                             Based on your performance, we
-                                            recommend taking another drill
-                                            focused on your weak areas.
+                                            recommend visiting the Study Hub to
+                                            review modules focused on your weak
+                                            areas before taking another drill.
                                         </p>
-                                        <Link href={'/drills'}>
+                                        <Link href={'/learn'}>
                                             <Button className="w-full shadow-sm">
-                                                Start Custom Drill{' '}
-                                                <ArrowRight className="ml-1 size-3.5" />
+                                                Go to Study Hub{' '}
+                                                <BookOpen className="ml-1 size-3.5" />
                                             </Button>
                                         </Link>
                                     </div>
