@@ -1,0 +1,110 @@
+import { Brain } from 'lucide-react';
+import React from 'react';
+import { PageHeader } from '@/components/page-header';
+import { Card } from '@/components/ui/card';
+import { categoryMeta } from '../hooks/use-drills-state';
+import type { Category, Question } from '../types';
+
+interface HubViewProps {
+    categories: Category[];
+    questions: Question[];
+    handleCategoryClick: (catName: string) => void;
+}
+
+export function HubView({
+    categories,
+    questions,
+    handleCategoryClick,
+}: HubViewProps) {
+    const activeCategories = categories.filter(
+        (c) => c.name.toLowerCase() !== 'demographic',
+    );
+
+    return (
+        <div className="flex flex-col gap-6">
+            <PageHeader
+                title="Practice Drill Hub"
+                description="Select a category below to focus your practice. Each drill module is designed to target specific cognitive areas required for civil service examinations."
+            />
+
+            {activeCategories.length > 0 ? (
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                    {activeCategories.map((cat) => {
+                        const meta = categoryMeta[cat.name] || {
+                            icon: Brain,
+                            bgColor: 'bg-slate-600',
+                            description:
+                                'Master your skills in this civil service exam practice module.',
+                        };
+                        const CardIcon = meta.icon;
+                        const actualCount = questions.filter(
+                            (q) =>
+                                q.category
+                                    .toLowerCase()
+                                    .includes(cat.name.toLowerCase()) ||
+                                cat.name
+                                    .toLowerCase()
+                                    .includes(q.category.toLowerCase()),
+                        ).length;
+
+                        return (
+                            <Card
+                                key={cat.id}
+                                onClick={() => handleCategoryClick(cat.name)}
+                                className="group relative flex cursor-pointer flex-col justify-between overflow-hidden p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-md"
+                            >
+                                <div>
+                                    <div className="flex items-start justify-between">
+                                        <div
+                                            className={`rounded-xl ${meta.bgColor} p-3 text-white shadow-xs`}
+                                        >
+                                            <CardIcon className="size-6" />
+                                        </div>
+                                        <span className="rounded-full bg-slate-100 px-2.5 py-1 text-[10px] font-extrabold text-muted-foreground dark:bg-slate-800">
+                                            📝 {actualCount} Qs
+                                        </span>
+                                    </div>
+
+                                    <h3 className="mt-5 font-heading text-xl font-bold text-foreground transition group-hover:text-blue-600 dark:group-hover:text-blue-400">
+                                        {cat.name}
+                                    </h3>
+                                    <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                                        {meta.description}
+                                    </p>
+                                </div>
+
+                                <div className="mt-6 flex flex-wrap gap-1.5">
+                                    {cat.subcategory.map((sub) => (
+                                        <span
+                                            key={sub.id}
+                                            className="rounded-lg border border-border bg-slate-50/50 px-2 py-0.5 text-xs font-semibold text-muted-foreground dark:bg-slate-900/40"
+                                        >
+                                            {sub.name}
+                                        </span>
+                                    ))}
+                                </div>
+                            </Card>
+                        );
+                    })}
+                </div>
+            ) : (
+                <div className="flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-border bg-card py-20 text-center shadow-sm">
+                    <div className="mx-auto mb-5 flex size-14 items-center justify-center rounded-xl bg-slate-100 text-muted-foreground ring-8 dark:bg-slate-900">
+                        <Brain className="size-6 text-blue-600 dark:text-blue-400" />
+                    </div>
+                    <span className="dark:bg-amber-955/40 mb-3.5 inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-3.5 py-1 text-[10px] font-extrabold tracking-wider text-amber-700 uppercase dark:text-amber-400">
+                        <span className="size-1.5 rounded-full bg-amber-500" />
+                        Coming Soon
+                    </span>
+                    <h3 className="font-heading text-lg font-bold text-foreground">
+                        No Practice Drills Available
+                    </h3>
+                    <p className="mx-auto mt-2 max-w-2xl text-xs leading-relaxed text-muted-foreground">
+                        Practice drill modules are coming soon! Hiraya Review is
+                        currently compiling comprehensive exam question banks.
+                    </p>
+                </div>
+            )}
+        </div>
+    );
+}

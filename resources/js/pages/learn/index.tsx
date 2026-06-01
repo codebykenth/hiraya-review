@@ -1,154 +1,23 @@
-import { Head, Link } from '@inertiajs/react';
-import { Search, BookOpen, Clock, Tag, ArrowRight } from 'lucide-react';
-import { useState } from 'react';
+import { Head } from '@inertiajs/react';
+import React from 'react';
 import { PageContainer } from '@/components/page-container';
 import { PageHeader } from '@/components/page-header';
-import { Card } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
+import { ModulesGrid } from './components/modules-grid';
+import { SearchFilterRow } from './components/search-filter-row';
+import { useLearnState } from './hooks/use-learn-state';
+import type { LearnIndexProps } from './types';
 
-interface LearnModule {
-    id: number;
-    title: string;
-    slug: string;
-    topic: string;
-    summary: string;
-    estimated_minutes: number;
-    category: string;
-    subcategory: string;
-}
+export default function LearnIndex(props: LearnIndexProps) {
+    const { categories = [] } = props;
 
-interface Category {
-    id: number;
-    name: string;
-    slug: string;
-    subcategory: { id: number; name: string; slug: string }[];
-}
-
-interface LearnIndexProps {
-    modules: LearnModule[];
-    categories: Category[];
-}
-
-// Map categories to color accents for premium UI visuals
-const categoryColors: Record<
-    string,
-    { bg: string; text: string; border: string; glow: string }
-> = {
-    'General Information': {
-        bg: 'bg-teal-50 dark:bg-teal-950/20',
-        text: 'text-teal-700 dark:text-teal-400',
-        border: 'border-teal-150 dark:border-teal-900/35',
-        glow: 'shadow-teal-100/50',
-    },
-    'Verbal Ability': {
-        bg: 'bg-blue-50 dark:bg-blue-950/20',
-        text: 'text-blue-700 dark:text-blue-400',
-        border: 'border-blue-150 dark:border-blue-900/35',
-        glow: 'shadow-blue-100/50',
-    },
-    'Analytical Ability': {
-        bg: 'bg-emerald-50 dark:bg-emerald-950/20',
-        text: 'text-emerald-700 dark:text-emerald-400',
-        border: 'border-emerald-150 dark:border-emerald-900/35',
-        glow: 'shadow-emerald-100/50',
-    },
-    'Numerical Ability': {
-        bg: 'bg-orange-50 dark:bg-orange-950/20',
-        text: 'text-orange-700 dark:text-orange-400',
-        border: 'border-orange-150 dark:border-orange-900/35',
-        glow: 'shadow-orange-100/50',
-    },
-    'Clerical Ability': {
-        bg: 'bg-indigo-50 dark:bg-indigo-950/20',
-        text: 'text-indigo-700 dark:text-indigo-400',
-        border: 'border-indigo-150 dark:border-indigo-900/35',
-        glow: 'shadow-indigo-100/50',
-    },
-};
-
-export default function LearnIndex({ modules, categories }: LearnIndexProps) {
-    const [searchQuery, setSearchQuery] = useState(() => {
-        if (typeof window !== 'undefined') {
-            const params = new URLSearchParams(window.location.search);
-
-            return params.get('search') || '';
-        }
-
-        return '';
-    });
-    const [selectedCategory, setSelectedCategory] = useState<string>('all');
-
-    // Strict 1-liner comment: Filter lessons based on active category and query keywords
-    const filteredModules = modules.filter((mod) => {
-        const queryLower = searchQuery.toLowerCase().trim();
-        let matchesQuery = true;
-
-        if (queryLower) {
-            const titleLower = mod.title.toLowerCase();
-            const topicLower = mod.topic.toLowerCase();
-            const summaryLower = mod.summary.toLowerCase();
-
-            // 1. Direct full phrase match (highest relevance)
-            const fullMatch =
-                titleLower.includes(queryLower) ||
-                topicLower.includes(queryLower) ||
-                summaryLower.includes(queryLower);
-
-            if (fullMatch) {
-                matchesQuery = true;
-            } else {
-                // 2. Split words match fallback (matches any word in the query of length > 2)
-                const queryWords = queryLower
-                    .split(/\s+/)
-                    .filter((word) => word.length > 2);
-                matchesQuery =
-                    queryWords.length > 0 &&
-                    queryWords.some(
-                        (word) =>
-                            titleLower.includes(word) ||
-                            topicLower.includes(word) ||
-                            summaryLower.includes(word),
-                    );
-            }
-        }
-
-        const matchesCategory =
-            selectedCategory === 'all' || mod.category === selectedCategory;
-
-        return matchesQuery && matchesCategory;
-    });
-
-    const groupedModules = Object.entries(
-        filteredModules.reduce(
-            (acc, mod) => {
-                if (!acc[mod.category]) {
-                    acc[mod.category] = [];
-                }
-
-                acc[mod.category].push(mod);
-
-                return acc;
-            },
-            {} as Record<string, LearnModule[]>,
-        ),
-    ).sort(([a], [b]) => {
-        const indexA = categories.findIndex((c) => c.name === a);
-        const indexB = categories.findIndex((c) => c.name === b);
-
-        if (indexA === -1 && indexB === -1) {
-            return a.localeCompare(b);
-        }
-
-        if (indexA === -1) {
-            return 1;
-        }
-
-        if (indexB === -1) {
-            return -1;
-        }
-
-        return indexA - indexB;
-    });
+    const {
+        searchQuery,
+        setSearchQuery,
+        selectedCategory,
+        setSelectedCategory,
+        filteredModules,
+        groupedModules,
+    } = useLearnState(props);
 
     return (
         <>
@@ -177,170 +46,21 @@ export default function LearnIndex({ modules, categories }: LearnIndexProps) {
                 />
 
                 {/* Search and Category Filter Row */}
-                <div className="flex flex-col gap-5 rounded-2xl border border-border bg-card p-5 shadow-2xs lg:flex-row lg:items-center lg:justify-between">
-                    <div className="relative w-full shrink-0 lg:w-96">
-                        <Search className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
-                        <Input
-                            type="text"
-                            placeholder="Search by topic, lesson name, or keywords..."
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full pl-10"
-                        />
-                    </div>
-
-                    <div className="flex flex-wrap gap-2">
-                        <button
-                            onClick={() => setSelectedCategory('all')}
-                            className={`cursor-pointer rounded-lg px-4 py-2 text-xs font-extrabold transition ${
-                                selectedCategory === 'all'
-                                    ? 'bg-blue-600 text-white shadow-xs'
-                                    : 'bg-slate-50 text-muted-foreground hover:bg-slate-100 dark:bg-slate-900 dark:hover:bg-slate-800'
-                            }`}
-                        >
-                            All Categories
-                        </button>
-                        {categories.map((cat) => {
-                            const isSelected = selectedCategory === cat.name;
-
-                            return (
-                                <button
-                                    key={cat.id}
-                                    onClick={() =>
-                                        setSelectedCategory(cat.name)
-                                    }
-                                    className={`cursor-pointer rounded-lg px-4 py-2 text-xs font-extrabold transition ${
-                                        isSelected
-                                            ? 'bg-blue-600 text-white shadow-xs'
-                                            : 'bg-slate-50 text-muted-foreground hover:bg-slate-100 dark:bg-slate-900 dark:hover:bg-slate-800'
-                                    }`}
-                                >
-                                    {cat.name}
-                                </button>
-                            );
-                        })}
-                    </div>
-                </div>
+                <SearchFilterRow
+                    searchQuery={searchQuery}
+                    setSearchQuery={setSearchQuery}
+                    selectedCategory={selectedCategory}
+                    setSelectedCategory={setSelectedCategory}
+                    categories={categories}
+                />
 
                 {/* Modules Grid */}
-                {filteredModules.length > 0 ? (
-                    <div className="flex flex-col gap-12">
-                        {groupedModules.map(([categoryName, groupMods]) => {
-                            const colors = categoryColors[categoryName] || {
-                                bg: 'bg-slate-50 dark:bg-slate-800/40',
-                                text: 'text-muted-foreground',
-                                border: 'border-border',
-                                glow: '',
-                            };
-
-                            return (
-                                <section
-                                    key={categoryName}
-                                    className="flex flex-col gap-5"
-                                >
-                                    <h2 className="flex items-center gap-3 border-b border-border pb-3 font-heading text-xl font-black text-foreground">
-                                        <span
-                                            className={`size-3 rounded-full border ${colors.bg} ${colors.border}`}
-                                        />
-                                        {categoryName}
-                                    </h2>
-                                    <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-                                        {groupMods.map((mod) => (
-                                            <Link
-                                                key={mod.id}
-                                                href={`/learn/${mod.slug}`}
-                                                className="group block"
-                                            >
-                                                <Card className="flex h-full flex-col justify-between overflow-hidden p-6 transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-md">
-                                                    <div>
-                                                        {/* Badges row */}
-                                                        <div className="flex flex-wrap items-center gap-2">
-                                                            <span
-                                                                className={`rounded-full border px-2.5 py-0.5 text-[9px] font-extrabold tracking-wide uppercase ${colors.bg} ${colors.text} ${colors.border}`}
-                                                            >
-                                                                {mod.category}
-                                                            </span>
-                                                            <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[9px] font-bold text-muted-foreground dark:bg-slate-900">
-                                                                {
-                                                                    mod.subcategory
-                                                                }
-                                                            </span>
-                                                        </div>
-
-                                                        <h3 className="mt-5 font-heading text-lg leading-snug font-bold text-foreground transition group-hover:text-blue-600 dark:group-hover:text-blue-400">
-                                                            {mod.title}
-                                                        </h3>
-
-                                                        <div className="mt-2.5 flex items-center gap-1.5 text-[10px] font-bold text-muted-foreground uppercase">
-                                                            <Tag className="size-3" />
-                                                            <span>
-                                                                Topic:{' '}
-                                                                {mod.topic}
-                                                            </span>
-                                                        </div>
-
-                                                        <p className="mt-3 line-clamp-3 text-xs leading-relaxed text-muted-foreground">
-                                                            {mod.summary}
-                                                        </p>
-                                                    </div>
-
-                                                    {/* Action Footing */}
-                                                    <div className="mt-6 flex items-center justify-between border-t border-border pt-4">
-                                                        <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                                                            <Clock className="size-3.5" />
-                                                            <span>
-                                                                {
-                                                                    mod.estimated_minutes
-                                                                }{' '}
-                                                                min read
-                                                            </span>
-                                                        </div>
-
-                                                        <span className="dark:text-blue-450 flex items-center gap-1 text-xs font-black text-blue-600 transition-all group-hover:gap-2">
-                                                            Start Lesson
-                                                            <ArrowRight className="size-3.5" />
-                                                        </span>
-                                                    </div>
-                                                </Card>
-                                            </Link>
-                                        ))}
-                                    </div>
-                                </section>
-                            );
-                        })}
-                    </div>
-                ) : /* Empty State / Coming Soon State */
-                searchQuery === '' ? (
-                    <div className="relative overflow-hidden rounded-2xl border-2 border-dashed border-border bg-card/70 p-12 text-center shadow-sm transition-all duration-300 hover:border-blue-300 dark:hover:border-blue-900/50">
-                        <div className="mx-auto mb-5 flex size-14 items-center justify-center rounded-xl bg-slate-100 text-muted-foreground ring-8 dark:bg-slate-900">
-                            <BookOpen className="size-6 text-blue-600 dark:text-blue-400" />
-                        </div>
-                        <span className="mb-3.5 inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-3.5 py-1 text-[10px] font-extrabold tracking-wider text-amber-700 uppercase dark:bg-amber-950/40 dark:text-amber-400">
-                            <span className="size-1.5 rounded-full bg-amber-500" />
-                            Coming Soon
-                        </span>
-                        <h3 className="font-heading text-lg font-bold text-foreground">
-                            No Learning Modules Available
-                        </h3>
-                        <p className="mx-auto mt-2 max-w-2xl text-xs leading-relaxed text-muted-foreground">
-                            Hiraya Review is currently designing bite-sized
-                            conceptual lessons, strategy guides, and detailed
-                            category rationales.
-                        </p>
-                    </div>
-                ) : (
-                    <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border bg-card py-16">
-                        <BookOpen className="size-12 text-muted-foreground" />
-                        <h3 className="mt-4 text-sm font-black text-foreground">
-                            No learning modules match your search
-                        </h3>
-                        <p className="mt-1 max-w-2xl text-center text-xs leading-normal text-muted-foreground">
-                            Try checking other categories or adjust your keyword
-                            search. Admins will curate more review topics
-                            shortly!
-                        </p>
-                    </div>
-                )}
+                <ModulesGrid
+                    filteredModules={filteredModules}
+                    groupedModules={groupedModules}
+                    categories={categories}
+                    searchQuery={searchQuery}
+                />
             </PageContainer>
         </>
     );

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\Cache;
 
 class LearnModule extends Model
 {
@@ -13,11 +14,11 @@ class LearnModule extends Model
     protected static function booted(): void
     {
         static::saved(function () {
-            \Illuminate\Support\Facades\Cache::forget('sitemap_xml');
+            Cache::forget('sitemap_xml');
         });
 
         static::deleted(function () {
-            \Illuminate\Support\Facades\Cache::forget('sitemap_xml');
+            Cache::forget('sitemap_xml');
         });
     }
 

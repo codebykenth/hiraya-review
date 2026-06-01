@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ApplySuggestionsRequest;
 use App\Models\StudySchedule;
 use App\Services\StudyPlanAnalyzer;
 use Illuminate\Http\Request;
@@ -21,18 +22,9 @@ class StudySuggestionController extends Controller
         return response()->json($suggestions);
     }
 
-    public function applySuggestions(Request $request)
+    public function applySuggestions(ApplySuggestionsRequest $request)
     {
-        $validated = $request->validate([
-            'suggestions' => 'required|array',
-            'suggestions.*.study_date' => 'required|date',
-            'suggestions.*.study_time' => 'nullable|string',
-            'suggestions.*.title' => 'required|string|max:255',
-            'suggestions.*.description' => 'nullable|string',
-            'suggestions.*.module_links' => 'nullable|array',
-            'suggestions.*.module_links.*.title' => 'required_with:suggestions.*.module_links|string',
-            'suggestions.*.module_links.*.url' => 'required_with:suggestions.*.module_links|string',
-        ]);
+        $validated = $request->validated();
 
         $created = [];
 

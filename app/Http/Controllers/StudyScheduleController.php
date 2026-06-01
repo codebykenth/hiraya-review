@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\BulkUpdateStudyTimeRequest;
+use App\Http\Requests\StoreStudyScheduleRequest;
+use App\Http\Requests\UpdateStudyScheduleRequest;
 use App\Models\ExamDate;
 use App\Models\LearnModule;
 use App\Models\StudySchedule;
@@ -14,6 +17,14 @@ use Illuminate\Support\Facades\Schema;
 
 class StudyScheduleController extends Controller
 {
+    private function formatScheduleForCalendar(StudySchedule $schedule): array
+    {
+        return [
+            ...$schedule->toArray(),
+            'study_date' => $schedule->study_date->format('Y-m-d'),
+        ];
+    }
+
     public function index(Request $request)
     {
         $year = $request->query('year', now()->year);
@@ -27,7 +38,8 @@ class StudyScheduleController extends Controller
             ->get()
             ->groupBy(function ($schedule) {
                 return $schedule->study_date->format('Y-m-d');
-            });
+            })
+            ->map(fn ($items) => $items->map(fn ($schedule) => $this->formatScheduleForCalendar($schedule))->values());
 
         $examDates = [];
         if (Schema::hasTable('exam_dates')) {
@@ -48,21 +60,41 @@ class StudyScheduleController extends Controller
             $examDates = array_values($examDates);
         }
 
+        // Fetch past pending uncompleted tasks
+        $pastPending = StudySchedule::where('user_id', Auth::id())
+            ->where('study_date', '<', Carbon::today())
+            ->where('is_done', false)
+            ->orderBy('study_date', 'asc')
+            ->get()
+            ->map(fn ($schedule) => $this->formatScheduleForCalendar($schedule));
+
+        $nextExam = null;
+        if (Schema::hasTable('exam_dates')) {
+            $nextExamModel = ExamDate::where('is_active', true)
+                ->where('date', '>=', Carbon::today())
+                ->orderBy('date', 'asc')
+                ->first();
+
+            if ($nextExamModel) {
+                $nextExam = [
+                    'date' => $nextExamModel->date->format('Y-m-d'),
+                    'description' => $nextExamModel->description,
+                    'days_remaining' => Carbon::today()->diffInDays($nextExamModel->date, false),
+                ];
+            }
+        }
+
         return response()->json([
             'schedules' => $schedules,
             'examDates' => $examDates,
+            'pastPending' => $pastPending,
+            'nextExam' => $nextExam,
         ]);
     }
 
-    public function store(Request $request)
+    public function store(StoreStudyScheduleRequest $request)
     {
-        $validated = $request->validate([
-            'study_date' => 'required|date|after_or_equal:today',
-            'study_time' => 'nullable|date_format:H:i',
-            'title' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'subcategory_id' => 'nullable|exists:subcategories,id',
-        ]);
+        $validated = $request->validated();
 
         $existing = StudySchedule::where('user_id', Auth::id())
             ->whereDate('study_date', $validated['study_date'])
@@ -70,7 +102,7 @@ class StudyScheduleController extends Controller
             ->first();
 
         if ($existing) {
-            return response()->json($existing, 200);
+            return response()->json($this->formatScheduleForCalendar($existing), 200);
         }
 
         $schedule = StudySchedule::create([
@@ -78,22 +110,12 @@ class StudyScheduleController extends Controller
             ...$validated,
         ]);
 
-        return response()->json($schedule, 201);
+        return response()->json($this->formatScheduleForCalendar($schedule), 201);
     }
 
-    public function update(Request $request, StudySchedule $studySchedule)
+    public function update(UpdateStudyScheduleRequest $request, StudySchedule $studySchedule)
     {
-        if ($studySchedule->user_id !== Auth::id()) {
-            return response()->json(['message' => 'Unauthorized'], 403);
-        }
-
-        $validated = $request->validate([
-            'study_date' => 'required|date',
-            'study_time' => 'nullable|date_format:H:i:s,H:i',
-            'title' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'subcategory_id' => 'nullable|exists:subcategories,id',
-        ]);
+        $validated = $request->validated();
 
         // Fix time format validation edge cases depending on H:i:s or H:i input
         if (isset($validated['study_time']) && strlen($validated['study_time']) === 5) {
@@ -102,12 +124,14 @@ class StudyScheduleController extends Controller
 
         $studySchedule->update($validated);
 
-        return response()->json($studySchedule);
+        return response()->json($this->formatScheduleForCalendar($studySchedule));
     }
 
     public function getSubcategories()
     {
-        $subcategories = Subcategory::orderBy('name')->get(['id', 'name', 'category_id']);
+        $subcategories = Subcategory::whereHas('category', function ($query) {
+            $query->where('is_demographic', false);
+        })->orderBy('name')->get(['id', 'name', 'category_id']);
         $modules = LearnModule::where('is_published', true)
             ->with(['subcategory:id,name', 'category:id,name'])
             ->get(['id', 'title', 'slug', 'topic', 'subcategory_id', 'category_id']);
@@ -122,6 +146,31 @@ class StudyScheduleController extends Controller
                 'category_name' => $m->category?->name,
             ]),
         ]);
+    }
+
+    public function bulkUpdateTime(BulkUpdateStudyTimeRequest $request)
+    {
+        $validated = $request->validated();
+        $query = StudySchedule::where('user_id', Auth::id());
+
+        if (! empty($validated['start_date'])) {
+            $query->whereDate('study_date', '>=', $validated['start_date']);
+        }
+        if (! empty($validated['end_date'])) {
+            $query->whereDate('study_date', '<=', $validated['end_date']);
+        }
+
+        if (! empty($validated['category_id'])) {
+            $query->whereHas('subcategory', function ($q) use ($validated) {
+                $q->where('category_id', $validated['category_id']);
+            });
+        }
+
+        $query->update([
+            'study_time' => $validated['study_time'] ?: null,
+        ]);
+
+        return response()->json(['message' => 'Study times updated successfully.']);
     }
 
     public function destroyAll()

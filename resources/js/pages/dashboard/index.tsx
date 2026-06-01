@@ -1,4 +1,4 @@
-import { Head, Link, router, usePage } from '@inertiajs/react';
+import { Link } from '@inertiajs/react';
 import {
     Play,
     TrendingUp,
@@ -10,7 +10,6 @@ import {
     Target,
     Info,
 } from 'lucide-react';
-import { useEffect, useState } from 'react';
 import AiReadinessCard from '@/components/ai-readiness-card';
 import {
     TrackBadge,
@@ -20,245 +19,40 @@ import {
 import { PageContainer } from '@/components/page-container';
 import { PageHeader } from '@/components/page-header';
 import { Card } from '@/components/ui/card';
-import { dashboard } from '@/routes';
 import { index as drillsIndex } from '@/routes/drills';
 import { index as examsIndex } from '@/routes/exams';
 
-interface ChartDataPoint {
-    score: number;
-    label: string;
-    date: string;
-    track: string;
-    detail: string;
-    categoryScores?: CategoryScore[];
-}
-
-interface CategoryScore {
-    name: string;
-    correct: number;
-    total: number;
-    percentage: number;
-}
-
-interface DashboardProps {
-    stats?: {
-        avgScore: number;
-        totalExams: number;
-        strongestArea: string;
-        weakestArea: string;
-        chartData: ChartDataPoint[];
-        categories: {
-            name: string;
-            percentage: number;
-            color: string;
-            correct: number;
-            total: number;
-        }[];
-        passingRate: number;
-        totalDuration: string;
-        avgDuration: string;
-        totalQuestionsSolved: number;
-        filters?: {
-            track: string;
-            runs: string;
-        };
-    } | null;
-    aiAnalysis?: {
-        status: 'no_data' | 'generating' | 'ready';
-        data: any | null;
-    };
-}
+import { useDashboardState } from './hooks/use-dashboard-state';
+import type { DashboardProps } from './types';
 
 export default function Dashboard({ stats, aiAnalysis }: DashboardProps) {
-    // Access Inertia shared props to greet the user dynamically
-    const { auth } = usePage().props;
-    const firstName = auth?.user?.name ? auth.user.name.split(' ')[0] : 'User';
-    const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
-    const [isOpen, setIsOpen] = useState(false);
-    const [isRunsOpen, setIsRunsOpen] = useState(false);
-
-    // Read active filters from backend or fallback
-    const currentTrack = stats?.filters?.track || 'Professional';
-    const currentRuns = stats?.filters?.runs || '6';
-
-    const updateFilter = (key: 'track' | 'runs', value: string) => {
-        router.get(
-            dashboard().url,
-            { track: currentTrack, runs: currentRuns, [key]: value },
-            { preserveState: true, preserveScroll: true, replace: true },
-        );
-    };
-
-    // Redirect to exams page if a pending free exam session exists after registration
-    useEffect(() => {
-        const pendingExam = localStorage.getItem('pending_free_exam');
-
-        if (pendingExam) {
-            router.visit('/exams');
-        }
-    }, []);
-
-    // Dismiss active score history tooltip when clicking outside the chart
-    useEffect(() => {
-        const handleBodyClick = () => {
-            setHoveredIdx(null);
-        };
-        document.body.addEventListener('click', handleBodyClick);
-        return () => {
-            document.body.removeEventListener('click', handleBodyClick);
-        };
-    }, []);
-
-    const defaultStats = {
-        avgScore: 84,
-        totalExams: 12,
-        strongestArea: 'Verbal',
-        weakestArea: 'Numerical',
-        passingRate: 75,
-        totalDuration: '3h 15m',
-        avgDuration: '16m 15s',
-        totalQuestionsSolved: 340,
-        chartData: [
-            {
-                score: 40,
-                label: 'Run 1',
-                date: 'May 20',
-                track: 'Professional Exam',
-                detail: '68/170 Correct',
-                categoryScores: [],
-            },
-            {
-                score: 52,
-                label: 'Run 2',
-                date: 'May 21',
-                track: 'Subprofessional Exam',
-                detail: '78/150 Correct',
-                categoryScores: [],
-            },
-            {
-                score: 45,
-                label: 'Run 3',
-                date: 'May 22',
-                track: 'Analytical Drill',
-                detail: '18/40 Correct',
-                categoryScores: [],
-            },
-            {
-                score: 68,
-                label: 'Run 4',
-                date: 'May 23',
-                track: 'Verbal Drill',
-                detail: '27/40 Correct',
-                categoryScores: [],
-            },
-            {
-                score: 60,
-                label: 'Run 5',
-                date: 'May 24',
-                track: 'Numerical Drill',
-                detail: '24/40 Correct',
-                categoryScores: [],
-            },
-            {
-                score: 85,
-                label: 'Run 6',
-                date: 'May 25',
-                track: 'Professional Exam',
-                detail: '144/170 Correct',
-                categoryScores: [],
-            },
-        ],
-        categories: [
-            {
-                name: 'Verbal',
-                percentage: 92,
-                color: 'bg-emerald-600 dark:bg-emerald-500',
-                correct: 46,
-                total: 50,
-            },
-            {
-                name: 'Clerical',
-                percentage: 85,
-                color: 'bg-blue-600 dark:bg-blue-500',
-                correct: 34,
-                total: 40,
-            },
-            {
-                name: 'General',
-                percentage: 78,
-                color: 'bg-indigo-600 dark:bg-indigo-500',
-                correct: 39,
-                total: 50,
-            },
-            {
-                name: 'Numerical',
-                percentage: 65,
-                color: 'bg-rose-600 dark:bg-rose-500',
-                correct: 26,
-                total: 40,
-            },
-            {
-                name: 'Analytical',
-                percentage: 70,
-                color: 'bg-amber-600 dark:bg-amber-500',
-                correct: 28,
-                total: 40,
-            },
-        ],
-    };
-
-    const activeStats = stats || defaultStats;
-    const isDemoMode = !stats || stats.totalExams === 0;
-    const chartData = activeStats.chartData || defaultStats.chartData;
-
-    const filteredChartData = [...chartData];
-
-    const chartWidth = 800;
-    const chartHeight = 260;
-    const chartPadding = 32;
-    const chartPaddingLeft = 50;
-    const chartPaddingRight = 32;
-
-    // Map stats points to coordinate space within the responsive SVG viewport
-    const points = filteredChartData.map((dp, idx) => {
-        const x =
-            chartPaddingLeft +
-            (idx * (chartWidth - chartPaddingLeft - chartPaddingRight)) /
-                (filteredChartData.length - 1 || 1);
-        const y =
-            chartHeight -
-            chartPadding -
-            (dp.score * (chartHeight - chartPadding * 2)) / 100;
-
-        return { x, y };
-    });
-
-    // Generate smooth bezier curves connecting the score data points
-    const pathD = points.reduce((acc, p, i) => {
-        if (i === 0) {
-            return `M ${p.x} ${p.y}`;
-        }
-
-        const prev = points[i - 1];
-        const cpX1 = prev.x + (p.x - prev.x) / 2;
-        const cpY1 = prev.y;
-        const cpX2 = prev.x + (p.x - prev.x) / 2;
-        const cpY2 = p.y;
-
-        return `${acc} C ${cpX1} ${cpY1}, ${cpX2} ${cpY2}, ${p.x} ${p.y}`;
-    }, '');
-
-    // Form an enclosed shape path to apply the soft gradient background fill
-    const areaD =
-        points.length > 0
-            ? `${pathD} L ${points[points.length - 1].x} ${chartHeight - chartPadding} L ${points[0].x} ${chartHeight - chartPadding} Z`
-            : '';
-
-    const categories = activeStats.categories;
+    const {
+        firstName,
+        hoveredIdx,
+        setHoveredIdx,
+        isOpen,
+        setIsOpen,
+        isRunsOpen,
+        setIsRunsOpen,
+        currentTrack,
+        currentRuns,
+        updateFilter,
+        activeStats,
+        isDemoMode,
+        filteredChartData,
+        chartWidth,
+        chartHeight,
+        chartPadding,
+        chartPaddingLeft,
+        chartPaddingRight,
+        points,
+        pathD,
+        areaD,
+        categories,
+    } = useDashboardState({ stats, aiAnalysis });
 
     return (
         <>
-            <Head title="Dashboard" />
             <PageContainer>
                 {/* Greeting Header & Main Action Controls */}
                 <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
@@ -655,7 +449,8 @@ export default function Dashboard({ stats, aiAnalysis }: DashboardProps) {
                                             chartHeight -
                                             chartPadding -
                                             (level *
-                                                (chartHeight - chartPadding * 2)) /
+                                                (chartHeight -
+                                                    chartPadding * 2)) /
                                                 100;
 
                                         return (
@@ -733,11 +528,17 @@ export default function Dashboard({ stats, aiAnalysis }: DashboardProps) {
                                             <circle
                                                 cx={p.x}
                                                 cy={p.y}
-                                                r={hoveredIdx === idx ? '6' : '4.5'}
+                                                r={
+                                                    hoveredIdx === idx
+                                                        ? '6'
+                                                        : '4.5'
+                                                }
                                                 fill="#ffffff"
                                                 stroke="#2563eb"
                                                 strokeWidth={
-                                                    hoveredIdx === idx ? '3' : '2'
+                                                    hoveredIdx === idx
+                                                        ? '3'
+                                                        : '2'
                                                 }
                                                 className="cursor-pointer transition-all duration-150"
                                                 onMouseEnter={() =>
@@ -760,8 +561,9 @@ export default function Dashboard({ stats, aiAnalysis }: DashboardProps) {
                                                         className="dark:fill-blue-400"
                                                     >
                                                         {
-                                                            filteredChartData[idx]
-                                                                .score
+                                                            filteredChartData[
+                                                                idx
+                                                            ].score
                                                         }
                                                         %
                                                     </text>
@@ -777,7 +579,11 @@ export default function Dashboard({ stats, aiAnalysis }: DashboardProps) {
                                                 className="cursor-pointer fill-slate-400 hover:fill-blue-600 dark:fill-slate-500 dark:hover:fill-blue-400"
                                                 onClick={(e) => {
                                                     e.stopPropagation();
-                                                    setHoveredIdx(hoveredIdx === idx ? null : idx);
+                                                    setHoveredIdx(
+                                                        hoveredIdx === idx
+                                                            ? null
+                                                            : idx,
+                                                    );
                                                 }}
                                             >
                                                 {filteredChartData[idx].date}
@@ -792,10 +598,18 @@ export default function Dashboard({ stats, aiAnalysis }: DashboardProps) {
                                                 className="cursor-pointer"
                                                 onClick={(e) => {
                                                     e.stopPropagation();
-                                                    setHoveredIdx(hoveredIdx === idx ? null : idx);
+                                                    setHoveredIdx(
+                                                        hoveredIdx === idx
+                                                            ? null
+                                                            : idx,
+                                                    );
                                                 }}
-                                                onMouseEnter={() => setHoveredIdx(idx)}
-                                                onMouseLeave={() => setHoveredIdx(null)}
+                                                onMouseEnter={() =>
+                                                    setHoveredIdx(idx)
+                                                }
+                                                onMouseLeave={() =>
+                                                    setHoveredIdx(null)
+                                                }
                                             />
                                         </g>
                                     ))}
@@ -1020,13 +834,11 @@ export default function Dashboard({ stats, aiAnalysis }: DashboardProps) {
         </>
     );
 }
-
-// Preserve navigation breadcrumb tracking config logic
 Dashboard.layout = {
     breadcrumbs: [
         {
             title: 'Dashboard',
-            href: dashboard(),
+            href: '/dashboard',
         },
     ],
 };

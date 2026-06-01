@@ -2,6 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\BulkDestroyLearnModulesRequest;
+use App\Http\Requests\GenerateLearnModuleRequest;
+use App\Http\Requests\StoreLearnModuleRequest;
+use App\Http\Requests\UpdateLearnModuleRequest;
 use App\Jobs\GenerateLearnModuleJob;
 use App\Models\Category;
 use App\Models\LearnModule;
@@ -15,16 +19,6 @@ use Inertia\Response;
 
 class AdminLearnController extends Controller
 {
-    /**
-     * Helper to ensure user has admin role access.
-     */
-    private function checkAdminAccess(): void
-    {
-        if (! auth()->user() || auth()->user()->role !== 'admin') {
-            abort(403, 'Unauthorized access to learning administration.');
-        }
-    }
-
     /**
      * Clear all related learning caches when content is modified.
      */
@@ -43,7 +37,6 @@ class AdminLearnController extends Controller
      */
     public function index(Request $request): Response
     {
-        $this->checkAdminAccess();
 
         $modules = LearnModule::with(['category', 'subcategory'])
             ->latest()
@@ -76,7 +69,6 @@ class AdminLearnController extends Controller
      */
     public function create(Request $request): Response
     {
-        $this->checkAdminAccess();
 
         $categories = Category::with('subcategory')->orderBy('sort_order')->get();
 
@@ -89,9 +81,8 @@ class AdminLearnController extends Controller
     /**
      * Store a manually created or generated learn module in the database.
      */
-    public function store(Request $request): RedirectResponse
+    public function store(StoreLearnModuleRequest $request): RedirectResponse
     {
-        $this->checkAdminAccess();
 
         // Bulk AI Learn Module commit
         if ($request->has('modules') && is_array($request->input('modules'))) {
@@ -164,16 +155,7 @@ class AdminLearnController extends Controller
             return redirect()->route('admin.learn.drafts')->with('success', "{$savedCount} approved learning modules published successfully!");
         }
 
-        $validated = $request->validate([
-            'category_id' => 'nullable|exists:categories,id',
-            'subcategory_id' => 'nullable|exists:subcategories,id',
-            'title' => 'required|string|max:255',
-            'topic' => 'required|string|max:255',
-            'summary' => 'required|string',
-            'content' => 'required|string',
-            'estimated_minutes' => 'required|integer|min:1|max:120',
-            'is_published' => 'required|boolean',
-        ]);
+        $validated = $request->validated();
 
         $slug = Str::slug($validated['title']);
 
@@ -207,7 +189,6 @@ class AdminLearnController extends Controller
      */
     public function edit(string $id): Response
     {
-        $this->checkAdminAccess();
 
         $module = LearnModule::findOrFail($id);
         $categories = Category::with('subcategory')->orderBy('sort_order')->get();
@@ -231,22 +212,12 @@ class AdminLearnController extends Controller
     /**
      * Update the specified learning module.
      */
-    public function update(Request $request, string $id): RedirectResponse
+    public function update(UpdateLearnModuleRequest $request, string $id): RedirectResponse
     {
-        $this->checkAdminAccess();
 
         $module = LearnModule::findOrFail($id);
 
-        $validated = $request->validate([
-            'category_id' => 'nullable|exists:categories,id',
-            'subcategory_id' => 'nullable|exists:subcategories,id',
-            'title' => 'required|string|max:255',
-            'topic' => 'required|string|max:255',
-            'summary' => 'required|string',
-            'content' => 'required|string',
-            'estimated_minutes' => 'required|integer|min:1|max:120',
-            'is_published' => 'required|boolean',
-        ]);
+        $validated = $request->validated();
 
         // Keep or update slug if title changed
         if ($module->title !== $validated['title']) {
@@ -280,7 +251,6 @@ class AdminLearnController extends Controller
      */
     public function destroy(string $id): RedirectResponse
     {
-        $this->checkAdminAccess();
 
         $module = LearnModule::findOrFail($id);
         $module->delete();
@@ -293,14 +263,10 @@ class AdminLearnController extends Controller
     /**
      * Bulk delete learning modules.
      */
-    public function bulkDestroy(Request $request): RedirectResponse
+    public function bulkDestroy(BulkDestroyLearnModulesRequest $request): RedirectResponse
     {
-        $this->checkAdminAccess();
 
-        $validated = $request->validate([
-            'ids' => 'required|array',
-            'ids.*' => 'integer|exists:learn_modules,id',
-        ]);
+        $validated = $request->validated();
 
         LearnModule::whereIn('id', $validated['ids'])->delete();
 
@@ -309,17 +275,10 @@ class AdminLearnController extends Controller
         return redirect()->route('admin.learn.index')->with('success', 'Selected learning modules deleted successfully!');
     }
 
-    public function generate(Request $request)
+    public function generate(GenerateLearnModuleRequest $request)
     {
-        $this->checkAdminAccess();
 
-        $validated = $request->validate([
-            'category' => 'required|string',
-            'subcategory' => 'required|string',
-            'topic' => 'required|string|max:255',
-            'prompt' => 'nullable|string',
-            'primary_model' => 'nullable|string',
-        ]);
+        $validated = $request->validated();
 
         GenerateLearnModuleJob::dispatchAfterResponse($validated, auth()->id() ?: 1, $validated['primary_model'] ?? 'llama-3.3-70b-versatile');
 
@@ -335,7 +294,6 @@ class AdminLearnController extends Controller
      */
     public function drafts(Request $request): Response
     {
-        $this->checkAdminAccess();
 
         $drafts = LearnModule::with(['category', 'subcategory'])
             ->where('is_published', false)

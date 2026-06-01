@@ -152,3 +152,47 @@ test('creating duplicate study schedule returns existing schedule and does not d
 
     $this->assertEquals(1, StudySchedule::where('user_id', $user->id)->count());
 });
+
+test('user can update study schedule is_done status', function () {
+    $user = User::factory()->create();
+    $date = now()->format('Y-m-d');
+
+    $schedule = StudySchedule::create([
+        'user_id' => $user->id,
+        'study_date' => $date,
+        'title' => 'Biology Study',
+        'is_done' => false,
+    ]);
+
+    $response = $this->actingAs($user)->putJson("/study-schedules/{$schedule->id}", [
+        'study_date' => $date,
+        'title' => 'Biology Study',
+        'is_done' => true,
+    ]);
+
+    $response->assertStatus(200);
+    $this->assertTrue((bool) $response->json('is_done'));
+    $this->assertDatabaseHas('study_schedules', [
+        'id' => $schedule->id,
+        'is_done' => true,
+    ]);
+});
+
+test('index returns past uncompleted study schedules', function () {
+    $user = User::factory()->create();
+    $yesterday = now()->subDay()->format('Y-m-d');
+
+    $schedule = StudySchedule::create([
+        'user_id' => $user->id,
+        'study_date' => $yesterday,
+        'title' => 'Yesterday Uncompleted Task',
+        'is_done' => false,
+    ]);
+
+    $response = $this->actingAs($user)->get('/study-schedules?year='.now()->year.'&month='.now()->month);
+
+    $response->assertStatus(200);
+    $response->assertJsonStructure(['pastPending']);
+    $response->assertJsonCount(1, 'pastPending');
+    $this->assertEquals('Yesterday Uncompleted Task', $response->json('pastPending.0.title'));
+});

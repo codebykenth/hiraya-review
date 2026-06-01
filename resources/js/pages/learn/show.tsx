@@ -6,76 +6,19 @@ import {
     Clock,
     Lightbulb,
 } from 'lucide-react';
-import { useEffect, useRef } from 'react';
+import React from 'react';
 import { getCategoryStyles } from '@/components/curation-index-shell';
 import { LessonMarkdown } from '@/components/lesson-markdown';
 import { PageContainer } from '@/components/page-container';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-
-interface LearnShowProps {
-    module: {
-        id: number;
-        title: string;
-        slug: string;
-        topic: string;
-        summary: string;
-        content: string;
-        estimated_minutes: number;
-        is_published: boolean;
-        category: string;
-        subcategory: string;
-        creator_name: string;
-        updated_at: string;
-    };
-    recommended: {
-        title: string;
-        slug: string;
-        estimated_minutes: number;
-    }[];
-}
+import { useScrollProgress } from './hooks/use-scroll-progress';
+import type { LearnShowProps } from './types';
 
 export default function LearnShow({ module, recommended }: LearnShowProps) {
-    const progressRef = useRef<HTMLDivElement | null>(null);
+    const progressRef = useScrollProgress();
     const { auth } = usePage<{ auth: { user: any } }>().props;
     const isLoggedIn = !!auth.user;
-
-    useEffect(() => {
-        let frameId = 0;
-
-        const handleScroll = () => {
-            if (frameId) {
-                return;
-            }
-
-            frameId = window.requestAnimationFrame(() => {
-                const windScroll =
-                    document.documentElement.scrollTop ||
-                    document.body.scrollTop;
-                const height =
-                    (document.documentElement.scrollHeight ||
-                        document.documentElement.clientHeight) -
-                    document.documentElement.clientHeight;
-                const scrolled = height > 0 ? (windScroll / height) * 100 : 0;
-
-                if (progressRef.current) {
-                    progressRef.current.style.transform = `scaleX(${Math.min(scrolled, 100) / 100})`;
-                }
-
-                frameId = 0;
-            });
-        };
-
-        window.addEventListener('scroll', handleScroll);
-
-        return () => {
-            window.removeEventListener('scroll', handleScroll);
-
-            if (frameId) {
-                window.cancelAnimationFrame(frameId);
-            }
-        };
-    }, []);
 
     return (
         <>

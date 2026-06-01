@@ -4,7 +4,9 @@ import { useState, useEffect } from 'react';
 import AppLogo from '@/components/app-logo';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { Button } from '@/components/ui/button';
-import { home, dashboard, login, register } from '@/routes';
+import { home, login, register } from '@/routes';
+import { index as dashboardIndex } from '@/routes/dashboard';
+
 import type { Auth } from '@/types';
 
 // Declare expected page props to satisfy TypeScript strict compiler checks
@@ -163,7 +165,7 @@ export default function SiteHeader({
                     <div className="hidden items-center gap-4 xl:flex">
                         {auth.user ? (
                             <Link
-                                href={dashboard()}
+                                href={dashboardIndex()}
                                 className="inline-block rounded-sm border border-[#19140035] px-5 py-1.5 text-sm leading-normal text-[#1b1b18] hover:border-[#1915014a] dark:border-[#3E3E3A] dark:text-[#EDEDEC] dark:hover:border-[#62605b]"
                             >
                                 Dashboard
@@ -264,7 +266,7 @@ export default function SiteHeader({
                         <div className="flex flex-col gap-3">
                             {auth.user ? (
                                 <Link
-                                    href={dashboard()}
+                                    href={dashboardIndex()}
                                     onClick={() => setIsMenuOpen(false)}
                                     className="flex items-center justify-center rounded-xl border border-slate-200 bg-white py-3 text-center text-sm font-semibold text-slate-900 shadow-sm transition-colors hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900 dark:text-white dark:hover:bg-slate-950"
                                 >

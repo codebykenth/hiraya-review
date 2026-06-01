@@ -15,21 +15,11 @@ use Inertia\Response;
 class AdminDashboardController extends Controller
 {
     /**
-     * Helper to verify if the active user is an administrator.
-     */
-    private function checkAdminAccess(): void
-    {
-        if (! auth()->user() || auth()->user()->role !== 'admin') {
-            abort(403, 'Unauthorized access to admin dashboard.');
-        }
-    }
-
-    /**
      * Display the dynamic administrator stats overview panel.
      */
     public function index(Request $request): Response
     {
-        $this->checkAdminAccess();
+
         // 1. Database model counters
         $metrics = [
             'total_questions' => Question::count(),

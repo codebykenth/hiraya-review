@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\AdminUserUpdateRequest;
 use App\Models\ExamAttempt;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
@@ -12,21 +13,10 @@ use Inertia\Response;
 class AdminUserController extends Controller
 {
     /**
-     * Helper to verify if the active user is an administrator.
-     */
-    private function checkAdminAccess(): void
-    {
-        if (! auth()->user() || auth()->user()->role !== 'admin') {
-            abort(403, 'Unauthorized access to user administration.');
-        }
-    }
-
-    /**
      * Show all users with their statistics for the admin dashboard.
      */
     public function index(Request $request): Response
     {
-        $this->checkAdminAccess();
 
         // Retrieve ALL users (including soft-deleted) and fetch their exam attempts count
         $users = User::withTrashed()
@@ -66,14 +56,10 @@ class AdminUserController extends Controller
     /**
      * Update user role.
      */
-    public function update(Request $request, int $id): RedirectResponse
+    public function update(AdminUserUpdateRequest $request, int $id): RedirectResponse
     {
-        $this->checkAdminAccess();
 
-        $request->validate([
-            'role' => 'sometimes|string|in:admin,user',
-            'is_active' => 'sometimes|boolean',
-        ]);
+        $validated = $request->validated();
 
         $user = User::findOrFail($id);
 
@@ -104,7 +90,6 @@ class AdminUserController extends Controller
      */
     public function destroy(int $id): RedirectResponse
     {
-        $this->checkAdminAccess();
 
         $user = User::findOrFail($id);
 
@@ -124,7 +109,6 @@ class AdminUserController extends Controller
      */
     public function restore(int $id): RedirectResponse
     {
-        $this->checkAdminAccess();
 
         $user = User::onlyTrashed()->findOrFail($id);
         $user->restore();
@@ -137,7 +121,6 @@ class AdminUserController extends Controller
      */
     public function forceDelete(int $id): RedirectResponse
     {
-        $this->checkAdminAccess();
 
         $user = User::withTrashed()->findOrFail($id);
 

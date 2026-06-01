@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreExamDateRequest;
+use App\Http\Requests\UpdateExamDateRequest;
 use App\Models\ExamDate;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Inertia\Inertia;
 
@@ -18,13 +19,9 @@ class AdminExamDateController extends Controller
         ]);
     }
 
-    public function store(Request $request)
+    public function store(StoreExamDateRequest $request)
     {
-        $validated = $request->validate([
-            'date' => 'required|date|unique:exam_dates,date',
-            'description' => 'required|string|max:255',
-            'is_active' => 'boolean',
-        ]);
+        $validated = $request->validated();
 
         ExamDate::create([
             'date' => $validated['date'],
@@ -37,13 +34,9 @@ class AdminExamDateController extends Controller
         return redirect()->back()->with('success', 'Exam date added successfully.');
     }
 
-    public function update(Request $request, ExamDate $examDate)
+    public function update(UpdateExamDateRequest $request, ExamDate $examDate)
     {
-        $validated = $request->validate([
-            'date' => 'required|date|unique:exam_dates,date,'.$examDate->id,
-            'description' => 'required|string|max:255',
-            'is_active' => 'boolean',
-        ]);
+        $validated = $request->validated();
 
         $examDate->update([
             'date' => $validated['date'],

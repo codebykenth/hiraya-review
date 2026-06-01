@@ -2,6 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\BulkDestroyQuestionsRequest;
+use App\Http\Requests\GenerateQuestionsRequest;
+use App\Http\Requests\StoreCategoryRequest;
+use App\Http\Requests\StoreQuestionRequest;
+use App\Http\Requests\StoreSubcategoryRequest;
+use App\Http\Requests\UpdateCategoryRequest;
+use App\Http\Requests\UpdateQuestionRequest;
+use App\Http\Requests\UpdateSubcategoryRequest;
 use App\Jobs\GenerateQuestionsJob;
 use App\Models\Category;
 use App\Models\Question;
@@ -15,16 +23,6 @@ use Inertia\Inertia;
 
 class QuestionController extends Controller
 {
-    /**
-     * Helper to verify if the active user is an administrator.
-     */
-    private function checkAdminAccess(): void
-    {
-        if (! auth()->user() || auth()->user()->role !== 'admin') {
-            abort(403, 'Unauthorized access to scope management.');
-        }
-    }
-
     /**
      * Helper to ensure categories are seeded dynamically if empty.
      */
@@ -129,16 +127,9 @@ class QuestionController extends Controller
     /**
      * Generate exam questions using Gemini 2.5 Flash API.
      */
-    public function generate(Request $request)
+    public function generate(GenerateQuestionsRequest $request)
     {
-        $validated = $request->validate([
-            'category' => 'required|string',
-            'subcategory' => 'required|string',
-            'count' => 'required|integer|min:1|max:10',
-            'language' => 'required|string',
-            'prompt' => 'nullable|string',
-            'primary_model' => 'nullable|string',
-        ]);
+        $validated = $request->validated();
 
         GenerateQuestionsJob::dispatchAfterResponse($validated, auth()->id() ?: (User::first()?->id ?: 1), $validated['primary_model'] ?? 'llama-3.3-70b-versatile');
 
@@ -152,7 +143,7 @@ class QuestionController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreQuestionRequest $request)
     {
         // Bulk AI Question generation commit
         if ($request->has('questions') && is_array($request->input('questions'))) {
@@ -220,18 +211,7 @@ class QuestionController extends Controller
             return redirect()->route('questions.drafts')->with('success', "{$savedCount} approved questions committed successfully!");
         }
 
-        $isDemographic = Category::where('name', $request->input('category'))->value('is_demographic') ?? ($request->input('category') === 'Demographic Profile');
-
-        $validated = $request->validate([
-            'stem' => 'required|string',
-            'category' => 'required|string',
-            'subcategory' => $isDemographic ? 'nullable|string' : 'required|string',
-            'language' => 'required|string',
-            'options' => $isDemographic ? 'required|array|min:2' : 'required|array|min:5|max:5',
-            'correct_option' => $isDemographic ? 'nullable|integer' : 'required|integer|min:0|max:4',
-            'explanation' => $isDemographic ? 'nullable|string' : 'required|string',
-            'status' => 'required|in:active,draft',
-        ]);
+        $validated = $request->validated();
 
         try {
             $category = Category::firstOrCreate(
@@ -332,22 +312,11 @@ class QuestionController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(UpdateQuestionRequest $request, string $id)
     {
         $question = Question::findOrFail($id);
 
-        $isDemographic = Category::where('name', $request->input('category'))->value('is_demographic') ?? ($request->input('category') === 'Demographic Profile');
-
-        $validated = $request->validate([
-            'category' => 'required|string',
-            'subcategory' => $isDemographic ? 'nullable|string' : 'required|string',
-            'language' => 'required|string',
-            'stem' => 'required|string',
-            'options' => $isDemographic ? 'required|array|min:2' : 'required|array|min:4|max:5',
-            'correct_option' => $isDemographic ? 'nullable|integer' : 'required|integer',
-            'explanation' => $isDemographic ? 'nullable|string' : 'required|string',
-            'status' => 'required|string|in:active,draft',
-        ]);
+        $validated = $request->validated();
 
         // Find or create category/subcategory structure dynamically matching creation logic
         $category = Category::firstOrCreate([
@@ -401,12 +370,9 @@ class QuestionController extends Controller
     /**
      * Bulk delete questions.
      */
-    public function bulkDestroy(Request $request)
+    public function bulkDestroy(BulkDestroyQuestionsRequest $request)
     {
-        $validated = $request->validate([
-            'ids' => 'required|array',
-            'ids.*' => 'integer|exists:questions,id',
-        ]);
+        $validated = $request->validated();
 
         Question::whereIn('id', $validated['ids'])->delete();
 
@@ -422,14 +388,10 @@ class QuestionController extends Controller
     /**
      * Store a new dynamic category.
      */
-    public function storeCategory(Request $request)
+    public function storeCategory(StoreCategoryRequest $request)
     {
-        $this->checkAdminAccess();
 
-        $validated = $request->validate([
-            'name' => 'required|string|max:255|unique:categories,name',
-            'is_demographic' => 'nullable|boolean',
-        ]);
+        $validated = $request->validated();
 
         $category = Category::create([
             'name' => $validated['name'],
@@ -445,13 +407,10 @@ class QuestionController extends Controller
     /**
      * Update a dynamic category.
      */
-    public function updateCategory(Request $request, Category $category)
+    public function updateCategory(UpdateCategoryRequest $request, Category $category)
     {
-        $this->checkAdminAccess();
 
-        $validated = $request->validate([
-            'name' => 'required|string|max:255|unique:categories,name,'.$category->id,
-        ]);
+        $validated = $request->validated();
 
         $category->update([
             'name' => $validated['name'],
@@ -467,7 +426,6 @@ class QuestionController extends Controller
      */
     public function destroyCategory(Category $category)
     {
-        $this->checkAdminAccess();
 
         // Delete related subcategories & questions first
         $category->subcategory()->delete();
@@ -480,14 +438,10 @@ class QuestionController extends Controller
     /**
      * Store a new dynamic subcategory.
      */
-    public function storeSubcategory(Request $request)
+    public function storeSubcategory(StoreSubcategoryRequest $request)
     {
-        $this->checkAdminAccess();
 
-        $validated = $request->validate([
-            'category_id' => 'required|exists:categories,id',
-            'name' => 'required|string|max:255',
-        ]);
+        $validated = $request->validated();
 
         $subcategory = Subcategory::create([
             'category_id' => $validated['category_id'],
@@ -504,13 +458,10 @@ class QuestionController extends Controller
     /**
      * Update a dynamic subcategory.
      */
-    public function updateSubcategory(Request $request, Subcategory $subcategory)
+    public function updateSubcategory(UpdateSubcategoryRequest $request, Subcategory $subcategory)
     {
-        $this->checkAdminAccess();
 
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-        ]);
+        $validated = $request->validated();
 
         $subcategory->update([
             'name' => $validated['name'],
@@ -526,7 +477,6 @@ class QuestionController extends Controller
      */
     public function destroySubcategory(Subcategory $subcategory)
     {
-        $this->checkAdminAccess();
 
         $subcategory->delete();
         $this->clearCache();

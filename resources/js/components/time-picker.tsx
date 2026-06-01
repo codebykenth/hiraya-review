@@ -1,5 +1,5 @@
 import { ChevronUp, ChevronDown } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 interface TimePickerProps {
     value: string;
@@ -11,7 +11,7 @@ export function TimePicker({ value, onChange }: TimePickerProps) {
 
     const parseTime = (timeString: string) => {
         if (!timeString) {
-            return { hours: 0, minutes: 0, period: 'AM' };
+            return { hours: 12, minutes: 0, period: 'AM' };
         }
 
         const [hoursStr, minutesStr] = timeString.split(':');
@@ -41,6 +41,89 @@ export function TimePicker({ value, onChange }: TimePickerProps) {
     };
 
     const { hours, minutes, period } = parseTime(value);
+
+    // Local inputs for typing to prevent parent state overriding during active typing
+    const [hourInput, setHourInput] = useState(String(hours).padStart(2, '0'));
+    const [minuteInput, setMinuteInput] = useState(
+        String(minutes).padStart(2, '0'),
+    );
+    const [isHourFocused, setIsHourFocused] = useState(false);
+    const [isMinuteFocused, setIsMinuteFocused] = useState(false);
+
+    // Keep local state in sync with value updates when not focused
+    useEffect(() => {
+        const { hours: nextHours, minutes: nextMinutes } = parseTime(value);
+
+        const timer = setTimeout(() => {
+            if (!isHourFocused) {
+                setHourInput(String(nextHours).padStart(2, '0'));
+            }
+
+            if (!isMinuteFocused) {
+                setMinuteInput(String(nextMinutes).padStart(2, '0'));
+            }
+        }, 0);
+
+        return () => clearTimeout(timer);
+    }, [value, isHourFocused, isMinuteFocused]);
+
+    const handleHourInputChange = (val: string) => {
+        // Strip non-digits and cap at 2 characters
+        const cleanVal = val.replace(/\D/g, '').substring(0, 2);
+        setHourInput(cleanVal);
+
+        const parsed = parseInt(cleanVal);
+
+        if (!isNaN(parsed)) {
+            const constrainedHour = Math.max(1, Math.min(12, parsed));
+            const hours24 = convertTo24Hour(constrainedHour, period);
+            onChange(
+                `${String(hours24).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`,
+            );
+        }
+    };
+
+    const handleMinuteInputChange = (val: string) => {
+        // Strip non-digits and cap at 2 characters
+        const cleanVal = val.replace(/\D/g, '').substring(0, 2);
+        setMinuteInput(cleanVal);
+
+        const parsed = parseInt(cleanVal);
+
+        if (!isNaN(parsed)) {
+            const constrainedMinute = Math.max(0, Math.min(59, parsed));
+            const hours24 = convertTo24Hour(hours, period);
+            onChange(
+                `${String(hours24).padStart(2, '0')}:${String(constrainedMinute).padStart(2, '0')}`,
+            );
+        }
+    };
+
+    const handleHourBlur = () => {
+        setIsHourFocused(false);
+        const parsed = parseInt(hourInput);
+        const finalHour = isNaN(parsed)
+            ? 12
+            : Math.max(1, Math.min(12, parsed));
+        setHourInput(String(finalHour).padStart(2, '0'));
+        const hours24 = convertTo24Hour(finalHour, period);
+        onChange(
+            `${String(hours24).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`,
+        );
+    };
+
+    const handleMinuteBlur = () => {
+        setIsMinuteFocused(false);
+        const parsed = parseInt(minuteInput);
+        const finalMinute = isNaN(parsed)
+            ? 0
+            : Math.max(0, Math.min(59, parsed));
+        setMinuteInput(String(finalMinute).padStart(2, '0'));
+        const hours24 = convertTo24Hour(hours, period);
+        onChange(
+            `${String(hours24).padStart(2, '0')}:${String(finalMinute).padStart(2, '0')}`,
+        );
+    };
 
     const handleHourChange = (newHour: number) => {
         const constrainedHour = Math.max(1, Math.min(12, newHour));
@@ -110,15 +193,13 @@ export function TimePicker({ value, onChange }: TimePickerProps) {
                                 <ChevronUp className="h-5 w-5 text-slate-600 dark:text-slate-400" />
                             </button>
                             <input
-                                type="number"
-                                min="1"
-                                max="12"
-                                value={String(hours).padStart(2, '0')}
+                                type="text"
+                                value={hourInput}
+                                onFocus={() => setIsHourFocused(true)}
                                 onChange={(e) =>
-                                    handleHourChange(
-                                        parseInt(e.target.value) || 1,
-                                    )
+                                    handleHourInputChange(e.target.value)
                                 }
+                                onBlur={handleHourBlur}
                                 className="h-12 w-16 rounded border border-slate-300 bg-white text-center text-lg font-semibold focus:border-blue-500 focus:outline-none dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
                             />
                             <button
@@ -144,15 +225,13 @@ export function TimePicker({ value, onChange }: TimePickerProps) {
                                 <ChevronUp className="h-5 w-5 text-slate-600 dark:text-slate-400" />
                             </button>
                             <input
-                                type="number"
-                                min="0"
-                                max="59"
-                                value={String(minutes).padStart(2, '0')}
+                                type="text"
+                                value={minuteInput}
+                                onFocus={() => setIsMinuteFocused(true)}
                                 onChange={(e) =>
-                                    handleMinuteChange(
-                                        parseInt(e.target.value) || 0,
-                                    )
+                                    handleMinuteInputChange(e.target.value)
                                 }
+                                onBlur={handleMinuteBlur}
                                 className="h-12 w-16 rounded border border-slate-300 bg-white text-center text-lg font-semibold focus:border-blue-500 focus:outline-none dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
                             />
                             <button

@@ -29,7 +29,7 @@ import {
     SidebarMenuItem,
     SidebarSeparator,
 } from '@/components/ui/sidebar';
-import { dashboard, guide } from '@/routes';
+import { guide } from '@/routes';
 import { dashboard as adminDashboard } from '@/routes/admin';
 import {
     index as adminLearnIndex,
@@ -37,6 +37,7 @@ import {
 } from '@/routes/admin/learn';
 import { index as adminUsersIndex } from '@/routes/admin/users';
 import { index as calendarIndex } from '@/routes/calendar';
+import { index as dashboardIndex } from '@/routes/dashboard';
 import { index as drillsIndex } from '@/routes/drills';
 import { index as examsIndex } from '@/routes/exams';
 import { index as historyIndex } from '@/routes/history';
@@ -51,7 +52,7 @@ import type { NavItem } from '@/types';
 const generalNavItems: NavItem[] = [
     {
         title: 'Dashboard',
-        href: dashboard(),
+        href: dashboardIndex(),
         icon: LayoutDashboard,
     },
     {
@@ -157,7 +158,7 @@ export function AppSidebar() {
                 <SidebarMenu>
                     <SidebarMenuItem>
                         <SidebarMenuButton size="xl" asChild>
-                            <Link href={dashboard()} prefetch>
+                            <Link href={dashboardIndex()} prefetch>
                                 <AppLogo />
                             </Link>
                         </SidebarMenuButton>

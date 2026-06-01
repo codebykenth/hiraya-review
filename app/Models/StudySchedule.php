@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-#[Fillable(['user_id', 'study_date', 'study_time', 'title', 'description', 'subcategory_id'])]
+#[Fillable(['user_id', 'study_date', 'study_time', 'title', 'description', 'subcategory_id', 'is_done'])]
 class StudySchedule extends Model
 {
     protected function casts(): array
@@ -14,6 +14,7 @@ class StudySchedule extends Model
         return [
             'study_date' => 'date',
             'study_time' => 'datetime:H:i',
+            'is_done' => 'boolean',
         ];
     }
 
