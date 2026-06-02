@@ -218,84 +218,85 @@ class GenerateUserAnalysisJob implements ShouldQueue
             'category_name' => $s->category?->name,
         ])->toArray();
 
-        $systemPrompt = "You are an expert Civil Service Exam (CSE) coach in the Philippines. Analyze the student's exam performance data and produce a highly comprehensive and predictive diagnostic report. Be direct, encouraging but honest. Do not sugarcoat poor performance. Respond ONLY with a valid JSON object.
+        $systemPrompt = "
+        You are an expert Civil Service Exam (CSE) coach in the Philippines. Analyze the student's exam performance data and produce a highly comprehensive and predictive diagnostic report. Be direct, encouraging but honest. Do not sugarcoat poor performance. Respond ONLY with a valid JSON object.
 
-CRITICAL ACCURACY RULES:
-1. You MUST evaluate and base the subject_mastery rating and color strictly on the actual categoryBreakdown accuracy percentages passed to you:
-   - 80% or above accuracy: 'Mastered' (emerald)
-   - 60% to 79% accuracy: 'Needs Practice' (amber)
-   - below 60% accuracy: 'Critical Concern' (rose)
-   - No attempts or 0% total questions: 'Insufficient Data' (sky)
-2. You must NOT guess or make up rating scores, mock pass confidence levels, or trends outside these direct relationships.
-3. Make sure all recommendations and action plans correspond exactly to the available subcategories provided. Do not invent subtopics that are not in the list.
-4. Every subcategory listed in recommended_modules MUST strictly belong to one of the category names listed in critical_weaknesses to prevent student confusion. Do not suggest subcategories from outside your identified critical weaknesses.
-5. All subject names in subject_mastery, strengths, and critical_weaknesses MUST strictly use the exact spelling of the 5 standard categories: 'Verbal Ability', 'Clerical Ability', 'General Information', 'Numerical Ability', and 'Analytical Ability'. Do not abbreviate or invent category names.";
+        CRITICAL ACCURACY RULES:
+        1. You MUST evaluate and base the subject_mastery rating and color strictly on the actual categoryBreakdown accuracy percentages passed to you:
+        - 80% or above accuracy: 'Mastered' (emerald)
+        - 60% to 79% accuracy: 'Needs Practice' (amber)
+        - below 60% accuracy: 'Critical Concern' (rose)
+        - No attempts or 0% total questions: 'Insufficient Data' (sky)
+        2. You must NOT guess or make up rating scores, mock pass confidence levels, or trends outside these direct relationships.
+        3. Make sure all recommendations and action plans correspond exactly to the available subcategories provided. Do not invent subtopics that are not in the list.
+        4. Every subcategory listed in recommended_modules MUST strictly belong to one of the category names listed in critical_weaknesses to prevent student confusion. Do not suggest subcategories from outside your identified critical weaknesses.
+        5. All subject names in subject_mastery, strengths, and critical_weaknesses MUST strictly use the exact spelling of the 5 standard categories: 'Verbal Ability', 'Clerical Ability', 'General Information', 'Numerical Ability', and 'Analytical Ability'. Do not abbreviate or invent category names.";
 
         $userPrompt = "Analyze this student's exam performance:
-- Total Attempts: {$totalAttempts}
-- Average Score: {$avgScore}%
-- Passing Rate (Full Mock Exams): {$passingRate}%
-- Score Trend (oldest to newest): ".json_encode($scores).'
-- Per-category accuracy breakdown across all attempts: '.json_encode($categoryBreakdown).'
-- Detailed subtopic performance (actual answers): '.json_encode($subtopicBreakdown).'
-- Available subcategories in our database: '.json_encode($availableSubcategories)."
+        - Total Attempts: {$totalAttempts}
+        - Average Score: {$avgScore}%
+        - Passing Rate (Full Mock Exams): {$passingRate}%
+        - Score Trend (oldest to newest): ".json_encode($scores).'
+        - Per-category accuracy breakdown across all attempts: '.json_encode($categoryBreakdown).'
+        - Detailed subtopic performance (actual answers): '.json_encode($subtopicBreakdown).'
+        - Available subcategories in our database: '.json_encode($availableSubcategories)."
 
-Expected JSON response schema:
-{
-  \"pass_probability\": integer 0-100,
-  \"verdict\": \"1-2 sentence honest assessment\",
-  \"trend\": \"improving|declining|stable|insufficient_data\",
-  \"strengths\": [\"category name\"],
-  \"critical_weaknesses\": [\"worst category first, max 3\"],
-  \"priority_action\": \"one specific actionable thing to do today\",
-  \"recommended_modules\": [\"subcategory names to study, max 3\"],
-  \"encouragement\": \"1 sentence motivation\",
-  
-  \"predictive_metrics\": {
-    \"estimated_exam_score\": \"string (e.g., '72% - 76% predicted actual score')\",
-    \"days_to_readiness\": \"string (e.g., '25 days of targeted practice')\",
-    \"completion_pace\": \"string (1 concise sentence explaining pace, e.g., 'Fast but prone to careless errors.')\",
-    \"mock_pass_confidence\": \"high|moderate|low\"
-  },
-  \"subject_mastery\": [
-    {
-      \"subject\": \"string (e.g., 'Numerical Ability')\",
-      \"rating\": \"string (e.g., 'Needs Practice' or 'Mastered' or 'Critical Concern')\",
-      \"color\": \"rose|amber|emerald|sky\",
-      \"insight\": \"1 sentence explanation of why this rating was given\"
-    }
-  ],
-  \"timeline_prediction\": {
-    \"current_stage\": \"string (e.g., 'Foundation Building')\",
-    \"milestone_prediction\": \"1 sentence prediction of what they can achieve in 10 days if they study\",
-    \"potential_score_improvement\": \"string (e.g., '+15% with consistent practice')\"
-  },
-  \"remediation_matrix\": [
-    {
-      \"subtopic\": \"string (e.g., 'Word Analogy')\",
-      \"difficulty_level\": \"Hard|Medium|Easy\",
-      \"reason_for_struggle\": \"1 concise reason why they might be failing\",
-      \"coaching_tip\": \"1 highly specific study tactic for this subtopic\"
-    }
-  ],
-  \"personalized_7_day_plan\": [
-    // This must be a dynamic plan of days (minimum 7 days, maximum 14 days) exactly aligning with your estimation in days_to_readiness (e.g. if you estimate '10 days of targeted practice', generate 10 days; if you estimate 14 or more days, generate exactly 14 days representing the first crucial phase).
-    {
-      \"day\": \"string (e.g., 'Day 1')\",
-      \"focus_topic\": \"string (e.g., 'Numerical: Fractions & Decimals')\",
-      \"activity\": \"string (e.g., 'Solve 20 practice questions')\",
-      \"subcategory_id\": integer|null (referencing the matching ID from the available subcategories list provided, or null if none fit)
-    }
-  ],
-  \"long_term_roadmap\": [
-    // If their days_to_readiness is longer than 14 days (e.g., 25 days or 60 days), supply a high-level weekly milestone plan here for the phases after Day 14 (e.g. Weeks 3-4, Weeks 5-6, etc.) up to their total estimated readiness window. Focus on category consolidation and mock sprints. If readiness is 14 days or less, you can leave this empty.
-    {
-      \"phase\": \"string (e.g., 'Phase 2 (Weeks 3-4)')\",
-      \"focus\": \"string (e.g., 'Core Numerical & Verbal Mastery')\",
-      \"milestone\": \"string (e.g., 'Achieve >75% correctness on fractions & vocabulary drills')\"
-    }
-  ]
-}";
+        Expected JSON response schema:
+        {
+            \"pass_probability\": integer 0-100,
+            \"verdict\": \"1-2 sentence honest assessment\",
+            \"trend\": \"improving|declining|stable|insufficient_data\",
+            \"strengths\": [\"category name\"],
+            \"critical_weaknesses\": [\"worst category first, max 3\"],
+            \"priority_action\": \"one specific actionable thing to do today\",
+            \"recommended_modules\": [\"subcategory names to study, max 3\"],
+            \"encouragement\": \"1 sentence motivation\",
+            
+            \"predictive_metrics\": {
+                \"estimated_exam_score\": \"string (e.g., '72% - 76% predicted actual score')\",
+                \"days_to_readiness\": \"string (e.g., '25 days of targeted practice')\",
+                \"completion_pace\": \"string (1 concise sentence explaining pace, e.g., 'Fast but prone to careless errors.')\",
+                \"mock_pass_confidence\": \"high|moderate|low\"
+            },
+            \"subject_mastery\": [
+                {
+                \"subject\": \"string (e.g., 'Numerical Ability')\",
+                \"rating\": \"string (e.g., 'Needs Practice' or 'Mastered' or 'Critical Concern')\",
+                \"color\": \"rose|amber|emerald|sky\",
+                \"insight\": \"1 sentence explanation of why this rating was given\"
+                }
+            ],
+            \"timeline_prediction\": {
+                \"current_stage\": \"string (e.g., 'Foundation Building')\",
+                \"milestone_prediction\": \"1 sentence prediction of what they can achieve in 10 days if they study\",
+                \"potential_score_improvement\": \"string (e.g., '+15% with consistent practice')\"
+            },
+            \"remediation_matrix\": [
+                {
+                \"subtopic\": \"string (e.g., 'Word Analogy')\",
+                \"difficulty_level\": \"Hard|Medium|Easy\",
+                \"reason_for_struggle\": \"1 concise reason why they might be failing\",
+                \"coaching_tip\": \"1 highly specific study tactic for this subtopic\"
+                }
+            ],
+            \"personalized_7_day_plan\": [
+                // This must be a dynamic plan of days (minimum 7 days, maximum 14 days) exactly aligning with your estimation in days_to_readiness (e.g. if you estimate '10 days of targeted practice', generate 10 days; if you estimate 14 or more days, generate exactly 14 days representing the first crucial phase).
+                {
+                \"day\": \"string (e.g., 'Day 1')\",
+                \"focus_topic\": \"string (e.g., 'Numerical: Fractions & Decimals')\",
+                \"activity\": \"string (e.g., 'Solve 20 practice questions')\",
+                \"subcategory_id\": integer|null (referencing the matching ID from the available subcategories list provided, or null if none fit)
+                }
+            ],
+            \"long_term_roadmap\": [
+                // If their days_to_readiness is longer than 14 days (e.g., 25 days or 60 days), supply a high-level weekly milestone plan here for the phases after Day 14 (e.g. Weeks 3-4, Weeks 5-6, etc.) up to their total estimated readiness window. Focus on category consolidation and mock sprints. If readiness is 14 days or less, you can leave this empty.
+                {
+                \"phase\": \"string (e.g., 'Phase 2 (Weeks 3-4)')\",
+                \"focus\": \"string (e.g., 'Core Numerical & Verbal Mastery')\",
+                \"milestone\": \"string (e.g., 'Achieve >75% correctness on fractions & vocabulary drills')\"
+                }
+            ]
+        }";
 
         try {
             $resultText = null;

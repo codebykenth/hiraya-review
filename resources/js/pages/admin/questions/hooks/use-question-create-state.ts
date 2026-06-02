@@ -76,18 +76,13 @@ export function useQuestionCreateState({
 
     // Sync subcategories for AI view
     useEffect(() => {
-        if (cseCategoriesTree[aiCategory]) {
-            const firstSub = cseCategoriesTree[aiCategory][0];
+        const validSubs = cseCategoriesTree[aiCategory] || [];
 
-            if (aiSubcategory !== firstSub) {
-                const timer = setTimeout(() => {
-                    setAiSubcategory(firstSub);
-                }, 0);
-
-                return () => clearTimeout(timer);
-            }
+        // Only reset if the current subcategory does not belong to the selected category
+        if (aiSubcategory && !validSubs.includes(aiSubcategory)) {
+            setAiSubcategory(validSubs[0] || '');
         }
-    }, [aiCategory, aiSubcategory, cseCategoriesTree]);
+    }, [aiCategory, cseCategoriesTree]); // Removed aiSubcategory from deps to prevent infinite reset loop
 
     const manualForm = useForm({
         stem: '',
@@ -104,18 +99,13 @@ export function useQuestionCreateState({
 
     // Sync subcategories for Manual view
     useEffect(() => {
-        if (cseCategoriesTree[data.category]) {
-            const firstSub = cseCategoriesTree[data.category][0];
+        const validSubs = cseCategoriesTree[data.category] || [];
 
-            if (data.subcategory !== firstSub) {
-                const timer = setTimeout(() => {
-                    setData('subcategory', firstSub);
-                }, 0);
-
-                return () => clearTimeout(timer);
-            }
+        // Only reset if the current subcategory does not belong to the selected category
+        if (data.subcategory && !validSubs.includes(data.subcategory)) {
+            setData('subcategory', validSubs[0] || '');
         }
-    }, [data.category, data.subcategory, cseCategoriesTree, setData]);
+    }, [data.category, cseCategoriesTree, setData]); // Removed data.subcategory from deps
 
     const handleOptionChange = (idx: number, val: string) => {
         const newOptions = [...data.options];
@@ -199,7 +189,7 @@ export function useQuestionCreateState({
             if (!response.ok) {
                 throw new Error(
                     resData.error ||
-                        'Failed to generate questions. Please try again.',
+                    'Failed to generate questions. Please try again.',
                 );
             }
 
@@ -213,7 +203,7 @@ export function useQuestionCreateState({
             } else {
                 setErrorMsg(
                     err.message ||
-                        'An error occurred while generating questions.',
+                    'An error occurred while generating questions.',
                 );
             }
         }

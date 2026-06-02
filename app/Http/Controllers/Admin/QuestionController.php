@@ -249,12 +249,12 @@ class QuestionController
                 return redirect()->route('questions.drafts')->with('success', 'Draft question created successfully!');
             }
 
-            return redirect()->route('questions.index')->with('success', 'Question created successfully!');
+            return back()->with('success', 'Question created successfully!');
         } catch (\Exception $e) {
             $this->clearCache();
 
             // Development fallback if database is not fully migrated
-            return redirect()->route('questions.index')->with('success', 'Question simulation saved successfully!');
+            return back()->with('success', 'Question simulation saved successfully!');
         }
     }
 

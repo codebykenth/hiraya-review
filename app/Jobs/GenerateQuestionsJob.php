@@ -51,46 +51,67 @@ class GenerateQuestionsJob implements ShouldQueue
             return;
         }
 
-        $systemPrompt = "You are a professional Civil Service Exam reviewer writer in the Philippines.
-Generate multiple-choice questions that are challenging, syllabus-aligned, and strictly realistic according to the official CSC Exam Scope.
+        $systemPrompt = "
+        You are a professional Civil Service Exam reviewer writer in the Philippines.
+        Generate multiple-choice questions that are challenging, syllabus-aligned, and strictly realistic according to the official CSC Exam Scope.
 
-Official Category & Subcategory Schema:
-- General Information: 'Philippine Constitution', 'Code of Conduct and Ethical Standards (R.A. 6713)', 'Peace and Human Rights Issues and Concepts', 'Environment Management and Protection'
-- Verbal Ability: 'Word meaning', 'Sentence completion', 'Error recognition', 'Sentence structure', 'Paragraph organization', 'Reading comprehension'
-- Analytical Ability: 'Word analogy', 'Symbolic logic / abstract reasoning', 'Identifying assumptions and drawing conclusions', 'Data interpretation'
-- Numerical Ability: 'Basic operations', 'Number sequence', 'Word problems'
-- Clerical Ability: 'Filing', 'Spelling'
+        Official Category & Subcategory Schema:
+        * General Information: 'Philippine Constitution', 'Code of Conduct and Ethical Standards (R.A. 6713)', 'Peace and Human Rights Issues and Concepts', 'Environment Management and Protection'
+        * Verbal Ability: 'Word meaning', 'Sentence completion', 'Error recognition', 'Sentence structure', 'Paragraph organization', 'Reading comprehension'
+        * Analytical Ability: 'Word analogy', 'Symbolic logic / abstract reasoning', 'Identifying assumptions and drawing conclusions', 'Data interpretation'
+        * Numerical Ability: 'Basic operations', 'Number sequence', 'Word problems'
+        * Clerical Ability: 'Filing', 'Spelling'
 
-For 'Symbolic logic / abstract reasoning' questions, formulate rigorous conditional logic scenarios. In the question and explanation, always use sequential uppercase letters (A, B, C, D) for the logical propositions in sequence. In the explanation block, you MUST first explicitly define/tell what each variable represents (e.g., 'Let A = adhere to the Code of Conduct, B = avoid conflicts of interest, C = public trust is maintained, D = receive high integrity ratings') so the user can easily understand the symbols, and then represent formal deductive logic chains using standard operators (e.g. 'A -> B -> C -> D' or '~D -> ~C -> ~B -> ~A') to describe Modus Tollens or contraposition rules, ensuring they are rendered visually as interactive logic chains by the UI parser.
+        Category Specific Rules:
+        * Word meaning: You MUST explicitly indicate which word the user needs to define. If you use a sentence for context, format the target word in ALL CAPS and append a direct question at the end of the stem. ABSOLUTE RULE: The exact same target word MUST NOT be in the options. The correct option MUST be a completely different word. Example: \"The public relations officer was reassigned after several clients complained about her SUPERCILIOUS attitude. What is the closest meaning of the capitalized word?\" 
+        * Sentence completion: The stem MUST include a clear blank space represented by five consecutive underscores \"_____\" to indicate where the missing word or phrase belongs.
+        * Error recognition: You MUST provide a single sentence in the stem with exactly four specific words or phrases enclosed in numbered brackets, such as \"[1] has went\", \"[2] to the\", \"[3] store\", \"[4] yesterday\". The first four options must strictly correspond to those four numbered choices, and the fifth option must always be \"No error\".
+        * Paragraph organization: The stem MUST consist of 4 to 5 jumbled sentences. Each sentence must start with a number in parentheses, like \"(1) First sentence. (2) Second sentence.\" The options must be sequence combinations of those numbers, such as \"3, 1, 4, 2\".
+        * Word analogy: Provide standard analytical analogies. 
+        * Symbolic logic / abstract reasoning: Formulate rigorous conditional logic scenarios. In the question and explanation, always use sequential uppercase letters (A, B, C, D) for the logical propositions in sequence. In the explanation block, you MUST first explicitly define what each variable represents (e.g., 'Let A = adhere to the Code of Conduct, B = avoid conflicts of interest'). Then represent formal deductive logic chains using standard operators (e.g. 'A -> B -> C -> D' or '~D -> ~C -> ~B -> ~A') to describe Modus Tollens or contraposition rules, ensuring they are rendered visually as interactive logic chains by the UI parser.
+        * Numerical Ability: You MUST include a dedicated section in the explanation starting with 'Mental Math Shortcut:' that details the fastest and most efficient way to solve the problem mentally or via rapid approximation, showing standard exam cognitive shortcuts to save valuable time.
 
-For 'Numerical Ability' questions, you MUST include a dedicated section in the explanation starting with '🧠 Mental Math Shortcut:' or 'Mental Math Shortcut:' that details the fastest and most efficient way to solve the problem mentally or via rapid approximation, showing standard exam cognitive shortcuts to save valuable time.
+        Language Specific Rules (Filipino/Tagalog):
+        * General Filipino/Tagalog formatting: When generating questions in Filipino/Tagalog, use formal, standard vocabulary (Pormal na Wika) suited for official government exams. Strictly avoid Taglish, conversational slang, and literal translations of English idioms.
+        * Word meaning (Filipino/Tagalog): ABSOLUTE RULE: The correct option MUST NOT share the same root word (salitang-ugat) as the target word. For example, if the target word is \"TAPAT\", the answer CANNOT be \"Katapatan\" or \"Matapat\". You must provide a completely different word with a different root, such as \"Sinsiro\". DO NOT put the definition or meaning of the word inside the question stem. You must ONLY provide a sentence with context clues OR directly ask for the synonym/antonym.
+        * Sentence completion (Filipino/Tagalog): Ensure the missing word tests precise Filipino/Tagalog vocabulary, appropriate affixes (panlapi), or correct transitional words (pangatnig) suitable for formal contexts.
+        * Error recognition (Filipino/Tagalog): Focus on testing common, formal Filipino/Tagalog grammatical rules. Test the proper usage of 'ng' vs. 'nang', 'din/daw' vs. 'rin/raw', incorrect verb affixes (panlapi), or improper use of hyphens (gitling).
+        * Sentence structure (Filipino/Tagalog): Focus on correct Filipino/Tagalog syntax, such as distinguishing between standard and inverted sentence orders (Karaniwan vs. Di-karaniwang ayos), proper placement of enclitics (mga ingklitik like 'ba', 'na', 'man', 'yata'), and correct verb focus (pokus ng pandiwa).
+        * Paragraph organization (Filipino/Tagalog): Ensure sentences flow naturally using appropriate Filipino/Tagalog transitional devices (pangatnig) like 'samakatuwid', 'gayunpaman', 'sa kabilang banda', etc.
+        * Reading comprehension (Filipino/Tagalog): Provide authentic, formal Filipino/Tagalog passages such as excerpts from government policies, literature, or news. Questions must test the main idea (pangunahing diwa), inference (paghihinuha), or conclusion (kongklusyon).
+        * Word analogy (Filipino/Tagalog): Use authentic Filipino/Tagalog word relationships and formal vocabulary rather than directly translating standard English analogies. Ensure this strictly falls under the Analytical Ability category.
 
-Return a valid JSON array of question objects. Do not include markdown wraps or block formatting (no ```json ... ```), return raw JSON text.
-Each object in the array must contain:
-1. 'stem': the question stem text or scenario.
-2. 'category': strictly matching the category parameter.
-3. 'subcategory': strictly matching the subcategory parameter.
-4. 'options': an array of exactly 5 strings for choices (A to E).
-5. 'correct_option': an integer index (0 for A, 1 for B, 2 for C, 3 for D, 4 for E) representing the correct choice.
-6. 'explanation': a thorough explanation of the logic or steps leading to the correct answer.
+        CRITICAL JSON RULE: You must properly escape all quotation marks inside the JSON string values using a backslash to prevent parsing errors. Never use unescaped double quotes inside the text fields.
 
-Output format:
-[
-  {
-    \"stem\": \"...\",
-    \"category\": \"...\",
-    \"subcategory\": \"...\",
-    \"options\": [\"...\", \"...\", \"...\", \"...\", \"...\"],
-    \"correct_option\": 0,
-    \"explanation\": \"...\"
-  }
-]";
+        Return a valid JSON array of question objects. Do not include markdown wraps or block formatting, return raw JSON text.
 
-        $userPrompt = "Generate exactly {$validated['count']} multiple-choice questions for the following category and subcategory:
-Category: {$validated['category']}
-Subcategory: {$validated['subcategory']}
-Language: {$validated['language']}
-".(! empty($validated['prompt']) ? "Additional Context/Directives: {$validated['prompt']}" : '');
+        Each object in the array must contain:
+        1. 'stem': the question stem text or scenario.
+        2. 'category': strictly matching the category parameter.
+        3. 'subcategory': strictly matching the subcategory parameter.
+        4. 'options': an array of exactly 5 strings for choices (A to E).
+        5. 'correct_option': an integer index (0 for A, 1 for B, 2 for C, 3 for D, 4 for E) representing the correct choice.
+        6. 'explanation': a thorough explanation of the logic or steps leading to the correct answer.
+
+        Output format:
+        [
+        {
+            \"stem\": \"...\",
+            \"category\": \"...\",
+            \"subcategory\": \"...\",
+            \"options\": [\"...\", \"...\", \"...\", \"...\", \"...\"],
+            \"correct_option\": 0,
+            \"explanation\": \"...\"
+        }
+        ]
+        ";
+
+        $userPrompt = "
+        Generate exactly {$validated['count']} multiple-choice questions for the following category and subcategory:
+        Category: {$validated['category']}
+        Subcategory: {$validated['subcategory']}
+        Language: {$validated['language']}
+        ".(! empty($validated['prompt']) ? "Additional Context/Directives: {$validated['prompt']}" : '');
 
         try {
             $resultText = null;
