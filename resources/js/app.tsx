@@ -82,7 +82,7 @@ createInertiaApp({
             name === 'about' ||
             name === 'guide' ||
             name === 'error' ||
-            name.startsWith('legal/');
+            name.startsWith('public/');
 
         let pageLayout: any = undefined;
 

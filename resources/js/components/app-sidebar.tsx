@@ -36,7 +36,6 @@ import {
     drafts as adminLearnDrafts,
 } from '@/routes/admin/learn';
 import { index as adminUsersIndex } from '@/routes/admin/users';
-import { index as calendarIndex } from '@/routes/calendar';
 import { index as dashboardIndex } from '@/routes/dashboard';
 import { index as drillsIndex } from '@/routes/drills';
 import { index as examsIndex } from '@/routes/exams';
@@ -46,6 +45,7 @@ import {
     index as questionsIndex,
     drafts as questionsDrafts,
 } from '@/routes/questions';
+import { index as calendarIndex } from '@/routes/study-schedules/index';
 
 import type { NavItem } from '@/types';
 

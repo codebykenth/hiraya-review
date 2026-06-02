@@ -1,39 +1,39 @@
 <?php
 
-use App\Http\Controllers\AdminDashboardController;
-use App\Http\Controllers\AdminExamDateController;
-use App\Http\Controllers\AdminLearnController;
-use App\Http\Controllers\AdminSyllabusController;
-use App\Http\Controllers\AdminUserController;
+use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Admin\ExamDateController;
+use App\Http\Controllers\Admin\LearnController as AdminLearnController;
+use App\Http\Controllers\Admin\QuestionController;
+use App\Http\Controllers\Admin\SyllabusController;
+use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\DrillController;
-use App\Http\Controllers\ExamController;
-use App\Http\Controllers\ExamHistoryController;
-use App\Http\Controllers\LearnController;
-use App\Http\Controllers\QuestionController;
 use App\Http\Controllers\Settings\AcceptTermsController;
 use App\Http\Controllers\SitemapController;
-use App\Http\Controllers\StudyScheduleController;
-use App\Http\Controllers\StudySuggestionController;
 use App\Http\Controllers\SupportController;
+use App\Http\Controllers\User\DashboardController as UserDashboardController;
+use App\Http\Controllers\User\DrillController;
+use App\Http\Controllers\User\ExamController;
+use App\Http\Controllers\User\ExamHistoryController;
+use App\Http\Controllers\User\LearnController as UserLearnController;
+use App\Http\Controllers\User\StudyScheduleController;
+use App\Http\Controllers\User\StudySuggestionController;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 // Public page views — rate limited to prevent scraping & DDoS floods
 Route::middleware('throttle:global-views')->group(function () {
-    Route::inertia('/', 'welcome')->name('home');
-    Route::inertia('about', 'about')->name('about');
-    Route::inertia('privacy', 'legal/privacy')->name('privacy');
-    Route::inertia('terms', 'legal/terms')->name('terms');
-    Route::inertia('support', 'legal/support')->name('support');
+    Route::inertia('/', 'public/welcome')->name('home');
+    Route::inertia('about', 'public/about')->name('about');
+    Route::inertia('privacy', 'public/privacy')->name('privacy');
+    Route::inertia('terms', 'public/terms')->name('terms');
+    Route::inertia('support', 'public/support')->name('support');
     Route::inertia('guide', 'guide')->name('guide');
     Route::get('exams', [ExamController::class, 'index'])->name('exams.index');
 
     // Publicly accessible Learn Module routes (for advanced long-tail SEO crawl)
-    Route::get('learn', [LearnController::class, 'index'])->name('learn.index');
-    Route::get('learn/{slug}', [LearnController::class, 'show'])->name('learn.show');
+    Route::get('learn', [UserLearnController::class, 'index'])->name('learn.index');
+    Route::get('learn/{slug}', [UserLearnController::class, 'show'])->name('learn.show');
 
     // Dynamic XML Sitemap for Google Search Console
     Route::get('sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
@@ -77,8 +77,8 @@ Route::inertia('dev-docs', 'dev-docs')
 Route::middleware(['auth', 'verified'])->group(function () {
     // View / Read Endpoints (Rate limited to 120 requests/minute to block scrapers & view flood DDoS)
     Route::middleware('throttle:global-views')->group(function () {
-        Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
-        Route::get('dashboard/ai-analysis', [ExamController::class, 'aiAnalysisReport'])->name('dashboard.ai-analysis');
+        Route::get('dashboard', [UserDashboardController::class, 'index'])->name('dashboard.index');
+        Route::get('dashboard/ai-analysis', [UserDashboardController::class, 'aiAnalysisReport'])->name('dashboard.ai-analysis');
         Route::get('drills', [DrillController::class, 'index'])->name('drills.index');
         Route::get('history', [ExamHistoryController::class, 'index'])->name('history.index');
     });
@@ -92,8 +92,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Study Schedule Routes
     Route::middleware('throttle:global-views')->group(function () {
-        Route::get('calendar', fn () => Inertia::render('calendar/index'))->name('calendar.index');
         Route::get('study-schedules', [StudyScheduleController::class, 'index'])->name('study-schedules.index');
+        Route::get('study-schedules/data', [StudyScheduleController::class, 'data'])->name('study-schedules.data');
         Route::get('study-schedules/subcategories', [StudyScheduleController::class, 'getSubcategories'])->name('study-schedules.subcategories');
         Route::get('study-suggestions', [StudySuggestionController::class, 'getSuggestions'])->name('study-suggestions.get');
     });
@@ -111,20 +111,20 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::middleware('admin')->group(function () {
         Route::middleware('throttle:global-views')->group(function () {
             Route::get('admin/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
-            Route::get('admin/syllabus', [AdminSyllabusController::class, 'index'])->name('admin.syllabus.index');
+            Route::get('admin/syllabus', [SyllabusController::class, 'index'])->name('admin.syllabus.index');
             Route::get('admin/learn', [AdminLearnController::class, 'index'])->name('admin.learn.index');
             Route::get('admin/learn/drafts', [AdminLearnController::class, 'drafts'])->name('admin.learn.drafts');
             Route::get('admin/learn/create', [AdminLearnController::class, 'create'])->name('admin.learn.create');
             Route::get('admin/learn/{id}/edit', [AdminLearnController::class, 'edit'])->name('admin.learn.edit');
-            Route::get('admin/users', [AdminUserController::class, 'index'])->name('admin.users.index');
-            Route::get('admin/exam-dates', [AdminExamDateController::class, 'index'])->name('admin.exam-dates.index');
+            Route::get('admin/users', [UserController::class, 'index'])->name('admin.users.index');
+            Route::get('admin/exam-dates', [ExamDateController::class, 'index'])->name('admin.exam-dates.index');
 
             // Question Resource Views
-            Route::get('questions', [QuestionController::class, 'index'])->name('questions.index');
-            Route::get('questions/create', [QuestionController::class, 'create'])->name('questions.create');
-            Route::get('questions/drafts', [QuestionController::class, 'drafts'])->name('questions.drafts');
-            Route::get('questions/{question}', [QuestionController::class, 'show'])->name('questions.show');
-            Route::get('questions/{question}/edit', [QuestionController::class, 'edit'])->name('questions.edit');
+            Route::get('admin/questions', [QuestionController::class, 'index'])->name('questions.index');
+            Route::get('admin/questions/create', [QuestionController::class, 'create'])->name('questions.create');
+            Route::get('admin/questions/drafts', [QuestionController::class, 'drafts'])->name('questions.drafts');
+            Route::get('admin/questions/{question}', [QuestionController::class, 'show'])->name('questions.show');
+            Route::get('admin/questions/{question}/edit', [QuestionController::class, 'edit'])->name('questions.edit');
         });
 
         Route::middleware('throttle:global-mutations')->group(function () {
@@ -133,14 +133,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::put('admin/learn/{id}', [AdminLearnController::class, 'update'])->name('admin.learn.update');
             Route::delete('admin/learn/{id}', [AdminLearnController::class, 'destroy'])->name('admin.learn.destroy');
 
-            Route::put('admin/users/{id}', [AdminUserController::class, 'update'])->name('admin.users.update');
-            Route::delete('admin/users/{id}', [AdminUserController::class, 'destroy'])->name('admin.users.destroy');
-            Route::post('admin/users/{id}/restore', [AdminUserController::class, 'restore'])->name('admin.users.restore');
-            Route::delete('admin/users/{id}/force-delete', [AdminUserController::class, 'forceDelete'])->name('admin.users.force-delete');
+            Route::put('admin/users/{id}', [UserController::class, 'update'])->name('admin.users.update');
+            Route::delete('admin/users/{id}', [UserController::class, 'destroy'])->name('admin.users.destroy');
+            Route::post('admin/users/{id}/restore', [UserController::class, 'restore'])->name('admin.users.restore');
+            Route::delete('admin/users/{id}/force-delete', [UserController::class, 'forceDelete'])->name('admin.users.force-delete');
 
-            Route::post('admin/exam-dates', [AdminExamDateController::class, 'store'])->name('admin.exam-dates.store');
-            Route::put('admin/exam-dates/{examDate}', [AdminExamDateController::class, 'update'])->name('admin.exam-dates.update');
-            Route::delete('admin/exam-dates/{examDate}', [AdminExamDateController::class, 'destroy'])->name('admin.exam-dates.destroy');
+            Route::post('admin/exam-dates', [ExamDateController::class, 'store'])->name('admin.exam-dates.store');
+            Route::put('admin/exam-dates/{examDate}', [ExamDateController::class, 'update'])->name('admin.exam-dates.update');
+            Route::delete('admin/exam-dates/{examDate}', [ExamDateController::class, 'destroy'])->name('admin.exam-dates.destroy');
 
             // Dynamic Scope Management Routes
             Route::post('questions/categories', [QuestionController::class, 'storeCategory'])->name('questions.categories.store');
