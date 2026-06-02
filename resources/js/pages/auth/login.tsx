@@ -1,10 +1,12 @@
 import { Form, Head } from '@inertiajs/react';
+import { useState } from 'react';
 import FacebookIcon from '@/components/facebook-icon';
 import GoogleIcon from '@/components/google-icon';
 import InputError from '@/components/input-error';
 import PasskeyVerify from '@/components/passkey-verify';
 import PasswordInput from '@/components/password-input';
 import TextLink from '@/components/text-link';
+import TurnstileWidget from '@/components/turnstile-widget';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
@@ -17,9 +19,16 @@ import { request } from '@/routes/password';
 type Props = {
     status?: string;
     canResetPassword: boolean;
+    turnstileSiteKey?: string;
 };
 
-export default function Login({ status, canResetPassword }: Props) {
+export default function Login({
+    status,
+    canResetPassword,
+    turnstileSiteKey,
+}: Props) {
+    const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+
     return (
         <>
             <Head title="Log in" />
@@ -30,10 +39,15 @@ export default function Login({ status, canResetPassword }: Props) {
                 {...store.form()}
                 resetOnSuccess={['password']}
                 className="flex flex-col gap-6"
+                transform={(data) => ({
+                    ...data,
+                    cf_turnstile_response: turnstileToken,
+                })}
             >
                 {({ processing, errors }) => (
                     <>
                         <div className="grid gap-6">
+                            {/* Email field */}
                             <div className="grid gap-2">
                                 <Label htmlFor="email">Email</Label>
                                 <Input
@@ -50,6 +64,7 @@ export default function Login({ status, canResetPassword }: Props) {
                                 <InputError message={errors.email} />
                             </div>
 
+                            {/* Password field */}
                             <div className="grid gap-2">
                                 <div className="flex items-center">
                                     <Label htmlFor="password">Password</Label>
@@ -75,6 +90,21 @@ export default function Login({ status, canResetPassword }: Props) {
                                 <InputError message={errors.password} />
                             </div>
 
+                            {/* Turnstile Widget */}
+                            {turnstileSiteKey && (
+                                <TurnstileWidget
+                                    siteKey={turnstileSiteKey}
+                                    onVerify={(token) => {
+                                        console.log('Turnstile token:', token);
+                                        setTurnstileToken(token);
+                                    }}
+                                    theme="auto"
+                                />
+                            )}
+
+                            <InputError message={errors.turnstile} />
+
+                            {/* Remember me */}
                             <div className="flex items-center space-x-3">
                                 <Checkbox
                                     id="remember"
@@ -93,7 +123,7 @@ export default function Login({ status, canResetPassword }: Props) {
                                 type="submit"
                                 className="mt-2 h-12 w-full rounded-xl bg-blue-600 text-base font-semibold text-white shadow-md transition-all duration-200 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-500"
                                 tabIndex={4}
-                                disabled={processing}
+                                disabled={processing || !turnstileToken}
                                 data-test="login-button"
                             >
                                 {processing && <Spinner />}
@@ -101,6 +131,7 @@ export default function Login({ status, canResetPassword }: Props) {
                             </Button>
                         </div>
 
+                        {/* Social login buttons */}
                         <div className="relative flex items-center py-2">
                             <div className="flex-grow border-t border-slate-200 dark:border-slate-800"></div>
                             <span className="mx-4 flex-shrink text-xs font-medium tracking-wider text-slate-400 uppercase dark:text-slate-500">

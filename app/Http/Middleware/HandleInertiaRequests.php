@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Services\TurnstileService;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -47,6 +48,10 @@ class HandleInertiaRequests extends Middleware
                 'host' => env('PUSHER_HOST'),
                 'port' => config('broadcasting.connections.pusher.options.port'),
                 'scheme' => config('broadcasting.connections.pusher.options.scheme'),
+            ],
+            'turnstile' => [
+                'siteKey' => app(TurnstileService::class)->getSiteKey(),
+                'enabled' => app(TurnstileService::class)->isConfigured(),
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
         ];

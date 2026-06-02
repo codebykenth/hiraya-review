@@ -8,6 +8,7 @@ import PasswordInput from '@/components/password-input';
 import SocialConsentModal from '@/components/social-consent-modal';
 import type { SocialProvider } from '@/components/social-consent-modal';
 import TextLink from '@/components/text-link';
+import TurnstileWidget from '@/components/turnstile-widget';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -17,11 +18,13 @@ import { store } from '@/routes/register';
 
 type Props = {
     passwordRules: string;
+    turnstileSiteKey?: string;
 };
 
-export default function Register({ passwordRules }: Props) {
+export default function Register({ passwordRules, turnstileSiteKey }: Props) {
     const [termsAccepted, setTermsAccepted] = useState(false);
     const [socialModal, setSocialModal] = useState<SocialProvider | null>(null);
+    const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
 
     return (
         <>
@@ -39,6 +42,10 @@ export default function Register({ passwordRules }: Props) {
                 resetOnSuccess={['password', 'password_confirmation']}
                 disableWhileProcessing
                 className="flex flex-col gap-6"
+                transform={(data) => ({
+                    ...data,
+                    cf_turnstile_response: turnstileToken,
+                })}
             >
                 {({ processing, errors }) => (
                     <>
@@ -118,9 +125,22 @@ export default function Register({ passwordRules }: Props) {
                                 tabIndex={5}
                             />
 
+                            {/* Turnstile Widget */}
+                            {turnstileSiteKey && (
+                                <TurnstileWidget
+                                    siteKey={turnstileSiteKey}
+                                    onVerify={(token) =>
+                                        setTurnstileToken(token)
+                                    }
+                                    theme="auto"
+                                />
+                            )}
+
+                            <InputError message={errors.turnstile} />
+
                             <Button
                                 type="submit"
-                                disabled={!termsAccepted}
+                                disabled={!termsAccepted || !turnstileToken}
                                 className="mt-2 h-12 w-full rounded-xl bg-blue-600 text-base font-semibold text-white shadow-md transition-all duration-200 hover:bg-blue-700 disabled:opacity-50 dark:bg-blue-600 dark:hover:bg-blue-500"
                                 tabIndex={6}
                                 data-test="register-user-button"

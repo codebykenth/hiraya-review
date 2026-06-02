@@ -80,9 +80,13 @@ export function useQuestionCreateState({
 
         // Only reset if the current subcategory does not belong to the selected category
         if (aiSubcategory && !validSubs.includes(aiSubcategory)) {
-            setAiSubcategory(validSubs[0] || '');
+            const timer = setTimeout(() => {
+                setAiSubcategory(validSubs[0] || '');
+            }, 0);
+
+            return () => clearTimeout(timer);
         }
-    }, [aiCategory, cseCategoriesTree]); // Removed aiSubcategory from deps to prevent infinite reset loop
+    }, [aiCategory, cseCategoriesTree, aiSubcategory]);
 
     const manualForm = useForm({
         stem: '',
@@ -103,9 +107,13 @@ export function useQuestionCreateState({
 
         // Only reset if the current subcategory does not belong to the selected category
         if (data.subcategory && !validSubs.includes(data.subcategory)) {
-            setData('subcategory', validSubs[0] || '');
+            const timer = setTimeout(() => {
+                setData('subcategory', validSubs[0] || '');
+            }, 0);
+
+            return () => clearTimeout(timer);
         }
-    }, [data.category, cseCategoriesTree, setData]); // Removed data.subcategory from deps
+    }, [data.category, cseCategoriesTree, data.subcategory, setData]);
 
     const handleOptionChange = (idx: number, val: string) => {
         const newOptions = [...data.options];
@@ -189,7 +197,7 @@ export function useQuestionCreateState({
             if (!response.ok) {
                 throw new Error(
                     resData.error ||
-                    'Failed to generate questions. Please try again.',
+                        'Failed to generate questions. Please try again.',
                 );
             }
 
@@ -203,7 +211,7 @@ export function useQuestionCreateState({
             } else {
                 setErrorMsg(
                     err.message ||
-                    'An error occurred while generating questions.',
+                        'An error occurred while generating questions.',
                 );
             }
         }

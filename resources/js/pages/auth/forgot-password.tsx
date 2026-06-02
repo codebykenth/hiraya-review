@@ -1,15 +1,24 @@
 // Components
 import { Form, Head } from '@inertiajs/react';
 import { LoaderCircle } from 'lucide-react';
+import { useState } from 'react';
 import InputError from '@/components/input-error';
 import TextLink from '@/components/text-link';
+import TurnstileWidget from '@/components/turnstile-widget';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { login } from '@/routes';
 import { email } from '@/routes/password';
 
-export default function ForgotPassword({ status }: { status?: string }) {
+type Props = {
+    status?: string;
+    turnstileSiteKey?: string;
+};
+
+export default function ForgotPassword({ status, turnstileSiteKey }: Props) {
+    const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+
     return (
         <>
             <Head title="Forgot password" />
@@ -21,7 +30,13 @@ export default function ForgotPassword({ status }: { status?: string }) {
             )}
 
             <div className="space-y-6">
-                <Form {...email.form()}>
+                <Form
+                    {...email.form()}
+                    transform={(data) => ({
+                        ...data,
+                        cf_turnstile_response: turnstileToken,
+                    })}
+                >
                     {({ processing, errors }) => (
                         <>
                             <div className="grid gap-2">
@@ -38,10 +53,23 @@ export default function ForgotPassword({ status }: { status?: string }) {
                                 <InputError message={errors.email} />
                             </div>
 
+                            {/* Turnstile Widget */}
+                            {turnstileSiteKey && (
+                                <TurnstileWidget
+                                    siteKey={turnstileSiteKey}
+                                    onVerify={(token) =>
+                                        setTurnstileToken(token)
+                                    }
+                                    theme="auto"
+                                />
+                            )}
+
+                            <InputError message={errors.turnstile} />
+
                             <div className="my-6 flex items-center justify-start">
                                 <Button
                                     className="w-full"
-                                    disabled={processing}
+                                    disabled={processing || !turnstileToken}
                                     data-test="email-password-reset-link-button"
                                 >
                                     {processing && (
