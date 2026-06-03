@@ -58,14 +58,14 @@ class SetCacheHeaders
             return $this->applyImmutableHeaders($response);
         }
 
-        // Other static assets by extension
-        if ($this->hasExtension($path, self::MEDIA_EXTENSIONS)) {
-            return $this->applyStaticHeaders($response, 2592000); // 30 days
-        }
-
         // Favicon and other root-level static files
         if (in_array($path, ['/favicon.ico', '/favicon.svg', '/apple-touch-icon.png', '/robots.txt', '/ads.txt'])) {
             return $this->applyStaticHeaders($response, 86400); // 1 day
+        }
+
+        // Other static assets by extension
+        if ($this->hasExtension($path, self::MEDIA_EXTENSIONS)) {
+            return $this->applyStaticHeaders($response, 2592000); // 30 days
         }
 
         // Dynamic Inertia pages: private, no CDN cache, short browser cache
