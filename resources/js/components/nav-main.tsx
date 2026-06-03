@@ -1,6 +1,6 @@
 import { Link, usePage } from '@inertiajs/react';
 import { ChevronRight } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
     SidebarGroup,
     SidebarGroupLabel,
@@ -12,7 +12,7 @@ import {
     SidebarMenuSubButton,
 } from '@/components/ui/sidebar';
 import { useCurrentUrl } from '@/hooks/use-current-url';
-import { cn } from '@/lib/utils';
+import { cn, toUrl } from '@/lib/utils';
 import type { NavItem } from '@/types';
 
 export function NavMain({
@@ -25,6 +25,34 @@ export function NavMain({
     const { isCurrentUrl } = useCurrentUrl();
     const { url } = usePage();
 
+    const isSubActive = useCallback(
+        (sub: NavItem, siblingItems: NavItem[]) => {
+            const currentPath = url.split('?')[0];
+            const cleanSubHref = sub.href ? toUrl(sub.href).split('?')[0] : '';
+
+            if (currentPath === cleanSubHref) {
+return true;
+}
+
+            const isParentOfCurrent =
+                cleanSubHref && currentPath.startsWith(cleanSubHref + '/');
+
+            if (isParentOfCurrent) {
+                const hasBetterExactMatch = siblingItems.some(
+                    (sibling) =>
+                        sibling.href !== sub.href &&
+                        sibling.href &&
+                        currentPath === toUrl(sibling.href).split('?')[0],
+                );
+
+                return !hasBetterExactMatch;
+            }
+
+            return false;
+        },
+        [url],
+    );
+
     // Smart auto-expansion state: automatically expand sections where a sub-item is active
     const [openItems, setOpenItems] = useState<Record<string, boolean>>(() => {
         const initial: Record<string, boolean> = {};
@@ -32,7 +60,7 @@ export function NavMain({
         for (const item of items) {
             if (item.items) {
                 const hasActiveChild = item.items.some((sub) =>
-                    isCurrentUrl(sub.href),
+                    isSubActive(sub, item.items || []),
                 );
 
                 if (hasActiveChild) {
@@ -52,7 +80,7 @@ export function NavMain({
         for (const item of items) {
             if (item.items) {
                 const hasActiveChild = item.items.some((sub) =>
-                    isCurrentUrl(sub.href),
+                    isSubActive(sub, item.items || []),
                 );
 
                 if (hasActiveChild) {
@@ -67,7 +95,7 @@ export function NavMain({
         }, 0);
 
         return () => clearTimeout(timer);
-    }, [url, items, isCurrentUrl]);
+    }, [url, items, isSubActive]);
 
     const toggleItem = (title: string) => {
         setOpenItems((prev) => {
@@ -99,7 +127,7 @@ export function NavMain({
                     if (hasSubItems) {
                         const isOpen = !!openItems[item.title];
                         const hasActiveChild = item.items!.some((sub) =>
-                            isCurrentUrl(sub.href),
+                            isSubActive(sub, item.items || []),
                         );
 
                         return (
@@ -138,8 +166,9 @@ export function NavMain({
                                 {isOpen && (
                                     <SidebarMenuSub className="mt-1 transition-all duration-200 ease-in-out">
                                         {item.items!.map((sub) => {
-                                            const subActive = isCurrentUrl(
-                                                sub.href,
+                                            const subActive = isSubActive(
+                                                sub,
+                                                item.items || [],
                                             );
 
                                             return (

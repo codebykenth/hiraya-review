@@ -11,6 +11,14 @@ import {
 } from 'lucide-react';
 import React from 'react';
 import { Button } from '@/components/ui/button';
+import {
+    Dialog,
+    DialogTrigger,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogDescription,
+} from '@/components/ui/dialog';
 import { SelectField } from '@/components/ui/select';
 import { drafts as questionsDrafts } from '@/routes/questions';
 
@@ -114,82 +122,487 @@ export function AIGeneratorPanel({
                         </div>
 
                         {/* Model Select */}
-                        <SelectField
-                            label="Primary AI Model"
-                            value={aiPrimaryModel}
-                            disabled={isGenerating}
-                            onValueChange={setAiPrimaryModel}
-                            options={[
-                                {
-                                    value: 'llama-3.3-70b-versatile',
-                                    label: 'Groq LLaMA 3.3 70B (Versatile)',
-                                },
-                                {
-                                    value: 'openai/gpt-oss-120b',
-                                    label: 'Groq GPT-OSS 120B',
-                                },
-                                {
-                                    value: 'gemini-2.0-pro-exp',
-                                    label: 'Google Gemini 2.0 Pro (Exp)',
-                                },
-                                {
-                                    value: 'gemini-1.5-pro',
-                                    label: 'Google Gemini 1.5 Pro',
-                                },
-                                {
-                                    value: 'gemini-3.5-flash',
-                                    label: 'Google Gemini 3.5 Flash',
-                                },
-                                {
-                                    value: 'gemini-2.0-flash-thinking-exp',
-                                    label: 'Google Gemini 2.0 Flash Thinking',
-                                },
-                                {
-                                    value: 'gemini-2.0-flash',
-                                    label: 'Google Gemini 2.0 Flash',
-                                },
-                                {
-                                    value: 'qwen/qwen3-32b',
-                                    label: 'Groq Qwen 3 32B',
-                                },
-                                {
-                                    value: 'openai/gpt-oss-20b',
-                                    label: 'Groq GPT-OSS 20B',
-                                },
-                                {
-                                    value: 'meta-llama/llama-4-scout-17b-16e-instruct',
-                                    label: 'Groq LLaMA 4 Scout 17B',
-                                },
-                                {
-                                    value: 'gemini-1.5-flash',
-                                    label: 'Google Gemini 1.5 Flash',
-                                },
-                                {
-                                    value: 'gemini-1.5-flash-8b',
-                                    label: 'Google Gemini 1.5 Flash 8B',
-                                },
-                                {
-                                    value: 'llama-3.1-8b-instant',
-                                    label: 'Groq LLaMA 3.1 8B (Instant)',
-                                },
-                                {
-                                    value: 'allam-2-7b',
-                                    label: 'Groq Allam 2 7B',
-                                },
-                                {
-                                    value: 'canopylabs/orpheus-v1-english',
-                                    label: 'Groq Orpheus v1 English',
-                                },
-                                {
-                                    value: 'groq/compound',
-                                    label: 'Groq Compound',
-                                },
-                                {
-                                    value: 'groq/compound-mini',
-                                    label: 'Groq Compound Mini',
-                                },
-                            ]}
-                        />
+                        <div className="flex w-full flex-col gap-1.5">
+                            <div className="flex items-center justify-between">
+                                <label className="text-xs font-bold tracking-wider text-slate-400 uppercase">
+                                    Primary AI Model
+                                </label>
+                                <Dialog>
+                                    <DialogTrigger asChild>
+                                        <button
+                                            type="button"
+                                            className="inline-flex cursor-pointer items-center gap-1 text-[10px] font-bold tracking-wider text-blue-500 uppercase underline transition-colors hover:text-blue-700"
+                                        >
+                                            <HelpCircle className="size-3" />
+                                            Which model to use?
+                                        </button>
+                                    </DialogTrigger>
+                                    <DialogContent className="max-w-xl">
+                                        <DialogHeader>
+                                            <DialogTitle>
+                                                Best Model Recommendations
+                                            </DialogTitle>
+                                            <DialogDescription>
+                                                Select the best model depending
+                                                on the category or subcategory
+                                                you are generating.
+                                            </DialogDescription>
+                                        </DialogHeader>
+                                        <div className="mt-4 space-y-4 text-xs leading-relaxed font-semibold">
+                                            <div className="max-h-[400px] overflow-hidden overflow-y-auto rounded-xl border border-border">
+                                                <table className="w-full border-collapse text-left">
+                                                    <thead className="sticky top-0 z-10 border-b border-border bg-muted font-bold">
+                                                        <tr>
+                                                            <th className="text-slate-705 dark:text-slate-350 p-3">
+                                                                Category
+                                                            </th>
+                                                            <th className="text-slate-705 dark:text-slate-350 p-3">
+                                                                Subcategory
+                                                            </th>
+                                                            <th className="text-slate-705 dark:text-slate-350 p-3">
+                                                                Best Model
+                                                            </th>
+                                                            <th className="text-slate-705 dark:text-slate-350 p-3">
+                                                                Why?
+                                                            </th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody className="divide-y divide-border text-foreground">
+                                                        {/* Analytical Ability */}
+                                                        <tr className="bg-blue-500/5">
+                                                            <td
+                                                                className="p-3 font-bold"
+                                                                rowSpan={4}
+                                                            >
+                                                                Analytical
+                                                                Ability
+                                                            </td>
+                                                            <td className="p-3 font-bold">
+                                                                Symbolic logic /
+                                                                abstract
+                                                                reasoning
+                                                            </td>
+                                                            <td className="p-3 font-bold text-blue-600 dark:text-blue-400">
+                                                                Google Gemini
+                                                                3.5 Flash
+                                                            </td>
+                                                            <td className="p-3 text-muted-foreground">
+                                                                Mandates raw,
+                                                                visual-spatial
+                                                                SVG rendering.
+                                                                Groq models lack
+                                                                vision
+                                                                coordinate
+                                                                mapping and will
+                                                                output broken
+                                                                shapes.
+                                                            </td>
+                                                        </tr>
+                                                        <tr className="bg-blue-500/5">
+                                                            <td className="p-3 font-bold">
+                                                                Data
+                                                                interpretation
+                                                            </td>
+                                                            <td className="p-3 font-bold text-blue-600 dark:text-blue-400">
+                                                                Google Gemini
+                                                                3.5 Flash
+                                                            </td>
+                                                            <td className="p-3 text-muted-foreground">
+                                                                Requires
+                                                                rendering
+                                                                coordinate axes,
+                                                                lines, pie
+                                                                slices, or bar
+                                                                charts via SVG
+                                                                code.
+                                                            </td>
+                                                        </tr>
+                                                        <tr className="bg-blue-500/5">
+                                                            <td className="p-3 font-bold">
+                                                                Word analogy
+                                                            </td>
+                                                            <td className="p-3 font-bold text-purple-600 dark:text-purple-400">
+                                                                Groq LLaMA 3.3
+                                                                70B
+                                                            </td>
+                                                            <td className="p-3 text-muted-foreground">
+                                                                Superb semantic
+                                                                understanding of
+                                                                word
+                                                                relationship
+                                                                pairs.
+                                                            </td>
+                                                        </tr>
+                                                        <tr className="bg-blue-500/5">
+                                                            <td className="p-3 font-bold">
+                                                                Identifying
+                                                                assumptions &
+                                                                conclusions
+                                                            </td>
+                                                            <td className="p-3 font-bold text-purple-600 dark:text-purple-400">
+                                                                Groq LLaMA 3.3
+                                                                70B
+                                                            </td>
+                                                            <td className="p-3 text-muted-foreground">
+                                                                Excellent
+                                                                deductive logic
+                                                                capabilities for
+                                                                detecting
+                                                                unstated
+                                                                premises and
+                                                                drawing valid
+                                                                inferences.
+                                                            </td>
+                                                        </tr>
+                                                        {/* Numerical Ability */}
+                                                        <tr className="bg-amber-500/5">
+                                                            <td
+                                                                className="p-3 font-bold"
+                                                                rowSpan={3}
+                                                            >
+                                                                Numerical
+                                                                Ability
+                                                            </td>
+                                                            <td className="p-3 font-bold">
+                                                                Basic operations
+                                                            </td>
+                                                            <td className="p-3 font-bold text-purple-600 dark:text-purple-400">
+                                                                Groq LLaMA 3.3
+                                                                70B
+                                                            </td>
+                                                            <td className="p-3 text-muted-foreground">
+                                                                Best at
+                                                                step-by-step
+                                                                arithmetic
+                                                                breakdowns and
+                                                                formatting math
+                                                                formulas.
+                                                            </td>
+                                                        </tr>
+                                                        <tr className="bg-amber-500/5">
+                                                            <td className="p-3 font-bold">
+                                                                Number sequence
+                                                            </td>
+                                                            <td className="p-3 font-bold text-purple-600 dark:text-purple-400">
+                                                                Groq LLaMA 3.3
+                                                                70B
+                                                            </td>
+                                                            <td className="p-3 text-muted-foreground">
+                                                                Accurately
+                                                                identifies
+                                                                mathematical
+                                                                patterns (+3,
+                                                                x2, fibonacci)
+                                                                and explains
+                                                                them clearly.
+                                                            </td>
+                                                        </tr>
+                                                        <tr className="bg-amber-500/5">
+                                                            <td className="p-3 font-bold">
+                                                                Word problems
+                                                            </td>
+                                                            <td className="p-3 font-bold text-purple-600 dark:text-purple-400">
+                                                                Groq LLaMA 3.3
+                                                                70B
+                                                            </td>
+                                                            <td className="p-3 text-muted-foreground">
+                                                                Superb at
+                                                                interpreting
+                                                                word-based math
+                                                                scenarios (work
+                                                                rates, age
+                                                                problems) and
+                                                                generating
+                                                                logical
+                                                                equations.
+                                                            </td>
+                                                        </tr>
+                                                        {/* General Information */}
+                                                        <tr className="bg-emerald-500/5">
+                                                            <td
+                                                                className="p-3 font-bold"
+                                                                rowSpan={4}
+                                                            >
+                                                                General
+                                                                Information
+                                                            </td>
+                                                            <td className="p-3 font-bold">
+                                                                Philippine
+                                                                Constitution
+                                                            </td>
+                                                            <td className="p-3 font-bold text-purple-600 dark:text-purple-400">
+                                                                Groq LLaMA 3.3
+                                                                70B
+                                                            </td>
+                                                            <td className="p-3 text-muted-foreground">
+                                                                Outstanding
+                                                                recall of
+                                                                historical legal
+                                                                texts and
+                                                                specific
+                                                                Articles/Sections
+                                                                of the 1987
+                                                                Constitution.
+                                                            </td>
+                                                        </tr>
+                                                        <tr className="bg-emerald-500/5">
+                                                            <td className="p-3 font-bold">
+                                                                Code of Conduct
+                                                                (R.A. 6713)
+                                                            </td>
+                                                            <td className="p-3 font-bold text-purple-600 dark:text-purple-400">
+                                                                Groq LLaMA 3.3
+                                                                70B
+                                                            </td>
+                                                            <td className="p-3 text-muted-foreground">
+                                                                Accurately
+                                                                interprets
+                                                                ethical
+                                                                scenarios,
+                                                                norms, duties,
+                                                                and prohibitions
+                                                                for public
+                                                                officials.
+                                                            </td>
+                                                        </tr>
+                                                        <tr className="bg-emerald-500/5">
+                                                            <td className="p-3 font-bold">
+                                                                Peace and Human
+                                                                Rights
+                                                            </td>
+                                                            <td className="p-3 font-bold text-purple-600 dark:text-purple-400">
+                                                                Groq LLaMA 3.3
+                                                                70B
+                                                            </td>
+                                                            <td className="p-3 text-muted-foreground">
+                                                                Strong
+                                                                understanding of
+                                                                international
+                                                                treaties, human
+                                                                rights
+                                                                principles, and
+                                                                peace concepts.
+                                                            </td>
+                                                        </tr>
+                                                        <tr className="bg-emerald-500/5">
+                                                            <td className="p-3 font-bold">
+                                                                Environment
+                                                                Management
+                                                            </td>
+                                                            <td className="p-3 font-bold text-purple-600 dark:text-purple-400">
+                                                                Groq LLaMA 3.3
+                                                                70B
+                                                            </td>
+                                                            <td className="p-3 text-muted-foreground">
+                                                                High recall of
+                                                                global
+                                                                environment
+                                                                protection
+                                                                agreements and
+                                                                national
+                                                                environmental
+                                                                acts.
+                                                            </td>
+                                                        </tr>
+                                                        {/* Verbal Ability */}
+                                                        <tr className="bg-purple-500/5">
+                                                            <td
+                                                                className="p-3 font-bold"
+                                                                rowSpan={6}
+                                                            >
+                                                                Verbal Ability
+                                                            </td>
+                                                            <td className="p-3 font-bold">
+                                                                Word meaning
+                                                            </td>
+                                                            <td className="p-3 font-bold text-purple-600 dark:text-purple-400">
+                                                                Groq LLaMA 3.3
+                                                                70B
+                                                            </td>
+                                                            <td className="p-3 text-muted-foreground">
+                                                                Exceptional
+                                                                contextual
+                                                                vocabulary
+                                                                mapping and
+                                                                distractor
+                                                                choices
+                                                                generation.
+                                                            </td>
+                                                        </tr>
+                                                        <tr className="bg-purple-500/5">
+                                                            <td className="p-3 font-bold">
+                                                                Sentence
+                                                                completion
+                                                            </td>
+                                                            <td className="p-3 font-bold text-purple-600 dark:text-purple-400">
+                                                                Groq LLaMA 3.3
+                                                                70B
+                                                            </td>
+                                                            <td className="p-3 text-muted-foreground">
+                                                                Excellent
+                                                                understanding of
+                                                                logical flow,
+                                                                tenses, and
+                                                                context clues.
+                                                            </td>
+                                                        </tr>
+                                                        <tr className="bg-purple-500/5">
+                                                            <td className="p-3 font-bold">
+                                                                Error
+                                                                recognition
+                                                            </td>
+                                                            <td className="p-3 font-bold text-purple-600 dark:text-purple-400">
+                                                                Groq LLaMA 3.3
+                                                                70B
+                                                            </td>
+                                                            <td className="p-3 text-muted-foreground">
+                                                                Strong grammar
+                                                                parser. Easily
+                                                                finds
+                                                                subject-verb
+                                                                disagreements or
+                                                                incorrect
+                                                                modifiers.
+                                                            </td>
+                                                        </tr>
+                                                        <tr className="bg-purple-500/5">
+                                                            <td className="p-3 font-bold">
+                                                                Sentence
+                                                                structure
+                                                            </td>
+                                                            <td className="p-3 font-bold text-purple-600 dark:text-purple-400">
+                                                                Groq LLaMA 3.3
+                                                                70B
+                                                            </td>
+                                                            <td className="p-3 text-muted-foreground">
+                                                                Deep syntactic
+                                                                logic to
+                                                                evaluate
+                                                                phrasing
+                                                                alternatives and
+                                                                structure
+                                                                errors.
+                                                            </td>
+                                                        </tr>
+                                                        <tr className="bg-purple-500/5">
+                                                            <td className="p-3 font-bold">
+                                                                Paragraph
+                                                                organization
+                                                            </td>
+                                                            <td className="p-3 font-bold text-purple-600 dark:text-purple-400">
+                                                                Groq LLaMA 3.3
+                                                                70B
+                                                            </td>
+                                                            <td className="p-3 text-muted-foreground">
+                                                                Highly skilled
+                                                                at determining
+                                                                structural
+                                                                chronology and
+                                                                cohesive logical
+                                                                flow in
+                                                                sentences.
+                                                            </td>
+                                                        </tr>
+                                                        <tr className="bg-purple-500/5">
+                                                            <td className="p-3 font-bold">
+                                                                Reading
+                                                                comprehension
+                                                            </td>
+                                                            <td className="p-3 font-bold text-purple-600 dark:text-purple-400">
+                                                                Groq LLaMA 3.3
+                                                                70B
+                                                            </td>
+                                                            <td className="p-3 text-muted-foreground">
+                                                                Can synthesize
+                                                                longer essays,
+                                                                evaluate central
+                                                                themes, and
+                                                                design accurate
+                                                                comprehension
+                                                                questions.
+                                                            </td>
+                                                        </tr>
+                                                        {/* Clerical Ability */}
+                                                        <tr className="bg-rose-500/5">
+                                                            <td
+                                                                className="p-3 font-bold"
+                                                                rowSpan={2}
+                                                            >
+                                                                Clerical Ability
+                                                            </td>
+                                                            <td className="p-3 font-bold">
+                                                                Filing
+                                                            </td>
+                                                            <td className="p-3 font-bold text-purple-600 dark:text-purple-400">
+                                                                Groq LLaMA 3.3
+                                                                70B
+                                                            </td>
+                                                            <td className="p-3 text-muted-foreground">
+                                                                Excellent
+                                                                alphabetical
+                                                                logic, indexing
+                                                                compliance, and
+                                                                filing rule
+                                                                accuracy.
+                                                            </td>
+                                                        </tr>
+                                                        <tr className="bg-rose-500/5">
+                                                            <td className="p-3 font-bold">
+                                                                Spelling
+                                                            </td>
+                                                            <td className="p-3 font-bold text-purple-600 dark:text-purple-400">
+                                                                Groq LLaMA 3.3
+                                                                70B
+                                                            </td>
+                                                            <td className="p-3 text-muted-foreground">
+                                                                Best at
+                                                                identifying
+                                                                commonly
+                                                                misspelled words
+                                                                and creating
+                                                                spelling
+                                                                options.
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </DialogContent>
+                                </Dialog>
+                            </div>
+                            <SelectField
+                                value={aiPrimaryModel}
+                                disabled={isGenerating}
+                                onValueChange={setAiPrimaryModel}
+                                options={[
+                                    {
+                                        value: 'gemini-3.5-flash',
+                                        label: 'Google Gemini 3.5 Flash (Best for CSE & SVGs)',
+                                    },
+                                    {
+                                        value: 'llama-3.3-70b-versatile',
+                                        label: 'Groq LLaMA 3.3 70B (High Reasoning)',
+                                    },
+                                    {
+                                        value: 'gemini-2.5-flash',
+                                        label: 'Google Gemini 2.5 Flash',
+                                    },
+                                    {
+                                        value: 'mixtral-8x7b-32768',
+                                        label: 'Groq Mixtral 8x7B',
+                                    },
+                                    {
+                                        value: 'gemma2-9b-it',
+                                        label: 'Groq Gemma 2 9B',
+                                    },
+                                    {
+                                        value: 'llama-3.1-8b-instant',
+                                        label: 'Groq LLaMA 3.1 8B (Fast)',
+                                    },
+                                ]}
+                            />
+                        </div>
 
                         {/* Additional Prompting Context */}
                         <div className="flex flex-col gap-1.5">

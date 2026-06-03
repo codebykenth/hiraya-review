@@ -7,6 +7,7 @@ export interface LearnModule {
     estimated_minutes: number;
     category: string;
     subcategory: string;
+    is_completed?: boolean;
 }
 
 export interface Category {
@@ -35,6 +36,7 @@ export interface LearnShowProps {
         subcategory: string;
         creator_name: string;
         updated_at: string;
+        is_completed?: boolean;
     };
     recommended: {
         title: string;

@@ -1,5 +1,5 @@
 import { Link } from '@inertiajs/react';
-import { BookOpen, Clock, Tag, ArrowRight } from 'lucide-react';
+import { BookOpen, Clock, Tag, ArrowRight, CheckCircle2 } from 'lucide-react';
 import React from 'react';
 import { Card } from '@/components/ui/card';
 import { categoryColors } from '../hooks/use-learn-state';
@@ -58,6 +58,12 @@ export function ModulesGrid({
                                                     <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[9px] font-bold text-muted-foreground dark:bg-slate-900">
                                                         {mod.subcategory}
                                                     </span>
+                                                    {mod.is_completed && (
+                                                        <span className="ml-auto flex items-center gap-1 rounded-full bg-green-50 px-2 py-0.5 text-[9px] font-black text-green-700 dark:bg-green-950/40 dark:text-green-400">
+                                                            <CheckCircle2 className="size-3" />
+                                                            Completed
+                                                        </span>
+                                                    )}
                                                 </div>
 
                                                 <h3 className="mt-5 font-heading text-lg leading-snug font-bold text-foreground transition group-hover:text-blue-600 dark:group-hover:text-blue-400">

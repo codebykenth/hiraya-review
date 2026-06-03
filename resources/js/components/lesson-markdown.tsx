@@ -647,8 +647,8 @@ export function LessonMarkdown({ content = '' }: LessonMarkdownProps) {
                     const nextTrimmed = cleanText(lines[j].trim());
 
                     if (nextTrimmed === '') {
-continue;
-}
+                        continue;
+                    }
 
                     // Stop if we hit a new Question, a Header, Divider, or new block
                     if (
@@ -753,8 +753,8 @@ continue;
                     const nextTrimmed = cleanText(lines[j].trim());
 
                     if (nextTrimmed === '') {
-continue;
-}
+                        continue;
+                    }
 
                     if (
                         /^(Q\d+[:.)]|Question\s+\d*[:.)]?)/i.test(

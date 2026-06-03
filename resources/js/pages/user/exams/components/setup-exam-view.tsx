@@ -9,6 +9,7 @@ import {
     ArrowRight,
 } from 'lucide-react';
 import React from 'react';
+import { HowItWorksModal } from '@/components/how-it-works-modal';
 import { PageContainer } from '@/components/page-container';
 import { PageHeader } from '@/components/page-header';
 
@@ -40,11 +41,35 @@ export function SetupExamView({
 
             <PageContainer>
                 {/* Header Information Section */}
-                <PageHeader
-                    title="Mock Exams"
-                    description="Select your target certification level to configure the simulation parameters."
-                    className="flex flex-col gap-1"
-                />
+                <div className="mb-8 flex items-start gap-3">
+                    <PageHeader
+                        title="Mock Exams"
+                        description="Select your target certification level to configure the simulation parameters."
+                        tooltip="A full-length timed mock examination simulating the official Civil Service Exam environment."
+                    />
+                    <div className="mt-1">
+                        <HowItWorksModal
+                            title="How Mock Exams Work"
+                            tips={[
+                                {
+                                    icon: '⏱️',
+                                    title: 'Full Simulation',
+                                    text: 'This is a strict simulation of the actual Civil Service Exam. Once started, the timer cannot be paused.',
+                                },
+                                {
+                                    icon: '📊',
+                                    title: 'Post-Exam Review',
+                                    text: 'You will only see your score and the correct answers after you submit the entire exam. Use the review mode to analyze your mistakes.',
+                                },
+                                {
+                                    icon: '🎯',
+                                    title: 'Passing Target',
+                                    text: 'Aim for a score of 80% or higher, which is the actual passing rate for the official Civil Service Exam.',
+                                },
+                            ]}
+                        />
+                    </div>
+                </div>
 
                 {/* Primary Column Grid Layout */}
                 <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">

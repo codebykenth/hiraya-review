@@ -14,6 +14,10 @@ import {
     CheckCircle2,
     Clock,
     ChevronRight,
+    RotateCcw,
+    XCircle,
+    CalendarPlus,
+    CalendarMinus,
 } from 'lucide-react';
 import Pusher from 'pusher-js';
 import { useEffect, useState } from 'react';
@@ -25,6 +29,7 @@ interface SubjectMasteryItem {
     rating: string;
     color: 'rose' | 'amber' | 'emerald' | 'sky';
     insight: string;
+    recommended_action: string;
 }
 
 interface RemediationItem {
@@ -34,18 +39,78 @@ interface RemediationItem {
     coaching_tip: string;
 }
 
-interface StudyDay {
-    day: string;
+interface StudyTask {
     focus_topic: string;
     activity: string;
     subcategory_id?: number | null;
 }
 
+interface StudyDay {
+    day: string;
+    tasks: StudyTask[];
+}
+
 interface ExistingSchedule {
+    id?: number;
     study_date: string;
     title: string;
     subcategory_id?: number | null;
 }
+
+const getTopicBadge = (topic: string) => {
+    const lower = topic.toLowerCase();
+    let label = 'General';
+
+    if (
+        lower.includes('numerical') ||
+        lower.includes('math') ||
+        lower.includes('fraction') ||
+        lower.includes('operation') ||
+        lower.includes('sequence') ||
+        lower.includes('problem')
+    ) {
+        label = 'Numerical Ability';
+    } else if (
+        lower.includes('verbal') ||
+        lower.includes('word') ||
+        lower.includes('reading') ||
+        lower.includes('grammar') ||
+        lower.includes('comprehension') ||
+        lower.includes('sentence')
+    ) {
+        label = 'Verbal Ability';
+    } else if (
+        lower.includes('analytical') ||
+        lower.includes('logic') ||
+        lower.includes('abstract') ||
+        lower.includes('reasoning')
+    ) {
+        label = 'Analytical Ability';
+    } else if (
+        lower.includes('clerical') ||
+        lower.includes('filing') ||
+        lower.includes('spelling') ||
+        lower.includes('alphabet')
+    ) {
+        label = 'Clerical Ability';
+    } else if (
+        lower.includes('constitution') ||
+        lower.includes('general info') ||
+        lower.includes('philippine') ||
+        lower.includes('ra 6713') ||
+        lower.includes('conduct') ||
+        lower.includes('human rights') ||
+        lower.includes('environment')
+    ) {
+        label = 'General Info';
+    }
+
+    return (
+        <span className="inline-flex items-center rounded border border-slate-200 bg-slate-50 px-1.5 py-0.5 text-[10px] font-bold tracking-wider text-slate-500 uppercase dark:border-slate-800 dark:bg-slate-900/60 dark:text-slate-400">
+            {label}
+        </span>
+    );
+};
 
 interface AiAnalysisProps {
     status: 'no_data' | 'generating' | 'ready';
@@ -73,7 +138,7 @@ interface AiAnalysisProps {
             potential_score_improvement: string;
         };
         remediation_matrix?: RemediationItem[];
-        personalized_7_day_plan?: StudyDay[];
+        personalized_study_plan?: StudyDay[];
         long_term_roadmap?: Array<{
             phase: string;
             focus: string;
@@ -106,12 +171,17 @@ export default function AiAnalysisReport({
     const [scheduledDays, setScheduledDays] = useState<Record<string, boolean>>(
         {},
     );
-    const [schedulingDays, setSchedulingDays] = useState<
-        Record<string, boolean>
-    >({});
+    const [togglingDays, setTogglingDays] = useState<Record<string, boolean>>(
+        {},
+    );
+    const [isBulkActionRunning, setIsBulkActionRunning] = useState(false);
 
-    const handleScheduleDay = async (dayPlan: StudyDay, index: number) => {
-        setSchedulingDays((prev) => ({ ...prev, [dayPlan.day]: true }));
+    const handleToggleScheduleDay = async (
+        dayPlan: StudyDay,
+        index: number,
+    ) => {
+        const dayKey = dayPlan.day;
+        setTogglingDays((prev) => ({ ...prev, [dayKey]: true }));
         const today = new Date();
         today.setDate(today.getDate() + index);
         const yyyy = today.getFullYear();
@@ -124,28 +194,154 @@ export default function AiAnalysisReport({
                 .querySelector('meta[name="csrf-token"]')
                 ?.getAttribute('content') || '';
 
-        try {
-            const response = await fetch('/study-schedules', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': csrfToken,
-                },
-                body: JSON.stringify({
-                    study_date: studyDateStr,
-                    title: `Study: ${dayPlan.focus_topic}`,
-                    description: dayPlan.activity,
-                    subcategory_id: dayPlan.subcategory_id || null,
-                }),
-            });
+        const isCurrentlyScheduled = scheduledDays[dayKey];
 
-            if (response.ok) {
-                setScheduledDays((prev) => ({ ...prev, [dayPlan.day]: true }));
+        try {
+            if (isCurrentlyScheduled) {
+                const matchingSchedules = (existingSchedules || []).filter(
+                    (s) => s.study_date === studyDateStr,
+                );
+                const promises = matchingSchedules.map((s) => {
+                    if (s.id) {
+                        return fetch(`/study-schedules/${s.id}`, {
+                            method: 'DELETE',
+                            headers: {
+                                'X-CSRF-TOKEN': csrfToken,
+                            },
+                        });
+                    }
+
+                    return Promise.resolve(null);
+                });
+                await Promise.all(promises);
+                setScheduledDays((prev) => ({ ...prev, [dayKey]: false }));
+            } else {
+                const promises = (dayPlan.tasks || []).map((task) =>
+                    fetch('/study-schedules', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': csrfToken,
+                        },
+                        body: JSON.stringify({
+                            study_date: studyDateStr,
+                            title: `Study: ${task.focus_topic}`,
+                            description: task.activity,
+                            subcategory_id: task.subcategory_id || null,
+                        }),
+                    }),
+                );
+                const responses = await Promise.all(promises);
+
+                if (responses.every((r) => r.ok)) {
+                    setScheduledDays((prev) => ({ ...prev, [dayKey]: true }));
+                }
             }
+
+            router.reload({ only: ['existingSchedules'] });
         } catch (error) {
-            console.error('Failed to schedule study day:', error);
+            console.error('Failed to toggle study day schedule:', error);
         } finally {
-            setSchedulingDays((prev) => ({ ...prev, [dayPlan.day]: false }));
+            setTogglingDays((prev) => ({ ...prev, [dayKey]: false }));
+        }
+    };
+
+    const handleBulkToggleSchedules = async () => {
+        if (!data || !data.personalized_study_plan) {
+return;
+}
+
+        setIsBulkActionRunning(true);
+
+        const csrfToken =
+            document
+                .querySelector('meta[name="csrf-token"]')
+                ?.getAttribute('content') || '';
+
+        const allScheduled = data.personalized_study_plan.every(
+            (dayPlan) => scheduledDays[dayPlan.day],
+        );
+
+        try {
+            if (allScheduled) {
+                const deletePromises: Promise<any>[] = [];
+                data.personalized_study_plan.forEach((dayPlan, index) => {
+                    const today = new Date();
+                    today.setDate(today.getDate() + index);
+                    const yyyy = today.getFullYear();
+                    const mm = String(today.getMonth() + 1).padStart(2, '0');
+                    const dd = String(today.getDate()).padStart(2, '0');
+                    const studyDateStr = `${yyyy}-${mm}-${dd}`;
+
+                    const matching = (existingSchedules || []).filter(
+                        (s) => s.study_date === studyDateStr,
+                    );
+                    matching.forEach((s) => {
+                        if (s.id) {
+                            deletePromises.push(
+                                fetch(`/study-schedules/${s.id}`, {
+                                    method: 'DELETE',
+                                    headers: {
+                                        'X-CSRF-TOKEN': csrfToken,
+                                    },
+                                }),
+                            );
+                        }
+                    });
+                });
+                await Promise.all(deletePromises);
+
+                const updatedScheduled: Record<string, boolean> = {};
+                data.personalized_study_plan.forEach((dayPlan) => {
+                    updatedScheduled[dayPlan.day] = false;
+                });
+                setScheduledDays(updatedScheduled);
+            } else {
+                const createPromises: Promise<any>[] = [];
+                data.personalized_study_plan.forEach((dayPlan, index) => {
+                    if (scheduledDays[dayPlan.day]) {
+return;
+}
+
+                    const today = new Date();
+                    today.setDate(today.getDate() + index);
+                    const yyyy = today.getFullYear();
+                    const mm = String(today.getMonth() + 1).padStart(2, '0');
+                    const dd = String(today.getDate()).padStart(2, '0');
+                    const studyDateStr = `${yyyy}-${mm}-${dd}`;
+
+                    (dayPlan.tasks || []).forEach((task) => {
+                        createPromises.push(
+                            fetch('/study-schedules', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRF-TOKEN': csrfToken,
+                                },
+                                body: JSON.stringify({
+                                    study_date: studyDateStr,
+                                    title: `Study: ${task.focus_topic}`,
+                                    description: task.activity,
+                                    subcategory_id: task.subcategory_id || null,
+                                }),
+                            }),
+                        );
+                    });
+                });
+                await Promise.all(createPromises);
+
+                const updatedScheduled: Record<string, boolean> = {};
+                data.personalized_study_plan.forEach((dayPlan) => {
+                    updatedScheduled[dayPlan.day] = true;
+                });
+                setScheduledDays(updatedScheduled);
+            }
+
+            router.reload({ only: ['existingSchedules'] });
+        } catch (error) {
+            console.error('Failed bulk scheduling toggle:', error);
+        } finally {
+            setIsBulkActionRunning(false);
         }
     };
 
@@ -156,9 +352,9 @@ export default function AiAnalysisReport({
     }, [status]);
 
     useEffect(() => {
-        if (data?.personalized_7_day_plan && existingSchedules.length > 0) {
+        if (data?.personalized_study_plan && existingSchedules.length > 0) {
             const initialScheduled: Record<string, boolean> = {};
-            data.personalized_7_day_plan.forEach((dayPlan, index) => {
+            data.personalized_study_plan.forEach((dayPlan, index) => {
                 const today = new Date();
                 today.setDate(today.getDate() + index);
                 const yyyy = today.getFullYear();
@@ -166,13 +362,15 @@ export default function AiAnalysisReport({
                 const dd = String(today.getDate()).padStart(2, '0');
                 const studyDateStr = `${yyyy}-${mm}-${dd}`;
 
-                const exists = existingSchedules.some(
-                    (s) =>
-                        s.study_date === studyDateStr &&
-                        s.title === `Study: ${dayPlan.focus_topic}`,
+                const allTasksExist = dayPlan.tasks?.every((task) =>
+                    existingSchedules.some(
+                        (s) =>
+                            s.study_date === studyDateStr &&
+                            s.title === `Study: ${task.focus_topic}`,
+                    ),
                 );
 
-                if (exists) {
+                if (allTasksExist && dayPlan.tasks?.length > 0) {
                     initialScheduled[dayPlan.day] = true;
                 }
             });
@@ -222,6 +420,11 @@ export default function AiAnalysisReport({
         };
     }, [localStatus, auth?.user?.id, pusher]);
 
+    const allScheduled =
+        data?.personalized_study_plan?.every(
+            (dayPlan) => scheduledDays[dayPlan.day],
+        ) || false;
+
     return (
         <>
             <Head>
@@ -230,7 +433,7 @@ export default function AiAnalysisReport({
                 </title>
                 <meta
                     name="description"
-                    content="Get deep predictive coaching insights, timeline readiness milestones, subtopic gaps, and your personalized 7-day study plan."
+                    content="Get deep predictive coaching insights, timeline readiness milestones, subtopic gaps, and your personalized daily study plan."
                 />
             </Head>
 
@@ -354,23 +557,52 @@ export default function AiAnalysisReport({
                                         Last Updated Today
                                     </span>
                                     {isLocal && (
-                                        <button
-                                            onClick={() => {
-                                                setLocalStatus('generating');
-                                                setErrorMessage(null);
-                                                router.visit(
-                                                    '/dashboard/ai-analysis?retry=1',
-                                                    {
-                                                        replace: true,
-                                                        preserveScroll: true,
-                                                    },
-                                                );
-                                            }}
-                                            className="text-emerald-650 dark:bg-emerald-550/10 inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-emerald-500/20 bg-emerald-600/10 px-2.5 py-1 text-[10px] font-black uppercase transition hover:bg-emerald-600/20 dark:text-emerald-400"
-                                        >
-                                            <Sparkles className="size-3" />
-                                            Generate Again
-                                        </button>
+                                        <div className="flex gap-2">
+                                            <button
+                                                onClick={() => {
+                                                    if (
+                                                        confirm(
+                                                            'Delete existing analysis and generate a new one from scratch?',
+                                                        )
+                                                    ) {
+                                                        setLocalStatus(
+                                                            'generating',
+                                                        );
+                                                        setErrorMessage(null);
+                                                        router.visit(
+                                                            '/dashboard/ai-analysis?delete=1',
+                                                            {
+                                                                replace: true,
+                                                                preserveScroll: true,
+                                                            },
+                                                        );
+                                                    }
+                                                }}
+                                                className="text-rose-650 dark:bg-rose-550/10 inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-rose-500/20 bg-rose-600/10 px-2.5 py-1 text-[10px] font-black uppercase transition hover:bg-rose-600/20 dark:text-rose-400"
+                                            >
+                                                <RotateCcw className="size-3" />
+                                                Delete Analysis
+                                            </button>
+                                            <button
+                                                onClick={() => {
+                                                    setLocalStatus(
+                                                        'generating',
+                                                    );
+                                                    setErrorMessage(null);
+                                                    router.visit(
+                                                        '/dashboard/ai-analysis?retry=1',
+                                                        {
+                                                            replace: true,
+                                                            preserveScroll: true,
+                                                        },
+                                                    );
+                                                }}
+                                                className="text-emerald-650 dark:bg-emerald-550/10 inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-emerald-500/20 bg-emerald-600/10 px-2.5 py-1 text-[10px] font-black uppercase transition hover:bg-emerald-600/20 dark:text-emerald-400"
+                                            >
+                                                <Sparkles className="size-3" />
+                                                Generate Again
+                                            </button>
+                                        </div>
                                     )}
                                 </div>
                             </div>
@@ -648,6 +880,19 @@ export default function AiAnalysisReport({
                                                         <p className="mt-3 text-xs leading-relaxed text-slate-500 dark:text-slate-400">
                                                             {item.insight}
                                                         </p>
+                                                        {item.recommended_action && (
+                                                            <div className="mt-3 rounded-lg border border-indigo-100 bg-indigo-50/50 p-3 dark:border-indigo-900/30 dark:bg-indigo-950/20">
+                                                                <span className="flex items-center gap-1.5 text-[10px] font-black tracking-wider text-indigo-600 uppercase dark:text-indigo-400">
+                                                                    <Zap className="size-3" />
+                                                                    Action Step
+                                                                </span>
+                                                                <p className="mt-1 text-xs leading-relaxed font-bold text-slate-800 dark:text-slate-200">
+                                                                    {
+                                                                        item.recommended_action
+                                                                    }
+                                                                </p>
+                                                            </div>
+                                                        )}
                                                     </div>
                                                 </Card>
                                             );
@@ -735,69 +980,143 @@ export default function AiAnalysisReport({
                             )}
 
                         {/* Dynamic Personalized Calendar */}
-                        {data.personalized_7_day_plan &&
-                            data.personalized_7_day_plan.length > 0 && (
-                                <div>
-                                    <h3 className="mb-4 flex items-center gap-2 text-lg font-black text-slate-900 dark:text-white">
-                                        <Calendar className="size-5 text-emerald-600 dark:text-emerald-400" />
-                                        Your Personalized{' '}
-                                        {data.personalized_7_day_plan.length}
-                                        -Day Action Plan
-                                    </h3>
+                        {data?.personalized_study_plan &&
+                            data.personalized_study_plan.length > 0 && (
+                                <div className="space-y-4">
+                                    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                                        <h3 className="flex items-center gap-2 text-lg font-black text-slate-900 dark:text-white">
+                                            <Calendar className="size-5 text-emerald-600 dark:text-emerald-400" />
+                                            Your 7-Day Action Plan
+                                        </h3>
+                                        <button
+                                            onClick={handleBulkToggleSchedules}
+                                            disabled={isBulkActionRunning}
+                                            className={`flex cursor-pointer items-center justify-center gap-2 rounded-xl px-4 py-2 text-xs font-black tracking-wider uppercase transition-all duration-200 disabled:opacity-50 ${
+                                                allScheduled
+                                                    ? 'dark:hover:bg-rose-955/35 border border-rose-200 bg-rose-50 text-rose-700 hover:bg-rose-100/70 dark:border-rose-900/40 dark:bg-rose-950/20 dark:text-rose-400'
+                                                    : 'dark:hover:bg-indigo-955/35 border border-indigo-200 bg-indigo-50 text-indigo-700 hover:bg-indigo-100/70 dark:border-indigo-900/40 dark:bg-indigo-950/20 dark:text-indigo-400'
+                                            }`}
+                                        >
+                                            {isBulkActionRunning ? (
+                                                <Loader2 className="size-4 animate-spin" />
+                                            ) : allScheduled ? (
+                                                <CalendarMinus className="size-4" />
+                                            ) : (
+                                                <CalendarPlus className="size-4" />
+                                            )}
+                                            {allScheduled
+                                                ? 'Unschedule All Days'
+                                                : 'Schedule All Days'}
+                                        </button>
+                                    </div>
                                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7">
-                                        {data.personalized_7_day_plan.map(
+                                        {data.personalized_study_plan.map(
                                             (dayPlan, index) => (
                                                 <Card
                                                     key={dayPlan.day}
-                                                    className="flex flex-col justify-between gap-3 p-4 transition duration-300 hover:border-blue-400 dark:hover:border-blue-700"
+                                                    className="flex flex-col justify-between gap-3 border-t-2 border-t-slate-200 p-4 transition duration-300 hover:border-indigo-500/50 dark:border-t-slate-700 dark:hover:border-indigo-500/50"
                                                 >
                                                     <div>
-                                                        <div className="dark:border-slate-850 mb-2 flex items-center justify-between border-b border-slate-100 pb-2">
-                                                            <span className="text-xs font-black text-indigo-600 uppercase dark:text-indigo-400">
+                                                        <div className="dark:border-slate-850 mb-3 flex items-center justify-between border-b border-slate-100 pb-2">
+                                                            <span className="text-sm font-black tracking-wider text-slate-900 uppercase dark:text-white">
                                                                 {dayPlan.day}
                                                             </span>
-                                                            <BookOpen className="size-3.5 text-slate-400" />
+                                                            <BookOpen className="size-4 text-slate-400" />
                                                         </div>
-                                                        <span className="text-slate-850 block text-xs leading-tight font-bold dark:text-slate-200">
-                                                            {
-                                                                dayPlan.focus_topic
-                                                            }
-                                                        </span>
-                                                        <p className="mt-2 text-[11px] leading-relaxed text-slate-500 italic dark:text-slate-400">
-                                                            {dayPlan.activity}
-                                                        </p>
+                                                        <div className="flex flex-col gap-2.5">
+                                                            {(
+                                                                dayPlan.tasks ||
+                                                                []
+                                                            ).map(
+                                                                (
+                                                                    task,
+                                                                    tIndex,
+                                                                ) => (
+                                                                    <div
+                                                                        key={
+                                                                            tIndex
+                                                                        }
+                                                                        className="flex flex-col gap-2 rounded-lg border border-slate-100 bg-slate-50/50 p-3 dark:border-slate-800/60 dark:bg-slate-900/30"
+                                                                    >
+                                                                        <div className="flex items-start justify-between gap-2">
+                                                                            {getTopicBadge(
+                                                                                task.focus_topic,
+                                                                            )}
+                                                                        </div>
+                                                                        <span className="block text-sm leading-snug font-bold text-slate-900 dark:text-slate-100">
+                                                                            {
+                                                                                task.focus_topic
+                                                                            }
+                                                                        </span>
+                                                                        <p className="dark:text-slate-350 text-xs leading-relaxed text-slate-600">
+                                                                            {
+                                                                                task.activity
+                                                                            }
+                                                                        </p>
+                                                                    </div>
+                                                                ),
+                                                            )}
+                                                        </div>
                                                     </div>
 
                                                     <div className="dark:border-slate-850 mt-2 border-t border-slate-100/80 pt-2">
                                                         {scheduledDays[
                                                             dayPlan.day
                                                         ] ? (
-                                                            <span className="inline-flex w-full items-center justify-center gap-1 rounded-lg bg-emerald-50 px-2 py-1 text-[10px] font-black text-emerald-700 uppercase dark:bg-emerald-500/10 dark:text-emerald-400">
-                                                                <CheckCircle2 className="size-3" />
-                                                                Scheduled
-                                                            </span>
-                                                        ) : (
                                                             <button
                                                                 onClick={() =>
-                                                                    handleScheduleDay(
+                                                                    handleToggleScheduleDay(
                                                                         dayPlan,
                                                                         index,
                                                                     )
                                                                 }
                                                                 disabled={
-                                                                    schedulingDays[
+                                                                    togglingDays[
                                                                         dayPlan
                                                                             .day
                                                                     ]
                                                                 }
-                                                                className="inline-flex w-full cursor-pointer items-center justify-center gap-1 rounded-lg bg-indigo-50 px-2 py-1 text-[10px] font-black text-indigo-700 uppercase transition hover:bg-indigo-100 disabled:opacity-50 dark:bg-indigo-500/10 dark:text-indigo-400 dark:hover:bg-indigo-500/20"
+                                                                className="group inline-flex w-full cursor-pointer items-center justify-center gap-1.5 rounded-lg border border-emerald-200 bg-emerald-50 px-2 py-2 text-xs font-black tracking-wider text-emerald-700 uppercase transition-all duration-205 hover:border-rose-200 hover:bg-rose-50 hover:text-rose-700 disabled:opacity-50 dark:border-emerald-900/40 dark:bg-emerald-500/10 dark:text-emerald-400 dark:hover:border-rose-900/40 dark:hover:bg-rose-500/10 dark:hover:text-rose-400"
                                                             >
-                                                                {schedulingDays[
+                                                                {togglingDays[
                                                                     dayPlan.day
                                                                 ] ? (
-                                                                    <Loader2 className="size-3 animate-spin" />
+                                                                    <Loader2 className="size-3.5 animate-spin" />
                                                                 ) : (
-                                                                    <Calendar className="size-3" />
+                                                                    <>
+                                                                        <CheckCircle2 className="size-3.5 group-hover:hidden" />
+                                                                        <XCircle className="hidden size-3.5 text-rose-500 group-hover:inline dark:text-rose-400" />
+                                                                        <span className="group-hover:hidden">
+                                                                            Scheduled
+                                                                        </span>
+                                                                        <span className="hidden group-hover:inline">
+                                                                            Unschedule
+                                                                        </span>
+                                                                    </>
+                                                                )}
+                                                            </button>
+                                                        ) : (
+                                                            <button
+                                                                onClick={() =>
+                                                                    handleToggleScheduleDay(
+                                                                        dayPlan,
+                                                                        index,
+                                                                    )
+                                                                }
+                                                                disabled={
+                                                                    togglingDays[
+                                                                        dayPlan
+                                                                            .day
+                                                                    ]
+                                                                }
+                                                                className="inline-flex w-full cursor-pointer items-center justify-center gap-1.5 rounded-lg border border-indigo-200 bg-indigo-50 px-2 py-2 text-xs font-black tracking-wider text-indigo-700 uppercase transition-all duration-205 hover:bg-indigo-100 disabled:opacity-50 dark:border-indigo-900/40 dark:bg-indigo-500/10 dark:text-indigo-400 dark:hover:bg-indigo-500/20"
+                                                            >
+                                                                {togglingDays[
+                                                                    dayPlan.day
+                                                                ] ? (
+                                                                    <Loader2 className="size-3.5 animate-spin" />
+                                                                ) : (
+                                                                    <Calendar className="size-3.5" />
                                                                 )}
                                                                 Schedule
                                                             </button>
@@ -810,59 +1129,19 @@ export default function AiAnalysisReport({
                                 </div>
                             )}
 
-                        {/* Phased Strategic Roadmap */}
-                        {data.long_term_roadmap &&
-                            data.long_term_roadmap.length > 0 && (
-                                <div className="mt-8 border-t border-slate-200/80 pt-8 dark:border-slate-800">
-                                    <h3 className="mb-4 flex items-center gap-2 text-lg font-black text-slate-900 dark:text-white">
-                                        <Sparkles className="size-5 animate-pulse text-amber-500" />
-                                        Long-Term Phased Study Roadmap (Day 15+)
-                                    </h3>
-                                    <div className="relative ml-4 space-y-6 border-l-2 border-slate-200 pl-6 dark:border-slate-800">
-                                        {data.long_term_roadmap.map(
-                                            (phaseItem) => (
-                                                <div
-                                                    key={phaseItem.phase}
-                                                    className="relative"
-                                                >
-                                                    {/* Glowing timeline dot */}
-                                                    <div className="absolute top-1.5 -left-[31px] flex h-4 w-4 items-center justify-center rounded-full bg-amber-500 ring-4 ring-white dark:ring-slate-900">
-                                                        <div className="h-1.5 w-1.5 rounded-full bg-white" />
-                                                    </div>
-                                                    <div>
-                                                        <span className="border-amber-250 inline-flex items-center rounded-full border bg-amber-50 px-2.5 py-0.5 text-xs font-black tracking-wider text-amber-800 uppercase dark:border-amber-900/40 dark:bg-amber-950/30 dark:text-amber-400">
-                                                            {phaseItem.phase}
-                                                        </span>
-                                                        <h4 className="mt-1 text-sm font-bold text-slate-900 dark:text-white">
-                                                            Focus Area:{' '}
-                                                            {phaseItem.focus}
-                                                        </h4>
-                                                        <p className="mt-1 max-w-3xl text-xs leading-relaxed text-slate-600 dark:text-slate-400">
-                                                            Milestone Target:{' '}
-                                                            {
-                                                                phaseItem.milestone
-                                                            }
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                            ),
-                                        )}
-                                    </div>
-                                </div>
-                            )}
-
-                        {/* Encouragement Footer */}
-                        <div className="flex flex-col items-center justify-between gap-4 border-t border-slate-200 pt-6 sm:flex-row dark:border-slate-800">
-                            <p className="text-xs text-slate-500 italic dark:text-slate-400">
-                                "{data.encouragement}"
-                            </p>
-                            {/* <Link
+                        {data?.encouragement && (
+                            <div className="flex flex-col items-center justify-between gap-4 border-t border-slate-200 pt-6 sm:flex-row dark:border-slate-800">
+                                <p className="text-xs text-slate-500 italic dark:text-slate-400">
+                                    "{data.encouragement}"
+                                </p>
+                            </div>
+                        )}
+                        {/* <Link
                                 href="/dashboard"
                                 className="inline-flex items-center gap-1.5 rounded-lg border border-slate-250 bg-white px-3 py-1.5 text-xs font-bold text-slate-700 hover:bg-slate-50 transition dark:border-slate-800 dark:bg-slate-950 dark:text-slate-300 dark:hover:bg-slate-900"
                             >
                                 Back to Dashboard
                             </Link> */}
-                        </div>
                     </div>
                 )}
             </PageContainer>

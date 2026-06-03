@@ -9,6 +9,8 @@ interface SearchFilterRowProps {
     selectedCategory: string;
     setSelectedCategory: (cat: string) => void;
     categories: Category[];
+    categoryStats?: Record<string, { completed: number; total: number }>;
+    overallProgressPercent?: number;
 }
 
 export function SearchFilterRow({
@@ -17,6 +19,8 @@ export function SearchFilterRow({
     selectedCategory,
     setSelectedCategory,
     categories,
+    categoryStats = {},
+    overallProgressPercent = 0,
 }: SearchFilterRowProps) {
     return (
         <div className="flex flex-col gap-5 rounded-2xl border border-border bg-card p-5 shadow-2xs lg:flex-row lg:items-center lg:justify-between">
@@ -40,10 +44,18 @@ export function SearchFilterRow({
                             : 'bg-slate-50 text-muted-foreground hover:bg-slate-100 dark:bg-slate-900 dark:hover:bg-slate-800'
                     }`}
                 >
-                    All Categories
+                    All Categories ({overallProgressPercent}%)
                 </button>
                 {categories.map((cat) => {
                     const isSelected = selectedCategory === cat.name;
+                    const stat = categoryStats[cat.name] || {
+                        completed: 0,
+                        total: 0,
+                    };
+                    const pct =
+                        stat.total > 0
+                            ? Math.round((stat.completed / stat.total) * 100)
+                            : 0;
 
                     return (
                         <button
@@ -55,7 +67,7 @@ export function SearchFilterRow({
                                     : 'bg-slate-50 text-muted-foreground hover:bg-slate-100 dark:bg-slate-900 dark:hover:bg-slate-800'
                             }`}
                         >
-                            {cat.name}
+                            {cat.name} ({pct}%)
                         </button>
                     );
                 })}

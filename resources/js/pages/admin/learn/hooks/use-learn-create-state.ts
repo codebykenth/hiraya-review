@@ -107,9 +107,7 @@ export function useLearnCreateState({
     const [activeTab, setActiveTab] = useState<'ai' | 'manual'>(initialTab);
     const [aiTopic, setAiTopic] = useState(initialTopic);
     const [aiPrompt, setAiPrompt] = useState('');
-    const [aiPrimaryModel, setAiPrimaryModel] = useState(
-        'llama-3.3-70b-versatile',
-    );
+    const [aiPrimaryModel, setAiPrimaryModel] = useState('gemini-3.5-flash');
     const [isGenerating, setIsGenerating] = useState(false);
     const [generationError, setGenerationError] = useState<string | null>(null);
     const [successMsg, setSuccessMsg] = useState<string | null>(null);

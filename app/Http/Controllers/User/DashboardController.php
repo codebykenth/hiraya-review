@@ -311,11 +311,28 @@ class DashboardController
 
         $status = 'no_data';
         $data = null;
-
         if ($latestAttemptId) {
             $cacheKey = "ai-analysis-generating-{$userId}";
+            $failKey = "ai-analysis-failed-{$userId}";
+
+            if ($request->has('delete')) {
+                UserAiAnalysis::where('user_id', $userId)->delete();
+                Cache::forget($cacheKey);
+                Cache::forget($failKey);
+
+                return redirect('/dashboard/ai-analysis');
+            }
+
             if ($request->has('retry')) {
                 Cache::forget($cacheKey);
+                Cache::forget($failKey);
+
+                if (! Cache::has($cacheKey)) {
+                    Cache::put($cacheKey, true, 60);
+                    GenerateUserAnalysisJob::dispatchAfterResponse($userId, $latestAttemptId);
+                }
+
+                return redirect('/dashboard/ai-analysis');
             }
 
             if (! $analysis) {
@@ -325,10 +342,10 @@ class DashboardController
                 }
                 $status = 'generating';
             } else {
-                $generatedToday = $analysis->updated_at->isToday();
+                $isRecent = $analysis->updated_at->diffInDays(now()) < 7;
                 $failKey = "ai-analysis-failed-{$userId}";
-                if ($request->has('retry') || (! $generatedToday && $analysis->last_exam_attempt_id !== $latestAttemptId)) {
-                    if ($request->has('retry') || ! Cache::has($failKey)) {
+                if (! $isRecent && $analysis->last_exam_attempt_id !== $latestAttemptId) {
+                    if (! Cache::has($failKey)) {
                         if (! Cache::has($cacheKey)) {
                             Cache::put($cacheKey, true, 60);
                             GenerateUserAnalysisJob::dispatchAfterResponse($userId, $latestAttemptId);
@@ -348,6 +365,7 @@ class DashboardController
             ->where('study_date', '>=', now()->startOfDay())
             ->get()
             ->map(fn ($s) => [
+                'id' => $s->id,
                 'study_date' => $s->study_date->format('Y-m-d'),
                 'title' => $s->title,
                 'subcategory_id' => $s->subcategory_id,

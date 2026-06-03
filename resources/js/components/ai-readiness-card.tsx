@@ -243,7 +243,7 @@ export default function AiReadinessCard({ aiAnalysis }: AiReadinessCardProps) {
                                 AI Readiness Report
                                 <span className="border-indigo-150 inline-flex items-center gap-1 rounded-full border bg-indigo-50 px-2 py-0.5 text-[9px] font-black tracking-wider text-indigo-700 uppercase dark:border-indigo-500/20 dark:bg-indigo-500/10 dark:text-indigo-400">
                                     <Sparkles className="size-2.5" />
-                                    Daily Update
+                                    Weekly Update
                                 </span>
                             </h3>
                             <p className="text-xs text-slate-500 dark:text-slate-400">
@@ -307,15 +307,15 @@ export default function AiReadinessCard({ aiAnalysis }: AiReadinessCardProps) {
                             </svg>
                             <div className="flex flex-col items-center justify-center">
                                 <span
-                                    className={`text-2xl font-black ${textColor}`}
+                                    className={`text-3xl font-black ${textColor}`}
                                 >
                                     {prob}%
                                 </span>
-                                <span className="text-[10px] font-bold tracking-wider text-slate-500 uppercase dark:text-slate-400">
-                                    Pass Prob
-                                </span>
                             </div>
                         </div>
+                        <span className="mt-2 text-[10px] font-black tracking-widest text-slate-500 uppercase dark:text-slate-400">
+                            Passing Probability
+                        </span>
                     </div>
 
                     {/* Verdict: 9 cols */}

@@ -6,9 +6,11 @@ use App\Events\AiGenerationCompleted;
 use App\Events\AiGenerationFailed;
 use App\Models\Category;
 use App\Models\ExamAttempt;
+use App\Models\ExamDate;
 use App\Models\Question;
 use App\Models\Subcategory;
 use App\Models\UserAiAnalysis;
+use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -17,6 +19,7 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 
 class GenerateUserAnalysisJob implements ShouldQueue
 {
@@ -28,12 +31,14 @@ class GenerateUserAnalysisJob implements ShouldQueue
 
     public function __construct(
         protected int $userId,
-        protected int $latestAttemptId
+        protected int $latestAttemptId,
+        protected string $primaryModel = 'llama-3.3-70b-versatile'
     ) {}
 
     public function handle(): void
     {
         set_time_limit(300);
+        Log::info("GenerateUserAnalysisJob: Started for user {$this->userId} with attempt {$this->latestAttemptId}");
 
         $groqKey = config('services.groq.key') ?: env('GROQ_API_KEY');
         $geminiKey = config('services.gemini.key') ?: env('GEMINI_API_KEY');
@@ -218,6 +223,20 @@ class GenerateUserAnalysisJob implements ShouldQueue
             'category_name' => $s->category?->name,
         ])->toArray();
 
+        $daysUntilExam = null;
+        $examDateStr = 'Not set';
+        if (Schema::hasTable('exam_dates')) {
+            $examDate = ExamDate::where('is_active', true)
+                ->where('date', '>', now())
+                ->orderBy('date')
+                ->first();
+            if ($examDate) {
+                $examDateCarbon = Carbon::parse($examDate->date);
+                $daysUntilExam = now()->diffInDays($examDateCarbon, false);
+                $examDateStr = $examDateCarbon->format('F j, Y');
+            }
+        }
+
         $systemPrompt = "
         You are an expert Civil Service Exam (CSE) coach in the Philippines. Analyze the student's exam performance data and produce a highly comprehensive and predictive diagnostic report. Be direct, encouraging but honest. Do not sugarcoat poor performance. Respond ONLY with a valid JSON object.
 
@@ -239,6 +258,7 @@ class GenerateUserAnalysisJob implements ShouldQueue
         - Score Trend (oldest to newest): ".json_encode($scores).'
         - Per-category accuracy breakdown across all attempts: '.json_encode($categoryBreakdown).'
         - Detailed subtopic performance (actual answers): '.json_encode($subtopicBreakdown).'
+        - Days Until Next Exam: " . ($daysUntilExam !== null ? "{$daysUntilExam} days (Exam Date: {$examDateStr})" : "No active exam date set") . "
         - Available subcategories in our database: '.json_encode($availableSubcategories)."
 
         Expected JSON response schema:
@@ -263,7 +283,8 @@ class GenerateUserAnalysisJob implements ShouldQueue
                 \"subject\": \"string (e.g., 'Numerical Ability')\",
                 \"rating\": \"string (e.g., 'Needs Practice' or 'Mastered' or 'Critical Concern')\",
                 \"color\": \"rose|amber|emerald|sky\",
-                \"insight\": \"1 sentence explanation of why this rating was given\"
+                \"insight\": \"1 sentence explanation of why this rating was given\",
+                \"recommended_action\": \"1 specific actionable step to improve or maintain this subject\"
                 }
             ],
             \"timeline_prediction\": {
@@ -279,21 +300,24 @@ class GenerateUserAnalysisJob implements ShouldQueue
                 \"coaching_tip\": \"1 highly specific study tactic for this subtopic\"
                 }
             ],
-            \"personalized_7_day_plan\": [
-                // This must be a dynamic plan of days (minimum 7 days, maximum 14 days) exactly aligning with your estimation in days_to_readiness (e.g. if you estimate '10 days of targeted practice', generate 10 days; if you estimate 14 or more days, generate exactly 14 days representing the first crucial phase).
+            \"personalized_study_plan\": [
+                // IMPORTANT: Generate a highly actionable 7-day study roadmap (Day 1 to Day 7) that directly maps to their diagnostic performance, is fully coherent with the 'days_to_readiness' estimation, and critically factors in the number of days remaining until their exam.
+                // Coherence & Urgency Rules:
+                // 1. Weakness Prioritization: Heavily prioritize the student's weakest categories and subtopics (specifically those identified under 'critical_weaknesses' or having the lowest accuracy scores in the breakdown). Day 1, Day 2, and Day 3 MUST focus primarily on these highest-priority weak areas.
+                // 2. Density & Urgency: If the user requires a lot of prep (e.g., 'days_to_readiness' indicates they need 30+ or 60+ days of intensive practice, or their weaknesses are severe), OR if their actual exam is very close (e.g., less than 30 days away), do NOT suggest just 1 simple topic per day. Instead, suggest multiple intensive study tasks per day (e.g., 2 or 3 distinct subtopics or activities on Day 1, Day 2, etc.) to match the density and urgency of their study timeline.
+                // 3. Extreme Urgency: If the exam is extremely close (e.g., under 10 days away) and they still have critical concern areas, prioritize maximum density (3+ distinct tasks covering key weak areas daily) to cover as much ground as possible.
+                // 4. Stable Maintenance: Conversely, if they are close to passing and the exam is far away, suggest lighter focus areas (1 targeted topic per day).
+                // 5. Strict Uniqueness Rule: Ensure each focus_topic and subcategory suggested across the entire 7 days is completely unique. Do NOT duplicate or repeat the exact same subcategory_id or focus_topic (e.g., if you suggest 'Numerical Ability: Fractions' on Day 1, do NOT suggest it again on Day 3; instead, suggest different subtopics like 'Decimals', 'Word Problems', etc.). Every day should cover distinct topics to maximize breadth of study coverage.
+                // Do NOT limit yourself to short descriptions; write detailed, clear, and fully descriptive focus_topic names and activity descriptions so the student knows exactly what to study.
                 {
                 \"day\": \"string (e.g., 'Day 1')\",
-                \"focus_topic\": \"string (e.g., 'Numerical: Fractions & Decimals')\",
-                \"activity\": \"string (e.g., 'Solve 20 practice questions')\",
-                \"subcategory_id\": integer|null (referencing the matching ID from the available subcategories list provided, or null if none fit)
-                }
-            ],
-            \"long_term_roadmap\": [
-                // If their days_to_readiness is longer than 14 days (e.g., 25 days or 60 days), supply a high-level weekly milestone plan here for the phases after Day 14 (e.g. Weeks 3-4, Weeks 5-6, etc.) up to their total estimated readiness window. Focus on category consolidation and mock sprints. If readiness is 14 days or less, you can leave this empty.
-                {
-                \"phase\": \"string (e.g., 'Phase 2 (Weeks 3-4)')\",
-                \"focus\": \"string (e.g., 'Core Numerical & Verbal Mastery')\",
-                \"milestone\": \"string (e.g., 'Achieve >75% correctness on fractions & vocabulary drills')\"
+                \"tasks\": [
+                    {
+                    \"focus_topic\": \"string (e.g., 'Numerical Ability: Fractions & Decimals Word Problems')\",
+                    \"activity\": \"string (e.g., 'Review fractional conversions, work on 15 long-form practice drills, and note time spent per question.')\",
+                    \"subcategory_id\": integer|null (referencing the matching ID from the available subcategories list provided, or null if none fit)
+                    }
+                ]
                 }
             ]
         }";
@@ -357,8 +381,9 @@ class GenerateUserAnalysisJob implements ShouldQueue
                                                     'rating' => ['type' => 'STRING'],
                                                     'color' => ['type' => 'STRING'],
                                                     'insight' => ['type' => 'STRING'],
+                                                    'recommended_action' => ['type' => 'STRING'],
                                                 ],
-                                                'required' => ['subject', 'rating', 'color', 'insight'],
+                                                'required' => ['subject', 'rating', 'color', 'insight', 'recommended_action'],
                                             ],
                                         ],
                                         'timeline_prediction' => [
@@ -383,29 +408,26 @@ class GenerateUserAnalysisJob implements ShouldQueue
                                                 'required' => ['subtopic', 'difficulty_level', 'reason_for_struggle', 'coaching_tip'],
                                             ],
                                         ],
-                                        'personalized_7_day_plan' => [
+                                        'personalized_study_plan' => [
                                             'type' => 'ARRAY',
                                             'items' => [
                                                 'type' => 'OBJECT',
                                                 'properties' => [
                                                     'day' => ['type' => 'STRING'],
-                                                    'focus_topic' => ['type' => 'STRING'],
-                                                    'activity' => ['type' => 'STRING'],
-                                                    'subcategory_id' => ['type' => 'INTEGER'],
+                                                    'tasks' => [
+                                                        'type' => 'ARRAY',
+                                                        'items' => [
+                                                            'type' => 'OBJECT',
+                                                            'properties' => [
+                                                                'focus_topic' => ['type' => 'STRING'],
+                                                                'activity' => ['type' => 'STRING'],
+                                                                'subcategory_id' => ['type' => 'INTEGER'],
+                                                            ],
+                                                            'required' => ['focus_topic', 'activity'],
+                                                        ],
+                                                    ],
                                                 ],
-                                                'required' => ['day', 'focus_topic', 'activity'],
-                                            ],
-                                        ],
-                                        'long_term_roadmap' => [
-                                            'type' => 'ARRAY',
-                                            'items' => [
-                                                'type' => 'OBJECT',
-                                                'properties' => [
-                                                    'phase' => ['type' => 'STRING'],
-                                                    'focus' => ['type' => 'STRING'],
-                                                    'milestone' => ['type' => 'STRING'],
-                                                ],
-                                                'required' => ['phase', 'focus', 'milestone'],
+                                                'required' => ['day', 'tasks'],
                                             ],
                                         ],
                                     ],
@@ -472,36 +494,20 @@ class GenerateUserAnalysisJob implements ShouldQueue
                 }
             };
 
-            // Define fallback lists of free models (ordered from best to worst)
-            $groqModels = ['llama-3.3-70b-versatile', 'gemma2-9b-it', 'mixtral-8x7b-32768', 'llama-3.1-8b-instant'];
-            $geminiModels = ['gemini-2.5-flash', 'gemini-1.5-flash'];
+            $isGemini = str_starts_with($this->primaryModel, 'gemini-');
 
-            $success = false;
-
-            // Try Groq first for analysis as standard
-            foreach ($groqModels as $model) {
-                Log::info('GenerateUserAnalysisJob: Attempting Groq model: '.$model);
-                if ($attemptGroq($model)) {
-                    $success = true;
-                    break;
-                }
-                Log::warning('GenerateUserAnalysisJob: Groq model '.$model.' failed: '.$errorMsg);
-            }
-
-            // Fallback to Gemini
-            if (! $success) {
-                foreach ($geminiModels as $model) {
-                    Log::info('GenerateUserAnalysisJob: Attempting Gemini fallback model: '.$model);
-                    if ($attemptGemini($model)) {
-                        $success = true;
-                        break;
-                    }
-                    Log::warning('GenerateUserAnalysisJob: Gemini model '.$model.' failed: '.$errorMsg);
-                }
+            if ($isGemini) {
+                Log::info("GenerateUserAnalysisJob: Calling Gemini API with model: {$this->primaryModel}");
+                $success = $attemptGemini($this->primaryModel);
+                Log::info('GenerateUserAnalysisJob: Gemini API responded. Success: '.($success ? 'true' : 'false'));
+            } else {
+                Log::info("GenerateUserAnalysisJob: Calling Groq API with model: {$this->primaryModel}");
+                $success = $attemptGroq($this->primaryModel);
+                Log::info('GenerateUserAnalysisJob: Groq API responded. Success: '.($success ? 'true' : 'false'));
             }
 
             if (! $success) {
-                Log::error('GenerateUserAnalysisJob: All AI generation models failed.');
+                Log::error('GenerateUserAnalysisJob: AI generation model failed: '.$errorMsg);
                 Cache::put("ai-analysis-failed-{$this->userId}", true, 300);
                 event(new AiGenerationFailed($this->userId, 'analysis', 'analysis'));
 
@@ -525,17 +531,18 @@ class GenerateUserAnalysisJob implements ShouldQueue
                     ]
                 );
 
+                Log::info("GenerateUserAnalysisJob: Successfully saved analysis and dispatched event for user {$this->userId}.");
                 event(new AiGenerationCompleted($this->userId, 'analysis', 'analysis'));
 
                 return;
             }
 
-            Log::error('GenerateUserAnalysisJob: API failed or returned invalid JSON structure.');
+            Log::error('GenerateUserAnalysisJob: API failed or returned invalid JSON structure. Raw output: '.substr($text, 0, 500));
             Cache::put("ai-analysis-failed-{$this->userId}", true, 300);
             event(new AiGenerationFailed($this->userId, 'analysis', 'analysis'));
 
         } catch (\Exception $e) {
-            Log::error('GenerateUserAnalysisJob Exception: '.$e->getMessage());
+            Log::error('GenerateUserAnalysisJob Exception: '.$e->getMessage()."\n".$e->getTraceAsString());
             Cache::put("ai-analysis-failed-{$this->userId}", true, 300);
             event(new AiGenerationFailed($this->userId, 'analysis', 'analysis'));
         } finally {

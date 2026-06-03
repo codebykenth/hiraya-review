@@ -1,6 +1,7 @@
 import { Head } from '@inertiajs/react';
 import React from 'react';
 import { ConfirmModal } from '@/components/confirm-modal';
+import { HowItWorksModal } from '@/components/how-it-works-modal';
 import { PageContainer } from '@/components/page-container';
 import { PageHeader } from '@/components/page-header';
 import { TooltipProvider } from '@/components/ui/tooltip';
@@ -35,12 +36,35 @@ export default function HistoryPage(props: HistoryPageProps) {
 
             <PageContainer>
                 {/* 1. HEADER SECTION */}
-                <PageHeader
-                    title="History"
-                    description="Review your past performance, analyze detailed score breakdowns, and identify specific areas for improvement across all your exam tracks."
-                    descriptionClassName="text-sm text-muted-foreground max-w-3xl leading-relaxed"
-                    className="flex flex-col gap-1"
-                />
+                <div className="mb-8 flex items-start gap-3">
+                    <PageHeader
+                        title="History"
+                        description="Review your past performance, analyze detailed score breakdowns, and identify specific areas for improvement across all your exam tracks."
+                        tooltip="A log of all your previous exam attempts, subcategory performance reports, and historical stats."
+                    />
+                    <div className="mt-1">
+                        <HowItWorksModal
+                            title="How History Works"
+                            tips={[
+                                {
+                                    icon: '🔍',
+                                    title: 'Detailed Breakdowns',
+                                    text: 'Click on any past attempt to see a comprehensive breakdown of your score across different subject categories.',
+                                },
+                                {
+                                    icon: '📅',
+                                    title: 'Filter by Date & Track',
+                                    text: 'Use the filters to quickly find specific exam runs or see how you performed during a specific time period.',
+                                },
+                                {
+                                    icon: '🗑️',
+                                    title: 'Manage Records',
+                                    text: 'You can delete old or irrelevant attempt records to keep your AI Readiness Score focused on your most recent performance.',
+                                },
+                            ]}
+                        />
+                    </div>
+                </div>
 
                 {/* 2. FILTERS CONTAINER */}
                 <FiltersCard

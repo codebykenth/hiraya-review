@@ -1,10 +1,11 @@
-import { Head, Link, usePage } from '@inertiajs/react';
+import { Head, Link, usePage, router } from '@inertiajs/react';
 import {
     BookMarked,
     Calendar,
     ChevronLeft,
     Clock,
     Lightbulb,
+    CheckCircle2,
 } from 'lucide-react';
 import React from 'react';
 import { getCategoryStyles } from '@/components/curation-index-shell';
@@ -69,6 +70,16 @@ export default function LearnShow({ module, recommended }: LearnShowProps) {
                                 {module.title}
                             </h1>
 
+                            {module.is_completed && (
+                                <div className="mt-4 flex items-center gap-2.5 rounded-lg border border-green-200/40 bg-green-50/50 px-4 py-3 text-sm font-semibold text-green-800 dark:border-green-900/30 dark:bg-green-950/20 dark:text-green-400">
+                                    <CheckCircle2 className="size-5 shrink-0 fill-green-600/10 text-green-600 dark:text-green-400" />
+                                    <span>
+                                        Lesson Completed — Well done! Keep going
+                                        with your study schedule.
+                                    </span>
+                                </div>
+                            )}
+
                             <p className="mt-4 border-l-4 border-blue-600 pl-5 text-base leading-8 font-semibold text-muted-foreground italic">
                                 {module.summary}
                             </p>
@@ -82,7 +93,37 @@ export default function LearnShow({ module, recommended }: LearnShowProps) {
 
                             <div className="relative mt-8 border-t border-border pt-7 text-foreground">
                                 {isLoggedIn ? (
-                                    <LessonMarkdown content={module.content} />
+                                    <>
+                                        <LessonMarkdown
+                                            content={module.content}
+                                        />
+                                        <div className="mt-8 flex justify-end border-t border-border pt-6">
+                                            <Button
+                                                onClick={() =>
+                                                    router.post(
+                                                        `/learn/${module.slug}/complete`,
+                                                        {},
+                                                        {
+                                                            preserveScroll: true,
+                                                        },
+                                                    )
+                                                }
+                                                variant={
+                                                    module.is_completed
+                                                        ? 'outline'
+                                                        : 'default'
+                                                }
+                                                className="flex items-center gap-2 font-bold"
+                                            >
+                                                <CheckCircle2
+                                                    className={`size-4 ${module.is_completed ? 'fill-green-600/10 text-green-600 dark:text-green-400' : ''}`}
+                                                />
+                                                {module.is_completed
+                                                    ? 'Completed'
+                                                    : 'Mark as Complete'}
+                                            </Button>
+                                        </div>
+                                    </>
                                 ) : (
                                     <div className="pointer-events-none relative max-h-[320px] overflow-hidden select-none">
                                         <LessonMarkdown

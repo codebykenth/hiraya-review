@@ -31,7 +31,7 @@ class GenerateLearnModuleJob implements ShouldQueue
 
     protected $primaryModel;
 
-    public function __construct(array $validated, int $userId, string $primaryModel = 'llama-3.3-70b-versatile')
+    public function __construct(array $validated, int $userId, string $primaryModel = 'gemini-3.5-flash')
     {
         $this->validated = $validated;
         $this->userId = $userId;
@@ -49,6 +49,17 @@ class GenerateLearnModuleJob implements ShouldQueue
             AiGenerationFailed::dispatch($this->userId, 'API Key is missing.', 'module');
 
             return;
+        }
+
+        $subcategory = $validated['subcategory'];
+        $categorySpecificRules = '';
+
+        if ($subcategory === 'Symbolic logic / abstract reasoning') {
+            $categorySpecificRules = "- If the topic is 'Symbolic logic / abstract reasoning', you MUST generate visual-spatial geometric puzzles (like finding the next shape in a sequence, folding patterns, or rotating grids) using raw, scalable SVG code. Output raw <svg viewBox=\"...\">...</svg> blocks directly inside the markdown. You MUST include SVG visuals not just in the scenario, but ALSO in every single option of the Check Your Understanding questions (Options A to D must be standalone SVGs showing the possible answers, do NOT use descriptive text for options), AND in the explanation block to visually demonstrate the correct pattern and solution. Keep SVGs clean with simple paths, <rect>, <circle>, or <polygon>. Ensure the visual sequence is logically solvable and visually clear. In the explanation block, explicitly define the visual pattern (e.g. 'The black dot rotates 90 degrees clockwise') and provide the correct logical solution alongside the SVG. Do NOT use standard deductive logic chains for Abstract Reasoning, use visual SVG puzzles instead!\n- CRITICAL HIDDEN MECHANICS: NEVER mention terms like 'SVG', 'SVG-visualized', 'scalable vector', or 'raw code' anywhere in the title, summary, or user-facing text. The end-user examinee should just read the text naturally; they do not need to know the images are SVGs. Refer to them simply as 'the chart', 'the image', or 'the pattern'.";
+        } elseif ($subcategory === 'Data interpretation') {
+            $categorySpecificRules = "- If the topic is 'Data interpretation', you MUST provide a data source for interpretation. You should provide a beautifully formatted markdown table AND/OR a chart visualization (e.g., bar chart, line graph, pie chart) using raw, scalable SVG code directly inside the text. Feel free to use both a table and an SVG chart together, or vary them. If using an SVG chart, ensure it has clear axes, data labels, titles, and legends using <text> elements. The options should be text or numbers based on the data, and the explanation block must reference the specific data points. Keep any SVG code clean and well-structured.\n- CRITICAL HIDDEN MECHANICS: NEVER mention terms like 'SVG', 'SVG-visualized', 'scalable vector', or 'raw code' anywhere in the title, summary, or user-facing text. The end-user examinee should just read the text naturally; they do not need to know the images are SVGs. Refer to them simply as 'the chart', 'the image', or 'the pattern'.";
+        } else {
+            $categorySpecificRules = '- If it is standard verbal logic, you may use propositional variables.';
         }
 
         $systemPrompt = "You are a top-tier Civil Service Exam (CSE) instructor and curriculum writer in the Philippines.
@@ -70,10 +81,7 @@ Structure the content with:
 2. ## Key Rules and Principles - give a clear bulleted breakdown of the theory, rules, spelling laws, or math logic.
 3. ## Mental Shortcut or Strategy Tip - explain fast exam-time solving methods.
 4. ## Realistic Example Scenario - walk through a step-by-step example. If mathematical, use Markdown tables with pipes. CRITICAL RULES FOR VISUAL TOPICS:
-- If the topic is 'Symbolic logic / abstract reasoning', you MUST generate visual-spatial geometric puzzles (like finding the next shape in a sequence, folding patterns, or rotating grids) using raw, scalable SVG code. Output raw <svg viewBox=\"...\">...</svg> blocks directly inside the markdown. You MUST include SVG visuals not just in the scenario, but ALSO in every single option of the Check Your Understanding questions (Options A to D must be standalone SVGs showing the possible answers, do NOT use descriptive text for options), AND in the explanation block to visually demonstrate the correct pattern and solution. Keep SVGs clean with simple paths, <rect>, <circle>, or <polygon>. Ensure the visual sequence is logically solvable and visually clear. In the explanation block, explicitly define the visual pattern (e.g. 'The black dot rotates 90 degrees clockwise') and provide the correct logical solution alongside the SVG. Do NOT use standard deductive logic chains for Abstract Reasoning, use visual SVG puzzles instead!
-- If the topic is 'Data interpretation', you MUST provide a data source for interpretation. You should provide a beautifully formatted markdown table AND/OR a chart visualization (e.g., bar chart, line graph, pie chart) using raw, scalable SVG code directly inside the text. Feel free to use both a table and an SVG chart together, or vary them. If using an SVG chart, ensure it has clear axes, data labels, titles, and legends using <text> elements. The options should be text or numbers based on the data, and the explanation block must reference the specific data points. Keep any SVG code clean and well-structured.
-- If it is standard verbal logic, you may use propositional variables.
-- CRITICAL HIDDEN MECHANICS: NEVER mention terms like 'SVG', 'SVG-visualized', 'scalable vector', or 'raw code' anywhere in the title, summary, or user-facing text. The end-user examinee should just read the text naturally; they do not need to know the images are SVGs. Refer to them simply as 'the chart', 'the image', or 'the pattern'.
+{$categorySpecificRules}
 5. ## Check Your Understanding - this must be the final section in content.
 
 The final ## Check Your Understanding section must contain exactly 3 multiple-choice questions. Each question must use this exact visible format:
@@ -158,7 +166,8 @@ Topic: {$validated['topic']}
 
                         return true;
                     } else {
-                        $errorMsg = 'Gemini API failed with status '.$response->status().': '.$response->body();
+                        $body = $response->json();
+                        $errorMsg = $body['error']['message'] ?? $response->body();
 
                         return false;
                     }
@@ -196,7 +205,8 @@ Topic: {$validated['topic']}
 
                         return true;
                     } else {
-                        $errorMsg = 'Groq API failed with status '.$groqResponse->status().': '.$groqResponse->body();
+                        $body = $groqResponse->json();
+                        $errorMsg = $body['error']['message'] ?? $groqResponse->body();
 
                         return false;
                     }
@@ -207,70 +217,28 @@ Topic: {$validated['topic']}
                 }
             };
 
-            // Define fallback lists of free models (ordered from best to worst)
-            $groqModels = ['llama-3.3-70b-versatile', 'gemma2-9b-it', 'mixtral-8x7b-32768', 'llama-3.1-8b-instant'];
-            $geminiModels = ['gemini-2.5-flash', 'gemini-1.5-flash'];
-
+            $success = false;
             $primaryIsGemini = str_starts_with($this->primaryModel, 'gemini');
 
-            $geminiChain = array_unique(array_merge([$this->primaryModel], $geminiModels));
-            $groqChain = array_unique(array_merge([$this->primaryModel], $groqModels));
-
-            // Clean chains to keep only relevant models
-            $geminiChain = array_values(array_filter($geminiChain, fn ($m) => str_starts_with($m, 'gemini')));
-            $groqChain = array_values(array_filter($groqChain, fn ($m) => ! str_starts_with($m, 'gemini')));
-
-            $success = false;
-
             if ($primaryIsGemini) {
-                // Try Gemini first
-                foreach ($geminiChain as $model) {
-                    Log::info('GenerateLearnModuleJob: Attempting Gemini model: '.$model);
-                    if ($attemptGemini($model)) {
-                        $success = true;
-                        break;
-                    }
-                    Log::warning('GenerateLearnModuleJob: Gemini model '.$model.' failed: '.$errorMsg);
-                }
-
-                // Fallback to Groq
-                if (! $success) {
-                    foreach ($groqChain as $model) {
-                        Log::info('GenerateLearnModuleJob: Attempting Groq fallback model: '.$model);
-                        if ($attemptGroq($model)) {
-                            $success = true;
-                            break;
-                        }
-                        Log::warning('GenerateLearnModuleJob: Groq model '.$model.' failed: '.$errorMsg);
-                    }
+                Log::info('GenerateLearnModuleJob: Attempting Gemini model: '.$this->primaryModel);
+                if ($attemptGemini($this->primaryModel)) {
+                    $success = true;
+                } else {
+                    Log::warning('GenerateLearnModuleJob: Gemini model '.$this->primaryModel.' failed: '.$errorMsg);
                 }
             } else {
-                // Try Groq first
-                foreach ($groqChain as $model) {
-                    Log::info('GenerateLearnModuleJob: Attempting Groq model: '.$model);
-                    if ($attemptGroq($model)) {
-                        $success = true;
-                        break;
-                    }
-                    Log::warning('GenerateLearnModuleJob: Groq model '.$model.' failed: '.$errorMsg);
-                }
-
-                // Fallback to Gemini
-                if (! $success) {
-                    foreach ($geminiChain as $model) {
-                        Log::info('GenerateLearnModuleJob: Attempting Gemini fallback model: '.$model);
-                        if ($attemptGemini($model)) {
-                            $success = true;
-                            break;
-                        }
-                        Log::warning('GenerateLearnModuleJob: Gemini model '.$model.' failed: '.$errorMsg);
-                    }
+                Log::info('GenerateLearnModuleJob: Attempting Groq model: '.$this->primaryModel);
+                if ($attemptGroq($this->primaryModel)) {
+                    $success = true;
+                } else {
+                    Log::warning('GenerateLearnModuleJob: Groq model '.$this->primaryModel.' failed: '.$errorMsg);
                 }
             }
 
             if (! $success) {
-                Log::error('GenerateLearnModuleJob: All AI generation models failed.');
-                AiGenerationFailed::dispatch($this->userId, 'AI Generation failed across all primary and fallback free models.', 'module');
+                Log::error('GenerateLearnModuleJob: AI generation failed using model: '.$this->primaryModel.'. Error: '.$errorMsg);
+                AiGenerationFailed::dispatch($this->userId, $errorMsg ?: 'AI Generation failed using the selected model.', 'module');
 
                 return;
             }

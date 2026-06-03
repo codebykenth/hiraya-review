@@ -1,5 +1,6 @@
 import { Brain } from 'lucide-react';
 import React from 'react';
+import { HowItWorksModal } from '@/components/how-it-works-modal';
 import { PageHeader } from '@/components/page-header';
 import { Card } from '@/components/ui/card';
 import { categoryMeta } from '../hooks/use-drills-state';
@@ -22,10 +23,35 @@ export function HubView({
 
     return (
         <div className="flex flex-col gap-6">
-            <PageHeader
-                title="Practice Drill Hub"
-                description="Select a category below to focus your practice. Each drill module is designed to target specific cognitive areas required for civil service examinations."
-            />
+            <div className="mb-2 flex items-start gap-3">
+                <PageHeader
+                    title="Practice Drill Hub"
+                    description="Select a category below to focus your practice. Each drill module is designed to target specific cognitive areas required for civil service examinations."
+                    tooltip="Short, highly focused exercise sessions with instant answers to build subtopic muscle memory."
+                />
+                <div className="mt-1">
+                    <HowItWorksModal
+                        title="How Practice Drills Work"
+                        tips={[
+                            {
+                                icon: '⚡',
+                                title: 'Micro-learning',
+                                text: 'Drills are short, focused sessions designed for rapid repetition on specific subcategories to build your muscle memory.',
+                            },
+                            {
+                                icon: '⏱️',
+                                title: 'Practice Modes',
+                                text: 'Choose Timed mode to build your speed for the actual exam, or Untimed mode for deep comprehension and reading.',
+                            },
+                            {
+                                icon: '💡',
+                                title: 'Instant Feedback',
+                                text: 'Unlike full mock exams, drills provide immediate explanations after every single question so you learn right away.',
+                            },
+                        ]}
+                    />
+                </div>
+            </div>
 
             {activeCategories.length > 0 ? (
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">

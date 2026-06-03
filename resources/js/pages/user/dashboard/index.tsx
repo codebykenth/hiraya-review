@@ -16,6 +16,7 @@ import {
     StatusBadge,
     ScoreProgress,
 } from '@/components/attempt-components';
+import { HowItWorksModal } from '@/components/how-it-works-modal';
 import { PageContainer } from '@/components/page-container';
 import { PageHeader } from '@/components/page-header';
 import { Card } from '@/components/ui/card';
@@ -56,23 +57,48 @@ export default function Dashboard({ stats, aiAnalysis }: DashboardProps) {
             <PageContainer>
                 {/* Greeting Header & Main Action Controls */}
                 <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-                    <PageHeader
-                        title={
-                            <>
-                                Welcome back,
-                                <br />
-                                <span className="font-extrabold text-blue-600 dark:text-blue-400">
-                                    {firstName}
-                                </span>
-                            </>
-                        }
-                        description={
-                            <>
-                                Let's continue your preparation for the Civil
-                                Service Exam.
-                            </>
-                        }
-                    />
+                    <div className="flex items-start gap-3">
+                        <PageHeader
+                            title={
+                                <>
+                                    Welcome back,
+                                    <br />
+                                    <span className="font-extrabold text-blue-600 dark:text-blue-400">
+                                        {firstName}
+                                    </span>
+                                </>
+                            }
+                            description="Let's continue your preparation for the Civil Service Exam."
+                            tooltip="Your central hub for tracking exam history, monitoring passing probability, and managing practice drills."
+                        />
+                        <div className="mt-2">
+                            <HowItWorksModal
+                                title="How the Dashboard Works"
+                                tips={[
+                                    {
+                                        icon: '🤖',
+                                        title: 'AI Readiness Score',
+                                        text: 'Your probability of passing the actual Civil Service Exam, updated automatically every 7 days based on your most recent performance trends.',
+                                    },
+                                    {
+                                        icon: '🎯',
+                                        title: 'Priority Recommendations',
+                                        text: 'Our AI analyzes your weakest subject areas and automatically recommends specific modules and drills for you to focus on next.',
+                                    },
+                                    {
+                                        icon: '📄',
+                                        title: 'Full AI Report',
+                                        text: 'Click the "Full Report" button in your AI Readiness card to view a comprehensive 7-day action plan that adapts weekly to your strengths and weaknesses.',
+                                    },
+                                    {
+                                        icon: '📈',
+                                        title: 'Performance History',
+                                        text: 'The score history chart tracks your progress across your recent exam attempts, providing a clear visual of your improvement over time.',
+                                    },
+                                ]}
+                            />
+                        </div>
+                    </div>
                     <div className="flex flex-col items-stretch gap-3 sm:items-end">
                         <div className="flex flex-wrap gap-2">
                             <Link

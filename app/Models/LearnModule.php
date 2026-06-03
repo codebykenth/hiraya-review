@@ -38,7 +38,31 @@ class LearnModule extends Model
         'estimated_minutes',
         'is_published',
         'created_by',
+        'completed_by_user_ids',
     ];
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'completed_by_user_ids' => 'array',
+            'is_published' => 'boolean',
+        ];
+    }
+
+    /**
+     * Determine if this module is completed by a user.
+     */
+    public function isCompletedBy(int $userId): bool
+    {
+        $userIds = $this->completed_by_user_ids ?? [];
+
+        return in_array($userId, $userIds);
+    }
 
     /**
      * Get the category that this learning module belongs to.

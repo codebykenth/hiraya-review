@@ -65,9 +65,8 @@ export function useQuestionCreateState({
         useState<string>(defaultSubcategory);
     const [aiCount, setAiCount] = useState<number>(3);
     const [aiLanguage, setAiLanguage] = useState<string>('English');
-    const [aiPrimaryModel, setAiPrimaryModel] = useState<string>(
-        'llama-3.3-70b-versatile',
-    );
+    const [aiPrimaryModel, setAiPrimaryModel] =
+        useState<string>('gemini-3.5-flash');
     const [aiPrompt, setAiPrompt] = useState<string>('');
     const [isGenerating, setIsGenerating] = useState<boolean>(false);
     const [errorMsg, setErrorMsg] = useState<string | null>(null);

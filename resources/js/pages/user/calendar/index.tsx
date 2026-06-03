@@ -1,5 +1,12 @@
 import { Head, usePage } from '@inertiajs/react';
-import { ChevronLeft, ChevronRight, Plus, Trash2, Clock } from 'lucide-react';
+import {
+    ChevronLeft,
+    ChevronRight,
+    Plus,
+    Trash2,
+    Clock,
+    HelpCircle,
+} from 'lucide-react';
 import React from 'react';
 import { ConfirmModal } from '@/components/confirm-modal';
 import { PageContainer } from '@/components/page-container';
@@ -12,6 +19,9 @@ import {
     DialogHeader,
     DialogTitle,
     DialogFooter,
+    DialogDescription,
+    DialogClose,
+    DialogTrigger,
 } from '@/components/ui/dialog';
 import { BulkUpdateModal } from './components/bulk-update-modal';
 import { CalendarGrid } from './components/calendar-grid';
@@ -78,10 +88,116 @@ export default function Calendar() {
             <Head title="Study Plan" />
             <PageContainer>
                 <div className="mb-8 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
-                    <PageHeader
-                        title="Study Plan"
-                        description="Plan your study sessions by clicking on a date"
-                    />
+                    <div className="flex items-start gap-3">
+                        <PageHeader
+                            title="Study Plan"
+                            description="Plan your study sessions by clicking on a date"
+                            tooltip="Your personalized calendar where you can create, reschedule, drag-and-drop, and track daily study tasks."
+                        />
+                        <Dialog>
+                            <DialogTrigger asChild>
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="text-blue-650 mt-1 h-7 gap-1.5 rounded-full border-blue-200 bg-blue-50 px-3 text-[11px] font-bold shadow-sm hover:bg-blue-100 hover:text-blue-700 dark:border-blue-900 dark:bg-blue-950/40 dark:text-blue-400"
+                                >
+                                    <HelpCircle className="size-3.5" />
+                                    How it works
+                                </Button>
+                            </DialogTrigger>
+                            <DialogContent className="max-w-md">
+                                <DialogHeader>
+                                    <DialogTitle className="flex items-center gap-2 text-xl">
+                                        <HelpCircle className="size-5 text-blue-600" />
+                                        How the Study Plan Works
+                                    </DialogTitle>
+                                    <DialogDescription className="pt-2 text-sm">
+                                        Master your study schedule with
+                                        these quick tips:
+                                    </DialogDescription>
+                                </DialogHeader>
+                                <div className="space-y-4 py-2">
+                                    <div className="flex gap-3">
+                                        <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+                                            👆
+                                        </div>
+                                        <div>
+                                            <h4 className="text-sm font-bold text-foreground">
+                                                Click to Add or Edit
+                                            </h4>
+                                            <p className="mt-0.5 text-xs text-muted-foreground">
+                                                Click any empty space on a
+                                                day to add a session. Click
+                                                an existing task's title to
+                                                edit it.
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div className="flex gap-3">
+                                        <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+                                            🖐️
+                                        </div>
+                                        <div>
+                                            <h4 className="text-sm font-bold text-foreground">
+                                                Drag and Drop
+                                            </h4>
+                                            <p className="mt-0.5 text-xs text-muted-foreground">
+                                                Simply click and hold any
+                                                task, then drag and drop it
+                                                into another day's block to
+                                                instantly reschedule it.
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div className="flex gap-3">
+                                        <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+                                            <Clock className="size-4" />
+                                        </div>
+                                        <div>
+                                            <h4 className="text-sm font-bold text-foreground">
+                                                Bulk Time Update
+                                            </h4>
+                                            <p className="mt-0.5 text-xs text-muted-foreground">
+                                                Use the "Bulk Update Time"
+                                                button to select multiple
+                                                tasks across different days
+                                                and set them all to the same
+                                                time.
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div className="flex gap-3">
+                                        <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+                                            ✅
+                                        </div>
+                                        <div>
+                                            <h4 className="text-sm font-bold text-foreground">
+                                                Mark as Complete
+                                            </h4>
+                                            <p className="mt-0.5 text-xs text-muted-foreground">
+                                                Click the circle next to a
+                                                task to mark it done. It
+                                                will turn green. Incomplete
+                                                past tasks will
+                                                automatically alert you!
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <DialogFooter className="mt-2 sm:justify-center">
+                                    <DialogClose asChild>
+                                        <Button
+                                            type="button"
+                                            variant="secondary"
+                                            className="w-full sm:w-auto"
+                                        >
+                                            Got it!
+                                        </Button>
+                                    </DialogClose>
+                                </DialogFooter>
+                            </DialogContent>
+                        </Dialog>
+                    </div>
                     <ExamCountdown nextExam={calendarNextExam} />
                 </div>
 

@@ -88,6 +88,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('exams/attempts', [ExamController::class, 'storeAttempt'])->name('exams.attempts.store');
         Route::post('exams/attempts/bulk-delete', [ExamHistoryController::class, 'bulkDestroy'])->name('exams.attempts.bulkDestroy');
         Route::delete('exams/attempts/{attempt}', [ExamHistoryController::class, 'destroy'])->name('exams.attempts.destroy');
+        Route::post('learn/{slug}/complete', [UserLearnController::class, 'toggleComplete'])->name('learn.complete');
     });
 
     // Study Schedule Routes

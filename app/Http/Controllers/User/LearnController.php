@@ -75,6 +75,18 @@ class LearnController
             }
         }
 
+        $userId = auth()->id();
+        $completedModuleIds = [];
+        if ($userId) {
+            $completedModuleIds = LearnModule::whereJsonContains('completed_by_user_ids', $userId)->pluck('id')->toArray();
+        }
+
+        $modules = array_map(function ($mod) use ($completedModuleIds) {
+            $mod['is_completed'] = in_array($mod['id'], $completedModuleIds);
+
+            return $mod;
+        }, $modules);
+
         return Inertia::render('user/learn/index', [
             'modules' => $modules,
             'categories' => $categories,
@@ -189,9 +201,43 @@ class LearnController
             Cache::forever("learn.module.recommended.{$module['id']}", $recommended);
         }
 
+        $userId = auth()->id();
+        $module['is_completed'] = false;
+        if ($userId) {
+            $mod = LearnModule::find($module['id']);
+            if ($mod) {
+                $module['is_completed'] = $mod->isCompletedBy($userId);
+            }
+        }
+
         return Inertia::render('user/learn/show', [
             'module' => $module,
             'recommended' => $recommended,
         ]);
+    }
+
+    /**
+     * Toggle the completion status of a learning module for the authenticated user.
+     */
+    public function toggleComplete(Request $request, string $slug)
+    {
+        $userId = auth()->id();
+        if (! $userId) {
+            return redirect()->back();
+        }
+
+        $module = LearnModule::where('slug', $slug)->firstOrFail();
+        $completedByUserIds = $module->completed_by_user_ids ?? [];
+
+        if (in_array($userId, $completedByUserIds)) {
+            $completedByUserIds = array_values(array_diff($completedByUserIds, [$userId]));
+        } else {
+            $completedByUserIds[] = $userId;
+        }
+
+        $module->completed_by_user_ids = $completedByUserIds;
+        $module->save();
+
+        return redirect()->back();
     }
 }
