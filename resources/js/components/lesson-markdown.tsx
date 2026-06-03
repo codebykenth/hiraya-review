@@ -1,6 +1,10 @@
 import { BookOpen, CheckCircle2, HelpCircle, Lightbulb } from 'lucide-react';
 import React, { useCallback, useMemo, useState } from 'react';
 import { formatMathInline } from '@/lib/exam-formatters';
+import {
+    findMatchingBrace,
+    parseLaTeXToJSX,
+} from '@/lib/latex-parser';
 
 function RevealableAnswer({
     answerContent,
@@ -96,221 +100,6 @@ const cleanText = (value: string): string =>
         .trim();
 
 export function LessonMarkdown({ content = '' }: LessonMarkdownProps) {
-    const findMatchingBrace = useCallback(
-        (str: string, startIndex: number): number => {
-            let count = 0;
-
-            for (let idx = startIndex; idx < str.length; idx++) {
-                if (str[idx] === '{') {
-                    count++;
-                }
-
-                if (str[idx] === '}') {
-                    count--;
-
-                    if (count === 0) {
-                        return idx;
-                    }
-                }
-            }
-
-            return -1;
-        },
-        [],
-    );
-
-    const parseLaTeXToJSX = useCallback(
-        (latex: string): React.ReactNode => {
-            const parseBlock = (str: string): React.ReactNode[] => {
-                const result: React.ReactNode[] = [];
-                let i = 0;
-
-                while (i < str.length) {
-                    if (str.startsWith('\\text{', i)) {
-                        const matchIndex = findMatchingBrace(str, i + 5);
-
-                        if (matchIndex !== -1) {
-                            result.push(
-                                <span
-                                    key={i}
-                                    className="mx-1 font-sans font-medium"
-                                >
-                                    {str.substring(i + 6, matchIndex)}
-                                </span>,
-                            );
-                            i = matchIndex + 1;
-                            continue;
-                        }
-                    }
-
-                    if (str.startsWith('\\frac{', i)) {
-                        const numStart = i + 5;
-                        const numEnd = findMatchingBrace(str, numStart);
-
-                        if (numEnd !== -1) {
-                            let denomStart = numEnd + 1;
-
-                            while (
-                                denomStart < str.length &&
-                                str[denomStart] !== '{'
-                            ) {
-                                denomStart++;
-                            }
-
-                            const denomEnd =
-                                denomStart < str.length
-                                    ? findMatchingBrace(str, denomStart)
-                                    : -1;
-
-                            if (denomEnd !== -1) {
-                                result.push(
-                                    <span
-                                        key={i}
-                                        className="mx-1 inline-flex flex-col text-center align-middle leading-none"
-                                    >
-                                        <span className="block border-b border-slate-500 px-1 pb-0.5 text-[0.9em] dark:border-slate-500">
-                                            {parseBlock(
-                                                str.substring(
-                                                    numStart + 1,
-                                                    numEnd,
-                                                ),
-                                            )}
-                                        </span>
-                                        <span className="block px-1 pt-0.5 text-[0.9em]">
-                                            {parseBlock(
-                                                str.substring(
-                                                    denomStart + 1,
-                                                    denomEnd,
-                                                ),
-                                            )}
-                                        </span>
-                                    </span>,
-                                );
-                                i = denomEnd + 1;
-                                continue;
-                            }
-                        }
-                    }
-
-                    if (str[i] === '^' || str[i] === '_') {
-                        const isSup = str[i] === '^';
-
-                        if (str[i + 1] === '{') {
-                            const braceEnd = findMatchingBrace(str, i + 1);
-
-                            if (braceEnd !== -1) {
-                                const content = parseBlock(
-                                    str.substring(i + 2, braceEnd),
-                                );
-                                result.push(
-                                    isSup ? (
-                                        <sup
-                                            key={i}
-                                            className="text-[0.75em] leading-none font-bold"
-                                        >
-                                            {content}
-                                        </sup>
-                                    ) : (
-                                        <sub
-                                            key={i}
-                                            className="text-[0.75em] leading-none"
-                                        >
-                                            {content}
-                                        </sub>
-                                    ),
-                                );
-                                i = braceEnd + 1;
-                                continue;
-                            }
-                        }
-
-                        const char = str[i + 1] || '';
-                        result.push(
-                            isSup ? (
-                                <sup
-                                    key={i}
-                                    className="text-[0.75em] leading-none font-bold"
-                                >
-                                    {char}
-                                </sup>
-                            ) : (
-                                <sub
-                                    key={i}
-                                    className="text-[0.75em] leading-none"
-                                >
-                                    {char}
-                                </sub>
-                            ),
-                        );
-                        i += 2;
-                        continue;
-                    }
-
-                    const commands = [
-                        { cmd: '\\pm', symbol: ' +/- ' },
-                        { cmd: '\\times', symbol: ' x ' },
-                        { cmd: '\\cdot', symbol: ' * ' },
-                        { cmd: '\\div', symbol: ' / ' },
-                        { cmd: '\\dots', symbol: '...' },
-                        { cmd: '\\ldots', symbol: '...' },
-                        { cmd: '\\left(', symbol: '(' },
-                        { cmd: '\\right)', symbol: ')' },
-                        { cmd: '\\left[', symbol: '[' },
-                        { cmd: '\\right]', symbol: ']' },
-                        { cmd: '\\left\\{', symbol: '{' },
-                        { cmd: '\\right\\}', symbol: '}' },
-                        { cmd: '\\{', symbol: '{' },
-                        { cmd: '\\}', symbol: '}' },
-                        { cmd: '\\le', symbol: ' <= ' },
-                        { cmd: '\\leq', symbol: ' <= ' },
-                        { cmd: '\\ge', symbol: ' >= ' },
-                        { cmd: '\\geq', symbol: ' >= ' },
-                        { cmd: '\\neq', symbol: ' != ' },
-                        { cmd: '\\approx', symbol: ' approx. ' },
-                        { cmd: '\\pi', symbol: 'pi' },
-                        { cmd: '\\infty', symbol: 'infinity' },
-                        { cmd: '\\deg', symbol: ' degrees' },
-                        { cmd: '\\alpha', symbol: 'alpha' },
-                        { cmd: '\\beta', symbol: 'beta' },
-                        { cmd: '\\theta', symbol: 'theta' },
-                    ];
-
-                    const command = commands.find((item) =>
-                        str.startsWith(item.cmd, i),
-                    );
-
-                    if (command) {
-                        result.push(
-                            <span key={i} className="mx-0.5">
-                                {command.symbol}
-                            </span>,
-                        );
-                        i += command.cmd.length;
-                        continue;
-                    }
-
-                    if (str[i] === '\\' && i + 1 < str.length) {
-                        result.push(str[i + 1]);
-                        i += 2;
-                        continue;
-                    }
-
-                    result.push(str[i]);
-                    i++;
-                }
-
-                return result;
-            };
-
-            return (
-                <span className="font-mono font-semibold text-slate-900 dark:text-slate-100">
-                    {parseBlock(latex)}
-                </span>
-            );
-        },
-        [findMatchingBrace],
-    );
-
     const parseInline = useCallback(
         (text: string): React.ReactNode => {
             const normalized = cleanText(text);
@@ -440,7 +229,7 @@ export function LessonMarkdown({ content = '' }: LessonMarkdownProps) {
 
             return result.length > 0 ? <>{result}</> : normalized;
         },
-        [parseLaTeXToJSX],
+        [],
     );
 
     const parseLineContent = useCallback(
@@ -591,7 +380,26 @@ export function LessonMarkdown({ content = '' }: LessonMarkdownProps) {
                 flushTable(String(idx));
             }
 
-            if (/^[-*_]{2,30}$/.test(trimmed)) {
+            let lastNonEmptyLine = '';
+            for (let j = idx - 1; j >= 0; j--) {
+                if (lines[j].trim() !== '') {
+                    lastNonEmptyLine = lines[j];
+                    break;
+                }
+            }
+            const isPrevMath = /^[0-9+\-x/*=.,\s]+$/.test(lastNonEmptyLine) && lastNonEmptyLine.trim().length < 40 && /[0-9]/.test(lastNonEmptyLine);
+
+            if (/^\s*_{2,30}\s*$/.test(rawLine) || (isPrevMath && /^\s*[-*]{3,30}\s*$/.test(rawLine))) {
+                rendered.push(
+                    <p key={`hr-${idx}`} className="my-0 text-lg font-mono tracking-widest whitespace-pre leading-8 text-slate-700 dark:text-slate-300">
+                        {rawLine.replace(/[-*]/g, '_')}
+                    </p>,
+                );
+
+                continue;
+            }
+
+            if (/^[-*]{3,30}$/.test(trimmed)) {
                 rendered.push(
                     <hr
                         key={`hr-${idx}`}
@@ -865,12 +673,16 @@ export function LessonMarkdown({ content = '' }: LessonMarkdownProps) {
                 continue;
             }
 
+            const isMathLine = /^[0-9+\-x/*=.,\s]+$/.test(rawLine) && rawLine.trim().length < 40 && /[0-9]/.test(rawLine);
+
             rendered.push(
                 <p
                     key={`p-${idx}`}
-                    className="my-4 text-base leading-8 text-slate-700 dark:text-slate-300"
+                    className={`${
+                        isMathLine ? 'my-0 text-lg font-mono tracking-widest whitespace-pre' : 'my-4 text-base'
+                    } leading-8 text-slate-700 dark:text-slate-300`}
                 >
-                    {parseLineContent(trimmed)}
+                    {isMathLine ? rawLine : parseLineContent(trimmed)}
                 </p>,
             );
         }

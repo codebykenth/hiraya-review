@@ -1,5 +1,6 @@
 import { ArrowRight } from 'lucide-react';
 import React from 'react';
+import { parseLatexString } from '@/lib/latex-parser';
 
 interface ExplanationPreviewProps {
     text: string;
@@ -12,13 +13,13 @@ export function ExplanationPreview({ text }: ExplanationPreviewProps) {
 
     const parseInlineBold = (lineText: string) => {
         const boldRegex = /\*\*(.*?)\*\*/g;
-        const parts = [];
+        const parts: React.ReactNode[] = [];
         let lastIndex = 0;
         let match;
 
         while ((match = boldRegex.exec(lineText)) !== null) {
             if (match.index > lastIndex) {
-                parts.push(lineText.substring(lastIndex, match.index));
+                parts.push(parseLatexString(lineText.substring(lastIndex, match.index)));
             }
 
             parts.push(
@@ -26,17 +27,17 @@ export function ExplanationPreview({ text }: ExplanationPreviewProps) {
                     key={match.index}
                     className="font-black text-foreground"
                 >
-                    {match[1]}
+                    {parseLatexString(match[1])}
                 </strong>,
             );
             lastIndex = boldRegex.lastIndex;
         }
 
         if (lastIndex < lineText.length) {
-            parts.push(lineText.substring(lastIndex));
+            parts.push(parseLatexString(lineText.substring(lastIndex)));
         }
 
-        return parts.length > 0 ? parts : lineText;
+        return parts.length > 0 ? parts : parseLatexString(lineText);
     };
 
     const lines = text.split('\n');
@@ -67,7 +68,7 @@ export function ExplanationPreview({ text }: ExplanationPreviewProps) {
                         🧠 Mental Math Shortcut
                     </span>
                     <p className="text-xs leading-relaxed font-semibold text-foreground">
-                        {content}
+                        {parseInlineBold(content)}
                     </p>
                 </div>,
             );
@@ -86,7 +87,7 @@ export function ExplanationPreview({ text }: ExplanationPreviewProps) {
                     {nodes.map((node, nIdx) => (
                         <React.Fragment key={nIdx}>
                             <span className="shadow-3xs inline-flex items-center justify-center rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-black text-white">
-                                {node}
+                                {parseLatexString(node)}
                             </span>
                             {nIdx < nodes.length - 1 && (
                                 <ArrowRight className="size-4 shrink-0 text-blue-400 dark:text-blue-600" />

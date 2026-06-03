@@ -1,4 +1,5 @@
 import React from 'react';
+import { parseLatexString } from '@/lib/latex-parser';
 
 export const formatDuration = (totalSecs: number, showLabel = true): string => {
     const h = Math.floor(totalSecs / 3600);
@@ -50,11 +51,22 @@ export const formatMathInline = (text: string) => {
         return text;
     }
 
-    // Split by fraction (e.g. 1/2 or 1 / 2) or superscript (e.g. ^2, ^-3, ^n)
-    const parts = text.split(/(\b\d+\s*\/\s*\d+\b|\^[-a-zA-Z0-9]+)/);
+    return parseLatexString(text, formatMathInlineBase);
+};
+
+export const formatMathInlineBase = (text: string) => {
+    if (typeof text !== 'string') {
+        return text;
+    }
+
+    // Convert (-3)3 to (-3)^3
+    let processedText = text.replace(/\)(\d+)\b/g, ')^$1');
+
+    // Split by fraction (e.g. 1/2, 4.8 / 0.6, 18 / (-2)), superscript (e.g. ^2, ^-3, ^n), or sqrt(...)
+    const parts = processedText.split(/(\b\d+(?:\.\d+)?\s*\/\s*(?:-?\d+(?:\.\d+)?|\(\s*-?\d+(?:\.\d+)?\s*\))|\^[-a-zA-Z0-9]+|\bsqrt\([^)]+\))/gi);
 
     if (parts.length === 1) {
-        return text;
+        return parseLatexString(text);
     }
 
     return (
@@ -86,6 +98,18 @@ export const formatMathInline = (text: string) => {
                             </span>
                         );
                     }
+
+                    if (part.toLowerCase().startsWith('sqrt(')) {
+                        const inner = part.substring(5, part.length - 1);
+                        return (
+                            <span key={idx} className="mx-0.5 inline-flex items-center whitespace-nowrap">
+                                <span className="text-[1.1em] font-serif leading-none mr-[1px]">√</span>
+                                <span className="border-t border-slate-700 pt-[1px] leading-tight dark:border-slate-300">
+                                    {inner}
+                                </span>
+                            </span>
+                        );
+                    }
                 }
 
                 return <React.Fragment key={idx}>{part}</React.Fragment>;
@@ -110,7 +134,7 @@ export const renderFormattedText = (
 
     // Strict 1-liner comment: Pre-format continuous single-line numbered lists to newlines
     const cleanedText = processedText.replace(
-        /(?:\s+|:|^)(\d+\.)\s+/g,
+        /(?:\s+|^)(\d+\.)\s+/g,
         '\n$1 ',
     );
 
@@ -159,7 +183,7 @@ export const renderFormattedText = (
 
             // Strict 1-liner comment: Regex to match standard math expressions, logic arrow chains, negation states, parenthesized variables, and single letter variables
             const mathPattern =
-                /(\b\d+(?:\.\d+)?%|\b\d+\/\d+\b|\[[^\]]+\]|\bProject\s+[A-Z]\b|\bQ[1-4]\b|(?:\b\d+(?:,\d{3})*(?:\.\d+)?\s*[+\-*/=]\s*)+\d+(?:,\d{3})*(?:\.\d+)?%?|[~¬]?\s*\b[A-Z]\b\s*(?:->|=>)\s*[~¬]?\s*\b[A-Z]\b(?:\s*(?:->|=>)\s*[~¬]?\s*\b[A-Z]\b)*|[~¬]\s*\b[A-Z]\b|\(\s*[~¬]?\s*\b[A-Z]\b\s*\)|'\s*\b[A-Z]\b\s*'|"\s*\b[A-Z]\b\s*"|\b[B-H|J-N|P-Z]\b)/g;
+                /(\b\d+(?:\.\d+)?%|\[[^\]]+\]|\bProject\s+[A-Z]\b|\bQ[1-4]\b|[~¬]?\s*\b[A-Z]\b\s*(?:->|=>)\s*[~¬]?\s*\b[A-Z]\b(?:\s*(?:->|=>)\s*[~¬]?\s*\b[A-Z]\b)*|[~¬]\s*\b[A-Z]\b|\(\s*[~¬]?\s*\b[A-Z]\b\s*\)|'\s*\b[A-Z]\b\s*'|"\s*\b[A-Z]\b\s*"|\b[B-H|J-N|P-Z]\b)/g;
 
             const renderSingleVariable = (v: string) => {
                 const cleaned = v.trim();
@@ -224,33 +248,35 @@ export const renderFormattedText = (
 
                 return (
                     <span className="font-semibold text-slate-800">
-                        {formatMathInline(token)}
+                        {formatMathInlineBase(token)}
                     </span>
                 );
             };
 
             const renderRichParagraphContent = (content: string) => {
-                const mathParts = content.split(mathPattern);
+                return parseLatexString(content, (plainStr: string) => {
+                    const mathParts = plainStr.split(mathPattern);
 
-                return (
-                    <>
-                        {mathParts.map((mPart, mIdx) => {
-                            if (mPart.match(mathPattern)) {
+                    return (
+                        <>
+                            {mathParts.map((mPart, mIdx) => {
+                                if (mPart.match(mathPattern)) {
+                                    return (
+                                        <React.Fragment key={mIdx}>
+                                            {renderTokenContent(mPart)}
+                                        </React.Fragment>
+                                    );
+                                }
+
                                 return (
-                                    <React.Fragment key={mIdx}>
-                                        {renderTokenContent(mPart)}
-                                    </React.Fragment>
+                                    <span key={mIdx}>
+                                        {formatMathInlineBase(mPart)}
+                                    </span>
                                 );
-                            }
-
-                            return (
-                                <span key={mIdx}>
-                                    {formatMathInline(mPart)}
-                                </span>
-                            );
-                        })}
-                    </>
-                );
+                            })}
+                        </>
+                    );
+                });
             };
 
             // Strict 1-liner comment: Match step-by-step indicators to render styled step block cards
@@ -318,7 +344,7 @@ export const renderFormattedText = (
                             <React.Fragment key={idx}>
                                 {renderRichParagraph(
                                     line,
-                                    'text-[18px] font-extrabold text-slate-850 dark:text-slate-100 leading-relaxed',
+                                    'text-[18px] font-extrabold text-slate-850 dark:text-slate-100 leading-loose tracking-wide',
                                 )}
                             </React.Fragment>
                         ))}
@@ -338,7 +364,7 @@ export const renderFormattedText = (
                                 <div className="mt-0.5 flex-1">
                                     {renderRichParagraph(
                                         item.text,
-                                        'text-base font-semibold leading-relaxed text-slate-700 dark:text-slate-300',
+                                        'text-base font-semibold leading-loose tracking-wide text-slate-700 dark:text-slate-300',
                                     )}
                                 </div>
                             </div>
@@ -352,7 +378,7 @@ export const renderFormattedText = (
                             <React.Fragment key={idx}>
                                 {renderRichParagraph(
                                     line,
-                                    'text-[18px] font-extrabold text-slate-850 dark:text-slate-100 leading-relaxed',
+                                    'text-[18px] font-extrabold text-slate-850 dark:text-slate-100 leading-loose tracking-wide',
                                 )}
                             </React.Fragment>
                         ))}

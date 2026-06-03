@@ -9,9 +9,10 @@ import {
     Activity,
 } from 'lucide-react';
 import { getCategoryStyles } from '@/components/curation-index-shell';
-import { ExplanationPreview } from '@/components/explanation-preview';
 import { PageContainer } from '@/components/page-container';
 import { PageHeader } from '@/components/page-header';
+import { renderFormattedText, formatMathInline } from '@/lib/exam-formatters';
+import { parseLatexString } from '@/lib/latex-parser';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -88,7 +89,7 @@ export default function QuestionShow({ question }: QuestionShowProps) {
 
                             {/* Stem */}
                             <div className="mb-6 text-sm leading-relaxed font-semibold whitespace-pre-line text-foreground">
-                                {question.stem}
+                                {renderFormattedText(question.stem)}
                             </div>
 
                             {/* Option list stack */}
@@ -125,7 +126,7 @@ export default function QuestionShow({ question }: QuestionShowProps) {
                                                         : 'text-muted-foreground'
                                                 }`}
                                             >
-                                                {option}
+                                                {formatMathInline(option)}
                                             </span>
 
                                             {/* Correct marker check */}
@@ -146,7 +147,9 @@ export default function QuestionShow({ question }: QuestionShowProps) {
                                 <Sparkles className="size-4.5 text-blue-600" />
                                 Cognitive Explanation & Rationale
                             </h2>
-                            <ExplanationPreview text={question.explanation} />
+                            <div className="text-sm leading-relaxed text-muted-foreground">
+                                {renderFormattedText(question.explanation)}
+                            </div>
                         </div>
                     </div>
 
