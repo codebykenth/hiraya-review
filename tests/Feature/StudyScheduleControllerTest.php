@@ -14,7 +14,7 @@ test('authenticated user can view study schedules for a month', function () {
         'description' => 'Solve practice problems',
     ]);
 
-    $response = $this->actingAs($user)->get('/study-schedules?year='.now()->year.'&month='.now()->month);
+    $response = $this->actingAs($user)->get('/study-schedules/data?year='.now()->year.'&month='.now()->month);
 
     $response->assertStatus(200);
     $response->assertJsonStructure(['schedules']);
@@ -50,7 +50,7 @@ test('user can only see their own study schedules', function () {
         'title' => 'Chemistry',
     ]);
 
-    $response = $this->actingAs($user2)->get('/study-schedules?year='.now()->year.'&month='.now()->month);
+    $response = $this->actingAs($user2)->get('/study-schedules/data?year='.now()->year.'&month='.now()->month);
 
     $response->assertStatus(200);
     $schedules = $response->json('schedules');
@@ -114,7 +114,7 @@ test('study schedule requires valid date', function () {
 });
 
 test('unauthenticated user cannot view calendar page', function () {
-    $response = $this->get('/calendar');
+    $response = $this->get('/study-schedules');
 
     $response->assertRedirect('/login');
 });
@@ -189,7 +189,7 @@ test('index returns past uncompleted study schedules', function () {
         'is_done' => false,
     ]);
 
-    $response = $this->actingAs($user)->get('/study-schedules?year='.now()->year.'&month='.now()->month);
+    $response = $this->actingAs($user)->get('/study-schedules/data?year='.now()->year.'&month='.now()->month);
 
     $response->assertStatus(200);
     $response->assertJsonStructure(['pastPending']);

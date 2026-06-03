@@ -21,6 +21,6 @@ class AcceptTermsController extends Controller
 
         $user->update(['terms_accepted_at' => now()]);
 
-        return redirect()->intended(route('dashboard'));
+        return redirect()->intended(route('dashboard.index'));
     }
 }

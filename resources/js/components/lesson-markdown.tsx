@@ -1,7 +1,64 @@
-import { BookOpen, CheckCircle2, HelpCircle, Lightbulb } from 'lucide-react';
+import {
+    BookOpen,
+    CheckCircle2,
+    HelpCircle,
+    Lightbulb,
+    ZoomIn,
+} from 'lucide-react';
 import React, { useCallback, useMemo, useState } from 'react';
+import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { formatMathInline } from '@/lib/exam-formatters';
 import { parseLaTeXToJSX } from '@/lib/latex-parser';
+
+function ZoomableSvg({
+    svgContent,
+    isOption = false,
+}: {
+    svgContent: string;
+    isOption?: boolean;
+}) {
+    const scaledSvg = svgContent.replace(
+        /^<svg/,
+        `<svg class="${isOption ? 'max-h-32 w-auto h-auto object-contain' : 'max-h-64 w-auto h-auto object-contain'}"`,
+    );
+
+    return (
+        <Dialog>
+            <DialogTrigger asChild>
+                <div
+                    className={`group relative cursor-pointer overflow-hidden transition-all hover:scale-[1.02] active:scale-95 ${
+                        isOption
+                            ? 'my-1 flex w-full justify-center'
+                            : 'mx-auto my-4 flex w-full max-w-2xl justify-center rounded-xl border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900'
+                    }`}
+                >
+                    <div
+                        className="flex w-full items-center justify-center"
+                        dangerouslySetInnerHTML={{
+                            __html: scaledSvg,
+                        }}
+                    />
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/0 opacity-0 transition-all group-hover:bg-black/5 group-hover:opacity-100 dark:group-hover:bg-white/10">
+                        <div className="rounded-full bg-white/90 p-1.5 text-slate-700 shadow-sm backdrop-blur-sm dark:bg-slate-900/90 dark:text-slate-300">
+                            <ZoomIn className="size-4" />
+                        </div>
+                    </div>
+                </div>
+            </DialogTrigger>
+            <DialogContent className="max-w-4xl border-none bg-transparent p-0 shadow-none">
+                <div
+                    className="flex w-full justify-center rounded-2xl bg-white p-8 dark:bg-slate-900"
+                    dangerouslySetInnerHTML={{
+                        __html: svgContent.replace(
+                            /^<svg/,
+                            `<svg class="w-full h-auto max-h-[80vh] object-contain"`,
+                        ),
+                    }}
+                />
+            </DialogContent>
+        </Dialog>
+    );
+}
 
 function RevealableAnswer({
     answerContent,
@@ -248,10 +305,21 @@ export function LessonMarkdown({ content = '' }: LessonMarkdownProps) {
     );
 
     const elements = useMemo(() => {
+        const svgMap = new Map<string, string>();
+        let svgCounter = 0;
+
         const normalizedContent = content
             .replace(/\r\n/g, '\n')
             .replace(/\\r\\n/g, '\n')
-            .replace(/\\n/g, '\n');
+            .replace(/\\n/g, '\n')
+            .replace(/(<svg[\s\S]*?<\/svg>)/gi, (match) => {
+                const marker = `___SVG_MARKER_${svgCounter}___`;
+                svgMap.set(marker, match);
+                svgCounter++;
+
+                return `\n${marker}\n`;
+            });
+
         const lines = normalizedContent.split('\n');
         const rendered: React.ReactNode[] = [];
         let tableHeaders: string[] = [];
@@ -370,6 +438,21 @@ export function LessonMarkdown({ content = '' }: LessonMarkdownProps) {
 
             if (!trimmed.startsWith('|')) {
                 flushTable(String(idx));
+            }
+
+            if (trimmed.startsWith('___SVG_MARKER_')) {
+                const svgContent = svgMap.get(trimmed);
+
+                if (svgContent) {
+                    rendered.push(
+                        <ZoomableSvg
+                            key={`svg-block-${idx}`}
+                            svgContent={svgContent}
+                        />,
+                    );
+                }
+
+                continue;
             }
 
             let lastNonEmptyLine = '';
@@ -551,16 +634,41 @@ export function LessonMarkdown({ content = '' }: LessonMarkdownProps) {
             }
 
             if (/^Answer:/i.test(trimmed)) {
-                const answerContent = parseLineContent(trimmed);
-                const explanationContent: React.ReactNode[] = [];
-                let explanationEndIdx = idx;
+                const answerNodes: React.ReactNode[] = [
+                    <span key={`ans-text-${idx}`}>
+                        {parseLineContent(trimmed)}
+                    </span>,
+                ];
+                const explanationNodes: React.ReactNode[] = [];
+                let currentTarget = answerNodes;
+                let blockEndIdx = idx;
 
-                // Look ahead to find Explanation
-                for (let j = idx + 1; j < lines.length && j <= idx + 5; j++) {
+                for (let j = idx + 1; j < lines.length; j++) {
                     const nextTrimmed = cleanText(lines[j].trim());
 
+                    if (nextTrimmed === '') {
+continue;
+}
+
+                    // Stop if we hit a new Question, a Header, Divider, or new block
+                    if (
+                        /^(Q\d+[:.)]|Question\s+\d*[:.)]?)/i.test(
+                            nextTrimmed,
+                        ) ||
+                        /^#/.test(nextTrimmed) ||
+                        /^[-*]{3,30}$/.test(nextTrimmed) ||
+                        /^\s*_{2,30}\s*$/.test(nextTrimmed) ||
+                        /^(Mental Shortcut|Strategy Tip|Core Concept):/i.test(
+                            nextTrimmed,
+                        ) ||
+                        /^Answer:/i.test(nextTrimmed)
+                    ) {
+                        break;
+                    }
+
                     if (/^Explanation:/i.test(nextTrimmed)) {
-                        explanationContent.push(
+                        currentTarget = explanationNodes;
+                        currentTarget.push(
                             <div
                                 key={`explanation-${j}`}
                                 className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-base leading-8 text-slate-700 dark:border-slate-800 dark:bg-slate-900/60 dark:text-slate-300"
@@ -568,68 +676,154 @@ export function LessonMarkdown({ content = '' }: LessonMarkdownProps) {
                                 {parseLineContent(nextTrimmed)}
                             </div>,
                         );
-                        explanationEndIdx = j;
+                    } else if (nextTrimmed.startsWith('___SVG_MARKER_')) {
+                        const svgContent = svgMap.get(nextTrimmed);
 
-                        // Collect immediate following lines that might be part of the explanation
-                        for (let k = j + 1; k < lines.length; k++) {
-                            const extTrimmed = cleanText(lines[k].trim());
-
-                            if (
-                                extTrimmed !== '' &&
-                                !/^[-*]\s+/.test(extTrimmed) &&
-                                !/^\d+\.\s+/.test(extTrimmed) &&
-                                !/^(Q\d+|Question|#)/i.test(extTrimmed)
-                            ) {
-                                explanationContent.push(
-                                    <div
-                                        key={`explanation-ext-${k}`}
-                                        className="mt-2 px-4 text-base leading-8 text-slate-700 dark:text-slate-300"
-                                    >
-                                        {parseLineContent(extTrimmed)}
-                                    </div>,
-                                );
-                                explanationEndIdx = k;
-                            } else if (extTrimmed !== '') {
-                                break;
-                            }
+                        if (svgContent) {
+                            currentTarget.push(
+                                <ZoomableSvg
+                                    key={`svg-block-${j}`}
+                                    svgContent={svgContent}
+                                />,
+                            );
                         }
-
-                        break;
-                    } else if (nextTrimmed !== '') {
-                        break;
+                    } else if (/^[-*]\s+/.test(nextTrimmed)) {
+                        currentTarget.push(
+                            <div
+                                key={`ul-${j}`}
+                                className="mt-2 flex gap-3 pl-1 text-base leading-8 text-slate-700 dark:text-slate-300"
+                            >
+                                <span className="mt-3 size-1.5 shrink-0 rounded-full bg-blue-600 dark:bg-blue-400" />
+                                <span>
+                                    {parseLineContent(
+                                        nextTrimmed.substring(1).trim(),
+                                    )}
+                                </span>
+                            </div>,
+                        );
+                    } else {
+                        // Standard paragraph
+                        currentTarget.push(
+                            <div
+                                key={`text-${j}`}
+                                className="mt-2 px-4 text-base leading-8 text-slate-700 dark:text-slate-300"
+                            >
+                                {parseLineContent(nextTrimmed)}
+                            </div>,
+                        );
                     }
+
+                    blockEndIdx = j;
                 }
 
                 rendered.push(
                     <RevealableAnswer
                         key={`answer-block-${idx}`}
-                        answerContent={answerContent}
+                        answerContent={
+                            <div className="flex flex-col gap-2">
+                                {answerNodes}
+                            </div>
+                        }
                         explanationContent={
-                            explanationContent.length > 0
-                                ? explanationContent
-                                : null
+                            explanationNodes.length > 0 ? (
+                                <div className="mt-2 flex flex-col gap-2">
+                                    {explanationNodes}
+                                </div>
+                            ) : null
                         }
                     />,
                 );
 
-                idx = explanationEndIdx;
+                idx = blockEndIdx;
                 continue;
             }
 
             if (/^Explanation:/i.test(trimmed)) {
-                // Standalone explanation (if answer was missing)
+                const explanationNodes: React.ReactNode[] = [
+                    <div
+                        key={`explanation-${idx}`}
+                        className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-base leading-8 text-slate-700 dark:border-slate-800 dark:bg-slate-900/60 dark:text-slate-300"
+                    >
+                        {parseLineContent(trimmed)}
+                    </div>,
+                ];
+                let blockEndIdx = idx;
+
+                for (let j = idx + 1; j < lines.length; j++) {
+                    const nextTrimmed = cleanText(lines[j].trim());
+
+                    if (nextTrimmed === '') {
+continue;
+}
+
+                    if (
+                        /^(Q\d+[:.)]|Question\s+\d*[:.)]?)/i.test(
+                            nextTrimmed,
+                        ) ||
+                        /^#/.test(nextTrimmed) ||
+                        /^[-*]{3,30}$/.test(nextTrimmed) ||
+                        /^\s*_{2,30}\s*$/.test(nextTrimmed) ||
+                        /^(Mental Shortcut|Strategy Tip|Core Concept):/i.test(
+                            nextTrimmed,
+                        ) ||
+                        /^Answer:/i.test(nextTrimmed) ||
+                        /^Explanation:/i.test(nextTrimmed)
+                    ) {
+                        break;
+                    }
+
+                    if (nextTrimmed.startsWith('___SVG_MARKER_')) {
+                        const svgContent = svgMap.get(nextTrimmed);
+
+                        if (svgContent) {
+                            explanationNodes.push(
+                                <ZoomableSvg
+                                    key={`svg-block-${j}`}
+                                    svgContent={svgContent}
+                                />,
+                            );
+                        }
+                    } else if (/^[-*]\s+/.test(nextTrimmed)) {
+                        explanationNodes.push(
+                            <div
+                                key={`ul-${j}`}
+                                className="mt-2 flex gap-3 pl-1 text-base leading-8 text-slate-700 dark:text-slate-300"
+                            >
+                                <span className="mt-3 size-1.5 shrink-0 rounded-full bg-blue-600 dark:bg-blue-400" />
+                                <span>
+                                    {parseLineContent(
+                                        nextTrimmed.substring(1).trim(),
+                                    )}
+                                </span>
+                            </div>,
+                        );
+                    } else {
+                        explanationNodes.push(
+                            <div
+                                key={`text-${j}`}
+                                className="mt-2 px-4 text-base leading-8 text-slate-700 dark:text-slate-300"
+                            >
+                                {parseLineContent(nextTrimmed)}
+                            </div>,
+                        );
+                    }
+
+                    blockEndIdx = j;
+                }
+
                 rendered.push(
                     <RevealableAnswer
                         key={`explanation-standalone-${idx}`}
                         answerContent="See Explanation"
                         explanationContent={
-                            <div className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-base leading-8 text-slate-700 dark:border-slate-800 dark:bg-slate-900/60 dark:text-slate-300">
-                                {parseLineContent(trimmed)}
+                            <div className="mt-2 flex flex-col gap-2">
+                                {explanationNodes}
                             </div>
                         }
                     />,
                 );
 
+                idx = blockEndIdx;
                 continue;
             }
 

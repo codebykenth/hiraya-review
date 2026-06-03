@@ -54,12 +54,26 @@ class GenerateLearnModuleJob implements ShouldQueue
         $systemPrompt = "You are a top-tier Civil Service Exam (CSE) instructor and curriculum writer in the Philippines.
 Generate a rich, readable, syllabus-aligned learning tutorial/module for Filipino examinees preparing for the Professional or Subprofessional exam.
 
+Official Category & Subcategory Schema (With Exam Level context):
+* General Information (Both Levels): 'Philippine Constitution', 'Code of Conduct and Ethical Standards (R.A. 6713)', 'Peace and Human Rights Issues and Concepts', 'Environment Management and Protection'
+* Verbal Ability (Both Levels): 'Word meaning', 'Sentence completion', 'Error recognition', 'Sentence structure', 'Paragraph organization', 'Reading comprehension'
+* Analytical Ability (Professional Level ONLY): 'Word analogy', 'Symbolic logic / abstract reasoning', 'Identifying assumptions and drawing conclusions', 'Data interpretation'
+* Numerical Ability (Both Levels): 'Basic operations', 'Number sequence', 'Word problems'
+* Clerical Ability (Subprofessional Level ONLY): 'Filing', 'Spelling'
+
+Philippine Context Rule:
+For Word Problems, Reading Comprehension, Data Interpretation, and any Example Scenarios, you MUST use realistic Philippine context. Use Philippine Pesos (₱), local Philippine cities (e.g., Manila, Cebu, Davao), local names (e.g., Juan, Maria, Santos), and real Philippine government agencies (e.g., CSC, BIR, DOH) to make the module authentic to the CSE. Tailor the tone of the module depending on whether the topic is exclusively for the Professional or Subprofessional exam.
+
 Use clean standard Markdown only. Do not use decorative emoji, mojibake, HTML, or code fences. Prefer short paragraphs, clear headings, bullet lists, and readable tables when helpful.
 Structure the content with:
 1. ## Core Concept and Context - introduce the topic and explain why it matters in the exam.
 2. ## Key Rules and Principles - give a clear bulleted breakdown of the theory, rules, spelling laws, or math logic.
 3. ## Mental Shortcut or Strategy Tip - explain fast exam-time solving methods.
-4. ## Realistic Example Scenario - walk through a step-by-step example. If logical, use uppercase propositional variables such as A, B, C and arrows like A -> B -> C. If mathematical, use Markdown tables with pipes.
+4. ## Realistic Example Scenario - walk through a step-by-step example. If mathematical, use Markdown tables with pipes. CRITICAL RULES FOR VISUAL TOPICS:
+- If the topic is 'Symbolic logic / abstract reasoning', you MUST generate visual-spatial geometric puzzles (like finding the next shape in a sequence, folding patterns, or rotating grids) using raw, scalable SVG code. Output raw <svg viewBox=\"...\">...</svg> blocks directly inside the markdown. You MUST include SVG visuals not just in the scenario, but ALSO in every single option of the Check Your Understanding questions (Options A to D must be standalone SVGs showing the possible answers, do NOT use descriptive text for options), AND in the explanation block to visually demonstrate the correct pattern and solution. Keep SVGs clean with simple paths, <rect>, <circle>, or <polygon>. Ensure the visual sequence is logically solvable and visually clear. In the explanation block, explicitly define the visual pattern (e.g. 'The black dot rotates 90 degrees clockwise') and provide the correct logical solution alongside the SVG. Do NOT use standard deductive logic chains for Abstract Reasoning, use visual SVG puzzles instead!
+- If the topic is 'Data interpretation', you MUST provide a data source for interpretation. You should provide a beautifully formatted markdown table AND/OR a chart visualization (e.g., bar chart, line graph, pie chart) using raw, scalable SVG code directly inside the text. Feel free to use both a table and an SVG chart together, or vary them. If using an SVG chart, ensure it has clear axes, data labels, titles, and legends using <text> elements. The options should be text or numbers based on the data, and the explanation block must reference the specific data points. Keep any SVG code clean and well-structured.
+- If it is standard verbal logic, you may use propositional variables.
+- CRITICAL HIDDEN MECHANICS: NEVER mention terms like 'SVG', 'SVG-visualized', 'scalable vector', or 'raw code' anywhere in the title, summary, or user-facing text. The end-user examinee should just read the text naturally; they do not need to know the images are SVGs. Refer to them simply as 'the chart', 'the image', or 'the pattern'.
 5. ## Check Your Understanding - this must be the final section in content.
 
 The final ## Check Your Understanding section must contain exactly 3 multiple-choice questions. Each question must use this exact visible format:

@@ -8,27 +8,26 @@ use Illuminate\Support\Facades\Bus;
 use Inertia\Testing\AssertableInertia as Assert;
 
 test('guests are redirected to the login page', function () {
-    $response = $this->get(route('dashboard'));
+    $response = $this->get(route('dashboard.index'));
     $response->assertRedirect(route('login'));
 });
 
 test('authenticated users can visit the dashboard', function () {
     $user = User::factory()->create();
-    $this->actingAs($user);
 
-    $response = $this->get(route('dashboard'));
-    $response->assertOk();
+    $response = $this->actingAs($user)->get(route('dashboard.index'));
+
+    $response->assertStatus(200);
 });
 
 test('dashboard status is no_data if user has no exam attempts', function () {
     $user = User::factory()->create();
-    $this->actingAs($user);
 
-    $response = $this->get(route('dashboard'));
+    $response = $this->actingAs($user)->get(route('dashboard.index'));
     $response->assertOk();
 
     $response->assertInertia(fn (Assert $page) => $page
-        ->component('dashboard')
+        ->component('user/dashboard/index')
         ->has('aiAnalysis', fn (Assert $page) => $page
             ->where('status', 'no_data')
             ->where('data', null)
@@ -61,13 +60,13 @@ test('dashboard dispatches GenerateUserAnalysisJob if user has exam attempts but
         ],
     ]);
 
-    $response = $this->get(route('dashboard'));
+    $response = $this->get(route('dashboard.index'));
     $response->assertOk();
 
     Bus::assertDispatched(GenerateUserAnalysisJob::class);
 
     $response->assertInertia(fn (Assert $page) => $page
-        ->component('dashboard')
+        ->component('user/dashboard/index')
         ->has('aiAnalysis', fn (Assert $page) => $page
             ->where('status', 'generating')
             ->where('data', null)
@@ -115,11 +114,11 @@ test('dashboard serves cached analysis if generated today', function () {
         'analysis_json' => $analysisData,
     ]);
 
-    $response = $this->get(route('dashboard'));
+    $response = $this->get(route('dashboard.index'));
     $response->assertOk();
 
     $response->assertInertia(fn (Assert $page) => $page
-        ->component('dashboard')
+        ->component('user/dashboard/index')
         ->has('aiAnalysis', fn (Assert $page) => $page
             ->where('status', 'ready')
             ->where('data', $analysisData)

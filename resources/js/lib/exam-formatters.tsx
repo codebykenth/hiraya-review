@@ -189,9 +189,9 @@ export const renderFormattedText = (
                 return null;
             }
 
-            // Strict 1-liner comment: Regex to match standard math expressions, logic arrow chains, negation states, parenthesized variables, and single letter variables
+            // Strict 1-liner comment: Regex to match standard math expressions, logic arrow chains, negation states, parenthesized variables, and specific tokens.
             const mathPattern =
-                /(\b\d+(?:\.\d+)?%|\[[^\]]+\]|\bProject\s+[A-Z]\b|\bQ[1-4]\b|[~¬]?\s*\b[A-Z]\b\s*(?:->|=>)\s*[~¬]?\s*\b[A-Z]\b(?:\s*(?:->|=>)\s*[~¬]?\s*\b[A-Z]\b)*|[~¬]\s*\b[A-Z]\b|\(\s*[~¬]?\s*\b[A-Z]\b\s*\)|'\s*\b[A-Z]\b\s*'|"\s*\b[A-Z]\b\s*"|\b[B-H|J-N|P-Z]\b)/g;
+                /(\b\d+(?:\.\d+)?%|\[[^\]]+\]|\bProject\s+[A-Z]\b|\bQ[1-4]\b|[~¬]?\s*\b[A-Z]\b\s*(?:->|=>)\s*[~¬]?\s*\b[A-Z]\b(?:\s*(?:->|=>)\s*[~¬]?\s*\b[A-Z]\b)*|[~¬]\s*\b[A-Z]\b|\(\s*[~¬]?\s*\b[A-Z]\b\s*\)|'\s*\b[A-Z]\b\s*'|"\s*\b[A-Z]\b\s*")/g;
 
             const renderSingleVariable = (v: string) => {
                 const cleaned = v.trim();
@@ -321,15 +321,15 @@ export const renderFormattedText = (
                 const shortcutContent = shortcutMatch[3];
 
                 return (
-                    <div className="shadow-3xs my-3 flex items-start gap-3 rounded-r-xl border-l-3 border-amber-500 bg-amber-50/15 p-3.5 dark:bg-amber-950/10">
-                        <span className="shadow-3xs mt-0.5 flex size-5.5 shrink-0 items-center justify-center rounded-full bg-amber-500 text-[11px] text-white select-none">
+                    <div className="shadow-3xs my-4 flex items-start gap-3 rounded-r-xl border-l-4 border-rose-500 bg-rose-50/40 p-4 dark:border-rose-500/80 dark:bg-rose-950/20">
+                        <span className="shadow-3xs mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full bg-rose-500 text-[12px] text-white select-none">
                             🧠
                         </span>
                         <div className="flex-1">
-                            <strong className="text-amber-850 mb-1 block font-heading text-xs font-extrabold tracking-wider uppercase dark:text-amber-300">
+                            <strong className="mb-1.5 block font-heading text-[13px] font-black tracking-widest text-rose-900 uppercase dark:text-rose-300">
                                 {title}
                             </strong>
-                            <div className="dark:text-slate-350 text-xs leading-relaxed font-bold text-slate-600">
+                            <div className="text-[14px] leading-loose font-bold text-slate-800 dark:text-slate-200">
                                 {renderRichParagraphContent(shortcutContent)}
                             </div>
                         </div>
@@ -472,6 +472,7 @@ export const renderFormattedText = (
                                     }`}
                                 >
                                     <div
+                                        className="flex w-full items-center justify-center"
                                         dangerouslySetInnerHTML={{
                                             __html: scaledSvg,
                                         }}

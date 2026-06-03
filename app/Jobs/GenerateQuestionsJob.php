@@ -55,12 +55,15 @@ class GenerateQuestionsJob implements ShouldQueue
         You are a professional Civil Service Exam reviewer writer in the Philippines.
         Generate multiple-choice questions that are challenging, syllabus-aligned, and strictly realistic according to the official CSC Exam Scope.
 
-        Official Category & Subcategory Schema:
-        * General Information: 'Philippine Constitution', 'Code of Conduct and Ethical Standards (R.A. 6713)', 'Peace and Human Rights Issues and Concepts', 'Environment Management and Protection'
-        * Verbal Ability: 'Word meaning', 'Sentence completion', 'Error recognition', 'Sentence structure', 'Paragraph organization', 'Reading comprehension'
-        * Analytical Ability: 'Word analogy', 'Symbolic logic / abstract reasoning', 'Identifying assumptions and drawing conclusions', 'Data interpretation'
-        * Numerical Ability: 'Basic operations', 'Number sequence', 'Word problems'
-        * Clerical Ability: 'Filing', 'Spelling'
+        Official Category & Subcategory Schema (With Exam Level context):
+        * General Information (Both Levels): 'Philippine Constitution', 'Code of Conduct and Ethical Standards (R.A. 6713)', 'Peace and Human Rights Issues and Concepts', 'Environment Management and Protection'
+        * Verbal Ability (Both Levels): 'Word meaning', 'Sentence completion', 'Error recognition', 'Sentence structure', 'Paragraph organization', 'Reading comprehension'
+        * Analytical Ability (Professional Level ONLY): 'Word analogy', 'Symbolic logic / abstract reasoning', 'Identifying assumptions and drawing conclusions', 'Data interpretation'
+        * Numerical Ability (Both Levels): 'Basic operations', 'Number sequence', 'Word problems'
+        * Clerical Ability (Subprofessional Level ONLY): 'Filing', 'Spelling'
+
+        Philippine Context Rule:
+        For Word Problems, Reading Comprehension, Data Interpretation, and Sentence texts, you MUST use realistic Philippine context. Use Philippine Pesos (₱), local Philippine cities (e.g., Manila, Cebu, Davao), local names (e.g., Juan, Maria, Santos), and real Philippine government agencies (e.g., CSC, BIR, DOH) to make the questions authentic to the CSE.
 
         Category Specific Rules:
         * Word meaning: You MUST explicitly indicate which word the user needs to define. If you use a sentence for context, format the target word in ALL CAPS and append a direct question at the end of the stem. ABSOLUTE RULE: The exact same target word MUST NOT be in the options. The correct option MUST be a completely different word. Example: \"The public relations officer was reassigned after several clients complained about her SUPERCILIOUS attitude. What is the closest meaning of the capitalized word?\" 
@@ -69,6 +72,7 @@ class GenerateQuestionsJob implements ShouldQueue
         * Paragraph organization: The stem MUST consist of 4 to 5 jumbled sentences. Each sentence must start with a number in parentheses, like \"(1) First sentence. (2) Second sentence.\" The options must be sequence combinations of those numbers, such as \"3, 1, 4, 2\".
         * Word analogy: Provide standard analytical analogies. 
         * Symbolic logic / abstract reasoning: You MUST generate visual-spatial geometric puzzles (like finding the next shape in a sequence, folding patterns, or rotating grids) using raw, scalable SVG code. Output raw <svg viewBox=\"...\">...</svg> blocks directly inside the text. You MUST include SVG visuals not just in the question stem, but ALSO in every single option (Options A to E must be standalone SVGs showing the possible answers, do NOT use descriptive text for options), AND in the explanation block to visually demonstrate the correct pattern and solution. Keep SVGs clean with simple paths, <rect>, <circle>, or <polygon>. Ensure the visual sequence is logically solvable and visually clear. In the explanation block, explicitly define the visual pattern (e.g. 'The black dot rotates 90 degrees clockwise') and provide the correct logical solution alongside the SVG. Do NOT use standard deductive logic chains for Abstract Reasoning, use visual SVG puzzles instead!
+        * Data interpretation: You MUST provide a data source for interpretation based on realistic Philippine public administration data (e.g., population growth, budget allocation, public school enrollment rates). You should provide a beautifully formatted markdown table AND/OR a chart visualization (e.g., bar chart, line graph, pie chart) using raw, scalable SVG code directly inside the question stem. Feel free to use both a table and an SVG chart together, or vary them so some questions use tables and some use charts. If using an SVG chart, ensure it has clear axes, data labels, titles, and legends using <text> elements. The options should be text or numbers based on the data, and the explanation block must reference the specific data points. Keep any SVG code clean and well-structured.
         * Numerical Ability: You MUST include a dedicated section in the explanation starting with 'Mental Math Shortcut:' that details the fastest and most efficient way to solve the problem mentally or via rapid approximation, showing standard exam cognitive shortcuts to save valuable time.
 
         Language Specific Rules (Filipino/Tagalog):
@@ -151,7 +155,7 @@ class GenerateQuestionsJob implements ShouldQueue
                                         'properties' => [
                                             'stem' => [
                                                 'type' => 'STRING',
-                                                'description' => 'The question stem or scenario. If it includes a data table, represent it beautifully as a formatted text/markdown table.',
+                                                'description' => 'The question stem or scenario. If it includes a data table, represent it beautifully as a formatted text/markdown table. If it requires data interpretation, embed raw SVG charts directly.',
                                             ],
                                             'category' => ['type' => 'STRING'],
                                             'subcategory' => ['type' => 'STRING'],

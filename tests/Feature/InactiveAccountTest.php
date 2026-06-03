@@ -27,7 +27,7 @@ class InactiveAccountTest extends TestCase
         $this->actingAs($user)
             ->get('/dashboard')
             ->assertInertia(fn (Assert $page) => $page
-                ->component('dashboard')
+                ->component('user/dashboard/index')
                 ->where('auth.user.is_active', false)
             );
     }

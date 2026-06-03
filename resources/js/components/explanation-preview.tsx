@@ -66,12 +66,12 @@ export function ExplanationPreview({ text }: ExplanationPreviewProps) {
             elements.push(
                 <div
                     key={`shortcut-${idx}`}
-                    className="my-4 rounded-xl border border-amber-200 bg-amber-50/15 p-4 dark:border-amber-900/30 dark:bg-amber-950/10"
+                    className="my-4 rounded-xl border border-rose-200 bg-rose-50/40 p-4 dark:border-rose-900/40 dark:bg-rose-950/20"
                 >
-                    <span className="mb-1 block text-[10px] font-black tracking-wide text-amber-800 uppercase dark:text-amber-400">
+                    <span className="mb-1 block text-[11px] font-black tracking-wider text-rose-800 uppercase dark:text-rose-300">
                         🧠 Mental Math Shortcut
                     </span>
-                    <p className="text-xs leading-relaxed font-semibold text-foreground">
+                    <p className="text-sm leading-relaxed font-bold text-foreground">
                         {parseInlineBold(content)}
                     </p>
                 </div>,
