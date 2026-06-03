@@ -1,5 +1,4 @@
-import type {
-    DragEndEvent} from '@dnd-kit/core';
+import type { DragEndEvent } from '@dnd-kit/core';
 import {
     DndContext,
     useDroppable,
@@ -107,8 +106,8 @@ export function CalendarGrid({
         const { active, over } = event;
 
         if (!over || !active.data.current?.schedule || !handleDragSchedule) {
-return;
-}
+            return;
+        }
 
         const schedule = active.data.current.schedule;
         const sourceDate = schedule.study_date || schedule.date;

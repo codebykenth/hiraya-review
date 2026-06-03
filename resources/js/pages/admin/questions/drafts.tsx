@@ -24,6 +24,7 @@ import {
     store as questionsStore,
     create as questionsCreate,
     destroy as questionsDestroy,
+    bulkDestroy as questionsBulkDestroy,
 } from '@/routes/questions';
 
 interface DraftQuestion {
@@ -165,6 +166,32 @@ export default function DraftsQuestionList({
         );
     };
 
+    const handleBulkDeletePending = () => {
+        const pendingIds = draftQuestions
+            .filter((q) => !q.approved)
+            .map((q) => q.id);
+
+        if (pendingIds.length === 0) {
+            return;
+        }
+
+        if (
+            confirm(
+                `Are you sure you want to delete ${pendingIds.length} unapproved draft(s)? This action cannot be undone.`,
+            )
+        ) {
+            router.post(
+                questionsBulkDestroy().url,
+                {
+                    ids: pendingIds,
+                },
+                {
+                    preserveScroll: true,
+                },
+            );
+        }
+    };
+
     return (
         <>
             <Head title="Drafts Review Center" />
@@ -185,6 +212,7 @@ export default function DraftsQuestionList({
                 commitLabel="Commit Approved"
                 onCommit={handleCommitApproved}
                 onToggleAll={handleToggleAllDrafts}
+                onBulkDeletePending={handleBulkDeletePending}
                 emptyStateTitle="No Drafts Pending Review"
                 emptyStateDescription="There are currently no draft questions in the review queue. Select options in the AI Generator or manual form to add more."
                 emptyStateActionUrl={questionsCreate().url}
@@ -381,6 +409,9 @@ export default function DraftsQuestionList({
                                                     <span className="text-sm leading-tight">
                                                         {renderFormattedText(
                                                             opt,
+                                                            false,
+                                                            undefined,
+                                                            true,
                                                         )}
                                                     </span>
                                                 </div>

@@ -245,10 +245,6 @@ class QuestionController
 
             $this->clearCache();
 
-            if ($validated['status'] === 'draft') {
-                return redirect()->route('questions.drafts')->with('success', 'Draft question created successfully!');
-            }
-
             return back()->with('success', 'Question created successfully!');
         } catch (\Exception $e) {
             $this->clearCache();

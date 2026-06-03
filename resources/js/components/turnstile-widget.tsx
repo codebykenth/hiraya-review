@@ -54,8 +54,8 @@ export default function TurnstileWidget({
                 !containerRef.current ||
                 widgetIdRef.current
             ) {
-return;
-}
+                return;
+            }
 
             widgetIdRef.current = window.turnstile.render(
                 containerRef.current,
@@ -99,8 +99,8 @@ return;
         return () => {
             // Cleanup event listener if unmounted before load
             if (script) {
-script.removeEventListener('load', renderWidget);
-}
+                script.removeEventListener('load', renderWidget);
+            }
 
             // Properly remove the widget instance
             if (widgetIdRef.current && window.turnstile) {

@@ -125,7 +125,12 @@ export default function QuestionShow({ question }: QuestionShowProps) {
                                                         : 'text-muted-foreground'
                                                 }`}
                                             >
-                                                {renderFormattedText(option)}
+                                                {renderFormattedText(
+                                                    option,
+                                                    false,
+                                                    undefined,
+                                                    true,
+                                                )}
                                             </span>
 
                                             {/* Correct marker check */}

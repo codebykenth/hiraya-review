@@ -594,8 +594,8 @@ export function useCalendarState(initialProps: CalendarPageProps) {
         newDate: string,
     ) => {
         if (sourceDate === newDate) {
-return;
-}
+            return;
+        }
 
         // Optimistic update
         const updated = new Map(schedules);

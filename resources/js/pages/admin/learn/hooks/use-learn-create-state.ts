@@ -234,7 +234,7 @@ export function useLearnCreateState({
         e.preventDefault();
         manualForm.post(adminLearnStore().url, {
             onSuccess: () => {
-                manualForm.reset();
+                manualForm.reset('title', 'topic', 'summary', 'content');
             },
         });
     };

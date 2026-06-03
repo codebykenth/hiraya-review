@@ -1,4 +1,6 @@
+import { ZoomIn } from 'lucide-react';
 import React from 'react';
+import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { parseLatexString } from '@/lib/latex-parser';
 
 export const formatDuration = (totalSecs: number, showLabel = true): string => {
@@ -130,6 +132,7 @@ export const renderFormattedText = (
     text: string,
     stripLogicSymbols: boolean = false,
     letterMap?: Record<string, string>,
+    isOption: boolean = false,
 ) => {
     if (!text) {
         return null;
@@ -451,12 +454,48 @@ export const renderFormattedText = (
         <div className="flex flex-col gap-1.5">
             {svgParts.map((svgPart, svgIndex) => {
                 if (svgPart.match(/^<svg/)) {
+                    // Pre-process the SVG string to inject a class for responsive sizing
+                    // We also ensure it doesn't exceed 100% width or fixed pixel heights that break layout
+                    const scaledSvg = svgPart.replace(
+                        /^<svg/,
+                        `<svg class="${isOption ? 'max-h-32 w-auto h-auto object-contain' : 'max-h-64 w-auto h-auto object-contain'}"`,
+                    );
+
                     return (
-                        <div
-                            key={`svg-${svgIndex}`}
-                            className="mx-auto my-4 flex w-full max-w-2xl justify-center rounded-xl border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900"
-                            dangerouslySetInnerHTML={{ __html: svgPart }}
-                        />
+                        <Dialog key={`svg-${svgIndex}`}>
+                            <DialogTrigger asChild>
+                                <div
+                                    className={`group relative cursor-pointer overflow-hidden transition-all hover:scale-[1.02] active:scale-95 ${
+                                        isOption
+                                            ? 'my-1 flex w-full justify-center'
+                                            : 'mx-auto my-4 flex w-full max-w-2xl justify-center rounded-xl border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900'
+                                    }`}
+                                >
+                                    <div
+                                        dangerouslySetInnerHTML={{
+                                            __html: scaledSvg,
+                                        }}
+                                    />
+
+                                    <div className="absolute inset-0 flex items-center justify-center bg-black/0 opacity-0 transition-all group-hover:bg-black/5 group-hover:opacity-100 dark:group-hover:bg-white/10">
+                                        <div className="rounded-full bg-white/90 p-1.5 text-slate-700 shadow-sm backdrop-blur-sm dark:bg-slate-900/90 dark:text-slate-300">
+                                            <ZoomIn className="size-4" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </DialogTrigger>
+                            <DialogContent className="max-w-4xl border-none bg-transparent p-0 shadow-none">
+                                <div
+                                    className="flex w-full justify-center rounded-2xl bg-white p-8 dark:bg-slate-900"
+                                    dangerouslySetInnerHTML={{
+                                        __html: svgPart.replace(
+                                            /^<svg/,
+                                            `<svg class="w-full h-auto max-h-[80vh] object-contain"`,
+                                        ),
+                                    }}
+                                />
+                            </DialogContent>
+                        </Dialog>
                     );
                 }
 

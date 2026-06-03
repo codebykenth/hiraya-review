@@ -269,6 +269,9 @@ export function LiveExamView({
                                                         >
                                                             {renderFormattedText(
                                                                 opt,
+                                                                false,
+                                                                undefined,
+                                                                true,
                                                             )}
                                                         </p>
                                                     </div>

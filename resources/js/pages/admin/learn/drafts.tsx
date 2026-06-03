@@ -24,6 +24,7 @@ import {
     drafts as adminLearnDrafts,
     store as adminLearnStore,
     destroy as adminLearnDestroy,
+    bulkDestroy as adminLearnBulkDestroy,
 } from '@/routes/admin/learn';
 
 interface DraftModule {
@@ -147,6 +148,32 @@ export default function DraftsLearnList({
         );
     };
 
+    const handleBulkDeletePending = () => {
+        const pendingIds = draftModules
+            .filter((m) => !m.approved)
+            .map((m) => m.id);
+
+        if (pendingIds.length === 0) {
+            return;
+        }
+
+        if (
+            confirm(
+                `Are you sure you want to delete ${pendingIds.length} unapproved draft module(s)? This action cannot be undone.`,
+            )
+        ) {
+            router.post(
+                adminLearnBulkDestroy().url,
+                {
+                    ids: pendingIds,
+                },
+                {
+                    preserveScroll: true,
+                },
+            );
+        }
+    };
+
     return (
         <>
             <Head title="Drafts Review" />
@@ -168,6 +195,7 @@ export default function DraftsLearnList({
                 commitLabel="Publish Approved"
                 onCommit={handleCommitApproved}
                 onToggleAll={handleToggleAllDrafts}
+                onBulkDeletePending={handleBulkDeletePending}
                 emptyStateTitle="No Syllabus Drafts Pending"
                 emptyStateDescription="There are currently no draft modules waiting in the curation pipeline. Launch the AI Lesson Generator or create one manually to populate this review center."
                 emptyStateActionUrl="/admin/learn/create"

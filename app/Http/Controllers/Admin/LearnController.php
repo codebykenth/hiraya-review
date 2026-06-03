@@ -181,7 +181,7 @@ class LearnController
 
         $this->clearCache();
 
-        return redirect()->route('admin.learn.index')->with('success', 'Learning module created successfully!');
+        return back()->with('success', 'Learning module created successfully!');
     }
 
     /**

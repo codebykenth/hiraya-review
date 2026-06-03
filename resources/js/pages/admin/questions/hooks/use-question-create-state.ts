@@ -148,7 +148,7 @@ export function useQuestionCreateState({
         post(questionsStore().url, {
             preserveScroll: true,
             onSuccess: () => {
-                reset();
+                reset('stem', 'options', 'correct_option', 'explanation');
             },
         });
     };

@@ -50,6 +50,7 @@ interface DraftsReviewShellProps<T extends BaseDraftItem> {
     commitLabel: string;
     onCommit: () => void;
     onToggleAll: () => void;
+    onBulkDeletePending?: () => void;
     emptyStateTitle: string;
     emptyStateDescription: string;
     emptyStateActionUrl: string;
@@ -70,6 +71,7 @@ export function DraftsReviewShell<T extends BaseDraftItem>({
     commitLabel,
     onCommit,
     onToggleAll,
+    onBulkDeletePending,
     emptyStateTitle,
     emptyStateDescription,
     emptyStateActionUrl,
@@ -199,6 +201,19 @@ export function DraftsReviewShell<T extends BaseDraftItem>({
                 {/* BULK ACTIONS HEADER DECK */}
                 {items.length > 0 && (
                     <div className="flex items-center gap-2">
+                        {onBulkDeletePending && (
+                            <Button
+                                type="button"
+                                variant="destructive"
+                                size="sm"
+                                disabled={items.length - approvedCount === 0}
+                                icon={X}
+                                onClick={onBulkDeletePending}
+                            >
+                                Delete Unapproved (
+                                {items.length - approvedCount})
+                            </Button>
+                        )}
                         <Button
                             type="button"
                             variant="outline"

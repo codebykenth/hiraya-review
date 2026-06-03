@@ -229,6 +229,9 @@ export function ReviewExamView({
                                                             <p className="text-sm font-bold transition md:text-base">
                                                                 {renderFormattedText(
                                                                     opt,
+                                                                    false,
+                                                                    undefined,
+                                                                    true,
                                                                 )}
                                                             </p>
                                                             {!isDemographic &&
