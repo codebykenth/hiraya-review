@@ -22,8 +22,7 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from '@/components/ui/tooltip';
-import { renderFormattedText, formatMathInline } from '@/lib/exam-formatters';
-import { parseLatexString } from '@/lib/latex-parser';
+import { renderFormattedText } from '@/lib/exam-formatters';
 
 interface Question {
     id: number;
@@ -268,7 +267,9 @@ export function LiveExamView({
                                                                     : 'text-foreground'
                                                             }`}
                                                         >
-                                                            {formatMathInline(opt)}
+                                                            {renderFormattedText(
+                                                                opt,
+                                                            )}
                                                         </p>
                                                     </div>
                                                 );

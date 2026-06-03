@@ -19,7 +19,11 @@ export function ExplanationPreview({ text }: ExplanationPreviewProps) {
 
         while ((match = boldRegex.exec(lineText)) !== null) {
             if (match.index > lastIndex) {
-                parts.push(parseLatexString(lineText.substring(lastIndex, match.index)));
+                parts.push(
+                    parseLatexString(
+                        lineText.substring(lastIndex, match.index),
+                    ),
+                );
             }
 
             parts.push(

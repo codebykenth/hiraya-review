@@ -12,7 +12,7 @@ import {
     Minus,
 } from 'lucide-react';
 import Pusher from 'pusher-js';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 interface AiReadinessCardProps {
     aiAnalysis?: {
@@ -32,8 +32,19 @@ interface AiReadinessCardProps {
 
 export default function AiReadinessCard({ aiAnalysis }: AiReadinessCardProps) {
     const { auth, pusher } = usePage().props as any;
-    const status = aiAnalysis?.status || 'no_data';
+    const initialStatus = aiAnalysis?.status || 'no_data';
+    const [localStatus, setLocalStatus] = useState<
+        'no_data' | 'generating' | 'ready' | 'failed'
+    >(initialStatus);
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const data = aiAnalysis?.data;
+
+    const [prevInitialStatus, setPrevInitialStatus] = useState(initialStatus);
+
+    if (initialStatus !== prevInitialStatus) {
+        setPrevInitialStatus(initialStatus);
+        setLocalStatus(initialStatus);
+    }
 
     useEffect(() => {
         if (status !== 'generating' || !auth?.user?.id || !pusher?.key) {
@@ -60,17 +71,62 @@ export default function AiReadinessCard({ aiAnalysis }: AiReadinessCardProps) {
             router.reload({ only: ['aiAnalysis'] });
         });
 
+        channel.listen('.ai-analysis-failed', (e: any) => {
+            setLocalStatus('failed');
+            setErrorMessage(
+                e?.message ||
+                    'AI coach is currently busy. Please try again later.',
+            );
+        });
+
         return () => {
             channel.stopListening('.ai-analysis-ready');
+            channel.stopListening('.ai-analysis-failed');
             echo.disconnect();
         };
-    }, [status, auth?.user?.id, pusher]);
+    }, [localStatus, auth?.user?.id, pusher]);
 
     // Container style sharing across all states to guarantee consistent glassmorphism
     const containerClasses =
         'relative overflow-hidden rounded-2xl border border-slate-200/80 bg-gradient-to-br from-blue-50/70 via-indigo-50/40 to-slate-50 p-6 text-slate-900 shadow-sm transition-all hover:shadow-md dark:border-slate-800 dark:from-slate-900 dark:via-slate-950 dark:to-blue-950 dark:text-white dark:shadow-xl backdrop-blur-md';
 
-    if (status === 'no_data') {
+    if (localStatus === 'failed') {
+        return (
+            <div className={containerClasses}>
+                <div className="pointer-events-none absolute -top-24 -right-24 h-48 w-48 rounded-full bg-rose-500/5 blur-3xl dark:bg-rose-500/10" />
+
+                <div className="flex flex-col items-center justify-between gap-4 text-center md:flex-row md:text-left">
+                    <div className="flex flex-col items-center gap-4 md:flex-row">
+                        <div className="border-rose-150 flex size-12 shrink-0 items-center justify-center rounded-xl border bg-rose-50 text-rose-600 dark:border-rose-500/20 dark:bg-rose-500/10 dark:text-rose-400">
+                            <Brain className="size-6" />
+                        </div>
+                        <div>
+                            <h3 className="flex items-center justify-center gap-2 text-lg font-bold tracking-tight text-slate-900 md:justify-start dark:text-white">
+                                AI Readiness Report
+                                <span className="border-rose-150 inline-flex items-center rounded-full border bg-rose-50 px-2 py-0.5 text-[10px] font-medium text-rose-700 dark:border-rose-500/20 dark:bg-rose-500/10 dark:text-rose-400">
+                                    Failed
+                                </span>
+                            </h3>
+                            <p className="dark:text-slate-450 mt-1 text-sm text-slate-500">
+                                {errorMessage ||
+                                    'Report generation failed. Please try again later.'}
+                            </p>
+                        </div>
+                    </div>
+                    <div>
+                        <Link
+                            href="/dashboard/ai-analysis?retry=1"
+                            className="inline-flex items-center gap-1 rounded-lg bg-blue-600 px-3 py-1 text-xs font-extrabold text-white transition hover:bg-blue-700"
+                        >
+                            Retry &rarr;
+                        </Link>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    if (localStatus === 'no_data') {
         return (
             <div className={containerClasses}>
                 {/* Background decorative glows */}
@@ -100,7 +156,7 @@ export default function AiReadinessCard({ aiAnalysis }: AiReadinessCardProps) {
         );
     }
 
-    if (status === 'generating') {
+    if (localStatus === 'generating') {
         return (
             <div className={containerClasses}>
                 {/* Background decorative glows */}
@@ -128,7 +184,7 @@ export default function AiReadinessCard({ aiAnalysis }: AiReadinessCardProps) {
         );
     }
 
-    if (status === 'ready' && data) {
+    if (localStatus === 'ready' && data) {
         const prob = data.pass_probability;
         const radius = 40;
         const strokeWidth = 8;

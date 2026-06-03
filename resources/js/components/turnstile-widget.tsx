@@ -49,14 +49,21 @@ export default function TurnstileWidget({
     useEffect(() => {
         const renderWidget = () => {
             // Prevent double-rendering
-            if (!window.turnstile || !containerRef.current || widgetIdRef.current) return;
+            if (
+                !window.turnstile ||
+                !containerRef.current ||
+                widgetIdRef.current
+            ) {
+return;
+}
 
             widgetIdRef.current = window.turnstile.render(
                 containerRef.current,
                 {
                     sitekey: siteKey,
                     // Pull from the ref to ensure we always use the latest functions without re-rendering
-                    callback: (token: string) => callbacks.current.onVerify(token),
+                    callback: (token: string) =>
+                        callbacks.current.onVerify(token),
                     'error-callback': () => callbacks.current.onError?.(),
                     'expired-callback': () => callbacks.current.onExpire?.(),
                     theme,
@@ -67,18 +74,21 @@ export default function TurnstileWidget({
 
         // Singleton script injection check
         const scriptId = 'cloudflare-turnstile-script';
-        let script = document.getElementById(scriptId) as HTMLScriptElement | null;
+        let script = document.getElementById(
+            scriptId,
+        ) as HTMLScriptElement | null;
 
         if (!script) {
             script = document.createElement('script');
             script.id = scriptId;
-            script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js';
+            script.src =
+                'https://challenges.cloudflare.com/turnstile/v0/api.js';
             script.async = true;
             script.defer = true;
             document.head.appendChild(script);
         }
 
-        // If turnstile is already loaded, render immediately. 
+        // If turnstile is already loaded, render immediately.
         // Otherwise, wait for script onload.
         if (window.turnstile) {
             renderWidget();
@@ -88,7 +98,9 @@ export default function TurnstileWidget({
 
         return () => {
             // Cleanup event listener if unmounted before load
-            if (script) script.removeEventListener('load', renderWidget);
+            if (script) {
+script.removeEventListener('load', renderWidget);
+}
 
             // Properly remove the widget instance
             if (widgetIdRef.current && window.turnstile) {

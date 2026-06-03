@@ -60,10 +60,12 @@ export const formatMathInlineBase = (text: string) => {
     }
 
     // Convert (-3)3 to (-3)^3
-    let processedText = text.replace(/\)(\d+)\b/g, ')^$1');
+    const processedText = text.replace(/\)(\d+)\b/g, ')^$1');
 
     // Split by fraction (e.g. 1/2, 4.8 / 0.6, 18 / (-2)), superscript (e.g. ^2, ^-3, ^n), or sqrt(...)
-    const parts = processedText.split(/(\b\d+(?:\.\d+)?\s*\/\s*(?:-?\d+(?:\.\d+)?|\(\s*-?\d+(?:\.\d+)?\s*\))|\^[-a-zA-Z0-9]+|\bsqrt\([^)]+\))/gi);
+    const parts = processedText.split(
+        /(\b\d+(?:\.\d+)?\s*\/\s*(?:-?\d+(?:\.\d+)?|\(\s*-?\d+(?:\.\d+)?\s*\))|\^[-a-zA-Z0-9]+|\bsqrt\([^)]+\))/gi,
+    );
 
     if (parts.length === 1) {
         return parseLatexString(text);
@@ -101,9 +103,15 @@ export const formatMathInlineBase = (text: string) => {
 
                     if (part.toLowerCase().startsWith('sqrt(')) {
                         const inner = part.substring(5, part.length - 1);
+
                         return (
-                            <span key={idx} className="mx-0.5 inline-flex items-center whitespace-nowrap">
-                                <span className="text-[1.1em] font-serif leading-none mr-[1px]">√</span>
+                            <span
+                                key={idx}
+                                className="mx-0.5 inline-flex items-center whitespace-nowrap"
+                            >
+                                <span className="mr-[1px] font-serif text-[1.1em] leading-none">
+                                    √
+                                </span>
                                 <span className="border-t border-slate-700 pt-[1px] leading-tight dark:border-slate-300">
                                     {inner}
                                 </span>
@@ -132,14 +140,11 @@ export const renderFormattedText = (
         ? text.replace(/\s*\(\s*[~¬]?\s*[A-Z]\s*\)/g, '')
         : text;
 
-    // Strict 1-liner comment: Pre-format continuous single-line numbered lists to newlines
-    const cleanedText = processedText.replace(
-        /(?:\s+|^)(\d+\.)\s+/g,
-        '\n$1 ',
-    );
+    // Extract SVGs before table parsing to avoid conflicts
+    const svgRegex = /(<svg[\s\S]*?<\/svg>)/g;
+    const svgParts = processedText.split(svgRegex);
 
     const tableRegex = /((?:^|\n)\|[^\n]+\|[^\n]*(?:\n\|[^\n]+\|[^\n]*)+)/g;
-    const parts = cleanedText.split(tableRegex);
 
     const formatNumberedLists = (inputText: string) => {
         if (!inputText) {
@@ -444,18 +449,36 @@ export const renderFormattedText = (
 
     return (
         <div className="flex flex-col gap-1.5">
-            {parts.map((part, index) => {
-                if (part.match(tableRegex)) {
+            {svgParts.map((svgPart, svgIndex) => {
+                if (svgPart.match(/^<svg/)) {
                     return (
-                        <React.Fragment key={index}>
-                            {renderTable(part)}
-                        </React.Fragment>
+                        <div
+                            key={`svg-${svgIndex}`}
+                            className="mx-auto my-4 flex w-full max-w-2xl justify-center rounded-xl border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900"
+                            dangerouslySetInnerHTML={{ __html: svgPart }}
+                        />
                     );
                 }
 
+                const parts = svgPart.split(tableRegex);
+
                 return (
-                    <React.Fragment key={index}>
-                        {formatNumberedLists(part)}
+                    <React.Fragment key={`text-${svgIndex}`}>
+                        {parts.map((part, index) => {
+                            if (part.match(tableRegex)) {
+                                return (
+                                    <React.Fragment key={index}>
+                                        {renderTable(part)}
+                                    </React.Fragment>
+                                );
+                            }
+
+                            return (
+                                <React.Fragment key={index}>
+                                    {formatNumberedLists(part)}
+                                </React.Fragment>
+                            );
+                        })}
                     </React.Fragment>
                 );
             })}

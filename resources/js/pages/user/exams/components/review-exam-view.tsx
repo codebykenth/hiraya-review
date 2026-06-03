@@ -13,9 +13,7 @@ import QuestionPalettePanel from '@/components/question-palette-panel';
 import {
     renderFormattedText,
     extractPropositions,
-    formatMathInline,
 } from '@/lib/exam-formatters';
-import { parseLatexString } from '@/lib/latex-parser';
 
 interface Question {
     id: number;
@@ -229,7 +227,9 @@ export function ReviewExamView({
                                                         </span>
                                                         <div className="flex flex-1 items-center justify-between">
                                                             <p className="text-sm font-bold transition md:text-base">
-                                                                {formatMathInline(opt)}
+                                                                {renderFormattedText(
+                                                                    opt,
+                                                                )}
                                                             </p>
                                                             {!isDemographic &&
                                                                 isCorrectOption && (

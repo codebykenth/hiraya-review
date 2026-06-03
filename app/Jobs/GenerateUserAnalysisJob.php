@@ -502,6 +502,7 @@ class GenerateUserAnalysisJob implements ShouldQueue
 
             if (! $success) {
                 Log::error('GenerateUserAnalysisJob: All AI generation models failed.');
+                Cache::put("ai-analysis-failed-{$this->userId}", true, 300);
                 event(new AiGenerationFailed($this->userId, 'analysis', 'analysis'));
 
                 return;
@@ -530,10 +531,12 @@ class GenerateUserAnalysisJob implements ShouldQueue
             }
 
             Log::error('GenerateUserAnalysisJob: API failed or returned invalid JSON structure.');
+            Cache::put("ai-analysis-failed-{$this->userId}", true, 300);
             event(new AiGenerationFailed($this->userId, 'analysis', 'analysis'));
 
         } catch (\Exception $e) {
             Log::error('GenerateUserAnalysisJob Exception: '.$e->getMessage());
+            Cache::put("ai-analysis-failed-{$this->userId}", true, 300);
             event(new AiGenerationFailed($this->userId, 'analysis', 'analysis'));
         } finally {
             Cache::forget("ai-analysis-generating-{$this->userId}");

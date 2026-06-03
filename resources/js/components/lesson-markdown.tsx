@@ -1,10 +1,7 @@
 import { BookOpen, CheckCircle2, HelpCircle, Lightbulb } from 'lucide-react';
 import React, { useCallback, useMemo, useState } from 'react';
 import { formatMathInline } from '@/lib/exam-formatters';
-import {
-    findMatchingBrace,
-    parseLaTeXToJSX,
-} from '@/lib/latex-parser';
+import { parseLaTeXToJSX } from '@/lib/latex-parser';
 
 function RevealableAnswer({
     answerContent,
@@ -100,137 +97,132 @@ const cleanText = (value: string): string =>
         .trim();
 
 export function LessonMarkdown({ content = '' }: LessonMarkdownProps) {
-    const parseInline = useCallback(
-        (text: string): React.ReactNode => {
-            const normalized = cleanText(text);
+    const parseInline = useCallback((text: string): React.ReactNode => {
+        const normalized = cleanText(text);
 
-            if (!normalized) {
-                return null;
+        if (!normalized) {
+            return null;
+        }
+
+        const result: React.ReactNode[] = [];
+        let i = 0;
+
+        const parseFormatting = (
+            str: string,
+            keyPrefix: string,
+        ): React.ReactNode[] => {
+            if (!str) {
+                return [];
             }
 
-            const result: React.ReactNode[] = [];
-            let i = 0;
+            // Match **bold** OR *italic* with word boundaries to prevent matching math 2*3*4
+            const formatRegex =
+                /(\*\*([^*]+?)\*\*)|(^|\W)\*([^\s*](?:[^*]*?[^\s*])?)\*(?=\W|$)/g;
+            const parts: React.ReactNode[] = [];
+            let lastIdx = 0;
+            let match;
 
-            const parseFormatting = (
-                str: string,
-                keyPrefix: string,
-            ): React.ReactNode[] => {
-                if (!str) {
-                    return [];
+            while ((match = formatRegex.exec(str)) !== null) {
+                if (match.index > lastIdx) {
+                    parts.push(
+                        formatMathInline(str.substring(lastIdx, match.index)),
+                    );
                 }
 
-                // Match **bold** OR *italic* with word boundaries to prevent matching math 2*3*4
-                const formatRegex =
-                    /(\*\*([^*]+?)\*\*)|(^|\W)\*([^\s*](?:[^*]*?[^\s*])?)\*(?=\W|$)/g;
-                const parts: React.ReactNode[] = [];
-                let lastIdx = 0;
-                let match;
-
-                while ((match = formatRegex.exec(str)) !== null) {
-                    if (match.index > lastIdx) {
-                        parts.push(
-                            formatMathInline(
-                                str.substring(lastIdx, match.index),
-                            ),
-                        );
+                if (match[1]) {
+                    // Bold match
+                    parts.push(
+                        <strong
+                            key={`${keyPrefix}-bold-${match.index}`}
+                            className="font-extrabold text-slate-950 dark:text-white"
+                        >
+                            {formatMathInline(match[2].trim())}
+                        </strong>,
+                    );
+                } else if (match[4]) {
+                    // Italic match
+                    // Push the leading boundary character (match[3]) as normal text
+                    if (match[3]) {
+                        parts.push(formatMathInline(match[3]));
                     }
 
-                    if (match[1]) {
-                        // Bold match
-                        parts.push(
-                            <strong
-                                key={`${keyPrefix}-bold-${match.index}`}
-                                className="font-extrabold text-slate-950 dark:text-white"
-                            >
-                                {formatMathInline(match[2].trim())}
-                            </strong>,
-                        );
-                    } else if (match[4]) {
-                        // Italic match
-                        // Push the leading boundary character (match[3]) as normal text
-                        if (match[3]) {
-                            parts.push(formatMathInline(match[3]));
-                        }
-
-                        parts.push(
-                            <em
-                                key={`${keyPrefix}-italic-${match.index}`}
-                                className="text-slate-900 italic dark:text-slate-100"
-                            >
-                                {formatMathInline(match[4].trim())}
-                            </em>,
-                        );
-                    }
-
-                    lastIdx = formatRegex.lastIndex;
+                    parts.push(
+                        <em
+                            key={`${keyPrefix}-italic-${match.index}`}
+                            className="text-slate-900 italic dark:text-slate-100"
+                        >
+                            {formatMathInline(match[4].trim())}
+                        </em>,
+                    );
                 }
 
-                if (lastIdx < str.length) {
-                    parts.push(formatMathInline(str.substring(lastIdx)));
+                lastIdx = formatRegex.lastIndex;
+            }
+
+            if (lastIdx < str.length) {
+                parts.push(formatMathInline(str.substring(lastIdx)));
+            }
+
+            return parts.length > 0 ? parts : [formatMathInline(str)];
+        };
+
+        while (i < normalized.length) {
+            if (normalized.startsWith('$$', i)) {
+                const endIdx = normalized.indexOf('$$', i + 2);
+
+                if (endIdx !== -1) {
+                    result.push(
+                        <div
+                            key={`display-math-${i}`}
+                            className="my-5 flex items-center justify-center overflow-x-auto rounded-lg border border-slate-200 bg-slate-50 p-4 text-base dark:border-slate-800 dark:bg-slate-900/70"
+                        >
+                            {parseLaTeXToJSX(
+                                normalized.substring(i + 2, endIdx),
+                            )}
+                        </div>,
+                    );
+                    i = endIdx + 2;
+                    continue;
                 }
+            }
 
-                return parts.length > 0 ? parts : [formatMathInline(str)];
-            };
+            if (normalized[i] === '$') {
+                const endIdx = normalized.indexOf('$', i + 1);
 
-            while (i < normalized.length) {
-                if (normalized.startsWith('$$', i)) {
-                    const endIdx = normalized.indexOf('$$', i + 2);
-
-                    if (endIdx !== -1) {
-                        result.push(
-                            <div
-                                key={`display-math-${i}`}
-                                className="my-5 flex items-center justify-center overflow-x-auto rounded-lg border border-slate-200 bg-slate-50 p-4 text-base dark:border-slate-800 dark:bg-slate-900/70"
-                            >
-                                {parseLaTeXToJSX(
-                                    normalized.substring(i + 2, endIdx),
-                                )}
-                            </div>,
-                        );
-                        i = endIdx + 2;
-                        continue;
-                    }
-                }
-
-                if (normalized[i] === '$') {
-                    const endIdx = normalized.indexOf('$', i + 1);
-
-                    if (endIdx !== -1) {
-                        result.push(
-                            <span
-                                key={`inline-math-${i}`}
-                                className="mx-1 inline-flex items-center rounded-md border border-blue-100 bg-blue-50 px-1.5 py-0.5 text-[0.95em] dark:border-blue-900/50 dark:bg-blue-950/30"
-                            >
-                                {parseLaTeXToJSX(
-                                    normalized.substring(i + 1, endIdx),
-                                )}
-                            </span>,
-                        );
-                        i = endIdx + 1;
-                        continue;
-                    }
-
-                    result.push('$');
-                    i++;
+                if (endIdx !== -1) {
+                    result.push(
+                        <span
+                            key={`inline-math-${i}`}
+                            className="mx-1 inline-flex items-center rounded-md border border-blue-100 bg-blue-50 px-1.5 py-0.5 text-[0.95em] dark:border-blue-900/50 dark:bg-blue-950/30"
+                        >
+                            {parseLaTeXToJSX(
+                                normalized.substring(i + 1, endIdx),
+                            )}
+                        </span>,
+                    );
+                    i = endIdx + 1;
                     continue;
                 }
 
-                const nextDollar = normalized.indexOf('$', i);
-                const nextMathIdx =
-                    nextDollar === -1 ? normalized.length : nextDollar;
-                result.push(
-                    ...parseFormatting(
-                        normalized.substring(i, nextMathIdx),
-                        `plain-${i}`,
-                    ),
-                );
-                i = nextMathIdx > i ? nextMathIdx : i + 1;
+                result.push('$');
+                i++;
+                continue;
             }
 
-            return result.length > 0 ? <>{result}</> : normalized;
-        },
-        [],
-    );
+            const nextDollar = normalized.indexOf('$', i);
+            const nextMathIdx =
+                nextDollar === -1 ? normalized.length : nextDollar;
+            result.push(
+                ...parseFormatting(
+                    normalized.substring(i, nextMathIdx),
+                    `plain-${i}`,
+                ),
+            );
+            i = nextMathIdx > i ? nextMathIdx : i + 1;
+        }
+
+        return result.length > 0 ? <>{result}</> : normalized;
+    }, []);
 
     const parseLineContent = useCallback(
         (text: string): React.ReactNode => {
@@ -381,17 +373,28 @@ export function LessonMarkdown({ content = '' }: LessonMarkdownProps) {
             }
 
             let lastNonEmptyLine = '';
+
             for (let j = idx - 1; j >= 0; j--) {
                 if (lines[j].trim() !== '') {
                     lastNonEmptyLine = lines[j];
                     break;
                 }
             }
-            const isPrevMath = /^[0-9+\-x/*=.,\s]+$/.test(lastNonEmptyLine) && lastNonEmptyLine.trim().length < 40 && /[0-9]/.test(lastNonEmptyLine);
 
-            if (/^\s*_{2,30}\s*$/.test(rawLine) || (isPrevMath && /^\s*[-*]{3,30}\s*$/.test(rawLine))) {
+            const isPrevMath =
+                /^[0-9+\-x/*=.,\s]+$/.test(lastNonEmptyLine) &&
+                lastNonEmptyLine.trim().length < 40 &&
+                /[0-9]/.test(lastNonEmptyLine);
+
+            if (
+                /^\s*_{2,30}\s*$/.test(rawLine) ||
+                (isPrevMath && /^\s*[-*]{3,30}\s*$/.test(rawLine))
+            ) {
                 rendered.push(
-                    <p key={`hr-${idx}`} className="my-0 text-lg font-mono tracking-widest whitespace-pre leading-8 text-slate-700 dark:text-slate-300">
+                    <p
+                        key={`hr-${idx}`}
+                        className="my-0 font-mono text-lg leading-8 tracking-widest whitespace-pre text-slate-700 dark:text-slate-300"
+                    >
                         {rawLine.replace(/[-*]/g, '_')}
                     </p>,
                 );
@@ -673,13 +676,18 @@ export function LessonMarkdown({ content = '' }: LessonMarkdownProps) {
                 continue;
             }
 
-            const isMathLine = /^[0-9+\-x/*=.,\s]+$/.test(rawLine) && rawLine.trim().length < 40 && /[0-9]/.test(rawLine);
+            const isMathLine =
+                /^[0-9+\-x/*=.,\s]+$/.test(rawLine) &&
+                rawLine.trim().length < 40 &&
+                /[0-9]/.test(rawLine);
 
             rendered.push(
                 <p
                     key={`p-${idx}`}
                     className={`${
-                        isMathLine ? 'my-0 text-lg font-mono tracking-widest whitespace-pre' : 'my-4 text-base'
+                        isMathLine
+                            ? 'my-0 font-mono text-lg tracking-widest whitespace-pre'
+                            : 'my-4 text-base'
                     } leading-8 text-slate-700 dark:text-slate-300`}
                 >
                     {isMathLine ? rawLine : parseLineContent(trimmed)}

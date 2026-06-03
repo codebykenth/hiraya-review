@@ -249,11 +249,17 @@ class DashboardController
             if (! $analysis || (! $generatedToday && $analysis->last_exam_attempt_id !== $latestAttemptId)) {
                 // No analysis yet, OR: new exam exists AND not yet generated today
                 $cacheKey = "ai-analysis-generating-{$userId}";
-                if (! Cache::has($cacheKey)) {
-                    Cache::put($cacheKey, true, 60);
-                    GenerateUserAnalysisJob::dispatchAfterResponse($userId, $latestAttemptId);
+                $failKey = "ai-analysis-failed-{$userId}";
+
+                if (Cache::has($failKey)) {
+                    $analysisStatus = 'failed';
+                } else {
+                    if (! Cache::has($cacheKey)) {
+                        Cache::put($cacheKey, true, 60);
+                        GenerateUserAnalysisJob::dispatchAfterResponse($userId, $latestAttemptId);
+                    }
+                    $analysisStatus = 'generating';
                 }
-                $analysisStatus = 'generating';
             } else {
                 // Serve cached: generated today already, or no new exam since last analysis
                 $analysisStatus = 'ready';
@@ -320,12 +326,17 @@ class DashboardController
                 $status = 'generating';
             } else {
                 $generatedToday = $analysis->updated_at->isToday();
+                $failKey = "ai-analysis-failed-{$userId}";
                 if ($request->has('retry') || (! $generatedToday && $analysis->last_exam_attempt_id !== $latestAttemptId)) {
-                    if (! Cache::has($cacheKey)) {
-                        Cache::put($cacheKey, true, 60);
-                        GenerateUserAnalysisJob::dispatchAfterResponse($userId, $latestAttemptId);
+                    if ($request->has('retry') || ! Cache::has($failKey)) {
+                        if (! Cache::has($cacheKey)) {
+                            Cache::put($cacheKey, true, 60);
+                            GenerateUserAnalysisJob::dispatchAfterResponse($userId, $latestAttemptId);
+                        }
+                        $status = 'generating';
+                    } else {
+                        $status = 'failed';
                     }
-                    $status = 'generating';
                 } else {
                     $status = 'ready';
                     $data = $analysis->analysis_json;

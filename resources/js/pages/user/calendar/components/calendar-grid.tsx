@@ -1,16 +1,17 @@
-import { Link } from '@inertiajs/react';
-import { Plus, Trash2 } from 'lucide-react';
-import React from 'react';
+import type {
+    DragEndEvent} from '@dnd-kit/core';
 import {
     DndContext,
     useDroppable,
     useDraggable,
-    DragEndEvent,
     closestCenter,
     PointerSensor,
     useSensor,
     useSensors,
 } from '@dnd-kit/core';
+import { Link } from '@inertiajs/react';
+import { Plus, Trash2 } from 'lucide-react';
+import React from 'react';
 import {
     Tooltip,
     TooltipContent,
@@ -22,26 +23,41 @@ import type { StudySchedule, CalendarDay, LearnModule } from '../types';
 
 function DroppableDay({ id, children, className, onClick }: any) {
     const { setNodeRef, isOver } = useDroppable({ id });
+
     return (
-        <div ref={setNodeRef} onClick={onClick} className={`${className} ${isOver ? 'ring-2 ring-blue-400 ring-inset dark:ring-blue-500 bg-blue-50/50 dark:bg-blue-900/20' : ''}`}>
+        <div
+            ref={setNodeRef}
+            onClick={onClick}
+            className={`${className} ${isOver ? 'bg-blue-50/50 ring-2 ring-blue-400 ring-inset dark:bg-blue-900/20 dark:ring-blue-500' : ''}`}
+        >
             {children}
         </div>
     );
 }
 
 function DraggableSchedule({ schedule, children, className, onClick }: any) {
-    const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({ 
-        id: `schedule-${schedule.id}`,
-        data: { schedule }
-    });
-    
-    const style = transform ? {
-        transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
-        zIndex: 50,
-    } : undefined;
+    const { attributes, listeners, setNodeRef, transform, isDragging } =
+        useDraggable({
+            id: `schedule-${schedule.id}`,
+            data: { schedule },
+        });
+
+    const style = transform
+        ? {
+              transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
+              zIndex: 50,
+          }
+        : undefined;
 
     return (
-        <div ref={setNodeRef} style={style} {...attributes} {...listeners} onClick={onClick} className={`${className} ${isDragging ? 'opacity-50 shadow-lg' : ''}`}>
+        <div
+            ref={setNodeRef}
+            style={style}
+            {...attributes}
+            {...listeners}
+            onClick={onClick}
+            className={`${className} ${isDragging ? 'opacity-50 shadow-lg' : ''}`}
+        >
             {children}
         </div>
     );
@@ -60,7 +76,11 @@ interface CalendarGridProps {
         date: string,
     ) => Promise<void>;
     handleDeleteSchedule: (scheduleId: number, date: string) => Promise<void>;
-    handleDragSchedule?: (schedule: StudySchedule, sourceDate: string, newDate: string) => Promise<void>;
+    handleDragSchedule?: (
+        schedule: StudySchedule,
+        sourceDate: string,
+        newDate: string,
+    ) => Promise<void>;
 }
 
 export function CalendarGrid({
@@ -80,15 +100,18 @@ export function CalendarGrid({
             activationConstraint: {
                 distance: 5,
             },
-        })
+        }),
     );
 
     const handleDragEnd = (event: DragEndEvent) => {
         const { active, over } = event;
-        if (!over || !active.data.current?.schedule || !handleDragSchedule) return;
+
+        if (!over || !active.data.current?.schedule || !handleDragSchedule) {
+return;
+}
 
         const schedule = active.data.current.schedule;
-        const sourceDate = schedule.study_date || schedule.date; 
+        const sourceDate = schedule.study_date || schedule.date;
         const targetDate = over.id as string;
 
         // Verify dates are different (ignore drops on the same day)
@@ -346,126 +369,206 @@ export function CalendarGrid({
                 </div>
 
                 {/* Calendar grid */}
-                <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-                <div className="space-y-2">
-                    {weeks.map((week, weekIndex) => (
-                        <div key={weekIndex} className="grid grid-cols-7 gap-2">
-                            {week.map((calendarDay) => (
-                                <DroppableDay
-                                    key={calendarDay.date}
-                                    id={calendarDay.date}
-                                    onClick={() => {
-                                        if (
+                <DndContext
+                    sensors={sensors}
+                    collisionDetection={closestCenter}
+                    onDragEnd={handleDragEnd}
+                >
+                    <div className="space-y-2">
+                        {weeks.map((week, weekIndex) => (
+                            <div
+                                key={weekIndex}
+                                className="grid grid-cols-7 gap-2"
+                            >
+                                {week.map((calendarDay) => (
+                                    <DroppableDay
+                                        key={calendarDay.date}
+                                        id={calendarDay.date}
+                                        onClick={() => {
+                                            if (
+                                                calendarDay.isCurrentMonth &&
+                                                calendarDay.date >= todayStr
+                                            ) {
+                                                openModal(calendarDay.date);
+                                            }
+                                        }}
+                                        className={`group relative flex min-h-24 flex-col rounded-lg border p-2 transition-all ${
                                             calendarDay.isCurrentMonth &&
                                             calendarDay.date >= todayStr
-                                        ) {
-                                            openModal(calendarDay.date);
-                                        }
-                                    }}
-                                    className={`group relative flex min-h-24 flex-col rounded-lg border p-2 transition-all ${
-                                        calendarDay.isCurrentMonth &&
-                                        calendarDay.date >= todayStr
-                                            ? 'cursor-pointer hover:border-blue-300 hover:shadow-sm'
-                                            : ''
-                                    } ${
-                                        examDates.includes(calendarDay.date)
-                                            ? 'border-red-400 bg-red-50 dark:border-red-900/50 dark:bg-red-950/20'
-                                            : isToday(calendarDay.date)
-                                              ? 'border-blue-400 bg-blue-50 dark:border-blue-800 dark:bg-blue-900/20'
-                                              : calendarDay.isCurrentMonth
-                                                ? 'border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900'
-                                                : 'border-slate-100 bg-slate-50 opacity-60 dark:border-slate-800 dark:bg-slate-900/50'
-                                    }`}
-                                >
-                                    <div className="flex items-center justify-between">
-                                        <span
-                                            className={`text-sm font-semibold ${
-                                                examDates.includes(
-                                                    calendarDay.date,
-                                                )
-                                                    ? 'text-red-900 dark:text-red-400'
-                                                    : isToday(calendarDay.date)
-                                                      ? 'text-blue-900 dark:text-blue-400'
-                                                      : calendarDay.isCurrentMonth
-                                                        ? 'text-slate-900 dark:text-slate-100'
-                                                        : 'text-slate-400 dark:text-slate-500'
-                                            }`}
-                                        >
-                                            {examDates.includes(
-                                                calendarDay.date,
-                                            ) && (
-                                                <span className="mr-1 inline-block rounded-full bg-red-600 px-1.5 py-0.5 text-xs font-bold text-white">
-                                                    Exam Date
-                                                </span>
-                                            )}
-                                            {isToday(calendarDay.date) &&
-                                                !examDates.includes(
+                                                ? 'cursor-pointer hover:border-blue-300 hover:shadow-sm'
+                                                : ''
+                                        } ${
+                                            examDates.includes(calendarDay.date)
+                                                ? 'border-red-400 bg-red-50 dark:border-red-900/50 dark:bg-red-950/20'
+                                                : isToday(calendarDay.date)
+                                                  ? 'border-blue-400 bg-blue-50 dark:border-blue-800 dark:bg-blue-900/20'
+                                                  : calendarDay.isCurrentMonth
+                                                    ? 'border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900'
+                                                    : 'border-slate-100 bg-slate-50 opacity-60 dark:border-slate-800 dark:bg-slate-900/50'
+                                        }`}
+                                    >
+                                        <div className="flex items-center justify-between">
+                                            <span
+                                                className={`text-sm font-semibold ${
+                                                    examDates.includes(
+                                                        calendarDay.date,
+                                                    )
+                                                        ? 'text-red-900 dark:text-red-400'
+                                                        : isToday(
+                                                                calendarDay.date,
+                                                            )
+                                                          ? 'text-blue-900 dark:text-blue-400'
+                                                          : calendarDay.isCurrentMonth
+                                                            ? 'text-slate-900 dark:text-slate-100'
+                                                            : 'text-slate-400 dark:text-slate-500'
+                                                }`}
+                                            >
+                                                {examDates.includes(
                                                     calendarDay.date,
                                                 ) && (
-                                                    <span className="mr-1 inline-block rounded-full bg-blue-600 px-1.5 py-0.5 text-xs font-bold text-white">
-                                                        Today
+                                                    <span className="mr-1 inline-block rounded-full bg-red-600 px-1.5 py-0.5 text-xs font-bold text-white">
+                                                        Exam Date
                                                     </span>
                                                 )}
-                                            {calendarDay.day}
-                                        </span>
-                                        {calendarDay.isCurrentMonth &&
-                                            calendarDay.date >= todayStr && (
-                                                <TooltipProvider
-                                                    delayDuration={150}
-                                                >
-                                                    <Tooltip>
-                                                        <TooltipTrigger asChild>
-                                                            <button
-                                                                onClick={(
-                                                                    e,
-                                                                ) => {
-                                                                    e.stopPropagation();
-                                                                    openModal(
-                                                                        calendarDay.date,
-                                                                    );
-                                                                }}
-                                                                className="rounded p-1 opacity-100 transition-opacity hover:bg-blue-100 lg:opacity-0 lg:group-hover:opacity-100 dark:hover:bg-blue-900/30"
-                                                            >
-                                                                <Plus className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-                                                            </button>
-                                                        </TooltipTrigger>
-                                                        <TooltipContent>
-                                                            Add study item
-                                                        </TooltipContent>
-                                                    </Tooltip>
-                                                </TooltipProvider>
-                                            )}
-                                    </div>
-
-                                    {/* Study items for this day */}
-                                    <div className="mt-2 flex-1 space-y-1 overflow-y-auto">
-                                        {calendarDay.schedules.map(
-                                            (schedule) => {
-                                                const colors =
-                                                    getCategoryColors(
-                                                        schedule.title,
-                                                        schedule.subcategory_id,
-                                                    );
-
-                                                return (
-                                                    <DraggableSchedule
-                                                        key={schedule.id}
-                                                        schedule={schedule}
-                                                        onClick={(e: React.MouseEvent) => {
-                                                            e.stopPropagation();
-                                                            openEditModal(
-                                                                schedule,
-                                                                calendarDay.date,
-                                                            );
-                                                        }}
-                                                        className={`group relative cursor-pointer rounded p-1.5 text-xs transition-all hover:opacity-90 ${
-                                                            schedule.is_done
-                                                                ? 'border border-emerald-500/30 bg-emerald-50/50 text-emerald-800 opacity-75 dark:bg-emerald-950/20 dark:text-emerald-300'
-                                                                : `${colors.bg} ${colors.text}`
-                                                        }`}
+                                                {isToday(calendarDay.date) &&
+                                                    !examDates.includes(
+                                                        calendarDay.date,
+                                                    ) && (
+                                                        <span className="mr-1 inline-block rounded-full bg-blue-600 px-1.5 py-0.5 text-xs font-bold text-white">
+                                                            Today
+                                                        </span>
+                                                    )}
+                                                {calendarDay.day}
+                                            </span>
+                                            {calendarDay.isCurrentMonth &&
+                                                calendarDay.date >=
+                                                    todayStr && (
+                                                    <TooltipProvider
+                                                        delayDuration={150}
                                                     >
-                                                        <div className="flex items-start justify-between gap-1">
-                                                            <div className="flex min-w-0 flex-1 items-start gap-1.5">
+                                                        <Tooltip>
+                                                            <TooltipTrigger
+                                                                asChild
+                                                            >
+                                                                <button
+                                                                    onClick={(
+                                                                        e,
+                                                                    ) => {
+                                                                        e.stopPropagation();
+                                                                        openModal(
+                                                                            calendarDay.date,
+                                                                        );
+                                                                    }}
+                                                                    className="rounded p-1 opacity-100 transition-opacity hover:bg-blue-100 lg:opacity-0 lg:group-hover:opacity-100 dark:hover:bg-blue-900/30"
+                                                                >
+                                                                    <Plus className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                                                                </button>
+                                                            </TooltipTrigger>
+                                                            <TooltipContent>
+                                                                Add study item
+                                                            </TooltipContent>
+                                                        </Tooltip>
+                                                    </TooltipProvider>
+                                                )}
+                                        </div>
+
+                                        {/* Study items for this day */}
+                                        <div className="mt-2 flex-1 space-y-1 overflow-y-auto">
+                                            {calendarDay.schedules.map(
+                                                (schedule) => {
+                                                    const colors =
+                                                        getCategoryColors(
+                                                            schedule.title,
+                                                            schedule.subcategory_id,
+                                                        );
+
+                                                    return (
+                                                        <DraggableSchedule
+                                                            key={schedule.id}
+                                                            schedule={schedule}
+                                                            onClick={(
+                                                                e: React.MouseEvent,
+                                                            ) => {
+                                                                e.stopPropagation();
+                                                                openEditModal(
+                                                                    schedule,
+                                                                    calendarDay.date,
+                                                                );
+                                                            }}
+                                                            className={`group relative cursor-pointer rounded p-1.5 text-xs transition-all hover:opacity-90 ${
+                                                                schedule.is_done
+                                                                    ? 'border border-emerald-500/30 bg-emerald-50/50 text-emerald-800 opacity-75 dark:bg-emerald-950/20 dark:text-emerald-300'
+                                                                    : `${colors.bg} ${colors.text}`
+                                                            }`}
+                                                        >
+                                                            <div className="flex items-start justify-between gap-1">
+                                                                <div className="flex min-w-0 flex-1 items-start gap-1.5">
+                                                                    <TooltipProvider
+                                                                        delayDuration={
+                                                                            150
+                                                                        }
+                                                                    >
+                                                                        <Tooltip>
+                                                                            <TooltipTrigger
+                                                                                asChild
+                                                                            >
+                                                                                <input
+                                                                                    type="checkbox"
+                                                                                    checked={
+                                                                                        !!schedule.is_done
+                                                                                    }
+                                                                                    onClick={(
+                                                                                        e,
+                                                                                    ) =>
+                                                                                        e.stopPropagation()
+                                                                                    }
+                                                                                    onChange={async (
+                                                                                        e,
+                                                                                    ) => {
+                                                                                        e.stopPropagation();
+                                                                                        await toggleScheduleDone(
+                                                                                            schedule,
+                                                                                            calendarDay.date,
+                                                                                        );
+                                                                                    }}
+                                                                                    className="mt-0.5 h-3.5 w-3.5 shrink-0 cursor-pointer rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
+                                                                                />
+                                                                            </TooltipTrigger>
+                                                                            <TooltipContent>
+                                                                                {schedule.is_done
+                                                                                    ? 'Mark as incomplete'
+                                                                                    : 'Mark as completed'}
+                                                                            </TooltipContent>
+                                                                        </Tooltip>
+                                                                    </TooltipProvider>
+                                                                    <div className="min-w-0 flex-1">
+                                                                        {schedule.study_time && (
+                                                                            <span
+                                                                                className={`mr-1.5 inline-block rounded-md bg-white/60 px-1.5 py-0.5 text-[10px] font-bold shadow-sm dark:bg-black/20 ${
+                                                                                    schedule.is_done
+                                                                                        ? 'text-emerald-700 dark:text-emerald-400'
+                                                                                        : colors.time
+                                                                                }`}
+                                                                            >
+                                                                                {schedule.study_time.substring(
+                                                                                    0,
+                                                                                    5,
+                                                                                )}
+                                                                            </span>
+                                                                        )}
+                                                                        <span
+                                                                            className={`leading-tight font-medium break-words ${
+                                                                                schedule.is_done
+                                                                                    ? 'text-emerald-900/60 line-through decoration-emerald-500/50 dark:text-emerald-400/60'
+                                                                                    : ''
+                                                                            }`}
+                                                                        >
+                                                                            {
+                                                                                schedule.title
+                                                                            }
+                                                                        </span>
+                                                                    </div>
+                                                                </div>
                                                                 <TooltipProvider
                                                                     delayDuration={
                                                                         150
@@ -475,257 +578,191 @@ export function CalendarGrid({
                                                                         <TooltipTrigger
                                                                             asChild
                                                                         >
-                                                                            <input
-                                                                                type="checkbox"
-                                                                                checked={
-                                                                                    !!schedule.is_done
-                                                                                }
+                                                                            <button
                                                                                 onClick={(
-                                                                                    e,
-                                                                                ) =>
-                                                                                    e.stopPropagation()
-                                                                                }
-                                                                                onChange={async (
                                                                                     e,
                                                                                 ) => {
                                                                                     e.stopPropagation();
-                                                                                    await toggleScheduleDone(
-                                                                                        schedule,
+                                                                                    handleDeleteSchedule(
+                                                                                        schedule.id,
                                                                                         calendarDay.date,
                                                                                     );
                                                                                 }}
-                                                                                className="mt-0.5 h-3.5 w-3.5 shrink-0 cursor-pointer rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
-                                                                            />
+                                                                                className="ml-1 hidden shrink-0 rounded p-0.5 group-hover:block hover:bg-red-100"
+                                                                            >
+                                                                                <Trash2 className="h-3 w-3 text-red-600" />
+                                                                            </button>
                                                                         </TooltipTrigger>
                                                                         <TooltipContent>
-                                                                            {schedule.is_done
-                                                                                ? 'Mark as incomplete'
-                                                                                : 'Mark as completed'}
+                                                                            Delete
                                                                         </TooltipContent>
                                                                     </Tooltip>
                                                                 </TooltipProvider>
-                                                                <div className="min-w-0 flex-1">
-                                                                    {schedule.study_time && (
-                                                                        <span
-                                                                            className={`mr-1.5 inline-block rounded-md bg-white/60 px-1.5 py-0.5 text-[10px] font-bold shadow-sm dark:bg-black/20 ${
-                                                                                schedule.is_done
-                                                                                    ? 'text-emerald-700 dark:text-emerald-400'
-                                                                                    : colors.time
-                                                                            }`}
-                                                                        >
-                                                                            {schedule.study_time.substring(
-                                                                                0,
-                                                                                5,
-                                                                            )}
-                                                                        </span>
-                                                                    )}
-                                                                    <span
-                                                                        className={`leading-tight font-medium break-words ${
-                                                                            schedule.is_done
-                                                                                ? 'text-emerald-900/60 line-through decoration-emerald-500/50 dark:text-emerald-400/60'
-                                                                                : ''
-                                                                        }`}
-                                                                    >
-                                                                        {
-                                                                            schedule.title
-                                                                        }
-                                                                    </span>
-                                                                </div>
                                                             </div>
-                                                            <TooltipProvider
-                                                                delayDuration={
-                                                                    150
-                                                                }
-                                                            >
-                                                                <Tooltip>
-                                                                    <TooltipTrigger
-                                                                        asChild
-                                                                    >
-                                                                        <button
-                                                                            onClick={(
-                                                                                e,
-                                                                            ) => {
-                                                                                e.stopPropagation();
-                                                                                handleDeleteSchedule(
-                                                                                    schedule.id,
-                                                                                    calendarDay.date,
-                                                                                );
-                                                                            }}
-                                                                            className="ml-1 hidden shrink-0 rounded p-0.5 group-hover:block hover:bg-red-100"
-                                                                        >
-                                                                            <Trash2 className="h-3 w-3 text-red-600" />
-                                                                        </button>
-                                                                    </TooltipTrigger>
-                                                                    <TooltipContent>
-                                                                        Delete
-                                                                    </TooltipContent>
-                                                                </Tooltip>
-                                                            </TooltipProvider>
-                                                        </div>
-                                                        {schedule.description && (
-                                                            <div
-                                                                className={`mt-1 text-xs ${
-                                                                    schedule.is_done
-                                                                        ? 'text-emerald-800/60 line-through decoration-emerald-500/30 dark:text-emerald-400/60'
-                                                                        : colors.desc
-                                                                }`}
-                                                            >
-                                                                {(() => {
-                                                                    const desc =
-                                                                        schedule.description.replace(
-                                                                            /^Score:\s*[0-9.]+%?\s*-\s*/,
-                                                                            '',
-                                                                        );
+                                                            {schedule.description && (
+                                                                <div
+                                                                    className={`mt-1 text-xs ${
+                                                                        schedule.is_done
+                                                                            ? 'text-emerald-800/60 line-through decoration-emerald-500/30 dark:text-emerald-400/60'
+                                                                            : colors.desc
+                                                                    }`}
+                                                                >
+                                                                    {(() => {
+                                                                        const desc =
+                                                                            schedule.description.replace(
+                                                                                /^Score:\s*[0-9.]+%?\s*-\s*/,
+                                                                                '',
+                                                                            );
 
-                                                                    const linkRegex =
-                                                                        /\[(.*?)\]\((.*?)\)/g;
-                                                                    const links =
-                                                                        [];
-                                                                    const existingUrls =
-                                                                        new Set();
-                                                                    let match;
+                                                                        const linkRegex =
+                                                                            /\[(.*?)\]\((.*?)\)/g;
+                                                                        const links =
+                                                                            [];
+                                                                        const existingUrls =
+                                                                            new Set();
+                                                                        let match;
 
-                                                                    while (
-                                                                        (match =
-                                                                            linkRegex.exec(
-                                                                                desc,
-                                                                            )) !==
-                                                                        null
-                                                                    ) {
-                                                                        links.push(
-                                                                            {
-                                                                                title: match[1],
-                                                                                url: match[2],
-                                                                            },
-                                                                        );
-                                                                        existingUrls.add(
-                                                                            match[2],
-                                                                        );
-                                                                    }
-
-                                                                    for (const mod of learnModules) {
-                                                                        if (
-                                                                            links.length >=
-                                                                            3
+                                                                        while (
+                                                                            (match =
+                                                                                linkRegex.exec(
+                                                                                    desc,
+                                                                                )) !==
+                                                                            null
                                                                         ) {
-                                                                            break;
+                                                                            links.push(
+                                                                                {
+                                                                                    title: match[1],
+                                                                                    url: match[2],
+                                                                                },
+                                                                            );
+                                                                            existingUrls.add(
+                                                                                match[2],
+                                                                            );
                                                                         }
 
-                                                                        const modUrl = `/learn/${mod.slug}`;
-
-                                                                        if (
-                                                                            !existingUrls.has(
-                                                                                modUrl,
-                                                                            )
-                                                                        ) {
+                                                                        for (const mod of learnModules) {
                                                                             if (
-                                                                                isModuleRelated(
-                                                                                    mod,
-                                                                                    schedule.title,
-                                                                                    desc,
+                                                                                links.length >=
+                                                                                3
+                                                                            ) {
+                                                                                break;
+                                                                            }
+
+                                                                            const modUrl = `/learn/${mod.slug}`;
+
+                                                                            if (
+                                                                                !existingUrls.has(
+                                                                                    modUrl,
                                                                                 )
                                                                             ) {
-                                                                                links.push(
-                                                                                    {
-                                                                                        title: mod.title,
-                                                                                        url: modUrl,
-                                                                                        isAuto: true,
-                                                                                    },
-                                                                                );
-                                                                                existingUrls.add(
-                                                                                    modUrl,
-                                                                                );
+                                                                                if (
+                                                                                    isModuleRelated(
+                                                                                        mod,
+                                                                                        schedule.title,
+                                                                                        desc,
+                                                                                    )
+                                                                                ) {
+                                                                                    links.push(
+                                                                                        {
+                                                                                            title: mod.title,
+                                                                                            url: modUrl,
+                                                                                            isAuto: true,
+                                                                                        },
+                                                                                    );
+                                                                                    existingUrls.add(
+                                                                                        modUrl,
+                                                                                    );
+                                                                                }
                                                                             }
                                                                         }
-                                                                    }
 
-                                                                    let mainText =
-                                                                        desc
-                                                                            .replace(
-                                                                                /(?:\r?\n)+Links:[\s\S]*$/,
-                                                                                '',
-                                                                            )
-                                                                            .trim();
-                                                                    mainText =
-                                                                        mainText
-                                                                            .replace(
-                                                                                /\[(.*?)\]\((.*?)\)/g,
-                                                                                '',
-                                                                            )
-                                                                            .trim();
+                                                                        let mainText =
+                                                                            desc
+                                                                                .replace(
+                                                                                    /(?:\r?\n)+Links:[\s\S]*$/,
+                                                                                    '',
+                                                                                )
+                                                                                .trim();
+                                                                        mainText =
+                                                                            mainText
+                                                                                .replace(
+                                                                                    /\[(.*?)\]\((.*?)\)/g,
+                                                                                    '',
+                                                                                )
+                                                                                .trim();
 
-                                                                    if (
-                                                                        links.length >
-                                                                        0
-                                                                    ) {
+                                                                        if (
+                                                                            links.length >
+                                                                            0
+                                                                        ) {
+                                                                            return (
+                                                                                <>
+                                                                                    <p className="line-clamp-3">
+                                                                                        {
+                                                                                            mainText
+                                                                                        }
+                                                                                    </p>
+                                                                                    <div className="mt-1.5 flex flex-col gap-1">
+                                                                                        {links.map(
+                                                                                            (
+                                                                                                l,
+                                                                                                i,
+                                                                                            ) => (
+                                                                                                <Link
+                                                                                                    key={
+                                                                                                        i
+                                                                                                    }
+                                                                                                    href={
+                                                                                                        l.url
+                                                                                                    }
+                                                                                                    className={`block w-full rounded px-1.5 py-1 text-[10px] font-bold break-words sm:text-xs ${
+                                                                                                        schedule.is_done
+                                                                                                            ? 'bg-emerald-50/20 text-emerald-700/60 line-through decoration-emerald-500/20 dark:bg-emerald-950/20 dark:text-emerald-400/60'
+                                                                                                            : l.isAuto
+                                                                                                              ? 'bg-amber-50 text-amber-700 hover:text-amber-900 dark:bg-amber-900/40 dark:text-amber-400 dark:hover:text-amber-300'
+                                                                                                              : 'bg-white/50 text-blue-700 hover:text-blue-900 dark:bg-blue-900/40 dark:text-blue-300 dark:hover:text-blue-200'
+                                                                                                    }`}
+                                                                                                    onClick={(
+                                                                                                        e,
+                                                                                                    ) =>
+                                                                                                        e.stopPropagation()
+                                                                                                    }
+                                                                                                >
+                                                                                                    {l.isAuto
+                                                                                                        ? '✨ '
+                                                                                                        : '📖 '}
+                                                                                                    Learn:{' '}
+                                                                                                    {
+                                                                                                        l.title
+                                                                                                    }
+                                                                                                </Link>
+                                                                                            ),
+                                                                                        )}
+                                                                                    </div>
+                                                                                </>
+                                                                            );
+                                                                        }
+
                                                                         return (
-                                                                            <>
-                                                                                <p className="line-clamp-3">
-                                                                                    {
-                                                                                        mainText
-                                                                                    }
-                                                                                </p>
-                                                                                <div className="mt-1.5 flex flex-col gap-1">
-                                                                                    {links.map(
-                                                                                        (
-                                                                                            l,
-                                                                                            i,
-                                                                                        ) => (
-                                                                                            <Link
-                                                                                                key={
-                                                                                                    i
-                                                                                                }
-                                                                                                href={
-                                                                                                    l.url
-                                                                                                }
-                                                                                                className={`block w-full rounded px-1.5 py-1 text-[10px] font-bold break-words sm:text-xs ${
-                                                                                                    schedule.is_done
-                                                                                                        ? 'bg-emerald-50/20 text-emerald-700/60 line-through decoration-emerald-500/20 dark:bg-emerald-950/20 dark:text-emerald-400/60'
-                                                                                                        : l.isAuto
-                                                                                                          ? 'bg-amber-50 text-amber-700 hover:text-amber-900 dark:bg-amber-900/40 dark:text-amber-400 dark:hover:text-amber-300'
-                                                                                                          : 'bg-white/50 text-blue-700 hover:text-blue-900 dark:bg-blue-900/40 dark:text-blue-300 dark:hover:text-blue-200'
-                                                                                                }`}
-                                                                                                onClick={(
-                                                                                                    e,
-                                                                                                ) =>
-                                                                                                    e.stopPropagation()
-                                                                                                }
-                                                                                            >
-                                                                                                {l.isAuto
-                                                                                                    ? '✨ '
-                                                                                                    : '📖 '}
-                                                                                                Learn:{' '}
-                                                                                                {
-                                                                                                    l.title
-                                                                                                }
-                                                                                            </Link>
-                                                                                        ),
-                                                                                    )}
-                                                                                </div>
-                                                                            </>
+                                                                            <p className="line-clamp-3">
+                                                                                {
+                                                                                    mainText
+                                                                                }
+                                                                            </p>
                                                                         );
-                                                                    }
-
-                                                                    return (
-                                                                        <p className="line-clamp-3">
-                                                                            {
-                                                                                mainText
-                                                                            }
-                                                                        </p>
-                                                                    );
-                                                                })()}
-                                                            </div>
-                                                        )}
-                                                    </DraggableSchedule>
-                                                );
-                                            },
-                                        )}
-                                    </div>
-                                </DroppableDay>
-                            ))}
-                        </div>
-                    ))}
-                </div>
+                                                                    })()}
+                                                                </div>
+                                                            )}
+                                                        </DraggableSchedule>
+                                                    );
+                                                },
+                                            )}
+                                        </div>
+                                    </DroppableDay>
+                                ))}
+                            </div>
+                        ))}
+                    </div>
                 </DndContext>
             </div>
         </div>

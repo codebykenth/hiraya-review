@@ -11,10 +11,9 @@ import {
 import { getCategoryStyles } from '@/components/curation-index-shell';
 import { PageContainer } from '@/components/page-container';
 import { PageHeader } from '@/components/page-header';
-import { renderFormattedText, formatMathInline } from '@/lib/exam-formatters';
-import { parseLatexString } from '@/lib/latex-parser';
-
 import { Button } from '@/components/ui/button';
+import { renderFormattedText } from '@/lib/exam-formatters';
+
 import {
     index as questionsIndex,
     edit as questionsEdit,
@@ -126,7 +125,7 @@ export default function QuestionShow({ question }: QuestionShowProps) {
                                                         : 'text-muted-foreground'
                                                 }`}
                                             >
-                                                {formatMathInline(option)}
+                                                {renderFormattedText(option)}
                                             </span>
 
                                             {/* Correct marker check */}

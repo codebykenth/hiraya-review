@@ -583,7 +583,9 @@ export function useCalendarState(initialProps: CalendarPageProps) {
         }
     };
 
-    const pendingUpdates = useRef<Map<number, { schedule: StudySchedule, newDate: string }>>(new Map());
+    const pendingUpdates = useRef<
+        Map<number, { schedule: StudySchedule; newDate: string }>
+    >(new Map());
     const saveTimer = useRef<NodeJS.Timeout | null>(null);
 
     const handleDragSchedule = async (
@@ -591,7 +593,9 @@ export function useCalendarState(initialProps: CalendarPageProps) {
         sourceDate: string,
         newDate: string,
     ) => {
-        if (sourceDate === newDate) return;
+        if (sourceDate === newDate) {
+return;
+}
 
         // Optimistic update
         const updated = new Map(schedules);
@@ -602,7 +606,10 @@ export function useCalendarState(initialProps: CalendarPageProps) {
             sourceDate,
             sourceSchedules.filter((s) => s.id !== schedule.id),
         );
-        updated.set(newDate, [...targetSchedules, { ...schedule, study_date: newDate }]);
+        updated.set(newDate, [
+            ...targetSchedules,
+            { ...schedule, study_date: newDate },
+        ]);
         setSchedules(updated);
 
         // Debounce backend synchronization to prevent spamming the database
@@ -618,28 +625,33 @@ export function useCalendarState(initialProps: CalendarPageProps) {
             let hasError = false;
 
             try {
-                const promises = Array.from(updatesToProcess.entries()).map(([id, data]) => {
-                    return fetch(`/study-schedules/${id}`, {
-                        method: 'PUT',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN':
-                                document
-                                    .querySelector('meta[name="csrf-token"]')
-                                    ?.getAttribute('content') || '',
-                        },
-                        body: JSON.stringify({
-                            study_date: data.newDate,
-                            study_time: data.schedule.study_time
-                                ? data.schedule.study_time.substring(0, 5)
-                                : null,
-                            title: data.schedule.title,
-                            description: data.schedule.description || null,
-                            subcategory_id: data.schedule.subcategory_id || null,
-                            is_done: data.schedule.is_done,
-                        }),
-                    });
-                });
+                const promises = Array.from(updatesToProcess.entries()).map(
+                    ([id, data]) => {
+                        return fetch(`/study-schedules/${id}`, {
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN':
+                                    document
+                                        .querySelector(
+                                            'meta[name="csrf-token"]',
+                                        )
+                                        ?.getAttribute('content') || '',
+                            },
+                            body: JSON.stringify({
+                                study_date: data.newDate,
+                                study_time: data.schedule.study_time
+                                    ? data.schedule.study_time.substring(0, 5)
+                                    : null,
+                                title: data.schedule.title,
+                                description: data.schedule.description || null,
+                                subcategory_id:
+                                    data.schedule.subcategory_id || null,
+                                is_done: data.schedule.is_done,
+                            }),
+                        });
+                    },
+                );
 
                 const responses = await Promise.all(promises);
 
@@ -652,8 +664,11 @@ export function useCalendarState(initialProps: CalendarPageProps) {
                 hasError = true;
             } finally {
                 if (hasError) {
-                    setErrorMessage('Failed to save some dragged items. Synchronizing with server.');
+                    setErrorMessage(
+                        'Failed to save some dragged items. Synchronizing with server.',
+                    );
                 }
+
                 // Always refresh from the backend once the batch finishes
                 await fetchSchedules(true);
             }

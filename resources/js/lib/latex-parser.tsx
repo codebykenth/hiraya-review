@@ -3,10 +3,7 @@ import React from 'react';
 /**
  * Find the index of the matching closing brace for the opening brace at startIndex.
  */
-export const findMatchingBrace = (
-    str: string,
-    startIndex: number,
-): number => {
+export const findMatchingBrace = (str: string, startIndex: number): number => {
     let count = 0;
 
     for (let idx = startIndex; idx < str.length; idx++) {
@@ -59,10 +56,7 @@ export const parseLaTeXToJSX = (latex: string): React.ReactNode => {
                 if (numEnd !== -1) {
                     let denomStart = numEnd + 1;
 
-                    while (
-                        denomStart < str.length &&
-                        str[denomStart] !== '{'
-                    ) {
+                    while (denomStart < str.length && str[denomStart] !== '{') {
                         denomStart++;
                     }
 
@@ -84,10 +78,7 @@ export const parseLaTeXToJSX = (latex: string): React.ReactNode => {
                                 </span>
                                 <span className="block px-1 pt-0.5 text-[0.9em]">
                                     {parseBlock(
-                                        str.substring(
-                                            denomStart + 1,
-                                            denomEnd,
-                                        ),
+                                        str.substring(denomStart + 1, denomEnd),
                                     )}
                                 </span>
                             </span>,
@@ -141,10 +132,7 @@ export const parseLaTeXToJSX = (latex: string): React.ReactNode => {
                             {char}
                         </sup>
                     ) : (
-                        <sub
-                            key={i}
-                            className="text-[0.75em] leading-none"
-                        >
+                        <sub key={i} className="text-[0.75em] leading-none">
                             {char}
                         </sub>
                     ),
@@ -201,6 +189,7 @@ export const parseLaTeXToJSX = (latex: string): React.ReactNode => {
 
             // Check for inline fraction like 8/12
             const fracMatch = str.substring(i).match(/^(\d+)\s*\/\s*(\d+)/);
+
             if (fracMatch) {
                 result.push(
                     <span
@@ -235,9 +224,7 @@ export const parseLaTeXToJSX = (latex: string): React.ReactNode => {
     };
 
     return (
-        <span className="font-semibold text-inherit">
-            {parseBlock(latex)}
-        </span>
+        <span className="font-semibold text-inherit">{parseBlock(latex)}</span>
     );
 };
 
@@ -306,7 +293,9 @@ export const parseLatexString = (
         const nextDollar = text.indexOf('$', i);
         const plainEnd = nextDollar === -1 ? text.length : nextDollar;
         const plainText = text.substring(i, plainEnd);
-        result.push(plainTextProcessor ? plainTextProcessor(plainText) : plainText);
+        result.push(
+            plainTextProcessor ? plainTextProcessor(plainText) : plainText,
+        );
         i = plainEnd > i ? plainEnd : i + 1;
     }
 

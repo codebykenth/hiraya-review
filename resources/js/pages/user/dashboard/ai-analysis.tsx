@@ -203,11 +203,11 @@ export default function AiAnalysisReport({
 
         const channel = echo.private(`App.Models.User.${auth.user.id}`);
 
-        channel.listen('ai-analysis-ready', () => {
+        channel.listen('.ai-analysis-ready', () => {
             router.reload({ only: ['data', 'status'] });
         });
 
-        channel.listen('ai-analysis-failed', (e: any) => {
+        channel.listen('.ai-analysis-failed', (e: any) => {
             setLocalStatus('failed');
             setErrorMessage(
                 e.message ||
@@ -216,8 +216,8 @@ export default function AiAnalysisReport({
         });
 
         return () => {
-            channel.stopListening('ai-analysis-ready');
-            channel.stopListening('ai-analysis-failed');
+            channel.stopListening('.ai-analysis-ready');
+            channel.stopListening('.ai-analysis-failed');
             echo.disconnect();
         };
     }, [localStatus, auth?.user?.id, pusher]);

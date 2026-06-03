@@ -2,7 +2,6 @@ import { Head, router } from '@inertiajs/react';
 import { Check, X, Edit3, ListChecks } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { DraftsReviewShell } from '@/components/drafts-review-shell';
-import { renderFormattedText, formatMathInline } from '@/lib/exam-formatters';
 import type { CategoryItem } from '@/components/drafts-review-shell';
 import { Button } from '@/components/ui/button';
 import {
@@ -19,6 +18,7 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from '@/components/ui/tooltip';
+import { renderFormattedText } from '@/lib/exam-formatters';
 import {
     index as questionsIndex,
     store as questionsStore,
@@ -379,7 +379,9 @@ export default function DraftsQuestionList({
                                                         )}
                                                     </span>
                                                     <span className="text-sm leading-tight">
-                                                        {formatMathInline(opt)}
+                                                        {renderFormattedText(
+                                                            opt,
+                                                        )}
                                                     </span>
                                                 </div>
                                                 {isCorrect && (
