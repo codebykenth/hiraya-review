@@ -70,6 +70,7 @@ export default function Calendar() {
         toggleScheduleDone,
         handleRescheduleToToday,
         handleResetAll,
+        handleDragSchedule,
     } = useCalendarState({ schedules, examDates, pastPending, nextExam });
 
     return (
@@ -228,6 +229,7 @@ export default function Calendar() {
                         openEditModal={openEditModal}
                         toggleScheduleDone={toggleScheduleDone}
                         handleDeleteSchedule={handleDeleteSchedule}
+                        handleDragSchedule={handleDragSchedule}
                     />
                 </Card>
 

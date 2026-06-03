@@ -95,7 +95,6 @@ export default function Login({
                                 <TurnstileWidget
                                     siteKey={turnstileSiteKey}
                                     onVerify={(token) => {
-                                        console.log('Turnstile token:', token);
                                         setTurnstileToken(token);
                                     }}
                                     theme="auto"

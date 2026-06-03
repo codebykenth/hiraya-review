@@ -2,6 +2,16 @@ import { Link } from '@inertiajs/react';
 import { Plus, Trash2 } from 'lucide-react';
 import React from 'react';
 import {
+    DndContext,
+    useDroppable,
+    useDraggable,
+    DragEndEvent,
+    closestCenter,
+    PointerSensor,
+    useSensor,
+    useSensors,
+} from '@dnd-kit/core';
+import {
     Tooltip,
     TooltipContent,
     TooltipProvider,
@@ -9,6 +19,33 @@ import {
 } from '@/components/ui/tooltip';
 import { categoryNames } from '../hooks/use-calendar-state';
 import type { StudySchedule, CalendarDay, LearnModule } from '../types';
+
+function DroppableDay({ id, children, className, onClick }: any) {
+    const { setNodeRef, isOver } = useDroppable({ id });
+    return (
+        <div ref={setNodeRef} onClick={onClick} className={`${className} ${isOver ? 'ring-2 ring-blue-400 ring-inset dark:ring-blue-500 bg-blue-50/50 dark:bg-blue-900/20' : ''}`}>
+            {children}
+        </div>
+    );
+}
+
+function DraggableSchedule({ schedule, children, className, onClick }: any) {
+    const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({ 
+        id: `schedule-${schedule.id}`,
+        data: { schedule }
+    });
+    
+    const style = transform ? {
+        transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
+        zIndex: 50,
+    } : undefined;
+
+    return (
+        <div ref={setNodeRef} style={style} {...attributes} {...listeners} onClick={onClick} className={`${className} ${isDragging ? 'opacity-50 shadow-lg' : ''}`}>
+            {children}
+        </div>
+    );
+}
 
 interface CalendarGridProps {
     weeks: CalendarDay[][];
@@ -23,6 +60,7 @@ interface CalendarGridProps {
         date: string,
     ) => Promise<void>;
     handleDeleteSchedule: (scheduleId: number, date: string) => Promise<void>;
+    handleDragSchedule?: (schedule: StudySchedule, sourceDate: string, newDate: string) => Promise<void>;
 }
 
 export function CalendarGrid({
@@ -35,7 +73,30 @@ export function CalendarGrid({
     openEditModal,
     toggleScheduleDone,
     handleDeleteSchedule,
+    handleDragSchedule,
 }: CalendarGridProps) {
+    const sensors = useSensors(
+        useSensor(PointerSensor, {
+            activationConstraint: {
+                distance: 5,
+            },
+        })
+    );
+
+    const handleDragEnd = (event: DragEndEvent) => {
+        const { active, over } = event;
+        if (!over || !active.data.current?.schedule || !handleDragSchedule) return;
+
+        const schedule = active.data.current.schedule;
+        const sourceDate = schedule.study_date || schedule.date; 
+        const targetDate = over.id as string;
+
+        // Verify dates are different (ignore drops on the same day)
+        if (sourceDate !== targetDate) {
+            handleDragSchedule(schedule, sourceDate, targetDate);
+        }
+    };
+
     const isToday = (dateStr: string) => dateStr === todayStr;
 
     const getCategoryColors = (title: string, subcategoryId?: number) => {
@@ -285,12 +346,14 @@ export function CalendarGrid({
                 </div>
 
                 {/* Calendar grid */}
+                <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
                 <div className="space-y-2">
                     {weeks.map((week, weekIndex) => (
                         <div key={weekIndex} className="grid grid-cols-7 gap-2">
                             {week.map((calendarDay) => (
-                                <div
+                                <DroppableDay
                                     key={calendarDay.date}
+                                    id={calendarDay.date}
                                     onClick={() => {
                                         if (
                                             calendarDay.isCurrentMonth &&
@@ -385,9 +448,10 @@ export function CalendarGrid({
                                                     );
 
                                                 return (
-                                                    <div
+                                                    <DraggableSchedule
                                                         key={schedule.id}
-                                                        onClick={(e) => {
+                                                        schedule={schedule}
+                                                        onClick={(e: React.MouseEvent) => {
                                                             e.stopPropagation();
                                                             openEditModal(
                                                                 schedule,
@@ -652,16 +716,17 @@ export function CalendarGrid({
                                                                 })()}
                                                             </div>
                                                         )}
-                                                    </div>
+                                                    </DraggableSchedule>
                                                 );
                                             },
                                         )}
                                     </div>
-                                </div>
+                                </DroppableDay>
                             ))}
                         </div>
                     ))}
                 </div>
+                </DndContext>
             </div>
         </div>
     );

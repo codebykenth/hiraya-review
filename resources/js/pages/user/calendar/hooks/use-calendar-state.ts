@@ -583,6 +583,83 @@ export function useCalendarState(initialProps: CalendarPageProps) {
         }
     };
 
+    const pendingUpdates = useRef<Map<number, { schedule: StudySchedule, newDate: string }>>(new Map());
+    const saveTimer = useRef<NodeJS.Timeout | null>(null);
+
+    const handleDragSchedule = async (
+        schedule: StudySchedule,
+        sourceDate: string,
+        newDate: string,
+    ) => {
+        if (sourceDate === newDate) return;
+
+        // Optimistic update
+        const updated = new Map(schedules);
+        const sourceSchedules = updated.get(sourceDate) || [];
+        const targetSchedules = updated.get(newDate) || [];
+
+        updated.set(
+            sourceDate,
+            sourceSchedules.filter((s) => s.id !== schedule.id),
+        );
+        updated.set(newDate, [...targetSchedules, { ...schedule, study_date: newDate }]);
+        setSchedules(updated);
+
+        // Debounce backend synchronization to prevent spamming the database
+        pendingUpdates.current.set(schedule.id, { schedule, newDate });
+
+        if (saveTimer.current) {
+            clearTimeout(saveTimer.current);
+        }
+
+        saveTimer.current = setTimeout(async () => {
+            const updatesToProcess = new Map(pendingUpdates.current);
+            pendingUpdates.current.clear();
+            let hasError = false;
+
+            try {
+                const promises = Array.from(updatesToProcess.entries()).map(([id, data]) => {
+                    return fetch(`/study-schedules/${id}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN':
+                                document
+                                    .querySelector('meta[name="csrf-token"]')
+                                    ?.getAttribute('content') || '',
+                        },
+                        body: JSON.stringify({
+                            study_date: data.newDate,
+                            study_time: data.schedule.study_time
+                                ? data.schedule.study_time.substring(0, 5)
+                                : null,
+                            title: data.schedule.title,
+                            description: data.schedule.description || null,
+                            subcategory_id: data.schedule.subcategory_id || null,
+                            is_done: data.schedule.is_done,
+                        }),
+                    });
+                });
+
+                const responses = await Promise.all(promises);
+
+                if (responses.some((r) => !r.ok)) {
+                    hasError = true;
+                } else {
+                    monthCacheRef.current.clear();
+                }
+            } catch {
+                hasError = true;
+            } finally {
+                if (hasError) {
+                    setErrorMessage('Failed to save some dragged items. Synchronizing with server.');
+                }
+                // Always refresh from the backend once the batch finishes
+                await fetchSchedules(true);
+            }
+        }, 1500); // 1.5 second debounce delay
+    };
+
     const handleResetAll = () => {
         setConfirmModal({
             isOpen: true,
@@ -658,5 +735,6 @@ export function useCalendarState(initialProps: CalendarPageProps) {
         toggleScheduleDone,
         handleRescheduleToToday,
         handleResetAll,
+        handleDragSchedule,
     };
 }

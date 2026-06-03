@@ -56,12 +56,12 @@ export default function AiReadinessCard({ aiAnalysis }: AiReadinessCardProps) {
 
         const channel = echo.private(`App.Models.User.${auth.user.id}`);
 
-        channel.listen('ai-analysis-ready', () => {
+        channel.listen('.ai-analysis-ready', () => {
             router.reload({ only: ['aiAnalysis'] });
         });
 
         return () => {
-            channel.stopListening('ai-analysis-ready');
+            channel.stopListening('.ai-analysis-ready');
             echo.disconnect();
         };
     }, [status, auth?.user?.id, pusher]);
