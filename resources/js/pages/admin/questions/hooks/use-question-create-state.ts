@@ -68,6 +68,8 @@ export function useQuestionCreateState({
     const [aiPrimaryModel, setAiPrimaryModel] =
         useState<string>('gemini-3.5-flash');
     const [aiPrompt, setAiPrompt] = useState<string>('');
+    const [aiSymbolicVariety, setAiSymbolicVariety] = useState<string>('all');
+    const [aiDataVariety, setAiDataVariety] = useState<string>('all');
     const [isGenerating, setIsGenerating] = useState<boolean>(false);
     const [errorMsg, setErrorMsg] = useState<string | null>(null);
     const [successMsg, setSuccessMsg] = useState<string | null>(null);
@@ -80,12 +82,31 @@ export function useQuestionCreateState({
         // Only reset if the current subcategory does not belong to the selected category
         if (aiSubcategory && !validSubs.includes(aiSubcategory)) {
             const timer = setTimeout(() => {
-                setAiSubcategory(validSubs[0] || '');
+                const newSub = validSubs[0] || '';
+                setAiSubcategory(newSub);
+
+                if (
+                    newSub === 'Symbolic logic / abstract reasoning' ||
+                    newSub === 'Data interpretation'
+                ) {
+                    setAiCount(1);
+                }
             }, 0);
 
             return () => clearTimeout(timer);
         }
     }, [aiCategory, cseCategoriesTree, aiSubcategory]);
+
+    const handleSetAiSubcategory = (subcat: string) => {
+        setAiSubcategory(subcat);
+
+        if (
+            subcat === 'Symbolic logic / abstract reasoning' ||
+            subcat === 'Data interpretation'
+        ) {
+            setAiCount(1);
+        }
+    };
 
     const manualForm = useForm({
         stem: '',
@@ -188,6 +209,8 @@ export function useQuestionCreateState({
                     language: aiLanguage,
                     prompt: aiPrompt,
                     primary_model: aiPrimaryModel,
+                    symbolic_variety: aiSymbolicVariety,
+                    data_variety: aiDataVariety,
                 }),
             });
 
@@ -255,7 +278,7 @@ export function useQuestionCreateState({
         aiCategory,
         setAiCategory,
         aiSubcategory,
-        setAiSubcategory,
+        setAiSubcategory: handleSetAiSubcategory,
         aiCount,
         setAiCount,
         aiLanguage,
@@ -264,6 +287,10 @@ export function useQuestionCreateState({
         setAiPrimaryModel,
         aiPrompt,
         setAiPrompt,
+        aiSymbolicVariety,
+        setAiSymbolicVariety,
+        aiDataVariety,
+        setAiDataVariety,
         isGenerating,
         errorMsg,
         successMsg,

@@ -32,6 +32,10 @@ export default function CreateQuestion(props: CreateProps) {
         handleOptionChange,
         handleManualSubmit,
         handleGenerateAI,
+        aiSymbolicVariety,
+        setAiSymbolicVariety,
+        aiDataVariety,
+        setAiDataVariety,
         handleCancelAIGeneration,
     } = useQuestionCreateState(props);
 
@@ -49,6 +53,10 @@ export default function CreateQuestion(props: CreateProps) {
             setAiPrimaryModel={setAiPrimaryModel}
             aiPrompt={aiPrompt}
             setAiPrompt={setAiPrompt}
+            aiSymbolicVariety={aiSymbolicVariety}
+            setAiSymbolicVariety={setAiSymbolicVariety}
+            aiDataVariety={aiDataVariety}
+            setAiDataVariety={setAiDataVariety}
             isGenerating={isGenerating}
             errorMsg={errorMsg}
             successMsg={successMsg}

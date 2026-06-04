@@ -19,6 +19,7 @@ import {
     DialogTitle,
     DialogDescription,
 } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
 import { SelectField } from '@/components/ui/select';
 import { drafts as questionsDrafts } from '@/routes/questions';
 
@@ -35,6 +36,10 @@ interface AIGeneratorPanelProps {
     setAiPrimaryModel: (val: string) => void;
     aiPrompt: string;
     setAiPrompt: (val: string) => void;
+    aiSymbolicVariety: string;
+    setAiSymbolicVariety: (val: string) => void;
+    aiDataVariety: string;
+    setAiDataVariety: (val: string) => void;
     isGenerating: boolean;
     errorMsg: string | null;
     successMsg: string | null;
@@ -56,6 +61,10 @@ export function AIGeneratorPanel({
     setAiPrimaryModel,
     aiPrompt,
     setAiPrompt,
+    aiSymbolicVariety,
+    setAiSymbolicVariety,
+    aiDataVariety,
+    setAiDataVariety,
     isGenerating,
     errorMsg,
     successMsg,
@@ -96,29 +105,158 @@ export function AIGeneratorPanel({
                             options={cseCategoriesTree[aiCategory] || []}
                         />
 
-                        <div className="grid grid-cols-2 gap-4">
-                            {/* Count Select */}
+                        {/* Symbolic reasoning format select - dynamic */}
+                        {aiSubcategory ===
+                            'Symbolic logic / abstract reasoning' && (
                             <SelectField
-                                label="Count"
-                                value={aiCount}
+                                label="Abstract Reasoning Variety"
+                                value={aiSymbolicVariety}
                                 disabled={isGenerating}
-                                onValueChange={(val) => setAiCount(Number(val))}
-                                options={[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(
-                                    (c) => ({
-                                        value: c,
-                                        label: `${c} Question${c > 1 ? 's' : ''}`,
-                                    }),
-                                )}
+                                onValueChange={setAiSymbolicVariety}
+                                options={[
+                                    {
+                                        value: 'all',
+                                        label: 'Random / All Formats',
+                                    },
+                                    {
+                                        value: 'format_a',
+                                        label: 'Format A: Grid-based Logical Matrix',
+                                    },
+                                    {
+                                        value: 'format_b',
+                                        label: 'Format B: Sequence Puzzle',
+                                    },
+                                    {
+                                        value: 'format_c',
+                                        label: 'Format C: Visual Analogy',
+                                    },
+                                    {
+                                        value: 'format_d',
+                                        label: 'Format D: Rotation/Reflection Grid',
+                                    },
+                                    {
+                                        value: 'format_e',
+                                        label: 'Format E: Odd One Out / Classification',
+                                    },
+                                    {
+                                        value: 'format_f',
+                                        label: 'Format F: Cube Folding / 3D Net',
+                                    },
+                                    {
+                                        value: 'format_g',
+                                        label: 'Format G: Dot Placement / Intersection Logic',
+                                    },
+                                    {
+                                        value: 'format_h',
+                                        label: 'Format H: Mirror/Water Reflections',
+                                    },
+                                ]}
                             />
+                        )}
+
+                        {/* Data interpretation format select - dynamic */}
+                        {aiSubcategory === 'Data interpretation' && (
+                            <SelectField
+                                label="Data Interpretation Variety"
+                                value={aiDataVariety}
+                                disabled={isGenerating}
+                                onValueChange={setAiDataVariety}
+                                options={[
+                                    {
+                                        value: 'all',
+                                        label: 'Random / All Formats',
+                                    },
+                                    {
+                                        value: 'format_a',
+                                        label: 'Format A: Bar Chart',
+                                    },
+                                    {
+                                        value: 'format_b',
+                                        label: 'Format B: Line Graph',
+                                    },
+                                    {
+                                        value: 'format_c',
+                                        label: 'Format C: Pie/Donut Chart',
+                                    },
+                                    {
+                                        value: 'format_d',
+                                        label: 'Format D: Formatted Table',
+                                    },
+                                    {
+                                        value: 'format_e',
+                                        label: 'Format E: Combined Table and Chart',
+                                    },
+                                ]}
+                            />
+                        )}
+
+                        <div
+                            className={
+                                aiCategory === 'Verbal Ability'
+                                    ? 'grid grid-cols-2 gap-4'
+                                    : 'w-full'
+                            }
+                        >
+                            {/* Count Input */}
+                            <div className="flex w-full flex-col gap-1.5">
+                                <label className="text-xs font-bold tracking-wider text-slate-400 uppercase">
+                                    Count
+                                </label>
+                                <Input
+                                    type="number"
+                                    min={1}
+                                    max={
+                                        aiSubcategory ===
+                                            'Symbolic logic / abstract reasoning' ||
+                                        aiSubcategory === 'Data interpretation'
+                                            ? 1
+                                            : 20
+                                    }
+                                    value={aiCount || ''}
+                                    disabled={
+                                        isGenerating ||
+                                        aiSubcategory ===
+                                            'Symbolic logic / abstract reasoning' ||
+                                        aiSubcategory === 'Data interpretation'
+                                    }
+                                    onChange={(e) => {
+                                        const val = parseInt(e.target.value);
+                                        setAiCount(isNaN(val) ? 0 : val);
+                                    }}
+                                    onBlur={(e) => {
+                                        let val = parseInt(e.target.value);
+
+                                        if (isNaN(val) || val < 1) {
+                                            val = 1;
+                                        }
+
+                                        const maxVal =
+                                            aiSubcategory ===
+                                                'Symbolic logic / abstract reasoning' ||
+                                            aiSubcategory ===
+                                                'Data interpretation'
+                                                ? 1
+                                                : 20;
+
+                                        if (val > maxVal) {
+                                            val = maxVal;
+                                        }
+
+                                        setAiCount(val);
+                                    }}
+                                />
+                            </div>
 
                             {/* Language Select */}
-                            <SelectField
-                                label="Language"
-                                value={aiLanguage}
-                                disabled={isGenerating}
-                                onValueChange={setAiLanguage}
-                                options={['English', 'Tagalog']}
-                            />
+                            {aiCategory === 'Verbal Ability' && (
+                                <SelectField
+                                    label="Language"
+                                    value={aiLanguage}
+                                    disabled={isGenerating}
+                                    onValueChange={setAiLanguage}
+                                    options={['English', 'Tagalog']}
+                                />
+                            )}
                         </div>
 
                         {/* Model Select */}

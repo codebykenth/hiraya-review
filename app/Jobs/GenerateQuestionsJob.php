@@ -88,10 +88,26 @@ class GenerateQuestionsJob implements ShouldQueue
                     $categorySpecificRules .= "\n        * Word analogy (Filipino/Tagalog): Use authentic Filipino/Tagalog word relationships and formal vocabulary rather than directly translating standard English analogies. Ensure this strictly falls under the Analytical Ability category.";
                 }
             } elseif ($subcategory === 'Symbolic logic / abstract reasoning') {
-                $categorySpecificRules = "* Symbolic logic / abstract reasoning: You MUST generate visual-spatial geometric puzzles using raw, scalable SVG code. Output raw <svg viewBox=\"...\">...</svg> blocks directly inside the text. You MUST include SVG visuals not just in the question stem, but ALSO in every single option (Options A to E must be standalone SVGs showing the possible answers, do NOT use descriptive text for options), AND in the explanation block to visually demonstrate the correct pattern and solution. Keep SVGs clean with simple paths, <rect>, <circle>, or <polygon>.
-        CRITICAL STEM SVG RULE: The question 'stem' MUST contain at least one <svg> block representing the puzzle's reference diagram or sequence. You are forbidden from generating visual questions without including the reference SVG in the stem! (Except for Odd One Out Format E, where the puzzle is defined by the options).
-        CRITICAL TOKEN OPTIMIZATION RULE: To prevent generation cutoffs, you MUST heavily minify your SVG code. Do NOT use any HTML comments (<!-- -->) inside the SVGs. Remove all unnecessary whitespace, spaces, and line breaks within the SVG code. Keep the code as compact as possible.
-        CRITICAL VARIETY RULE: To prevent repetitive questions, randomly select one of the following abstract reasoning formats for each question:
+                $variety = $validated['symbolic_variety'] ?? 'all';
+                $varietyInstruction = '';
+                if ($variety === 'format_a') {
+                    $varietyInstruction = "CRITICAL VARIETY RULE: You MUST generate ONLY the following format. You are forbidden from generating any other format:\n        - Format A: Grid-based Logical Matrix. Generate a single SVG showing a grid of shapes (e.g. 2x2, 3x3, or 4x4 cells). The bottom-right cell MUST show a question mark '?' indicating the missing symbol. The other cells must follow a logical grid-based pattern (e.g. addition, subtraction, or overlap of lines/shapes in rows or columns).";
+                } elseif ($variety === 'format_b') {
+                    $varietyInstruction = "CRITICAL VARIETY RULE: You MUST generate ONLY the following format. You are forbidden from generating any other format:\n        - Format B: Sequence Puzzle. A sequence of frames (ranging from 3 to 6 frames) showing a progressive transformation. You can either generate a single SVG displaying all frames side-by-side, or individual labeled frames (e.g. '**Frame 1:**\n<svg...>\n**Frame 2:**\n<svg...>'; choose whichever fits best, but prefer a single SVG containing all frames side-by-side).";
+                } elseif ($variety === 'format_c') {
+                    $varietyInstruction = "CRITICAL VARIETY RULE: You MUST generate ONLY the following format. You are forbidden from generating any other format:\n        - Format C: Visual Analogy. Frame A is to Frame B, as Frame C is to '?'. Render as a single SVG or individual labeled frames showing the transformation.";
+                } elseif ($variety === 'format_d') {
+                    $varietyInstruction = "CRITICAL VARIETY RULE: You MUST generate ONLY the following format. You are forbidden from generating any other format:\n        - Format D: Rotation/Reflection Grid. A grid of shaded shapes (e.g., 2x2, 3x3, 4x4) that rotate, mirror, or shift according to a distinct pattern.";
+                } elseif ($variety === 'format_e') {
+                    $varietyInstruction = "CRITICAL VARIETY RULE: You MUST generate ONLY the following format. You are forbidden from generating any other format:\n        - Format E: Odd One Out / Classification. The stem asks to find the figure that does not belong. Options A to E show different SVG figures, where 4 of them share a common geometric or mathematical property (e.g., line count, symmetry, rotational similarity) and 1 is the 'odd one out'.";
+                } elseif ($variety === 'format_f') {
+                    $varietyInstruction = "CRITICAL VARIETY RULE: You MUST generate ONLY the following format. You are forbidden from generating any other format:\n        - Format F: Cube Folding / 3D Net. The stem shows a 2D unfolded cube net (showing shapes on the faces). The options show folded 3D cube representations, and the user must identify the only correct folded version.";
+                } elseif ($variety === 'format_g') {
+                    $varietyInstruction = "CRITICAL VARIETY RULE: You MUST generate ONLY the following format. You are forbidden from generating any other format:\n        - Format G: Dot Placement / Intersection Logic. The stem shows a reference diagram where shapes (like a circle, triangle, and square) overlap, with a dot placed in a specific intersection region. The options show similar overlapping shapes, and the user must choose the only option where a dot can be placed in the identical intersection condition.";
+                } elseif ($variety === 'format_h') {
+                    $varietyInstruction = "CRITICAL VARIETY RULE: You MUST generate ONLY the following format. You are forbidden from generating any other format:\n        - Format H: Mirror/Water Reflections. The stem shows a complex figure, and the options show reflections across a given axis (horizontal or vertical).";
+                } else {
+                    $varietyInstruction = "CRITICAL VARIETY RULE: To prevent repetitive questions, randomly select one of the following abstract reasoning formats for each question:
         - Format A: Grid-based Logical Matrix. Generate a single SVG showing a grid of shapes (e.g. 2x2, 3x3, or 4x4 cells). The bottom-right cell MUST show a question mark '?' indicating the missing symbol. The other cells must follow a logical grid-based pattern (e.g. addition, subtraction, or overlap of lines/shapes in rows or columns).
         - Format B: Sequence Puzzle. A sequence of frames (ranging from 3 to 6 frames) showing a progressive transformation. You can either generate a single SVG displaying all frames side-by-side, or individual labeled frames (e.g. '**Frame 1:**\n<svg...>\n**Frame 2:**\n<svg...>').
         - Format C: Visual Analogy. Frame A is to Frame B, as Frame C is to '?'. Render as a single SVG or individual labeled frames showing the transformation.
@@ -99,17 +115,39 @@ class GenerateQuestionsJob implements ShouldQueue
         - Format E: Odd One Out / Classification. The stem asks to find the figure that does not belong. Options A to E show different SVG figures, where 4 of them share a common geometric or mathematical property (e.g., line count, symmetry, rotational similarity) and 1 is the 'odd one out'.
         - Format F: Cube Folding / 3D Net. The stem shows a 2D unfolded cube net (showing shapes on the faces). The options show folded 3D cube representations, and the user must identify the only correct folded version.
         - Format G: Dot Placement / Intersection Logic. The stem shows a reference diagram where shapes (like a circle, triangle, and square) overlap, with a dot placed in a specific intersection region. The options show similar overlapping shapes, and the user must choose the only option where a dot can be placed in the identical intersection condition.
-        - Format H: Mirror/Water Reflections. The stem shows a complex figure, and the options show reflections across a given axis (horizontal or vertical).
+        - Format H: Mirror/Water Reflections. The stem shows a complex figure, and the options show reflections across a given axis (horizontal or vertical).";
+                }
+
+                $categorySpecificRules = "* Symbolic logic / abstract reasoning: You MUST generate visual-spatial geometric puzzles using raw, scalable SVG code. Output raw <svg viewBox=\"...\">...</svg> blocks directly inside the text. You MUST include SVG visuals not just in the question stem, but ALSO in every single option (Options A to E must be standalone SVGs showing the possible answers, do NOT use descriptive text for options), AND in the explanation block to visually demonstrate the correct pattern and solution. Keep SVGs clean with simple paths, <rect>, <circle>, or <polygon>.
+        CRITICAL STEM SVG RULE: The question 'stem' MUST contain at least one <svg> block representing the puzzle's reference diagram or sequence. You are forbidden from generating visual questions without including the reference SVG in the stem! (Except for Odd One Out Format E, where the puzzle is defined by the options).
+        CRITICAL TOKEN OPTIMIZATION RULE: To prevent generation cutoffs, you MUST heavily minify your SVG code. Do NOT use any HTML comments (<!-- -->) inside the SVGs. Remove all unnecessary whitespace, spaces, and line breaks within the SVG code. Keep the code as compact as possible.
+        {$varietyInstruction}
         
         CRITICAL GEOMETRIC COHERENCE RULE: Ensure that all elements (e.g. dots, lines, shapes) inside the SVGs never unintentionally overlap or intersect, unless it is a deliberate part of the puzzle logic. For multiple-choice options (A to E), every option must be constructed with clean spatial layouts and correct coordinate separation so that the correct answer cannot be easily guessed by simply choosing the only option without overlapping elements.";
             } elseif ($subcategory === 'Data interpretation') {
-                $categorySpecificRules = "* Data interpretation: You MUST provide a data source for interpretation based on realistic Philippine public administration data (e.g., population growth, budget allocation, public school enrollment rates).
-        CRITICAL VARIETY RULE: To prevent repetitive questions, randomly select one of the following formats for each question:
+                $variety = $validated['data_variety'] ?? 'all';
+                $varietyInstruction = '';
+                if ($variety === 'format_a') {
+                    $varietyInstruction = "CRITICAL VARIETY RULE: You MUST generate ONLY the following format. You are forbidden from generating any other format:\n        - Format A: Bar Chart. Render a clean vertical or horizontal bar chart using raw SVG. Base the data on 4 to 6 categories/years. Vertical bars must grow bottom-up from the X-axis (e.g., if X-axis is at y=250, a bar of height 100 must be positioned at y=150, height=100). Ensure it has clear axes, gridlines, data labels, and a title.";
+                } elseif ($variety === 'format_b') {
+                    $varietyInstruction = "CRITICAL VARIETY RULE: You MUST generate ONLY the following format. You are forbidden from generating any other format:\n        - Format B: Line Graph. Render a clean line graph representing trends over 4 to 6 periods using raw SVG. Draw distinct data points connected by lines, with gridlines, axes, data labels, and a title.";
+                } elseif ($variety === 'format_c') {
+                    $varietyInstruction = "CRITICAL VARIETY RULE: You MUST generate ONLY the following format. You are forbidden from generating any other format:\n        - Format C: Pie Chart or Donut Chart. Render a clean pie or donut chart representing shares or percentages using raw SVG paths (<path d=\"...\">) or SVG circle segments, with different filled colors for each slice, percentage labels, a clear legend, and a title.";
+                } elseif ($variety === 'format_d') {
+                    $varietyInstruction = "CRITICAL VARIETY RULE: You MUST generate ONLY the following format. You are forbidden from generating any other format:\n        - Format D: Formatted Table. Provide a beautifully formatted markdown table with columns and rows showing statistical data (DO NOT use SVG code).";
+                } elseif ($variety === 'format_e') {
+                    $varietyInstruction = "CRITICAL VARIETY RULE: You MUST generate ONLY the following format. You are forbidden from generating any other format:\n        - Format E: Combined Table and Chart. Provide both a formatted markdown table and a matching SVG chart (bar chart or line graph) to allow comprehensive interpretation of multi-variable data.";
+                } else {
+                    $varietyInstruction = 'CRITICAL VARIETY RULE: To prevent repetitive questions, randomly select one of the following formats for each question:
         - Format A: Bar Chart. Render a clean vertical or horizontal bar chart using raw SVG. Base the data on 4 to 6 categories/years. Vertical bars must grow bottom-up from the X-axis (e.g., if X-axis is at y=250, a bar of height 100 must be positioned at y=150, height=100). Ensure it has clear axes, gridlines, data labels, and a title.
         - Format B: Line Graph. Render a clean line graph representing trends over 4 to 6 periods using raw SVG. Draw distinct data points connected by lines, with gridlines, axes, data labels, and a title.
-        - Format C: Pie Chart or Donut Chart. Render a clean pie or donut chart representing shares or percentages using raw SVG paths (<path d=\"...\">) or SVG circle segments, with different filled colors for each slice, percentage labels, a clear legend, and a title.
+        - Format C: Pie Chart or Donut Chart. Render a clean pie or donut chart representing shares or percentages using raw SVG paths (<path d="...">) or SVG circle segments, with different filled colors for each slice, percentage labels, a clear legend, and a title.
         - Format D: Formatted Table. Provide a beautifully formatted markdown table with columns and rows showing statistical data (DO NOT use SVG code).
-        - Format E: Combined Table and Chart. Provide both a formatted markdown table and a matching SVG chart (bar chart or line graph) to allow comprehensive interpretation of multi-variable data.
+        - Format E: Combined Table and Chart. Provide both a formatted markdown table and a matching SVG chart (bar chart or line graph) to allow comprehensive interpretation of multi-variable data.';
+                }
+
+                $categorySpecificRules = "* Data interpretation: You MUST provide a data source for interpretation based on realistic Philippine public administration data (e.g., population growth, budget allocation, public school enrollment rates).
+        {$varietyInstruction}
         
         CRITICAL SVG RULES: Use a fixed viewBox='0 0 600 400' for charts. Ensure all text labels use <text> elements with clear font sizes and do not overlap with other visual elements. Keep any SVG code clean, well-structured, and minified without comments. The options should be plain text or numbers based on the data, and the explanation block must reference the specific data points.";
             } elseif ($subcategory === 'Reading comprehension') {
@@ -171,8 +209,11 @@ class GenerateQuestionsJob implements ShouldQueue
         ";
 
             $count = $validated['count'];
-            if ($subcategory === 'Symbolic logic / abstract reasoning' && $count > 3) {
-                $count = 3; // Force lower count to prevent token exhaustion cutoffs
+            if (
+                ($subcategory === 'Symbolic logic / abstract reasoning' || $subcategory === 'Data interpretation')
+                && $count > 1
+            ) {
+                $count = 1; // Force max 1 to prevent token exhaustion or visualization overhead
             }
 
             $userPrompt = "
@@ -188,7 +229,7 @@ class GenerateQuestionsJob implements ShouldQueue
                 $firstAttemptFailed = false;
 
                 // Define closures for both API calls
-                $attemptGemini = function ($model = 'gemini-3.5-flash') use ($apiKey, $systemPrompt, $userPrompt, &$resultText, &$errorMsg) {
+                $attemptGemini = function ($model = 'gemini-3.5-flash') use ($apiKey, $systemPrompt, $userPrompt, $subcategory, &$resultText, &$errorMsg) {
                     if (! $apiKey) {
                         $errorMsg = 'GEMINI_API_KEY is missing.';
 
@@ -207,7 +248,7 @@ class GenerateQuestionsJob implements ShouldQueue
                             'generationConfig' => [
                                 'temperature' => 0.7,
                                 'topP' => 0.9,
-                                'maxOutputTokens' => 8192,
+                                'maxOutputTokens' => in_array($subcategory, ['Symbolic logic / abstract reasoning', 'Data interpretation']) ? 16384 : 8192,
                                 'responseMimeType' => 'application/json',
                                 'responseSchema' => [
                                     'type' => 'ARRAY',
@@ -253,6 +294,10 @@ class GenerateQuestionsJob implements ShouldQueue
                         if ($response->successful()) {
                             $result = $response->json();
                             $resultText = $result['candidates'][0]['content']['parts'][0]['text'] ?? '';
+
+                            if (isset($result['usageMetadata'])) {
+                                Log::info("GenerateQuestionsJob Token Usage for {$subcategory}:", $result['usageMetadata']);
+                            }
 
                             return true;
                         } else {
