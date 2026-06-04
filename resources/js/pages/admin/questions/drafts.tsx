@@ -1,8 +1,8 @@
-import { Head, router } from '@inertiajs/react';
+﻿import { Head, router } from '@inertiajs/react';
 import { Check, X, Edit3, ListChecks, Save } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import { DraftsReviewShell } from '@/components/drafts-review-shell';
-import type { CategoryItem } from '@/components/drafts-review-shell';
+import { DraftsReviewShell } from '@/components/domain/drafts-review-shell';
+import type { CategoryItem } from '@/components/domain/drafts-review-shell';
 import { Button } from '@/components/ui/button';
 import {
     Dialog,

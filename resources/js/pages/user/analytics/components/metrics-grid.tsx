@@ -1,5 +1,5 @@
-import React from 'react';
 import { Award, Target, FileText, Clock, TrendingUp, TrendingDown } from 'lucide-react';
+import React from 'react';
 import type { AnalyticsStats } from '../types';
 
 interface MetricsGridProps {

@@ -9,9 +9,9 @@ import {
     ArrowRight,
 } from 'lucide-react';
 import React from 'react';
-import { HowItWorksModal } from '@/components/how-it-works-modal';
 import { PageContainer } from '@/components/layout/page-container';
 import { PageHeader } from '@/components/layout/page-header';
+import { HowItWorksModal } from '@/components/shared/how-it-works-modal';
 
 interface SetupExamViewProps {
     selectedExamId: number | null;

@@ -8,9 +8,9 @@ import {
     HelpCircle,
 } from 'lucide-react';
 import React from 'react';
-import { ConfirmModal } from '@/components/confirm-modal';
 import { PageContainer } from '@/components/layout/page-container';
 import { PageHeader } from '@/components/layout/page-header';
+import { ConfirmModal } from '@/components/shared/confirm-modal';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import {

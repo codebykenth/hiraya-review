@@ -1,5 +1,5 @@
 ﻿import { Breadcrumbs } from '@/components/layout/breadcrumbs';
-import { ThemeToggle } from '@/components/theme-toggle';
+import { ThemeToggle } from '@/components/shared/theme-toggle';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import type { BreadcrumbItem as BreadcrumbItemType } from '@/types';
 

@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
 import { Clock } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
 
 interface ExamCountdownProps {
     examDate: string;
@@ -26,6 +26,7 @@ export function ExamCountdown({ examDate, examDateRaw, motivationText }: ExamCou
 
             if (difference <= 0) {
                 setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0, isExpired: true });
+
                 return;
             }
 

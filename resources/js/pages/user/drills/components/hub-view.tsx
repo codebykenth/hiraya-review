@@ -1,7 +1,7 @@
 ﻿import { Brain } from 'lucide-react';
 import React from 'react';
-import { HowItWorksModal } from '@/components/how-it-works-modal';
 import { PageHeader } from '@/components/layout/page-header';
+import { HowItWorksModal } from '@/components/shared/how-it-works-modal';
 import { Card } from '@/components/ui/card';
 import { categoryMeta } from '../hooks/use-drills-state';
 import type { Category, Question } from '../types';

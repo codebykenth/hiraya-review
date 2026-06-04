@@ -9,11 +9,11 @@ import {
     HelpCircle,
 } from 'lucide-react';
 import React from 'react';
-import QuestionPalettePanel from './question-palette-panel';
 import {
     renderFormattedText,
     extractPropositions,
 } from '@/lib/exam-formatters';
+import QuestionPalettePanel from './question-palette-panel';
 
 interface Question {
     id: number;

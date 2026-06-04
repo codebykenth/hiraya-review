@@ -1,6 +1,5 @@
 import { Clock } from 'lucide-react';
 import React from 'react';
-import { TimePicker } from './time-picker';
 import { Button } from '@/components/ui/button';
 import {
     Dialog,
@@ -10,6 +9,7 @@ import {
     DialogFooter,
 } from '@/components/ui/dialog';
 import { mainCategories } from '../hooks/use-calendar-state';
+import { TimePicker } from './time-picker';
 
 interface BulkUpdateModalProps {
     isOpen: boolean;

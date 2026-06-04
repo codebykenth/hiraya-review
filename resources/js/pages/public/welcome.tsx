@@ -9,18 +9,16 @@ import {
     BookOpen,
     History,
     Target,
-    Lightbulb,
-    HelpCircle,
     Award,
     ClipboardList,
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import FeatureGrid from './components/feature-grid';
+import { ReviewerGuideTabs } from '@/components/domain/reviewer-guide-tabs';
+import { PageHeader } from '@/components/layout/page-header';
 import Section from '@/components/layout/section';
 import SectionHeader from '@/components/layout/section-header';
 import SiteFooter from '@/components/layout/site-footer';
 import SiteHeader from '@/components/layout/site-header';
-import { PageHeader } from '@/components/layout/page-header';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -33,7 +31,7 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import { register } from '@/routes';
-import { ReviewerGuideTabs } from '@/components/reviewer-guide-tabs';
+import FeatureGrid from './components/feature-grid';
 
 export default function Welcome() {
     const { auth } = usePage().props;

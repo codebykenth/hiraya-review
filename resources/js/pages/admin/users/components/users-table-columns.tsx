@@ -1,4 +1,4 @@
-import {
+﻿import {
     Activity,
     Lock,
     Unlock,
@@ -7,7 +7,7 @@ import {
     XCircle,
     RotateCcw,
 } from 'lucide-react';
-import type { TableColumn } from '@/components/admin-table';
+import type { TableColumn } from '@/components/domain/admin-table';
 import {
     Tooltip,
     TooltipContent,

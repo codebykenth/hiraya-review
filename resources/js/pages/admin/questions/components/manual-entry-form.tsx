@@ -1,7 +1,7 @@
-import { router } from '@inertiajs/react';
+﻿import { router } from '@inertiajs/react';
 import { FileText, CheckCircle2, Save, RotateCcw } from 'lucide-react';
 import React from 'react';
-import InputError from '@/components/input-error';
+import InputError from '@/components/shared/input-error';
 import { Button } from '@/components/ui/button';
 import { SelectField } from '@/components/ui/select';
 import { index as questionsIndex } from '@/routes/questions';

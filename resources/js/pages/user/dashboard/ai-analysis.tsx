@@ -22,8 +22,8 @@ import {
 import Pusher from 'pusher-js';
 import { useEffect, useState } from 'react';
 import { PageContainer } from '@/components/layout/page-container';
+import { ConfirmModal } from '@/components/shared/confirm-modal';
 import { Card } from '@/components/ui/card';
-import { ConfirmModal } from '@/components/confirm-modal';
 
 interface SubjectMasteryItem {
     subject: string;

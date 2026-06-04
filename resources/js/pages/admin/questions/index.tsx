@@ -1,11 +1,11 @@
-import { Head, Link, router } from '@inertiajs/react';
+﻿import { Head, Link, router } from '@inertiajs/react';
 import { Eye, Edit2, Trash2, FileQuestion } from 'lucide-react';
-import type { TableColumn } from '@/components/admin-table';
+import type { TableColumn } from '@/components/domain/admin-table';
 import {
     CurationIndexShell,
     getCategoryStyles,
-} from '@/components/curation-index-shell';
-import type { CategoryItem } from '@/components/drafts-review-shell';
+} from '@/components/domain/curation-index-shell';
+import type { CategoryItem } from '@/components/domain/drafts-review-shell';
 import {
     Tooltip,
     TooltipContent,

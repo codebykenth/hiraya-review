@@ -1,8 +1,8 @@
+import { Layers } from 'lucide-react';
 import React from 'react';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from 'recharts';
 import { Card } from '@/components/ui/card';
 import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from '@/components/ui/chart';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from 'recharts';
-import { Layers } from 'lucide-react';
 import type { AttemptBreakdown } from '../types';
 
 interface AttemptBreakdownChartProps {

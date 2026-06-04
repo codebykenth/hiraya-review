@@ -8,7 +8,7 @@ import {
     Layers,
     Activity,
 } from 'lucide-react';
-import { getCategoryStyles } from '@/components/curation-index-shell';
+import { getCategoryStyles } from '@/components/domain/curation-index-shell';
 import { PageContainer } from '@/components/layout/page-container';
 import { PageHeader } from '@/components/layout/page-header';
 import { Button } from '@/components/ui/button';

@@ -1,5 +1,5 @@
-import { Clock } from 'lucide-react';
-import InputError from '@/components/input-error';
+﻿import { Clock } from 'lucide-react';
+import InputError from '@/components/shared/input-error';
 import { Input } from '@/components/ui/input';
 
 interface LearnModuleFieldsProps {

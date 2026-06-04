@@ -1,9 +1,9 @@
-import { Form } from '@inertiajs/react';
+﻿import { Form } from '@inertiajs/react';
 import { REGEXP_ONLY_DIGITS } from 'input-otp';
 import { Check, Copy, ScanLine } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import AlertError from '@/components/alert-error';
-import InputError from '@/components/input-error';
+import AlertError from '@/components/shared/alert-error';
+import InputError from '@/components/shared/input-error';
 import { Button } from '@/components/ui/button';
 import {
     Dialog,

@@ -9,7 +9,7 @@ import { AppSidebar } from '@/components/layout/app-sidebar';
 import { AppSidebarHeader } from '@/components/layout/app-sidebar-header';
 import SiteFooter from '@/components/layout/site-footer';
 import SiteHeader from '@/components/layout/site-header';
-import TermsAcceptanceGuard from '@/components/terms-acceptance-guard';
+import TermsAcceptanceGuard from '@/components/shared/terms-acceptance-guard';
 import type { AppLayoutProps } from '@/types';
 
 export default function AppSidebarLayout({

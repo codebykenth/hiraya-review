@@ -1,8 +1,8 @@
+import { TrendingUp } from 'lucide-react';
 import React from 'react';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from 'recharts';
 import { Card } from '@/components/ui/card';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from 'recharts';
-import { TrendingUp } from 'lucide-react';
 import type { ChartDataPoint } from '../types';
 
 interface ScoreHistoryChartProps {

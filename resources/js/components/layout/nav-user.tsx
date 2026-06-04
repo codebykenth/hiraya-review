@@ -1,6 +1,6 @@
 ﻿import { usePage } from '@inertiajs/react';
 import { ChevronsUpDown } from 'lucide-react';
-import type { Auth } from '@/types';
+import { UserInfo } from '@/components/layout/user-info';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -12,9 +12,9 @@ import {
     SidebarMenuItem,
     useSidebar,
 } from '@/components/ui/sidebar';
-import { UserInfo } from '@/components/layout/user-info';
 import { UserMenuContent } from '@/components/user-menu-content';
 import { useIsMobile } from '@/hooks/use-mobile';
+import type { Auth } from '@/types';
 
 export function NavUser() {
     const { auth } = usePage<{ auth: Auth }>().props;

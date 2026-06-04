@@ -1,6 +1,6 @@
-import { Head } from '@inertiajs/react';
+﻿import { Head } from '@inertiajs/react';
 import React from 'react';
-import { CurationCreateShell } from '@/components/curation-create-shell';
+import { CurationCreateShell } from '@/components/domain/curation-create-shell';
 import { index as questionsIndex } from '@/routes/questions';
 import { AIGeneratorPanel } from './components/ai-generator-panel';
 import { ManualEntryForm } from './components/manual-entry-form';

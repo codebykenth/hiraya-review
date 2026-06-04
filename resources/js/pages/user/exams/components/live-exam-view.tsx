@@ -15,7 +15,6 @@ import {
     LogIn,
 } from 'lucide-react';
 import React from 'react';
-import QuestionPalettePanel from './question-palette-panel';
 import {
     Tooltip,
     TooltipContent,
@@ -23,6 +22,7 @@ import {
     TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { renderFormattedText } from '@/lib/exam-formatters';
+import QuestionPalettePanel from './question-palette-panel';
 
 interface Question {
     id: number;

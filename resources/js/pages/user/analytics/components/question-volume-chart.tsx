@@ -1,8 +1,8 @@
+import { BarChart2 } from 'lucide-react';
 import React from 'react';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from 'recharts';
 import { Card } from '@/components/ui/card';
 import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from '@/components/ui/chart';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from 'recharts';
-import { BarChart2 } from 'lucide-react';
 import type { AnalyticsCategory } from '../types';
 
 interface QuestionVolumeChartProps {
@@ -12,6 +12,7 @@ interface QuestionVolumeChartProps {
 export function QuestionVolumeChart({ categories }: QuestionVolumeChartProps) {
     const data = categories.map((cat) => {
         const name = cat.name.replace(' Ability', '').replace(' Information', '');
+
         return {
             name,
             correct: cat.correct,

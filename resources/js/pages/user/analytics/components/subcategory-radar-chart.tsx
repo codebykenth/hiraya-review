@@ -1,8 +1,8 @@
+import { Target } from 'lucide-react';
 import React from 'react';
+import { RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, ResponsiveContainer } from 'recharts';
 import { Card } from '@/components/ui/card';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
-import { RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, ResponsiveContainer } from 'recharts';
-import { Target } from 'lucide-react';
 import type { AnalyticsCategory } from '../types';
 
 interface SubcategoryRadarChartProps {
@@ -16,7 +16,7 @@ export function SubcategoryRadarChart({ categories }: SubcategoryRadarChartProps
     // The user's request: "Radar/Spider - Skill shape across all subcategories"
     // Wait, let's collect all subcategories. If there are 15+, it might look messy but radar handles it.
     
-    let data: any[] = [];
+    const data: any[] = [];
     categories.forEach(cat => {
         if (cat.subcategories) {
             cat.subcategories.forEach(sub => {

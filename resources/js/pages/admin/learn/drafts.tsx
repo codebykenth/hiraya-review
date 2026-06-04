@@ -1,9 +1,9 @@
-import { Head, router } from '@inertiajs/react';
+﻿import { Head, router } from '@inertiajs/react';
 import { Check, X, Edit3, FileText, Sparkles, Save } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import { DraftsReviewShell } from '@/components/drafts-review-shell';
-import type { CategoryItem } from '@/components/drafts-review-shell';
-import { LessonMarkdown } from '@/components/lesson-markdown';
+import { DraftsReviewShell } from '@/components/domain/drafts-review-shell';
+import type { CategoryItem } from '@/components/domain/drafts-review-shell';
+import { LessonMarkdown } from '@/components/domain/lesson-markdown';
 import { Button } from '@/components/ui/button';
 import {
     Dialog,
@@ -324,7 +324,7 @@ export default function DraftsLearnList({
                                     {m.subcategory}
                                 </span>
                                 <span className="rounded-full border border-border bg-muted px-3 py-0.5 text-xs font-semibold text-foreground">
-                                    ⏱️ {m.estimated_minutes} mins
+                                    â±ï¸ {m.estimated_minutes} mins
                                 </span>
                                 {m.approved ? (
                                     <span className="bg-emerald-550/10 rounded-full border border-emerald-200 px-3 py-0.5 text-xs font-bold text-emerald-700 dark:border-emerald-900/30 dark:bg-emerald-950/20 dark:text-emerald-400">

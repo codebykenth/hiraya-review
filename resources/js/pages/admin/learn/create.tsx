@@ -1,5 +1,5 @@
-import { Head } from '@inertiajs/react';
-import { CurationCreateShell } from '@/components/curation-create-shell';
+﻿import { Head } from '@inertiajs/react';
+import { CurationCreateShell } from '@/components/domain/curation-create-shell';
 import {
     create as adminLearnCreate,
     drafts as adminLearnDrafts,

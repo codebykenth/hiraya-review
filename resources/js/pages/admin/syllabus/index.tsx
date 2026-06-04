@@ -1,9 +1,9 @@
 ﻿import { Head } from '@inertiajs/react';
 import { Database } from 'lucide-react';
 import { useState } from 'react';
-import { ConfirmModal } from '@/components/confirm-modal';
 import { PageContainer } from '@/components/layout/page-container';
 import { PageHeader } from '@/components/layout/page-header';
+import { ConfirmModal } from '@/components/shared/confirm-modal';
 import { CategoryPanel } from './components/category-panel';
 import { SubcategoryPanel } from './components/subcategory-panel';
 import { useSyllabusForm } from './hooks/use-syllabus-form';

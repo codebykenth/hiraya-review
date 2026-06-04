@@ -1,5 +1,5 @@
 ﻿import { Head, usePage } from '@inertiajs/react';
-import { ReviewerGuideTabs } from '@/components/reviewer-guide-tabs';
+import { ReviewerGuideTabs } from '@/components/domain/reviewer-guide-tabs';
 import { PageHeader } from '@/components/layout/page-header';
 import SiteFooter from '@/components/layout/site-footer';
 import SiteHeader from '@/components/layout/site-header';

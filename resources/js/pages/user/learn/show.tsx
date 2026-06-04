@@ -11,8 +11,8 @@ import {
 import Pusher from 'pusher-js';
 import React from 'react';
 import { toast } from 'sonner';
-import { getCategoryStyles } from '@/components/curation-index-shell';
-import { LessonMarkdown } from '@/components/lesson-markdown';
+import { getCategoryStyles } from '@/components/domain/curation-index-shell';
+import { LessonMarkdown } from '@/components/domain/lesson-markdown';
 import { PageContainer } from '@/components/layout/page-container';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';

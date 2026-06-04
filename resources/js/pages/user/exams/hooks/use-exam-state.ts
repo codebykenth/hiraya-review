@@ -2,8 +2,8 @@ import { router, setLayoutProps, usePage } from '@inertiajs/react';
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { fallbackDemographicQuestions } from '@/data/fallback-demographics';
 import { formatDuration } from '@/lib/exam-formatters';
-import type { Question, ExamResults, ExamIndexProps } from '../types';
 import type { Auth } from '@/types';
+import type { Question, ExamResults, ExamIndexProps } from '../types';
 
 const shuffleOptionsForQuestion = (q: Question): Question => {
     const indices = q.options.map((_, i) => i);
@@ -925,6 +925,7 @@ export function useExamState({
                             .slice(0, count - picked.length),
                     ];
                 }
+
                 if (picked.length < count) {
                     const fbPool = fallbackQuestions.filter(
                         (q) =>
@@ -938,11 +939,13 @@ export function useExamState({
                             .slice(0, count - picked.length),
                     ];
                 }
+
                 while (picked.length < count && picked.length > 0) {
                     picked.push(
                         picked[Math.floor(Math.random() * picked.length)],
                     );
                 }
+
                 return picked.slice(0, count);
             };
 
@@ -958,13 +961,19 @@ export function useExamState({
                 const groups: Record<string, Question[]> = {};
                 pool.forEach((q) => {
                     const key = q.subcategory || 'General';
-                    if (!groups[key]) groups[key] = [];
+
+                    if (!groups[key]) {
+groups[key] = [];
+}
+
                     groups[key].push(q);
                 });
 
                 const subcatNames = Object.keys(groups);
-                if (subcatNames.length === 0)
-                    return pickFlat(pool, targetCount, catName);
+
+                if (subcatNames.length === 0) {
+return pickFlat(pool, targetCount, catName);
+}
 
                 // Divide quota evenly, distribute remainder round-robin
                 const baseQuota = Math.floor(targetCount / subcatNames.length);
@@ -973,17 +982,23 @@ export function useExamState({
 
                 for (const subName of subcatNames) {
                     const quota = baseQuota + (remainder > 0 ? 1 : 0);
-                    if (remainder > 0) remainder--;
+
+                    if (remainder > 0) {
+remainder--;
+}
+
                     const subPool = groups[subName];
 
                     if (splitLanguage) {
                         // Split ~50/50 English vs Filipino within this subcategory
                         const engPool = subPool.filter((q) => {
                             const lang = (q.language || '').toLowerCase();
+
                             return lang === 'english' || lang === '';
                         });
                         const filPool = subPool.filter((q) => {
                             const lang = (q.language || '').toLowerCase();
+
                             return (
                                 lang.includes('filipino') ||
                                 lang.includes('tagalog')

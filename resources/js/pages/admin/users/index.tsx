@@ -11,9 +11,9 @@ import {
     Trash2,
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import { AdminTable } from '@/components/admin-table';
-import { ConfirmModal } from '@/components/confirm-modal';
+import { AdminTable } from '@/components/domain/admin-table';
 import { PageContainer } from '@/components/layout/page-container';
+import { ConfirmModal } from '@/components/shared/confirm-modal';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useBulkSelection } from '@/hooks/use-bulk-selection';

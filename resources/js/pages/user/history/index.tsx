@@ -1,9 +1,9 @@
 ﻿import { Head } from '@inertiajs/react';
 import React from 'react';
-import { ConfirmModal } from '@/components/confirm-modal';
-import { HowItWorksModal } from '@/components/how-it-works-modal';
 import { PageContainer } from '@/components/layout/page-container';
 import { PageHeader } from '@/components/layout/page-header';
+import { ConfirmModal } from '@/components/shared/confirm-modal';
+import { HowItWorksModal } from '@/components/shared/how-it-works-modal';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { AttemptsTable } from './components/attempts-table';
 import { FiltersCard } from './components/filters-card';

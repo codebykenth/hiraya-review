@@ -1,8 +1,8 @@
-import { Form } from '@inertiajs/react';
+﻿import { Form } from '@inertiajs/react';
 import { useState } from 'react';
 import ProfileController from '@/actions/App/Http/Controllers/Settings/ProfileController';
-import Heading from '@/components/heading';
-import InputError from '@/components/input-error';
+import Heading from '@/components/shared/heading';
+import InputError from '@/components/shared/input-error';
 import { Button } from '@/components/ui/button';
 import {
     Dialog,

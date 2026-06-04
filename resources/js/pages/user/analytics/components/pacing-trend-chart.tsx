@@ -1,8 +1,8 @@
+import { Clock } from 'lucide-react';
 import React from 'react';
+import { ComposedChart, Line, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from 'recharts';
 import { Card } from '@/components/ui/card';
 import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from '@/components/ui/chart';
-import { ComposedChart, Line, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from 'recharts';
-import { Clock } from 'lucide-react';
 import type { PacingTrend } from '../types';
 
 interface PacingTrendChartProps {

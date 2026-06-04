@@ -1,8 +1,8 @@
+import { Award } from 'lucide-react';
 import React from 'react';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Cell, ResponsiveContainer } from 'recharts';
 import { Card } from '@/components/ui/card';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Cell, ResponsiveContainer } from 'recharts';
-import { Award } from 'lucide-react';
 import type { AnalyticsCategory } from '../types';
 
 interface SubjectMasteryChartProps {
@@ -18,6 +18,7 @@ export function SubjectMasteryChart({ categories }: SubjectMasteryChartProps) {
 
     const config = segments.reduce((acc, seg) => {
         acc[seg.name] = { label: seg.name, color: seg.colorHex };
+
         return acc;
     }, { percentage: { label: 'Accuracy' } } as Record<string, { label: string; color?: string }>);
 

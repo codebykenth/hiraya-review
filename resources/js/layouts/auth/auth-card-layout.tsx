@@ -1,8 +1,8 @@
 ﻿import type { PropsWithChildren } from 'react';
 import AppLogoIcon from '@/components/layout/app-logo-icon';
-import BrandName from '@/components/brand-name';
 import SiteFooter from '@/components/layout/site-footer';
 import SiteHeader from '@/components/layout/site-header';
+import BrandName from '@/components/shared/brand-name';
 
 export default function AuthCardLayout({
     children,

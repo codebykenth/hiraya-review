@@ -1,12 +1,12 @@
-import { Form, Head } from '@inertiajs/react';
+﻿import { Form, Head } from '@inertiajs/react';
 import { useState } from 'react';
-import FacebookIcon from '@/components/facebook-icon';
-import GoogleIcon from '@/components/google-icon';
-import InputError from '@/components/input-error';
-import PasskeyVerify from '@/components/passkey-verify';
-import PasswordInput from '@/components/password-input';
-import TextLink from '@/components/text-link';
-import TurnstileWidget from '@/components/turnstile-widget';
+import FacebookIcon from '@/components/auth/facebook-icon';
+import GoogleIcon from '@/components/auth/google-icon';
+import PasskeyVerify from '@/components/auth/passkey-verify';
+import PasswordInput from '@/components/auth/password-input';
+import TurnstileWidget from '@/components/auth/turnstile-widget';
+import InputError from '@/components/shared/input-error';
+import TextLink from '@/components/shared/text-link';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
@@ -84,7 +84,7 @@ export default function Login({
                                     required
                                     tabIndex={2}
                                     autoComplete="current-password"
-                                    placeholder="••••••••"
+                                    placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
                                     className="h-11 rounded-xl border-slate-200 bg-white/50 backdrop-blur-xs placeholder:text-slate-400 dark:border-slate-800 dark:bg-slate-900/50 dark:placeholder:text-slate-500"
                                 />
                                 <InputError message={errors.password} />

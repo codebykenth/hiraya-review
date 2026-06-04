@@ -1,7 +1,7 @@
-import { createInertiaApp, router } from '@inertiajs/react';
+﻿import { createInertiaApp, router } from '@inertiajs/react';
 import { toast } from 'sonner';
-import { SupportWidget } from '@/components/support-widget';
-import { TrafficOverloadGuard } from '@/components/traffic-overload-guard';
+import { SupportWidget } from '@/components/shared/support-widget';
+import { TrafficOverloadGuard } from '@/components/shared/traffic-overload-guard';
 import { Toaster } from '@/components/ui/sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { initializeTheme } from '@/hooks/use-appearance';

@@ -8,14 +8,14 @@ import {
     ChevronRight,
 } from 'lucide-react';
 import { useEffect } from 'react';
-import { ExamCountdown } from '@/pages/user/dashboard/components/exam-countdown';
 import { PageContainer } from '@/components/layout/page-container';
 import { PageHeader } from '@/components/layout/page-header';
 import { Card } from '@/components/ui/card';
+import { ExamCountdown } from '@/pages/user/dashboard/components/exam-countdown';
+import { index as analyticsIndex } from '@/routes/analytics';
 import { index as drillsIndex } from '@/routes/drills';
 import { index as examsIndex } from '@/routes/exams';
 import { index as learnIndex } from '@/routes/learn';
-import { index as analyticsIndex } from '@/routes/analytics';
 import type { DashboardProps } from '../types';
 
 export function UserDashboardPage({ stats, aiAnalysis }: DashboardProps) {
@@ -24,6 +24,7 @@ export function UserDashboardPage({ stats, aiAnalysis }: DashboardProps) {
 
     useEffect(() => {
         const pendingExam = localStorage.getItem('pending_free_exam');
+
         if (pendingExam) {
             window.location.href = '/exams';
         }

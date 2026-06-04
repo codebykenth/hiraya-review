@@ -1,11 +1,6 @@
 import { Link, router } from '@inertiajs/react';
 import { BookOpen, Trash2, Clock } from 'lucide-react';
 import React from 'react';
-import {
-    TrackBadge,
-    StatusBadge,
-    ScoreProgress,
-} from './attempt-components';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -16,6 +11,11 @@ import {
 } from '@/components/ui/tooltip';
 import { generatePaginationLinks } from '@/lib/utils';
 import type { Attempt, Pagination } from '../types';
+import {
+    TrackBadge,
+    StatusBadge,
+    ScoreProgress,
+} from './attempt-components';
 
 interface AttemptsTableProps {
     attempts: Attempt[];

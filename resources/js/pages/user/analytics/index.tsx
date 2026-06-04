@@ -1,17 +1,17 @@
 ﻿import React from 'react';
 import { PageContainer } from '@/components/layout/page-container';
 import { PageHeader } from '@/components/layout/page-header';
-import { HowItWorksModal } from '@/components/how-it-works-modal';
+import { HowItWorksModal } from '@/components/shared/how-it-works-modal';
 import { AnalyticsFilters } from './components/analytics-filters';
-import { useAnalyticsState } from './hooks/use-analytics-state';
-import { AnalyticsProps } from './types';
-import { MetricsGrid } from './components/metrics-grid';
-import { ScoreHistoryChart } from './components/score-history-chart';
-import { SubjectMasteryChart } from './components/subject-mastery-chart';
-import { QuestionVolumeChart } from './components/question-volume-chart';
-import { SubcategoryRadarChart } from './components/subcategory-radar-chart';
-import { PacingTrendChart } from './components/pacing-trend-chart';
 import { AttemptBreakdownChart } from './components/attempt-breakdown-chart';
+import { MetricsGrid } from './components/metrics-grid';
+import { PacingTrendChart } from './components/pacing-trend-chart';
+import { QuestionVolumeChart } from './components/question-volume-chart';
+import { ScoreHistoryChart } from './components/score-history-chart';
+import { SubcategoryRadarChart } from './components/subcategory-radar-chart';
+import { SubjectMasteryChart } from './components/subject-mastery-chart';
+import { useAnalyticsState } from './hooks/use-analytics-state';
+import type { AnalyticsProps } from './types';
 
 export default function AnalyticsIndex({ stats, aiAnalysis }: AnalyticsProps) {
     const {

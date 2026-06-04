@@ -1,10 +1,10 @@
-// Components
+﻿// Components
 import { Form, Head } from '@inertiajs/react';
 import { LoaderCircle } from 'lucide-react';
 import { useState } from 'react';
-import InputError from '@/components/input-error';
-import TextLink from '@/components/text-link';
-import TurnstileWidget from '@/components/turnstile-widget';
+import TurnstileWidget from '@/components/auth/turnstile-widget';
+import InputError from '@/components/shared/input-error';
+import TextLink from '@/components/shared/text-link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';

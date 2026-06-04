@@ -1,6 +1,5 @@
 import { ChevronDown, Lightbulb, Plus, Check } from 'lucide-react';
 import React from 'react';
-import { TimePicker } from './time-picker';
 import { Button } from '@/components/ui/button';
 import {
     Dialog,
@@ -12,6 +11,7 @@ import {
 } from '@/components/ui/dialog';
 import { mainCategories, categoryNames } from '../hooks/use-calendar-state';
 import type { Subcategory, LearnModule, AttachedModule } from '../types';
+import { TimePicker } from './time-picker';
 
 interface ScheduleModalProps {
     isOpen: boolean;

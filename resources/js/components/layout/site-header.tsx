@@ -2,7 +2,7 @@
 import { Menu, X } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import AppLogo from '@/components/layout/app-logo';
-import { ThemeToggle } from '@/components/theme-toggle';
+import { ThemeToggle } from '@/components/shared/theme-toggle';
 import { Button } from '@/components/ui/button';
 import { home, login, register } from '@/routes';
 import { index as dashboardIndex } from '@/routes/dashboard';

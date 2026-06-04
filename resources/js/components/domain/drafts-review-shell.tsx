@@ -12,8 +12,8 @@ import {
 } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
 import { PageContainer } from '@/components/layout/page-container';
+import { Button } from '@/components/ui/button';
 import { generatePaginationLinks } from '@/lib/utils';
-import { Button } from './ui/button';
 
 export interface BaseDraftItem {
     id: number;

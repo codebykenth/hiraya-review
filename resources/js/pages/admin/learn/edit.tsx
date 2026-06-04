@@ -1,7 +1,7 @@
-import { Head, useForm } from '@inertiajs/react';
+﻿import { Head, useForm } from '@inertiajs/react';
 import { BookOpen } from 'lucide-react';
 import React from 'react';
-import { CurationEditShell } from '@/components/curation-edit-shell';
+import { CurationEditShell } from '@/components/domain/curation-edit-shell';
 import { SelectField } from '@/components/ui/select';
 import {
     index as adminLearnIndex,

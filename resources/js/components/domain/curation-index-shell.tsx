@@ -8,12 +8,12 @@ import {
     Trash2,
 } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
-import type { TableColumn } from '@/components/admin-table';
-import { AdminTable } from '@/components/admin-table';
-import { ConfirmModal } from '@/components/confirm-modal';
+import type { TableColumn } from '@/components/domain/admin-table';
+import { AdminTable } from '@/components/domain/admin-table';
 import { PageContainer } from '@/components/layout/page-container';
+import { ConfirmModal } from '@/components/shared/confirm-modal';
+import { Button } from '@/components/ui/button';
 import type { CategoryItem } from './drafts-review-shell';
-import { Button } from './ui/button';
 
 export function getCategoryStyles(category: string) {
     switch (category) {

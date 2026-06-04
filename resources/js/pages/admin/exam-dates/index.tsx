@@ -1,6 +1,6 @@
 ﻿import { Head, router } from '@inertiajs/react';
-import { ConfirmModal } from '@/components/confirm-modal';
 import { PageContainer } from '@/components/layout/page-container';
+import { ConfirmModal } from '@/components/shared/confirm-modal';
 import { useConfirmModal } from '@/hooks/use-confirm-modal';
 import { ExamDateForm } from './components/exam-date-form';
 import { ExamDatesTable } from './components/exam-dates-table';

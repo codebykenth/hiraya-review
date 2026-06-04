@@ -1,6 +1,6 @@
-import { Head } from '@inertiajs/react';
-import AppearanceTabs from '@/components/appearance-tabs';
-import Heading from '@/components/heading';
+﻿import { Head } from '@inertiajs/react';
+import AppearanceTabs from '@/components/shared/appearance-tabs';
+import Heading from '@/components/shared/heading';
 import { edit as editAppearance } from '@/routes/appearance';
 
 export default function Appearance() {

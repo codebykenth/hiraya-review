@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import ConsentCheckbox from '@/components/consent-checkbox';
+import React, { useState } from 'react';
+import ConsentCheckbox from '@/components/auth/consent-checkbox';
 import { Button } from '@/components/ui/button';
 
 export type SocialProvider = 'google' | 'facebook';

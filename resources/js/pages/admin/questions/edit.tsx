@@ -1,8 +1,8 @@
-import { Head, useForm } from '@inertiajs/react';
+﻿import { Head, useForm } from '@inertiajs/react';
 import { HelpCircle } from 'lucide-react';
 import React, { useState } from 'react';
-import { CurationEditShell } from '@/components/curation-edit-shell';
-import InputError from '@/components/input-error';
+import { CurationEditShell } from '@/components/domain/curation-edit-shell';
+import InputError from '@/components/shared/input-error';
 import { SelectField } from '@/components/ui/select';
 import {
     index as questionsIndex,

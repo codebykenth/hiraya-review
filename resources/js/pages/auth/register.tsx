@@ -1,14 +1,14 @@
-import { Form, Head } from '@inertiajs/react';
+﻿import { Form, Head } from '@inertiajs/react';
 import { useState } from 'react';
-import ConsentCheckbox from '@/components/consent-checkbox';
-import FacebookIcon from '@/components/facebook-icon';
-import GoogleIcon from '@/components/google-icon';
-import InputError from '@/components/input-error';
-import PasswordInput from '@/components/password-input';
-import SocialConsentModal from '@/components/social-consent-modal';
-import type { SocialProvider } from '@/components/social-consent-modal';
-import TextLink from '@/components/text-link';
-import TurnstileWidget from '@/components/turnstile-widget';
+import ConsentCheckbox from '@/components/auth/consent-checkbox';
+import FacebookIcon from '@/components/auth/facebook-icon';
+import GoogleIcon from '@/components/auth/google-icon';
+import PasswordInput from '@/components/auth/password-input';
+import SocialConsentModal from '@/components/auth/social-consent-modal';
+import type { SocialProvider } from '@/components/auth/social-consent-modal';
+import TurnstileWidget from '@/components/auth/turnstile-widget';
+import InputError from '@/components/shared/input-error';
+import TextLink from '@/components/shared/text-link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -92,7 +92,7 @@ export default function Register({ passwordRules, turnstileSiteKey }: Props) {
                                     tabIndex={3}
                                     autoComplete="new-password"
                                     name="password"
-                                    placeholder="••••••••"
+                                    placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
                                     passwordrules={passwordRules}
                                     className="h-11 rounded-xl border-slate-200 bg-white/50 backdrop-blur-xs placeholder:text-slate-400 dark:border-slate-800 dark:bg-slate-900/50 dark:placeholder:text-slate-500"
                                 />
@@ -109,7 +109,7 @@ export default function Register({ passwordRules, turnstileSiteKey }: Props) {
                                     tabIndex={4}
                                     autoComplete="new-password"
                                     name="password_confirmation"
-                                    placeholder="••••••••"
+                                    placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
                                     passwordrules={passwordRules}
                                     className="h-11 rounded-xl border-slate-200 bg-white/50 backdrop-blur-xs placeholder:text-slate-400 dark:border-slate-800 dark:bg-slate-900/50 dark:placeholder:text-slate-500"
                                 />
