@@ -1,4 +1,4 @@
-import AppLogoIcon from '@/components/app-logo-icon';
+﻿import AppLogoIcon from '@/components/layout/app-logo-icon';
 import BrandName from '@/components/brand-name';
 
 export default function AppLogo() {

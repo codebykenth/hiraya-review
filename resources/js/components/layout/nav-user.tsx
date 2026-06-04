@@ -1,4 +1,4 @@
-import { usePage } from '@inertiajs/react';
+﻿import { usePage } from '@inertiajs/react';
 import { ChevronsUpDown } from 'lucide-react';
 import type { Auth } from '@/types';
 import {
@@ -12,7 +12,7 @@ import {
     SidebarMenuItem,
     useSidebar,
 } from '@/components/ui/sidebar';
-import { UserInfo } from '@/components/user-info';
+import { UserInfo } from '@/components/layout/user-info';
 import { UserMenuContent } from '@/components/user-menu-content';
 import { useIsMobile } from '@/hooks/use-mobile';
 

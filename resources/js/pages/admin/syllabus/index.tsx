@@ -2,8 +2,8 @@
 import { Database } from 'lucide-react';
 import { useState } from 'react';
 import { ConfirmModal } from '@/components/confirm-modal';
-import { PageContainer } from '@/components/page-container';
-import { PageHeader } from '@/components/page-header';
+import { PageContainer } from '@/components/layout/page-container';
+import { PageHeader } from '@/components/layout/page-header';
 import { CategoryPanel } from './components/category-panel';
 import { SubcategoryPanel } from './components/subcategory-panel';
 import { useSyllabusForm } from './hooks/use-syllabus-form';

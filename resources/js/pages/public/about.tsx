@@ -1,4 +1,4 @@
-import { Head, Link } from '@inertiajs/react';
+﻿import { Head, Link } from '@inertiajs/react';
 import {
     Target,
     Users,
@@ -9,8 +9,8 @@ import {
     Heart,
 } from 'lucide-react';
 import React from 'react';
-import SiteFooter from '@/components/site-footer';
-import SiteHeader from '@/components/site-header';
+import SiteFooter from '@/components/layout/site-footer';
+import SiteHeader from '@/components/layout/site-header';
 import { Button } from '@/components/ui/button';
 
 export default function About() {

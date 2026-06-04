@@ -1,14 +1,14 @@
-import { usePage } from '@inertiajs/react';
+﻿import { usePage } from '@inertiajs/react';
 import Echo from 'laravel-echo';
 import Pusher from 'pusher-js';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
-import { AppContent } from '@/components/app-content';
-import { AppShell } from '@/components/app-shell';
-import { AppSidebar } from '@/components/app-sidebar';
-import { AppSidebarHeader } from '@/components/app-sidebar-header';
-import SiteFooter from '@/components/site-footer';
-import SiteHeader from '@/components/site-header';
+import { AppContent } from '@/components/layout/app-content';
+import { AppShell } from '@/components/layout/app-shell';
+import { AppSidebar } from '@/components/layout/app-sidebar';
+import { AppSidebarHeader } from '@/components/layout/app-sidebar-header';
+import SiteFooter from '@/components/layout/site-footer';
+import SiteHeader from '@/components/layout/site-header';
 import TermsAcceptanceGuard from '@/components/terms-acceptance-guard';
 import type { AppLayoutProps } from '@/types';
 

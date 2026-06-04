@@ -1,4 +1,4 @@
-import { Head, Link } from '@inertiajs/react';
+﻿import { Head, Link } from '@inertiajs/react';
 import {
     ChevronLeft,
     PenLine,
@@ -9,8 +9,8 @@ import {
     Activity,
 } from 'lucide-react';
 import { getCategoryStyles } from '@/components/curation-index-shell';
-import { PageContainer } from '@/components/page-container';
-import { PageHeader } from '@/components/page-header';
+import { PageContainer } from '@/components/layout/page-container';
+import { PageHeader } from '@/components/layout/page-header';
 import { Button } from '@/components/ui/button';
 import { renderFormattedText } from '@/lib/exam-formatters';
 

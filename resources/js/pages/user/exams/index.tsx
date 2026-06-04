@@ -1,5 +1,5 @@
-import { ConfirmModal } from '@/components/confirm-modal';
-import { PageContainer } from '@/components/page-container';
+﻿import { ConfirmModal } from '@/components/confirm-modal';
+import { PageContainer } from '@/components/layout/page-container';
 import { Button } from '@/components/ui/button';
 import {
     Dialog,

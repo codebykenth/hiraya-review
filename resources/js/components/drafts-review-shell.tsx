@@ -1,4 +1,4 @@
-import { Link } from '@inertiajs/react';
+﻿import { Link } from '@inertiajs/react';
 import {
     Check,
     X,
@@ -11,7 +11,7 @@ import {
     ChevronLeft,
 } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
-import { PageContainer } from '@/components/page-container';
+import { PageContainer } from '@/components/layout/page-container';
 import { generatePaginationLinks } from '@/lib/utils';
 import { Button } from './ui/button';
 

@@ -1,8 +1,8 @@
-import { Link } from '@inertiajs/react';
+﻿import { Link } from '@inertiajs/react';
 import { ChevronLeft, Sparkles, PenLine } from 'lucide-react';
 import React from 'react';
-import { PageContainer } from '@/components/page-container';
-import { PageHeader } from '@/components/page-header';
+import { PageContainer } from '@/components/layout/page-container';
+import { PageHeader } from '@/components/layout/page-header';
 
 interface CurationCreateShellProps {
     title: string;

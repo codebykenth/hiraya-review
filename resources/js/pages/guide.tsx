@@ -1,8 +1,8 @@
-import { Head, usePage } from '@inertiajs/react';
+﻿import { Head, usePage } from '@inertiajs/react';
 import { ReviewerGuideTabs } from '@/components/reviewer-guide-tabs';
-import { PageHeader } from '@/components/page-header';
-import SiteFooter from '@/components/site-footer';
-import SiteHeader from '@/components/site-header';
+import { PageHeader } from '@/components/layout/page-header';
+import SiteFooter from '@/components/layout/site-footer';
+import SiteHeader from '@/components/layout/site-header';
 import AppLayout from '@/layouts/app-layout';
 import type { Auth } from '@/types';
 

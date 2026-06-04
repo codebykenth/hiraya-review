@@ -1,7 +1,7 @@
-import { Head } from '@inertiajs/react';
+﻿import { Head } from '@inertiajs/react';
 import { FileText } from 'lucide-react';
-import SiteFooter from '@/components/site-footer';
-import SiteHeader from '@/components/site-header';
+import SiteFooter from '@/components/layout/site-footer';
+import SiteHeader from '@/components/layout/site-header';
 import { Card } from '@/components/ui/card';
 
 export default function Terms() {

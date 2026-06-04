@@ -1,7 +1,7 @@
-import { Brain } from 'lucide-react';
+﻿import { Brain } from 'lucide-react';
 import React from 'react';
 import { HowItWorksModal } from '@/components/how-it-works-modal';
-import { PageHeader } from '@/components/page-header';
+import { PageHeader } from '@/components/layout/page-header';
 import { Card } from '@/components/ui/card';
 import { categoryMeta } from '../hooks/use-drills-state';
 import type { Category, Question } from '../types';
@@ -34,17 +34,17 @@ export function HubView({
                         title="How Practice Drills Work"
                         tips={[
                             {
-                                icon: '⚡',
+                                icon: 'âš¡',
                                 title: 'Micro-learning',
                                 text: 'Drills are short, focused sessions designed for rapid repetition on specific subcategories to build your muscle memory.',
                             },
                             {
-                                icon: '⏱️',
+                                icon: 'â±ï¸',
                                 title: 'Practice Modes',
                                 text: 'Choose Timed mode to build your speed for the actual exam, or Untimed mode for deep comprehension and reading.',
                             },
                             {
-                                icon: '💡',
+                                icon: 'ðŸ’¡',
                                 title: 'Instant Feedback',
                                 text: 'Unlike full mock exams, drills provide immediate explanations after every single question so you learn right away.',
                             },
@@ -87,7 +87,7 @@ export function HubView({
                                             <CardIcon className="size-6" />
                                         </div>
                                         <span className="rounded-full bg-slate-100 px-2.5 py-1 text-[10px] font-extrabold text-muted-foreground dark:bg-slate-800">
-                                            📝 {actualCount} Qs
+                                            ðŸ“ {actualCount} Qs
                                         </span>
                                     </div>
 

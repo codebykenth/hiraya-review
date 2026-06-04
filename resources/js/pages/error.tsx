@@ -1,4 +1,4 @@
-import { Head, Link, usePage } from '@inertiajs/react';
+﻿import { Head, Link, usePage } from '@inertiajs/react';
 import {
     Home,
     ArrowLeft,
@@ -8,8 +8,8 @@ import {
     FileQuestion,
 } from 'lucide-react';
 import React from 'react';
-import SiteFooter from '@/components/site-footer';
-import SiteHeader from '@/components/site-header';
+import SiteFooter from '@/components/layout/site-footer';
+import SiteHeader from '@/components/layout/site-header';
 import AppLayout from '@/layouts/app-layout';
 
 interface ErrorPageProps {

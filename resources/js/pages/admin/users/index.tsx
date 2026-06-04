@@ -13,7 +13,7 @@ import {
 import { useState, useEffect } from 'react';
 import { AdminTable } from '@/components/admin-table';
 import { ConfirmModal } from '@/components/confirm-modal';
-import { PageContainer } from '@/components/page-container';
+import { PageContainer } from '@/components/layout/page-container';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useBulkSelection } from '@/hooks/use-bulk-selection';

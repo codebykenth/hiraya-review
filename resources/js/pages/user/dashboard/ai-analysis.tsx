@@ -1,4 +1,4 @@
-import { Head, Link, router, usePage } from '@inertiajs/react';
+﻿import { Head, Link, router, usePage } from '@inertiajs/react';
 import Echo from 'laravel-echo';
 import {
     Brain,
@@ -21,7 +21,7 @@ import {
 } from 'lucide-react';
 import Pusher from 'pusher-js';
 import { useEffect, useState } from 'react';
-import { PageContainer } from '@/components/page-container';
+import { PageContainer } from '@/components/layout/page-container';
 import { Card } from '@/components/ui/card';
 import { ConfirmModal } from '@/components/confirm-modal';
 
@@ -1202,7 +1202,7 @@ export default function AiAnalysisReport({
                             </p>
 
                             <p className="text-indigo-650 mt-3 text-xs font-bold dark:text-indigo-400">
-                                💡 Tip: You can close this, continue practicing
+                                ðŸ’¡ Tip: You can close this, continue practicing
                                 drills, and check back in a few minutes!
                             </p>
 

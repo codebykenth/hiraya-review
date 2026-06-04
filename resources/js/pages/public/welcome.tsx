@@ -1,4 +1,4 @@
-import { Head, Link, router, usePage } from '@inertiajs/react';
+﻿import { Head, Link, router, usePage } from '@inertiajs/react';
 import {
     ArrowRight,
     Sparkles,
@@ -16,11 +16,11 @@ import {
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import FeatureGrid from './components/feature-grid';
-import Section from '@/components/section';
-import SectionHeader from '@/components/section-header';
-import SiteFooter from '@/components/site-footer';
-import SiteHeader from '@/components/site-header';
-import { PageHeader } from '@/components/page-header';
+import Section from '@/components/layout/section';
+import SectionHeader from '@/components/layout/section-header';
+import SiteFooter from '@/components/layout/site-footer';
+import SiteHeader from '@/components/layout/site-header';
+import { PageHeader } from '@/components/layout/page-header';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';

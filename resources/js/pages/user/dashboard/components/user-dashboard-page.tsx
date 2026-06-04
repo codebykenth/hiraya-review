@@ -1,4 +1,4 @@
-import { Link, usePage } from '@inertiajs/react';
+﻿import { Link, usePage } from '@inertiajs/react';
 import {
     Play,
     BookOpen,
@@ -9,8 +9,8 @@ import {
 } from 'lucide-react';
 import { useEffect } from 'react';
 import { ExamCountdown } from '@/pages/user/dashboard/components/exam-countdown';
-import { PageContainer } from '@/components/page-container';
-import { PageHeader } from '@/components/page-header';
+import { PageContainer } from '@/components/layout/page-container';
+import { PageHeader } from '@/components/layout/page-header';
 import { Card } from '@/components/ui/card';
 import { index as drillsIndex } from '@/routes/drills';
 import { index as examsIndex } from '@/routes/exams';

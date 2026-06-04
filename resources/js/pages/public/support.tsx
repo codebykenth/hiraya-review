@@ -1,9 +1,9 @@
-import { Head, useForm } from '@inertiajs/react';
+﻿import { Head, useForm } from '@inertiajs/react';
 import { Mail, MessageSquare, ShieldAlert, ArrowRight } from 'lucide-react';
 import { useState } from 'react';
 import InputError from '@/components/input-error';
-import SiteFooter from '@/components/site-footer';
-import SiteHeader from '@/components/site-header';
+import SiteFooter from '@/components/layout/site-footer';
+import SiteHeader from '@/components/layout/site-header';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';

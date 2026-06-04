@@ -1,6 +1,6 @@
-import { Head } from '@inertiajs/react';
+﻿import { Head } from '@inertiajs/react';
 import React from 'react';
-import { PageContainer } from '@/components/page-container';
+import { PageContainer } from '@/components/layout/page-container';
 import { index as drillsIndex } from '@/routes/drills';
 import { ConfigView } from './components/config-view';
 import { HubView } from './components/hub-view';

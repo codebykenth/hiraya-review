@@ -1,6 +1,6 @@
-import React from 'react';
-import { PageContainer } from '@/components/page-container';
-import { PageHeader } from '@/components/page-header';
+﻿import React from 'react';
+import { PageContainer } from '@/components/layout/page-container';
+import { PageHeader } from '@/components/layout/page-header';
 import { HowItWorksModal } from '@/components/how-it-works-modal';
 import { AnalyticsFilters } from './components/analytics-filters';
 import { useAnalyticsState } from './hooks/use-analytics-state';
@@ -38,17 +38,17 @@ export default function AnalyticsIndex({ stats, aiAnalysis }: AnalyticsProps) {
                         title="How Analytics Works"
                         tips={[
                             {
-                                icon: '📊',
+                                icon: 'ðŸ“Š',
                                 title: 'Performance Stats',
                                 text: 'Track your average score, passing rate, and total practice runs across professional or subprofessional categories.',
                             },
                             {
-                                icon: '📈',
+                                icon: 'ðŸ“ˆ',
                                 title: 'Score Trends',
                                 text: 'Interactive chart illustrating your performance improvements across historical attempts.',
                             },
                             {
-                                icon: '🎯',
+                                icon: 'ðŸŽ¯',
                                 title: 'Diagnostic Gaps',
                                 text: 'Detailed subtopic analysis pointing out your exact strengths and target focus areas.',
                             },

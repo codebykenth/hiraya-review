@@ -1,4 +1,4 @@
-import {
+﻿import {
     Brain,
     ChevronLeft,
     Check,
@@ -8,7 +8,7 @@ import {
     ChevronRight,
 } from 'lucide-react';
 import React from 'react';
-import { PageHeader } from '@/components/page-header';
+import { PageHeader } from '@/components/layout/page-header';
 import { Card } from '@/components/ui/card';
 import {
     categoryMeta,
@@ -76,7 +76,7 @@ export function ConfigView({
             {isRetakeConfig && (
                 <div className="dark:bg-amber-950/10 dark:text-amber-400 flex flex-col justify-between gap-3 rounded-xl border border-amber-200 bg-amber-50/50 p-4 text-xs font-semibold text-amber-800 shadow-2xs sm:flex-row sm:items-center dark:border-amber-900/30">
                     <div className="flex items-center gap-2">
-                        <span className="text-sm">🔄</span>
+                        <span className="text-sm">ðŸ”„</span>
                         <span>
                             <strong>Retake Mode Active:</strong> Settings have
                             been locked to match your historical attempt.
@@ -112,7 +112,7 @@ export function ConfigView({
                     {/* 1. Subcategory Selector */}
                     <Card className="p-5 shadow-2xs">
                         <span className="mb-3 block text-[10px] font-extrabold tracking-wider text-muted-foreground uppercase">
-                            🌲 Select Subcategories
+                            ðŸŒ² Select Subcategories
                         </span>
                         <div className="flex flex-wrap gap-2.5">
                             {selectedCategory.subcategory.map((sub) => {
@@ -149,7 +149,7 @@ export function ConfigView({
                     <Card className="p-5 shadow-2xs">
                         <div className="mb-3 flex items-center justify-between">
                             <span className="text-[10px] font-extrabold tracking-wider text-muted-foreground uppercase">
-                                🔢 Question Count
+                                ðŸ”¢ Question Count
                             </span>
                             <span className="dark:bg-blue-950/20 rounded-md bg-blue-50/50 px-2 py-0.5 text-[10px] font-bold text-blue-600 dark:text-blue-400">
                                 Total Questions:{' '}
@@ -260,7 +260,7 @@ export function ConfigView({
                     {/* 3. Language Selector */}
                     <Card className="p-5 shadow-2xs">
                         <span className="mb-3.5 block text-[10px] font-extrabold tracking-wider text-muted-foreground uppercase">
-                            🌐 Language
+                            ðŸŒ Language
                         </span>
                         <div className="flex flex-wrap gap-6">
                             {(hasFilipinoQuestions
@@ -305,7 +305,7 @@ export function ConfigView({
                     {/* 4. Practice Mode Selector */}
                     <Card className="p-5 shadow-2xs">
                         <span className="mb-3.5 block text-[10px] font-extrabold tracking-wider text-muted-foreground uppercase">
-                            ⏱️ Practice Mode
+                            â±ï¸ Practice Mode
                         </span>
                         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                             <button
