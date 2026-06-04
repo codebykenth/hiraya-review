@@ -184,21 +184,11 @@ export function useDrillsState({
                 selectedCategory.name
                     .toLowerCase()
                     .includes(q.category.toLowerCase());
-            const subcatMatch =
-                selectedSubcats.length === 0 ||
-                selectedSubcats.some(
-                    (subName) =>
-                        q.subcategory
-                            .toLowerCase()
-                            .includes(subName.toLowerCase()) ||
-                        subName
-                            .toLowerCase()
-                            .includes(q.subcategory.toLowerCase()),
-                );
 
-            return catMatch && subcatMatch && q.language === 'Filipino';
+            const qLang = (q.language || '').toLowerCase();
+            return catMatch && (qLang.includes('filipino') || qLang.includes('tagalog'));
         });
-    }, [questions, selectedCategory, selectedSubcats]);
+    }, [questions, selectedCategory]);
 
     const effectiveLanguage =
         hasFilipinoQuestions || language === 'English' ? language : 'English';
@@ -231,10 +221,11 @@ export function useDrillsState({
 
             let langMatch = true;
 
+            const qLang = (q.language || '').toLowerCase();
             if (effectiveLanguage === 'English') {
-                langMatch = q.language === 'English';
+                langMatch = qLang === 'english' || qLang === '';
             } else if (effectiveLanguage === 'Filipino') {
-                langMatch = q.language === 'Filipino';
+                langMatch = qLang.includes('filipino') || qLang.includes('tagalog');
             }
 
             return catMatch && subcatMatch && langMatch;

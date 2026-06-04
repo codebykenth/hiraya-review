@@ -28,7 +28,7 @@ export function getCategoryStyles(category: string) {
         case 'General Information':
             return 'bg-rose-50 text-rose-650 border-rose-100 dark:bg-rose-950/20 dark:text-rose-400 dark:border-rose-900/30';
         default:
-            return 'bg-slate-50 text-slate-650 border-slate-100 dark:bg-slate-900 dark:text-slate-400 dark:border-slate-850';
+            return 'bg-slate-50 text-slate-650 border-slate-100 dark:bg-slate-900 dark:text-slate-400 dark:border-slate-800';
     }
 }
 

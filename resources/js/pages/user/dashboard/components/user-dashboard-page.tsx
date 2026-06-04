@@ -1,835 +1,178 @@
-import { Link } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 import {
     Play,
-    TrendingUp,
-    TrendingDown,
-    Award,
-    FileText,
-    ChevronDown,
-    Clock,
+    BookOpen,
     Target,
-    Info,
+    ClipboardList,
+    TrendingUp,
+    ChevronRight,
 } from 'lucide-react';
-import AiReadinessCard from '@/components/ai-readiness-card';
-import {
-    TrackBadge,
-    StatusBadge,
-    ScoreProgress,
-} from '@/components/attempt-components';
+import { useEffect } from 'react';
+import { ExamCountdown } from '@/pages/user/dashboard/components/exam-countdown';
 import { PageContainer } from '@/components/page-container';
 import { PageHeader } from '@/components/page-header';
 import { Card } from '@/components/ui/card';
 import { index as drillsIndex } from '@/routes/drills';
 import { index as examsIndex } from '@/routes/exams';
-import { useDashboardState } from '../hooks/use-dashboard-state';
+import { index as learnIndex } from '@/routes/learn';
+import { index as analyticsIndex } from '@/routes/analytics';
 import type { DashboardProps } from '../types';
 
 export function UserDashboardPage({ stats, aiAnalysis }: DashboardProps) {
-    const {
-        firstName,
-        hoveredIdx,
-        setHoveredIdx,
-        isOpen,
-        setIsOpen,
-        isRunsOpen,
-        setIsRunsOpen,
-        currentTrack,
-        currentRuns,
-        updateFilter,
-        activeStats,
-        isDemoMode,
-        filteredChartData,
-        chartWidth,
-        chartHeight,
-        chartPadding,
-        chartPaddingLeft,
-        chartPaddingRight,
-        points,
-        pathD,
-        areaD,
-        categories,
-    } = useDashboardState({ stats, aiAnalysis });
+    const { auth } = usePage().props as any;
+    const firstName = auth?.user?.name ? auth.user.name.split(' ')[0] : 'User';
+
+    useEffect(() => {
+        const pendingExam = localStorage.getItem('pending_free_exam');
+        if (pendingExam) {
+            window.location.href = '/exams';
+        }
+    }, []);
 
     return (
-        <>
-            <PageContainer>
-                {/* Greeting Header & Main Action Controls */}
-                <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-                    <PageHeader
-                        title={
-                            <>
-                                Welcome back,
-                                <br />
-                                <span className="font-extrabold text-blue-600 dark:text-blue-400">
-                                    {firstName}
-                                </span>
-                            </>
+        <PageContainer>
+            {/* Greeting Header & Main Action Controls */}
+            <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                <PageHeader
+                    title={
+                        <>
+                            Welcome back,
+                            <br />
+                            <span className="font-extrabold text-blue-600 dark:text-blue-400">
+                                {firstName}
+                            </span>
+                        </>
+                    }
+                    description="Let's continue your preparation for the Civil Service Exam."
+                />
+                <div className="flex flex-wrap gap-2">
+                    <Link
+                        href={
+                            examsIndex({
+                                query: { start: 'professional' },
+                            }).url
                         }
-                        description={
-                            <>
-                                Let's continue your preparation for the Civil
-                                Service Exam.
-                            </>
+                        className="flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-xs font-semibold text-white shadow-sm transition hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none"
+                    >
+                        <Play className="size-3.5 fill-current" />
+                        Start Professional Exam
+                    </Link>
+                    <Link
+                        href={
+                            examsIndex({
+                                query: { start: 'subprofessional' },
+                            }).url
                         }
-                    />
-                    <div className="flex flex-col items-stretch gap-3 sm:items-end">
-                        <div className="flex flex-wrap gap-2">
-                            <Link
-                                href={
-                                    examsIndex({
-                                        query: { start: 'professional' },
-                                    }).url
-                                }
-                                className="flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-xs font-semibold text-white shadow-sm transition hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none"
-                            >
-                                <Play className="size-3.5 fill-current" />
-                                Start Professional Exam
-                            </Link>
-                            <Link
-                                href={
-                                    examsIndex({
-                                        query: { start: 'subprofessional' },
-                                    }).url
-                                }
-                                className="flex items-center justify-center gap-2 rounded-lg border border-blue-200 bg-blue-50/50 px-4 py-2.5 text-xs font-semibold text-blue-600 transition hover:bg-blue-100/50 dark:border-blue-900/50 dark:bg-blue-950/20 dark:text-blue-400 dark:hover:bg-blue-900/30"
-                            >
-                                Start Subprofessional Exam
-                            </Link>
-                        </div>
-                        {/* Overall Dashboard Filters */}
-                        <div className="mt-2 flex flex-wrap items-center justify-end gap-2 sm:mt-0">
-                            <div className="relative">
-                                <button
-                                    onClick={() => setIsOpen(!isOpen)}
-                                    className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-bold text-slate-700 shadow-sm transition hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-300 dark:hover:bg-slate-900"
-                                >
-                                    {currentTrack === 'All'
-                                        ? 'All Tracks'
-                                        : currentTrack}
-                                    <ChevronDown className="size-3.5" />
-                                </button>
-                                {isOpen && (
-                                    <>
-                                        <div
-                                            className="fixed inset-0 z-10"
-                                            onClick={() => setIsOpen(false)}
-                                        />
-                                        <div className="absolute right-0 z-20 mt-2 w-48 origin-top-right rounded-lg border border-slate-200 bg-white p-1 shadow-lg ring-1 ring-black/5 focus:outline-none dark:border-slate-800 dark:bg-slate-950">
-                                            {[
-                                                'All',
-                                                'Professional',
-                                                'Subprofessional',
-                                                'Drill',
-                                            ].map((opt) => (
-                                                <button
-                                                    key={opt}
-                                                    onClick={() => {
-                                                        updateFilter(
-                                                            'track',
-                                                            opt,
-                                                        );
-                                                        setIsOpen(false);
-                                                    }}
-                                                    className={`flex w-full items-center rounded-md px-3 py-2 text-left text-xs transition ${
-                                                        currentTrack === opt
-                                                            ? 'bg-blue-50 font-bold text-blue-600 dark:bg-blue-950/40 dark:text-blue-400'
-                                                            : 'text-slate-700 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-900'
-                                                    }`}
-                                                >
-                                                    {opt === 'All'
-                                                        ? 'All Tracks'
-                                                        : opt}
-                                                </button>
-                                            ))}
-                                        </div>
-                                    </>
-                                )}
-                            </div>
-                            <div className="relative">
-                                <button
-                                    onClick={() => setIsRunsOpen(!isRunsOpen)}
-                                    className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-bold text-slate-700 shadow-sm transition hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-300 dark:hover:bg-slate-900"
-                                >
-                                    {currentRuns === 'all'
-                                        ? 'All Runs'
-                                        : `Last ${currentRuns} Runs`}
-                                    <ChevronDown className="size-3.5" />
-                                </button>
-                                {isRunsOpen && (
-                                    <>
-                                        <div
-                                            className="fixed inset-0 z-10"
-                                            onClick={() => setIsRunsOpen(false)}
-                                        />
-                                        <div className="absolute right-0 z-20 mt-2 w-36 origin-top-right rounded-lg border border-slate-200 bg-white p-1 shadow-lg ring-1 ring-black/5 focus:outline-none dark:border-slate-800 dark:bg-slate-950">
-                                            {[
-                                                {
-                                                    value: '6',
-                                                    label: 'Last 6 Runs',
-                                                },
-                                                {
-                                                    value: '12',
-                                                    label: 'Last 12 Runs',
-                                                },
-                                                {
-                                                    value: 'all',
-                                                    label: 'All Runs',
-                                                },
-                                            ].map((opt) => (
-                                                <button
-                                                    key={opt.value}
-                                                    onClick={() => {
-                                                        updateFilter(
-                                                            'runs',
-                                                            opt.value,
-                                                        );
-                                                        setIsRunsOpen(false);
-                                                    }}
-                                                    className={`flex w-full items-center rounded-md px-3 py-2 text-left text-xs transition ${
-                                                        currentRuns ===
-                                                        opt.value
-                                                            ? 'bg-blue-50 font-bold text-blue-600 dark:bg-blue-950/40 dark:text-blue-400'
-                                                            : 'text-slate-700 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-900'
-                                                    }`}
-                                                >
-                                                    {opt.label}
-                                                </button>
-                                            ))}
-                                        </div>
-                                    </>
-                                )}
-                            </div>
-                        </div>
-                    </div>
+                        className="flex items-center justify-center gap-2 rounded-lg border border-blue-200 bg-blue-50/50 px-4 py-2.5 text-xs font-semibold text-blue-600 transition hover:bg-blue-100/50 dark:border-blue-900/50 dark:bg-blue-950/20 dark:text-blue-400 dark:hover:bg-blue-900/30"
+                    >
+                        Start Subprofessional Exam
+                    </Link>
                 </div>
+            </div>
 
-                {/* Performance Metrics Card Grid Layout - Upgraded to 6 dynamic indicators */}
-                <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
-                    {/* AVG SCORE */}
-                    <div className="relative overflow-hidden rounded-xl border border-blue-100 bg-gradient-to-br from-blue-50/40 to-white p-5 shadow-sm transition hover:shadow-md dark:border-blue-950/30 dark:from-blue-950/10 dark:to-slate-950">
-                        <div className="flex items-center justify-between">
-                            <span className="text-[10px] font-bold tracking-wider text-blue-600 uppercase dark:text-blue-400">
-                                Avg Score
-                            </span>
-                            <Award className="size-4 text-blue-500" />
-                        </div>
-                        <div className="mt-2 flex items-baseline gap-1">
-                            <span className="font-heading text-2xl font-extrabold tracking-tight text-slate-900 dark:text-white">
-                                {activeStats.avgScore}%
-                            </span>
-                            <span className="inline-flex items-center gap-0.5 rounded-full bg-emerald-50 px-1 py-0.5 text-[9px] font-semibold text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400">
-                                <TrendingUp className="size-2.5" />
-                                Live
-                            </span>
-                        </div>
-                    </div>
+            {/* Exam Countdown Card */}
+            {stats?.examDate && stats?.examDateRaw && (
+                <ExamCountdown
+                    examDate={stats.examDate}
+                    examDateRaw={stats.examDateRaw}
+                    motivationText={aiAnalysis?.data?.encouragement}
+                />
+            )}
 
-                    {/* PASSING RATE */}
-                    <div className="relative overflow-hidden rounded-xl border border-emerald-100 bg-gradient-to-br from-emerald-50/20 to-white p-5 shadow-sm transition hover:shadow-md dark:border-emerald-950/30 dark:from-emerald-950/10 dark:to-slate-950">
-                        <div className="flex items-center justify-between">
-                            <span className="text-[10px] font-bold tracking-wider text-emerald-600 uppercase dark:text-emerald-400">
-                                Passing Rate
-                            </span>
-                            <Target className="size-4 text-emerald-500" />
+            {/* Simple Monitor cards pointing to core modules */}
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                {/* Learn Card */}
+                <Card className="flex flex-col justify-between p-6 transition hover:shadow-md dark:bg-slate-900/60">
+                    <div className="flex items-start gap-4">
+                        <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600 dark:bg-blue-950/40 dark:text-blue-400">
+                            <BookOpen className="size-5" />
                         </div>
-                        <div className="mt-2 flex items-baseline gap-1">
-                            <span className="font-heading text-2xl font-extrabold tracking-tight text-slate-900 dark:text-white">
-                                {activeStats.passingRate}%
-                            </span>
-                            <span className="text-[9px] font-semibold text-slate-400">
-                                Target 80%
-                            </span>
-                        </div>
-                    </div>
-
-                    {/* TOTAL EXAMS */}
-                    <div className="relative overflow-hidden rounded-xl border border-indigo-100 bg-white p-5 shadow-sm transition hover:shadow-md dark:border-indigo-950/30 dark:bg-slate-950">
-                        <div className="flex items-center justify-between">
-                            <span className="text-[10px] font-bold tracking-wider text-indigo-600 uppercase dark:text-indigo-400">
-                                Total runs
-                            </span>
-                            <FileText className="size-4 text-indigo-400" />
-                        </div>
-                        <div className="mt-2">
-                            <span className="font-heading text-2xl font-extrabold tracking-tight text-slate-900 dark:text-white">
-                                {activeStats.totalExams}
-                            </span>
-                            <p className="text-[9px] text-slate-400">
-                                Practice attempts
+                        <div>
+                            <h4 className="text-sm font-bold text-slate-900 dark:text-white">
+                                Study Scope
+                            </h4>
+                            <p className="mt-1 text-xs leading-relaxed text-slate-500 dark:text-slate-400">
+                                Access learning modules, review guides, and core materials.
                             </p>
                         </div>
                     </div>
+                    <Link
+                        href={learnIndex()}
+                        className="mt-4 inline-flex items-center gap-1 text-xs font-bold text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
+                    >
+                        Learn Modules <ChevronRight className="size-3.5" />
+                    </Link>
+                </Card>
 
-                    {/* QUESTIONS SOLVED */}
-                    <div className="relative overflow-hidden rounded-xl border border-purple-100 bg-white p-5 shadow-sm transition hover:shadow-md dark:border-purple-950/30 dark:bg-slate-950">
-                        <div className="flex items-center justify-between">
-                            <span className="text-[10px] font-bold tracking-wider text-purple-600 uppercase dark:text-purple-400">
-                                Avg Time
-                            </span>
-                            <Clock className="size-4 text-purple-400" />
+                {/* Practice Drills Card */}
+                <Card className="flex flex-col justify-between p-6 transition hover:shadow-md dark:bg-slate-900/60">
+                    <div className="flex items-start gap-4">
+                        <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 dark:bg-indigo-950/40 dark:text-indigo-400">
+                            <Target className="size-5" />
                         </div>
-                        <div className="mt-2">
-                            <span className="font-heading text-2xl font-extrabold tracking-tight text-slate-900 dark:text-white">
-                                {activeStats.avgDuration}
-                            </span>
-                            <p className="text-[9px] text-slate-400">
-                                Per attempt
+                        <div>
+                            <h4 className="text-sm font-bold text-slate-900 dark:text-white">
+                                Practice Drills
+                            </h4>
+                            <p className="mt-1 text-xs leading-relaxed text-slate-500 dark:text-slate-400">
+                                Sharpen your skills with quick subtopic practice drills.
                             </p>
                         </div>
                     </div>
+                    <Link
+                        href={drillsIndex()}
+                        className="mt-4 inline-flex items-center gap-1 text-xs font-bold text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300"
+                    >
+                        Start Drill <ChevronRight className="size-3.5" />
+                    </Link>
+                </Card>
 
-                    {/* STRONGEST AREA */}
-                    <div className="relative overflow-hidden rounded-xl border border-l-4 border-slate-100 border-l-emerald-500 bg-white p-5 shadow-sm transition hover:shadow-md dark:border-slate-800 dark:bg-slate-950">
-                        <div className="flex items-center justify-between">
-                            <span className="text-[10px] font-bold tracking-wider text-emerald-600 uppercase dark:text-emerald-400">
-                                Strongest
-                            </span>
-                            <TrendingUp className="size-4 text-emerald-500" />
+                {/* Mock Exams Card */}
+                <Card className="flex flex-col justify-between p-6 transition hover:shadow-md dark:bg-slate-900/60">
+                    <div className="flex items-start gap-4">
+                        <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-purple-50 text-purple-600 dark:bg-purple-950/40 dark:text-purple-400">
+                            <ClipboardList className="size-5" />
                         </div>
-                        <div className="mt-2">
-                            <span className="line-clamp-1 font-heading text-base font-extrabold tracking-tight text-slate-900 dark:text-white">
-                                {activeStats.strongestArea}
-                            </span>
-                        </div>
-                    </div>
-
-                    {/* WEAKEST AREA */}
-                    <div className="relative overflow-hidden rounded-xl border border-l-4 border-slate-100 border-l-rose-500 bg-white p-5 shadow-sm transition hover:shadow-md dark:border-slate-800 dark:bg-slate-950">
-                        <div className="flex items-center justify-between">
-                            <span className="text-[10px] font-bold tracking-wider text-rose-600 uppercase dark:text-rose-400">
-                                Focus Area
-                            </span>
-                            <TrendingDown className="size-4 text-rose-500" />
-                        </div>
-                        <div className="mt-2">
-                            <span className="line-clamp-1 font-heading text-base font-extrabold tracking-tight text-slate-900 dark:text-white">
-                                {activeStats.weakestArea}
-                            </span>
+                        <div>
+                            <h4 className="text-sm font-bold text-slate-900 dark:text-white">
+                                Mock Exams
+                            </h4>
+                            <p className="mt-1 text-xs leading-relaxed text-slate-500 dark:text-slate-400">
+                                Simulate the real exam environment with full-length runs.
+                            </p>
                         </div>
                     </div>
-                </div>
+                    <Link
+                        href={examsIndex()}
+                        className="mt-4 inline-flex items-center gap-1 text-xs font-bold text-purple-600 hover:text-purple-700 dark:text-purple-400 dark:hover:text-purple-300"
+                    >
+                        View Exams <ChevronRight className="size-3.5" />
+                    </Link>
+                </Card>
 
-                {/* AI Readiness Card */}
-                <div className="mt-6">
-                    <AiReadinessCard aiAnalysis={aiAnalysis} />
-                </div>
-
-                {/* Score Trends & Category breakdown container layout */}
-                <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-                    {/* Score Trends Section */}
-                    <Card className="relative p-6 lg:col-span-2">
-                        <div className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                            <div className="flex flex-col gap-1">
-                                <h2 className="flex items-center gap-2 font-heading text-2xl font-black tracking-tight text-slate-950 dark:text-white">
-                                    Score History
-                                    {isDemoMode && (
-                                        <span className="bg-amber-55 inline-flex items-center gap-1 rounded-full border border-amber-200/65 px-2 py-0.5 text-[9px] font-black tracking-wide text-amber-700 uppercase dark:border-amber-900/50 dark:bg-amber-950/20 dark:text-amber-400">
-                                            Demo Data
-                                        </span>
-                                    )}
-                                </h2>
-                                <p className="text-sm font-semibold text-slate-500 dark:text-slate-400">
-                                    Track your score percentage across recent
-                                    attempts.
-                                </p>
-                                <div className="group relative flex w-fit items-center gap-1 text-xs font-bold text-slate-400">
-                                    <Info className="size-3.5 cursor-help" />
-                                    Trend details
-                                    <div className="pointer-events-none absolute bottom-full left-1/2 z-20 mb-2 w-48 -translate-x-1/2 rounded bg-slate-900 p-2 text-[10px] text-white opacity-0 shadow-lg transition-opacity group-hover:opacity-100 dark:bg-slate-800">
-                                        Displays the scores of your last 6
-                                        attempts. Hover on any node to view
-                                        details.
-                                    </div>
-                                </div>
-                            </div>
+                {/* Analytics Card */}
+                <Card className="flex flex-col justify-between p-6 transition hover:shadow-md dark:bg-slate-900/60">
+                    <div className="flex items-start gap-4">
+                        <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400">
+                            <TrendingUp className="size-5" />
                         </div>
-
-                        {/* Interactive SVG line chart visualization */}
-                        <div className="relative w-full overflow-x-auto rounded-xl border border-slate-200 bg-gradient-to-b from-slate-50 to-white p-3 dark:border-slate-800/70 dark:from-slate-900/30 dark:to-slate-950">
-                            <div className="min-w-[600px] md:min-w-0">
-                                {/* Detailed HTML absolute glassmorphic tooltip card */}
-                                {hoveredIdx !== null &&
-                                    filteredChartData[hoveredIdx] &&
-                                    filteredChartData[hoveredIdx].track !==
-                                        'No Data' && (
-                                        <div
-                                            className="pointer-events-none absolute z-10 -translate-x-1/2 -translate-y-full rounded-lg border border-blue-200/50 bg-white/95 p-3 shadow-xl backdrop-blur-sm transition-all duration-150 dark:border-slate-800/50 dark:bg-slate-950/95"
-                                            style={{
-                                                left: `${(points[hoveredIdx].x / chartWidth) * 100}%`,
-                                                top: `${(points[hoveredIdx].y / chartHeight) * 100 - 8}%`,
-                                            }}
-                                        >
-                                            <div className="flex min-w-[130px] flex-col gap-1">
-                                                <span className="text-[10px] font-extrabold tracking-wide text-blue-600 uppercase dark:text-blue-400">
-                                                    {
-                                                        filteredChartData[
-                                                            hoveredIdx
-                                                        ].track
-                                                    }
-                                                </span>
-                                                <div className="flex items-baseline justify-between gap-3">
-                                                    <span className="text-sm font-black text-slate-800 dark:text-white">
-                                                        {
-                                                            filteredChartData[
-                                                                hoveredIdx
-                                                            ].score
-                                                        }
-                                                        %
-                                                    </span>
-                                                    <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">
-                                                        {
-                                                            filteredChartData[
-                                                                hoveredIdx
-                                                            ].detail
-                                                        }
-                                                    </span>
-                                                </div>
-                                                <span className="text-[9px] text-slate-400">
-                                                    Date:{' '}
-                                                    {
-                                                        filteredChartData[
-                                                            hoveredIdx
-                                                        ].date
-                                                    }
-                                                </span>
-                                            </div>
-                                        </div>
-                                    )}
-
-                                <svg
-                                    className="h-auto w-full"
-                                    viewBox={`0 0 ${chartWidth} ${chartHeight}`}
-                                >
-                                    <defs>
-                                        <pattern
-                                            id="grid"
-                                            width="40"
-                                            height="20"
-                                            patternUnits="userSpaceOnUse"
-                                        >
-                                            <path
-                                                d="M 40 0 L 0 0 0 20"
-                                                fill="none"
-                                                stroke="currentColor"
-                                                strokeWidth="0.5"
-                                                className="text-blue-100/40 dark:text-slate-800/40"
-                                            />
-                                        </pattern>
-                                        <linearGradient
-                                            id="chartGradient"
-                                            x1="0"
-                                            y1="0"
-                                            x2="0"
-                                            y2="1"
-                                        >
-                                            <stop
-                                                offset="0%"
-                                                stopColor="#2563eb"
-                                                stopOpacity="0.2"
-                                            />
-                                            <stop
-                                                offset="100%"
-                                                stopColor="#2563eb"
-                                                stopOpacity="0.0"
-                                            />
-                                        </linearGradient>
-                                    </defs>
-
-                                    {/* Background grid mesh */}
-                                    <rect
-                                        width={chartWidth}
-                                        height={chartHeight}
-                                        fill="url(#grid)"
-                                    />
-
-                                    {/* Render clean guide metrics */}
-                                    {[0, 25, 50, 75, 100].map((level) => {
-                                        const y =
-                                            chartHeight -
-                                            chartPadding -
-                                            (level *
-                                                (chartHeight -
-                                                    chartPadding * 2)) /
-                                                100;
-
-                                        return (
-                                            <g key={level}>
-                                                <line
-                                                    x1={chartPaddingLeft}
-                                                    y1={y}
-                                                    x2={
-                                                        chartWidth -
-                                                        chartPaddingRight
-                                                    }
-                                                    y2={y}
-                                                    stroke="currentColor"
-                                                    strokeWidth="0.5"
-                                                    className="text-blue-100/30 dark:text-slate-800/30"
-                                                    strokeDasharray="4 4"
-                                                />
-                                                <text
-                                                    x={chartPaddingLeft - 8}
-                                                    y={y + 3}
-                                                    textAnchor="end"
-                                                    fontSize="9"
-                                                    fontWeight="bold"
-                                                    className="fill-slate-400 dark:fill-slate-500"
-                                                >
-                                                    {level}%
-                                                </text>
-                                            </g>
-                                        );
-                                    })}
-
-                                    {points.length > 0 && (
-                                        <>
-                                            <path
-                                                d={areaD}
-                                                fill="url(#chartGradient)"
-                                            />
-                                            <path
-                                                d={pathD}
-                                                fill="none"
-                                                stroke="#2563eb"
-                                                strokeWidth="2.5"
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                            />
-                                        </>
-                                    )}
-
-                                    {points.length === 0 && (
-                                        <text
-                                            x={chartWidth / 2}
-                                            y={chartHeight / 2}
-                                            textAnchor="middle"
-                                            fontSize="11"
-                                            fontWeight="semibold"
-                                            className="fill-slate-400 dark:fill-slate-500"
-                                        >
-                                            No matched attempts found.
-                                        </text>
-                                    )}
-
-                                    {points.map((p, idx) => (
-                                        <g key={idx}>
-                                            {/* Outer glowing focus indicator on hover */}
-                                            {hoveredIdx === idx && (
-                                                <circle
-                                                    cx={p.x}
-                                                    cy={p.y}
-                                                    r="9"
-                                                    fill="#2563eb"
-                                                    fillOpacity="0.15"
-                                                    className="animate-pulse"
-                                                />
-                                            )}
-                                            <circle
-                                                cx={p.x}
-                                                cy={p.y}
-                                                r={
-                                                    hoveredIdx === idx
-                                                        ? '6'
-                                                        : '4.5'
-                                                }
-                                                fill="#ffffff"
-                                                stroke="#2563eb"
-                                                strokeWidth={
-                                                    hoveredIdx === idx
-                                                        ? '3'
-                                                        : '2'
-                                                }
-                                                className="cursor-pointer transition-all duration-150"
-                                                onMouseEnter={() =>
-                                                    setHoveredIdx(idx)
-                                                }
-                                                onMouseLeave={() =>
-                                                    setHoveredIdx(null)
-                                                }
-                                            />
-
-                                            {/* Score tag text inside SVG */}
-                                            {idx === points.length - 1 &&
-                                                hoveredIdx === null && (
-                                                    <text
-                                                        x={p.x - 15}
-                                                        y={p.y - 12}
-                                                        fontSize="11"
-                                                        fontWeight="bold"
-                                                        fill="#2563eb"
-                                                        className="dark:fill-blue-400"
-                                                    >
-                                                        {
-                                                            filteredChartData[
-                                                                idx
-                                                            ].score
-                                                        }
-                                                        %
-                                                    </text>
-                                                )}
-
-                                            {/* Dynamic X-Axis label dates */}
-                                            <text
-                                                x={p.x}
-                                                y={chartHeight - 4}
-                                                textAnchor="middle"
-                                                fontSize="10"
-                                                fontWeight="bold"
-                                                className="cursor-pointer fill-slate-400 hover:fill-blue-600 dark:fill-slate-500 dark:hover:fill-blue-400"
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    setHoveredIdx(
-                                                        hoveredIdx === idx
-                                                            ? null
-                                                            : idx,
-                                                    );
-                                                }}
-                                            >
-                                                {filteredChartData[idx].date}
-                                            </text>
-
-                                            {/* Larger invisible overlay for easier tapping on mobile */}
-                                            <circle
-                                                cx={p.x}
-                                                cy={p.y}
-                                                r="20"
-                                                fill="transparent"
-                                                className="cursor-pointer"
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    setHoveredIdx(
-                                                        hoveredIdx === idx
-                                                            ? null
-                                                            : idx,
-                                                    );
-                                                }}
-                                                onMouseEnter={() =>
-                                                    setHoveredIdx(idx)
-                                                }
-                                                onMouseLeave={() =>
-                                                    setHoveredIdx(null)
-                                                }
-                                            />
-                                        </g>
-                                    ))}
-                                </svg>
-                            </div>
+                        <div>
+                            <h4 className="text-sm font-bold text-slate-900 dark:text-white">
+                                AI & Analytics
+                            </h4>
+                            <p className="mt-1 text-xs leading-relaxed text-slate-500 dark:text-slate-400">
+                                Track passing probability, score trends, and study plans.
+                            </p>
                         </div>
-
-                        {/* Recent Attempts Table/List filling the empty space */}
-                        <div className="dark:border-slate-850 mt-6 border-t border-slate-100 pt-6">
-                            <h3 className="mb-4 flex items-center gap-1.5 text-xs font-black tracking-wider text-slate-500 uppercase dark:text-slate-400">
-                                Run Details (
-                                {
-                                    filteredChartData.filter(
-                                        (d) => d.track !== 'No Data',
-                                    ).length
-                                }{' '}
-                                attempts matched)
-                                {isDemoMode && (
-                                    <span className="font-extrabold text-amber-500 lowercase dark:text-amber-400">
-                                        (preview only)
-                                    </span>
-                                )}
-                            </h3>
-                            {filteredChartData.filter(
-                                (d) => d.track !== 'No Data',
-                            ).length === 0 ? (
-                                <p className="border-slate-150 rounded-lg border border-dashed py-3 text-center text-xs text-slate-400 dark:border-slate-800">
-                                    No attempt logs available for this filter
-                                    range.
-                                </p>
-                            ) : (
-                                <div className="overflow-x-auto rounded-lg border border-border">
-                                    <table className="w-full text-left text-sm text-foreground">
-                                        <thead className="border-b border-border bg-slate-50/50 text-[10px] font-black tracking-wider text-muted-foreground uppercase dark:bg-slate-900/30">
-                                            <tr>
-                                                <th className="px-4 py-2.5">
-                                                    Attempt
-                                                </th>
-                                                <th className="px-4 py-2.5">
-                                                    Date
-                                                </th>
-                                                <th className="px-4 py-2.5">
-                                                    Type
-                                                </th>
-                                                <th className="px-4 py-2.5">
-                                                    Score & Categories
-                                                </th>
-                                                <th className="px-4 py-2.5 text-right">
-                                                    Result
-                                                </th>
-                                            </tr>
-                                        </thead>
-                                        <tbody className="divide-y divide-border bg-card dark:divide-slate-900/80">
-                                            {[...filteredChartData]
-                                                .reverse()
-                                                .map((run, i) => {
-                                                    if (
-                                                        run.track === 'No Data'
-                                                    ) {
-                                                        return null;
-                                                    }
-
-                                                    const status =
-                                                        run.score >= 80
-                                                            ? 'Pass'
-                                                            : 'Fail';
-
-                                                    return (
-                                                        <tr
-                                                            key={i}
-                                                            className="transition hover:bg-slate-50/20 dark:hover:bg-slate-900/10"
-                                                        >
-                                                            <td className="px-4 py-4 font-black text-slate-950 dark:text-white">
-                                                                {run.label}
-                                                            </td>
-                                                            <td className="px-4 py-2.5 text-slate-500 dark:text-slate-400">
-                                                                {run.date}
-                                                            </td>
-                                                            <td className="px-4 py-2.5">
-                                                                <TrackBadge
-                                                                    track={
-                                                                        run.track
-                                                                    }
-                                                                />
-                                                            </td>
-                                                            <td className="px-4 py-2.5">
-                                                                <ScoreProgress
-                                                                    score={
-                                                                        run.score
-                                                                    }
-                                                                    status={
-                                                                        status
-                                                                    }
-                                                                    detail={
-                                                                        run.detail
-                                                                    }
-                                                                    categoryScores={
-                                                                        run.categoryScores
-                                                                    }
-                                                                />
-                                                            </td>
-                                                            <td className="px-4 py-2.5 text-right">
-                                                                <StatusBadge
-                                                                    status={
-                                                                        status
-                                                                    }
-                                                                />
-                                                            </td>
-                                                        </tr>
-                                                    );
-                                                })}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            )}
-                        </div>
-                    </Card>
-
-                    {/* Category Breakdown list */}
-                    {/* Category Breakdown list */}
-                    <Card className="relative p-6">
-                        <div className="mb-5 flex items-start justify-between gap-3">
-                            <div>
-                                <h2 className="font-heading text-2xl font-black tracking-tight text-slate-950 dark:text-white">
-                                    Diagnostic Mastery
-                                </h2>
-                                <p className="mt-1 text-sm font-semibold text-slate-500 dark:text-slate-400">
-                                    Subject accuracy at a glance.
-                                </p>
-                            </div>
-                            <span className="rounded-full bg-slate-100 px-2.5 py-1 text-[10px] font-black tracking-wider text-slate-500 uppercase dark:bg-slate-900 dark:text-slate-400">
-                                Mastery
-                            </span>
-                        </div>
-
-                        <div className="flex flex-col gap-4">
-                            {categories.map((cat) => {
-                                // Compute dynamic mastery descriptors & badge styles
-                                let label = 'Not Started';
-                                let badgeClass =
-                                    'bg-slate-50 text-slate-600 border-slate-200/60 dark:bg-slate-900 dark:text-slate-400 dark:border-slate-800';
-
-                                if (cat.total && cat.total > 0) {
-                                    if (cat.percentage >= 80) {
-                                        label = 'Mastery';
-                                        badgeClass =
-                                            'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/30 dark:text-emerald-400 dark:border-emerald-900/50';
-                                    } else if (cat.percentage >= 60) {
-                                        label = 'Proficient';
-                                        badgeClass =
-                                            'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/30 dark:text-blue-400 dark:border-blue-900/50';
-                                    } else {
-                                        label = 'Needs Work';
-                                        badgeClass =
-                                            'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/30 dark:text-amber-400 dark:border-amber-900/50';
-                                    }
-                                }
-
-                                return (
-                                    <div
-                                        key={cat.name}
-                                        className="flex flex-col gap-3 rounded-xl border border-slate-100 bg-gradient-to-br from-white to-slate-50/70 p-4 shadow-sm transition hover:border-blue-100 hover:shadow-md dark:border-slate-800 dark:from-slate-950 dark:to-slate-900/40"
-                                    >
-                                        <div className="flex items-start justify-between gap-3">
-                                            <div className="min-w-0">
-                                                <span className="block truncate text-base font-black text-slate-950 dark:text-white">
-                                                    {cat.name} Ability
-                                                </span>
-                                                <span className="mt-0.5 block text-xs font-bold text-slate-500 dark:text-slate-400">
-                                                    {cat.total && cat.total > 0
-                                                        ? `${cat.correct}/${cat.total} solved`
-                                                        : '0/0 solved'}
-                                                </span>
-                                            </div>
-                                            <div className="flex shrink-0 flex-col items-end gap-1">
-                                                <span className="font-heading text-2xl font-black text-slate-950 dark:text-white">
-                                                    {cat.percentage}%
-                                                </span>
-                                                <span
-                                                    className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[9px] font-extrabold tracking-wide uppercase ${badgeClass}`}
-                                                >
-                                                    {label}
-                                                </span>
-                                            </div>
-                                        </div>
-
-                                        <div className="h-2.5 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
-                                            <div
-                                                className={`h-full rounded-full transition-all duration-500 ${cat.color}`}
-                                                style={{
-                                                    width: `${cat.percentage}%`,
-                                                }}
-                                            />
-                                        </div>
-
-                                        <div className="flex items-center justify-end">
-                                            <Link
-                                                href={
-                                                    drillsIndex({
-                                                        query: {
-                                                            category:
-                                                                cat.name ===
-                                                                'General'
-                                                                    ? 'General Information'
-                                                                    : cat.name +
-                                                                      ' Ability',
-                                                        },
-                                                    }).url
-                                                }
-                                                className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs font-black text-blue-600 transition hover:bg-blue-50 hover:text-blue-700 dark:text-blue-400 dark:hover:bg-blue-950/30 dark:hover:text-blue-300"
-                                            >
-                                                Start {cat.name} Drill &rarr;
-                                            </Link>
-                                        </div>
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    </Card>
-                </div>
-            </PageContainer>
-        </>
+                    </div>
+                    <Link
+                        href={analyticsIndex()}
+                        className="mt-4 inline-flex items-center gap-1 text-xs font-bold text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 dark:hover:text-emerald-300"
+                    >
+                        View Analytics <ChevronRight className="size-3.5" />
+                    </Link>
+                </Card>
+            </div>
+        </PageContainer>
     );
 }

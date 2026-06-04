@@ -120,7 +120,7 @@ export function AdminTable<T>({
                                         break;
                                     case 'indigo':
                                         badgeClass =
-                                            'bg-indigo-50/50 dark:bg-indigo-950/10 border-indigo-100 dark:border-indigo-900/20 text-indigo-850 dark:text-indigo-300';
+                                            'bg-indigo-50/50 dark:bg-indigo-950/10 border-indigo-100 dark:border-indigo-900/20 text-indigo-800 dark:text-indigo-300';
                                         iconWrapperClass =
                                             'border-indigo-250 bg-indigo-100 text-indigo-700 dark:border-indigo-900/30 dark:bg-indigo-950/20 dark:text-indigo-400';
                                         break;
@@ -128,7 +128,7 @@ export function AdminTable<T>({
                                         badgeClass =
                                             'bg-slate-50/50 dark:bg-slate-900/10 border-slate-200 dark:border-slate-800/40 text-slate-700 dark:text-slate-300';
                                         iconWrapperClass =
-                                            'border-slate-300 bg-slate-100 text-slate-600 dark:border-slate-850 dark:bg-slate-900 dark:text-slate-400';
+                                            'border-slate-300 bg-slate-100 text-slate-600 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-400';
                                 }
 
                                 return (
@@ -298,7 +298,7 @@ export function AdminTable<T>({
                                 onClick={() =>
                                     handlePageChange(currentPage - 1)
                                 }
-                                className="shadow-3xs dark:text-slate-350 dark:hover:bg-slate-850 h-8 cursor-pointer px-3 text-xs font-bold focus:outline-none dark:border-slate-800 dark:bg-slate-900"
+                                className="shadow-3xs dark:text-slate-350 dark:hover:bg-slate-800 h-8 cursor-pointer px-3 text-xs font-bold focus:outline-none dark:border-slate-800 dark:bg-slate-900"
                             >
                                 Previous
                             </Button>
@@ -334,7 +334,7 @@ export function AdminTable<T>({
                                         className={`size-8 cursor-pointer p-0 text-xs font-black transition focus:outline-none ${
                                             isActive
                                                 ? 'shadow-3xs bg-blue-600 text-white hover:bg-blue-700'
-                                                : 'dark:text-slate-350 dark:hover:bg-slate-850 border-slate-200 bg-white text-slate-700 dark:border-slate-800 dark:bg-slate-900'
+                                                : 'dark:text-slate-350 dark:hover:bg-slate-800 border-slate-200 bg-white text-slate-700 dark:border-slate-800 dark:bg-slate-900'
                                         }`}
                                     >
                                         {pageNum}
@@ -349,7 +349,7 @@ export function AdminTable<T>({
                                 onClick={() =>
                                     handlePageChange(currentPage + 1)
                                 }
-                                className="shadow-3xs dark:text-slate-350 dark:hover:bg-slate-850 h-8 cursor-pointer px-3 text-xs font-bold focus:outline-none dark:border-slate-800 dark:bg-slate-900"
+                                className="shadow-3xs dark:text-slate-350 dark:hover:bg-slate-800 h-8 cursor-pointer px-3 text-xs font-bold focus:outline-none dark:border-slate-800 dark:bg-slate-900"
                             >
                                 Next
                             </Button>

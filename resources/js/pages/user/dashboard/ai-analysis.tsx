@@ -23,6 +23,7 @@ import Pusher from 'pusher-js';
 import { useEffect, useState } from 'react';
 import { PageContainer } from '@/components/page-container';
 import { Card } from '@/components/ui/card';
+import { ConfirmModal } from '@/components/confirm-modal';
 
 interface SubjectMasteryItem {
     subject: string;
@@ -175,6 +176,20 @@ export default function AiAnalysisReport({
         {},
     );
     const [isBulkActionRunning, setIsBulkActionRunning] = useState(false);
+    const [confirmModal, setConfirmModal] = useState<{
+        isOpen: boolean;
+        title: string;
+        message: string;
+        onConfirm: () => void;
+        variant: 'danger' | 'success' | 'info';
+        confirmLabel?: string;
+    }>({
+        isOpen: false,
+        title: '',
+        message: '',
+        onConfirm: () => {},
+        variant: 'info',
+    });
 
     const handleToggleScheduleDay = async (
         dayPlan: StudyDay,
@@ -246,7 +261,7 @@ export default function AiAnalysisReport({
         }
     };
 
-    const handleBulkToggleSchedules = async () => {
+    const executeBulkToggleSchedules = async () => {
         if (!data || !data.personalized_study_plan) {
             return;
         }
@@ -343,6 +358,27 @@ export default function AiAnalysisReport({
         } finally {
             setIsBulkActionRunning(false);
         }
+    };
+
+    const handleBulkToggleSchedules = () => {
+        if (!data || !data.personalized_study_plan) {
+            return;
+        }
+
+        const allScheduled = data.personalized_study_plan.every(
+            (dayPlan) => scheduledDays[dayPlan.day],
+        );
+
+        setConfirmModal({
+            isOpen: true,
+            title: allScheduled ? 'Unschedule All Days' : 'Schedule All Days',
+            message: allScheduled
+                ? 'Are you sure you want to remove all study sessions from your calendar? This will delete all 7 scheduled days.'
+                : 'Are you sure you want to schedule all 7 days of this action plan? This will add these sessions to your study calendar.',
+            confirmLabel: allScheduled ? 'Unschedule All' : 'Schedule All',
+            variant: allScheduled ? 'danger' : 'success',
+            onConfirm: executeBulkToggleSchedules,
+        });
     };
 
     useEffect(() => {
@@ -509,7 +545,7 @@ export default function AiAnalysisReport({
                             onClick={() => {
                                 setLocalStatus('generating');
                                 setErrorMessage(null);
-                                router.visit('/dashboard/ai-analysis?retry=1', {
+                                router.visit('/analytics/ai-analysis?retry=1', {
                                     replace: true,
                                     preserveScroll: true,
                                 });
@@ -525,7 +561,7 @@ export default function AiAnalysisReport({
                 {localStatus === 'ready' && data && (
                     <div className="space-y-8">
                         {/* Header Banner */}
-                        <div className="relative overflow-hidden rounded-3xl border border-slate-200/80 bg-gradient-to-br from-blue-50/80 via-indigo-50/40 to-slate-50 p-6 sm:p-8 dark:border-slate-800 dark:from-slate-900 dark:via-slate-950 dark:to-blue-950">
+                        <div className="relative overflow-hidden rounded-3xl border border-slate-200/80 bg-gradient-to-br from-blue-50/80 via-indigo-50/40 to-slate-50 p-6 sm:p-8 dark:border-slate-800 dark:from-slate-900 dark:via-slate-900/90 dark:to-blue-950">
                             <div className="pointer-events-none absolute -top-24 -right-24 h-64 w-64 rounded-full bg-blue-500/5 blur-3xl dark:bg-blue-500/10" />
 
                             <div className="flex flex-col justify-between gap-6 md:flex-row md:items-center">
@@ -570,7 +606,7 @@ export default function AiAnalysisReport({
                                                         );
                                                         setErrorMessage(null);
                                                         router.visit(
-                                                            '/dashboard/ai-analysis?delete=1',
+                                                            '/analytics/ai-analysis?delete=1',
                                                             {
                                                                 replace: true,
                                                                 preserveScroll: true,
@@ -590,7 +626,7 @@ export default function AiAnalysisReport({
                                                     );
                                                     setErrorMessage(null);
                                                     router.visit(
-                                                        '/dashboard/ai-analysis?retry=1',
+                                                        '/analytics/ai-analysis?retry=1',
                                                         {
                                                             replace: true,
                                                             preserveScroll: true,
@@ -612,7 +648,7 @@ export default function AiAnalysisReport({
                         <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
                             {/* Score Gages / Primary metrics: 4 cols */}
                             <div className="space-y-6 lg:col-span-4">
-                                <Card className="flex h-full flex-col items-center justify-between bg-gradient-to-br from-white to-slate-50/50 p-6 text-center dark:from-slate-950 dark:to-slate-900/60">
+                                <Card className="flex h-full flex-col items-center justify-between bg-gradient-to-br from-white to-slate-50/50 p-6 text-center dark:from-slate-900 dark:to-slate-900/60">
                                     <span className="text-xs font-black tracking-wider text-slate-400 uppercase dark:text-slate-500">
                                         Pass Probability
                                     </span>
@@ -649,24 +685,21 @@ export default function AiAnalysisReport({
                                                 }
                                                 strokeLinecap="round"
                                                 className={`transition-all duration-500 ${
-                                                    data.pass_probability >= 70
+                                                    data.pass_probability >= 80
                                                         ? 'text-emerald-500'
-                                                        : data.pass_probability >=
-                                                            50
-                                                          ? 'text-amber-500'
-                                                          : 'text-rose-500'
+                                                        : 'text-rose-500'
                                                 }`}
                                             />
                                         </svg>
                                         <div className="flex flex-col items-center justify-center">
                                             <span
                                                 className={`text-4xl font-black ${
-                                                    data.pass_probability >= 70
+                                                    data.pass_probability >= 80
                                                         ? 'text-emerald-600 dark:text-emerald-400'
-                                                        : data.pass_probability >=
-                                                            50
-                                                          ? 'text-amber-600 dark:text-amber-400'
-                                                          : 'text-rose-600 dark:text-rose-400'
+                                                        : 'text-rose-600 dark:text-rose-400'
+                                                            
+                                                          
+                                                          
                                                 }`}
                                             >
                                                 {data.pass_probability}%
@@ -710,7 +743,7 @@ export default function AiAnalysisReport({
                                 {/* Estimated Exam Score */}
                                 <Card className="flex flex-col justify-between p-6 transition hover:shadow-md">
                                     <div className="flex items-center gap-3">
-                                        <div className="flex size-10 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 dark:bg-indigo-950/40 dark:text-indigo-400">
+                                        <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-indigo-50 text-indigo-600 dark:bg-indigo-950/40 dark:text-indigo-400">
                                             <Target className="size-5" />
                                         </div>
                                         <div>
@@ -734,7 +767,7 @@ export default function AiAnalysisReport({
                                 {/* Days to Readiness */}
                                 <Card className="flex flex-col justify-between p-6 transition hover:shadow-md">
                                     <div className="flex items-center gap-3">
-                                        <div className="flex size-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400">
+                                        <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-emerald-50 text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400">
                                             <Clock className="size-5" />
                                         </div>
                                         <div>
@@ -758,7 +791,7 @@ export default function AiAnalysisReport({
                                 {/* Completion Pace */}
                                 <Card className="flex flex-col justify-between p-6 transition hover:shadow-md">
                                     <div className="flex items-center gap-3">
-                                        <div className="flex size-10 items-center justify-center rounded-xl bg-amber-50 text-amber-600 dark:bg-amber-950/40 dark:text-amber-400">
+                                        <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-amber-50 text-amber-600 dark:bg-amber-950/40 dark:text-amber-400">
                                             <Activity className="size-5" />
                                         </div>
                                         <div>
@@ -782,7 +815,7 @@ export default function AiAnalysisReport({
                                 {/* Timeline / Milestone */}
                                 <Card className="flex flex-col justify-between p-6 transition hover:shadow-md">
                                     <div className="flex items-center gap-3">
-                                        <div className="flex size-10 items-center justify-center rounded-xl bg-blue-50 text-blue-600 dark:bg-blue-950/40 dark:text-blue-400">
+                                        <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-blue-50 text-blue-600 dark:bg-blue-950/40 dark:text-blue-400">
                                             <Zap className="size-5" />
                                         </div>
                                         <div>
@@ -808,7 +841,7 @@ export default function AiAnalysisReport({
 
                         {/* Honesty Coach Banner */}
                         <div className="border-blue-150 flex items-start gap-4 rounded-2xl border bg-blue-50/30 p-5 dark:border-slate-800 dark:bg-slate-900/40">
-                            <div className="flex size-10 shrink-0 items-center justify-center rounded-xl border border-blue-500/20 bg-blue-500/10 text-blue-600 dark:text-blue-400">
+                            <div className="flex size-10 shrink-0 items-center justify-center rounded-full border border-blue-500/20 bg-blue-500/10 text-blue-600 dark:text-blue-400">
                                 <Sparkles
                                     className="size-5 animate-spin"
                                     style={{ animationDuration: '6s' }}
@@ -861,11 +894,11 @@ export default function AiAnalysisReport({
                                             return (
                                                 <Card
                                                     key={item.subject}
-                                                    className="flex flex-col justify-between gap-4 p-5 transition hover:shadow-md"
+                                                    className="flex flex-col justify-between gap-4 p-5 transition hover:shadow-md dark:bg-slate-900/60 dark:border-slate-800"
                                                 >
                                                     <div>
-                                                        <div className="dark:border-slate-850 flex items-center justify-between gap-2 border-b border-slate-100 pb-3">
-                                                            <span className="text-slate-850 flex items-center gap-2 text-sm font-bold dark:text-slate-200">
+                                                        <div className="dark:border-slate-800 flex items-center justify-between gap-2 border-b border-slate-100 pb-3">
+                                                            <span className="text-slate-800 flex items-center gap-2 text-sm font-bold dark:text-slate-200">
                                                                 <span
                                                                     className={`size-2.5 rounded-full ${dotColor}`}
                                                                 />
@@ -906,10 +939,10 @@ export default function AiAnalysisReport({
                             data.remediation_matrix.length > 0 && (
                                 <div>
                                     <h3 className="mb-4 flex items-center gap-2 text-lg font-black text-slate-900 dark:text-white">
-                                        <AlertCircle className="text-rose-555 size-5" />
+                                        <AlertCircle className="text-rose-500 size-5" />
                                         Subtopic Remediation Pathway
                                     </h3>
-                                    <Card className="overflow-hidden border border-slate-200/80 dark:border-slate-800">
+                                    <Card className="overflow-hidden border border-slate-200/80 dark:border-slate-800 dark:bg-slate-900/60">
                                         <div className="overflow-x-auto">
                                             <table className="w-full border-collapse text-left text-xs">
                                                 <thead>
@@ -928,7 +961,7 @@ export default function AiAnalysisReport({
                                                         </th>
                                                     </tr>
                                                 </thead>
-                                                <tbody className="divide-slate-150 dark:divide-slate-850 divide-y">
+                                                <tbody className="divide-slate-200 dark:divide-slate-800 divide-y">
                                                     {data.remediation_matrix.map(
                                                         (row) => (
                                                             <tr
@@ -993,8 +1026,8 @@ export default function AiAnalysisReport({
                                             disabled={isBulkActionRunning}
                                             className={`flex cursor-pointer items-center justify-center gap-2 rounded-xl px-4 py-2 text-xs font-black tracking-wider uppercase transition-all duration-200 disabled:opacity-50 ${
                                                 allScheduled
-                                                    ? 'dark:hover:bg-rose-955/35 border border-rose-200 bg-rose-50 text-rose-700 hover:bg-rose-100/70 dark:border-rose-900/40 dark:bg-rose-950/20 dark:text-rose-400'
-                                                    : 'dark:hover:bg-indigo-955/35 border border-indigo-200 bg-indigo-50 text-indigo-700 hover:bg-indigo-100/70 dark:border-indigo-900/40 dark:bg-indigo-950/20 dark:text-indigo-400'
+                                                    ? 'dark:hover:bg-rose-950/35 border border-rose-200 bg-rose-50 text-rose-700 hover:bg-rose-100/70 dark:border-rose-900/40 dark:bg-rose-950/20 dark:text-rose-400'
+                                                    : 'dark:hover:bg-indigo-950/35 border border-indigo-200 bg-indigo-50 text-indigo-700 hover:bg-indigo-100/70 dark:border-indigo-900/40 dark:bg-indigo-950/20 dark:text-indigo-400'
                                             }`}
                                         >
                                             {isBulkActionRunning ? (
@@ -1014,10 +1047,10 @@ export default function AiAnalysisReport({
                                             (dayPlan, index) => (
                                                 <Card
                                                     key={dayPlan.day}
-                                                    className="flex flex-col justify-between gap-3 border-t-2 border-t-slate-200 p-4 transition duration-300 hover:border-indigo-500/50 dark:border-t-slate-700 dark:hover:border-indigo-500/50"
+                                                    className="flex flex-col justify-between gap-3 border-t-2 border-t-slate-200 p-4 transition duration-300 hover:border-indigo-500/50 dark:border-t-slate-700 dark:bg-slate-900/65 dark:hover:border-indigo-500/50"
                                                 >
                                                     <div>
-                                                        <div className="dark:border-slate-850 mb-3 flex items-center justify-between border-b border-slate-100 pb-2">
+                                                        <div className="dark:border-slate-800 mb-3 flex items-center justify-between border-b border-slate-100 pb-2">
                                                             <span className="text-sm font-black tracking-wider text-slate-900 uppercase dark:text-white">
                                                                 {dayPlan.day}
                                                             </span>
@@ -1036,7 +1069,7 @@ export default function AiAnalysisReport({
                                                                         key={
                                                                             tIndex
                                                                         }
-                                                                        className="flex flex-col gap-2 rounded-lg border border-slate-100 bg-slate-50/50 p-3 dark:border-slate-800/60 dark:bg-slate-900/30"
+                                                                        className="flex flex-col gap-2 rounded-lg border border-slate-100 bg-slate-50/50 p-3 dark:border-slate-800/40 dark:bg-slate-800/40"
                                                                     >
                                                                         <div className="flex items-start justify-between gap-2">
                                                                             {getTopicBadge(
@@ -1048,7 +1081,7 @@ export default function AiAnalysisReport({
                                                                                 task.focus_topic
                                                                             }
                                                                         </span>
-                                                                        <p className="dark:text-slate-350 text-xs leading-relaxed text-slate-600">
+                                                                        <p className="dark:text-slate-200 text-xs leading-relaxed text-slate-700">
                                                                             {
                                                                                 task.activity
                                                                             }
@@ -1059,7 +1092,7 @@ export default function AiAnalysisReport({
                                                         </div>
                                                     </div>
 
-                                                    <div className="dark:border-slate-850 mt-2 border-t border-slate-100/80 pt-2">
+                                                    <div className="dark:border-slate-800 mt-2 border-t border-slate-100/80 pt-2">
                                                         {scheduledDays[
                                                             dayPlan.day
                                                         ] ? (
@@ -1129,13 +1162,6 @@ export default function AiAnalysisReport({
                                 </div>
                             )}
 
-                        {data?.encouragement && (
-                            <div className="flex flex-col items-center justify-between gap-4 border-t border-slate-200 pt-6 sm:flex-row dark:border-slate-800">
-                                <p className="text-xs text-slate-500 italic dark:text-slate-400">
-                                    "{data.encouragement}"
-                                </p>
-                            </div>
-                        )}
                         {/* <Link
                                 href="/dashboard"
                                 className="inline-flex items-center gap-1.5 rounded-lg border border-slate-250 bg-white px-3 py-1.5 text-xs font-bold text-slate-700 hover:bg-slate-50 transition dark:border-slate-800 dark:bg-slate-950 dark:text-slate-300 dark:hover:bg-slate-900"
@@ -1195,7 +1221,7 @@ export default function AiAnalysisReport({
                                         setLocalStatus('generating');
                                         setErrorMessage(null);
                                         router.visit(
-                                            '/dashboard/ai-analysis?retry=1',
+                                            '/analytics/ai-analysis?retry=1',
                                             {
                                                 replace: true,
                                                 preserveScroll: true,
@@ -1211,6 +1237,18 @@ export default function AiAnalysisReport({
                     </div>
                 </div>
             )}
+
+            <ConfirmModal
+                isOpen={confirmModal.isOpen}
+                title={confirmModal.title}
+                message={confirmModal.message}
+                confirmLabel={confirmModal.confirmLabel}
+                variant={confirmModal.variant}
+                onClose={() =>
+                    setConfirmModal((prev) => ({ ...prev, isOpen: false }))
+                }
+                onConfirm={confirmModal.onConfirm}
+            />
         </>
     );
 }
@@ -1223,7 +1261,7 @@ AiAnalysisReport.layout = {
         },
         {
             title: 'AI Diagnostic Report',
-            href: '/dashboard/ai-analysis',
+            href: '/analytics/ai-analysis',
         },
     ],
 };

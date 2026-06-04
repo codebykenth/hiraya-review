@@ -26,22 +26,22 @@ class ExamController
         // 1. Fetch verified active questions from cached pool (fast in-memory processing)
         $activeQuestionsPool = Cache::rememberForever('questions.active', function () {
             return Question::where('status', 'active')
-                ->with(['subcategory.category'])
-                ->get()
-                ->map(function ($q) {
-                    return [
-                        'id' => $q->id,
-                        'stem' => $q->stem,
-                        'options' => $q->options ?? [],
-                        'correct_option' => $q->correct_option,
-                        'explanation' => $q->explanation ?? '',
-                        'category' => $q->subcategory?->category?->name ?? 'General Information',
-                        'subcategory' => $q->subcategory?->name ?? '',
-                        'language' => $q->language,
-                        'isDemographic' => $q->subcategory?->category?->is_demographic ?? false,
-                    ];
-                })->toArray();
-        });
+                 ->with(['subcategory.category'])
+                 ->get()
+                 ->map(function ($q) {
+                     return [
+                         'id' => $q->id,
+                         'stem' => $q->stem,
+                         'options' => $q->options ?? [],
+                         'correct_option' => $q->correct_option,
+                         'explanation' => $q->explanation ?? '',
+                         'category' => $q->subcategory?->category?->name ?? 'General Information',
+                         'subcategory' => $q->subcategory?->name ?? '',
+                         'language' => (str_contains(strtolower($q->language ?? ''), 'tagalog') || str_contains(strtolower($q->language ?? ''), 'filipino')) ? 'Filipino' : 'English',
+                         'isDemographic' => $q->subcategory?->category?->is_demographic ?? false,
+                     ];
+                 })->toArray();
+         });
 
         $questions = collect($activeQuestionsPool);
         $savedAttempt = null;

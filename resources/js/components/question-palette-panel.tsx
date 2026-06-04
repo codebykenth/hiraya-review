@@ -288,7 +288,7 @@ export default function QuestionPalettePanel({
                                               : isAnswered
                                                 ? 'border-blue-600 bg-blue-600 text-white hover:bg-blue-700'
                                                 : isFlagged
-                                                  ? 'dark:bg-rose-955/20 border-rose-300 bg-rose-50 font-extrabold text-rose-700 dark:border-rose-900/40 dark:text-rose-400'
+                                                  ? 'dark:bg-rose-950/20 border-rose-300 bg-rose-50 font-extrabold text-rose-700 dark:border-rose-900/40 dark:text-rose-400'
                                                   : isFreeAttempt && idx >= 20
                                                     ? 'border-border bg-background text-muted-foreground/40 hover:bg-muted'
                                                     : 'border-border bg-background text-foreground hover:bg-muted'

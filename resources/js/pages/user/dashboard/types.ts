@@ -33,6 +33,9 @@ export interface DashboardStats {
     totalDuration: string;
     avgDuration: string;
     totalQuestionsSolved: number;
+    daysUntilExam?: number | null;
+    examDate?: string | null;
+    examDateRaw?: string | null;
     filters?: {
         track: string;
         runs: string;
@@ -42,7 +45,7 @@ export interface DashboardStats {
 export interface DashboardProps {
     stats?: DashboardStats | null;
     aiAnalysis?: {
-        status: 'no_data' | 'generating' | 'ready';
+        status: 'no_data' | 'generating' | 'ready' | 'failed';
         data: any | null;
     };
 }

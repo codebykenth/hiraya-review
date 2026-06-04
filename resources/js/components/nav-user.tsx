@@ -1,5 +1,6 @@
 import { usePage } from '@inertiajs/react';
 import { ChevronsUpDown } from 'lucide-react';
+import type { Auth } from '@/types';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -16,7 +17,7 @@ import { UserMenuContent } from '@/components/user-menu-content';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 export function NavUser() {
-    const { auth } = usePage().props;
+    const { auth } = usePage<{ auth: Auth }>().props;
     const { state } = useSidebar();
     const isMobile = useIsMobile();
 

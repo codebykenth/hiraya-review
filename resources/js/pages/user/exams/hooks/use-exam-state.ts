@@ -3,6 +3,7 @@ import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { fallbackDemographicQuestions } from '@/data/fallback-demographics';
 import { formatDuration } from '@/lib/exam-formatters';
 import type { Question, ExamResults, ExamIndexProps } from '../types';
+import type { Auth } from '@/types';
 
 const shuffleOptionsForQuestion = (q: Question): Question => {
     const indices = q.options.map((_, i) => i);
@@ -33,7 +34,7 @@ export function useExamState({
         Drill: [],
     },
 }: ExamIndexProps) {
-    const { auth } = usePage().props;
+    const { auth } = usePage<{ auth: Auth }>().props;
 
     const fallbackQuestions: Question[] = questions;
     const demographicQuestions: Question[] = useMemo(
@@ -186,7 +187,7 @@ export function useExamState({
         message: '',
         confirmLabel: '',
         variant: 'success',
-        onConfirm: () => {},
+        onConfirm: () => { },
     });
 
     const [isExamActive, setIsExamActive] = useState(() => {
@@ -267,8 +268,8 @@ export function useExamState({
         const filtered =
             reviewCategoryFilter !== 'All Categories'
                 ? activeQuestions.filter(
-                      (q) => q.category === reviewCategoryFilter,
-                  )
+                    (q) => q.category === reviewCategoryFilter,
+                )
                 : activeQuestions;
 
         const subcats = Array.from(
@@ -558,7 +559,7 @@ export function useExamState({
             if (
                 reviewSubcategoryFilter !== 'All Subcategories' &&
                 (q.subcategory || 'General Concepts') !==
-                    reviewSubcategoryFilter
+                reviewSubcategoryFilter
             ) {
                 return false;
             }
@@ -871,7 +872,7 @@ export function useExamState({
             const track = getTrackNameForExam(examId);
             const fromServer =
                 seenQuestionIdsByTrack[
-                    track as keyof typeof seenQuestionIdsByTrack
+                track as keyof typeof seenQuestionIdsByTrack
                 ] ?? [];
             const fromCurrentSession =
                 selectedExamId === examId && activeQuestions.length > 0
@@ -906,27 +907,25 @@ export function useExamState({
 
             const seenSet = new Set(getSeenIdsForExam(examId));
 
-            const pickFromCategory = (
+            // Helper: pick N items from a flat pool, prioritizing unseen
+            const pickFlat = (
                 pool: Question[],
-                targetCount: number,
+                count: number,
                 catName: string,
-            ) => {
+            ): Question[] => {
                 const unseen = pool.filter((q) => !seenSet.has(q.id));
                 const seen = pool.filter((q) => seenSet.has(q.id));
-
                 let picked = [...unseen].sort(() => Math.random() - 0.5);
 
-                if (picked.length < targetCount) {
-                    const shuffledSeen = [...seen].sort(
-                        () => Math.random() - 0.5,
-                    );
+                if (picked.length < count) {
                     picked = [
                         ...picked,
-                        ...shuffledSeen.slice(0, targetCount - picked.length),
+                        ...[...seen]
+                            .sort(() => Math.random() - 0.5)
+                            .slice(0, count - picked.length),
                     ];
                 }
-
-                if (picked.length < targetCount) {
+                if (picked.length < count) {
                     const fbPool = fallbackQuestions.filter(
                         (q) =>
                             q.category === catName &&
@@ -936,14 +935,77 @@ export function useExamState({
                         ...picked,
                         ...[...fbPool]
                             .sort(() => Math.random() - 0.5)
-                            .slice(0, targetCount - picked.length),
+                            .slice(0, count - picked.length),
                     ];
                 }
-
-                while (picked.length < targetCount && picked.length > 0) {
+                while (picked.length < count && picked.length > 0) {
                     picked.push(
                         picked[Math.floor(Math.random() * picked.length)],
                     );
+                }
+                return picked.slice(0, count);
+            };
+
+            // Balanced picker: distributes evenly across subcategories
+            // For Verbal, splits each subcategory ~50/50 English/Filipino
+            const pickBalanced = (
+                pool: Question[],
+                targetCount: number,
+                catName: string,
+                splitLanguage = false,
+            ): Question[] => {
+                // Group by subcategory
+                const groups: Record<string, Question[]> = {};
+                pool.forEach((q) => {
+                    const key = q.subcategory || 'General';
+                    if (!groups[key]) groups[key] = [];
+                    groups[key].push(q);
+                });
+
+                const subcatNames = Object.keys(groups);
+                if (subcatNames.length === 0)
+                    return pickFlat(pool, targetCount, catName);
+
+                // Divide quota evenly, distribute remainder round-robin
+                const baseQuota = Math.floor(targetCount / subcatNames.length);
+                let remainder = targetCount % subcatNames.length;
+                const picked: Question[] = [];
+
+                for (const subName of subcatNames) {
+                    const quota = baseQuota + (remainder > 0 ? 1 : 0);
+                    if (remainder > 0) remainder--;
+                    const subPool = groups[subName];
+
+                    if (splitLanguage) {
+                        // Split ~50/50 English vs Filipino within this subcategory
+                        const engPool = subPool.filter((q) => {
+                            const lang = (q.language || '').toLowerCase();
+                            return lang === 'english' || lang === '';
+                        });
+                        const filPool = subPool.filter((q) => {
+                            const lang = (q.language || '').toLowerCase();
+                            return (
+                                lang.includes('filipino') ||
+                                lang.includes('tagalog')
+                            );
+                        });
+
+                        const filQuota =
+                            filPool.length > 0
+                                ? Math.min(
+                                      Math.floor(quota / 2),
+                                      filPool.length,
+                                  )
+                                : 0;
+                        const engQuota = quota - filQuota;
+
+                        picked.push(
+                            ...pickFlat(engPool, engQuota, catName),
+                            ...pickFlat(filPool, filQuota, catName),
+                        );
+                    } else {
+                        picked.push(...pickFlat(subPool, quota, catName));
+                    }
                 }
 
                 return picked.slice(0, targetCount);
@@ -952,67 +1014,38 @@ export function useExamState({
             const scoredPool: Question[] = [];
 
             if (examId === 1) {
-                const verbal = pickFromCategory(
-                    verbalPool,
-                    45,
-                    'Verbal Ability',
+                // Professional Level: 150 scored items
+                // Verbal: balanced across subcategories, ~50/50 English/Filipino
+                scoredPool.push(
+                    ...pickBalanced(verbalPool, 45, 'Verbal Ability', true),
                 );
-                const analytical = pickFromCategory(
-                    analyticalPool,
-                    52,
-                    'Analytical Ability',
+                scoredPool.push(
+                    ...pickBalanced(
+                        analyticalPool,
+                        52,
+                        'Analytical Ability',
+                    ),
                 );
-                const numerical = pickFromCategory(
-                    numericalPool,
-                    45,
-                    'Numerical Ability',
+                scoredPool.push(
+                    ...pickBalanced(numericalPool, 45, 'Numerical Ability'),
                 );
-                const general = pickFromCategory(
-                    generalPool,
-                    8,
-                    'General Information',
+                scoredPool.push(
+                    ...pickBalanced(generalPool, 8, 'General Information'),
                 );
-
-                const categoriesToPool = [
-                    verbal,
-                    analytical,
-                    numerical,
-                    general,
-                ].filter((c) => c.length > 0);
-                categoriesToPool.forEach((catPool) => {
-                    scoredPool.push(...catPool);
-                });
             } else {
-                const verbal = pickFromCategory(
-                    verbalPool,
-                    45,
-                    'Verbal Ability',
+                // Subprofessional Level: 145 scored items
+                scoredPool.push(
+                    ...pickBalanced(verbalPool, 45, 'Verbal Ability', true),
                 );
-                const clerical = pickFromCategory(
-                    clericalPool,
-                    47,
-                    'Clerical Ability',
+                scoredPool.push(
+                    ...pickBalanced(clericalPool, 47, 'Clerical Ability'),
                 );
-                const numerical = pickFromCategory(
-                    numericalPool,
-                    45,
-                    'Numerical Ability',
+                scoredPool.push(
+                    ...pickBalanced(numericalPool, 45, 'Numerical Ability'),
                 );
-                const general = pickFromCategory(
-                    generalPool,
-                    8,
-                    'General Information',
+                scoredPool.push(
+                    ...pickBalanced(generalPool, 8, 'General Information'),
                 );
-
-                const categoriesToPool = [
-                    verbal,
-                    clerical,
-                    numerical,
-                    general,
-                ].filter((c) => c.length > 0);
-                categoriesToPool.forEach((catPool) => {
-                    scoredPool.push(...catPool);
-                });
             }
 
             let finalDemographics = [...demographicQuestions];
@@ -1287,7 +1320,7 @@ export function useExamState({
         isExamSubmitted,
     ]);
 
-    const handleSubmitExamRef = useRef<(auto?: boolean) => void>(() => {});
+    const handleSubmitExamRef = useRef<(auto?: boolean) => void>(() => { });
 
     // Live countdown timer
     useEffect(() => {
@@ -1515,17 +1548,17 @@ export function useExamState({
         const trackName = isDrillSessionLocal
             ? 'Drill'
             : detailsTitleLocal.includes('Sub-Professional')
-              ? 'Subprofessional'
-              : 'Professional';
+                ? 'Subprofessional'
+                : 'Professional';
         const finalCategoryId = isDrillSessionLocal
             ? drillCategoryIdRef.current ||
-              savedAttemptRef.current?.category_id ||
-              null
+            savedAttemptRef.current?.category_id ||
+            null
             : null;
         const finalCategoryName = isDrillSessionLocal
             ? drillCategoryNameRef.current ||
-              savedAttemptRef.current?.cat_scores?.metadata?.category_name ||
-              'Practice Drill'
+            savedAttemptRef.current?.cat_scores?.metadata?.category_name ||
+            'Practice Drill'
             : detailsTitleLocal;
 
         const originalAnswers: Record<number, number> = {};

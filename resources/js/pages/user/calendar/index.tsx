@@ -199,7 +199,7 @@ export default function Calendar() {
                     <ExamCountdown nextExam={calendarNextExam} />
                 </div>
 
-                <Card className="border-border bg-white p-6 shadow-sm sm:p-6 dark:bg-slate-950">
+                <Card className="border-border bg-white p-6 shadow-sm sm:p-6 dark:bg-slate-900">
                     {/* Header with navigation */}
                     <div className="mb-6 flex flex-col justify-between gap-4 md:flex-row md:items-center">
                         <div className="flex items-center gap-4">
@@ -299,7 +299,7 @@ export default function Calendar() {
                             <Button
                                 variant="outline"
                                 onClick={handleResetAll}
-                                className="flex-1 border-red-200 bg-red-50 text-red-600 hover:bg-red-100 md:flex-initial"
+                                className="flex-1 border-red-200 bg-red-50 text-red-600 hover:bg-red-100 md:flex-initial dark:border-red-900/30 dark:bg-red-950/20 dark:text-red-400 dark:hover:bg-red-900/30 dark:hover:text-red-300"
                             >
                                 <Trash2 className="mr-2 h-4 w-4" />
                                 <span className="hidden sm:inline">

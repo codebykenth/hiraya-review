@@ -10,6 +10,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Settings\AcceptTermsController;
 use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\SupportController;
+use App\Http\Controllers\User\AnalyticsController;
 use App\Http\Controllers\User\DashboardController as UserDashboardController;
 use App\Http\Controllers\User\DrillController;
 use App\Http\Controllers\User\ExamController;
@@ -77,7 +78,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // View / Read Endpoints (Rate limited to 120 requests/minute to block scrapers & view flood DDoS)
     Route::middleware('throttle:global-views')->group(function () {
         Route::get('dashboard', [UserDashboardController::class, 'index'])->name('dashboard.index');
-        Route::get('dashboard/ai-analysis', [UserDashboardController::class, 'aiAnalysisReport'])->name('dashboard.ai-analysis');
+        Route::get('analytics', [AnalyticsController::class, 'index'])->name('analytics.index');
+        Route::get('analytics/ai-analysis', [AnalyticsController::class, 'aiAnalysisReport'])->name('analytics.ai-analysis');
         Route::get('drills', [DrillController::class, 'index'])->name('drills.index');
         Route::get('history', [ExamHistoryController::class, 'index'])->name('history.index');
     });

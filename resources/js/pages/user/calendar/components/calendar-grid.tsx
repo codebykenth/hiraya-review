@@ -402,8 +402,8 @@ export function CalendarGrid({
                                                 : isToday(calendarDay.date)
                                                   ? 'border-blue-400 bg-blue-50 dark:border-blue-800 dark:bg-blue-900/20'
                                                   : calendarDay.isCurrentMonth
-                                                    ? 'border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900'
-                                                    : 'border-slate-100 bg-slate-50 opacity-60 dark:border-slate-800 dark:bg-slate-900/50'
+                                                    ? 'border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-800/40'
+                                                    : 'border-slate-100 bg-slate-50 opacity-60 dark:border-slate-800/50 dark:bg-slate-900/20'
                                         }`}
                                     >
                                         <div className="flex items-center justify-between">

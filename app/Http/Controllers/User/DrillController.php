@@ -28,7 +28,7 @@ class DrillController
                         'explanation' => $q->explanation ?? '',
                         'category' => $q->subcategory?->category?->name ?? 'General Information',
                         'subcategory' => $q->subcategory?->name ?? '',
-                        'language' => $q->language ?? 'English',
+                        'language' => (str_contains(strtolower($q->language ?? ''), 'tagalog') || str_contains(strtolower($q->language ?? ''), 'filipino')) ? 'Filipino' : 'English',
                         'isDemographic' => $q->subcategory?->category?->is_demographic ?? false,
                     ];
                 })->toArray();

@@ -15,6 +15,7 @@ import {
     Compass,
     Database,
     Calendar as CalendarIcon,
+    TrendingUp,
 } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import { NavMain } from '@/components/nav-main';
@@ -36,6 +37,7 @@ import {
     drafts as adminLearnDrafts,
 } from '@/routes/admin/learn';
 import { index as adminUsersIndex } from '@/routes/admin/users';
+import { index as analyticsIndex } from '@/routes/analytics';
 import { index as dashboardIndex } from '@/routes/dashboard';
 import { index as drillsIndex } from '@/routes/drills';
 import { index as examsIndex } from '@/routes/exams';
@@ -47,7 +49,7 @@ import {
 } from '@/routes/questions';
 import { index as calendarIndex } from '@/routes/study-schedules/index';
 
-import type { NavItem } from '@/types';
+import type { NavItem, Auth } from '@/types';
 
 const generalNavItems: NavItem[] = [
     {
@@ -79,6 +81,11 @@ const generalNavItems: NavItem[] = [
         title: 'History',
         href: historyIndex(),
         icon: History,
+    },
+    {
+        title: 'Analytics',
+        href: analyticsIndex(),
+        icon: TrendingUp,
     },
     {
         title: 'Reviewer Guide',
@@ -149,7 +156,7 @@ const adminNavItems: NavItem[] = [
 ];
 
 export function AppSidebar() {
-    const { auth } = usePage().props;
+    const { auth } = usePage<{ auth: Auth }>().props;
     const isAdmin = auth.user?.role === 'admin';
 
     return (

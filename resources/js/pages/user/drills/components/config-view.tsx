@@ -74,7 +74,7 @@ export function ConfigView({
 
             {/* Retake Mode Status Banner */}
             {isRetakeConfig && (
-                <div className="dark:bg-amber-955/10 dark:text-amber-350 flex flex-col justify-between gap-3 rounded-xl border border-amber-200 bg-amber-50/50 p-4 text-xs font-semibold text-amber-800 shadow-2xs sm:flex-row sm:items-center dark:border-amber-900/30">
+                <div className="dark:bg-amber-950/10 dark:text-amber-400 flex flex-col justify-between gap-3 rounded-xl border border-amber-200 bg-amber-50/50 p-4 text-xs font-semibold text-amber-800 shadow-2xs sm:flex-row sm:items-center dark:border-amber-900/30">
                     <div className="flex items-center gap-2">
                         <span className="text-sm">🔄</span>
                         <span>
@@ -85,7 +85,7 @@ export function ConfigView({
                     <button
                         type="button"
                         onClick={() => setIsRetakeConfig(false)}
-                        className="dark:bg-amber-955 shrink-0 cursor-pointer rounded-lg bg-amber-100 px-3 py-1.5 font-bold text-amber-900 transition hover:bg-amber-200 focus:outline-none dark:text-amber-300 dark:hover:bg-amber-900"
+                        className="dark:bg-amber-950 shrink-0 cursor-pointer rounded-lg bg-amber-100 px-3 py-1.5 font-bold text-amber-900 transition hover:bg-amber-200 focus:outline-none dark:text-amber-400 dark:hover:bg-amber-900"
                     >
                         Unlock & Customize Settings
                     </button>
@@ -125,14 +125,14 @@ export function ConfigView({
                                         key={sub.name}
                                         disabled={isRetakeConfig}
                                         onClick={() => toggleSubcat(sub.name)}
-                                        className={`flex items-center gap-1 rounded-full px-4.5 py-2 text-xs font-bold transition focus:outline-none ${
+                                        className={`flex items-center gap-1 rounded-full border px-4.5 py-2 text-xs font-bold transition focus:outline-none ${
                                             isRetakeConfig
                                                 ? 'pointer-events-none opacity-60 select-none'
                                                 : ''
                                         } ${
                                             isSelected
-                                                ? 'dark:bg-blue-955/30 border-2 border-blue-600 bg-blue-50 text-blue-700 dark:text-blue-400'
-                                                : 'border border-border bg-white text-muted-foreground hover:bg-slate-50 dark:bg-slate-900 dark:hover:bg-slate-800/50'
+                                                ? 'border-blue-600 bg-blue-50 text-blue-700 dark:border-blue-500 dark:bg-blue-500/15 dark:text-blue-400'
+                                                : 'border-border bg-white text-muted-foreground hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900/50 dark:text-slate-400 dark:hover:bg-slate-800'
                                         }`}
                                     >
                                         {sub.name}
@@ -151,7 +151,7 @@ export function ConfigView({
                             <span className="text-[10px] font-extrabold tracking-wider text-muted-foreground uppercase">
                                 🔢 Question Count
                             </span>
-                            <span className="dark:bg-blue-955/20 rounded-md bg-blue-50/50 px-2 py-0.5 text-[10px] font-bold text-blue-600 dark:text-blue-400">
+                            <span className="dark:bg-blue-950/20 rounded-md bg-blue-50/50 px-2 py-0.5 text-[10px] font-bold text-blue-600 dark:text-blue-400">
                                 Total Questions:{' '}
                                 {questionCount === 'all'
                                     ? filteredQCount
@@ -318,7 +318,7 @@ export function ConfigView({
                                         : ''
                                 } ${
                                     isTimed
-                                        ? 'dark:bg-blue-955/10 border-blue-600 bg-blue-50/10 dark:border-blue-500'
+                                        ? 'dark:bg-blue-950/10 border-blue-600 bg-blue-50/10 dark:border-blue-500'
                                         : 'border-border bg-card hover:bg-slate-50/50 dark:hover:bg-slate-900/40'
                                 }`}
                             >
@@ -349,7 +349,7 @@ export function ConfigView({
                                         : ''
                                 } ${
                                     !isTimed
-                                        ? 'dark:bg-emerald-955/10 border-emerald-600 bg-emerald-50/10 dark:border-emerald-500'
+                                        ? 'dark:bg-emerald-950/10 border-emerald-600 bg-emerald-50/10 dark:border-emerald-500'
                                         : 'border-border bg-card hover:bg-slate-50/50 dark:hover:bg-slate-900/40'
                                 }`}
                             >
@@ -416,10 +416,10 @@ export function ConfigView({
                                         Format:
                                     </span>
                                     <span
-                                        className={`rounded-md px-2 py-0.5 text-[10px] font-bold uppercase ${
+                                        className={`rounded-full px-2.5 py-0.5 text-[10px] font-extrabold uppercase ${
                                             isTimed
-                                                ? 'dark:bg-blue-955/30 bg-blue-50 text-blue-700 dark:text-blue-400'
-                                                : 'dark:bg-emerald-955/30 bg-emerald-50 text-emerald-700 dark:text-emerald-400'
+                                                ? 'bg-blue-50 text-blue-700 dark:bg-blue-500/15 dark:text-blue-400'
+                                                : 'bg-emerald-50 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-400'
                                         }`}
                                     >
                                         {isTimed

@@ -51,7 +51,7 @@ export function ScopeSettingsModal({
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-xs">
-            <div className="relative flex h-[600px] w-full max-w-4xl animate-in flex-col overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-2xl duration-200 zoom-in-95 fade-in dark:border-slate-800 dark:bg-slate-950">
+            <div className="relative flex h-[600px] w-full max-w-4xl animate-in flex-col overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-2xl duration-200 zoom-in-95 fade-in dark:border-slate-800 dark:bg-slate-900">
                 {/* Modal Header */}
                 <div className="flex items-center justify-between border-b border-slate-100 bg-slate-50/50 px-6 py-4.5 dark:border-slate-900 dark:bg-slate-900/35">
                     <div>
@@ -113,7 +113,7 @@ export function ScopeSettingsModal({
                                     className={`flex cursor-pointer items-center justify-between rounded-xl border p-3 transition select-none ${
                                         selectedScopeCategory === cat.id
                                             ? 'shadow-3xs border-blue-200 bg-blue-50/50 text-blue-900 dark:border-blue-900/40 dark:bg-blue-950/20 dark:text-blue-200'
-                                            : 'border-slate-150 dark:border-slate-850 bg-white text-slate-700 hover:bg-slate-50 dark:bg-slate-950 dark:text-slate-300 dark:hover:bg-slate-900'
+                                            : 'border-slate-200 dark:border-slate-800 bg-white text-slate-700 hover:bg-slate-50 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800/80'
                                     }`}
                                 >
                                     <span className="truncate pr-2 text-sm font-semibold">
@@ -178,7 +178,7 @@ export function ScopeSettingsModal({
                                         (sub) => (
                                             <div
                                                 key={sub.id}
-                                                className="border-slate-150 shadow-3xs dark:border-slate-850 flex items-center justify-between rounded-xl border bg-white p-3 text-slate-700 dark:bg-slate-950 dark:text-slate-300"
+                                                className="border-slate-200 shadow-3xs dark:border-slate-800 flex items-center justify-between rounded-xl border bg-white p-3 text-slate-700 dark:bg-slate-900 dark:text-slate-300"
                                             >
                                                 <span className="truncate pr-2 text-sm font-medium">
                                                     {sub.name}

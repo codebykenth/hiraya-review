@@ -81,7 +81,7 @@ export function SetupExamView({
                             className={`flex cursor-pointer items-center justify-between rounded-xl border-2 p-5 shadow-sm transition hover:shadow-md ${
                                 selectedExamId === 1
                                     ? 'border-blue-600 bg-blue-50/10 dark:border-blue-500 dark:bg-blue-950/10'
-                                    : 'border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-950'
+                                    : 'border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900'
                             }`}
                         >
                             <div className="flex items-center gap-4">
@@ -119,7 +119,7 @@ export function SetupExamView({
                             className={`flex cursor-pointer items-center justify-between rounded-xl border-2 p-5 shadow-sm transition hover:shadow-md ${
                                 selectedExamId === 2
                                     ? 'border-blue-600 bg-blue-50/10 dark:border-blue-500 dark:bg-blue-950/10'
-                                    : 'border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-950'
+                                    : 'border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900'
                             }`}
                         >
                             <div className="flex items-center gap-4">
@@ -210,7 +210,7 @@ export function SetupExamView({
                         {/* Bottom Actions and Stable Connection Alert */}
                         <div className="mt-6 flex flex-col gap-4">
                             {/* Technical check callout to avoid data losses */}
-                            <div className="rounded-lg border border-slate-200 bg-white/70 p-3.5 text-center text-[11px] leading-relaxed font-medium text-slate-600 shadow-2xs dark:border-slate-800 dark:bg-slate-950/70 dark:text-slate-400">
+                            <div className="rounded-lg border border-slate-200 bg-white/70 p-3.5 text-center text-[11px] leading-relaxed font-medium text-slate-600 shadow-2xs dark:border-slate-800 dark:bg-slate-900/70 dark:text-slate-400">
                                 Ensure you have a stable connection. The timer
                                 will begin immediately upon confirmation.
                             </div>
