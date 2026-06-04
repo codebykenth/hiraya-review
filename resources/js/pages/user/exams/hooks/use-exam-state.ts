@@ -192,6 +192,23 @@ export function useExamState({
     const [isExamActive, setIsExamActive] = useState(() => {
         return restoredSession !== null;
     });
+
+    // Notify global layout widgets (like SupportWidget) when the user is actively taking an exam
+    useEffect(() => {
+        window.dispatchEvent(
+            new CustomEvent('live-exam-status', {
+                detail: { active: isExamActive },
+            }),
+        );
+
+        return () => {
+            window.dispatchEvent(
+                new CustomEvent('live-exam-status', {
+                    detail: { active: false },
+                }),
+            );
+        };
+    }, [isExamActive]);
     const [activeQuestions, setActiveQuestions] = useState<Question[]>(() => {
         if (restoredSession) {
             const pool = getRestoredQuestions(restoredSession.questionIds);

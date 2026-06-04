@@ -21,6 +21,7 @@ import { Spinner } from '@/components/ui/spinner';
 import { useAppearance } from '@/hooks/use-appearance';
 import { useClipboard } from '@/hooks/use-clipboard';
 import { OTP_MAX_LENGTH } from '@/hooks/use-two-factor-auth';
+import { sanitizeSvg } from '@/lib/sanitize-svg';
 import { confirm } from '@/routes/two-factor';
 
 function GridScanIcon() {
@@ -79,7 +80,7 @@ function TwoFactorSetupStep({
                                     <div
                                         className="aspect-square w-full rounded-lg bg-white p-2 [&_svg]:size-full"
                                         dangerouslySetInnerHTML={{
-                                            __html: qrCodeSvg,
+                                            __html: sanitizeSvg(qrCodeSvg),
                                         }}
                                         style={{
                                             filter:

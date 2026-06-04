@@ -233,7 +233,7 @@ export default function AiReadinessCard({ aiAnalysis }: AiReadinessCardProps) {
                 <div className="pointer-events-none absolute -bottom-24 -left-24 h-48 w-48 rounded-full bg-indigo-500/5 blur-3xl dark:bg-indigo-500/10" />
 
                 {/* Header */}
-                <div className="mb-6 flex items-center justify-between border-b border-slate-200/80 pb-4 dark:border-slate-800/80">
+                <div className="mb-6 flex flex-col gap-4 border-b border-slate-200/80 pb-4 sm:flex-row sm:items-center sm:justify-between dark:border-slate-800/80">
                     <div className="flex items-center gap-3">
                         <div className="border-blue-150 flex size-10 items-center justify-center rounded-xl border bg-blue-50 text-blue-600 dark:border-blue-500/20 dark:bg-blue-500/10 dark:text-blue-400">
                             <Brain className="size-5" />
@@ -253,7 +253,7 @@ export default function AiReadinessCard({ aiAnalysis }: AiReadinessCardProps) {
                         </div>
                     </div>
 
-                    <div className="flex items-center gap-3">
+                    <div className="flex flex-wrap items-center gap-3">
                         {/* Trend Badge */}
                         <div
                             className={`flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-bold ${trendColor}`}

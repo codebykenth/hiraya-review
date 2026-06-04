@@ -84,7 +84,20 @@ class GenerateQuestionsJob implements ShouldQueue
                 $categorySpecificRules .= "\n        * Word analogy (Filipino/Tagalog): Use authentic Filipino/Tagalog word relationships and formal vocabulary rather than directly translating standard English analogies. Ensure this strictly falls under the Analytical Ability category.";
             }
         } elseif ($subcategory === 'Symbolic logic / abstract reasoning') {
-            $categorySpecificRules = "* Symbolic logic / abstract reasoning: You MUST generate visual-spatial geometric puzzles (like finding the next shape in a sequence, folding patterns, or rotating grids) using raw, scalable SVG code. Output raw <svg viewBox=\"...\">...</svg> blocks directly inside the text. You MUST include SVG visuals not just in the question stem, but ALSO in every single option (Options A to E must be standalone SVGs showing the possible answers, do NOT use descriptive text for options), AND in the explanation block to visually demonstrate the correct pattern and solution. Keep SVGs clean with simple paths, <rect>, <circle>, or <polygon>. Ensure the visual sequence is logically solvable and visually clear. In the explanation block, explicitly define the visual pattern (e.g. 'The black dot rotates 90 degrees clockwise') and provide the correct logical solution alongside the SVG. Do NOT use standard deductive logic chains for Abstract Reasoning, use visual SVG puzzles instead!";
+            $categorySpecificRules = "* Symbolic logic / abstract reasoning: You MUST generate visual-spatial geometric puzzles using raw, scalable SVG code. Output raw <svg viewBox=\"...\">...</svg> blocks directly inside the text. You MUST include SVG visuals not just in the question stem, but ALSO in every single option (Options A to E must be standalone SVGs showing the possible answers, do NOT use descriptive text for options), AND in the explanation block to visually demonstrate the correct pattern and solution. Keep SVGs clean with simple paths, <rect>, <circle>, or <polygon>.
+        CRITICAL STEM SVG RULE: The question 'stem' MUST contain at least one <svg> block representing the puzzle's reference diagram or sequence. You are forbidden from generating visual questions without including the reference SVG in the stem! (Except for Odd One Out Format E, where the puzzle is defined by the options).
+        CRITICAL TOKEN OPTIMIZATION RULE: To prevent generation cutoffs, you MUST heavily minify your SVG code. Do NOT use any HTML comments (<!-- -->) inside the SVGs. Remove all unnecessary whitespace, spaces, and line breaks within the SVG code. Keep the code as compact as possible.
+        CRITICAL VARIETY RULE: To prevent repetitive questions, randomly select one of the following abstract reasoning formats for each question:
+        - Format A: Grid-based Logical Matrix. Generate a single SVG showing a grid of shapes (e.g. 2x2, 3x3, or 4x4 cells). The bottom-right cell MUST show a question mark '?' indicating the missing symbol. The other cells must follow a logical grid-based pattern (e.g. addition, subtraction, or overlap of lines/shapes in rows or columns).
+        - Format B: Sequence Puzzle. A sequence of frames (ranging from 3 to 6 frames) showing a progressive transformation. You can either generate a single SVG displaying all frames side-by-side, or individual labeled frames (e.g. '**Frame 1:**\n<svg...>\n**Frame 2:**\n<svg...>').
+        - Format C: Visual Analogy. Frame A is to Frame B, as Frame C is to '?'. Render as a single SVG or individual labeled frames showing the transformation.
+        - Format D: Rotation/Reflection Grid. A grid of shaded shapes (e.g., 2x2, 3x3, 4x4) that rotate, mirror, or shift according to a distinct pattern.
+        - Format E: Odd One Out / Classification. The stem asks to find the figure that does not belong. Options A to E show different SVG figures, where 4 of them share a common geometric or mathematical property (e.g., line count, symmetry, rotational similarity) and 1 is the 'odd one out'.
+        - Format F: Cube Folding / 3D Net. The stem shows a 2D unfolded cube net (showing shapes on the faces). The options show folded 3D cube representations, and the user must identify the only correct folded version.
+        - Format G: Dot Placement / Intersection Logic. The stem shows a reference diagram where shapes (like a circle, triangle, and square) overlap, with a dot placed in a specific intersection region. The options show similar overlapping shapes, and the user must choose the only option where a dot can be placed in the identical intersection condition.
+        - Format H: Mirror/Water Reflections. The stem shows a complex figure, and the options show reflections across a given axis (horizontal or vertical).
+        
+        CRITICAL GEOMETRIC COHERENCE RULE: Ensure that all elements (e.g. dots, lines, shapes) inside the SVGs never unintentionally overlap or intersect, unless it is a deliberate part of the puzzle logic. For multiple-choice options (A to E), every option must be constructed with clean spatial layouts and correct coordinate separation so that the correct answer cannot be easily guessed by simply choosing the only option without overlapping elements.";
         } elseif ($subcategory === 'Data interpretation') {
             $categorySpecificRules = '* Data interpretation: You MUST provide a data source for interpretation based on realistic Philippine public administration data (e.g., population growth, budget allocation, public school enrollment rates). You should provide a beautifully formatted markdown table AND/OR a chart visualization (e.g., bar chart, line graph, pie chart) using raw, scalable SVG code directly inside the question stem. Feel free to use both a table and an SVG chart together, or vary them so some questions use tables and some use charts. If using an SVG chart, ensure it has clear axes, data labels, titles, and legends using <text> elements. The options should be text or numbers based on the data, and the explanation block must reference the specific data points. Keep any SVG code clean and well-structured.';
         } elseif ($subcategory === 'Reading comprehension') {
@@ -145,8 +158,13 @@ class GenerateQuestionsJob implements ShouldQueue
         ]
         ";
 
+        $count = $validated['count'];
+        if ($subcategory === 'Symbolic logic / abstract reasoning' && $count > 3) {
+            $count = 3; // Force lower count to prevent token exhaustion cutoffs
+        }
+
         $userPrompt = "
-        Generate exactly {$validated['count']} multiple-choice questions for the following category and subcategory:
+        Generate exactly {$count} multiple-choice questions for the following category and subcategory:
         Category: {$validated['category']}
         Subcategory: {$validated['subcategory']}
         Language: {$validated['language']}
@@ -351,6 +369,8 @@ class GenerateQuestionsJob implements ShouldQueue
             Cache::forget('questions.all');
             Cache::forget('questions.active');
             Cache::forget('categories.tree');
+
+            Log::info('GenerateQuestionsJob: Successfully generated '.count($questions).' questions for subcategory "'.$subcategory.'" using model '.$this->primaryModel.' for user '.$this->userId.'.');
 
             AiGenerationCompleted::dispatch($this->userId, 'Questions generation completed! Check your drafts.', 'questions');
 

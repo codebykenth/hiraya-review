@@ -406,14 +406,14 @@ export default function DraftsQuestionList({
                                                             65 + optIdx,
                                                         )}
                                                     </span>
-                                                    <span className="text-sm leading-tight">
+                                                    <div className="w-full flex-1 text-sm leading-tight">
                                                         {renderFormattedText(
                                                             opt,
                                                             false,
                                                             undefined,
                                                             true,
                                                         )}
-                                                    </span>
+                                                    </div>
                                                 </div>
                                                 {isCorrect && (
                                                     <Check className="size-4 shrink-0 text-emerald-400" />

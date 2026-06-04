@@ -105,15 +105,15 @@ export default function Calendar() {
                                     How it works
                                 </Button>
                             </DialogTrigger>
-                            <DialogContent className="max-w-md">
+                            <DialogContent className="sm:max-w-2xl">
                                 <DialogHeader>
                                     <DialogTitle className="flex items-center gap-2 text-xl">
                                         <HelpCircle className="size-5 text-blue-600" />
                                         How the Study Plan Works
                                     </DialogTitle>
                                     <DialogDescription className="pt-2 text-sm">
-                                        Master your study schedule with
-                                        these quick tips:
+                                        Master your study schedule with these
+                                        quick tips:
                                     </DialogDescription>
                                 </DialogHeader>
                                 <div className="space-y-4 py-2">
@@ -126,10 +126,10 @@ export default function Calendar() {
                                                 Click to Add or Edit
                                             </h4>
                                             <p className="mt-0.5 text-xs text-muted-foreground">
-                                                Click any empty space on a
-                                                day to add a session. Click
-                                                an existing task's title to
-                                                edit it.
+                                                Click any empty space on a day
+                                                to add a session. Click an
+                                                existing task's title to edit
+                                                it.
                                             </p>
                                         </div>
                                     </div>
@@ -142,10 +142,10 @@ export default function Calendar() {
                                                 Drag and Drop
                                             </h4>
                                             <p className="mt-0.5 text-xs text-muted-foreground">
-                                                Simply click and hold any
-                                                task, then drag and drop it
-                                                into another day's block to
-                                                instantly reschedule it.
+                                                Simply click and hold any task,
+                                                then drag and drop it into
+                                                another day's block to instantly
+                                                reschedule it.
                                             </p>
                                         </div>
                                     </div>
@@ -159,10 +159,9 @@ export default function Calendar() {
                                             </h4>
                                             <p className="mt-0.5 text-xs text-muted-foreground">
                                                 Use the "Bulk Update Time"
-                                                button to select multiple
-                                                tasks across different days
-                                                and set them all to the same
-                                                time.
+                                                button to select multiple tasks
+                                                across different days and set
+                                                them all to the same time.
                                             </p>
                                         </div>
                                     </div>
@@ -175,11 +174,10 @@ export default function Calendar() {
                                                 Mark as Complete
                                             </h4>
                                             <p className="mt-0.5 text-xs text-muted-foreground">
-                                                Click the circle next to a
-                                                task to mark it done. It
-                                                will turn green. Incomplete
-                                                past tasks will
-                                                automatically alert you!
+                                                Click the circle next to a task
+                                                to mark it done. It will turn
+                                                green. Incomplete past tasks
+                                                will automatically alert you!
                                             </p>
                                         </div>
                                     </div>
@@ -294,7 +292,9 @@ export default function Calendar() {
                                 <span className="hidden sm:inline">
                                     Bulk Update Time
                                 </span>
-                                <span className="sm:hidden">Bulk Time</span>
+                                <span className="sm:hidden">
+                                    Bulk Update Time
+                                </span>
                             </Button>
                             <Button
                                 variant="outline"

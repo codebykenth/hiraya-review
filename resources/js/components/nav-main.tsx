@@ -31,8 +31,8 @@ export function NavMain({
             const cleanSubHref = sub.href ? toUrl(sub.href).split('?')[0] : '';
 
             if (currentPath === cleanSubHref) {
-return true;
-}
+                return true;
+            }
 
             const isParentOfCurrent =
                 cleanSubHref && currentPath.startsWith(cleanSubHref + '/');

@@ -248,8 +248,8 @@ export default function AiAnalysisReport({
 
     const handleBulkToggleSchedules = async () => {
         if (!data || !data.personalized_study_plan) {
-return;
-}
+            return;
+        }
 
         setIsBulkActionRunning(true);
 
@@ -300,8 +300,8 @@ return;
                 const createPromises: Promise<any>[] = [];
                 data.personalized_study_plan.forEach((dayPlan, index) => {
                     if (scheduledDays[dayPlan.day]) {
-return;
-}
+                        return;
+                    }
 
                     const today = new Date();
                     today.setDate(today.getDate() + index);

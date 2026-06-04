@@ -9,6 +9,7 @@ import React, { useCallback, useMemo, useState } from 'react';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { formatMathInline } from '@/lib/exam-formatters';
 import { parseLaTeXToJSX } from '@/lib/latex-parser';
+import { sanitizeSvg } from '@/lib/sanitize-svg';
 
 function ZoomableSvg({
     svgContent,
@@ -35,7 +36,7 @@ function ZoomableSvg({
                     <div
                         className="flex w-full items-center justify-center"
                         dangerouslySetInnerHTML={{
-                            __html: scaledSvg,
+                            __html: sanitizeSvg(scaledSvg),
                         }}
                     />
                     <div className="absolute inset-0 flex items-center justify-center bg-black/0 opacity-0 transition-all group-hover:bg-black/5 group-hover:opacity-100 dark:group-hover:bg-white/10">
@@ -49,9 +50,11 @@ function ZoomableSvg({
                 <div
                     className="flex w-full justify-center rounded-2xl bg-white p-8 dark:bg-slate-900"
                     dangerouslySetInnerHTML={{
-                        __html: svgContent.replace(
-                            /^<svg/,
-                            `<svg class="w-full h-auto max-h-[80vh] object-contain"`,
+                        __html: sanitizeSvg(
+                            svgContent.replace(
+                                /^<svg/,
+                                `<svg class="w-full h-auto max-h-[80vh] object-contain"`,
+                            ),
                         ),
                     }}
                 />

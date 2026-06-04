@@ -41,7 +41,7 @@ export function HowItWorksModal({
                     How it works
                 </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-md">
+            <DialogContent className="sm:max-w-2xl">
                 <DialogHeader>
                     <DialogTitle className="flex items-center gap-2 text-xl">
                         <HelpCircle className="size-5 text-blue-600" />

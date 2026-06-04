@@ -2,6 +2,7 @@ import { ZoomIn } from 'lucide-react';
 import React from 'react';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { parseLatexString } from '@/lib/latex-parser';
+import { sanitizeSvg } from '@/lib/sanitize-svg';
 
 export const formatDuration = (totalSecs: number, showLabel = true): string => {
     const h = Math.floor(totalSecs / 3600);
@@ -137,6 +138,18 @@ export const renderFormattedText = (
     if (!text) {
         return null;
     }
+
+    // Clean up literal escaped quotes that might leak from JSON/AI payloads,
+    // which breaks the browser's HTML parser in dangerouslySetInnerHTML
+    text = text.replace(/\\"/g, '"').replace(/\\'/g, "'");
+
+    // Clean up HTML tags and arrow entities that AI models sometimes output
+    // to group SVGs. We normalize them so our parser can group them properly.
+    text = text.replace(/<br\s*\/?>/gi, '\n');
+    text = text.replace(/<div[^>]*>/gi, '').replace(/<\/div>/gi, '');
+    text = text.replace(/<span[^>]*>(?:&rarr;|→)<\/span>/gi, ' → ');
+    text = text.replace(/&rarr;/gi, ' → ');
+    text = text.replace(/<span[^>]*>/gi, '').replace(/<\/span>/gi, '');
 
     // Strict 1-liner comment: Dynamically strip parenthesized logical variable markers if requested
     const processedText = stripLogicSymbols
@@ -450,31 +463,336 @@ export const renderFormattedText = (
         );
     };
 
+    const svgCount = (processedText.match(/<svg[\s\S]*?<\/svg>/gi) || [])
+        .length;
+
+    if (!isOption && svgCount > 1) {
+        const rawParts = processedText.split(/(<svg[\s\S]*?<\/svg>)/gi);
+        const labelRegex =
+            /(?:\r?\n|^)\s*(\*\*(?:Frame|Step|Shape|Figure|Box|Sequence|Frame\s+\d+|Step\s+\d+|Shape\s+\d+|Figure\s+\d+|Box\s+\d+)\s*\d*(?::)?\*\*|(?:[Ff]rame|[Ss]tep|[Ss]hape|[Ff]igure|[Bb]ox|[Ss]equence)\s*\d+(?::)?)\s*$/;
+
+        interface TempBlock {
+            type: 'text' | 'svg';
+            content: string;
+            label?: string;
+        }
+
+        const tempBlocks: TempBlock[] = [];
+
+        for (let idx = 0; idx < rawParts.length; idx++) {
+            const part = rawParts[idx];
+
+            if (part === undefined) {
+                continue;
+            }
+
+            if (idx % 2 === 0) {
+                if (part !== '') {
+                    tempBlocks.push({ type: 'text', content: part });
+                }
+            } else {
+                let label: string | undefined = undefined;
+
+                if (
+                    tempBlocks.length > 0 &&
+                    tempBlocks[tempBlocks.length - 1].type === 'text'
+                ) {
+                    const prevBlock = tempBlocks[tempBlocks.length - 1];
+                    const match = prevBlock.content.match(labelRegex);
+
+                    if (match) {
+                        label = match[1].trim();
+                        prevBlock.content = prevBlock.content
+                            .substring(0, match.index ?? 0)
+                            .trimEnd();
+                    }
+                }
+
+                tempBlocks.push({ type: 'svg', content: part, label });
+            }
+        }
+
+        interface SvgFrame {
+            label: string | null;
+            svg: string;
+        }
+
+        interface GroupedBlock {
+            type: 'text' | 'sequence' | 'svg';
+            content: string;
+            label?: string;
+            frames?: SvgFrame[];
+        }
+
+        const groupedBlocks: GroupedBlock[] = [];
+        let currentSequence: SvgFrame[] = [];
+
+        for (let idx = 0; idx < tempBlocks.length; idx++) {
+            const block = tempBlocks[idx];
+
+            if (block.type === 'svg') {
+                currentSequence.push({
+                    label: block.label || null,
+                    svg: block.content,
+                });
+            } else {
+                const trimmed = block.content.trim();
+                const isSequenceSeparator =
+                    trimmed === '' ||
+                    trimmed === '→' ||
+                    trimmed === '->' ||
+                    trimmed === '=>';
+
+                if (isSequenceSeparator) {
+                    continue;
+                } else {
+                    if (currentSequence.length > 0) {
+                        if (currentSequence.length === 1) {
+                            groupedBlocks.push({
+                                type: 'svg',
+                                content: currentSequence[0].svg,
+                                label: currentSequence[0].label || undefined,
+                            });
+                        } else {
+                            groupedBlocks.push({
+                                type: 'sequence',
+                                content: '',
+                                frames: [...currentSequence],
+                            });
+                        }
+
+                        currentSequence = [];
+                    }
+
+                    groupedBlocks.push({
+                        type: 'text',
+                        content: block.content,
+                    });
+                }
+            }
+        }
+
+        if (currentSequence.length > 0) {
+            if (currentSequence.length === 1) {
+                groupedBlocks.push({
+                    type: 'svg',
+                    content: currentSequence[0].svg,
+                    label: currentSequence[0].label || undefined,
+                });
+            } else {
+                groupedBlocks.push({
+                    type: 'sequence',
+                    content: '',
+                    frames: [...currentSequence],
+                });
+            }
+        }
+
+        return (
+            <div className="flex flex-col gap-1.5">
+                {groupedBlocks.map((block, blockIdx) => {
+                    if (block.type === 'sequence' && block.frames) {
+                        return (
+                            <div
+                                key={`seq-${blockIdx}`}
+                                className="my-6 flex flex-row flex-wrap items-center justify-center gap-3 rounded-xl border border-slate-100 bg-slate-50/50 p-4 dark:border-slate-800/60 dark:bg-slate-900/10"
+                            >
+                                {block.frames.map((frame, fIdx) => {
+                                    const cleanLabel = frame.label
+                                        ? frame.label
+                                              .replace(/\*\*|:/g, '')
+                                              .trim()
+                                        : '';
+
+                                    return (
+                                        <React.Fragment
+                                            key={`seq-frag-${fIdx}`}
+                                        >
+                                            {fIdx > 0 && (
+                                                <span className="self-center text-lg font-bold text-slate-400 select-none dark:text-slate-600">
+                                                    ➔
+                                                </span>
+                                            )}
+                                            <Dialog>
+                                                <DialogTrigger asChild>
+                                                    <div className="group relative flex cursor-pointer flex-col items-center justify-center rounded-xl border border-slate-200 bg-white p-3 shadow-xs transition-all hover:scale-[1.02] active:scale-95 dark:border-slate-800 dark:bg-slate-900">
+                                                        {cleanLabel && (
+                                                            <div className="mb-2 text-center text-xs font-extrabold text-slate-800 dark:text-slate-200">
+                                                                {cleanLabel}
+                                                            </div>
+                                                        )}
+                                                        <div
+                                                            className="flex size-24 items-center justify-center"
+                                                            dangerouslySetInnerHTML={{
+                                                                __html: sanitizeSvg(
+                                                                    frame.svg.replace(
+                                                                        /^\s*<svg/i,
+                                                                        `<svg width="100%" height="100%" class="w-full h-full object-contain"`,
+                                                                    ),
+                                                                ),
+                                                            }}
+                                                        />
+                                                        <div className="absolute inset-0 flex items-center justify-center bg-black/0 opacity-0 transition-all group-hover:bg-black/5 group-hover:opacity-100 dark:group-hover:bg-white/10">
+                                                            <div className="rounded-full bg-white/90 p-1.5 text-slate-700 shadow-xs backdrop-blur-sm dark:bg-slate-900/90 dark:text-slate-300">
+                                                                <ZoomIn className="size-3.5" />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </DialogTrigger>
+                                                <DialogContent className="max-w-4xl border-none bg-transparent p-0 shadow-none">
+                                                    <div
+                                                        className="flex w-full justify-center rounded-2xl bg-white p-8 dark:bg-slate-900"
+                                                        dangerouslySetInnerHTML={{
+                                                            __html: sanitizeSvg(
+                                                                frame.svg.replace(
+                                                                    /^\s*<svg/i,
+                                                                    `<svg width="100%" height="100%" class="w-full h-auto max-h-[80vh] object-contain"`,
+                                                                ),
+                                                            ),
+                                                        }}
+                                                    />
+                                                </DialogContent>
+                                            </Dialog>
+                                        </React.Fragment>
+                                    );
+                                })}
+                            </div>
+                        );
+                    }
+
+                    if (block.type === 'svg') {
+                        const scaledSvg = block.content.replace(
+                            /^\s*<svg/i,
+                            `<svg width="100%" height="100%" class="h-48 w-full object-contain"`,
+                        );
+                        const cleanLabel = block.label
+                            ? block.label.replace(/\*\*|:/g, '').trim()
+                            : '';
+
+                        return (
+                            <Dialog key={`svg-block-${blockIdx}`}>
+                                <DialogTrigger asChild>
+                                    <div className="group relative mx-auto my-4 flex w-full max-w-2xl cursor-pointer flex-col items-center justify-center overflow-hidden rounded-xl border border-slate-200 bg-white p-4 transition-all hover:scale-[1.02] active:scale-95 dark:border-slate-800 dark:bg-slate-900">
+                                        {cleanLabel && (
+                                            <div className="mb-2 text-center text-sm font-extrabold text-slate-800 dark:text-slate-200">
+                                                {cleanLabel}
+                                            </div>
+                                        )}
+                                        <div
+                                            className="flex w-full items-center justify-center"
+                                            dangerouslySetInnerHTML={{
+                                                __html: sanitizeSvg(scaledSvg),
+                                            }}
+                                        />
+
+                                        <div className="absolute inset-0 flex items-center justify-center bg-black/0 opacity-0 transition-all group-hover:bg-black/5 group-hover:opacity-100 dark:group-hover:bg-white/10">
+                                            <div className="rounded-full bg-white/90 p-1.5 text-slate-700 shadow-sm backdrop-blur-sm dark:bg-slate-900/90 dark:text-slate-300">
+                                                <ZoomIn className="size-4" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </DialogTrigger>
+                                <DialogContent className="max-w-4xl border-none bg-transparent p-0 shadow-none">
+                                    <div
+                                        className="flex w-full justify-center rounded-2xl bg-white p-8 dark:bg-slate-900"
+                                        dangerouslySetInnerHTML={{
+                                            __html: sanitizeSvg(
+                                                block.content.replace(
+                                                    /^\s*<svg/i,
+                                                    `<svg width="100%" height="100%" class="w-full h-auto max-h-[80vh] object-contain"`,
+                                                ),
+                                            ),
+                                        }}
+                                    />
+                                </DialogContent>
+                            </Dialog>
+                        );
+                    }
+
+                    const parts = block.content.split(tableRegex);
+
+                    return (
+                        <React.Fragment key={`text-block-${blockIdx}`}>
+                            {parts.map((part, index) => {
+                                if (part.match(tableRegex)) {
+                                    return (
+                                        <React.Fragment key={index}>
+                                            {renderTable(part)}
+                                        </React.Fragment>
+                                    );
+                                }
+
+                                return (
+                                    <React.Fragment key={index}>
+                                        {formatNumberedLists(part)}
+                                    </React.Fragment>
+                                );
+                            })}
+                        </React.Fragment>
+                    );
+                })}
+            </div>
+        );
+    }
+
     return (
         <div className="flex flex-col gap-1.5">
             {svgParts.map((svgPart, svgIndex) => {
-                if (svgPart.match(/^<svg/)) {
+                if (svgPart.trim().match(/^<svg/i)) {
                     // Pre-process the SVG string to inject a class for responsive sizing
                     // We also ensure it doesn't exceed 100% width or fixed pixel heights that break layout
                     const scaledSvg = svgPart.replace(
-                        /^<svg/,
-                        `<svg class="${isOption ? 'max-h-32 w-auto h-auto object-contain' : 'max-h-64 w-auto h-auto object-contain'}"`,
+                        /^\s*<svg/i,
+                        `<svg width="100%" height="100%" class="${isOption ? 'h-20 w-full object-contain' : 'h-48 w-full object-contain'}"`,
                     );
+
+                    if (isOption) {
+                        return (
+                            <Dialog key={`svg-${svgIndex}`}>
+                                <DialogTrigger asChild>
+                                    <div
+                                        onClick={(e) => e.stopPropagation()}
+                                        className="group relative my-1 flex w-full cursor-pointer justify-center overflow-hidden rounded-lg bg-white p-2 transition-all hover:scale-[1.02] active:scale-95 dark:bg-slate-900"
+                                    >
+                                        <div
+                                            className="flex w-full items-center justify-center"
+                                            dangerouslySetInnerHTML={{
+                                                __html: sanitizeSvg(scaledSvg),
+                                            }}
+                                        />
+
+                                        <div className="absolute inset-0 flex items-center justify-center bg-black/0 opacity-0 transition-all group-hover:bg-black/5 group-hover:opacity-100 dark:group-hover:bg-white/10">
+                                            <div className="rounded-full bg-white/90 p-1.5 text-slate-700 shadow-sm backdrop-blur-sm dark:bg-slate-900/90 dark:text-slate-300">
+                                                <ZoomIn className="size-3" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </DialogTrigger>
+                                <DialogContent className="max-w-4xl border-none bg-transparent p-0 shadow-none">
+                                    <div
+                                        className="flex w-full justify-center rounded-2xl bg-white p-8 dark:bg-slate-900"
+                                        dangerouslySetInnerHTML={{
+                                            __html: sanitizeSvg(
+                                                svgPart.replace(
+                                                    /^\s*<svg/i,
+                                                    `<svg width="100%" height="100%" class="w-full h-auto max-h-[80vh] object-contain"`,
+                                                ),
+                                            ),
+                                        }}
+                                    />
+                                </DialogContent>
+                            </Dialog>
+                        );
+                    }
 
                     return (
                         <Dialog key={`svg-${svgIndex}`}>
                             <DialogTrigger asChild>
-                                <div
-                                    className={`group relative cursor-pointer overflow-hidden transition-all hover:scale-[1.02] active:scale-95 ${
-                                        isOption
-                                            ? 'my-1 flex w-full justify-center'
-                                            : 'mx-auto my-4 flex w-full max-w-2xl justify-center rounded-xl border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900'
-                                    }`}
-                                >
+                                <div className="group relative mx-auto my-4 flex w-full max-w-2xl cursor-pointer justify-center overflow-hidden rounded-xl border border-slate-200 bg-white p-4 transition-all hover:scale-[1.02] active:scale-95 dark:border-slate-800 dark:bg-slate-900">
                                     <div
                                         className="flex w-full items-center justify-center"
                                         dangerouslySetInnerHTML={{
-                                            __html: scaledSvg,
+                                            __html: sanitizeSvg(scaledSvg),
                                         }}
                                     />
 
@@ -489,9 +807,11 @@ export const renderFormattedText = (
                                 <div
                                     className="flex w-full justify-center rounded-2xl bg-white p-8 dark:bg-slate-900"
                                     dangerouslySetInnerHTML={{
-                                        __html: svgPart.replace(
-                                            /^<svg/,
-                                            `<svg class="w-full h-auto max-h-[80vh] object-contain"`,
+                                        __html: sanitizeSvg(
+                                            svgPart.replace(
+                                                /^\s*<svg/i,
+                                                `<svg width="100%" height="100%" class="w-full h-auto max-h-[80vh] object-contain"`,
+                                            ),
                                         ),
                                     }}
                                 />

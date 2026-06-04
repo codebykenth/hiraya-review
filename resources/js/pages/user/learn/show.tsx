@@ -111,7 +111,7 @@ export default function LearnShow({ module, recommended }: LearnShowProps) {
                                                 variant={
                                                     module.is_completed
                                                         ? 'outline'
-                                                        : 'default'
+                                                        : 'success'
                                                 }
                                                 className="flex items-center gap-2 font-bold"
                                             >

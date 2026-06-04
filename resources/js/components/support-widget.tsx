@@ -1,5 +1,5 @@
 import { router } from '@inertiajs/react';
-import { Coffee } from 'lucide-react';
+import { Coffee, X } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import {
@@ -15,41 +15,113 @@ const appName = import.meta.env.VITE_APP_NAME || 'Hiraya Review';
 
 export function SupportWidget() {
     const [open, setOpen] = useState(false);
-    const [isVisible, setIsVisible] = useState(false);
     const [isMounted, setIsMounted] = useState(false);
+    const [showBubble, setShowBubble] = useState(false);
+    const [isLiveExamActive, setIsLiveExamActive] = useState(false);
 
     useEffect(() => {
-        const checkVisibility = () => {
-            const url = window.location.pathname;
-            setIsVisible(
-                !(url.startsWith('/exams') || url.startsWith('/drills')),
-            );
+        const handleNavigate = () => {
+            // Remove the hardcoded URL check so it can show on Setup and Scorecard views
+            // We'll rely on the isLiveExamActive state instead for exams/drills.
         };
 
-        // Check initially
-        checkVisibility();
+        const handleExamStatus = (e: any) => {
+            setIsLiveExamActive(e.detail.active);
+
+            if (!e.detail.active) {
+                // Check if they already dismissed it today before showing it again
+                const lastSeen = localStorage.getItem('support_bubble_date');
+
+                if (lastSeen !== new Date().toDateString()) {
+                    setTimeout(() => {
+                        setShowBubble(true);
+                    }, 1500);
+                }
+            }
+        };
+
+        window.addEventListener('live-exam-status', handleExamStatus);
 
         // Listen for Inertia navigation events
-        const removeListener = router.on('navigate', checkVisibility);
+        const removeListener = router.on('navigate', handleNavigate);
 
         // Defer mounting to avoid synchronous cascading render warning
         const timer = setTimeout(() => {
             setIsMounted(true);
         }, 0);
 
+        // Bubble logic (show once a day, delayed by 3 seconds)
+        let bubbleTimer: NodeJS.Timeout;
+        const lastSeen = localStorage.getItem('support_bubble_date');
+        const today = new Date().toDateString();
+
+        if (lastSeen !== today) {
+            bubbleTimer = setTimeout(() => {
+                setShowBubble(true);
+            }, 3000);
+        }
+
         return () => {
+            window.removeEventListener('live-exam-status', handleExamStatus);
             removeListener();
             clearTimeout(timer);
+
+            if (bubbleTimer) {
+clearTimeout(bubbleTimer);
+}
         };
     }, []);
 
-    if (!isMounted || !isVisible) {
+    const dismissBubble = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        e.preventDefault();
+        setShowBubble(false);
+        localStorage.setItem('support_bubble_date', new Date().toDateString());
+    };
+
+    const handleOpenChange = (newOpen: boolean) => {
+        setOpen(newOpen);
+
+        if (newOpen && showBubble) {
+            setShowBubble(false);
+            localStorage.setItem(
+                'support_bubble_date',
+                new Date().toDateString(),
+            );
+        }
+    };
+
+    if (!isMounted || isLiveExamActive) {
         return null;
     }
 
     return (
-        <div className="fixed right-6 bottom-6 z-50">
-            <Dialog open={open} onOpenChange={setOpen}>
+        <div className="fixed right-6 bottom-6 z-50 flex items-end gap-4">
+            {showBubble && (
+                <div className="relative mb-1 flex max-w-[220px] animate-in items-start gap-2 rounded-2xl border border-border bg-card p-3 shadow-xl duration-500 fade-in slide-in-from-bottom-4">
+                    <div className="flex-1">
+                        <p className="text-sm leading-tight font-bold text-foreground">
+                            Find{' '}
+                            <span className="text-blue-600 dark:text-blue-400">
+                                {appName}
+                            </span>{' '}
+                            helpful?
+                        </p>
+                        <p className="mt-1 text-xs font-semibold text-muted-foreground">
+                            Support the project! ☕
+                        </p>
+                    </div>
+                    <button
+                        onClick={dismissBubble}
+                        className="-mt-1 -mr-1 rounded-full p-1 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus:outline-none"
+                    >
+                        <X className="size-3.5" />
+                    </button>
+                    {/* Right pointer arrow connecting to the FAB */}
+                    <div className="absolute top-1/2 -right-1.5 h-3 w-3 -translate-y-1/2 rotate-45 border-t border-r border-border bg-card" />
+                </div>
+            )}
+            <Dialog open={open} onOpenChange={handleOpenChange}>
                 <DialogTrigger asChild>
                     <Button
                         size="icon"
