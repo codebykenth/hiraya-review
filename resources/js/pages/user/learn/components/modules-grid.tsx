@@ -114,7 +114,7 @@ export function ModulesGrid({
                 <div className="mx-auto mb-5 flex size-14 items-center justify-center rounded-xl bg-slate-100 text-muted-foreground ring-8 dark:bg-slate-900">
                     <BookOpen className="size-6 text-blue-600 dark:text-blue-400" />
                 </div>
-                <span className="dark:bg-amber-950/40 mb-3.5 inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-3.5 py-1 text-[10px] font-extrabold tracking-wider text-amber-700 uppercase dark:text-amber-400">
+                <span className="mb-3.5 inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-3.5 py-1 text-[10px] font-extrabold tracking-wider text-amber-700 uppercase dark:bg-amber-950/40 dark:text-amber-400">
                     <span className="size-1.5 rounded-full bg-amber-500" />
                     Coming Soon
                 </span>

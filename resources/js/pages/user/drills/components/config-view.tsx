@@ -74,7 +74,7 @@ export function ConfigView({
 
             {/* Retake Mode Status Banner */}
             {isRetakeConfig && (
-                <div className="dark:bg-amber-950/10 dark:text-amber-400 flex flex-col justify-between gap-3 rounded-xl border border-amber-200 bg-amber-50/50 p-4 text-xs font-semibold text-amber-800 shadow-2xs sm:flex-row sm:items-center dark:border-amber-900/30">
+                <div className="flex flex-col justify-between gap-3 rounded-xl border border-amber-200 bg-amber-50/50 p-4 text-xs font-semibold text-amber-800 shadow-2xs sm:flex-row sm:items-center dark:border-amber-900/30 dark:bg-amber-950/10 dark:text-amber-400">
                     <div className="flex items-center gap-2">
                         <span className="text-sm">ðŸ”„</span>
                         <span>
@@ -85,7 +85,7 @@ export function ConfigView({
                     <button
                         type="button"
                         onClick={() => setIsRetakeConfig(false)}
-                        className="dark:bg-amber-950 shrink-0 cursor-pointer rounded-lg bg-amber-100 px-3 py-1.5 font-bold text-amber-900 transition hover:bg-amber-200 focus:outline-none dark:text-amber-400 dark:hover:bg-amber-900"
+                        className="shrink-0 cursor-pointer rounded-lg bg-amber-100 px-3 py-1.5 font-bold text-amber-900 transition hover:bg-amber-200 focus:outline-none dark:bg-amber-950 dark:text-amber-400 dark:hover:bg-amber-900"
                     >
                         Unlock & Customize Settings
                     </button>
@@ -151,7 +151,7 @@ export function ConfigView({
                             <span className="text-[10px] font-extrabold tracking-wider text-muted-foreground uppercase">
                                 ðŸ”¢ Question Count
                             </span>
-                            <span className="dark:bg-blue-950/20 rounded-md bg-blue-50/50 px-2 py-0.5 text-[10px] font-bold text-blue-600 dark:text-blue-400">
+                            <span className="rounded-md bg-blue-50/50 px-2 py-0.5 text-[10px] font-bold text-blue-600 dark:bg-blue-950/20 dark:text-blue-400">
                                 Total Questions:{' '}
                                 {questionCount === 'all'
                                     ? filteredQCount
@@ -318,7 +318,7 @@ export function ConfigView({
                                         : ''
                                 } ${
                                     isTimed
-                                        ? 'dark:bg-blue-950/10 border-blue-600 bg-blue-50/10 dark:border-blue-500'
+                                        ? 'border-blue-600 bg-blue-50/10 dark:border-blue-500 dark:bg-blue-950/10'
                                         : 'border-border bg-card hover:bg-slate-50/50 dark:hover:bg-slate-900/40'
                                 }`}
                             >
@@ -349,7 +349,7 @@ export function ConfigView({
                                         : ''
                                 } ${
                                     !isTimed
-                                        ? 'dark:bg-emerald-950/10 border-emerald-600 bg-emerald-50/10 dark:border-emerald-500'
+                                        ? 'border-emerald-600 bg-emerald-50/10 dark:border-emerald-500 dark:bg-emerald-950/10'
                                         : 'border-border bg-card hover:bg-slate-50/50 dark:hover:bg-slate-900/40'
                                 }`}
                             >

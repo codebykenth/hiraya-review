@@ -113,7 +113,7 @@ export function ScopeSettingsModal({
                                     className={`flex cursor-pointer items-center justify-between rounded-xl border p-3 transition select-none ${
                                         selectedScopeCategory === cat.id
                                             ? 'shadow-3xs border-blue-200 bg-blue-50/50 text-blue-900 dark:border-blue-900/40 dark:bg-blue-950/20 dark:text-blue-200'
-                                            : 'border-slate-200 dark:border-slate-800 bg-white text-slate-700 hover:bg-slate-50 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800/80'
+                                            : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800/80'
                                     }`}
                                 >
                                     <span className="truncate pr-2 text-sm font-semibold">
@@ -178,7 +178,7 @@ export function ScopeSettingsModal({
                                         (sub) => (
                                             <div
                                                 key={sub.id}
-                                                className="border-slate-200 shadow-3xs dark:border-slate-800 flex items-center justify-between rounded-xl border bg-white p-3 text-slate-700 dark:bg-slate-900 dark:text-slate-300"
+                                                className="shadow-3xs flex items-center justify-between rounded-xl border border-slate-200 bg-white p-3 text-slate-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300"
                                             >
                                                 <span className="truncate pr-2 text-sm font-medium">
                                                     {sub.name}

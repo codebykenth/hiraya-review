@@ -52,7 +52,7 @@ export function ScorecardView({
             {savedAttempt && (
                 <Link
                     href="/history"
-                    className="text-slate-800 mb-4 flex w-fit cursor-pointer items-center gap-1 text-xs font-black transition hover:text-blue-600 focus:outline-none dark:text-white dark:hover:text-blue-400"
+                    className="mb-4 flex w-fit cursor-pointer items-center gap-1 text-xs font-black text-slate-800 transition hover:text-blue-600 focus:outline-none dark:text-white dark:hover:text-blue-400"
                 >
                     <ChevronLeft className="size-4" /> Back to History
                 </Link>
@@ -86,7 +86,7 @@ export function ScorecardView({
                 <div className="flex items-center gap-3">
                     <button
                         onClick={() => setReviewScreenActive(true)}
-                        className="shadow-3xs hover:bg-slate-50/60 flex cursor-pointer items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-xs font-bold transition focus:outline-none dark:border-slate-800 dark:bg-slate-900 dark:hover:bg-slate-800 dark:text-slate-300"
+                        className="shadow-3xs flex cursor-pointer items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-xs font-bold transition hover:bg-slate-50/60 focus:outline-none dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800"
                     >
                         <BookOpen className="size-3.5" /> View Review
                     </button>
@@ -148,20 +148,22 @@ export function ScorecardView({
                                                     />
                                                 </svg>
                                                 <div className="absolute inset-0 flex flex-col items-center justify-center">
-                                                    <span className={`text-xl leading-none font-black sm:text-3xl ${exactPercentage >= 80 ? 'text-slate-800 dark:text-white' : 'text-rose-600 dark:text-rose-400'}`}>
+                                                    <span
+                                                        className={`text-xl leading-none font-black sm:text-3xl ${exactPercentage >= 80 ? 'text-slate-800 dark:text-white' : 'text-rose-600 dark:text-rose-400'}`}
+                                                    >
                                                         {formattedPercentage}%
                                                     </span>
                                                 </div>
                                             </div>
                                             <div className="mt-2 flex flex-col items-center gap-1 sm:mt-4 sm:gap-1.5">
                                                 <span
-                                                    className={`inline-flex rounded-full px-2 py-0.5 text-[8px] font-extrabold tracking-wider uppercase sm:px-3 sm:py-1 sm:text-[10px] ${exactPercentage >= 80 ? 'dark:text-emerald-400 bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40' : 'dark:text-rose-400 bg-rose-50 text-rose-700 dark:bg-rose-950/40'}`}
+                                                    className={`inline-flex rounded-full px-2 py-0.5 text-[8px] font-extrabold tracking-wider uppercase sm:px-3 sm:py-1 sm:text-[10px] ${exactPercentage >= 80 ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400' : 'bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-400'}`}
                                                 >
                                                     {exactPercentage >= 80
                                                         ? 'PASSED'
                                                         : 'FAILED'}
                                                 </span>
-                                                <p className="text-slate-500 mt-0.5 text-center text-[10px] leading-tight font-semibold sm:mt-1 sm:text-xs dark:text-slate-400">
+                                                <p className="mt-0.5 text-center text-[10px] leading-tight font-semibold text-slate-500 sm:mt-1 sm:text-xs dark:text-slate-400">
                                                     Final Grade
                                                 </p>
                                             </div>
@@ -231,7 +233,7 @@ export function ScorecardView({
 
                                 {/* Bottom Section: 4 Stat Boxes */}
                                 <div className="mt-4 grid w-full grid-cols-2 gap-3 border-t border-slate-100 pt-4 sm:grid-cols-4 dark:border-slate-800">
-                                    <div className="dark:border-slate-800 flex flex-col items-center justify-center rounded-xl border border-slate-100 bg-slate-50/50 p-4 text-center dark:bg-slate-950/40">
+                                    <div className="flex flex-col items-center justify-center rounded-xl border border-slate-100 bg-slate-50/50 p-4 text-center dark:border-slate-800 dark:bg-slate-950/40">
                                         <span className="text-[10px] font-extrabold tracking-wider text-slate-400 uppercase">
                                             Correct
                                         </span>
@@ -242,7 +244,7 @@ export function ScorecardView({
                                             of {results.total}
                                         </span>
                                     </div>
-                                    <div className="dark:border-slate-800 flex flex-col items-center justify-center rounded-xl border border-slate-100 bg-slate-50/50 p-4 text-center dark:bg-slate-950/40">
+                                    <div className="flex flex-col items-center justify-center rounded-xl border border-slate-100 bg-slate-50/50 p-4 text-center dark:border-slate-800 dark:bg-slate-950/40">
                                         <span className="text-[10px] font-extrabold tracking-wider text-slate-400 uppercase">
                                             Incorrect
                                         </span>
@@ -253,7 +255,7 @@ export function ScorecardView({
                                             of {results.total}
                                         </span>
                                     </div>
-                                    <div className="dark:border-slate-800 flex flex-col items-center justify-center rounded-xl border border-slate-100 bg-slate-50/50 p-4 text-center dark:bg-slate-950/40">
+                                    <div className="flex flex-col items-center justify-center rounded-xl border border-slate-100 bg-slate-50/50 p-4 text-center dark:border-slate-800 dark:bg-slate-950/40">
                                         <span className="text-[10px] font-extrabold tracking-wider text-slate-400 uppercase">
                                             Skipped
                                         </span>
@@ -264,7 +266,7 @@ export function ScorecardView({
                                             unanswered
                                         </span>
                                     </div>
-                                    <div className="dark:border-slate-800 flex flex-col items-center justify-center rounded-xl border border-slate-100 bg-slate-50/50 p-4 text-center dark:bg-slate-950/40">
+                                    <div className="flex flex-col items-center justify-center rounded-xl border border-slate-100 bg-slate-50/50 p-4 text-center dark:border-slate-800 dark:bg-slate-950/40">
                                         <span className="text-[10px] font-extrabold tracking-wider text-slate-400 uppercase">
                                             Time
                                         </span>

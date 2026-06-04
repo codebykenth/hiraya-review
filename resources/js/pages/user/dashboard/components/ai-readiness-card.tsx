@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import Pusher from 'pusher-js';
 import { useEffect, useState } from 'react';
+import type { Auth } from '@/types';
 
 interface AiReadinessCardProps {
     aiAnalysis?: {
@@ -31,7 +32,7 @@ interface AiReadinessCardProps {
 }
 
 export default function AiReadinessCard({ aiAnalysis }: AiReadinessCardProps) {
-    const { auth, pusher } = usePage().props as any;
+    const { auth, pusher } = usePage<{ auth: Auth; pusher?: any }>().props;
     const initialStatus = aiAnalysis?.status || 'no_data';
     const [localStatus, setLocalStatus] = useState<
         'no_data' | 'generating' | 'ready' | 'failed'
@@ -97,13 +98,13 @@ export default function AiReadinessCard({ aiAnalysis }: AiReadinessCardProps) {
 
                 <div className="flex flex-col items-center justify-between gap-4 text-center md:flex-row md:text-left">
                     <div className="flex flex-col items-center gap-4 md:flex-row">
-                        <div className="border-rose-200 flex size-12 shrink-0 items-center justify-center rounded-xl border bg-rose-50 text-rose-600 dark:border-rose-500/20 dark:bg-rose-500/10 dark:text-rose-400">
+                        <div className="flex size-12 shrink-0 items-center justify-center rounded-xl border border-rose-200 bg-rose-50 text-rose-600 dark:border-rose-500/20 dark:bg-rose-500/10 dark:text-rose-400">
                             <Brain className="size-6" />
                         </div>
                         <div>
                             <h3 className="flex items-center justify-center gap-2 text-lg font-bold tracking-tight text-slate-900 md:justify-start dark:text-white">
                                 AI Readiness Report
-                                <span className="border-rose-200 inline-flex items-center rounded-full border bg-rose-50 px-2 py-0.5 text-[10px] font-medium text-rose-700 dark:border-rose-500/20 dark:bg-rose-500/10 dark:text-rose-400">
+                                <span className="inline-flex items-center rounded-full border border-rose-200 bg-rose-50 px-2 py-0.5 text-[10px] font-medium text-rose-700 dark:border-rose-500/20 dark:bg-rose-500/10 dark:text-rose-400">
                                     Failed
                                 </span>
                             </h3>
@@ -135,13 +136,13 @@ export default function AiReadinessCard({ aiAnalysis }: AiReadinessCardProps) {
 
                 <div className="flex flex-col items-center justify-between gap-4 text-center md:flex-row md:text-left">
                     <div className="flex flex-col items-center gap-4 md:flex-row">
-                        <div className="border-blue-200 flex size-12 shrink-0 items-center justify-center rounded-xl border bg-blue-50 text-blue-600 dark:border-blue-500/20 dark:bg-blue-500/10 dark:text-blue-400">
+                        <div className="flex size-12 shrink-0 items-center justify-center rounded-xl border border-blue-200 bg-blue-50 text-blue-600 dark:border-blue-500/20 dark:bg-blue-500/10 dark:text-blue-400">
                             <Brain className="size-6 animate-pulse" />
                         </div>
                         <div>
                             <h3 className="flex items-center justify-center gap-2 text-lg font-bold tracking-tight text-slate-900 md:justify-start dark:text-white">
                                 AI Readiness Report
-                                <span className="border-blue-200 inline-flex items-center rounded-full border bg-blue-50 px-2 py-0.5 text-[10px] font-medium text-blue-700 dark:border-blue-500/20 dark:bg-blue-500/10 dark:text-blue-400">
+                                <span className="inline-flex items-center rounded-full border border-blue-200 bg-blue-50 px-2 py-0.5 text-[10px] font-medium text-blue-700 dark:border-blue-500/20 dark:bg-blue-500/10 dark:text-blue-400">
                                     Locked
                                 </span>
                             </h3>
@@ -165,7 +166,7 @@ export default function AiReadinessCard({ aiAnalysis }: AiReadinessCardProps) {
                 <div className="flex flex-col items-center justify-center gap-4 py-8 text-center">
                     <div className="relative flex items-center justify-center">
                         <div className="absolute size-16 animate-ping rounded-full border border-blue-200 dark:border-blue-500/20" />
-                        <div className="border-blue-200 flex size-14 items-center justify-center rounded-full border bg-blue-50 text-blue-600 dark:border-blue-500/30 dark:bg-blue-500/10 dark:text-blue-400">
+                        <div className="flex size-14 items-center justify-center rounded-full border border-blue-200 bg-blue-50 text-blue-600 dark:border-blue-500/30 dark:bg-blue-500/10 dark:text-blue-400">
                             <Loader2 className="size-7 animate-spin" />
                         </div>
                     </div>
@@ -232,13 +233,13 @@ export default function AiReadinessCard({ aiAnalysis }: AiReadinessCardProps) {
                 {/* Header */}
                 <div className="mb-6 flex flex-col gap-4 border-b border-slate-200/80 pb-4 sm:flex-row sm:items-center sm:justify-between dark:border-slate-800/80">
                     <div className="flex items-center gap-3">
-                        <div className="border-blue-200 flex size-10 items-center justify-center rounded-xl border bg-blue-50 text-blue-600 dark:border-blue-500/20 dark:bg-blue-500/10 dark:text-blue-400">
+                        <div className="flex size-10 items-center justify-center rounded-xl border border-blue-200 bg-blue-50 text-blue-600 dark:border-blue-500/20 dark:bg-blue-500/10 dark:text-blue-400">
                             <Brain className="size-5" />
                         </div>
                         <div>
                             <h3 className="flex items-center gap-2 text-base font-bold tracking-tight text-slate-900 dark:text-white">
                                 AI Readiness Report
-                                <span className="border-indigo-200 inline-flex items-center gap-1 rounded-full border bg-indigo-50 px-2 py-0.5 text-[9px] font-black tracking-wider text-indigo-700 uppercase dark:border-indigo-500/20 dark:bg-indigo-500/10 dark:text-indigo-400">
+                                <span className="inline-flex items-center gap-1 rounded-full border border-indigo-200 bg-indigo-50 px-2 py-0.5 text-[9px] font-black tracking-wider text-indigo-700 uppercase dark:border-indigo-500/20 dark:bg-indigo-500/10 dark:text-indigo-400">
                                     <Sparkles className="size-2.5" />
                                     Weekly Update
                                 </span>
@@ -318,7 +319,7 @@ export default function AiReadinessCard({ aiAnalysis }: AiReadinessCardProps) {
                     {/* Verdict: 9 cols */}
                     <div className="flex flex-col gap-4 md:col-span-9">
                         <div>
-                            <p className="text-slate-800 text-base leading-relaxed font-bold dark:text-slate-100">
+                            <p className="text-base leading-relaxed font-bold text-slate-800 dark:text-slate-100">
                                 {data.verdict}
                             </p>
                         </div>
@@ -343,7 +344,7 @@ export default function AiReadinessCard({ aiAnalysis }: AiReadinessCardProps) {
                                             return (
                                                 <span
                                                     key={strength}
-                                                    className="border-emerald-200 inline-flex items-center rounded-full border bg-emerald-50 px-2.5 py-0.5 text-xs font-semibold text-emerald-700 dark:border-emerald-500/20 dark:bg-emerald-500/10 dark:text-emerald-400"
+                                                    className="inline-flex items-center rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-0.5 text-xs font-semibold text-emerald-700 dark:border-emerald-500/20 dark:bg-emerald-500/10 dark:text-emerald-400"
                                                 >
                                                     {cleanStrength}
                                                 </span>
@@ -381,7 +382,7 @@ export default function AiReadinessCard({ aiAnalysis }: AiReadinessCardProps) {
                                                     return (
                                                         <span
                                                             key={weakness}
-                                                            className="border-rose-200 inline-flex items-center rounded-full border bg-rose-50 px-2.5 py-0.5 text-xs font-semibold text-rose-700 dark:border-rose-500/20 dark:bg-rose-500/10 dark:text-rose-400"
+                                                            className="inline-flex items-center rounded-full border border-rose-200 bg-rose-50 px-2.5 py-0.5 text-xs font-semibold text-rose-700 dark:border-rose-500/20 dark:bg-rose-500/10 dark:text-rose-400"
                                                         >
                                                             {cleanWeakness}
                                                         </span>
@@ -425,7 +426,7 @@ export default function AiReadinessCard({ aiAnalysis }: AiReadinessCardProps) {
                                         <Link
                                             key={module}
                                             href={`/learn?search=${encodeURIComponent(module)}`}
-                                            className="hover:border-slate-300 dark:border-slate-700 inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-xs font-bold text-slate-700 transition hover:bg-slate-50 hover:text-slate-900 dark:bg-slate-800/80 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:text-white"
+                                            className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-xs font-bold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900 dark:border-slate-700 dark:bg-slate-800/80 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:text-white"
                                         >
                                             {module}
                                             <ChevronRight className="size-3" />

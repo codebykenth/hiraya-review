@@ -298,7 +298,7 @@ export function AdminTable<T>({
                                 onClick={() =>
                                     handlePageChange(currentPage - 1)
                                 }
-                                className="shadow-3xs dark:text-slate-350 dark:hover:bg-slate-800 h-8 cursor-pointer px-3 text-xs font-bold focus:outline-none dark:border-slate-800 dark:bg-slate-900"
+                                className="shadow-3xs dark:text-slate-350 h-8 cursor-pointer px-3 text-xs font-bold focus:outline-none dark:border-slate-800 dark:bg-slate-900 dark:hover:bg-slate-800"
                             >
                                 Previous
                             </Button>
@@ -334,7 +334,7 @@ export function AdminTable<T>({
                                         className={`size-8 cursor-pointer p-0 text-xs font-black transition focus:outline-none ${
                                             isActive
                                                 ? 'shadow-3xs bg-blue-600 text-white hover:bg-blue-700'
-                                                : 'dark:text-slate-350 dark:hover:bg-slate-800 border-slate-200 bg-white text-slate-700 dark:border-slate-800 dark:bg-slate-900'
+                                                : 'dark:text-slate-350 border-slate-200 bg-white text-slate-700 dark:border-slate-800 dark:bg-slate-900 dark:hover:bg-slate-800'
                                         }`}
                                     >
                                         {pageNum}
@@ -349,7 +349,7 @@ export function AdminTable<T>({
                                 onClick={() =>
                                     handlePageChange(currentPage + 1)
                                 }
-                                className="shadow-3xs dark:text-slate-350 dark:hover:bg-slate-800 h-8 cursor-pointer px-3 text-xs font-bold focus:outline-none dark:border-slate-800 dark:bg-slate-900"
+                                className="shadow-3xs dark:text-slate-350 h-8 cursor-pointer px-3 text-xs font-bold focus:outline-none dark:border-slate-800 dark:bg-slate-900 dark:hover:bg-slate-800"
                             >
                                 Next
                             </Button>

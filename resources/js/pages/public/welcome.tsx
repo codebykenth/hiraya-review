@@ -31,10 +31,11 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import { register } from '@/routes';
+import type { Auth } from '@/types';
 import FeatureGrid from './components/feature-grid';
 
 export default function Welcome() {
-    const { auth } = usePage().props;
+    const { auth } = usePage<{ auth: Auth }>().props;
     const [isFreeExamModalOpen, setIsFreeExamModalOpen] = useState(false);
     const [hoveredStep, setHoveredStep] = useState<number | null>(null);
 
@@ -111,8 +112,6 @@ export default function Welcome() {
             answer: 'Absolutely. Hiraya Review offers free access to its foundation study tracks and basic question pools.',
         },
     ];
-
-
 
     const websiteSchema = {
         '@context': 'https://schema.org',
@@ -477,17 +476,19 @@ export default function Welcome() {
                                 <Card
                                     onMouseEnter={() => setHoveredStep(1)}
                                     onMouseLeave={() => setHoveredStep(null)}
-                                    className={`relative flex flex-col items-center overflow-hidden rounded-xl border border-l-4 border-slate-200/80 bg-card p-8 text-center shadow-sm transition-all duration-300 ${hoveredStep === 1
+                                    className={`relative flex flex-col items-center overflow-hidden rounded-xl border border-l-4 border-slate-200/80 bg-card p-8 text-center shadow-sm transition-all duration-300 ${
+                                        hoveredStep === 1
                                             ? 'border-l-primary'
                                             : 'border-l-primary'
-                                        } hover:shadow-md`}
+                                    } hover:shadow-md`}
                                 >
                                     <div
-                                        className={`z-10 flex h-12 w-12 items-center justify-center rounded-full text-lg font-bold shadow-md transition-colors duration-300 ${hoveredStep === null ||
-                                                hoveredStep === 1
+                                        className={`z-10 flex h-12 w-12 items-center justify-center rounded-full text-lg font-bold shadow-md transition-colors duration-300 ${
+                                            hoveredStep === null ||
+                                            hoveredStep === 1
                                                 ? 'bg-primary text-white'
                                                 : 'border-2 border-primary bg-card text-primary'
-                                            }`}
+                                        }`}
                                     >
                                         1
                                     </div>
@@ -504,16 +505,18 @@ export default function Welcome() {
                                 <Card
                                     onMouseEnter={() => setHoveredStep(2)}
                                     onMouseLeave={() => setHoveredStep(null)}
-                                    className={`relative flex flex-col items-center overflow-hidden rounded-xl border border-l-4 border-slate-200/80 bg-card p-8 text-center shadow-sm transition-all duration-300 ${hoveredStep === 2
+                                    className={`relative flex flex-col items-center overflow-hidden rounded-xl border border-l-4 border-slate-200/80 bg-card p-8 text-center shadow-sm transition-all duration-300 ${
+                                        hoveredStep === 2
                                             ? 'border-l-primary'
                                             : 'border-l-primary'
-                                        } hover:shadow-md`}
+                                    } hover:shadow-md`}
                                 >
                                     <div
-                                        className={`z-10 flex h-12 w-12 items-center justify-center rounded-full text-lg font-bold shadow-sm transition-colors duration-300 ${hoveredStep === 2
+                                        className={`z-10 flex h-12 w-12 items-center justify-center rounded-full text-lg font-bold shadow-sm transition-colors duration-300 ${
+                                            hoveredStep === 2
                                                 ? 'bg-primary text-white'
                                                 : 'border-2 border-primary bg-card text-primary'
-                                            }`}
+                                        }`}
                                     >
                                         2
                                     </div>
@@ -530,16 +533,18 @@ export default function Welcome() {
                                 <Card
                                     onMouseEnter={() => setHoveredStep(3)}
                                     onMouseLeave={() => setHoveredStep(null)}
-                                    className={`relative flex flex-col items-center overflow-hidden rounded-xl border border-l-4 border-slate-200/80 bg-card p-8 text-center shadow-sm transition-all duration-300 ${hoveredStep === 3
+                                    className={`relative flex flex-col items-center overflow-hidden rounded-xl border border-l-4 border-slate-200/80 bg-card p-8 text-center shadow-sm transition-all duration-300 ${
+                                        hoveredStep === 3
                                             ? 'border-l-primary'
                                             : 'border-l-primary'
-                                        } hover:shadow-md`}
+                                    } hover:shadow-md`}
                                 >
                                     <div
-                                        className={`z-10 flex h-12 w-12 items-center justify-center rounded-full text-lg font-bold shadow-sm transition-colors duration-300 ${hoveredStep === 3
+                                        className={`z-10 flex h-12 w-12 items-center justify-center rounded-full text-lg font-bold shadow-sm transition-colors duration-300 ${
+                                            hoveredStep === 3
                                                 ? 'bg-primary text-white'
                                                 : 'border-2 border-primary bg-card text-primary'
-                                            }`}
+                                        }`}
                                     >
                                         3
                                     </div>
@@ -583,7 +588,7 @@ export default function Welcome() {
                                 return (
                                     <div
                                         key={index}
-                                        className="dark:border-slate-800 overflow-hidden rounded-xl border border-slate-200/80 bg-white shadow-sm transition-all duration-300 dark:bg-slate-900/40"
+                                        className="overflow-hidden rounded-xl border border-slate-200/80 bg-white shadow-sm transition-all duration-300 dark:border-slate-800 dark:bg-slate-900/40"
                                     >
                                         <button
                                             onClick={() =>
@@ -597,17 +602,19 @@ export default function Welcome() {
                                                 {faq.question}
                                             </span>
                                             <ChevronDown
-                                                className={`h-5 w-5 shrink-0 text-slate-400 transition-transform duration-300 ${isOpen
+                                                className={`h-5 w-5 shrink-0 text-slate-400 transition-transform duration-300 ${
+                                                    isOpen
                                                         ? 'rotate-180 text-primary'
                                                         : ''
-                                                    }`}
+                                                }`}
                                             />
                                         </button>
                                         <div
-                                            className={`transition-all duration-300 ease-in-out ${isOpen
-                                                    ? 'dark:border-slate-800 max-h-[250px] border-t border-slate-100'
+                                            className={`transition-all duration-300 ease-in-out ${
+                                                isOpen
+                                                    ? 'max-h-[250px] border-t border-slate-100 dark:border-slate-800'
                                                     : 'max-h-0'
-                                                } overflow-hidden`}
+                                            } overflow-hidden`}
                                         >
                                             <div className="px-6 py-5 text-sm leading-relaxed font-normal text-slate-600 dark:text-slate-400">
                                                 {faq.answer}

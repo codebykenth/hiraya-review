@@ -187,7 +187,7 @@ export function useExamState({
         message: '',
         confirmLabel: '',
         variant: 'success',
-        onConfirm: () => { },
+        onConfirm: () => {},
     });
 
     const [isExamActive, setIsExamActive] = useState(() => {
@@ -268,8 +268,8 @@ export function useExamState({
         const filtered =
             reviewCategoryFilter !== 'All Categories'
                 ? activeQuestions.filter(
-                    (q) => q.category === reviewCategoryFilter,
-                )
+                      (q) => q.category === reviewCategoryFilter,
+                  )
                 : activeQuestions;
 
         const subcats = Array.from(
@@ -559,7 +559,7 @@ export function useExamState({
             if (
                 reviewSubcategoryFilter !== 'All Subcategories' &&
                 (q.subcategory || 'General Concepts') !==
-                reviewSubcategoryFilter
+                    reviewSubcategoryFilter
             ) {
                 return false;
             }
@@ -872,7 +872,7 @@ export function useExamState({
             const track = getTrackNameForExam(examId);
             const fromServer =
                 seenQuestionIdsByTrack[
-                track as keyof typeof seenQuestionIdsByTrack
+                    track as keyof typeof seenQuestionIdsByTrack
                 ] ?? [];
             const fromCurrentSession =
                 selectedExamId === examId && activeQuestions.length > 0
@@ -963,8 +963,8 @@ export function useExamState({
                     const key = q.subcategory || 'General';
 
                     if (!groups[key]) {
-groups[key] = [];
-}
+                        groups[key] = [];
+                    }
 
                     groups[key].push(q);
                 });
@@ -972,8 +972,8 @@ groups[key] = [];
                 const subcatNames = Object.keys(groups);
 
                 if (subcatNames.length === 0) {
-return pickFlat(pool, targetCount, catName);
-}
+                    return pickFlat(pool, targetCount, catName);
+                }
 
                 // Divide quota evenly, distribute remainder round-robin
                 const baseQuota = Math.floor(targetCount / subcatNames.length);
@@ -984,8 +984,8 @@ return pickFlat(pool, targetCount, catName);
                     const quota = baseQuota + (remainder > 0 ? 1 : 0);
 
                     if (remainder > 0) {
-remainder--;
-}
+                        remainder--;
+                    }
 
                     const subPool = groups[subName];
 
@@ -1035,11 +1035,7 @@ remainder--;
                     ...pickBalanced(verbalPool, 45, 'Verbal Ability', true),
                 );
                 scoredPool.push(
-                    ...pickBalanced(
-                        analyticalPool,
-                        52,
-                        'Analytical Ability',
-                    ),
+                    ...pickBalanced(analyticalPool, 52, 'Analytical Ability'),
                 );
                 scoredPool.push(
                     ...pickBalanced(numericalPool, 45, 'Numerical Ability'),
@@ -1335,7 +1331,7 @@ remainder--;
         isExamSubmitted,
     ]);
 
-    const handleSubmitExamRef = useRef<(auto?: boolean) => void>(() => { });
+    const handleSubmitExamRef = useRef<(auto?: boolean) => void>(() => {});
 
     // Live countdown timer
     useEffect(() => {
@@ -1563,17 +1559,17 @@ remainder--;
         const trackName = isDrillSessionLocal
             ? 'Drill'
             : detailsTitleLocal.includes('Sub-Professional')
-                ? 'Subprofessional'
-                : 'Professional';
+              ? 'Subprofessional'
+              : 'Professional';
         const finalCategoryId = isDrillSessionLocal
             ? drillCategoryIdRef.current ||
-            savedAttemptRef.current?.category_id ||
-            null
+              savedAttemptRef.current?.category_id ||
+              null
             : null;
         const finalCategoryName = isDrillSessionLocal
             ? drillCategoryNameRef.current ||
-            savedAttemptRef.current?.cat_scores?.metadata?.category_name ||
-            'Practice Drill'
+              savedAttemptRef.current?.cat_scores?.metadata?.category_name ||
+              'Practice Drill'
             : detailsTitleLocal;
 
         const originalAnswers: Record<number, number> = {};

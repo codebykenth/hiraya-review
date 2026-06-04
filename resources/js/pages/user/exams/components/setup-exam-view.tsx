@@ -1,4 +1,4 @@
-﻿import { Head } from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
 import {
     Award,
     ClipboardList,
@@ -7,6 +7,8 @@ import {
     Clock,
     Timer,
     ArrowRight,
+    BarChart,
+    Target,
 } from 'lucide-react';
 import React from 'react';
 import { PageContainer } from '@/components/layout/page-container';
@@ -52,17 +54,17 @@ export function SetupExamView({
                             title="How Mock Exams Work"
                             tips={[
                                 {
-                                    icon: 'â±ï¸',
+                                    icon: <Clock className="size-4" />,
                                     title: 'Full Simulation',
                                     text: 'This is a strict simulation of the actual Civil Service Exam. Once started, the timer cannot be paused.',
                                 },
                                 {
-                                    icon: 'ðŸ“Š',
+                                    icon: <BarChart className="size-4" />,
                                     title: 'Post-Exam Review',
                                     text: 'You will only see your score and the correct answers after you submit the entire exam. Use the review mode to analyze your mistakes.',
                                 },
                                 {
-                                    icon: 'ðŸŽ¯',
+                                    icon: <Target className="size-4" />,
                                     title: 'Passing Target',
                                     text: 'Aim for a score of 80% or higher, which is the actual passing rate for the official Civil Service Exam.',
                                 },

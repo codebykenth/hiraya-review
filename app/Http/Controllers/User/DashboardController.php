@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers\User;
 
-use App\Models\ExamAttempt;
-use App\Models\UserAiAnalysis;
 use App\Jobs\GenerateUserAnalysisJob;
+use App\Models\ExamAttempt;
+use App\Models\ExamDate;
+use App\Models\UserAiAnalysis;
 use App\Services\ExamAttemptFormatter;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Schema;
 use Inertia\Inertia;
 
 class DashboardController
@@ -26,8 +29,8 @@ class DashboardController
         $examDate = null;
         $examDateRaw = null;
         $daysUntilExam = null;
-        if (\Illuminate\Support\Facades\Schema::hasTable('exam_dates')) {
-            $examDateObj = \App\Models\ExamDate::where('is_active', true)
+        if (Schema::hasTable('exam_dates')) {
+            $examDateObj = ExamDate::where('is_active', true)
                 ->where('date', '>', now())
                 ->orderBy('date')
                 ->first();
@@ -37,9 +40,9 @@ class DashboardController
                 $daysUntilExam = (int) ceil(now()->diffInDays($examDateObj->date, false));
             }
         }
-        
-        if (!$examDate) {
-            $defaultDate = \Carbon\Carbon::parse('2026-08-09');
+
+        if (! $examDate) {
+            $defaultDate = Carbon::parse('2026-08-09');
             $examDate = $defaultDate->format('F j, Y');
             $examDateRaw = $defaultDate->toDateString();
             $daysUntilExam = (int) ceil(now()->diffInDays($defaultDate, false));

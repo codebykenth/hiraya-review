@@ -24,6 +24,14 @@ interface HowItWorksModalProps {
     tips: Tip[];
 }
 
+const ICON_STYLES = [
+    'bg-blue-100 text-blue-600 dark:bg-blue-900/40 dark:text-blue-400',
+    'bg-amber-100 text-amber-600 dark:bg-amber-900/40 dark:text-amber-400',
+    'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/40 dark:text-emerald-400',
+    'bg-purple-100 text-purple-600 dark:bg-purple-900/40 dark:text-purple-400',
+    'bg-pink-100 text-pink-600 dark:bg-pink-900/40 dark:text-pink-400',
+];
+
 export function HowItWorksModal({
     title = 'How it Works',
     description = 'Master this feature with these quick tips:',
@@ -52,21 +60,28 @@ export function HowItWorksModal({
                     </DialogDescription>
                 </DialogHeader>
                 <div className="space-y-4 py-2">
-                    {tips.map((tip, idx) => (
-                        <div key={idx} className="flex gap-3">
-                            <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
-                                {tip.icon}
+                    {tips.map((tip, idx) => {
+                        const styleClass =
+                            ICON_STYLES[idx % ICON_STYLES.length];
+
+                        return (
+                            <div key={idx} className="flex gap-3">
+                                <div
+                                    className={`flex size-8 shrink-0 items-center justify-center rounded-full ${styleClass}`}
+                                >
+                                    {tip.icon}
+                                </div>
+                                <div>
+                                    <h4 className="text-sm font-bold text-foreground">
+                                        {tip.title}
+                                    </h4>
+                                    <p className="mt-0.5 text-xs text-muted-foreground">
+                                        {tip.text}
+                                    </p>
+                                </div>
                             </div>
-                            <div>
-                                <h4 className="text-sm font-bold text-foreground">
-                                    {tip.title}
-                                </h4>
-                                <p className="mt-0.5 text-xs text-muted-foreground">
-                                    {tip.text}
-                                </p>
-                            </div>
-                        </div>
-                    ))}
+                        );
+                    })}
                 </div>
                 <DialogFooter className="mt-2 sm:justify-center">
                     <DialogClose asChild>

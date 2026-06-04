@@ -1,4 +1,5 @@
-﻿import React from 'react';
+import { BarChart, TrendingUp, Target } from 'lucide-react';
+import React from 'react';
 import { PageContainer } from '@/components/layout/page-container';
 import { PageHeader } from '@/components/layout/page-header';
 import { HowItWorksModal } from '@/components/shared/how-it-works-modal';
@@ -38,17 +39,17 @@ export default function AnalyticsIndex({ stats, aiAnalysis }: AnalyticsProps) {
                         title="How Analytics Works"
                         tips={[
                             {
-                                icon: 'ðŸ“Š',
+                                icon: <BarChart className="size-4" />,
                                 title: 'Performance Stats',
                                 text: 'Track your average score, passing rate, and total practice runs across professional or subprofessional categories.',
                             },
                             {
-                                icon: 'ðŸ“ˆ',
+                                icon: <TrendingUp className="size-4" />,
                                 title: 'Score Trends',
                                 text: 'Interactive chart illustrating your performance improvements across historical attempts.',
                             },
                             {
-                                icon: 'ðŸŽ¯',
+                                icon: <Target className="size-4" />,
                                 title: 'Diagnostic Gaps',
                                 text: 'Detailed subtopic analysis pointing out your exact strengths and target focus areas.',
                             },
@@ -64,8 +65,8 @@ export default function AnalyticsIndex({ stats, aiAnalysis }: AnalyticsProps) {
 
             {/* Performance Metrics Card Grid Layout */}
             <MetricsGrid activeStats={activeStats} />
-            <div className="flex flex-col gap-6 mt-6">
-            {/* Score Trends & Category breakdown container layout */}
+            <div className="mt-6 flex flex-col gap-6">
+                {/* Score Trends & Category breakdown container layout */}
                 {/* Row 1: Score History (Full Width) */}
                 <ScoreHistoryChart
                     chartData={filteredChartData}
@@ -85,7 +86,9 @@ export default function AnalyticsIndex({ stats, aiAnalysis }: AnalyticsProps) {
                 </div>
 
                 {/* Row 4: Attempt Breakdown (Full Width) */}
-                <AttemptBreakdownChart data={activeStats.attemptBreakdowns || []} />
+                <AttemptBreakdownChart
+                    data={activeStats.attemptBreakdowns || []}
+                />
             </div>
         </PageContainer>
     );

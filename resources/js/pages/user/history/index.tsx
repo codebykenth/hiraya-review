@@ -1,4 +1,5 @@
-﻿import { Head } from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
+import { Search, Calendar, Trash2 } from 'lucide-react';
 import React from 'react';
 import { PageContainer } from '@/components/layout/page-container';
 import { PageHeader } from '@/components/layout/page-header';
@@ -47,17 +48,17 @@ export default function HistoryPage(props: HistoryPageProps) {
                             title="How History Works"
                             tips={[
                                 {
-                                    icon: 'ðŸ”',
+                                    icon: <Search className="size-4" />,
                                     title: 'Detailed Breakdowns',
                                     text: 'Click on any past attempt to see a comprehensive breakdown of your score across different subject categories.',
                                 },
                                 {
-                                    icon: 'ðŸ“…',
+                                    icon: <Calendar className="size-4" />,
                                     title: 'Filter by Date & Track',
                                     text: 'Use the filters to quickly find specific exam runs or see how you performed during a specific time period.',
                                 },
                                 {
-                                    icon: 'ðŸ—‘ï¸',
+                                    icon: <Trash2 className="size-4" />,
                                     title: 'Manage Records',
                                     text: 'You can delete old or irrelevant attempt records to keep your AI Readiness Score focused on your most recent performance.',
                                 },

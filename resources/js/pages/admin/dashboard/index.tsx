@@ -6,6 +6,7 @@ import {
     index as questionsIndex,
     drafts as questionsDrafts,
 } from '@/routes/questions';
+import type { Auth } from '@/types';
 import { DashboardAttemptsPanel } from './components/dashboard-attempts-panel';
 import { DashboardStatsGrid } from './components/dashboard-stats-grid';
 import { DashboardSyllabusPanel } from './components/dashboard-syllabus-panel';
@@ -16,7 +17,7 @@ export default function AdminDashboard({
     recentAttempts = [],
     categoriesStats = [],
 }: AdminDashboardProps) {
-    const { auth } = usePage().props;
+    const { auth } = usePage<{ auth: Auth }>().props;
     const adminName = auth?.user?.name ? auth.user.name.split(' ')[0] : 'Admin';
 
     return (

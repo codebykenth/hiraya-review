@@ -1,25 +1,38 @@
 import { Target } from 'lucide-react';
 import React from 'react';
-import { RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, ResponsiveContainer } from 'recharts';
+import {
+    RadarChart,
+    PolarGrid,
+    PolarAngleAxis,
+    PolarRadiusAxis,
+    Radar,
+    ResponsiveContainer,
+} from 'recharts';
 import { Card } from '@/components/ui/card';
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
+import {
+    ChartContainer,
+    ChartTooltip,
+    ChartTooltipContent,
+} from '@/components/ui/chart';
 import type { AnalyticsCategory } from '../types';
 
 interface SubcategoryRadarChartProps {
     categories: AnalyticsCategory[];
 }
 
-export function SubcategoryRadarChart({ categories }: SubcategoryRadarChartProps) {
+export function SubcategoryRadarChart({
+    categories,
+}: SubcategoryRadarChartProps) {
     // Flatten subcategories and take top 6 or all to form radar shape
     // Or we can just use the categories themselves if there are too many subcategories.
     // Let's use the categories since there are exactly 5, making a perfect pentagon radar chart!
     // The user's request: "Radar/Spider - Skill shape across all subcategories"
     // Wait, let's collect all subcategories. If there are 15+, it might look messy but radar handles it.
-    
+
     const data: any[] = [];
-    categories.forEach(cat => {
+    categories.forEach((cat) => {
         if (cat.subcategories) {
-            cat.subcategories.forEach(sub => {
+            cat.subcategories.forEach((sub) => {
                 data.push({
                     subject: sub.name,
                     accuracy: sub.percentage,
@@ -43,7 +56,7 @@ export function SubcategoryRadarChart({ categories }: SubcategoryRadarChartProps
     };
 
     return (
-        <Card className="p-5 border border-slate-200/80 bg-slate-50/50 dark:border-slate-800 dark:bg-slate-950/40">
+        <Card className="border border-slate-200/80 bg-slate-50/50 p-5 dark:border-slate-800 dark:bg-slate-950/40">
             <div className="mb-4 flex items-center gap-2">
                 <Target className="size-4.5 text-indigo-500" />
                 <div>
@@ -59,14 +72,31 @@ export function SubcategoryRadarChart({ categories }: SubcategoryRadarChartProps
             <div className="h-[250px] w-full">
                 <ChartContainer config={config} className="h-full w-full">
                     <ResponsiveContainer width="100%" height="100%">
-                        <RadarChart cx="50%" cy="50%" outerRadius="70%" data={data}>
+                        <RadarChart
+                            cx="50%"
+                            cy="50%"
+                            outerRadius="70%"
+                            data={data}
+                        >
                             <PolarGrid stroke="var(--border)" opacity={0.5} />
-                            <PolarAngleAxis 
-                                dataKey="subject" 
-                                tick={{ fontSize: 9, fill: 'var(--muted-foreground)' }} 
-                                tickFormatter={(val) => val.length > 12 ? val.substring(0, 12) + '...' : val}
+                            <PolarAngleAxis
+                                dataKey="subject"
+                                tick={{
+                                    fontSize: 9,
+                                    fill: 'var(--muted-foreground)',
+                                }}
+                                tickFormatter={(val) =>
+                                    val.length > 12
+                                        ? val.substring(0, 12) + '...'
+                                        : val
+                                }
                             />
-                            <PolarRadiusAxis angle={30} domain={[0, 100]} tick={{ fontSize: 9 }} tickCount={5} />
+                            <PolarRadiusAxis
+                                angle={30}
+                                domain={[0, 100]}
+                                tick={{ fontSize: 9 }}
+                                tickCount={5}
+                            />
                             <Radar
                                 name="Accuracy"
                                 dataKey="accuracy"
@@ -74,7 +104,11 @@ export function SubcategoryRadarChart({ categories }: SubcategoryRadarChartProps
                                 fill="var(--color-accuracy)"
                                 fillOpacity={0.4}
                             />
-                            <ChartTooltip content={<ChartTooltipContent indicator="line" />} />
+                            <ChartTooltip
+                                content={
+                                    <ChartTooltipContent indicator="line" />
+                                }
+                            />
                         </RadarChart>
                     </ResponsiveContainer>
                 </ChartContainer>

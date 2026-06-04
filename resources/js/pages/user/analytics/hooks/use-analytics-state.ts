@@ -1,5 +1,6 @@
 import { router, usePage } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
+import type { Auth } from '@/types';
 import type { AnalyticsProps, AnalyticsStats } from '../types';
 
 const defaultStats: AnalyticsStats = {
@@ -101,7 +102,7 @@ const defaultStats: AnalyticsStats = {
 };
 
 export function useAnalyticsState({ stats }: AnalyticsProps) {
-    const { auth } = usePage().props as any;
+    const { auth } = usePage<{ auth: Auth }>().props;
     const firstName = auth?.user?.name ? auth.user.name.split(' ')[0] : 'User';
     const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
     const [isOpen, setIsOpen] = useState(false);

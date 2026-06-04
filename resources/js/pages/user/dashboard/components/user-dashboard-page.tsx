@@ -16,10 +16,11 @@ import { index as analyticsIndex } from '@/routes/analytics';
 import { index as drillsIndex } from '@/routes/drills';
 import { index as examsIndex } from '@/routes/exams';
 import { index as learnIndex } from '@/routes/learn';
+import type { Auth } from '@/types';
 import type { DashboardProps } from '../types';
 
 export function UserDashboardPage({ stats, aiAnalysis }: DashboardProps) {
-    const { auth } = usePage().props as any;
+    const { auth } = usePage<{ auth: Auth }>().props;
     const firstName = auth?.user?.name ? auth.user.name.split(' ')[0] : 'User';
 
     useEffect(() => {
@@ -93,7 +94,8 @@ export function UserDashboardPage({ stats, aiAnalysis }: DashboardProps) {
                                 Study Scope
                             </h4>
                             <p className="mt-1 text-xs leading-relaxed text-slate-500 dark:text-slate-400">
-                                Access learning modules, review guides, and core materials.
+                                Access learning modules, review guides, and core
+                                materials.
                             </p>
                         </div>
                     </div>
@@ -116,7 +118,8 @@ export function UserDashboardPage({ stats, aiAnalysis }: DashboardProps) {
                                 Practice Drills
                             </h4>
                             <p className="mt-1 text-xs leading-relaxed text-slate-500 dark:text-slate-400">
-                                Sharpen your skills with quick subtopic practice drills.
+                                Sharpen your skills with quick subtopic practice
+                                drills.
                             </p>
                         </div>
                     </div>
@@ -139,7 +142,8 @@ export function UserDashboardPage({ stats, aiAnalysis }: DashboardProps) {
                                 Mock Exams
                             </h4>
                             <p className="mt-1 text-xs leading-relaxed text-slate-500 dark:text-slate-400">
-                                Simulate the real exam environment with full-length runs.
+                                Simulate the real exam environment with
+                                full-length runs.
                             </p>
                         </div>
                     </div>
@@ -162,7 +166,8 @@ export function UserDashboardPage({ stats, aiAnalysis }: DashboardProps) {
                                 AI & Analytics
                             </h4>
                             <p className="mt-1 text-xs leading-relaxed text-slate-500 dark:text-slate-400">
-                                Track passing probability, score trends, and study plans.
+                                Track passing probability, score trends, and
+                                study plans.
                             </p>
                         </div>
                     </div>

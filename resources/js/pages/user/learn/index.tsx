@@ -1,11 +1,13 @@
-﻿import { Head, usePage, router } from '@inertiajs/react';
+import { Head, usePage, router } from '@inertiajs/react';
 import Echo from 'laravel-echo';
+import { BookOpen, CheckCircle, BarChart } from 'lucide-react';
 import Pusher from 'pusher-js';
 import React from 'react';
 import { toast } from 'sonner';
 import { PageContainer } from '@/components/layout/page-container';
 import { PageHeader } from '@/components/layout/page-header';
 import { HowItWorksModal } from '@/components/shared/how-it-works-modal';
+import type { Auth } from '@/types';
 import { ModulesGrid } from './components/modules-grid';
 import { SearchFilterRow } from './components/search-filter-row';
 import { useLearnState } from './hooks/use-learn-state';
@@ -21,7 +23,7 @@ const progressBarColors: Record<string, string> = {
 
 export default function LearnIndex(props: LearnIndexProps) {
     const { modules = [], categories = [] } = props;
-    const { auth, pusher } = usePage<{ auth: { user: any }; pusher?: any }>()
+    const { auth, pusher } = usePage<{ auth: { user: Auth }; pusher?: any }>()
         .props;
     const isLoggedIn = !!auth?.user;
 
@@ -133,17 +135,17 @@ export default function LearnIndex(props: LearnIndexProps) {
                             title="How the Study Hub Works"
                             tips={[
                                 {
-                                    icon: 'ðŸ“–',
+                                    icon: <BookOpen className="size-4" />,
                                     title: 'Review Lessons',
                                     text: 'Access high-yield lessons, key conceptual breakdowns, and core exam strategies designed to target specific Civil Service subjects.',
                                 },
                                 {
-                                    icon: 'âœ…',
+                                    icon: <CheckCircle className="size-4" />,
                                     title: 'Track Progress',
                                     text: 'Click "Mark as Complete" inside any lesson to record your progress, update your overall progress bar, and display completed badges.',
                                 },
                                 {
-                                    icon: 'ðŸ“Š',
+                                    icon: <BarChart className="size-4" />,
                                     title: 'Smart Filtering',
                                     text: 'Filter lessons by specific categories to view individual completion percentages, or search keywords to find specific topics.',
                                 },

@@ -11,11 +11,7 @@ import {
 } from '@/components/ui/tooltip';
 import { generatePaginationLinks } from '@/lib/utils';
 import type { Attempt, Pagination } from '../types';
-import {
-    TrackBadge,
-    StatusBadge,
-    ScoreProgress,
-} from './attempt-components';
+import { TrackBadge, StatusBadge, ScoreProgress } from './attempt-components';
 
 interface AttemptsTableProps {
     attempts: Attempt[];

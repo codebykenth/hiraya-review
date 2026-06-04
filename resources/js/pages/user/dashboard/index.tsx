@@ -1,17 +1,16 @@
 ﻿import { Link, usePage } from '@inertiajs/react';
-import {
-    Play,
-} from 'lucide-react';
+import { Play } from 'lucide-react';
 import { useEffect } from 'react';
 import { PageContainer } from '@/components/layout/page-container';
 import { PageHeader } from '@/components/layout/page-header';
 import AiReadinessCard from '@/pages/user/dashboard/components/ai-readiness-card';
 import { ExamCountdown } from '@/pages/user/dashboard/components/exam-countdown';
 import { index as examsIndex } from '@/routes/exams';
+import type { Auth } from '@/types';
 import type { DashboardProps } from './types';
 
 export default function Dashboard({ stats, aiAnalysis }: DashboardProps) {
-    const { auth } = usePage().props as any;
+    const { auth } = usePage<{ auth: Auth }>().props;
     const firstName = auth?.user?.name ? auth.user.name.split(' ')[0] : 'User';
 
     useEffect(() => {
@@ -37,7 +36,7 @@ export default function Dashboard({ stats, aiAnalysis }: DashboardProps) {
                     }
                     description="Let's continue your preparation for the Civil Service Exam."
                 />
-                <div className="flex flex-col gap-2 w-full sm:w-auto">
+                <div className="flex w-full flex-col gap-2 sm:w-auto">
                     <Link
                         href={
                             examsIndex({
@@ -55,7 +54,7 @@ export default function Dashboard({ stats, aiAnalysis }: DashboardProps) {
                                 query: { start: 'subprofessional' },
                             }).url
                         }
-                        className="flex items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-xs font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900/60 dark:text-slate-200 dark:hover:bg-slate-850"
+                        className="dark:hover:bg-slate-850 flex items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-xs font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900/60 dark:text-slate-200"
                     >
                         Start Subprofessional Exam
                     </Link>

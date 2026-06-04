@@ -1,6 +1,7 @@
 import { router, usePage } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
 import { index as dashboardIndex } from '@/routes/dashboard';
+import type { Auth } from '@/types';
 import type { DashboardProps, DashboardStats } from '../types';
 
 const defaultStats: DashboardStats = {
@@ -102,7 +103,7 @@ const defaultStats: DashboardStats = {
 };
 
 export function useDashboardState({ stats }: DashboardProps) {
-    const { auth } = usePage().props;
+    const { auth } = usePage<{ auth: { user: Auth } }>().props;
     const firstName = auth?.user?.name ? auth.user.name.split(' ')[0] : 'User';
     const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
     const [isOpen, setIsOpen] = useState(false);

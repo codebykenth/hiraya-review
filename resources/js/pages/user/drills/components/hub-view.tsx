@@ -1,4 +1,4 @@
-﻿import { Brain } from 'lucide-react';
+import { Brain, Zap, Clock, Lightbulb, FileText } from 'lucide-react';
 import React from 'react';
 import { PageHeader } from '@/components/layout/page-header';
 import { HowItWorksModal } from '@/components/shared/how-it-works-modal';
@@ -34,17 +34,17 @@ export function HubView({
                         title="How Practice Drills Work"
                         tips={[
                             {
-                                icon: 'âš¡',
+                                icon: <Zap className="size-4" />,
                                 title: 'Micro-learning',
                                 text: 'Drills are short, focused sessions designed for rapid repetition on specific subcategories to build your muscle memory.',
                             },
                             {
-                                icon: 'â±ï¸',
+                                icon: <Clock className="size-4" />,
                                 title: 'Practice Modes',
                                 text: 'Choose Timed mode to build your speed for the actual exam, or Untimed mode for deep comprehension and reading.',
                             },
                             {
-                                icon: 'ðŸ’¡',
+                                icon: <Lightbulb className="size-4" />,
                                 title: 'Instant Feedback',
                                 text: 'Unlike full mock exams, drills provide immediate explanations after every single question so you learn right away.',
                             },
@@ -86,8 +86,8 @@ export function HubView({
                                         >
                                             <CardIcon className="size-6" />
                                         </div>
-                                        <span className="rounded-full bg-slate-100 px-2.5 py-1 text-[10px] font-extrabold text-muted-foreground dark:bg-slate-800">
-                                            ðŸ“ {actualCount} Qs
+                                        <span className="flex items-center gap-1 rounded-full bg-slate-100 px-2.5 py-1 text-[10px] font-extrabold text-muted-foreground dark:bg-slate-800">
+                                            <FileText className="size-3" /> {actualCount} Qs
                                         </span>
                                     </div>
 
@@ -118,7 +118,7 @@ export function HubView({
                     <div className="mx-auto mb-5 flex size-14 items-center justify-center rounded-xl bg-slate-100 text-muted-foreground ring-8 dark:bg-slate-900">
                         <Brain className="size-6 text-blue-600 dark:text-blue-400" />
                     </div>
-                    <span className="dark:bg-amber-950/40 mb-3.5 inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-3.5 py-1 text-[10px] font-extrabold tracking-wider text-amber-700 uppercase dark:text-amber-400">
+                    <span className="mb-3.5 inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-3.5 py-1 text-[10px] font-extrabold tracking-wider text-amber-700 uppercase dark:bg-amber-950/40 dark:text-amber-400">
                         <span className="size-1.5 rounded-full bg-amber-500" />
                         Coming Soon
                     </span>

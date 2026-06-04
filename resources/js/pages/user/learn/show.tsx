@@ -117,8 +117,8 @@ export default function LearnShow({ module, recommended }: LearnShowProps) {
                                 <div className="mt-4 flex items-center gap-2.5 rounded-lg border border-green-200/40 bg-green-50/50 px-4 py-3 text-sm font-semibold text-green-800 dark:border-green-900/30 dark:bg-green-950/20 dark:text-green-400">
                                     <CheckCircle2 className="size-5 shrink-0 fill-green-600/10 text-green-600 dark:text-green-400" />
                                     <span>
-                                        Lesson Completed â€” Well done! Keep going
-                                        with your study schedule.
+                                        Lesson Completed â€” Well done! Keep
+                                        going with your study schedule.
                                     </span>
                                 </div>
                             )}

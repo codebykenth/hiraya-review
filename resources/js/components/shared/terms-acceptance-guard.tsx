@@ -7,7 +7,7 @@ type Props = {
 };
 
 export default function TermsAcceptanceGuard({ children }: Props) {
-    const { auth } = usePage().props;
+    const { auth } = usePage<{ auth: { user: any } }>().props;
     const showTermsModal = auth?.user && !auth.user.terms_accepted_at;
 
     return (

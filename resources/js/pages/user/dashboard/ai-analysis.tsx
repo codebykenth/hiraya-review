@@ -1,4 +1,4 @@
-﻿import { Head, Link, router, usePage } from '@inertiajs/react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
 import Echo from 'laravel-echo';
 import {
     Brain,
@@ -18,12 +18,14 @@ import {
     XCircle,
     CalendarPlus,
     CalendarMinus,
+    Lightbulb,
 } from 'lucide-react';
 import Pusher from 'pusher-js';
 import { useEffect, useState } from 'react';
 import { PageContainer } from '@/components/layout/page-container';
 import { ConfirmModal } from '@/components/shared/confirm-modal';
 import { Card } from '@/components/ui/card';
+import type { Auth } from '@/types';
 
 interface SubjectMasteryItem {
     subject: string;
@@ -154,7 +156,7 @@ export default function AiAnalysisReport({
     isLocal,
     existingSchedules = [],
 }: AiAnalysisProps) {
-    const { auth, pusher } = usePage().props as any;
+    const { auth, pusher } = usePage<{ auth: Auth; pusher?: any }>().props;
     const [localStatus, setLocalStatus] = useState<
         'no_data' | 'generating' | 'ready' | 'failed'
     >(status);
@@ -697,9 +699,6 @@ export default function AiAnalysisReport({
                                                     data.pass_probability >= 80
                                                         ? 'text-emerald-600 dark:text-emerald-400'
                                                         : 'text-rose-600 dark:text-rose-400'
-                                                            
-                                                          
-                                                          
                                                 }`}
                                             >
                                                 {data.pass_probability}%
@@ -894,11 +893,11 @@ export default function AiAnalysisReport({
                                             return (
                                                 <Card
                                                     key={item.subject}
-                                                    className="flex flex-col justify-between gap-4 p-5 transition hover:shadow-md dark:bg-slate-900/60 dark:border-slate-800"
+                                                    className="flex flex-col justify-between gap-4 p-5 transition hover:shadow-md dark:border-slate-800 dark:bg-slate-900/60"
                                                 >
                                                     <div>
-                                                        <div className="dark:border-slate-800 flex items-center justify-between gap-2 border-b border-slate-100 pb-3">
-                                                            <span className="text-slate-800 flex items-center gap-2 text-sm font-bold dark:text-slate-200">
+                                                        <div className="flex items-center justify-between gap-2 border-b border-slate-100 pb-3 dark:border-slate-800">
+                                                            <span className="flex items-center gap-2 text-sm font-bold text-slate-800 dark:text-slate-200">
                                                                 <span
                                                                     className={`size-2.5 rounded-full ${dotColor}`}
                                                                 />
@@ -939,7 +938,7 @@ export default function AiAnalysisReport({
                             data.remediation_matrix.length > 0 && (
                                 <div>
                                     <h3 className="mb-4 flex items-center gap-2 text-lg font-black text-slate-900 dark:text-white">
-                                        <AlertCircle className="text-rose-500 size-5" />
+                                        <AlertCircle className="size-5 text-rose-500" />
                                         Subtopic Remediation Pathway
                                     </h3>
                                     <Card className="overflow-hidden border border-slate-200/80 dark:border-slate-800 dark:bg-slate-900/60">
@@ -961,7 +960,7 @@ export default function AiAnalysisReport({
                                                         </th>
                                                     </tr>
                                                 </thead>
-                                                <tbody className="divide-slate-200 dark:divide-slate-800 divide-y">
+                                                <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
                                                     {data.remediation_matrix.map(
                                                         (row) => (
                                                             <tr
@@ -1026,8 +1025,8 @@ export default function AiAnalysisReport({
                                             disabled={isBulkActionRunning}
                                             className={`flex cursor-pointer items-center justify-center gap-2 rounded-xl px-4 py-2 text-xs font-black tracking-wider uppercase transition-all duration-200 disabled:opacity-50 ${
                                                 allScheduled
-                                                    ? 'dark:hover:bg-rose-950/35 border border-rose-200 bg-rose-50 text-rose-700 hover:bg-rose-100/70 dark:border-rose-900/40 dark:bg-rose-950/20 dark:text-rose-400'
-                                                    : 'dark:hover:bg-indigo-950/35 border border-indigo-200 bg-indigo-50 text-indigo-700 hover:bg-indigo-100/70 dark:border-indigo-900/40 dark:bg-indigo-950/20 dark:text-indigo-400'
+                                                    ? 'border border-rose-200 bg-rose-50 text-rose-700 hover:bg-rose-100/70 dark:border-rose-900/40 dark:bg-rose-950/20 dark:text-rose-400 dark:hover:bg-rose-950/35'
+                                                    : 'border border-indigo-200 bg-indigo-50 text-indigo-700 hover:bg-indigo-100/70 dark:border-indigo-900/40 dark:bg-indigo-950/20 dark:text-indigo-400 dark:hover:bg-indigo-950/35'
                                             }`}
                                         >
                                             {isBulkActionRunning ? (
@@ -1042,7 +1041,7 @@ export default function AiAnalysisReport({
                                                 : 'Schedule All Days'}
                                         </button>
                                     </div>
-                                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7">
+                                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                                         {data.personalized_study_plan.map(
                                             (dayPlan, index) => (
                                                 <Card
@@ -1050,7 +1049,7 @@ export default function AiAnalysisReport({
                                                     className="flex flex-col justify-between gap-3 border-t-2 border-t-slate-200 p-4 transition duration-300 hover:border-indigo-500/50 dark:border-t-slate-700 dark:bg-slate-900/65 dark:hover:border-indigo-500/50"
                                                 >
                                                     <div>
-                                                        <div className="dark:border-slate-800 mb-3 flex items-center justify-between border-b border-slate-100 pb-2">
+                                                        <div className="mb-3 flex items-center justify-between border-b border-slate-100 pb-2 dark:border-slate-800">
                                                             <span className="text-sm font-black tracking-wider text-slate-900 uppercase dark:text-white">
                                                                 {dayPlan.day}
                                                             </span>
@@ -1081,7 +1080,7 @@ export default function AiAnalysisReport({
                                                                                 task.focus_topic
                                                                             }
                                                                         </span>
-                                                                        <p className="dark:text-slate-200 text-xs leading-relaxed text-slate-700">
+                                                                        <p className="text-xs leading-relaxed text-slate-700 dark:text-slate-200">
                                                                             {
                                                                                 task.activity
                                                                             }
@@ -1092,7 +1091,7 @@ export default function AiAnalysisReport({
                                                         </div>
                                                     </div>
 
-                                                    <div className="dark:border-slate-800 mt-2 border-t border-slate-100/80 pt-2">
+                                                    <div className="mt-2 border-t border-slate-100/80 pt-2 dark:border-slate-800">
                                                         {scheduledDays[
                                                             dayPlan.day
                                                         ] ? (
@@ -1201,10 +1200,14 @@ export default function AiAnalysisReport({
                                 has been successfully queued in the background.
                             </p>
 
-                            <p className="text-indigo-650 mt-3 text-xs font-bold dark:text-indigo-400">
-                                ðŸ’¡ Tip: You can close this, continue practicing
-                                drills, and check back in a few minutes!
-                            </p>
+                            <div className="mt-4 flex items-start gap-2 rounded-lg bg-indigo-50/50 p-3 text-indigo-700 dark:bg-indigo-950/30 dark:text-indigo-400">
+                                <Lightbulb className="mt-0.5 size-4 shrink-0" />
+                                <p className="text-xs font-bold leading-relaxed">
+                                    Tip: You can close this, continue
+                                    practicing drills, and check back in a few
+                                    minutes!
+                                </p>
+                            </div>
 
                             <div className="mt-6 flex w-full gap-3">
                                 <button

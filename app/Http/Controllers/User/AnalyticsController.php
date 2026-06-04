@@ -4,11 +4,14 @@ namespace App\Http\Controllers\User;
 
 use App\Jobs\GenerateUserAnalysisJob;
 use App\Models\ExamAttempt;
+use App\Models\ExamDate;
 use App\Models\StudySchedule;
 use App\Models\UserAiAnalysis;
 use App\Services\ExamAttemptFormatter;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Schema;
 use Inertia\Inertia;
 
 class AnalyticsController
@@ -182,7 +185,7 @@ class AnalyticsController
                     'name' => $runName,
                     'date' => $dateStr,
                     'secondsPerQuestion' => $avgTimePerQuestion,
-                    'accuracy' => $percentage
+                    'accuracy' => $percentage,
                 ];
 
                 $scoreMap = $attempt->cat_scores['categoryScoreMap'] ?? $attempt->cat_scores ?? [];
@@ -198,7 +201,9 @@ class AnalyticsController
                             break;
                         }
                     }
-                    if (!$found) $breakdown[$short] = 0;
+                    if (! $found) {
+                        $breakdown[$short] = 0;
+                    }
                 }
                 $attemptBreakdowns[] = $breakdown;
             }
@@ -337,17 +342,17 @@ class AnalyticsController
                     'subcategories' => $d['subcategories'],
                 ];
             }
-            
+
             for ($i = 1; $i <= 6; $i++) {
                 $pacingTrend[] = [
                     'name' => 'Run #'.$i,
-                    'date' => 'May '.(19+$i),
+                    'date' => 'May '.(19 + $i),
                     'secondsPerQuestion' => rand(40, 75),
-                    'accuracy' => rand(50, 90)
+                    'accuracy' => rand(50, 90),
                 ];
                 $attemptBreakdowns[] = [
                     'name' => 'Run #'.$i,
-                    'date' => 'May '.(19+$i),
+                    'date' => 'May '.(19 + $i),
                     'Verbal' => rand(50, 90),
                     'Clerical' => rand(60, 95),
                     'General' => rand(40, 80),
@@ -355,7 +360,7 @@ class AnalyticsController
                     'Analytical' => rand(40, 85),
                 ];
             }
-            
+
             $totalDurationText = '0 mins';
         }
 
@@ -398,8 +403,8 @@ class AnalyticsController
         $examDate = null;
         $examDateRaw = null;
         $daysUntilExam = null;
-        if (\Illuminate\Support\Facades\Schema::hasTable('exam_dates')) {
-            $examDateObj = \App\Models\ExamDate::where('is_active', true)
+        if (Schema::hasTable('exam_dates')) {
+            $examDateObj = ExamDate::where('is_active', true)
                 ->where('date', '>', now())
                 ->orderBy('date')
                 ->first();
@@ -409,9 +414,9 @@ class AnalyticsController
                 $daysUntilExam = (int) ceil(now()->diffInDays($examDateObj->date, false));
             }
         }
-        
-        if (!$examDate) {
-            $defaultDate = \Carbon\Carbon::parse('2026-08-09');
+
+        if (! $examDate) {
+            $defaultDate = Carbon::parse('2026-08-09');
             $examDate = $defaultDate->format('F j, Y');
             $examDateRaw = $defaultDate->toDateString();
             $daysUntilExam = (int) ceil(now()->diffInDays($defaultDate, false));

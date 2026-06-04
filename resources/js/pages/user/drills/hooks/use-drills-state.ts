@@ -187,7 +187,10 @@ export function useDrillsState({
 
             const qLang = (q.language || '').toLowerCase();
 
-            return catMatch && (qLang.includes('filipino') || qLang.includes('tagalog'));
+            return (
+                catMatch &&
+                (qLang.includes('filipino') || qLang.includes('tagalog'))
+            );
         });
     }, [questions, selectedCategory]);
 
@@ -227,7 +230,8 @@ export function useDrillsState({
             if (effectiveLanguage === 'English') {
                 langMatch = qLang === 'english' || qLang === '';
             } else if (effectiveLanguage === 'Filipino') {
-                langMatch = qLang.includes('filipino') || qLang.includes('tagalog');
+                langMatch =
+                    qLang.includes('filipino') || qLang.includes('tagalog');
             }
 
             return catMatch && subcatMatch && langMatch;

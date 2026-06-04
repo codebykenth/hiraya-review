@@ -11,13 +11,14 @@ import React from 'react';
 import SiteFooter from '@/components/layout/site-footer';
 import SiteHeader from '@/components/layout/site-header';
 import AppLayout from '@/layouts/app-layout';
+import type { Auth } from '@/types';
 
 interface ErrorPageProps {
     status: number;
 }
 
 export default function ErrorPage({ status }: ErrorPageProps) {
-    const { auth } = usePage<any>().props;
+    const { auth } = usePage<{ auth: Auth }>().props;
 
     const title =
         {
