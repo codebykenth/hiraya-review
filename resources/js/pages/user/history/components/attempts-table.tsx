@@ -5,7 +5,7 @@ import {
     TrackBadge,
     StatusBadge,
     ScoreProgress,
-} from '@/components/attempt-components';
+} from './attempt-components';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';

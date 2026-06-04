@@ -15,7 +15,7 @@ import {
     ClipboardList,
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import FeatureGrid from '@/components/feature-grid';
+import FeatureGrid from './components/feature-grid';
 import Section from '@/components/section';
 import SectionHeader from '@/components/section-header';
 import SiteFooter from '@/components/site-footer';

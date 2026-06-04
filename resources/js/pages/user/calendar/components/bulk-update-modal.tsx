@@ -1,6 +1,6 @@
 import { Clock } from 'lucide-react';
 import React from 'react';
-import { TimePicker } from '@/components/time-picker';
+import { TimePicker } from './time-picker';
 import { Button } from '@/components/ui/button';
 import {
     Dialog,

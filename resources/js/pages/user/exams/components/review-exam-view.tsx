@@ -9,7 +9,7 @@ import {
     HelpCircle,
 } from 'lucide-react';
 import React from 'react';
-import QuestionPalettePanel from '@/components/question-palette-panel';
+import QuestionPalettePanel from './question-palette-panel';
 import {
     renderFormattedText,
     extractPropositions,
