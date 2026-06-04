@@ -2,6 +2,7 @@ import { Head, useForm } from '@inertiajs/react';
 import { HelpCircle } from 'lucide-react';
 import React, { useState } from 'react';
 import { CurationEditShell } from '@/components/curation-edit-shell';
+import InputError from '@/components/input-error';
 import { SelectField } from '@/components/ui/select';
 import {
     index as questionsIndex,
@@ -192,11 +193,10 @@ export default function QuestionEdit({
                         onValueChange={handleCategoryChange}
                         options={Object.keys(cseCategoriesTree)}
                     />
-                    {errors.category && (
-                        <span className="text-red-650 mt-1 block text-[10px] font-medium">
-                            {errors.category}
-                        </span>
-                    )}
+                    <InputError
+                        message={errors.category}
+                        className="mt-1 block text-[10px] font-medium"
+                    />
 
                     <SelectField
                         label="Target Subcategory"
@@ -204,11 +204,10 @@ export default function QuestionEdit({
                         onValueChange={handleSubcategoryChange}
                         options={activeSubcategories}
                     />
-                    {errors.subcategory && (
-                        <span className="text-red-650 mt-1 block text-[10px] font-medium">
-                            {errors.subcategory}
-                        </span>
-                    )}
+                    <InputError
+                        message={errors.subcategory}
+                        className="mt-1 block text-[10px] font-medium"
+                    />
                 </div>
 
                 {/* Language */}
@@ -218,11 +217,10 @@ export default function QuestionEdit({
                     onValueChange={(val) => setData('language', val)}
                     options={['English', 'Tagalog']}
                 />
-                {errors.language && (
-                    <span className="mt-1 block text-[10px] font-medium text-red-600">
-                        {errors.language}
-                    </span>
-                )}
+                <InputError
+                    message={errors.language}
+                    className="mt-1 block text-[10px] font-medium"
+                />
 
                 {/* Question Stem (Text) */}
                 <div>
@@ -255,11 +253,10 @@ export default function QuestionEdit({
                         }`}
                         required
                     />
-                    {errors.stem && (
-                        <span className="text-red-650 mt-1 block text-[10px] font-medium">
-                            {errors.stem}
-                        </span>
-                    )}
+                    <InputError
+                        message={errors.stem}
+                        className="mt-1 block text-[10px] font-medium"
+                    />
                 </div>
 
                 {/* Distractor Choices */}
@@ -316,11 +313,10 @@ export default function QuestionEdit({
                             </div>
                         ))}
                     </div>
-                    {errors.options && (
-                        <span className="text-red-650 mt-1 block text-[10px] font-medium">
-                            {errors.options}
-                        </span>
-                    )}
+                    <InputError
+                        message={errors.options}
+                        className="mt-1 block text-[10px] font-medium"
+                    />
                 </div>
 
                 {/* Explanation */}
@@ -343,11 +339,10 @@ export default function QuestionEdit({
                             }`}
                             required
                         />
-                        {errors.explanation && (
-                            <span className="mt-1 block text-[10px] font-medium text-red-600">
-                                {errors.explanation}
-                            </span>
-                        )}
+                        <InputError
+                            message={errors.explanation}
+                            className="mt-1 block text-[10px] font-medium"
+                        />
                     </div>
                 )}
             </CurationEditShell>

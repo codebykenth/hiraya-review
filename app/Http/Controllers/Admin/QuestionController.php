@@ -125,13 +125,28 @@ class QuestionController
     }
 
     /**
-     * Generate exam questions using Gemini 2.5 Flash API.
+     * Generate exam questions.
      */
     public function generate(GenerateQuestionsRequest $request)
     {
         $validated = $request->validated();
+        $subcategory = $validated['subcategory'] ?? 'default';
+        $lockKey = 'generate-questions-lock:'.Str::slug($subcategory);
+        $lock = Cache::lock($lockKey, 180);
 
-        GenerateQuestionsJob::dispatchAfterResponse($validated, auth()->id() ?: (User::first()?->id ?: 1), $validated['primary_model'] ?? 'llama-3.3-70b-versatile');
+        if (! $lock->get()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'A question generation process is already in progress for this subcategory. Please wait for it to complete.',
+            ], 429);
+        }
+
+        GenerateQuestionsJob::dispatchAfterResponse(
+            $validated,
+            auth()->id() ?: (User::first()?->id ?: 1),
+            $validated['primary_model'] ?? 'llama-3.3-70b-versatile',
+            $lock->owner()
+        );
 
         return response()->json([
             'success' => true,

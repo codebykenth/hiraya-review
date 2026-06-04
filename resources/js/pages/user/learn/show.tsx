@@ -1,4 +1,5 @@
 import { Head, Link, usePage, router } from '@inertiajs/react';
+import Echo from 'laravel-echo';
 import {
     BookMarked,
     Calendar,
@@ -7,7 +8,9 @@ import {
     Lightbulb,
     CheckCircle2,
 } from 'lucide-react';
+import Pusher from 'pusher-js';
 import React from 'react';
+import { toast } from 'sonner';
 import { getCategoryStyles } from '@/components/curation-index-shell';
 import { LessonMarkdown } from '@/components/lesson-markdown';
 import { PageContainer } from '@/components/page-container';
@@ -18,8 +21,48 @@ import type { LearnShowProps } from './types';
 
 export default function LearnShow({ module, recommended }: LearnShowProps) {
     const progressRef = useScrollProgress();
-    const { auth } = usePage<{ auth: { user: any } }>().props;
+    const { auth, pusher } = usePage<{ auth: { user: any }; pusher?: any }>()
+        .props;
     const isLoggedIn = !!auth.user;
+
+    React.useEffect(() => {
+        if (!pusher?.key) {
+            return;
+        }
+
+        (window as any).Pusher = Pusher;
+        const echo = new Echo({
+            broadcaster: 'pusher',
+            key: pusher.key,
+            cluster: pusher.cluster ?? 'ap1',
+            wsHost: pusher.host
+                ? pusher.host
+                : `ws-${pusher.cluster}.pusher.com`,
+            wsPort: pusher.port ?? 80,
+            wssPort: pusher.port ?? 443,
+            forceTLS: (pusher.scheme ?? 'https') === 'https',
+            enabledTransports: ['ws', 'wss'],
+        });
+
+        echo.channel('learn-modules').listen(
+            'LearnModulePublished',
+            (e: any) => {
+                toast.success(`New study module available: ${e.module.title}`, {
+                    duration: 10000,
+                    action: {
+                        label: 'Go to module',
+                        onClick: () => {
+                            router.visit(`/learn/${e.module.slug}`);
+                        },
+                    },
+                });
+            },
+        );
+
+        return () => {
+            echo.disconnect();
+        };
+    }, [pusher]);
 
     return (
         <>

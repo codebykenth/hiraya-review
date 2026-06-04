@@ -56,8 +56,7 @@ Route::middleware('throttle:global-views')->group(function () {
 });
 
 Route::post('support', [SupportController::class, 'store'])
-    ->name('support.store')
-    ->middleware('throttle:support-submission');
+    ->name('support.store');
 
 // OAuth social login — rate limited to prevent redirect flooding against providers
 Route::middleware('throttle:10,1')->group(function () {

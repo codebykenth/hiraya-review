@@ -1,12 +1,7 @@
 import { router } from '@inertiajs/react';
-import {
-    FileText,
-    CheckCircle2,
-    AlertCircle,
-    Save,
-    RotateCcw,
-} from 'lucide-react';
+import { FileText, CheckCircle2, Save, RotateCcw } from 'lucide-react';
 import React from 'react';
+import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { SelectField } from '@/components/ui/select';
 import { index as questionsIndex } from '@/routes/questions';
@@ -105,12 +100,10 @@ export function ManualEntryForm({
                             }`}
                             required
                         />
-                        {errors.stem && (
-                            <p className="mt-1 inline-flex items-center gap-1 text-xs font-semibold text-red-600">
-                                <AlertCircle className="size-3.5" />
-                                {errors.stem}
-                            </p>
-                        )}
+                        <InputError
+                            message={errors.stem}
+                            className="mt-1 text-xs font-semibold"
+                        />
                     </div>
                 </div>
 
@@ -178,18 +171,14 @@ export function ManualEntryForm({
                             </div>
                         ))}
                     </div>
-                    {errors.options && (
-                        <p className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-red-600">
-                            <AlertCircle className="size-3.5" />
-                            {errors.options}
-                        </p>
-                    )}
-                    {errors.correct_option && (
-                        <p className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-red-600">
-                            <AlertCircle className="size-3.5" />
-                            {errors.correct_option}
-                        </p>
-                    )}
+                    <InputError
+                        message={errors.options}
+                        className="mt-2 text-xs font-semibold"
+                    />
+                    <InputError
+                        message={errors.correct_option}
+                        className="mt-2 text-xs font-semibold"
+                    />
                 </div>
 
                 {/* Explanation Card */}
@@ -221,12 +210,10 @@ export function ManualEntryForm({
                                 }`}
                                 required
                             />
-                            {errors.explanation && (
-                                <p className="mt-1 inline-flex items-center gap-1 text-xs font-semibold text-red-600">
-                                    <AlertCircle className="size-3.5" />
-                                    {errors.explanation}
-                                </p>
-                            )}
+                            <InputError
+                                message={errors.explanation}
+                                className="mt-1 text-xs font-semibold"
+                            />
                         </div>
                     </div>
                 )}
@@ -258,12 +245,10 @@ export function ManualEntryForm({
                                 }
                                 options={cseCategoriesTree[data.category] || []}
                             />
-                            {errors.subcategory && (
-                                <p className="mt-1 inline-flex items-center gap-1 text-[10px] font-semibold text-red-600">
-                                    <AlertCircle className="size-3" />
-                                    {errors.subcategory}
-                                </p>
-                            )}
+                            <InputError
+                                message={errors.subcategory}
+                                className="mt-1 text-[10px] font-semibold"
+                            />
                         </div>
 
                         {/* Language Select */}

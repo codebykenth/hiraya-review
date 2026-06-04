@@ -1,5 +1,8 @@
-import { Head, usePage } from '@inertiajs/react';
+import { Head, usePage, router } from '@inertiajs/react';
+import Echo from 'laravel-echo';
+import Pusher from 'pusher-js';
 import React from 'react';
+import { toast } from 'sonner';
 import { HowItWorksModal } from '@/components/how-it-works-modal';
 import { PageContainer } from '@/components/page-container';
 import { PageHeader } from '@/components/page-header';
@@ -18,8 +21,50 @@ const progressBarColors: Record<string, string> = {
 
 export default function LearnIndex(props: LearnIndexProps) {
     const { modules = [], categories = [] } = props;
-    const { auth } = usePage<{ auth: { user: any } }>().props;
+    const { auth, pusher } = usePage<{ auth: { user: any }; pusher?: any }>()
+        .props;
     const isLoggedIn = !!auth?.user;
+
+    React.useEffect(() => {
+        if (!pusher?.key) {
+            return;
+        }
+
+        (window as any).Pusher = Pusher;
+        const echo = new Echo({
+            broadcaster: 'pusher',
+            key: pusher.key,
+            cluster: pusher.cluster ?? 'ap1',
+            wsHost: pusher.host
+                ? pusher.host
+                : `ws-${pusher.cluster}.pusher.com`,
+            wsPort: pusher.port ?? 80,
+            wssPort: pusher.port ?? 443,
+            forceTLS: (pusher.scheme ?? 'https') === 'https',
+            enabledTransports: ['ws', 'wss'],
+        });
+
+        echo.channel('learn-modules').listen(
+            'LearnModulePublished',
+            (e: any) => {
+                router.reload({
+                    only: ['modules'],
+                    onSuccess: () => {
+                        toast.success(
+                            `New study module available: ${e.module.title}`,
+                            {
+                                duration: 8000,
+                            },
+                        );
+                    },
+                });
+            },
+        );
+
+        return () => {
+            echo.disconnect();
+        };
+    }, [pusher]);
 
     const activeCategories = React.useMemo(() => {
         return categories.filter((c) => c.name.toLowerCase() !== 'demographic');

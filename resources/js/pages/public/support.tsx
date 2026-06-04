@@ -1,6 +1,7 @@
 import { Head, useForm } from '@inertiajs/react';
 import { Mail, MessageSquare, ShieldAlert, ArrowRight } from 'lucide-react';
 import { useState } from 'react';
+import InputError from '@/components/input-error';
 import SiteFooter from '@/components/site-footer';
 import SiteHeader from '@/components/site-header';
 import { Button } from '@/components/ui/button';
@@ -28,6 +29,11 @@ export default function Support() {
                 setSubmittedData({ name: data.name, email: data.email });
                 setSubmitted(true);
                 reset();
+            },
+            onError: (errs) => {
+                Object.keys(errs).forEach((key) => {
+                    setData(key as any, '');
+                });
             },
         });
     };
@@ -162,11 +168,10 @@ export default function Support() {
                                                                 : ''
                                                         }
                                                     />
-                                                    {errors.name && (
-                                                        <p className="text-red-650 mt-1 text-xs font-semibold">
-                                                            {errors.name}
-                                                        </p>
-                                                    )}
+                                                    <InputError
+                                                        message={errors.name}
+                                                        className="mt-1 text-xs font-semibold"
+                                                    />
                                                 </div>
                                                 <div className="space-y-2">
                                                     <label
@@ -193,11 +198,10 @@ export default function Support() {
                                                                 : ''
                                                         }
                                                     />
-                                                    {errors.email && (
-                                                        <p className="text-red-650 mt-1 text-xs font-semibold">
-                                                            {errors.email}
-                                                        </p>
-                                                    )}
+                                                    <InputError
+                                                        message={errors.email}
+                                                        className="mt-1 text-xs font-semibold"
+                                                    />
                                                 </div>
                                             </div>
 
@@ -226,11 +230,10 @@ export default function Support() {
                                                             : 'border-border'
                                                     }`}
                                                 />
-                                                {errors.message && (
-                                                    <p className="text-red-650 mt-1 text-xs font-semibold">
-                                                        {errors.message}
-                                                    </p>
-                                                )}
+                                                <InputError
+                                                    message={errors.message}
+                                                    className="mt-1 text-xs font-semibold"
+                                                />
                                             </div>
 
                                             <div className="flex flex-col gap-3 pt-2 sm:flex-row sm:items-center sm:justify-between">

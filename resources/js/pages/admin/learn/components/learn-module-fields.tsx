@@ -1,4 +1,5 @@
 import { Clock } from 'lucide-react';
+import InputError from '@/components/input-error';
 import { Input } from '@/components/ui/input';
 
 interface LearnModuleFieldsProps {
@@ -44,11 +45,10 @@ export function LearnModuleFields({
                     onChange={(e) => setData('title', e.target.value)}
                     required
                 />
-                {errors.title && (
-                    <span className="mt-1 block text-[10px] font-medium text-red-600">
-                        {errors.title}
-                    </span>
-                )}
+                <InputError
+                    message={errors.title}
+                    className="mt-1 block text-[10px] font-medium"
+                />
             </div>
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -61,11 +61,10 @@ export function LearnModuleFields({
                         onChange={(e) => setData('topic', e.target.value)}
                         required
                     />
-                    {errors.topic && (
-                        <span className="mt-1 block text-[10px] font-medium text-red-600">
-                            {errors.topic}
-                        </span>
-                    )}
+                    <InputError
+                        message={errors.topic}
+                        className="mt-1 block text-[10px] font-medium"
+                    />
                 </div>
 
                 <div>
@@ -87,11 +86,10 @@ export function LearnModuleFields({
                             required
                         />
                     </div>
-                    {errors.estimated_minutes && (
-                        <span className="mt-1 block text-[10px] font-medium text-red-600">
-                            {errors.estimated_minutes}
-                        </span>
-                    )}
+                    <InputError
+                        message={errors.estimated_minutes}
+                        className="mt-1 block text-[10px] font-medium"
+                    />
                 </div>
             </div>
 
@@ -105,11 +103,10 @@ export function LearnModuleFields({
                     className={textareaClass}
                     required
                 />
-                {errors.summary && (
-                    <span className="mt-1 block text-[10px] font-medium text-red-600">
-                        {errors.summary}
-                    </span>
-                )}
+                <InputError
+                    message={errors.summary}
+                    className="mt-1 block text-[10px] font-medium"
+                />
             </div>
 
             <div>
@@ -124,11 +121,10 @@ export function LearnModuleFields({
                     className={contentClass}
                     required
                 />
-                {errors.content && (
-                    <span className="mt-1 block text-[10px] font-medium text-red-600">
-                        {errors.content}
-                    </span>
-                )}
+                <InputError
+                    message={errors.content}
+                    className="mt-1 block text-[10px] font-medium"
+                />
             </div>
         </>
     );

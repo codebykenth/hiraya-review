@@ -44,6 +44,17 @@ export default function Profile({
                     options={{
                         preserveScroll: true,
                     }}
+                    onError={(errs) => {
+                        Object.keys(errs).forEach((key) => {
+                            const input = document.getElementsByName(key)[0] as
+                                | HTMLInputElement
+                                | undefined;
+
+                            if (input) {
+                                input.value = '';
+                            }
+                        });
+                    }}
                     className="space-y-6"
                 >
                     {({ processing, errors }) => (

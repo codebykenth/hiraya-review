@@ -2,7 +2,17 @@
 
 namespace App\Providers;
 
+use App\Models\Category;
+use App\Models\ExamDate;
+use App\Models\LearnModule;
+use App\Models\Question;
+use App\Models\Subcategory;
 use App\Models\User;
+use App\Observers\CategoryObserver;
+use App\Observers\ExamDateObserver;
+use App\Observers\LearnModuleObserver;
+use App\Observers\QuestionObserver;
+use App\Observers\SubcategoryObserver;
 use Carbon\CarbonImmutable;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Cache\RateLimiting\Limit;
@@ -31,6 +41,13 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Register Observers for Cache Invalidation
+        Question::observe(QuestionObserver::class);
+        Category::observe(CategoryObserver::class);
+        Subcategory::observe(SubcategoryObserver::class);
+        LearnModule::observe(LearnModuleObserver::class);
+        ExamDate::observe(ExamDateObserver::class);
+
         $this->configureDefaults();
         if (app()->environment(['development', 'production'])) {
             URL::forceScheme('https');

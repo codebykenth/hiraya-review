@@ -367,6 +367,7 @@ export default function Calendar() {
                     setSubjectSearch={setSubjectSearch}
                     handleAddStudy={handleAddStudy}
                     isLoading={isLoading}
+                    errorMessage={errorMessage}
                 />
 
                 {/* Confirm Modal */}

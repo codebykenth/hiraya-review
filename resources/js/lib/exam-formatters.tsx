@@ -57,6 +57,43 @@ export const formatMathInline = (text: string) => {
     return parseLatexString(text, formatMathInlineBase);
 };
 
+export const formatMarkdownInline = (text: string): React.ReactNode[] => {
+    if (typeof text !== 'string') {
+        return [text];
+    }
+
+    const boldItalicPattern = /(\*\*(?:[^*]|\*[^*])+\*\*|\*(?:[^*])+\*)/g;
+    const parts = text.split(boldItalicPattern);
+
+    return parts.map((part, idx) => {
+        if (idx % 2 === 1) {
+            if (part.startsWith('**') && part.endsWith('**')) {
+                return (
+                    <strong
+                        key={idx}
+                        className="font-extrabold text-slate-950 dark:text-white"
+                    >
+                        {part.slice(2, -2)}
+                    </strong>
+                );
+            }
+
+            if (part.startsWith('*') && part.endsWith('*')) {
+                return (
+                    <em
+                        key={idx}
+                        className="text-slate-900 italic dark:text-slate-100"
+                    >
+                        {part.slice(1, -1)}
+                    </em>
+                );
+            }
+        }
+
+        return part;
+    });
+};
+
 export const formatMathInlineBase = (text: string) => {
     if (typeof text !== 'string') {
         return text;
@@ -167,7 +204,11 @@ export const renderFormattedText = (
             return null;
         }
 
-        const lines = inputText.split(/\n/);
+        // Normalize inline steps (e.g. "Step 2:") and list items (e.g. "1.") by inserting a newline before them
+        const normalizedText = inputText
+            .replace(/(?<!^)\s*\b(Step\s+\d+)\s*[:.-]/gi, '\n$1:')
+            .replace(/(?<!^)\s*\b([1-9]\.|\([1-9]\))\s+(?=[A-Z])/g, '\n$1 ');
+        const lines = normalizedText.split(/\n/);
         const listRegex = /^\s*(\(\d+\)|\d+\.)\s+(.+)$/;
 
         const listItems: { marker: string; text: string }[] = [];
@@ -275,29 +316,65 @@ export const renderFormattedText = (
             };
 
             const renderRichParagraphContent = (content: string) => {
-                return parseLatexString(content, (plainStr: string) => {
-                    const mathParts = plainStr.split(mathPattern);
+                const markdownParts = formatMarkdownInline(content);
 
-                    return (
-                        <>
-                            {mathParts.map((mPart, mIdx) => {
-                                if (mPart.match(mathPattern)) {
-                                    return (
-                                        <React.Fragment key={mIdx}>
-                                            {renderTokenContent(mPart)}
-                                        </React.Fragment>
-                                    );
-                                }
+                return (
+                    <>
+                        {markdownParts.map((part, partIdx) => {
+                            if (typeof part !== 'string') {
+                                return part;
+                            }
 
-                                return (
-                                    <span key={mIdx}>
-                                        {formatMathInlineBase(mPart)}
-                                    </span>
-                                );
-                            })}
-                        </>
-                    );
-                });
+                            return (
+                                <React.Fragment key={partIdx}>
+                                    {parseLatexString(
+                                        part,
+                                        (plainStr: string) => {
+                                            const mathParts =
+                                                plainStr.split(mathPattern);
+
+                                            return (
+                                                <>
+                                                    {mathParts.map(
+                                                        (mPart, mIdx) => {
+                                                            if (
+                                                                mPart.match(
+                                                                    mathPattern,
+                                                                )
+                                                            ) {
+                                                                return (
+                                                                    <React.Fragment
+                                                                        key={
+                                                                            mIdx
+                                                                        }
+                                                                    >
+                                                                        {renderTokenContent(
+                                                                            mPart,
+                                                                        )}
+                                                                    </React.Fragment>
+                                                                );
+                                                            }
+
+                                                            return (
+                                                                <span
+                                                                    key={mIdx}
+                                                                >
+                                                                    {formatMathInlineBase(
+                                                                        mPart,
+                                                                    )}
+                                                                </span>
+                                                            );
+                                                        },
+                                                    )}
+                                                </>
+                                            );
+                                        },
+                                    )}
+                                </React.Fragment>
+                            );
+                        })}
+                    </>
+                );
             };
 
             // Strict 1-liner comment: Match step-by-step indicators to render styled step block cards
@@ -308,15 +385,15 @@ export const renderFormattedText = (
                 const stepContent = stepMatch[2];
 
                 return (
-                    <div className="shadow-3xs my-2.5 flex items-start gap-3 rounded-r-xl border-l-3 border-blue-500 bg-blue-50/15 p-3.5 dark:bg-blue-950/10">
-                        <span className="shadow-3xs mt-0.5 flex size-5.5 shrink-0 items-center justify-center rounded-full bg-blue-600 font-mono text-[10px] font-black text-white select-none">
+                    <div className="shadow-3xs my-3.5 flex items-start gap-3 rounded-r-xl border-l-3 border-blue-500 bg-blue-50/20 p-3.5 dark:bg-blue-950/10">
+                        <span className="shadow-3xs mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full bg-blue-600 font-mono text-xs font-black text-white select-none">
                             {stepNum}
                         </span>
                         <div className="flex-1">
-                            <strong className="text-slate-850 mb-1 block text-xs font-extrabold dark:text-white">
+                            <strong className="mb-1 block text-sm font-black text-slate-950 dark:text-white">
                                 STEP {stepNum}
                             </strong>
-                            <div className="text-slate-650 dark:text-slate-350 text-xs leading-relaxed font-semibold">
+                            <div className="text-[15px] leading-relaxed font-medium text-slate-900 dark:text-slate-100">
                                 {renderRichParagraphContent(stepContent)}
                             </div>
                         </div>
@@ -365,7 +442,7 @@ export const renderFormattedText = (
                             <React.Fragment key={idx}>
                                 {renderRichParagraph(
                                     line,
-                                    'text-[18px] font-extrabold text-slate-850 dark:text-slate-100 leading-loose tracking-wide',
+                                    'text-[16px] font-medium text-slate-950 dark:text-slate-50 leading-relaxed tracking-wide',
                                 )}
                             </React.Fragment>
                         ))}
@@ -385,7 +462,7 @@ export const renderFormattedText = (
                                 <div className="mt-0.5 flex-1">
                                     {renderRichParagraph(
                                         item.text,
-                                        'text-base font-semibold leading-loose tracking-wide text-slate-700 dark:text-slate-300',
+                                        'text-[15px] font-medium leading-relaxed tracking-wide text-slate-900 dark:text-slate-100',
                                     )}
                                 </div>
                             </div>
@@ -399,7 +476,7 @@ export const renderFormattedText = (
                             <React.Fragment key={idx}>
                                 {renderRichParagraph(
                                     line,
-                                    'text-[18px] font-extrabold text-slate-850 dark:text-slate-100 leading-loose tracking-wide',
+                                    'text-[16px] font-medium text-slate-950 dark:text-slate-50 leading-relaxed tracking-wide',
                                 )}
                             </React.Fragment>
                         ))}
@@ -639,7 +716,7 @@ export const renderFormattedText = (
                                                         </div>
                                                     </div>
                                                 </DialogTrigger>
-                                                <DialogContent className="max-w-4xl border-none bg-transparent p-0 shadow-none">
+                                                <DialogContent className="max-w-5xl border-none bg-transparent p-0 shadow-none sm:max-w-[90vw] md:max-w-5xl lg:max-w-6xl">
                                                     <div
                                                         className="flex w-full justify-center rounded-2xl bg-white p-8 dark:bg-slate-900"
                                                         dangerouslySetInnerHTML={{
@@ -692,7 +769,7 @@ export const renderFormattedText = (
                                         </div>
                                     </div>
                                 </DialogTrigger>
-                                <DialogContent className="max-w-4xl border-none bg-transparent p-0 shadow-none">
+                                <DialogContent className="max-w-5xl border-none bg-transparent p-0 shadow-none sm:max-w-[90vw] md:max-w-5xl lg:max-w-6xl">
                                     <div
                                         className="flex w-full justify-center rounded-2xl bg-white p-8 dark:bg-slate-900"
                                         dangerouslySetInnerHTML={{
@@ -768,7 +845,7 @@ export const renderFormattedText = (
                                         </div>
                                     </div>
                                 </DialogTrigger>
-                                <DialogContent className="max-w-4xl border-none bg-transparent p-0 shadow-none">
+                                <DialogContent className="max-w-5xl border-none bg-transparent p-0 shadow-none sm:max-w-[90vw] md:max-w-5xl lg:max-w-6xl">
                                     <div
                                         className="flex w-full justify-center rounded-2xl bg-white p-8 dark:bg-slate-900"
                                         dangerouslySetInnerHTML={{
@@ -803,7 +880,7 @@ export const renderFormattedText = (
                                     </div>
                                 </div>
                             </DialogTrigger>
-                            <DialogContent className="max-w-4xl border-none bg-transparent p-0 shadow-none">
+                            <DialogContent className="max-w-5xl border-none bg-transparent p-0 shadow-none sm:max-w-[90vw] md:max-w-5xl lg:max-w-6xl">
                                 <div
                                     className="flex w-full justify-center rounded-2xl bg-white p-8 dark:bg-slate-900"
                                     dangerouslySetInnerHTML={{

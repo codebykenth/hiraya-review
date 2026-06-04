@@ -448,6 +448,27 @@ export function useCalendarState(initialProps: CalendarPageProps) {
                 }
 
                 closeModal();
+            } else {
+                const errData = await response.json();
+
+                if (errData.errors) {
+                    const firstError = Object.values(errData.errors)[0];
+                    setErrorMessage(
+                        Array.isArray(firstError)
+                            ? firstError[0]
+                            : String(firstError),
+                    );
+
+                    const updatedForm = { ...formData };
+                    Object.keys(errData.errors).forEach((key) => {
+                        if (key in updatedForm) {
+                            (updatedForm as any)[key] = '';
+                        }
+                    });
+                    setFormData(updatedForm);
+                } else {
+                    setErrorMessage(errData.message || 'An error occurred.');
+                }
             }
         } catch {
             setErrorMessage(

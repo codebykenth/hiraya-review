@@ -277,10 +277,24 @@ class LearnController
 
     public function generate(GenerateLearnModuleRequest $request)
     {
-
         $validated = $request->validated();
+        $topic = $validated['topic'] ?? 'default';
+        $lockKey = 'generate-learn-lock:'.Str::slug($topic);
+        $lock = Cache::lock($lockKey, 180);
 
-        GenerateLearnModuleJob::dispatchAfterResponse($validated, auth()->id() ?: 1, $validated['primary_model'] ?? 'llama-3.3-70b-versatile');
+        if (! $lock->get()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'A learning module generation process is already in progress for this topic. Please wait for it to complete.',
+            ], 429);
+        }
+
+        GenerateLearnModuleJob::dispatchAfterResponse(
+            $validated,
+            auth()->id() ?: 1,
+            $validated['primary_model'] ?? 'llama-3.3-70b-versatile',
+            $lock->owner()
+        );
 
         return response()->json([
             'success' => true,

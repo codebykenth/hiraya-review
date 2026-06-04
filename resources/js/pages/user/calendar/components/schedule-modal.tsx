@@ -44,6 +44,7 @@ interface ScheduleModalProps {
     setSubjectSearch: (val: string) => void;
     handleAddStudy: () => Promise<void>;
     isLoading: boolean;
+    errorMessage?: string | null;
 }
 
 export function ScheduleModal({
@@ -63,6 +64,7 @@ export function ScheduleModal({
     setSubjectSearch,
     handleAddStudy,
     isLoading,
+    errorMessage,
 }: ScheduleModalProps) {
     const parseScheduleDate = (dateStr: string) => {
         if (!dateStr) {
@@ -265,6 +267,11 @@ export function ScheduleModal({
                 </DialogHeader>
 
                 <div className="space-y-4 py-4">
+                    {errorMessage && (
+                        <div className="rounded-lg border border-red-200 bg-red-50 p-3 text-xs font-semibold text-red-800 dark:border-red-950/20 dark:bg-red-950/20 dark:text-red-400">
+                            {errorMessage}
+                        </div>
+                    )}
                     <div>
                         <label className="block text-sm font-medium text-slate-900 dark:text-slate-200">
                             Subject / Topic (optional)

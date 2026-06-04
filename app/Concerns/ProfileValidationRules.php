@@ -3,6 +3,10 @@
 namespace App\Concerns;
 
 use App\Models\User;
+use App\Rules\NoEmojis;
+use App\Rules\NoHtml;
+use App\Rules\NoProfanity;
+use App\Rules\NoUrls;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Validation\Rule;
 
@@ -28,7 +32,15 @@ trait ProfileValidationRules
      */
     protected function nameRules(): array
     {
-        return ['required', 'string', 'max:255'];
+        return [
+            'required',
+            'string',
+            'max:255',
+            new NoEmojis,
+            new NoHtml,
+            new NoUrls,
+            new NoProfanity,
+        ];
     }
 
     /**
@@ -41,7 +53,7 @@ trait ProfileValidationRules
         return [
             'required',
             'string',
-            'email',
+            'email:rfc,dns',
             'max:255',
             $userId === null
                 ? Rule::unique(User::class)

@@ -67,8 +67,8 @@ export function SupportWidget() {
             clearTimeout(timer);
 
             if (bubbleTimer) {
-clearTimeout(bubbleTimer);
-}
+                clearTimeout(bubbleTimer);
+            }
         };
     }, []);
 
