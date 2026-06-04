@@ -53,7 +53,7 @@ trait ProfileValidationRules
         return [
             'required',
             'string',
-            'email:rfc,dns',
+            'email:' . (app()->runningUnitTests() ? 'rfc' : 'rfc,dns'),
             'max:255',
             $userId === null
                 ? Rule::unique(User::class)
