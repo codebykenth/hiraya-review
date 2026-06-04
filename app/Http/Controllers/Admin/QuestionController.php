@@ -89,6 +89,7 @@ class QuestionController
                     'options' => $q->options,
                     'correct_option' => $q->correct_option,
                     'explanation' => $q->explanation,
+                    'language' => $q->language ?? 'English',
                     'approved' => true, // Start approved so user can commit in 1 click!
                 ];
             });
@@ -359,6 +360,17 @@ class QuestionController
         ]);
 
         $this->clearCache();
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Question draft updated successfully!',
+            ]);
+        }
+
+        if (str_contains(request()->header('Referer', ''), '/questions/drafts')) {
+            return redirect()->route('questions.drafts')->with('success', 'Question draft updated successfully!');
+        }
 
         return redirect()->route('questions.index')->with('success', 'Question updated successfully!');
     }

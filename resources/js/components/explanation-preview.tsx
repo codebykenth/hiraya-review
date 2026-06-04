@@ -44,7 +44,14 @@ export function ExplanationPreview({ text }: ExplanationPreviewProps) {
         return parts.length > 0 ? parts : parseLatexString(lineText);
     };
 
-    const lines = text.split('\n');
+    const normalizedText = text
+        .replace(/(?<!^)\s*\b(Step\s+\d+)\s*[:.-]/gi, '\n$1:')
+        .replace(/(?<!^)\s*\b([1-9]\.|\([1-9]\))\s+(?=[A-Z])/g, '\n$1 ')
+        .replace(
+            /(?<!^)\s*(🧠\s*)?\b(Mental Math Shortcut|Fast Track|Shortcut)\s*:/gi,
+            '\n$2:',
+        );
+    const lines = normalizedText.split('\n');
     const elements: React.ReactNode[] = [];
 
     lines.forEach((line, idx) => {

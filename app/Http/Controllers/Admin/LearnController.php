@@ -10,6 +10,7 @@ use App\Jobs\GenerateLearnModuleJob;
 use App\Models\Category;
 use App\Models\LearnModule;
 use App\Models\Subcategory;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -212,7 +213,7 @@ class LearnController
     /**
      * Update the specified learning module.
      */
-    public function update(UpdateLearnModuleRequest $request, string $id): RedirectResponse
+    public function update(UpdateLearnModuleRequest $request, string $id): RedirectResponse|JsonResponse
     {
 
         $module = LearnModule::findOrFail($id);
@@ -242,6 +243,17 @@ class LearnController
         ]);
 
         $this->clearCache($module);
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Learning module draft updated successfully!',
+            ]);
+        }
+
+        if (str_contains(request()->header('Referer', ''), '/learn/drafts')) {
+            return redirect()->route('admin.learn.drafts')->with('success', 'Learning module draft updated successfully!');
+        }
 
         return redirect()->route('admin.learn.index')->with('success', 'Learning module updated successfully!');
     }

@@ -118,8 +118,8 @@ class GenerateQuestionsJob implements ShouldQueue
                 }
             }
 
-            if (in_array($validated['category'], ['Numerical Ability'])) {
-                $categorySpecificRules .= "\n        * Numerical Ability: You MUST include a dedicated section in the explanation starting with 'Mental Math Shortcut:' that details the fastest and most efficient way to solve the problem mentally or via rapid approximation, showing standard exam cognitive shortcuts to save valuable time.";
+            if (in_array($validated['category'], ['Numerical Ability']) || $subcategory === 'Data interpretation') {
+                $categorySpecificRules .= "\n        * Numerical Ability / Data Interpretation: You MUST include a dedicated section in the explanation starting with 'Mental Math Shortcut:' that details the fastest and most efficient way to solve the problem mentally or via rapid approximation, showing standard exam cognitive shortcuts to save valuable time.";
             }
 
             $languageRule = '';

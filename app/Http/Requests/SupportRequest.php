@@ -28,7 +28,7 @@ class SupportRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:255', new NoEmojis, new NoHtml, new NoUrls, new NoProfanity],
-            'email' => ['required', 'email:' . (app()->runningUnitTests() ? 'rfc' : 'rfc,dns'), 'max:255'],
+            'email' => ['required', 'email:'.(app()->runningUnitTests() ? 'rfc' : 'rfc,dns'), 'max:255'],
             'message' => ['required', 'string', 'min:10', 'max:5000', new NoEmojis, new NoHtml, new NoProfanity],
         ];
     }

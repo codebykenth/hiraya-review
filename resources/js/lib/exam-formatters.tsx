@@ -204,16 +204,27 @@ export const renderFormattedText = (
             return null;
         }
 
-        // Normalize inline steps (e.g. "Step 2:") and list items (e.g. "1.") by inserting a newline before them
+        // Normalize inline steps (e.g. "Step 2:"), list items (e.g. "1."), and mental math shortcuts by inserting a newline before them
         const normalizedText = inputText
             .replace(/(?<!^)\s*\b(Step\s+\d+)\s*[:.-]/gi, '\n$1:')
-            .replace(/(?<!^)\s*\b([1-9]\.|\([1-9]\))\s+(?=[A-Z])/g, '\n$1 ');
+            .replace(/(?<!^)\s*\b([1-9]\.|\([1-9]\))\s+(?=[A-Z])/g, '\n$1 ')
+            .replace(
+                /(?<!^)\s*(🧠\s*)?\b(Mental Math Shortcut|Fast Track|Shortcut)\s*:/gi,
+                '\n$2:',
+            );
         const lines = normalizedText.split(/\n/);
         const listRegex = /^\s*(\(\d+\)|\d+\.)\s+(.+)$/;
 
-        const listItems: { marker: string; text: string }[] = [];
-        const introLines: string[] = [];
-        const outroLines: string[] = [];
+        interface ParsedBlock {
+            type: 'text' | 'step' | 'shortcut' | 'list';
+            stepNum?: string;
+            title?: string;
+            content: string[];
+            listItems?: { marker: string; text: string }[];
+        }
+
+        const blocks: ParsedBlock[] = [];
+        let currentBlock: ParsedBlock | null = null;
 
         for (const line of lines) {
             const trimmed = line.trim();
@@ -222,15 +233,70 @@ export const renderFormattedText = (
                 continue;
             }
 
-            const match = trimmed.match(listRegex);
+            const stepMatch = trimmed.match(
+                /^\s*Step\s+(\d+)\s*[:.-]\s*(.*)$/i,
+            );
+            const shortcutMatch = trimmed.match(
+                /^\s*(🧠\s*)?(Mental Math Shortcut|Fast Track|Shortcut)\s*:\s*(.*)$/i,
+            );
+            const listMatch = trimmed.match(listRegex);
 
-            if (match) {
-                listItems.push({ marker: match[1], text: match[2] });
-            } else {
-                if (listItems.length === 0) {
-                    introLines.push(line);
+            if (shortcutMatch) {
+                currentBlock = {
+                    type: 'shortcut',
+                    title: shortcutMatch[2],
+                    content: shortcutMatch[3].trim()
+                        ? [shortcutMatch[3].trim()]
+                        : [],
+                };
+                blocks.push(currentBlock);
+            } else if (stepMatch) {
+                currentBlock = {
+                    type: 'step',
+                    stepNum: stepMatch[1],
+                    content: stepMatch[2].trim() ? [stepMatch[2].trim()] : [],
+                };
+                blocks.push(currentBlock);
+            } else if (
+                listMatch &&
+                (!currentBlock ||
+                    (currentBlock.type !== 'shortcut' &&
+                        currentBlock.type !== 'step'))
+            ) {
+                if (
+                    currentBlock &&
+                    currentBlock.type === 'list' &&
+                    currentBlock.listItems
+                ) {
+                    currentBlock.listItems.push({
+                        marker: listMatch[1],
+                        text: listMatch[2],
+                    });
                 } else {
-                    outroLines.push(line);
+                    currentBlock = {
+                        type: 'list',
+                        content: [],
+                        listItems: [
+                            { marker: listMatch[1], text: listMatch[2] },
+                        ],
+                    };
+                    blocks.push(currentBlock);
+                }
+            } else {
+                if (
+                    currentBlock &&
+                    (currentBlock.type === 'shortcut' ||
+                        currentBlock.type === 'step')
+                ) {
+                    currentBlock.content.push(trimmed);
+                } else if (currentBlock && currentBlock.type === 'text') {
+                    currentBlock.content.push(trimmed);
+                } else {
+                    currentBlock = {
+                        type: 'text',
+                        content: [trimmed],
+                    };
+                    blocks.push(currentBlock);
                 }
             }
         }
@@ -436,52 +502,106 @@ export const renderFormattedText = (
 
         return (
             <div className="flex flex-col gap-3.5">
-                {introLines.length > 0 && (
-                    <div className="flex flex-col gap-2">
-                        {introLines.map((line, idx) => (
-                            <React.Fragment key={idx}>
-                                {renderRichParagraph(
-                                    line,
-                                    'text-[16px] font-medium text-slate-950 dark:text-slate-50 leading-relaxed tracking-wide',
-                                )}
-                            </React.Fragment>
-                        ))}
-                    </div>
-                )}
+                {blocks.map((block, bIdx) => {
+                    if (block.type === 'text') {
+                        return (
+                            <div key={bIdx} className="flex flex-col gap-2">
+                                {block.content.map((line, lIdx) => (
+                                    <React.Fragment key={lIdx}>
+                                        {renderRichParagraph(
+                                            line,
+                                            'text-[16px] font-medium text-slate-950 dark:text-slate-50 leading-relaxed tracking-wide',
+                                        )}
+                                    </React.Fragment>
+                                ))}
+                            </div>
+                        );
+                    }
 
-                {listItems.length > 0 && (
-                    <div className="my-2 flex flex-col gap-2.5 pl-1">
-                        {listItems.map((item, idx) => (
+                    if (block.type === 'list' && block.listItems) {
+                        return (
                             <div
-                                key={idx}
-                                className="flex items-start gap-3 rounded-lg border border-slate-100 bg-slate-50/40 p-3 transition hover:border-slate-200 dark:border-slate-900/60 dark:bg-slate-900/10"
+                                key={bIdx}
+                                className="my-2 flex flex-col gap-2.5 pl-1"
                             >
-                                <span className="inline-flex size-7 shrink-0 items-center justify-center rounded-md bg-blue-50 text-xs font-black text-blue-600 dark:bg-blue-950/40 dark:text-blue-400">
-                                    {item.marker.replace('.', '')}
+                                {block.listItems.map((item, idx) => (
+                                    <div
+                                        key={idx}
+                                        className="flex items-start gap-3 rounded-lg border border-slate-100 bg-slate-50/40 p-3 transition hover:border-slate-200 dark:border-slate-900/60 dark:bg-slate-900/10"
+                                    >
+                                        <span className="inline-flex size-7 shrink-0 items-center justify-center rounded-md bg-blue-50 text-xs font-black text-blue-600 dark:bg-blue-950/40 dark:text-blue-400">
+                                            {item.marker.replace('.', '')}
+                                        </span>
+                                        <div className="mt-0.5 flex-1">
+                                            {renderRichParagraph(
+                                                item.text,
+                                                'text-[15px] font-medium leading-relaxed tracking-wide text-slate-900 dark:text-slate-100',
+                                            )}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        );
+                    }
+
+                    if (block.type === 'step') {
+                        return (
+                            <div
+                                key={bIdx}
+                                className="shadow-3xs my-3.5 flex items-start gap-3 rounded-r-xl border-l-3 border-blue-500 bg-blue-50/20 p-3.5 dark:bg-blue-950/10"
+                            >
+                                <span className="shadow-3xs mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full bg-blue-600 font-mono text-xs font-black text-white select-none">
+                                    {block.stepNum}
                                 </span>
-                                <div className="mt-0.5 flex-1">
-                                    {renderRichParagraph(
-                                        item.text,
-                                        'text-[15px] font-medium leading-relaxed tracking-wide text-slate-900 dark:text-slate-100',
-                                    )}
+                                <div className="flex-1">
+                                    <strong className="mb-1 block text-sm font-black text-slate-950 dark:text-white">
+                                        STEP {block.stepNum}
+                                    </strong>
+                                    <div className="flex flex-col gap-2">
+                                        {block.content.map((line, lIdx) => (
+                                            <React.Fragment key={lIdx}>
+                                                {renderRichParagraph(
+                                                    line,
+                                                    'text-[15px] leading-relaxed font-medium text-slate-900 dark:text-slate-100',
+                                                )}
+                                            </React.Fragment>
+                                        ))}
+                                    </div>
                                 </div>
                             </div>
-                        ))}
-                    </div>
-                )}
+                        );
+                    }
 
-                {outroLines.length > 0 && (
-                    <div className="flex flex-col gap-2">
-                        {outroLines.map((line, idx) => (
-                            <React.Fragment key={idx}>
-                                {renderRichParagraph(
-                                    line,
-                                    'text-[16px] font-medium text-slate-950 dark:text-slate-50 leading-relaxed tracking-wide',
-                                )}
-                            </React.Fragment>
-                        ))}
-                    </div>
-                )}
+                    if (block.type === 'shortcut') {
+                        return (
+                            <div
+                                key={bIdx}
+                                className="shadow-3xs my-4 flex items-start gap-3 rounded-r-xl border-l-4 border-rose-500 bg-rose-50/40 p-4 dark:border-rose-500/80 dark:bg-rose-950/20"
+                            >
+                                <span className="shadow-3xs mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full bg-rose-500 text-[12px] text-white select-none">
+                                    🧠
+                                </span>
+                                <div className="flex-1">
+                                    <strong className="mb-1.5 block font-heading text-[13px] font-black tracking-widest text-rose-900 uppercase dark:text-rose-300">
+                                        {block.title}
+                                    </strong>
+                                    <div className="flex flex-col gap-2">
+                                        {block.content.map((line, lIdx) => (
+                                            <React.Fragment key={lIdx}>
+                                                {renderRichParagraph(
+                                                    line,
+                                                    'text-[14px] leading-loose font-bold text-slate-800 dark:text-slate-200',
+                                                )}
+                                            </React.Fragment>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        );
+                    }
+
+                    return null;
+                })}
             </div>
         );
     };

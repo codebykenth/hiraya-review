@@ -1,5 +1,5 @@
 import { Head, router } from '@inertiajs/react';
-import { Check, X, Edit3, ListChecks } from 'lucide-react';
+import { Check, X, Edit3, ListChecks, Save } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { DraftsReviewShell } from '@/components/drafts-review-shell';
 import type { CategoryItem } from '@/components/drafts-review-shell';
@@ -25,6 +25,7 @@ import {
     create as questionsCreate,
     destroy as questionsDestroy,
     bulkDestroy as questionsBulkDestroy,
+    update as questionsUpdate,
 } from '@/routes/questions';
 
 interface DraftQuestion {
@@ -51,6 +52,9 @@ export default function DraftsQuestionList({
     const [draftQuestions, setDraftQuestions] =
         useState<DraftQuestion[]>(initialDrafts);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
+    const [editingBackup, setEditingBackup] = useState<
+        Record<number, DraftQuestion>
+    >({});
 
     // Sync local state when Inertia refreshes initialDrafts from backend
     useEffect(() => {
@@ -99,12 +103,122 @@ export default function DraftsQuestionList({
         }
     };
 
-    const toggleEditDraft = (id: number) => {
+    const toggleEditDraft = async (id: number) => {
+        const questionToEdit = draftQuestions.find((q) => q.id === id);
+
+        if (questionToEdit && !questionToEdit.isEditing) {
+            setEditingBackup((prev) => ({
+                ...prev,
+                [id]: {
+                    ...questionToEdit,
+                    options: [...questionToEdit.options],
+                },
+            }));
+            setDraftQuestions((prev) =>
+                prev.map((q) => (q.id === id ? { ...q, isEditing: true } : q)),
+            );
+
+            return;
+        }
+
+        const current = draftQuestions.find((q) => q.id === id);
+        const original = editingBackup[id];
+
+        if (!current) {
+            return;
+        }
+
+        const hasChanges =
+            original &&
+            (current.stem !== original.stem ||
+                current.correct_option !== original.correct_option ||
+                current.explanation !== original.explanation ||
+                current.options.length !== original.options.length ||
+                current.options.some(
+                    (opt, idx) => opt !== original.options[idx],
+                ));
+
         setDraftQuestions((prev) =>
-            prev.map((q) =>
-                q.id === id ? { ...q, isEditing: !q.isEditing } : q,
-            ),
+            prev.map((q) => (q.id === id ? { ...q, isEditing: false } : q)),
         );
+
+        setEditingBackup((prev) => {
+            const copy = { ...prev };
+            delete copy[id];
+
+            return copy;
+        });
+
+        if (hasChanges) {
+            try {
+                const csrfToken =
+                    document
+                        .querySelector('meta[name="csrf-token"]')
+                        ?.getAttribute('content') || '';
+                const response = await fetch(questionsUpdate(id).url, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken,
+                        Accept: 'application/json',
+                    },
+                    body: JSON.stringify({
+                        category: current.category,
+                        subcategory: current.subcategory,
+                        language: (current as any).language || 'English',
+                        stem: current.stem,
+                        options: current.options,
+                        correct_option: current.correct_option,
+                        explanation: current.explanation,
+                        status: 'draft',
+                    }),
+                });
+
+                if (!response.ok) {
+                    throw new Error('Save failed');
+                }
+            } catch {
+                setErrorMessage(
+                    'Failed to save draft edits. Please check your connection.',
+                );
+                setDraftQuestions((prev) =>
+                    prev.map((q) =>
+                        q.id === id ? { ...q, isEditing: true } : q,
+                    ),
+                );
+
+                if (original) {
+                    setEditingBackup((prev) => ({
+                        ...prev,
+                        [id]: { ...original, options: [...original.options] },
+                    }));
+                }
+            }
+        }
+    };
+
+    const cancelEditDraft = (id: number) => {
+        const original = editingBackup[id];
+
+        if (original) {
+            setDraftQuestions((prev) =>
+                prev.map((q) =>
+                    q.id === id
+                        ? {
+                              ...original,
+                              options: [...original.options],
+                              isEditing: false,
+                          }
+                        : q,
+                ),
+            );
+            setEditingBackup((prev) => {
+                const copy = { ...prev };
+                delete copy[id];
+
+                return copy;
+            });
+        }
     };
 
     const handleUpdateDraftStem = (id: number, val: string) => {
@@ -250,66 +364,110 @@ export default function DraftsQuestionList({
                             {/* Card Actions toolbar */}
                             <div className="flex items-center gap-1.5">
                                 <TooltipProvider delayDuration={150}>
-                                    <Tooltip>
-                                        <TooltipTrigger asChild>
-                                            <button
-                                                type="button"
-                                                onClick={() =>
-                                                    toggleApproveDraft(q.id)
-                                                }
-                                                className={`cursor-pointer rounded-lg border p-1.5 transition ${
-                                                    q.approved
-                                                        ? 'border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-400'
-                                                        : 'border-border bg-card text-muted-foreground hover:text-foreground'
-                                                }`}
-                                            >
-                                                <Check className="size-4" />
-                                            </button>
-                                        </TooltipTrigger>
-                                        <TooltipContent>
-                                            {q.approved
-                                                ? 'Approved (Click to Unapprove)'
-                                                : 'Mark Approved'}
-                                        </TooltipContent>
-                                    </Tooltip>
+                                    {q.isEditing ? (
+                                        <>
+                                            <Tooltip>
+                                                <TooltipTrigger asChild>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() =>
+                                                            toggleEditDraft(
+                                                                q.id,
+                                                            )
+                                                        }
+                                                        className="cursor-pointer rounded-lg border border-emerald-200 bg-emerald-50 p-1.5 text-emerald-700 transition dark:border-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-400"
+                                                    >
+                                                        <Save className="size-4" />
+                                                    </button>
+                                                </TooltipTrigger>
+                                                <TooltipContent>
+                                                    Save Changes
+                                                </TooltipContent>
+                                            </Tooltip>
 
-                                    <Tooltip>
-                                        <TooltipTrigger asChild>
-                                            <button
-                                                type="button"
-                                                onClick={() =>
-                                                    toggleEditDraft(q.id)
-                                                }
-                                                className={`cursor-pointer rounded-lg border p-1.5 transition ${
-                                                    q.isEditing
-                                                        ? 'border-blue-200 bg-blue-50 text-blue-700 dark:border-blue-800 dark:bg-blue-950/40 dark:text-blue-400'
-                                                        : 'border-border bg-card text-muted-foreground hover:text-foreground'
-                                                }`}
-                                            >
-                                                <Edit3 className="size-4" />
-                                            </button>
-                                        </TooltipTrigger>
-                                        <TooltipContent>
-                                            Edit Draft Inline
-                                        </TooltipContent>
-                                    </Tooltip>
+                                            <Tooltip>
+                                                <TooltipTrigger asChild>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() =>
+                                                            cancelEditDraft(
+                                                                q.id,
+                                                            )
+                                                        }
+                                                        className="cursor-pointer rounded-lg border border-red-200 bg-red-50 p-1.5 text-red-700 transition dark:border-red-900/40 dark:bg-red-950/20 dark:text-red-400"
+                                                    >
+                                                        <X className="size-4" />
+                                                    </button>
+                                                </TooltipTrigger>
+                                                <TooltipContent>
+                                                    Cancel Edits
+                                                </TooltipContent>
+                                            </Tooltip>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Tooltip>
+                                                <TooltipTrigger asChild>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() =>
+                                                            toggleApproveDraft(
+                                                                q.id,
+                                                            )
+                                                        }
+                                                        className={`cursor-pointer rounded-lg border p-1.5 transition ${
+                                                            q.approved
+                                                                ? 'border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-400'
+                                                                : 'border-border bg-card text-muted-foreground hover:text-foreground'
+                                                        }`}
+                                                    >
+                                                        <Check className="size-4" />
+                                                    </button>
+                                                </TooltipTrigger>
+                                                <TooltipContent>
+                                                    {q.approved
+                                                        ? 'Approved (Click to Unapprove)'
+                                                        : 'Mark Approved'}
+                                                </TooltipContent>
+                                            </Tooltip>
 
-                                    <Tooltip>
-                                        <TooltipTrigger asChild>
-                                            <button
-                                                type="button"
-                                                onClick={() =>
-                                                    deleteDraft(q.id)
-                                                }
-                                                className="cursor-pointer rounded-lg border border-border bg-card p-1.5 text-muted-foreground transition hover:border-red-200 hover:text-red-600 dark:hover:border-red-900/50"
-                                            >
-                                                <X className="size-4" />
-                                            </button>
-                                        </TooltipTrigger>
-                                        <TooltipContent>
-                                            Delete Draft
-                                        </TooltipContent>
-                                    </Tooltip>
+                                            <Tooltip>
+                                                <TooltipTrigger asChild>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() =>
+                                                            toggleEditDraft(
+                                                                q.id,
+                                                            )
+                                                        }
+                                                        className="cursor-pointer rounded-lg border border-border bg-card p-1.5 text-muted-foreground transition hover:text-foreground"
+                                                    >
+                                                        <Edit3 className="size-4" />
+                                                    </button>
+                                                </TooltipTrigger>
+                                                <TooltipContent>
+                                                    Edit Draft Inline
+                                                </TooltipContent>
+                                            </Tooltip>
+
+                                            <Tooltip>
+                                                <TooltipTrigger asChild>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() =>
+                                                            deleteDraft(q.id)
+                                                        }
+                                                        className="cursor-pointer rounded-lg border border-border bg-card p-1.5 text-muted-foreground transition hover:border-red-200 hover:text-red-600 dark:hover:border-red-900/50"
+                                                    >
+                                                        <X className="size-4" />
+                                                    </button>
+                                                </TooltipTrigger>
+                                                <TooltipContent>
+                                                    Delete Draft
+                                                </TooltipContent>
+                                            </Tooltip>
+                                        </>
+                                    )}
                                 </TooltipProvider>
                             </div>
                         </div>
