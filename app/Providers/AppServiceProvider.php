@@ -25,7 +25,7 @@ use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
-
+use Illuminate\Database\Eloquent\Model;
 class AppServiceProvider extends ServiceProvider
 {
     /**
@@ -122,6 +122,8 @@ class AppServiceProvider extends ServiceProvider
         DB::prohibitDestructiveCommands(
             app()->isProduction(),
         );
+
+        Model::shouldBeStrict(! app()->isProduction());
 
         Password::defaults(
             fn (): ?Password => app()->isProduction()
