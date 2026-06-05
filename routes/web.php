@@ -30,6 +30,9 @@ Route::middleware('throttle:global-views')->group(function () {
     Route::inertia('terms', 'public/terms')->name('terms');
     Route::inertia('support', 'public/support')->name('support');
     Route::inertia('guide', 'guide')->name('guide');
+    Route::inertia('account-inactive', 'account-inactive', [
+        'adminEmail' => env('MAIL_FROM_ADDRESS', 'support@hirayareview.com'),
+    ])->name('account-inactive');
     Route::get('exams', [ExamController::class, 'index'])->name('exams.index');
 
     // Publicly accessible Learn Module routes (for advanced long-tail SEO crawl)

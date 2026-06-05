@@ -10,8 +10,14 @@ class CheckUserActive
 {
     public function handle(Request $request, Closure $next): Response
     {
-        $response = $next($request);
+        if ($request->user() && ! $request->user()->is_active) {
+            $allowedRoutes = ['account-inactive', 'logout'];
 
-        return $response;
+            if (! $request->routeIs($allowedRoutes)) {
+                return redirect()->route('account-inactive');
+            }
+        }
+
+        return $next($request);
     }
 }

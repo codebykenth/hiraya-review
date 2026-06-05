@@ -101,7 +101,7 @@ return [
     |
     */
 
-    'middleware' => ['web', 'turnstile.verify'],
+    'middleware' => ['web', 'turnstile.verify', 'throttle:global-mutations'],
 
     /*
     |--------------------------------------------------------------------------
