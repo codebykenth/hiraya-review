@@ -50,7 +50,7 @@ import {
 } from '@/routes/questions';
 import { index as calendarIndex } from '@/routes/study-schedules/index';
 
-import type { NavItem, Auth } from '@/types';
+import type { NavItem } from '@/types';
 
 const generalNavItems: NavItem[] = [
     {
@@ -167,14 +167,14 @@ const adminSystemItems: NavItem[] = [
 ];
 
 const viewMap: Record<string, string> = {
-    'Dashboard': 'dashboard',
+    Dashboard: 'dashboard',
     'Reviewer Guide': 'reviewer-guide',
     'Study Plan': 'study-plan',
-    'Learn': 'learn',
+    Learn: 'learn',
     'Practice Drills': 'practice-drills',
     'Mock Exams': 'mock-exams',
-    'History': 'history',
-    'Analytics': 'analytics',
+    History: 'history',
+    Analytics: 'analytics',
 };
 
 export function AppSidebar() {
@@ -184,12 +184,15 @@ export function AppSidebar() {
 
     const visibleGeneralItems = generalNavItems.filter((item) => {
         const viewId = viewMap[item.title];
+
         if (viewId && rolePermissions[viewId] !== undefined) {
             const val = String(rolePermissions[viewId]);
+
             if (val === 'false' || val === '0') {
                 return false;
             }
         }
+
         return true;
     });
 
@@ -215,9 +218,18 @@ export function AppSidebar() {
                         {visibleGeneralItems.length > 0 && (
                             <SidebarSeparator className="my-2" />
                         )}
-                        <NavMain items={adminCoreItems} label="Administration" />
-                        <NavMain items={adminContentItems} label="Curriculum & Content" />
-                        <NavMain items={adminSystemItems} label="System & Security" />
+                        <NavMain
+                            items={adminCoreItems}
+                            label="Administration"
+                        />
+                        <NavMain
+                            items={adminContentItems}
+                            label="Curriculum & Content"
+                        />
+                        <NavMain
+                            items={adminSystemItems}
+                            label="System & Security"
+                        />
                     </>
                 )}
             </SidebarContent>

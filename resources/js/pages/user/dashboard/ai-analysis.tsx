@@ -1173,8 +1173,14 @@ export default function AiAnalysisReport({
 
             {/* System Under Heavy Load Modal */}
             {isOverloadModalOpen && (
-                <div className="animate-fade-in fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-sm">
-                    <div className="relative w-full max-w-2xl animate-in overflow-hidden rounded-3xl border border-slate-200/80 bg-white p-4 shadow-2xl transition-all duration-200 zoom-in-95 fade-in sm:p-6 dark:border-slate-800 dark:bg-slate-900">
+                <div
+                    className="animate-fade-in fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-sm"
+                    onClick={() => setIsOverloadModalOpen(false)}
+                >
+                    <div
+                        className="relative w-full max-w-2xl animate-in overflow-hidden rounded-3xl border border-slate-200/80 bg-white p-4 shadow-2xl transition-all duration-200 zoom-in-95 fade-in sm:p-6 dark:border-slate-800 dark:bg-slate-900"
+                        onClick={(e) => e.stopPropagation()}
+                    >
                         {/* Decorative Background */}
                         <div className="pointer-events-none absolute -top-24 -right-24 h-48 w-48 rounded-full bg-amber-500/5 blur-3xl" />
 

@@ -444,7 +444,9 @@ export default function DraftsLearnList({
                                                     <button
                                                         type="button"
                                                         onClick={() =>
-                                                            promptDeleteDraft(m.id)
+                                                            promptDeleteDraft(
+                                                                m.id,
+                                                            )
                                                         }
                                                         className="hover:text-red-650 cursor-pointer rounded-lg border border-border bg-card p-1.5 text-muted-foreground transition hover:border-red-200 dark:hover:text-red-500"
                                                     >
@@ -657,7 +659,11 @@ export default function DraftsLearnList({
                           } unapproved draft(s)? This action cannot be undone.`
                         : 'Are you sure you want to delete this draft? This action cannot be undone.'
                 }
-                confirmLabel={deleteModal.type === 'bulk' ? 'Delete Drafts' : 'Delete Draft'}
+                confirmLabel={
+                    deleteModal.type === 'bulk'
+                        ? 'Delete Drafts'
+                        : 'Delete Draft'
+                }
                 variant="danger"
             />
         </>

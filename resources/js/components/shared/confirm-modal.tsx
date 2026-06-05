@@ -1,6 +1,14 @@
 import { ShieldAlert } from 'lucide-react';
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 
 export interface ConfirmModalProps {
@@ -15,14 +23,7 @@ export interface ConfirmModalProps {
     onConfirm: () => void;
 }
 
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-} from '@/components/ui/dialog';
+
 
 export function ConfirmModal({
     isOpen,
@@ -37,11 +38,10 @@ export function ConfirmModal({
 }: ConfirmModalProps) {
     const [verifyInput, setVerifyInput] = useState('');
 
-    useEffect(() => {
-        if (!isOpen) {
-            setVerifyInput('');
-        }
-    }, [isOpen]);
+    const handleClose = () => {
+        setVerifyInput('');
+        onClose();
+    };
     const getButtonConfig = () => {
         switch (variant) {
             case 'danger':
@@ -65,7 +65,7 @@ export function ConfirmModal({
     const config = getButtonConfig();
 
     return (
-        <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+        <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
             <DialogContent className="sm:max-w-2xl">
                 <DialogHeader>
                     <div className="flex items-center gap-2">
@@ -75,13 +75,17 @@ export function ConfirmModal({
                     <DialogDescription className="mt-2.5 text-left whitespace-pre-line text-slate-600 dark:text-slate-400">
                         {message}
                     </DialogDescription>
-                    
+
                     {verificationText && (
                         <div className="mt-4 flex flex-col gap-2 border-t border-border pt-4 text-left">
                             <label className="text-sm font-semibold text-foreground">
-                                To confirm, type <span className="rounded-md bg-muted px-1.5 py-0.5 font-mono text-xs font-bold text-foreground select-all">{verificationText}</span> below:
+                                To confirm, type{' '}
+                                <span className="rounded-md bg-muted px-1.5 py-0.5 font-mono text-xs font-bold text-foreground select-all">
+                                    {verificationText}
+                                </span>{' '}
+                                below:
                             </label>
-                            <Input 
+                            <Input
                                 type="text"
                                 value={verifyInput}
                                 onChange={(e) => setVerifyInput(e.target.value)}
@@ -94,15 +98,19 @@ export function ConfirmModal({
                     )}
                 </DialogHeader>
                 <DialogFooter className="mt-4 gap-2 sm:gap-2">
-                    <Button variant="outline" size="sm" onClick={onClose}>
+                    <Button variant="outline" size="sm" onClick={handleClose}>
                         {cancelLabel}
                     </Button>
                     <Button
                         variant={config.buttonVariant}
                         size="sm"
-                        disabled={verificationText ? verifyInput !== verificationText : false}
+                        disabled={
+                            verificationText
+                                ? verifyInput !== verificationText
+                                : false
+                        }
                         onClick={() => {
-                            onClose();
+                            handleClose();
                             onConfirm();
                         }}
                     >

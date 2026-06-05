@@ -6,7 +6,6 @@ interface UseUserFiltersProps {
     users: UserItem[];
     searchTerm: string;
     selectedRole: string;
-    showDeletedUsers: boolean;
     filters: FilterState;
 }
 
@@ -14,7 +13,6 @@ export function useUserFilters({
     users,
     searchTerm,
     selectedRole,
-    showDeletedUsers,
     filters,
 }: UseUserFiltersProps) {
     return useMemo(() => {
@@ -31,20 +29,14 @@ export function useUserFilters({
                 (selectedRole === 'Admins' && u.role === 'admin') ||
                 (selectedRole === 'Students' && u.role === 'student');
 
-            // Apply deleted filter
-            const isDeleted = !!u.deleted_at;
-            const matchesDeletedFilter = showDeletedUsers === isDeleted;
-
             // Apply advanced filters
             let matchesAdvancedFilters = true;
 
             if (filters.status !== 'all') {
-                if (filters.status === 'deleted') {
-                    matchesAdvancedFilters = isDeleted;
-                } else if (filters.status === 'active') {
-                    matchesAdvancedFilters = !isDeleted && u.is_active;
+                if (filters.status === 'active') {
+                    matchesAdvancedFilters = u.is_active;
                 } else if (filters.status === 'inactive') {
-                    matchesAdvancedFilters = !isDeleted && !u.is_active;
+                    matchesAdvancedFilters = !u.is_active;
                 }
             }
 
@@ -111,12 +103,7 @@ export function useUserFilters({
                 matchesAdvancedFilters = false;
             }
 
-            return (
-                matchesSearch &&
-                matchesRole &&
-                matchesDeletedFilter &&
-                matchesAdvancedFilters
-            );
+            return matchesSearch && matchesRole && matchesAdvancedFilters;
         });
-    }, [users, searchTerm, selectedRole, showDeletedUsers, filters]);
+    }, [users, searchTerm, selectedRole, filters]);
 }

@@ -26,7 +26,7 @@ class ViewManagementController extends Controller
 
         // Ensure defaults exist for both roles
         $roles = ['admin', 'user'];
-        
+
         foreach ($roles as $role) {
             foreach ($availableViews as $viewName => $label) {
                 RolePermission::firstOrCreate(
@@ -50,7 +50,7 @@ class ViewManagementController extends Controller
 
         foreach ($validated['permissions'] as $perm) {
             RolePermission::where('id', $perm['id'])->update([
-                'is_visible' => $perm['is_visible']
+                'is_visible' => $perm['is_visible'],
             ]);
         }
 

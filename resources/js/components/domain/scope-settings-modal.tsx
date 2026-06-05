@@ -50,8 +50,14 @@ export function ScopeSettingsModal({
     );
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-xs">
-            <div className="relative flex h-[600px] w-full max-w-4xl animate-in flex-col overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-2xl duration-200 zoom-in-95 fade-in dark:border-slate-800 dark:bg-slate-900">
+        <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-xs"
+            onClick={onClose}
+        >
+            <div
+                className="relative flex h-[600px] w-full max-w-4xl animate-in flex-col overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-2xl duration-200 zoom-in-95 fade-in dark:border-slate-800 dark:bg-slate-900"
+                onClick={(e) => e.stopPropagation()}
+            >
                 {/* Modal Header */}
                 <div className="flex items-center justify-between border-b border-slate-100 bg-slate-50/50 px-4 py-4.5 sm:px-6 dark:border-slate-900 dark:bg-slate-900/35">
                     <div>

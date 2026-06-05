@@ -1,11 +1,10 @@
-﻿import {
+import {
     Activity,
     Lock,
     Unlock,
     Trash2,
     CheckCircle,
     XCircle,
-    RotateCcw,
 } from 'lucide-react';
 import type { TableColumn } from '@/components/domain/admin-table';
 import {
@@ -23,8 +22,6 @@ interface UsersTableColumnsProps {
     onRoleChange: (user: UserItem, role: 'admin' | 'student') => void;
     onStatusToggle: (user: UserItem) => void;
     onDelete: (user: UserItem) => void;
-    onRestore: (user: UserItem) => void;
-    onForceDelete: (user: UserItem) => void;
     onSelectUser: (user: UserItem) => void;
     selectedUserIds: Set<number>;
     onToggleSelect: (userId: number) => void;
@@ -35,8 +32,6 @@ export function getUsersTableColumns({
     onRoleChange,
     onStatusToggle,
     onDelete,
-    onRestore,
-    onForceDelete,
     onSelectUser,
     selectedUserIds,
     onToggleSelect,
@@ -121,133 +116,82 @@ export function getUsersTableColumns({
             header: 'Actions',
             className: 'w-32 text-right',
             render: (u) => {
-                const isDeleted = !!u.deleted_at;
-
                 return (
                     <div className="flex items-center justify-end gap-1.5">
                         <TooltipProvider delayDuration={150}>
-                            {isDeleted ? (
-                                <>
-                                    <Tooltip>
-                                        <TooltipTrigger asChild>
-                                            <button
-                                                onClick={() => onRestore(u)}
-                                                className="cursor-pointer rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted hover:text-emerald-600 dark:text-emerald-400"
-                                            >
-                                                <RotateCcw className="size-4" />
-                                            </button>
-                                        </TooltipTrigger>
-                                        <TooltipContent>
-                                            Restore account
-                                        </TooltipContent>
-                                    </Tooltip>
-
-                                    <Tooltip>
-                                        <TooltipTrigger asChild>
-                                            <button
-                                                onClick={() => onForceDelete(u)}
-                                                className="cursor-pointer rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted hover:text-red-600"
-                                            >
-                                                <Trash2 className="size-4" />
-                                            </button>
-                                        </TooltipTrigger>
-                                        <TooltipContent>
-                                            Permanently delete
-                                        </TooltipContent>
-                                    </Tooltip>
-                                </>
+                            {u.role === 'admin' ? (
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <button
+                                            onClick={() =>
+                                                onRoleChange(u, 'student')
+                                            }
+                                            disabled={u.id === currentUserId}
+                                            className="cursor-pointer rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted hover:text-emerald-600 disabled:cursor-not-allowed disabled:opacity-30 dark:text-emerald-400"
+                                        >
+                                            <Unlock className="size-4" />
+                                        </button>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                        Demote to Student
+                                    </TooltipContent>
+                                </Tooltip>
                             ) : (
-                                <>
-                                    {u.role === 'admin' ? (
-                                        <Tooltip>
-                                            <TooltipTrigger asChild>
-                                                <button
-                                                    onClick={() =>
-                                                        onRoleChange(
-                                                            u,
-                                                            'student',
-                                                        )
-                                                    }
-                                                    disabled={
-                                                        u.id === currentUserId
-                                                    }
-                                                    className="cursor-pointer rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted hover:text-emerald-600 disabled:cursor-not-allowed disabled:opacity-30 dark:text-emerald-400"
-                                                >
-                                                    <Unlock className="size-4" />
-                                                </button>
-                                            </TooltipTrigger>
-                                            <TooltipContent>
-                                                Demote to Student
-                                            </TooltipContent>
-                                        </Tooltip>
-                                    ) : (
-                                        <Tooltip>
-                                            <TooltipTrigger asChild>
-                                                <button
-                                                    onClick={() =>
-                                                        onRoleChange(u, 'admin')
-                                                    }
-                                                    disabled={
-                                                        u.id === currentUserId
-                                                    }
-                                                    className="cursor-pointer rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted hover:text-indigo-600 disabled:cursor-not-allowed disabled:opacity-30 dark:text-indigo-400"
-                                                >
-                                                    <Lock className="size-4" />
-                                                </button>
-                                            </TooltipTrigger>
-                                            <TooltipContent>
-                                                Promote to Admin
-                                            </TooltipContent>
-                                        </Tooltip>
-                                    )}
-
-                                    <Tooltip>
-                                        <TooltipTrigger asChild>
-                                            <button
-                                                onClick={() =>
-                                                    onStatusToggle(u)
-                                                }
-                                                disabled={
-                                                    u.id === currentUserId
-                                                }
-                                                className={`cursor-pointer rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted disabled:cursor-not-allowed disabled:opacity-30 ${
-                                                    u.is_active
-                                                        ? 'hover:text-amber-600 dark:text-amber-400'
-                                                        : 'hover:text-emerald-600 dark:text-emerald-400'
-                                                }`}
-                                            >
-                                                {u.is_active ? (
-                                                    <XCircle className="size-4" />
-                                                ) : (
-                                                    <CheckCircle className="size-4" />
-                                                )}
-                                            </button>
-                                        </TooltipTrigger>
-                                        <TooltipContent>
-                                            {u.is_active
-                                                ? 'Deactivate account'
-                                                : 'Activate account'}
-                                        </TooltipContent>
-                                    </Tooltip>
-
-                                    <Tooltip>
-                                        <TooltipTrigger asChild>
-                                            <button
-                                                onClick={() => onDelete(u)}
-                                                disabled={
-                                                    u.id === currentUserId
-                                                }
-                                                className="cursor-pointer rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted hover:text-red-600 disabled:cursor-not-allowed disabled:opacity-30"
-                                            >
-                                                <Trash2 className="size-4" />
-                                            </button>
-                                        </TooltipTrigger>
-                                        <TooltipContent>
-                                            Delete account
-                                        </TooltipContent>
-                                    </Tooltip>
-                                </>
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <button
+                                            onClick={() =>
+                                                onRoleChange(u, 'admin')
+                                            }
+                                            disabled={u.id === currentUserId}
+                                            className="cursor-pointer rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted hover:text-indigo-600 disabled:cursor-not-allowed disabled:opacity-30 dark:text-indigo-400"
+                                        >
+                                            <Lock className="size-4" />
+                                        </button>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                        Promote to Admin
+                                    </TooltipContent>
+                                </Tooltip>
                             )}
+
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <button
+                                        onClick={() => onStatusToggle(u)}
+                                        disabled={u.id === currentUserId}
+                                        className={`cursor-pointer rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted disabled:cursor-not-allowed disabled:opacity-30 ${
+                                            u.is_active
+                                                ? 'hover:text-amber-600 dark:text-amber-400'
+                                                : 'hover:text-emerald-600 dark:text-emerald-400'
+                                        }`}
+                                    >
+                                        {u.is_active ? (
+                                            <XCircle className="size-4" />
+                                        ) : (
+                                            <CheckCircle className="size-4" />
+                                        )}
+                                    </button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    {u.is_active
+                                        ? 'Deactivate account'
+                                        : 'Activate account'}
+                                </TooltipContent>
+                            </Tooltip>
+
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <button
+                                        onClick={() => onDelete(u)}
+                                        disabled={u.id === currentUserId}
+                                        className="cursor-pointer rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted hover:text-red-600 disabled:cursor-not-allowed disabled:opacity-30"
+                                    >
+                                        <Trash2 className="size-4" />
+                                    </button>
+                                </TooltipTrigger>
+                                <TooltipContent>Delete account</TooltipContent>
+                            </Tooltip>
                         </TooltipProvider>
                     </div>
                 );

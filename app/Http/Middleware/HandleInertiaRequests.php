@@ -48,7 +48,7 @@ class HandleInertiaRequests extends Middleware
                 ) : null,
                 'permissions' => Cache::remember('role_permissions', 3600, function () {
                     return RolePermission::all()->groupBy('role')->map(function ($permissions) {
-                        return $permissions->pluck('is_visible', 'view_name')->map(fn($v) => (bool) $v)->toArray();
+                        return $permissions->pluck('is_visible', 'view_name')->map(fn ($v) => (bool) $v)->toArray();
                     })->toArray();
                 }),
             ],

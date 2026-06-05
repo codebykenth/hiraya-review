@@ -25,8 +25,7 @@ export function RoleViewCard({
     const rolePermissions = permissions.filter((p) => p.role === role);
     const orderMap = Object.keys(availableViews);
     const sortedPermissions = [...rolePermissions].sort(
-        (a, b) =>
-            orderMap.indexOf(a.view_name) - orderMap.indexOf(b.view_name),
+        (a, b) => orderMap.indexOf(a.view_name) - orderMap.indexOf(b.view_name),
     );
 
     return (

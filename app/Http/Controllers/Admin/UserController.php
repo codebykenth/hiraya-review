@@ -18,9 +18,8 @@ class UserController
     public function index(Request $request): Response
     {
 
-        // Retrieve ALL users (including soft-deleted) and fetch their exam attempts count
-        $users = User::withTrashed()
-            ->latest()
+        // Retrieve ALL active users and fetch their exam attempts count
+        $users = User::latest()
             ->get()
             ->map(function ($u) {
                 return [
@@ -32,7 +31,7 @@ class UserController
                     'last_login_at' => $u->last_login_at ? $u->last_login_at->format('Y-m-d H:i') : 'Never',
                     'is_active' => (bool) $u->is_active,
                     'terms_accepted_at' => $u->terms_accepted_at ? $u->terms_accepted_at->format('Y-m-d H:i') : null,
-                    'deleted_at' => $u->deleted_at ? $u->deleted_at->format('Y-m-d H:i') : null,
+                    'deleted_at' => null, // Kept to avoid breaking TS interface
                     'attempts_count' => ExamAttempt::where('user_id', $u->id)->count(),
                 ];
             });
@@ -86,7 +85,7 @@ class UserController
     }
 
     /**
-     * Soft delete user account (archive).
+     * Permanently delete user account.
      */
     public function destroy(int $id): RedirectResponse
     {
@@ -98,40 +97,7 @@ class UserController
             return back()->withErrors(['user' => 'You cannot delete your own active administrator account.']);
         }
 
-        // Soft delete (archive) the user
         $user->delete();
-
-        return back();
-    }
-
-    /**
-     * Restore a soft-deleted user.
-     */
-    public function restore(int $id): RedirectResponse
-    {
-
-        $user = User::onlyTrashed()->findOrFail($id);
-        $user->restore();
-
-        return back();
-    }
-
-    /**
-     * Permanently delete a user (force delete).
-     */
-    public function forceDelete(int $id): RedirectResponse
-    {
-
-        $user = User::withTrashed()->findOrFail($id);
-
-        // Security safeguard
-        if ($user->id === auth()->user()->id) {
-            return back()->withErrors(['user' => 'Cannot permanently delete your own account.']);
-        }
-
-        // Delete all associated attempts first
-        ExamAttempt::where('user_id', $user->id)->delete();
-        $user->forceDelete();
 
         return back();
     }

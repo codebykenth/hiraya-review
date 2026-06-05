@@ -199,8 +199,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::controller(UserController::class)->prefix('admin/users')->name('admin.users.')->group(function () {
                 Route::put('{id}', 'update')->name('update');
                 Route::delete('{id}', 'destroy')->name('destroy');
-                Route::post('{id}/restore', 'restore')->name('restore');
-                Route::delete('{id}/force-delete', 'forceDelete')->name('force-delete');
             });
 
             // Admin Exam Dates Mutations

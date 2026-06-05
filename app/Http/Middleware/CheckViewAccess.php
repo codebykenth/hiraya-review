@@ -2,10 +2,10 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\RolePermission;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
-use App\Models\RolePermission;
 use Symfony\Component\HttpFoundation\Response;
 
 class CheckViewAccess
@@ -36,7 +36,7 @@ class CheckViewAccess
         // Fetch permissions from cache (same as HandleInertiaRequests)
         $permissions = Cache::remember('role_permissions', 3600, function () {
             return RolePermission::all()->groupBy('role')->map(function ($permissions) {
-                return $permissions->pluck('is_visible', 'view_name')->map(fn($v) => (bool) $v)->toArray();
+                return $permissions->pluck('is_visible', 'view_name')->map(fn ($v) => (bool) $v)->toArray();
             })->toArray();
         });
 

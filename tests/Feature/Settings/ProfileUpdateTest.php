@@ -64,7 +64,7 @@ test('user can delete their account', function () {
         ->assertRedirect(route('home'));
 
     $this->assertGuest();
-    expect($user->fresh()->trashed())->toBeTrue();
+    expect($user->fresh())->toBeNull();
 });
 
 test('correct confirmation text must be provided to delete account', function () {

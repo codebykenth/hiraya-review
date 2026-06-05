@@ -1,10 +1,8 @@
-﻿import { Head, router, usePage } from '@inertiajs/react';
+import { Head, router, usePage } from '@inertiajs/react';
 import {
     Search,
     ChevronDown,
     Filter,
-    Eye,
-    EyeOff,
     CheckSquare,
     CheckCircle,
     XCircle,
@@ -43,7 +41,6 @@ export default function AdminUsersIndex({
     const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
     const [selectedRole, setSelectedRole] = useState('All Roles');
     const [currentPage, setCurrentPage] = useState(1);
-    const [showDeletedUsers, setShowDeletedUsers] = useState(false);
     const [selectedUserModal, setSelectedUserModal] = useState<UserItem | null>(
         null,
     );
@@ -68,7 +65,6 @@ export default function AdminUsersIndex({
         users,
         searchTerm: debouncedSearchTerm,
         selectedRole,
-        showDeletedUsers,
         filters,
     });
 
@@ -124,7 +120,7 @@ export default function AdminUsersIndex({
 
         open(
             'Delete User Account?',
-            `This will soft-delete the account for "${user.name}" (${user.email}). The account data will be preserved but hidden from the system.`,
+            `This will permanently delete the account for "${user.name}" (${user.email}). All associated mock exams, history, and analytics will be permanently destroyed. This action cannot be undone.`,
             'Delete Account',
             () => {
                 router.delete(`/admin/users/${user.id}`, {
@@ -139,7 +135,7 @@ export default function AdminUsersIndex({
         const count = selectedIds.size;
         open(
             'Bulk Delete Users?',
-            `This will soft-delete ${count} user account${count !== 1 ? 's' : ''}. The account data will be preserved but hidden from the system.`,
+            `This will permanently delete ${count} user account${count !== 1 ? 's' : ''}. All associated data will be destroyed. This action cannot be undone.`,
             'Delete Accounts',
             async () => {
                 setBulkActionLoading(true);
@@ -210,45 +206,11 @@ export default function AdminUsersIndex({
         );
     };
 
-    const handleRestore = (user: UserItem) => {
-        open(
-            'Restore User Account?',
-            `Restore ${user.name}'s account?`,
-            'Restore',
-            () => {
-                router.post(
-                    `/admin/users/${user.id}/restore`,
-                    {},
-                    { preserveScroll: true },
-                );
-            },
-            'success',
-        );
-    };
-
-    const handleForceDelete = (user: UserItem) => {
-        open(
-            'Permanently Delete Account?',
-            'This will permanently delete this account. Cannot be undone!',
-            'Delete',
-            () => {
-                router.post(
-                    `/admin/users/${user.id}/force-delete`,
-                    {},
-                    { preserveScroll: true },
-                );
-            },
-            'danger',
-        );
-    };
-
     const columns = getUsersTableColumns({
         currentUserId: currentUser.id,
         onRoleChange: handleRoleChange,
         onStatusToggle: handleToggleStatus,
         onDelete: handleDeleteUser,
-        onRestore: handleRestore,
-        onForceDelete: handleForceDelete,
         onSelectUser: setSelectedUserModal,
         selectedUserIds: selectedIds,
         onToggleSelect: toggleSelect,
@@ -305,28 +267,6 @@ export default function AdminUsersIndex({
                         >
                             <Filter className="size-3.5" />
                             Filters
-                        </Button>
-
-                        <Button
-                            variant={showDeletedUsers ? 'default' : 'outline'}
-                            size="sm"
-                            onClick={() => {
-                                setShowDeletedUsers(!showDeletedUsers);
-                                setCurrentPage(1);
-                            }}
-                            className="gap-1.5"
-                        >
-                            {showDeletedUsers ? (
-                                <>
-                                    <Eye className="size-3.5" />
-                                    Show Active
-                                </>
-                            ) : (
-                                <>
-                                    <EyeOff className="size-3.5" />
-                                    Show Deleted
-                                </>
-                            )}
                         </Button>
 
                         <span className="mt-1 block shrink-0 pl-1 text-right text-xs font-bold text-muted-foreground md:mt-0 md:text-left">

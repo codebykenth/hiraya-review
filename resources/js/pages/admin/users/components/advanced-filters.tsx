@@ -11,7 +11,7 @@ interface AdvancedFiltersProps {
 }
 
 export interface FilterState {
-    status: 'all' | 'active' | 'inactive' | 'deleted';
+    status: 'all' | 'active' | 'inactive';
     termsAcceptance: 'all' | 'accepted' | 'pending';
     role: 'all' | 'admin' | 'student';
     registrationDateFrom?: string;
@@ -105,11 +105,15 @@ export function AdvancedFilters({
     }
 
     return (
-        <div className="fixed inset-0 z-99 flex animate-in items-center justify-center bg-slate-900/60 p-4 backdrop-blur-xs duration-200 fade-in">
+        <div
+            className="fixed inset-0 z-99 flex animate-in items-center justify-center bg-slate-900/60 p-4 backdrop-blur-xs duration-200 fade-in"
+            onClick={onClose}
+        >
             <div
                 className="relative flex max-h-[90vh] w-full max-w-3xl animate-in flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl duration-205 zoom-in-95 dark:border-slate-800 dark:bg-slate-950"
                 role="dialog"
                 aria-modal="true"
+                onClick={(e) => e.stopPropagation()}
             >
                 {/* Header */}
                 <div className="flex shrink-0 items-center justify-between border-b border-slate-100 bg-slate-50/50 p-4 sm:p-6 dark:border-slate-900 dark:bg-slate-900/10">
@@ -136,13 +140,12 @@ export function AdvancedFilters({
                         <label className="text-xs font-bold tracking-wide text-slate-700 uppercase dark:text-slate-300">
                             Account Status
                         </label>
-                        <div className="mt-2.5 grid grid-cols-2 gap-2 sm:grid-cols-4">
+                        <div className="mt-2.5 grid grid-cols-2 gap-2 sm:grid-cols-3">
                             {(
                                 [
                                     { value: 'all', label: 'All' },
                                     { value: 'active', label: 'Active' },
                                     { value: 'inactive', label: 'Inactive' },
-                                    { value: 'deleted', label: 'Deleted' },
                                 ] as const
                             ).map(({ value, label }) => (
                                 <button

@@ -2,17 +2,16 @@
 
 use App\Http\Middleware\CheckMaintenanceMode;
 use App\Http\Middleware\CheckUserActive;
+use App\Http\Middleware\CheckViewAccess;
 use App\Http\Middleware\CompressResponse;
 use App\Http\Middleware\ConfirmPasswordForNonSocialUsers;
 use App\Http\Middleware\EnsureUserIsAdmin;
 use App\Http\Middleware\HandleAppearance;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\SetCacheHeaders;
-use App\Http\Middleware\CheckViewAccess;
 use App\Http\Middleware\TransactionMiddleware;
 use App\Http\Middleware\VerifyTurnstile;
 use App\Models\RolePermission;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -21,6 +20,7 @@ use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Middleware\SubstituteBindings;
+use Illuminate\Support\Facades\Cache;
 use Inertia\Inertia;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -73,7 +73,7 @@ return Application::configure(basePath: dirname(__DIR__))
                         'user' => $request->user(),
                         'permissions' => Cache::remember('role_permissions', 3600, function () {
                             return RolePermission::all()->groupBy('role')->map(function ($permissions) {
-                                return $permissions->pluck('is_visible', 'view_name')->map(fn($v) => (bool) $v)->toArray();
+                                return $permissions->pluck('is_visible', 'view_name')->map(fn ($v) => (bool) $v)->toArray();
                             })->toArray();
                         }),
                     ],

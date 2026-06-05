@@ -468,7 +468,9 @@ export default function DraftsQuestionList({
                                                     <button
                                                         type="button"
                                                         onClick={() =>
-                                                            promptDeleteDraft(q.id)
+                                                            promptDeleteDraft(
+                                                                q.id,
+                                                            )
                                                         }
                                                         className="cursor-pointer rounded-lg border border-border bg-card p-1.5 text-muted-foreground transition hover:border-red-200 hover:text-red-600 dark:hover:border-red-900/50"
                                                     >
@@ -667,7 +669,11 @@ export default function DraftsQuestionList({
                           } unapproved draft(s)? This action cannot be undone.`
                         : 'Are you sure you want to delete this draft? This action cannot be undone.'
                 }
-                confirmLabel={deleteModal.type === 'bulk' ? 'Delete Drafts' : 'Delete Draft'}
+                confirmLabel={
+                    deleteModal.type === 'bulk'
+                        ? 'Delete Drafts'
+                        : 'Delete Draft'
+                }
                 variant="danger"
             />
         </>
