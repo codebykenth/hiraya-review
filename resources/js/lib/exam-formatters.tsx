@@ -104,7 +104,7 @@ export const formatMathInlineBase = (text: string) => {
 
     // Split by fraction (e.g. 1/2, 4.8 / 0.6, 18 / (-2)), superscript (e.g. ^2, ^-3, ^n), or sqrt(...)
     const parts = processedText.split(
-        /(\b\d+(?:\.\d+)?\s*\/\s*(?:-?\d+(?:\.\d+)?|\(\s*-?\d+(?:\.\d+)?\s*\))|\^[-a-zA-Z0-9]+|\bsqrt\([^)]+\))/gi,
+        /(\b\d+(?:,\d+)*(?:\.\d+)?\s*\/\s*(?:-?\d+(?:,\d+)*(?:\.\d+)?|\(\s*-?\d+(?:,\d+)*(?:\.\d+)?\s*\))|\^[-a-zA-Z0-9]+|\bsqrt\([^)]+\))/gi,
     );
 
     if (parts.length === 1) {
@@ -207,7 +207,6 @@ export const renderFormattedText = (
         // Normalize inline steps (e.g. "Step 2:"), list items (e.g. "1."), and mental math shortcuts by inserting a newline before them
         const normalizedText = inputText
             .replace(/(?<!^)\s*\b(Step\s+\d+)\s*[:.-]/gi, '\n$1:')
-            .replace(/(?<!^)\s*\b([1-9]\.|\([1-9]\))\s+(?=[A-Z])/g, '\n$1 ')
             .replace(
                 /(?<!^)\s*(🧠\s*)?\b(Mental Math Shortcut|Fast Track|Shortcut)\s*:/gi,
                 '\n$2:',

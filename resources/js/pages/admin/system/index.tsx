@@ -80,6 +80,7 @@ export default function SystemIndex({
                         'WARNING: Running migrations will modify the database schema. Ensure you have backed up the database before proceeding.',
                     variant: 'danger' as const,
                     confirmLabel: 'Run Migrations',
+                    verificationText: 'CONFIRM',
                 };
             case 'rollback-migrations':
                 return {
@@ -88,6 +89,7 @@ export default function SystemIndex({
                         'CRITICAL WARNING: Rolling back migrations will destroy data! This reverts the last batch of migrations and drops related tables and data. Are you absolutely sure you want to proceed?',
                     variant: 'danger' as const,
                     confirmLabel: 'Force Rollback',
+                    verificationText: 'ROLLBACK',
                 };
             case 'toggle-maintenance':
                 return {
@@ -341,6 +343,7 @@ export default function SystemIndex({
                 title={modalConfig.title}
                 message={modalConfig.message}
                 variant={modalConfig.variant}
+                verificationText={(modalConfig as any).verificationText}
                 confirmLabel={
                     isProcessing ? 'Processing...' : modalConfig.confirmLabel
                 }

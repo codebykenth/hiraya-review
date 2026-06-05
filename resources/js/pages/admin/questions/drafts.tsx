@@ -3,6 +3,7 @@ import { Check, X, Edit3, ListChecks, Save } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { DraftsReviewShell } from '@/components/domain/drafts-review-shell';
 import type { CategoryItem } from '@/components/domain/drafts-review-shell';
+import { ConfirmModal } from '@/components/shared/confirm-modal';
 import { Button } from '@/components/ui/button';
 import {
     Dialog,
@@ -55,6 +56,11 @@ export default function DraftsQuestionList({
     const [editingBackup, setEditingBackup] = useState<
         Record<number, DraftQuestion>
     >({});
+    const [deleteModal, setDeleteModal] = useState<{
+        isOpen: boolean;
+        type: 'single' | 'bulk';
+        id: number | null;
+    }>({ isOpen: false, type: 'single', id: null });
 
     // Sync local state when Inertia refreshes initialDrafts from backend
     useEffect(() => {
@@ -81,24 +87,45 @@ export default function DraftsQuestionList({
         );
     };
 
-    const deleteDraft = async (id: number) => {
-        setDraftQuestions((prev) => prev.filter((q) => q.id !== id));
+    const promptDeleteDraft = (id: number) => {
+        setDeleteModal({ isOpen: true, type: 'single', id });
+    };
 
-        try {
-            const csrfToken =
-                document
-                    .querySelector('meta[name="csrf-token"]')
-                    ?.getAttribute('content') || '';
-            await fetch(questionsDestroy(id).url, {
-                method: 'DELETE',
-                headers: {
-                    'X-CSRF-TOKEN': csrfToken,
-                    Accept: 'application/json',
+    const confirmDeleteAction = async () => {
+        if (deleteModal.type === 'single' && deleteModal.id !== null) {
+            const id = deleteModal.id;
+            setDraftQuestions((prev) => prev.filter((q) => q.id !== id));
+
+            try {
+                const csrfToken =
+                    document
+                        .querySelector('meta[name="csrf-token"]')
+                        ?.getAttribute('content') || '';
+                await fetch(questionsDestroy(id).url, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': csrfToken,
+                        Accept: 'application/json',
+                    },
+                });
+            } catch {
+                setErrorMessage(
+                    'Failed to permanently delete draft. Please check your connection and try again.',
+                );
+            }
+        } else if (deleteModal.type === 'bulk') {
+            const pendingIds = draftQuestions
+                .filter((q) => !q.approved)
+                .map((q) => q.id);
+
+            router.post(
+                questionsBulkDestroy().url,
+                {
+                    ids: pendingIds,
                 },
-            });
-        } catch {
-            setErrorMessage(
-                'Failed to permanently delete draft. Please check your connection and try again.',
+                {
+                    preserveScroll: true,
+                },
             );
         }
     };
@@ -280,7 +307,7 @@ export default function DraftsQuestionList({
         );
     };
 
-    const handleBulkDeletePending = () => {
+    const promptBulkDeletePending = () => {
         const pendingIds = draftQuestions
             .filter((q) => !q.approved)
             .map((q) => q.id);
@@ -289,21 +316,7 @@ export default function DraftsQuestionList({
             return;
         }
 
-        if (
-            confirm(
-                `Are you sure you want to delete ${pendingIds.length} unapproved draft(s)? This action cannot be undone.`,
-            )
-        ) {
-            router.post(
-                questionsBulkDestroy().url,
-                {
-                    ids: pendingIds,
-                },
-                {
-                    preserveScroll: true,
-                },
-            );
-        }
+        setDeleteModal({ isOpen: true, type: 'bulk', id: null });
     };
 
     return (
@@ -326,7 +339,7 @@ export default function DraftsQuestionList({
                 commitLabel="Commit Approved"
                 onCommit={handleCommitApproved}
                 onToggleAll={handleToggleAllDrafts}
-                onBulkDeletePending={handleBulkDeletePending}
+                onBulkDeletePending={promptBulkDeletePending}
                 emptyStateTitle="No Drafts Pending Review"
                 emptyStateDescription="There are currently no draft questions in the review queue. Select options in the AI Generator or manual form to add more."
                 emptyStateActionUrl={questionsCreate().url}
@@ -455,7 +468,7 @@ export default function DraftsQuestionList({
                                                     <button
                                                         type="button"
                                                         onClick={() =>
-                                                            deleteDraft(q.id)
+                                                            promptDeleteDraft(q.id)
                                                         }
                                                         className="cursor-pointer rounded-lg border border-border bg-card p-1.5 text-muted-foreground transition hover:border-red-200 hover:text-red-600 dark:hover:border-red-900/50"
                                                     >
@@ -639,6 +652,24 @@ export default function DraftsQuestionList({
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
+
+            <ConfirmModal
+                isOpen={deleteModal.isOpen}
+                onClose={() =>
+                    setDeleteModal({ isOpen: false, type: 'single', id: null })
+                }
+                onConfirm={confirmDeleteAction}
+                title="Delete Draft"
+                message={
+                    deleteModal.type === 'bulk'
+                        ? `Are you sure you want to delete ${
+                              draftQuestions.filter((q) => !q.approved).length
+                          } unapproved draft(s)? This action cannot be undone.`
+                        : 'Are you sure you want to delete this draft? This action cannot be undone.'
+                }
+                confirmLabel={deleteModal.type === 'bulk' ? 'Delete Drafts' : 'Delete Draft'}
+                variant="danger"
+            />
         </>
     );
 }

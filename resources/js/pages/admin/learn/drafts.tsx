@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { DraftsReviewShell } from '@/components/domain/drafts-review-shell';
 import type { CategoryItem } from '@/components/domain/drafts-review-shell';
 import { LessonMarkdown } from '@/components/domain/lesson-markdown';
+import { ConfirmModal } from '@/components/shared/confirm-modal';
 import { Button } from '@/components/ui/button';
 import {
     Dialog,
@@ -60,6 +61,11 @@ export default function DraftsLearnList({
     const [editingBackup, setEditingBackup] = useState<
         Record<number, DraftModule>
     >({});
+    const [deleteModal, setDeleteModal] = useState<{
+        isOpen: boolean;
+        type: 'single' | 'bulk';
+        id: number | null;
+    }>({ isOpen: false, type: 'single', id: null });
 
     // Sync local state when Inertia refreshes initialDrafts from backend
     useEffect(() => {
@@ -84,26 +90,47 @@ export default function DraftsLearnList({
         );
     };
 
-    const deleteDraft = async (id: number) => {
-        setDraftModules((prev) => prev.filter((m) => m.id !== id));
+    const promptDeleteDraft = (id: number) => {
+        setDeleteModal({ isOpen: true, type: 'single', id });
+    };
 
-        try {
-            const csrfToken =
-                (
-                    document.querySelector(
-                        'meta[name="csrf-token"]',
-                    ) as HTMLMetaElement
-                )?.content || '';
-            await fetch(adminLearnDestroy(id).url, {
-                method: 'DELETE',
-                headers: {
-                    'X-CSRF-TOKEN': csrfToken,
-                    Accept: 'application/json',
+    const confirmDeleteAction = async () => {
+        if (deleteModal.type === 'single' && deleteModal.id !== null) {
+            const id = deleteModal.id;
+            setDraftModules((prev) => prev.filter((m) => m.id !== id));
+
+            try {
+                const csrfToken =
+                    (
+                        document.querySelector(
+                            'meta[name="csrf-token"]',
+                        ) as HTMLMetaElement
+                    )?.content || '';
+                await fetch(adminLearnDestroy(id).url, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': csrfToken,
+                        Accept: 'application/json',
+                    },
+                });
+            } catch {
+                setErrorMessage(
+                    'Failed to permanently delete draft. Please check your connection and try again.',
+                );
+            }
+        } else if (deleteModal.type === 'bulk') {
+            const pendingIds = draftModules
+                .filter((m) => !m.approved)
+                .map((m) => m.id);
+
+            router.post(
+                adminLearnBulkDestroy().url,
+                {
+                    ids: pendingIds,
                 },
-            });
-        } catch {
-            setErrorMessage(
-                'Failed to permanently delete draft. Please check your connection and try again.',
+                {
+                    preserveScroll: true,
+                },
             );
         }
     };
@@ -252,7 +279,7 @@ export default function DraftsLearnList({
         );
     };
 
-    const handleBulkDeletePending = () => {
+    const promptBulkDeletePending = () => {
         const pendingIds = draftModules
             .filter((m) => !m.approved)
             .map((m) => m.id);
@@ -261,21 +288,7 @@ export default function DraftsLearnList({
             return;
         }
 
-        if (
-            confirm(
-                `Are you sure you want to delete ${pendingIds.length} unapproved draft module(s)? This action cannot be undone.`,
-            )
-        ) {
-            router.post(
-                adminLearnBulkDestroy().url,
-                {
-                    ids: pendingIds,
-                },
-                {
-                    preserveScroll: true,
-                },
-            );
-        }
+        setDeleteModal({ isOpen: true, type: 'bulk', id: null });
     };
 
     return (
@@ -299,7 +312,7 @@ export default function DraftsLearnList({
                 commitLabel="Publish Approved"
                 onCommit={handleCommitApproved}
                 onToggleAll={handleToggleAllDrafts}
-                onBulkDeletePending={handleBulkDeletePending}
+                onBulkDeletePending={promptBulkDeletePending}
                 emptyStateTitle="No Syllabus Drafts Pending"
                 emptyStateDescription="There are currently no draft modules waiting in the curation pipeline. Launch the AI Lesson Generator or create one manually to populate this review center."
                 emptyStateActionUrl="/admin/learn/create"
@@ -431,7 +444,7 @@ export default function DraftsLearnList({
                                                     <button
                                                         type="button"
                                                         onClick={() =>
-                                                            deleteDraft(m.id)
+                                                            promptDeleteDraft(m.id)
                                                         }
                                                         className="hover:text-red-650 cursor-pointer rounded-lg border border-border bg-card p-1.5 text-muted-foreground transition hover:border-red-200 dark:hover:text-red-500"
                                                     >
@@ -629,6 +642,24 @@ export default function DraftsLearnList({
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
+
+            <ConfirmModal
+                isOpen={deleteModal.isOpen}
+                onClose={() =>
+                    setDeleteModal({ isOpen: false, type: 'single', id: null })
+                }
+                onConfirm={confirmDeleteAction}
+                title="Delete Draft"
+                message={
+                    deleteModal.type === 'bulk'
+                        ? `Are you sure you want to delete ${
+                              draftModules.filter((m) => !m.approved).length
+                          } unapproved draft(s)? This action cannot be undone.`
+                        : 'Are you sure you want to delete this draft? This action cannot be undone.'
+                }
+                confirmLabel={deleteModal.type === 'bulk' ? 'Delete Drafts' : 'Delete Draft'}
+                variant="danger"
+            />
         </>
     );
 }

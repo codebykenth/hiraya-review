@@ -1,6 +1,7 @@
 import { ShieldAlert } from 'lucide-react';
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 
 export interface ConfirmModalProps {
     isOpen: boolean;
@@ -9,6 +10,7 @@ export interface ConfirmModalProps {
     confirmLabel?: string;
     cancelLabel?: string;
     variant?: 'danger' | 'success' | 'info';
+    verificationText?: string;
     onClose: () => void;
     onConfirm: () => void;
 }
@@ -29,9 +31,17 @@ export function ConfirmModal({
     confirmLabel = 'Confirm',
     cancelLabel = 'Cancel',
     variant = 'success',
+    verificationText,
     onClose,
     onConfirm,
 }: ConfirmModalProps) {
+    const [verifyInput, setVerifyInput] = useState('');
+
+    useEffect(() => {
+        if (!isOpen) {
+            setVerifyInput('');
+        }
+    }, [isOpen]);
     const getButtonConfig = () => {
         switch (variant) {
             case 'danger':
@@ -62,9 +72,26 @@ export function ConfirmModal({
                         <ShieldAlert className={`size-5 ${config.iconColor}`} />
                         <DialogTitle>{title}</DialogTitle>
                     </div>
-                    <DialogDescription className="mt-2.5 text-left whitespace-pre-line">
+                    <DialogDescription className="mt-2.5 text-left whitespace-pre-line text-slate-600 dark:text-slate-400">
                         {message}
                     </DialogDescription>
+                    
+                    {verificationText && (
+                        <div className="mt-4 flex flex-col gap-2 border-t border-border pt-4 text-left">
+                            <label className="text-sm font-semibold text-foreground">
+                                To confirm, type <span className="rounded-md bg-muted px-1.5 py-0.5 font-mono text-xs font-bold text-foreground select-all">{verificationText}</span> below:
+                            </label>
+                            <Input 
+                                type="text"
+                                value={verifyInput}
+                                onChange={(e) => setVerifyInput(e.target.value)}
+                                placeholder={verificationText}
+                                className="font-mono text-sm"
+                                autoComplete="off"
+                                autoCorrect="off"
+                            />
+                        </div>
+                    )}
                 </DialogHeader>
                 <DialogFooter className="mt-4 gap-2 sm:gap-2">
                     <Button variant="outline" size="sm" onClick={onClose}>
@@ -73,6 +100,7 @@ export function ConfirmModal({
                     <Button
                         variant={config.buttonVariant}
                         size="sm"
+                        disabled={verificationText ? verifyInput !== verificationText : false}
                         onClick={() => {
                             onClose();
                             onConfirm();
