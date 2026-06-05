@@ -13,11 +13,12 @@ export function TrafficOverloadGuard() {
         // 1. Intercept Inertia requests exception states
         const unregisterHttpException = router.on('httpException', (event) => {
             const status = event.detail.response.status;
+            const isInertiaResponse = event.detail.response.headers && event.detail.response.headers['x-inertia'];
 
             if (status === 429) {
                 setErrorType('rate_limit');
                 setIsOpen(true);
-            } else if (status === 503 || status === 504 || status === 502) {
+            } else if (status === 504 || status === 502 || (status === 503 && !isInertiaResponse)) {
                 setErrorType('overload');
                 setIsOpen(true);
             }
@@ -37,8 +38,8 @@ export function TrafficOverloadGuard() {
                     const isFailureStatus =
                         response.status === 429 ||
                         response.status === 502 ||
-                        response.status === 503 ||
-                        response.status === 504;
+                        response.status === 504 ||
+                        (response.status === 503 && !response.headers.get('x-inertia'));
 
                     if (isFailureStatus) {
                         if (retries < maxRetries) {

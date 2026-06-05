@@ -33,11 +33,14 @@ return Application::configure(basePath: dirname(__DIR__))
             'turnstile.verify' => VerifyTurnstile::class,
         ]);
 
+        $middleware->remove(\Illuminate\Foundation\Http\Middleware\PreventRequestsDuringMaintenance::class);
+
         $middleware->encryptCookies(except: ['appearance', 'sidebar_state']);
 
         $middleware->web(append: [
             HandleAppearance::class,
             CheckUserActive::class,
+            \App\Http\Middleware\CheckMaintenanceMode::class,
             HandleInertiaRequests::class,
             AddLinkHeadersForPreloadedAssets::class,
             VerifyCsrfToken::class,

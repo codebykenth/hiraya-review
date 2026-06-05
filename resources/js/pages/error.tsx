@@ -22,10 +22,10 @@ export default function ErrorPage({ status }: ErrorPageProps) {
 
     const title =
         {
-            503: '503: Service Unavailable',
-            500: '500: Server Error',
-            404: '404: Page Not Found',
-            403: '403: Forbidden',
+            503: 'Service Unavailable',
+            500: 'Server Error',
+            404: 'Page Not Found',
+            403: 'Forbidden',
         }[status] || 'Error';
 
     const description =
@@ -65,27 +65,52 @@ export default function ErrorPage({ status }: ErrorPageProps) {
                 </p>
 
                 <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
-                    <button
-                        onClick={() => window.history.back()}
-                        className="inline-flex w-full items-center justify-center gap-2 rounded-xl border-2 border-slate-200 bg-transparent px-4 sm:px-6 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 sm:w-auto dark:border-slate-800 dark:text-slate-300 dark:hover:bg-slate-800/50"
-                    >
-                        <ArrowLeft className="size-4" />
-                        Go Back
-                    </button>
+                    {status === 503 ? (
+                        auth?.user ? (
+                            <Link
+                                href="/logout"
+                                method="post"
+                                as="button"
+                                className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 inline-flex w-full items-center justify-center gap-2 rounded-xl border-2 border-rose-200 bg-transparent px-4 sm:px-6 py-3 text-sm font-semibold text-rose-700 transition hover:bg-rose-50 sm:w-auto dark:border-rose-900 dark:text-rose-400 dark:hover:bg-rose-950/50"
+                            >
+                                Log Out
+                            </Link>
+                        ) : null
+                    ) : (
+                        <>
+                            <button
+                                onClick={() => window.history.back()}
+                                className="inline-flex w-full items-center justify-center gap-2 rounded-xl border-2 border-slate-200 bg-transparent px-4 sm:px-6 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 sm:w-auto dark:border-slate-800 dark:text-slate-300 dark:hover:bg-slate-800/50"
+                            >
+                                <ArrowLeft className="size-4" />
+                                Go Back
+                            </button>
 
-                    {auth?.user && (
-                        <Link
-                            href="/dashboard"
-                            className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 sm:px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700 focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2 sm:w-auto"
-                        >
-                            <Home className="size-4" />
-                            Back to Home
-                        </Link>
+                            {auth?.user && (
+                                <Link
+                                    href="/dashboard"
+                                    className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 sm:px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700 focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2 sm:w-auto"
+                                >
+                                    <Home className="size-4" />
+                                    Back to Home
+                                </Link>
+                            )}
+                        </>
                     )}
                 </div>
             </div>
         </div>
     );
+
+    // Bare layout for 503 maintenance mode to prevent clicking dead links
+    if (status === 503) {
+        return (
+            <div className="flex min-h-screen flex-col bg-slate-50 dark:bg-[#0a0a0a]">
+                <Head title={title} />
+                <main className="flex-1 flex items-center justify-center">{content}</main>
+            </div>
+        );
+    }
 
     if (auth?.user) {
         return (

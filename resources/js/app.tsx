@@ -1,4 +1,4 @@
-﻿import { createInertiaApp, router } from '@inertiajs/react';
+import { createInertiaApp, router } from '@inertiajs/react';
 import { toast } from 'sonner';
 import { SupportWidget } from '@/components/shared/support-widget';
 import { TrafficOverloadGuard } from '@/components/shared/traffic-overload-guard';
@@ -33,9 +33,15 @@ router.on('networkError', () => {
     });
 });
 
-router.on('httpException', () => {
+router.on('httpException', (event) => {
+    const status = event.detail.response.status;
+
+    // 503 is handled via the full-page Error component
+    // 429 is handled via TrafficOverloadGuard
+    if (status === 503 || status === 429) return;
+
     // Non-200, non-validation responses (403, 500, etc)
-    toast.error('Unexpected Error', {
+    toast.error(`Unexpected Error (${status})`, {
         description:
             'The server returned an error while processing your request.',
     });

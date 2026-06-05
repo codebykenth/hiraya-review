@@ -1,4 +1,4 @@
-﻿import { Link, usePage } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 import {
     BookOpen,
     ClipboardList,
@@ -16,6 +16,7 @@ import {
     Database,
     Calendar as CalendarIcon,
     TrendingUp,
+    Activity,
 } from 'lucide-react';
 import AppLogo from '@/components/layout/app-logo';
 import { NavMain } from '@/components/layout/nav-main';
@@ -138,20 +139,19 @@ const adminNavItems: NavItem[] = [
         icon: Users,
     },
     {
-        title: 'Settings',
-        icon: Settings,
-        items: [
-            {
-                title: 'Syllabus Scope',
-                href: '/admin/syllabus',
-                icon: Database,
-            },
-            {
-                title: 'Exam Dates',
-                href: '/admin/exam-dates',
-                icon: CalendarIcon,
-            },
-        ],
+        title: 'System Actions',
+        href: '/admin/system',
+        icon: Activity,
+    },
+    {
+        title: 'Syllabus Scope',
+        href: '/admin/syllabus',
+        icon: Database,
+    },
+    {
+        title: 'Exam Dates',
+        href: '/admin/exam-dates',
+        icon: CalendarIcon,
     },
 ];
 
