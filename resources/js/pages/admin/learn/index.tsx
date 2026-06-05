@@ -1,4 +1,4 @@
-﻿import { Head, Link, router } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import { Eye, Edit2, Trash2, FileText } from 'lucide-react';
 import type { TableColumn } from '@/components/domain/admin-table';
 import {
@@ -106,7 +106,7 @@ export default function AdminLearnIndex({
                             <TooltipTrigger asChild>
                                 <Link
                                     href={learnShow(mod.slug).url}
-                                    className="rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted hover:text-foreground"
+                                    className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted hover:text-foreground"
                                 >
                                     <Eye className="size-4" />
                                 </Link>
@@ -118,7 +118,7 @@ export default function AdminLearnIndex({
                             <TooltipTrigger asChild>
                                 <Link
                                     href={adminLearnEdit(mod.id).url}
-                                    className="rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted hover:text-blue-600 dark:text-blue-400"
+                                    className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted hover:text-blue-600 dark:text-blue-400"
                                 >
                                     <Edit2 className="size-4" />
                                 </Link>

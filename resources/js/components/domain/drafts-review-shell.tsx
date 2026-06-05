@@ -1,4 +1,4 @@
-﻿import { Link } from '@inertiajs/react';
+import { Link } from '@inertiajs/react';
 import {
     Check,
     X,
@@ -187,7 +187,7 @@ export function DraftsReviewShell<T extends BaseDraftItem>({
                 <div>
                     <Link
                         href={backUrl}
-                        className="flex w-fit cursor-pointer items-center gap-1 text-xs font-black text-foreground transition hover:text-blue-600 focus:outline-none dark:text-blue-400"
+                        className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 flex w-fit cursor-pointer items-center gap-1 text-xs font-black text-foreground transition hover:text-blue-600 focus:outline-none dark:text-blue-400"
                     >
                         <ChevronLeft className="size-4" />
                         {backLabel}
@@ -421,9 +421,9 @@ export function DraftsReviewShell<T extends BaseDraftItem>({
                         </p>
                         <Link
                             href={emptyStateActionUrl}
-                            className="mt-6 inline-flex cursor-pointer items-center gap-1.5 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-bold text-white shadow-md transition hover:bg-blue-700"
+                            className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 mt-6 inline-flex cursor-pointer items-center gap-1.5 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-bold text-white shadow-md transition hover:bg-blue-700"
                         >
-                            <EmptyStateActionIcon className="size-4" />
+                            <EmptyStateActionIcon className="transition-transform group-hover:scale-110 size-4" />
                             {emptyStateActionLabel}
                         </Link>
                     </div>

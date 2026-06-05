@@ -1,4 +1,4 @@
-﻿import { Database, Plus, Edit2, Trash2, Check, X } from 'lucide-react';
+import { Database, Plus, Edit2, Trash2, Check, X } from 'lucide-react';
 import React from 'react';
 import type { SyllabusFormState } from '../hooks/use-syllabus-form';
 import type { CategoryItem } from '../types';
@@ -56,7 +56,7 @@ export function SubcategoryPanel({
                         />
                         <button
                             type="submit"
-                            className="shadow-3xs inline-flex shrink-0 cursor-pointer items-center justify-center rounded-xl bg-blue-600 px-4 text-sm font-bold text-white transition hover:bg-blue-700 active:bg-blue-800"
+                            className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 shadow-3xs inline-flex shrink-0 cursor-pointer items-center justify-center rounded-xl bg-blue-600 px-4 text-sm font-bold text-white transition hover:bg-blue-700 active:bg-blue-800"
                         >
                             <Plus className="size-4" />
                         </button>
@@ -92,7 +92,7 @@ export function SubcategoryPanel({
                                         />
                                         <button
                                             type="submit"
-                                            className="cursor-pointer rounded-lg p-1.5 text-emerald-600 hover:bg-emerald-50 dark:bg-emerald-950/30 dark:text-emerald-400 dark:hover:bg-emerald-950/30"
+                                            className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 cursor-pointer rounded-lg p-1.5 text-emerald-600 hover:bg-emerald-50 dark:bg-emerald-950/30 dark:text-emerald-400 dark:hover:bg-emerald-950/30"
                                         >
                                             <Check className="size-4" />
                                         </button>

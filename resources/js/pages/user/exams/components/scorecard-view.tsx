@@ -1,4 +1,4 @@
-﻿import { Head, Link } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import { Award, BookOpen, ChevronLeft } from 'lucide-react';
 import { formatDuration } from '@/lib/exam-formatters';
 
@@ -52,7 +52,7 @@ export function ScorecardView({
             {savedAttempt && (
                 <Link
                     href="/history"
-                    className="mb-4 flex w-fit cursor-pointer items-center gap-1 text-xs font-black text-slate-800 transition hover:text-blue-600 focus:outline-none dark:text-blue-400 dark:text-white dark:hover:text-blue-400"
+                    className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 mb-4 flex w-fit cursor-pointer items-center gap-1 text-xs font-black text-slate-800 transition hover:text-blue-600 focus:outline-none dark:text-blue-400 dark:text-white dark:hover:text-blue-400"
                 >
                     <ChevronLeft className="size-4" /> Back to History
                 </Link>

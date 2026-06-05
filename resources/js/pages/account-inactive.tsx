@@ -1,4 +1,4 @@
-﻿import { Head, router, usePage } from '@inertiajs/react';
+import { Head, router, usePage } from '@inertiajs/react';
 import { LogOut, Mail } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -63,7 +63,7 @@ export default function AccountInactive({ adminEmail }: AccountInactiveProps) {
                                 <div className="space-y-3">
                                     <a
                                         href={`mailto:${adminEmail}`}
-                                        className="inline-flex items-center gap-2 rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+                                        className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 inline-flex items-center gap-2 rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
                                     >
                                         <Mail className="h-4 w-4" />
                                         {adminEmail}

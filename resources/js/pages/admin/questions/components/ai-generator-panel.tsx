@@ -1,4 +1,4 @@
-﻿import { Link } from '@inertiajs/react';
+import { Link } from '@inertiajs/react';
 import {
     Sparkles,
     Sparkle,
@@ -269,7 +269,7 @@ export function AIGeneratorPanel({
                                     <DialogTrigger asChild>
                                         <button
                                             type="button"
-                                            className="inline-flex cursor-pointer items-center gap-1 text-[10px] font-bold tracking-wider text-blue-500 uppercase underline transition-colors hover:text-blue-700"
+                                            className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 inline-flex cursor-pointer items-center gap-1 text-[10px] font-bold tracking-wider text-blue-500 uppercase underline transition-colors hover:text-blue-700"
                                         >
                                             <HelpCircle className="size-3" />
                                             Which model to use?
@@ -779,7 +779,7 @@ export function AIGeneratorPanel({
                                     </span>
                                     <Link
                                         href={questionsDrafts().url}
-                                        className="mt-1 inline-flex items-center gap-1 font-extrabold text-emerald-700 underline transition hover:text-emerald-900"
+                                        className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 mt-1 inline-flex items-center gap-1 font-extrabold text-emerald-700 underline transition hover:text-emerald-900"
                                     >
                                         Go to Drafts Review &rarr;
                                     </Link>

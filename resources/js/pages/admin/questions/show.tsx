@@ -1,4 +1,4 @@
-﻿import { Head, Link } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import {
     ChevronLeft,
     PenLine,
@@ -43,7 +43,7 @@ export default function QuestionShow({ question }: QuestionShowProps) {
                 {/* Back Link */}
                 <Link
                     href={questionsIndex().url}
-                    className="flex w-fit items-center gap-1 text-xs font-black text-foreground transition hover:text-blue-600 focus:outline-none dark:text-blue-400"
+                    className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 flex w-fit items-center gap-1 text-xs font-black text-foreground transition hover:text-blue-600 focus:outline-none dark:text-blue-400"
                 >
                     <ChevronLeft className="size-4" />
                     Back to Curation Manager

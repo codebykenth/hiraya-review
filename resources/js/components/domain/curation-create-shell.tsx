@@ -1,4 +1,4 @@
-﻿import { Link } from '@inertiajs/react';
+import { Link } from '@inertiajs/react';
 import { ChevronLeft, Sparkles, PenLine } from 'lucide-react';
 import React from 'react';
 import { PageContainer } from '@/components/layout/page-container';
@@ -30,7 +30,7 @@ export function CurationCreateShell({
             {/* Back Link */}
             <Link
                 href={backUrl}
-                className="flex w-fit cursor-pointer items-center gap-1 text-xs font-black text-foreground transition hover:text-blue-600 focus:outline-none dark:text-blue-400"
+                className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 flex w-fit cursor-pointer items-center gap-1 text-xs font-black text-foreground transition hover:text-blue-600 focus:outline-none dark:text-blue-400"
             >
                 <ChevronLeft className="size-4" />
                 {backLabel}

@@ -1,4 +1,4 @@
-﻿import { CheckCircle2, XCircle } from 'lucide-react';
+import { CheckCircle2, XCircle } from 'lucide-react';
 
 export function TrackBadge({ track }: { track: string }) {
     const lowerTrack = track.toLowerCase();
@@ -55,7 +55,7 @@ export function StatusBadge({ status }: { status: string }) {
         <span
             className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[10px] font-extrabold tracking-wide uppercase ${badgeClass}`}
         >
-            <StatusIcon className="size-3 shrink-0" />
+            <StatusIcon className="transition-transform group-hover:scale-110 size-3 shrink-0" />
             {text}
         </span>
     );

@@ -1,4 +1,4 @@
-﻿import { router } from '@inertiajs/react';
+import { router } from '@inertiajs/react';
 import { FileText, CheckCircle2, Save, RotateCcw } from 'lucide-react';
 import React from 'react';
 import InputError from '@/components/shared/input-error';
@@ -62,25 +62,25 @@ export function ManualEntryForm({
                             <div className="flex items-center gap-1 rounded-lg border border-border bg-muted p-1">
                                 <button
                                     type="button"
-                                    className="rounded px-2 py-0.5 text-xs font-black text-muted-foreground transition select-none hover:bg-card"
+                                    className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 rounded px-2 py-0.5 text-xs font-black text-muted-foreground transition select-none hover:bg-card"
                                 >
                                     B
                                 </button>
                                 <button
                                     type="button"
-                                    className="rounded px-2 py-0.5 text-xs text-muted-foreground italic transition select-none hover:bg-card"
+                                    className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 rounded px-2 py-0.5 text-xs text-muted-foreground italic transition select-none hover:bg-card"
                                 >
                                     I
                                 </button>
                                 <button
                                     type="button"
-                                    className="rounded px-2 py-0.5 font-mono text-xs text-muted-foreground transition select-none hover:bg-card"
+                                    className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 rounded px-2 py-0.5 font-mono text-xs text-muted-foreground transition select-none hover:bg-card"
                                 >
                                     List
                                 </button>
                                 <button
                                     type="button"
-                                    className="rounded px-2 py-0.5 text-xs text-muted-foreground transition select-none hover:bg-card"
+                                    className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 rounded px-2 py-0.5 text-xs text-muted-foreground transition select-none hover:bg-card"
                                 >
                                     Link
                                 </button>

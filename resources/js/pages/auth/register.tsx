@@ -1,4 +1,4 @@
-﻿import { Form, Head } from '@inertiajs/react';
+import { Form, Head } from '@inertiajs/react';
 import { useState } from 'react';
 import ConsentCheckbox from '@/components/auth/consent-checkbox';
 import FacebookIcon from '@/components/auth/facebook-icon';
@@ -165,7 +165,7 @@ export default function Register({ passwordRules, turnstileSiteKey }: Props) {
                                 className="h-11 rounded-xl border-slate-200 font-medium transition-colors hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-slate-900"
                                 onClick={() => setSocialModal('google')}
                             >
-                                <GoogleIcon className="mr-2 h-4 w-4" />
+                                <GoogleIcon className="transition-transform group-hover:scale-110 mr-2 h-4 w-4" />
                                 Google
                             </Button>
                             <Button
@@ -174,7 +174,7 @@ export default function Register({ passwordRules, turnstileSiteKey }: Props) {
                                 className="h-11 rounded-xl border-slate-200 font-medium transition-colors hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-slate-900"
                                 onClick={() => setSocialModal('facebook')}
                             >
-                                <FacebookIcon className="mr-2 h-4 w-4 text-blue-600 dark:text-blue-400" />
+                                <FacebookIcon className="transition-transform group-hover:scale-110 mr-2 h-4 w-4 text-blue-600 dark:text-blue-400" />
                                 Facebook
                             </Button>
                         </div>

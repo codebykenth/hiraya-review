@@ -1,4 +1,4 @@
-﻿import { Link, usePage } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 import { Menu, X } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import AppLogo from '@/components/layout/app-logo';
@@ -113,7 +113,7 @@ export default function SiteHeader({
             >
                 <nav className="container mx-auto flex items-center justify-between gap-2 px-4 py-3 lg:px-6 lg:py-4 xl:gap-4">
                     <div className="flex items-center">
-                        <Link href={home()} className="flex items-center gap-2">
+                        <Link href={home()} className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 flex items-center gap-2">
                             <AppLogo />
                         </Link>
                     </div>
@@ -166,7 +166,7 @@ export default function SiteHeader({
                         {auth.user ? (
                             <Link
                                 href={dashboardIndex()}
-                                className="inline-block rounded-sm border border-[#19140035] px-5 py-1.5 text-sm leading-normal text-[#1b1b18] hover:border-[#1915014a] dark:border-[#3E3E3A] dark:text-[#EDEDEC] dark:hover:border-[#62605b]"
+                                className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 inline-block rounded-sm border border-[#19140035] px-5 py-1.5 text-sm leading-normal text-[#1b1b18] hover:border-[#1915014a] dark:border-[#3E3E3A] dark:text-[#EDEDEC] dark:hover:border-[#62605b]"
                             >
                                 Dashboard
                             </Link>
@@ -175,7 +175,7 @@ export default function SiteHeader({
                                 <Button variant="ghost" asChild>
                                     <Link
                                         href={login()}
-                                        className="font-bold text-primary"
+                                        className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 font-bold text-primary"
                                     >
                                         Log in
                                     </Link>
@@ -183,7 +183,7 @@ export default function SiteHeader({
                                 <Button asChild>
                                     <Link
                                         href={register()}
-                                        className="font-bold"
+                                        className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 font-bold"
                                     >
                                         Register
                                     </Link>

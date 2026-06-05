@@ -1,4 +1,4 @@
-﻿import {
+import {
     Brain,
     ChevronLeft,
     Check,
@@ -97,7 +97,7 @@ export function ConfigView({
                 <div
                     className={`rounded-xl ${meta.bgColor} p-3 text-white shadow-xs`}
                 >
-                    <CategoryIcon className="size-6" />
+                    <CategoryIcon className="transition-transform group-hover:scale-110 size-6" />
                 </div>
                 <PageHeader
                     title={`${selectedCategory.name} Practice`}
@@ -433,7 +433,7 @@ export function ConfigView({
                         <div className="mt-8">
                             <button
                                 onClick={startDrill}
-                                className="flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 py-3 text-sm font-bold text-white shadow-md transition hover:bg-blue-700 focus:outline-none"
+                                className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 py-3 text-sm font-bold text-white shadow-md transition hover:bg-blue-700 focus:outline-none"
                             >
                                 Start Drill
                                 <ChevronRight className="size-4" />

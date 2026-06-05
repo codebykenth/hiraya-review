@@ -54,15 +54,17 @@ When revamping a page or component, follow these priorities to upgrade the UI fr
    - *Example Border:* `border-blue-200 dark:border-blue-900/50`
 4. **Dark Mode Specifics:** Ensure dark mode isn't just "gray". Use deep slates (`bg-slate-950`), and allow glowing accents to pop. Never leave hardcoded light-mode colors (like `bg-white`) without a `dark:bg-slate-950` equivalent.
 
-### Priority 4: Layout & Spacing Overhaul
-1. **Ditch `space-y-*`:** Always use `flex flex-col gap-*` or `grid gap-*` for predictable spacing. The `space-y` utility often breaks with hidden elements.
-2. **Breathing Room:** Increase padding. Upgrade `p-4` to `p-6` or `p-8` for major containers. Give elements room to breathe.
-3. **Responsive Grids:** Ensure complex layouts use CSS Grid to gracefully reflow on mobile (`grid-cols-1 md:grid-cols-2 xl:grid-cols-3`).
-
-### Priority 5: Micro-Animations & Interactivity
+### Priority 4: Micro-Animations & Interactivity
 1. **Buttons:** Ensure all buttons have hover states, focus rings (`focus-visible:ring-2`), and active scaling (`active:scale-95`).
 2. **Icons:** Add subtle animations to icons on hover (e.g., `group-hover:rotate-12`, `group-hover:scale-110 transition-transform`).
 3. **Loading States:** Use animated skeletons (`<Skeleton />`) instead of plain boxes or raw `animate-pulse` divs.
+
+### Priority 5: Mobile Responsiveness & Adaptive Layouts
+1. **Fluid Grids:** Always use responsive grid/flex classes (e.g., `grid-cols-1 md:grid-cols-2 lg:grid-cols-3` or `flex-col sm:flex-row`). Never hardcode fixed desktop widths.
+2. **Typography Scaling:** Scale fonts appropriately for mobile (e.g., `text-xl sm:text-2xl lg:text-3xl`).
+3. **Spacing Adjustments:** Reduce padding and gaps on small screens (e.g., `p-4 sm:p-6 lg:p-8` and `gap-3 sm:gap-6`).
+4. **Touch Targets:** Ensure interactive elements are large enough for mobile touch interaction.
+
 
 ## Component Specific Rules
 
@@ -96,3 +98,4 @@ Before finishing any UI revamp, verify:
 5. [ ] **Interactivity:** Buttons and cards have smooth hover and active states.
 6. [ ] **Theme Integrity:** No raw `hsl()` wrappers. Dark mode works flawlessly.
 7. [ ] **Animations:** Strategic micro-animations on interactive elements.
+8. [ ] **Responsiveness:** All layouts, typography, and spacing adapt fluidly to mobile, tablet, and desktop viewports.

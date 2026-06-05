@@ -1,4 +1,4 @@
-﻿import type { PropsWithChildren } from 'react';
+import type { PropsWithChildren } from 'react';
 import AppLogoIcon from '@/components/layout/app-logo-icon';
 import SiteFooter from '@/components/layout/site-footer';
 import SiteHeader from '@/components/layout/site-header';
@@ -32,7 +32,7 @@ export default function AuthCardLayout({
                         <div className="flex flex-col items-center gap-3 px-10 pt-10 pb-0 text-center">
                             {/* School icon */}
                             <div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-2xl border border-slate-200/50 bg-white/70 p-1 shadow-sm backdrop-blur-xl dark:border-slate-800 dark:border-slate-800/50 dark:bg-slate-900 dark:bg-slate-950/50">
-                                <AppLogoIcon className="size-10 object-contain" />
+                                <AppLogoIcon className="transition-transform group-hover:scale-110 size-10 object-contain" />
                             </div>
 
                             <span className="font-heading text-3xl font-black tracking-tight text-slate-900 sm:text-4xl dark:text-white">

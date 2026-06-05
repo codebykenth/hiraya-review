@@ -1,4 +1,4 @@
-﻿import { X, Database, Plus, Trash2 } from 'lucide-react';
+import { X, Database, Plus, Trash2 } from 'lucide-react';
 import React from 'react';
 
 export interface CategoryItem {
@@ -67,7 +67,7 @@ export function ScopeSettingsModal({
                     <button
                         type="button"
                         onClick={onClose}
-                        className="dark:hover:text-slate-250 rounded-lg p-1.5 text-slate-400 transition hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-900"
+                        className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 dark:hover:text-slate-250 rounded-lg p-1.5 text-slate-400 transition hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-900"
                     >
                         <X className="size-5" />
                     </button>
@@ -97,7 +97,7 @@ export function ScopeSettingsModal({
                             />
                             <button
                                 type="submit"
-                                className="shadow-3xs inline-flex shrink-0 cursor-pointer items-center justify-center rounded-xl bg-blue-600 px-4 text-sm font-bold text-white transition hover:bg-blue-700 active:bg-blue-800"
+                                className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 shadow-3xs inline-flex shrink-0 cursor-pointer items-center justify-center rounded-xl bg-blue-600 px-4 text-sm font-bold text-white transition hover:bg-blue-700 active:bg-blue-800"
                             >
                                 <Plus className="size-4" />
                             </button>
@@ -167,7 +167,7 @@ export function ScopeSettingsModal({
                                     />
                                     <button
                                         type="submit"
-                                        className="shadow-3xs inline-flex shrink-0 cursor-pointer items-center justify-center rounded-xl bg-blue-600 px-4 text-sm font-bold text-white transition hover:bg-blue-700 active:bg-blue-800"
+                                        className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 shadow-3xs inline-flex shrink-0 cursor-pointer items-center justify-center rounded-xl bg-blue-600 px-4 text-sm font-bold text-white transition hover:bg-blue-700 active:bg-blue-800"
                                     >
                                         <Plus className="size-4" />
                                     </button>

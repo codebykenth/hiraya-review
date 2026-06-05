@@ -1,4 +1,4 @@
-﻿import { Link } from '@inertiajs/react';
+import { Link } from '@inertiajs/react';
 import {
     Search,
     Sparkles,
@@ -257,7 +257,7 @@ export function CurationIndexShell<T>({
                             </p>
                             <Link
                                 href={aiGenerator.href}
-                                className="mt-2 block"
+                                className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 mt-2 block"
                             >
                                 <Button
                                     type="button"
@@ -289,7 +289,7 @@ export function CurationIndexShell<T>({
                             </p>
                             <Link
                                 href={manualEntry.href}
-                                className="mt-2 block"
+                                className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 mt-2 block"
                             >
                                 <Button
                                     type="button"

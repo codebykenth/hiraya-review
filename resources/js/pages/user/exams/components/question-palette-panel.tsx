@@ -1,4 +1,4 @@
-﻿import { CheckCircle2, ChevronRight, Lock, X } from 'lucide-react';
+import { CheckCircle2, ChevronRight, Lock, X } from 'lucide-react';
 import React, { useMemo } from 'react';
 
 export interface QuestionPalettePanelProps {
@@ -79,7 +79,7 @@ export default function QuestionPalettePanel({
                     </span>
                     <button
                         onClick={onCloseMobile}
-                        className="rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted"
+                        className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted"
                     >
                         <X className="size-5" />
                     </button>
@@ -366,7 +366,7 @@ export default function QuestionPalettePanel({
                 <div className="shrink-0 border-t border-border bg-card p-4">
                     <button
                         onClick={onSubmitExam}
-                        className="flex w-full items-center justify-center gap-1.5 rounded-lg bg-emerald-600 py-3 text-xs font-bold text-white shadow-xs transition hover:bg-emerald-700 focus:outline-none"
+                        className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 flex w-full items-center justify-center gap-1.5 rounded-lg bg-emerald-600 py-3 text-xs font-bold text-white shadow-xs transition hover:bg-emerald-700 focus:outline-none"
                     >
                         <CheckCircle2 className="size-4" />
                         Submit Exam

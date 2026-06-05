@@ -1,4 +1,4 @@
-﻿import { router } from '@inertiajs/react';
+import { router } from '@inertiajs/react';
 import { Coffee, X } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
@@ -113,7 +113,7 @@ export function SupportWidget() {
                     </div>
                     <button
                         onClick={dismissBubble}
-                        className="-mt-1 -mr-1 rounded-full p-1 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus:outline-none"
+                        className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 -mt-1 -mr-1 rounded-full p-1 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus:outline-none"
                     >
                         <X className="size-3.5" />
                     </button>
@@ -219,7 +219,7 @@ export function SupportWidget() {
                                 href="https://www.buymeacoffee.com/kenthalexisosila"
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="inline-flex h-10 w-full items-center justify-center rounded-md bg-[#FFDD00] px-4 py-2 text-sm font-medium text-black ring-offset-background transition-colors hover:bg-[#FFDD00]/90 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50"
+                                className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 inline-flex h-10 w-full items-center justify-center rounded-md bg-[#FFDD00] px-4 py-2 text-sm font-medium text-black ring-offset-background transition-colors hover:bg-[#FFDD00]/90 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50"
                             >
                                 <Coffee className="mr-2 h-4 w-4" />
                                 Buy me a coffee

@@ -1,4 +1,4 @@
-﻿import { Head } from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
 import {
     Award,
     BookOpen,
@@ -106,7 +106,7 @@ export function LiveExamView({
                                 <TooltipTrigger asChild>
                                     <button
                                         onClick={handleExitExam}
-                                        className="rounded-lg p-1.5 text-muted-foreground transition hover:bg-accent"
+                                        className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 rounded-lg p-1.5 text-muted-foreground transition hover:bg-accent"
                                     >
                                         <X className="size-5" />
                                     </button>
@@ -404,7 +404,7 @@ export function LiveExamView({
                                 <button
                                     type="button"
                                     onClick={handleRegisterFromFreeExam}
-                                    className="rounded-lg bg-blue-600 px-5 py-2.5 text-xs font-bold text-white transition hover:bg-blue-700 focus:outline-none"
+                                    className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 rounded-lg bg-blue-600 px-5 py-2.5 text-xs font-bold text-white transition hover:bg-blue-700 focus:outline-none"
                                 >
                                     Register Now
                                 </button>
@@ -443,14 +443,14 @@ export function LiveExamView({
                                 <button
                                     type="button"
                                     onClick={handleCancelFreeExam}
-                                    className="rounded-lg border border-slate-200 px-5 py-2.5 text-xs font-bold text-slate-600 transition hover:bg-slate-50 dark:border-slate-800 dark:text-slate-400 dark:hover:bg-slate-900"
+                                    className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 rounded-lg border border-slate-200 px-5 py-2.5 text-xs font-bold text-slate-600 transition hover:bg-slate-50 dark:border-slate-800 dark:text-slate-400 dark:hover:bg-slate-900"
                                 >
                                     Exit to Home
                                 </button>
                                 <button
                                     type="button"
                                     onClick={handleRegisterFromFreeExam}
-                                    className="flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-5 py-2.5 text-xs font-bold text-white shadow-sm transition hover:bg-blue-700 focus:outline-none"
+                                    className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-5 py-2.5 text-xs font-bold text-white shadow-sm transition hover:bg-blue-700 focus:outline-none"
                                 >
                                     <LogIn className="size-4" />
                                     Register Free Account

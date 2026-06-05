@@ -1,4 +1,4 @@
-﻿import { Head, usePage, router } from '@inertiajs/react';
+import { Head, usePage, router } from '@inertiajs/react';
 import Echo from 'laravel-echo';
 import { BookOpen, CheckCircle, BarChart } from 'lucide-react';
 import Pusher from 'pusher-js';
@@ -157,16 +157,16 @@ export default function LearnIndex(props: LearnIndexProps) {
                 {/* Overall Progress Card */}
                 {isLoggedIn && totalCount > 0 && (
                     <div className="mb-6 rounded-xl border border-border bg-card p-5 shadow-2xs">
-                        <div className="mb-2.5 flex items-center justify-between">
+                        <div className="mb-3 flex items-center justify-between">
                             <div className="flex items-center gap-2">
-                                <span className="font-heading text-sm font-bold text-foreground">
+                                <span className="font-heading text-base font-bold text-foreground">
                                     Overall Study Progress
                                 </span>
-                                <span className="rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-extrabold text-blue-700 dark:bg-blue-950/30 dark:bg-blue-950/40 dark:text-blue-400">
+                                <span className="rounded-full bg-blue-50 px-2.5 py-0.5 text-xs font-extrabold text-blue-700 dark:bg-blue-950/30 dark:bg-blue-950/40 dark:text-blue-400">
                                     {completedCount} / {totalCount} Completed
                                 </span>
                             </div>
-                            <span className="text-sm font-black text-blue-600 dark:text-blue-400">
+                            <span className="text-base font-black text-blue-600 dark:text-blue-400">
                                 {progressPercent}%
                             </span>
                         </div>
@@ -198,9 +198,9 @@ export default function LearnIndex(props: LearnIndexProps) {
                                 return (
                                     <div
                                         key={cat.id}
-                                        className="flex flex-col gap-1 rounded-lg border border-border/40 bg-slate-50/20 p-3 dark:bg-slate-900/10"
+                                        className="flex flex-col gap-1.5 rounded-lg border border-border/40 bg-slate-50/20 p-3.5 dark:bg-slate-900/10"
                                     >
-                                        <div className="flex items-center justify-between text-[11px] font-bold">
+                                        <div className="flex items-center justify-between text-sm font-bold">
                                             <span
                                                 className="truncate text-muted-foreground"
                                                 title={cat.name}
@@ -211,13 +211,13 @@ export default function LearnIndex(props: LearnIndexProps) {
                                                 {pct}%
                                             </span>
                                         </div>
-                                        <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800/80">
+                                        <div className="mt-1 h-2 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800/80">
                                             <div
                                                 className={`${barColor} h-full rounded-full transition-all duration-500`}
                                                 style={{ width: `${pct}%` }}
                                             />
                                         </div>
-                                        <span className="mt-0.5 text-[9px] font-semibold text-muted-foreground/80">
+                                        <span className="mt-0.5 text-xs font-semibold text-muted-foreground/80">
                                             {stats.completed} of {stats.total}{' '}
                                             modules
                                         </span>

@@ -1,4 +1,4 @@
-﻿import { Form, Head } from '@inertiajs/react';
+import { Form, Head } from '@inertiajs/react';
 import { useState } from 'react';
 import FacebookIcon from '@/components/auth/facebook-icon';
 import GoogleIcon from '@/components/auth/google-icon';
@@ -148,7 +148,7 @@ export default function Login({
                                     window.location.href = '/auth/google';
                                 }}
                             >
-                                <GoogleIcon className="mr-2 h-4 w-4" />
+                                <GoogleIcon className="transition-transform group-hover:scale-110 mr-2 h-4 w-4" />
                                 Google
                             </Button>
                             <Button
@@ -159,7 +159,7 @@ export default function Login({
                                     window.location.href = '/auth/facebook';
                                 }}
                             >
-                                <FacebookIcon className="mr-2 h-4 w-4 text-blue-600 dark:text-blue-400" />
+                                <FacebookIcon className="transition-transform group-hover:scale-110 mr-2 h-4 w-4 text-blue-600 dark:text-blue-400" />
                                 Facebook
                             </Button>
                         </div>

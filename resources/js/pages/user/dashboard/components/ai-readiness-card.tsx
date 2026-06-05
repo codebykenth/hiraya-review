@@ -1,4 +1,4 @@
-﻿import { Link, router, usePage } from '@inertiajs/react';
+import { Link, router, usePage } from '@inertiajs/react';
 import Echo from 'laravel-echo';
 import {
     Brain,
@@ -117,7 +117,7 @@ export default function AiReadinessCard({ aiAnalysis }: AiReadinessCardProps) {
                     <div>
                         <Link
                             href="/analytics/ai-analysis?retry=1"
-                            className="inline-flex items-center gap-1 rounded-lg bg-blue-600 px-3 py-1 text-xs font-extrabold text-white transition hover:bg-blue-700"
+                            className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 inline-flex items-center gap-1 rounded-lg bg-blue-600 px-3 py-1 text-xs font-extrabold text-white transition hover:bg-blue-700"
                         >
                             Retry &rarr;
                         </Link>
@@ -257,14 +257,14 @@ export default function AiReadinessCard({ aiAnalysis }: AiReadinessCardProps) {
                         <div
                             className={`flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-bold ${trendColor}`}
                         >
-                            <TrendIcon className="size-3.5" />
+                            <TrendIcon className="transition-transform group-hover:scale-110 size-3.5" />
                             {trendLabel}
                         </div>
 
                         {/* Full Report Link */}
                         <Link
                             href="/analytics/ai-analysis"
-                            className="inline-flex items-center gap-1 rounded-lg bg-blue-600 px-3 py-1 text-xs font-extrabold text-white transition hover:bg-blue-700"
+                            className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 inline-flex items-center gap-1 rounded-lg bg-blue-600 px-3 py-1 text-xs font-extrabold text-white transition hover:bg-blue-700"
                         >
                             Full Report &rarr;
                         </Link>
@@ -427,7 +427,7 @@ export default function AiReadinessCard({ aiAnalysis }: AiReadinessCardProps) {
                                         <Link
                                             key={module}
                                             href={`/learn?search=${encodeURIComponent(module)}`}
-                                            className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-xs font-bold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900 dark:border-slate-700 dark:bg-slate-800/80 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:text-white"
+                                            className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-xs font-bold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900 dark:border-slate-700 dark:bg-slate-800/80 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:text-white"
                                         >
                                             {module}
                                             <ChevronRight className="size-3" />

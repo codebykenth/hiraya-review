@@ -1,4 +1,4 @@
-﻿import { Head, Link, usePage, router } from '@inertiajs/react';
+import { Head, Link, usePage, router } from '@inertiajs/react';
 import Echo from 'laravel-echo';
 import {
     BookMarked,
@@ -85,7 +85,7 @@ export default function LearnShow({ module, recommended }: LearnShowProps) {
             <PageContainer className="bg-slate-50/30 p-4 md:p-6 dark:bg-slate-900/20">
                 <Link
                     href="/learn"
-                    className="flex w-fit items-center gap-1 text-sm font-black text-foreground transition hover:text-blue-600 focus:outline-none dark:text-blue-400 dark:hover:text-blue-400"
+                    className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 flex w-fit items-center gap-1 text-sm font-black text-foreground transition hover:text-blue-600 focus:outline-none dark:text-blue-400 dark:hover:text-blue-400"
                 >
                     <ChevronLeft className="size-4" />
                     Back to Study Hub
@@ -93,7 +93,7 @@ export default function LearnShow({ module, recommended }: LearnShowProps) {
 
                 <div className="mx-auto grid w-full max-w-7xl grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_19rem]">
                     <div className="min-w-0">
-                        <article className="animate-fade-in rounded-xl border border-border bg-card p-5 shadow-sm md:p-9">
+                        <article className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 animate-fade-in rounded-xl border border-border bg-card p-5 shadow-sm md:p-9">
                             <div className="flex flex-wrap items-center gap-2 border-b border-border pb-5">
                                 <span
                                     className={`rounded-full border px-3 py-0.5 text-xs font-extrabold uppercase ${getCategoryStyles(module.category)}`}
@@ -214,7 +214,7 @@ export default function LearnShow({ module, recommended }: LearnShowProps) {
                         </article>
                     </div>
 
-                    <aside className="flex min-w-0 flex-col gap-6">
+                    <aside className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 flex min-w-0 flex-col gap-6">
                         <Card className="p-5 shadow-xs">
                             <div className="flex items-center gap-2 border-b border-border pb-3">
                                 <BookMarked className="size-4 text-blue-600 dark:text-blue-400" />
@@ -273,7 +273,7 @@ export default function LearnShow({ module, recommended }: LearnShowProps) {
                                         <Link
                                             key={ri}
                                             href={`/learn/${rec.slug}`}
-                                            className="group block border-b border-border/40 pb-3 last:border-0 last:pb-0"
+                                            className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 group block border-b border-border/40 pb-3 last:border-0 last:pb-0"
                                         >
                                             <h4 className="line-clamp-2 text-sm font-black text-foreground transition group-hover:text-blue-600 dark:text-blue-400 dark:group-hover:text-blue-400">
                                                 {rec.title}

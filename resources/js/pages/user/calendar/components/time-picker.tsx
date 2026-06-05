@@ -1,4 +1,4 @@
-﻿import { ChevronUp, ChevronDown } from 'lucide-react';
+import { ChevronUp, ChevronDown } from 'lucide-react';
 import { useState, useEffect } from 'react';
 
 interface TimePickerProps {
@@ -188,7 +188,7 @@ export function TimePicker({ value, onChange }: TimePickerProps) {
                             <button
                                 type="button"
                                 onClick={incrementHour}
-                                className="rounded p-1 hover:bg-slate-100 dark:hover:bg-slate-900"
+                                className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 rounded p-1 hover:bg-slate-100 dark:hover:bg-slate-900"
                             >
                                 <ChevronUp className="h-5 w-5 text-slate-600 dark:text-slate-400" />
                             </button>
@@ -205,7 +205,7 @@ export function TimePicker({ value, onChange }: TimePickerProps) {
                             <button
                                 type="button"
                                 onClick={decrementHour}
-                                className="rounded p-1 hover:bg-slate-100 dark:hover:bg-slate-900"
+                                className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 rounded p-1 hover:bg-slate-100 dark:hover:bg-slate-900"
                             >
                                 <ChevronDown className="h-5 w-5 text-slate-600 dark:text-slate-400" />
                             </button>
@@ -220,7 +220,7 @@ export function TimePicker({ value, onChange }: TimePickerProps) {
                             <button
                                 type="button"
                                 onClick={incrementMinute}
-                                className="rounded p-1 hover:bg-slate-100 dark:hover:bg-slate-900"
+                                className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 rounded p-1 hover:bg-slate-100 dark:hover:bg-slate-900"
                             >
                                 <ChevronUp className="h-5 w-5 text-slate-600 dark:text-slate-400" />
                             </button>
@@ -237,7 +237,7 @@ export function TimePicker({ value, onChange }: TimePickerProps) {
                             <button
                                 type="button"
                                 onClick={decrementMinute}
-                                className="rounded p-1 hover:bg-slate-100 dark:hover:bg-slate-900"
+                                className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 rounded p-1 hover:bg-slate-100 dark:hover:bg-slate-900"
                             >
                                 <ChevronDown className="h-5 w-5 text-slate-600 dark:text-slate-400" />
                             </button>

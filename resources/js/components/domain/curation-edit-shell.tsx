@@ -1,4 +1,4 @@
-﻿import { Link } from '@inertiajs/react';
+import { Link } from '@inertiajs/react';
 import { ChevronLeft, Save } from 'lucide-react';
 import React from 'react';
 import { PageContainer } from '@/components/layout/page-container';
@@ -39,7 +39,7 @@ export function CurationEditShell({
             {/* Back Link */}
             <Link
                 href={backUrl}
-                className="flex w-fit items-center gap-1 text-xs font-black text-foreground transition hover:text-blue-600 focus:outline-none dark:text-blue-400"
+                className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 flex w-fit items-center gap-1 text-xs font-black text-foreground transition hover:text-blue-600 focus:outline-none dark:text-blue-400"
             >
                 <ChevronLeft className="size-4" />
                 {backLabel}
@@ -58,7 +58,7 @@ export function CurationEditShell({
                 >
                     <div className="flex items-center justify-between border-b border-border pb-3.5">
                         <span className="flex items-center gap-1.5 text-xs font-black text-foreground uppercase">
-                            <HeaderIcon className="size-4.5 animate-pulse text-blue-600 dark:text-blue-400" />
+                            <HeaderIcon className="transition-transform group-hover:scale-110 size-4.5 animate-pulse text-blue-600 dark:text-blue-400" />
                             {headerTitle}
                         </span>
 

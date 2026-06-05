@@ -44,7 +44,7 @@ export function ModulesGrid({
                                     <Link
                                         key={mod.id}
                                         href={`/learn/${mod.slug}`}
-                                        className="group block"
+                                        className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 group block"
                                     >
                                         <Card className="flex h-full flex-col justify-between overflow-hidden p-6 transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-xl hover:-translate-y-1 hover:shadow-primary/5">
                                             <div>

@@ -1,4 +1,4 @@
-﻿import { Form } from '@inertiajs/react';
+import { Form } from '@inertiajs/react';
 import { Eye, EyeOff, LockKeyhole, RefreshCw } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import AlertError from '@/components/shared/alert-error';
@@ -73,7 +73,7 @@ export default function TwoFactorRecoveryCodes({
                         aria-controls="recovery-codes-section"
                     >
                         <RecoveryCodeIconComponent
-                            className="size-4"
+                            className="transition-transform group-hover:scale-110 size-4"
                             aria-hidden="true"
                         />
                         {codesAreVisible ? 'Hide' : 'View'} recovery codes

@@ -1,4 +1,4 @@
-﻿import { Head, Link, router, usePage } from '@inertiajs/react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
 import {
     ArrowRight,
     Sparkles,
@@ -215,7 +215,7 @@ export default function Welcome() {
                                     <Button size="lg" asChild>
                                         <Link
                                             href={register()}
-                                            className="flex items-center gap-2 font-bold"
+                                            className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 flex items-center gap-2 font-bold"
                                         >
                                             Get Started Free
                                             <ArrowRight className="h-5 w-5" />
@@ -235,7 +235,7 @@ export default function Welcome() {
                                     <Button variant="outline" size="lg" asChild>
                                         <Link
                                             href={'#features'}
-                                            className="font-bold"
+                                            className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 font-bold"
                                         >
                                             Learn More
                                         </Link>
