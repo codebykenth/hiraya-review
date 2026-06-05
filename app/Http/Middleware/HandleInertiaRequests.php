@@ -40,7 +40,10 @@ class HandleInertiaRequests extends Middleware
             ...parent::share($request),
             'name' => config('app.name'),
             'auth' => [
-                'user' => $request->user(),
+                'user' => $request->user() ? array_merge(
+                    $request->user()->only(['id', 'name', 'email', 'email_verified_at', 'role', 'created_at', 'updated_at']),
+                    ['two_factor_enabled' => ! is_null($request->user()->two_factor_secret)]
+                ) : null,
             ],
             'pusher' => [
                 'key' => config('broadcasting.connections.pusher.key'),
