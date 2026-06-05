@@ -14,7 +14,7 @@ class EnsureUserIsAdmin
     public function handle(Request $request, Closure $next): Response
     {
         if (! auth()->user() || auth()->user()->role !== 'admin') {
-            abort(403, 'Unauthorized access to administration area.');
+            abort(404);
         }
 
         return $next($request);

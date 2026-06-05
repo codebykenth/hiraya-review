@@ -16,6 +16,7 @@ import {
     Calendar as CalendarIcon,
     TrendingUp,
     Activity,
+    Eye,
 } from 'lucide-react';
 import AppLogo from '@/components/layout/app-logo';
 import { NavMain } from '@/components/layout/nav-main';
@@ -58,6 +59,11 @@ const generalNavItems: NavItem[] = [
         icon: LayoutDashboard,
     },
     {
+        title: 'Reviewer Guide',
+        href: guide(),
+        icon: Compass,
+    },
+    {
         title: 'Study Plan',
         href: calendarIndex(),
         icon: CalendarIcon,
@@ -87,34 +93,26 @@ const generalNavItems: NavItem[] = [
         href: analyticsIndex(),
         icon: TrendingUp,
     },
-    {
-        title: 'Reviewer Guide',
-        href: guide(),
-        icon: Compass,
-    },
 ];
 
-const adminNavItems: NavItem[] = [
+const adminCoreItems: NavItem[] = [
     {
         title: 'Dashboard',
         href: adminDashboard(),
         icon: Gauge,
     },
     {
-        title: 'Questions',
-        icon: FileQuestion,
-        items: [
-            {
-                title: 'Question Management',
-                href: questionsIndex(),
-                icon: FileText,
-            },
-            {
-                title: 'Drafts Review',
-                href: questionsDrafts(),
-                icon: ListChecks,
-            },
-        ],
+        title: 'Users',
+        href: adminUsersIndex(),
+        icon: Users,
+    },
+];
+
+const adminContentItems: NavItem[] = [
+    {
+        title: 'Syllabus Scope',
+        href: '/admin/syllabus',
+        icon: Database,
     },
     {
         title: 'Modules',
@@ -133,19 +131,20 @@ const adminNavItems: NavItem[] = [
         ],
     },
     {
-        title: 'Users',
-        href: adminUsersIndex(),
-        icon: Users,
-    },
-    {
-        title: 'System Actions',
-        href: '/admin/system',
-        icon: Activity,
-    },
-    {
-        title: 'Syllabus Scope',
-        href: '/admin/syllabus',
-        icon: Database,
+        title: 'Questions',
+        icon: FileQuestion,
+        items: [
+            {
+                title: 'Question Management',
+                href: questionsIndex(),
+                icon: FileText,
+            },
+            {
+                title: 'Drafts Review',
+                href: questionsDrafts(),
+                icon: ListChecks,
+            },
+        ],
     },
     {
         title: 'Exam Dates',
@@ -154,9 +153,45 @@ const adminNavItems: NavItem[] = [
     },
 ];
 
+const adminSystemItems: NavItem[] = [
+    {
+        title: 'View Management',
+        href: '/admin/view-management',
+        icon: Eye,
+    },
+    {
+        title: 'System Actions',
+        href: '/admin/system',
+        icon: Activity,
+    },
+];
+
+const viewMap: Record<string, string> = {
+    'Dashboard': 'dashboard',
+    'Reviewer Guide': 'reviewer-guide',
+    'Study Plan': 'study-plan',
+    'Learn': 'learn',
+    'Practice Drills': 'practice-drills',
+    'Mock Exams': 'mock-exams',
+    'History': 'history',
+    'Analytics': 'analytics',
+};
+
 export function AppSidebar() {
-    const { auth } = usePage<{ auth: Auth }>().props;
+    const { auth } = usePage<{ auth: any }>().props;
     const isAdmin = auth.user?.role === 'admin';
+    const rolePermissions = auth.permissions?.[auth.user?.role || 'user'] || {};
+
+    const visibleGeneralItems = generalNavItems.filter((item) => {
+        const viewId = viewMap[item.title];
+        if (viewId && rolePermissions[viewId] !== undefined) {
+            const val = String(rolePermissions[viewId]);
+            if (val === 'false' || val === '0') {
+                return false;
+            }
+        }
+        return true;
+    });
 
     return (
         <Sidebar collapsible="icon" variant="inset">
@@ -173,12 +208,16 @@ export function AppSidebar() {
             </SidebarHeader>
 
             <SidebarContent className="overflow-x-hidden">
-                <NavMain items={generalNavItems} />
+                <NavMain items={visibleGeneralItems} />
 
                 {isAdmin && (
                     <>
-                        <SidebarSeparator className="my-2" />
-                        <NavMain items={adminNavItems} label="Administrator" />
+                        {visibleGeneralItems.length > 0 && (
+                            <SidebarSeparator className="my-2" />
+                        )}
+                        <NavMain items={adminCoreItems} label="Administration" />
+                        <NavMain items={adminContentItems} label="Curriculum & Content" />
+                        <NavMain items={adminSystemItems} label="System & Security" />
                     </>
                 )}
             </SidebarContent>

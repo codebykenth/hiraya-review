@@ -8,8 +8,11 @@ use App\Http\Middleware\EnsureUserIsAdmin;
 use App\Http\Middleware\HandleAppearance;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\SetCacheHeaders;
+use App\Http\Middleware\CheckViewAccess;
 use App\Http\Middleware\TransactionMiddleware;
 use App\Http\Middleware\VerifyTurnstile;
+use App\Models\RolePermission;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -33,6 +36,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'password.confirm' => ConfirmPasswordForNonSocialUsers::class,
             'admin' => EnsureUserIsAdmin::class,
             'turnstile.verify' => VerifyTurnstile::class,
+            'view.access' => CheckViewAccess::class,
         ]);
 
         $middleware->remove(PreventRequestsDuringMaintenance::class);
@@ -49,6 +53,7 @@ return Application::configure(basePath: dirname(__DIR__))
             SetCacheHeaders::class,
             CompressResponse::class,
             TransactionMiddleware::class,
+            CheckViewAccess::class,
         ]);
 
         $middleware->api(append: [
@@ -59,13 +64,18 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->respond(function (Response $response, Throwable $exception, Request $request) {
             $status = $response->getStatusCode();
-            if (in_array($status, [500, 503, 403])) {
+            if (in_array($status, [500, 503, 404, 403])) {
                 Inertia::setRootView('app');
 
                 return Inertia::render('error', [
                     'status' => $status,
                     'auth' => [
                         'user' => $request->user(),
+                        'permissions' => Cache::remember('role_permissions', 3600, function () {
+                            return RolePermission::all()->groupBy('role')->map(function ($permissions) {
+                                return $permissions->pluck('is_visible', 'view_name')->map(fn($v) => (bool) $v)->toArray();
+                            })->toArray();
+                        }),
                     ],
                 ])
                     ->toResponse($request)

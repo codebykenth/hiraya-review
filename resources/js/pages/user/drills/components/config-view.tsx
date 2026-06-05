@@ -6,6 +6,10 @@ import {
     Hourglass,
     CheckCircle2,
     ChevronRight,
+    ListFilter,
+    ListOrdered,
+    Globe,
+    RefreshCcw,
 } from 'lucide-react';
 import React from 'react';
 import { PageHeader } from '@/components/layout/page-header';
@@ -76,7 +80,7 @@ export function ConfigView({
             {isRetakeConfig && (
                 <div className="dark:bg-amber-950/30/50 flex flex-col justify-between gap-3 rounded-xl border border-amber-200 bg-amber-50 p-4 text-xs font-semibold text-amber-800 shadow-2xs sm:flex-row sm:items-center dark:border-amber-900/30 dark:border-amber-900/50 dark:bg-amber-950/10 dark:text-amber-400">
                     <div className="flex items-center gap-2">
-                        <span className="text-sm">ðŸ”„</span>
+                        <RefreshCcw className="size-4 shrink-0" />
                         <span>
                             <strong>Retake Mode Active:</strong> Settings have
                             been locked to match your historical attempt.
@@ -111,9 +115,10 @@ export function ConfigView({
                 <div className="flex flex-col gap-5 lg:col-span-2">
                     {/* 1. Subcategory Selector */}
                     <Card className="p-5 shadow-2xs">
-                        <span className="mb-3 block text-[10px] font-extrabold tracking-wider text-muted-foreground uppercase">
-                            ðŸŒ² Select Subcategories
-                        </span>
+                        <div className="mb-3 flex items-center gap-1.5 text-[10px] font-extrabold tracking-wider text-muted-foreground uppercase">
+                            <ListFilter className="size-3" />
+                            <span>Select Subcategories</span>
+                        </div>
                         <div className="flex flex-wrap gap-2.5">
                             {selectedCategory.subcategory.map((sub) => {
                                 const isSelected = selectedSubcats.includes(
@@ -148,9 +153,10 @@ export function ConfigView({
                     {/* 2. Question Count Selector */}
                     <Card className="p-5 shadow-2xs">
                         <div className="mb-3 flex items-center justify-between">
-                            <span className="text-[10px] font-extrabold tracking-wider text-muted-foreground uppercase">
-                                ðŸ”¢ Question Count
-                            </span>
+                            <div className="flex items-center gap-1.5 text-[10px] font-extrabold tracking-wider text-muted-foreground uppercase">
+                                <ListOrdered className="size-3" />
+                                <span>Question Count</span>
+                            </div>
                             <span className="dark:bg-blue-950/30/50 rounded-md bg-blue-50 px-2 py-0.5 text-[10px] font-bold text-blue-600 dark:bg-blue-950/20 dark:text-blue-400">
                                 Total Questions:{' '}
                                 {questionCount === 'all'
@@ -259,9 +265,10 @@ export function ConfigView({
 
                     {/* 3. Language Selector */}
                     <Card className="p-5 shadow-2xs">
-                        <span className="mb-3.5 block text-[10px] font-extrabold tracking-wider text-muted-foreground uppercase">
-                            ðŸŒ Language
-                        </span>
+                        <div className="mb-3.5 flex items-center gap-1.5 text-[10px] font-extrabold tracking-wider text-muted-foreground uppercase">
+                            <Globe className="size-3" />
+                            <span>Language</span>
+                        </div>
                         <div className="flex flex-wrap gap-3 sm:gap-6">
                             {(hasFilipinoQuestions
                                 ? ['English', 'Filipino', 'Both']
@@ -304,9 +311,10 @@ export function ConfigView({
 
                     {/* 4. Practice Mode Selector */}
                     <Card className="p-5 shadow-2xs">
-                        <span className="mb-3.5 block text-[10px] font-extrabold tracking-wider text-muted-foreground uppercase">
-                            â±ï¸ Practice Mode
-                        </span>
+                        <div className="mb-3.5 flex items-center gap-1.5 text-[10px] font-extrabold tracking-wider text-muted-foreground uppercase">
+                            <Timer className="size-3" />
+                            <span>Practice Mode</span>
+                        </div>
                         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                             <button
                                 type="button"

@@ -109,6 +109,10 @@ export function NavMain({
         });
     };
 
+    if (items.length === 0) {
+        return null;
+    }
+
     return (
         <SidebarGroup className="px-2 py-0">
             <SidebarGroupLabel

@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\QuestionController;
 use App\Http\Controllers\Admin\SyllabusController;
 use App\Http\Controllers\Admin\SystemController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\ViewManagementController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Settings\AcceptTermsController;
 use App\Http\Controllers\SitemapController;
@@ -154,6 +155,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::controller(SystemController::class)->prefix('system')->name('system.')->group(function () {
                 Route::get('/', 'index')->name('index');
             });
+
+            Route::controller(ViewManagementController::class)->prefix('view-management')->name('view-management.')->group(function () {
+                Route::get('/', 'index')->name('index');
+            });
         });
 
         // Question resource views (No admin prefix in paths or names originally)
@@ -175,6 +180,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
                 Route::post('run-migrations', 'runMigrations')->name('run-migrations');
                 Route::post('rollback-migrations', 'rollbackMigrations')->name('rollback-migrations');
                 Route::post('toggle-maintenance', 'toggleMaintenance')->name('toggle-maintenance');
+            });
+
+            // Admin View Management Mutations
+            Route::controller(ViewManagementController::class)->prefix('admin/view-management')->name('admin.view-management.')->group(function () {
+                Route::put('/', 'update')->name('update');
             });
 
             // Admin Learn Mutations

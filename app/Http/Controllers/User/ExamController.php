@@ -50,7 +50,7 @@ class ExamController
         if ($request->has('attempt_id')) {
             $attempt = ExamAttempt::where('user_id', auth()->id())
                 ->with('category')
-                ->find($request->attempt_id);
+                ->findOrFail($request->attempt_id);
 
             if ($attempt) {
                 // In-memory filter of cached pool
@@ -68,7 +68,7 @@ class ExamController
         } elseif ($request->filled('retake_same') || $request->filled('retake_fresh')) {
             $attemptId = $request->input('retake_same') ?? $request->input('retake_fresh');
             $attempt = ExamAttempt::where('user_id', auth()->id())
-                ->find($attemptId);
+                ->findOrFail($attemptId);
 
             if ($attempt) {
                 $meta = $attempt->cat_scores['metadata'] ?? [];
