@@ -13,12 +13,18 @@ export function TrafficOverloadGuard() {
         // 1. Intercept Inertia requests exception states
         const unregisterHttpException = router.on('httpException', (event) => {
             const status = event.detail.response.status;
-            const isInertiaResponse = event.detail.response.headers && event.detail.response.headers['x-inertia'];
+            const isInertiaResponse =
+                event.detail.response.headers &&
+                event.detail.response.headers['x-inertia'];
 
             if (status === 429) {
                 setErrorType('rate_limit');
                 setIsOpen(true);
-            } else if (status === 504 || status === 502 || (status === 503 && !isInertiaResponse)) {
+            } else if (
+                status === 504 ||
+                status === 502 ||
+                (status === 503 && !isInertiaResponse)
+            ) {
                 setErrorType('overload');
                 setIsOpen(true);
             }
@@ -39,7 +45,8 @@ export function TrafficOverloadGuard() {
                         response.status === 429 ||
                         response.status === 502 ||
                         response.status === 504 ||
-                        (response.status === 503 && !response.headers.get('x-inertia'));
+                        (response.status === 503 &&
+                            !response.headers.get('x-inertia'));
 
                     if (isFailureStatus) {
                         if (retries < maxRetries) {
@@ -122,7 +129,7 @@ export function TrafficOverloadGuard() {
             {/* Final Overload Warning Modal (shown only after all retries fail) */}
             {isOpen && (
                 <div className="animate-fade-in fixed inset-0 z-[9999] flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-sm">
-                    <div className="relative w-full max-w-2xl animate-in overflow-hidden rounded-3xl border border-slate-200/80 bg-white p-4 sm:p-6 shadow-2xl transition-all duration-200 zoom-in-95 fade-in dark:border-slate-800 dark:bg-slate-900">
+                    <div className="relative w-full max-w-2xl animate-in overflow-hidden rounded-3xl border border-slate-200/80 bg-white p-4 shadow-2xl transition-all duration-200 zoom-in-95 fade-in sm:p-6 dark:border-slate-800 dark:bg-slate-900">
                         {/* Decorative Background */}
                         <div className="pointer-events-none absolute -top-24 -right-24 h-48 w-48 rounded-full bg-amber-500/5 blur-3xl" />
 

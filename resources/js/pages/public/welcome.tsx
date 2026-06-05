@@ -197,7 +197,7 @@ export default function Welcome() {
                                     </span>
                                 </Badge>
 
-                                <h1 className="text-2xl sm:text-4xl leading-tight font-bold text-foreground md:text-5xl lg:text-6xl">
+                                <h1 className="text-2xl leading-tight font-bold text-foreground sm:text-4xl md:text-5xl lg:text-6xl">
                                     Master the Civil Service Exam with{' '}
                                     <span className="text-primary">
                                         Confidence
@@ -215,7 +215,7 @@ export default function Welcome() {
                                     <Button size="lg" asChild>
                                         <Link
                                             href={register()}
-                                            className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 flex items-center gap-2 font-bold"
+                                            className="group flex items-center gap-2 font-bold transition-all duration-300 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95"
                                         >
                                             Get Started Free
                                             <ArrowRight className="h-5 w-5" />
@@ -235,7 +235,7 @@ export default function Welcome() {
                                     <Button variant="outline" size="lg" asChild>
                                         <Link
                                             href={'#features'}
-                                            className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 font-bold"
+                                            className="group font-bold transition-all duration-300 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95"
                                         >
                                             Learn More
                                         </Link>
@@ -332,10 +332,10 @@ export default function Welcome() {
                             </div>
                         </div>
                     </Section>
-                    <div className="container mx-auto border-y border-gray-400 px-4 sm:px-6 py-10">
+                    <div className="container mx-auto border-y border-gray-400 px-4 py-10 sm:px-6">
                         <div className="flex flex-col items-center justify-evenly gap-5 sm:gap-10 md:flex-row md:gap-0">
                             <div className="flex flex-1 flex-col items-center">
-                                <p className="text-2xl sm:text-4xl font-black text-primary">
+                                <p className="text-2xl font-black text-primary sm:text-4xl">
                                     500+
                                 </p>
                                 <p className="mt-1 text-sm leading-relaxed font-bold tracking-wider text-muted-foreground uppercase">
@@ -344,7 +344,7 @@ export default function Welcome() {
                             </div>
                             <div className="hidden h-12 w-full max-w-[1px] bg-slate-300/60 md:block dark:bg-slate-800" />
                             <div className="flex flex-1 flex-col items-center">
-                                <p className="text-2xl sm:text-4xl font-black text-primary">
+                                <p className="text-2xl font-black text-primary sm:text-4xl">
                                     2
                                 </p>
                                 <p className="mt-1 text-sm leading-relaxed font-bold tracking-wider text-muted-foreground uppercase">
@@ -353,7 +353,7 @@ export default function Welcome() {
                             </div>
                             <div className="hidden h-12 w-full max-w-[1px] bg-slate-300/60 md:block dark:bg-slate-800" />
                             <div className="flex flex-1 flex-col items-center">
-                                <p className="text-2xl sm:text-4xl font-black text-primary">
+                                <p className="text-2xl font-black text-primary sm:text-4xl">
                                     6
                                 </p>
                                 <p className="mt-1 text-sm leading-relaxed font-bold tracking-wider text-muted-foreground uppercase">
@@ -362,7 +362,7 @@ export default function Welcome() {
                             </div>
                             <div className="hidden h-12 w-full max-w-[1px] bg-slate-300/60 md:block dark:bg-slate-800" />
                             <div className="flex flex-1 flex-col items-center">
-                                <p className="text-2xl sm:text-4xl font-black text-primary">
+                                <p className="text-2xl font-black text-primary sm:text-4xl">
                                     Free
                                 </p>
                                 <p className="mt-1 text-sm leading-relaxed font-bold tracking-wider text-muted-foreground uppercase">
@@ -476,7 +476,7 @@ export default function Welcome() {
                                 <Card
                                     onMouseEnter={() => setHoveredStep(1)}
                                     onMouseLeave={() => setHoveredStep(null)}
-                                    className={`relative flex flex-col items-center overflow-hidden rounded-xl border border-l-4 border-slate-200/80 bg-card p-4 sm:p-6 lg:p-8 text-center shadow-sm transition-all duration-300 ${
+                                    className={`relative flex flex-col items-center overflow-hidden rounded-xl border border-l-4 border-slate-200/80 bg-card p-4 text-center shadow-sm transition-all duration-300 sm:p-6 lg:p-8 ${
                                         hoveredStep === 1
                                             ? 'border-l-primary'
                                             : 'border-l-primary'
@@ -505,7 +505,7 @@ export default function Welcome() {
                                 <Card
                                     onMouseEnter={() => setHoveredStep(2)}
                                     onMouseLeave={() => setHoveredStep(null)}
-                                    className={`relative flex flex-col items-center overflow-hidden rounded-xl border border-l-4 border-slate-200/80 bg-card p-4 sm:p-6 lg:p-8 text-center shadow-sm transition-all duration-300 ${
+                                    className={`relative flex flex-col items-center overflow-hidden rounded-xl border border-l-4 border-slate-200/80 bg-card p-4 text-center shadow-sm transition-all duration-300 sm:p-6 lg:p-8 ${
                                         hoveredStep === 2
                                             ? 'border-l-primary'
                                             : 'border-l-primary'
@@ -533,7 +533,7 @@ export default function Welcome() {
                                 <Card
                                     onMouseEnter={() => setHoveredStep(3)}
                                     onMouseLeave={() => setHoveredStep(null)}
-                                    className={`relative flex flex-col items-center overflow-hidden rounded-xl border border-l-4 border-slate-200/80 bg-card p-4 sm:p-6 lg:p-8 text-center shadow-sm transition-all duration-300 ${
+                                    className={`relative flex flex-col items-center overflow-hidden rounded-xl border border-l-4 border-slate-200/80 bg-card p-4 text-center shadow-sm transition-all duration-300 sm:p-6 lg:p-8 ${
                                         hoveredStep === 3
                                             ? 'border-l-primary'
                                             : 'border-l-primary'
@@ -596,7 +596,7 @@ export default function Welcome() {
                                                     isOpen ? null : index,
                                                 )
                                             }
-                                            className="flex w-full items-center justify-between gap-4 px-4 sm:px-6 py-5 text-left font-bold text-slate-900 transition-colors hover:text-primary dark:text-white"
+                                            className="flex w-full items-center justify-between gap-4 px-4 py-5 text-left font-bold text-slate-900 transition-colors hover:text-primary sm:px-6 dark:text-white"
                                         >
                                             <span className="text-base font-bold tracking-tight md:text-[17px]">
                                                 {faq.question}
@@ -616,7 +616,7 @@ export default function Welcome() {
                                                     : 'max-h-0'
                                             } overflow-hidden`}
                                         >
-                                            <div className="px-4 sm:px-6 py-5 text-sm leading-relaxed font-normal text-slate-600 dark:text-slate-400">
+                                            <div className="px-4 py-5 text-sm leading-relaxed font-normal text-slate-600 sm:px-6 dark:text-slate-400">
                                                 {faq.answer}
                                             </div>
                                         </div>

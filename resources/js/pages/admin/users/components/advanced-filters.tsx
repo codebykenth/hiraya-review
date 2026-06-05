@@ -122,7 +122,7 @@ export function AdvancedFilters({
                     <button
                         type="button"
                         onClick={onClose}
-                        className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 cursor-pointer rounded-lg p-1.5 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700 focus:outline-none dark:hover:bg-slate-900 dark:hover:text-slate-200"
+                        className="group cursor-pointer rounded-lg p-1.5 text-slate-400 transition transition-all duration-300 hover:bg-slate-100 hover:text-slate-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95 dark:hover:bg-slate-900 dark:hover:text-slate-200"
                         aria-label="Close dialog"
                     >
                         <X className="size-4.5" />
@@ -130,7 +130,7 @@ export function AdvancedFilters({
                 </div>
 
                 {/* Content */}
-                <div className="flex-1 space-y-6 overflow-y-auto p-4 sm:p-6 pr-5">
+                <div className="flex-1 space-y-6 overflow-y-auto p-4 pr-5 sm:p-6">
                     {/* Account Status Filter */}
                     <div>
                         <label className="text-xs font-bold tracking-wide text-slate-700 uppercase dark:text-slate-300">

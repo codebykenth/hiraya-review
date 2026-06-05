@@ -12,7 +12,7 @@ export function DashboardSyllabusPanel({
     metrics,
 }: DashboardSyllabusPanelProps) {
     return (
-        <Card className="flex flex-col p-4 sm:p-6 shadow-xs">
+        <Card className="flex flex-col p-4 shadow-xs sm:p-6">
             <div className="mb-5">
                 <h2 className="text-md font-bold text-slate-900 dark:text-white">
                     Syllabus Scope Dispersal

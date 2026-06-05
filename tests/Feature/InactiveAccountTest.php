@@ -11,13 +11,13 @@ class InactiveAccountTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_inactive_user_can_still_access_authenticated_pages(): void
+    public function test_inactive_user_is_redirected_from_authenticated_pages(): void
     {
         $user = User::factory()->create(['is_active' => false]);
 
         $this->actingAs($user)
             ->get('/dashboard')
-            ->assertSuccessful();
+            ->assertRedirect(route('account-inactive'));
     }
 
     public function test_inactive_user_info_is_passed_to_frontend(): void
@@ -25,9 +25,9 @@ class InactiveAccountTest extends TestCase
         $user = User::factory()->create(['is_active' => false]);
 
         $this->actingAs($user)
-            ->get('/dashboard')
+            ->get('/account-inactive')
             ->assertInertia(fn (Assert $page) => $page
-                ->component('user/dashboard/index')
+                ->component('account-inactive')
                 ->where('auth.user.is_active', false)
             );
     }

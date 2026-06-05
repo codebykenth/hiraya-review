@@ -73,7 +73,7 @@ export default function TwoFactorRecoveryCodes({
                         aria-controls="recovery-codes-section"
                     >
                         <RecoveryCodeIconComponent
-                            className="transition-transform group-hover:scale-110 size-4"
+                            className="size-4 transition-transform group-hover:scale-110"
                             aria-hidden="true"
                         />
                         {codesAreVisible ? 'Hide' : 'View'} recovery codes

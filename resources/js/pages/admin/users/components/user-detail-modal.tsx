@@ -235,7 +235,7 @@ export function UserDetailModal({
                     <button
                         type="button"
                         onClick={onClose}
-                        className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 absolute top-4 right-4 z-10 cursor-pointer rounded-lg p-1.5 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700 focus:outline-none dark:hover:bg-slate-900 dark:hover:text-slate-200"
+                        className="group absolute top-4 right-4 z-10 cursor-pointer rounded-lg p-1.5 text-slate-400 transition transition-all duration-300 hover:bg-slate-100 hover:text-slate-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95 dark:hover:bg-slate-900 dark:hover:text-slate-200"
                         aria-label="Close dialog"
                     >
                         <svg
@@ -253,7 +253,7 @@ export function UserDetailModal({
                         </svg>
                     </button>
 
-                    <div className="flex-1 overflow-y-auto p-4 sm:p-6 pr-5">
+                    <div className="flex-1 overflow-y-auto p-4 pr-5 sm:p-6">
                         {/* Header */}
                         <div className="pr-6">
                             <h3 className="font-heading text-xl font-black tracking-tight text-slate-900 dark:text-white">
@@ -475,7 +475,7 @@ export function UserDetailModal({
                     </div>
 
                     {/* Footer Buttons */}
-                    <div className="flex shrink-0 justify-end gap-3 border-t border-slate-100 p-4 sm:p-6 pt-4 dark:border-slate-900">
+                    <div className="flex shrink-0 justify-end gap-3 border-t border-slate-100 p-4 pt-4 sm:p-6 dark:border-slate-900">
                         <Button
                             variant="outline"
                             size="sm"

@@ -480,7 +480,7 @@ export default function AiAnalysisReport({
                 <div className="mb-6">
                     <Link
                         href="/dashboard"
-                        className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 inline-flex items-center gap-2 text-sm font-semibold text-slate-500 transition hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200"
+                        className="group inline-flex items-center gap-2 text-sm font-semibold text-slate-500 transition transition-all duration-300 hover:text-slate-800 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95 dark:text-slate-400 dark:hover:text-slate-200"
                     >
                         <ArrowLeft className="size-4" />
                         Back to Dashboard
@@ -503,7 +503,7 @@ export default function AiAnalysisReport({
                         </p>
                         <Link
                             href="/exams"
-                            className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 mt-6 inline-flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-black text-white transition hover:bg-blue-700"
+                            className="group mt-6 inline-flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-black text-white transition transition-all duration-300 hover:bg-blue-700 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95"
                         >
                             Take an Exam Now
                             <ChevronRight className="size-4" />
@@ -573,7 +573,7 @@ export default function AiAnalysisReport({
                                     </div>
                                     <div>
                                         <div className="flex flex-wrap items-center gap-2">
-                                            <h1 className="text-xl sm:text-3xl font-black tracking-tight text-slate-900 sm:text-4xl dark:text-white">
+                                            <h1 className="text-xl font-black tracking-tight text-slate-900 sm:text-3xl sm:text-4xl dark:text-white">
                                                 AI Diagnostic & Predictions
                                             </h1>
                                             <span className="border-indigo-150 inline-flex items-center gap-1 rounded-full border bg-indigo-50 px-2.5 py-0.5 text-[10px] font-black tracking-wider text-indigo-700 uppercase dark:border-indigo-500/20 dark:bg-indigo-500/10 dark:bg-indigo-950/30 dark:text-indigo-400">
@@ -650,7 +650,7 @@ export default function AiAnalysisReport({
                         <div className="grid grid-cols-1 gap-4 sm:gap-8 lg:grid-cols-12">
                             {/* Score Gages / Primary metrics: 4 cols */}
                             <div className="space-y-6 lg:col-span-4">
-                                <Card className="flex h-full flex-col items-center justify-between bg-gradient-to-br from-white to-slate-50/50 p-4 sm:p-6 text-center dark:from-slate-900 dark:to-slate-900/60">
+                                <Card className="flex h-full flex-col items-center justify-between bg-gradient-to-br from-white to-slate-50/50 p-4 text-center sm:p-6 dark:from-slate-900 dark:to-slate-900/60">
                                     <span className="text-xs font-black tracking-wider text-slate-400 uppercase dark:text-slate-500">
                                         Pass Probability
                                     </span>
@@ -740,7 +740,7 @@ export default function AiAnalysisReport({
                             {/* Detailed predictive metrics: 8 cols */}
                             <div className="grid grid-cols-1 gap-3 sm:gap-6 md:grid-cols-2 lg:col-span-8">
                                 {/* Estimated Exam Score */}
-                                <Card className="flex flex-col justify-between p-4 sm:p-6 transition hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/5">
+                                <Card className="flex flex-col justify-between p-4 transition hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/5 sm:p-6">
                                     <div className="flex items-center gap-3">
                                         <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-indigo-50 text-indigo-600 dark:bg-indigo-950/30 dark:bg-indigo-950/40 dark:text-indigo-400">
                                             <Target className="size-5" />
@@ -764,7 +764,7 @@ export default function AiAnalysisReport({
                                 </Card>
 
                                 {/* Days to Readiness */}
-                                <Card className="flex flex-col justify-between p-4 sm:p-6 transition hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/5">
+                                <Card className="flex flex-col justify-between p-4 transition hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/5 sm:p-6">
                                     <div className="flex items-center gap-3">
                                         <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-emerald-50 text-emerald-600 dark:bg-emerald-950/30 dark:bg-emerald-950/40 dark:text-emerald-400">
                                             <Clock className="size-5" />
@@ -788,7 +788,7 @@ export default function AiAnalysisReport({
                                 </Card>
 
                                 {/* Completion Pace */}
-                                <Card className="flex flex-col justify-between p-4 sm:p-6 transition hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/5">
+                                <Card className="flex flex-col justify-between p-4 transition hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/5 sm:p-6">
                                     <div className="flex items-center gap-3">
                                         <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-amber-50 text-amber-600 dark:bg-amber-950/30 dark:bg-amber-950/40 dark:text-amber-400">
                                             <Activity className="size-5" />
@@ -812,7 +812,7 @@ export default function AiAnalysisReport({
                                 </Card>
 
                                 {/* Timeline / Milestone */}
-                                <Card className="flex flex-col justify-between p-4 sm:p-6 transition hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/5">
+                                <Card className="flex flex-col justify-between p-4 transition hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/5 sm:p-6">
                                     <div className="flex items-center gap-3">
                                         <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-blue-50 text-blue-600 dark:bg-blue-950/30 dark:bg-blue-950/40 dark:text-blue-400">
                                             <Zap className="size-5" />
@@ -1174,7 +1174,7 @@ export default function AiAnalysisReport({
             {/* System Under Heavy Load Modal */}
             {isOverloadModalOpen && (
                 <div className="animate-fade-in fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-sm">
-                    <div className="relative w-full max-w-2xl animate-in overflow-hidden rounded-3xl border border-slate-200/80 bg-white p-4 sm:p-6 shadow-2xl transition-all duration-200 zoom-in-95 fade-in dark:border-slate-800 dark:bg-slate-900">
+                    <div className="relative w-full max-w-2xl animate-in overflow-hidden rounded-3xl border border-slate-200/80 bg-white p-4 shadow-2xl transition-all duration-200 zoom-in-95 fade-in sm:p-6 dark:border-slate-800 dark:bg-slate-900">
                         {/* Decorative Background */}
                         <div className="pointer-events-none absolute -top-24 -right-24 h-48 w-48 rounded-full bg-amber-500/5 blur-3xl" />
 

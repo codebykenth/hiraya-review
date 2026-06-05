@@ -6,6 +6,7 @@ use App\Http\Requests\BulkDestroyAttemptsRequest;
 use App\Models\ExamAttempt;
 use App\Services\ExamAttemptFormatter;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 
 class ExamHistoryController
@@ -125,7 +126,7 @@ class ExamHistoryController
      */
     public function destroy(ExamAttempt $attempt)
     {
-        \Illuminate\Support\Facades\Gate::allowIf(fn ($user) => $user->id === $attempt->user_id);
+        Gate::allowIf(fn ($user) => $user->id === $attempt->user_id);
 
         $attempt->delete();
 

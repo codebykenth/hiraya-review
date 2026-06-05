@@ -43,7 +43,7 @@ export default function QuestionShow({ question }: QuestionShowProps) {
                 {/* Back Link */}
                 <Link
                     href={questionsIndex().url}
-                    className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 flex w-fit items-center gap-1 text-xs font-black text-foreground transition hover:text-blue-600 focus:outline-none dark:text-blue-400"
+                    className="group flex w-fit items-center gap-1 text-xs font-black text-foreground transition transition-all duration-300 hover:text-blue-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95 dark:text-blue-400"
                 >
                     <ChevronLeft className="size-4" />
                     Back to Curation Manager
@@ -72,7 +72,7 @@ export default function QuestionShow({ question }: QuestionShowProps) {
                     {/* Left & Middle Column: Question Stem & Choices */}
                     <div className="space-y-6 lg:col-span-2">
                         {/* 1. Main Question Card */}
-                        <div className="rounded-2xl border border-border bg-card p-4 sm:p-6 shadow-sm">
+                        <div className="rounded-2xl border border-border bg-card p-4 shadow-sm sm:p-6">
                             <div className="mb-5 flex items-center justify-between border-b border-border pb-3.5">
                                 <span className="flex items-center gap-1.5 text-xs font-black text-foreground uppercase">
                                     <HelpCircle className="size-4.5 text-blue-600 dark:text-blue-400" />
@@ -146,7 +146,7 @@ export default function QuestionShow({ question }: QuestionShowProps) {
                         </div>
 
                         {/* 2. Rationale Card */}
-                        <div className="rounded-2xl border border-border bg-card p-4 sm:p-6 shadow-sm">
+                        <div className="rounded-2xl border border-border bg-card p-4 shadow-sm sm:p-6">
                             <h2 className="mb-4 flex items-center gap-1.5 border-b border-border pb-3.5 text-sm font-black text-foreground uppercase">
                                 <Sparkles className="size-4.5 text-blue-600 dark:text-blue-400" />
                                 Cognitive Explanation & Rationale
@@ -160,7 +160,7 @@ export default function QuestionShow({ question }: QuestionShowProps) {
                     {/* Right Column: Metadata details card */}
                     <div className="space-y-6">
                         {/* Summary specifications card */}
-                        <div className="rounded-2xl border border-border bg-card p-4 sm:p-6 shadow-sm">
+                        <div className="rounded-2xl border border-border bg-card p-4 shadow-sm sm:p-6">
                             <h2 className="mb-4 block border-b border-border pb-3 text-xs font-black tracking-wider text-foreground uppercase">
                                 Question Metrics
                             </h2>
@@ -216,7 +216,7 @@ export default function QuestionShow({ question }: QuestionShowProps) {
                         </div>
 
                         {/* CSE Syllabus Mapping specs */}
-                        <div className="rounded-2xl border border-border bg-card p-4 sm:p-6 shadow-sm">
+                        <div className="rounded-2xl border border-border bg-card p-4 shadow-sm sm:p-6">
                             <h2 className="mb-4 block border-b border-border pb-3 text-xs font-black tracking-wider text-foreground uppercase">
                                 CSE Curation Guidelines
                             </h2>

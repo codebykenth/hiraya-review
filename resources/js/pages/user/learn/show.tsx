@@ -85,7 +85,7 @@ export default function LearnShow({ module, recommended }: LearnShowProps) {
             <PageContainer className="bg-slate-50/30 p-4 md:p-6 dark:bg-slate-900/20">
                 <Link
                     href="/learn"
-                    className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 flex w-fit items-center gap-1 text-sm font-black text-foreground transition hover:text-blue-600 focus:outline-none dark:text-blue-400 dark:hover:text-blue-400"
+                    className="group flex w-fit items-center gap-1 text-sm font-black text-foreground transition transition-all duration-300 hover:text-blue-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95 dark:text-blue-400 dark:hover:text-blue-400"
                 >
                     <ChevronLeft className="size-4" />
                     Back to Study Hub
@@ -93,7 +93,7 @@ export default function LearnShow({ module, recommended }: LearnShowProps) {
 
                 <div className="mx-auto grid w-full max-w-7xl grid-cols-1 gap-3 sm:gap-6 lg:grid-cols-[minmax(0,1fr)_19rem]">
                     <div className="min-w-0">
-                        <article className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 animate-fade-in rounded-xl border border-border bg-card p-5 shadow-sm md:p-9">
+                        <article className="group animate-fade-in rounded-xl border border-border bg-card p-5 shadow-sm transition-all duration-300 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95 md:p-9">
                             <div className="flex flex-wrap items-center gap-2 border-b border-border pb-5">
                                 <span
                                     className={`rounded-full border px-3 py-0.5 text-xs font-extrabold uppercase ${getCategoryStyles(module.category)}`}
@@ -109,7 +109,7 @@ export default function LearnShow({ module, recommended }: LearnShowProps) {
                                 </span>
                             </div>
 
-                            <h1 className="mt-6 font-heading text-xl sm:text-3xl leading-tight font-black text-foreground md:text-4xl">
+                            <h1 className="mt-6 font-heading text-xl leading-tight font-black text-foreground sm:text-3xl md:text-4xl">
                                 {module.title}
                             </h1>
 
@@ -177,8 +177,8 @@ export default function LearnShow({ module, recommended }: LearnShowProps) {
                                 )}
 
                                 {!isLoggedIn && (
-                                    <div className="absolute inset-x-0 bottom-0 z-10 flex flex-col items-center justify-center bg-gradient-to-t from-white/95 via-white/90 to-transparent p-4 sm:p-6 pt-32 text-center dark:from-slate-950/95 dark:via-slate-950/90">
-                                        <div className="max-w-2xl rounded-2xl border border-primary/20 bg-background/80 p-4 sm:p-6 lg:p-8 shadow-xl backdrop-blur-md">
+                                    <div className="absolute inset-x-0 bottom-0 z-10 flex flex-col items-center justify-center bg-gradient-to-t from-white/95 via-white/90 to-transparent p-4 pt-32 text-center sm:p-6 dark:from-slate-950/95 dark:via-slate-950/90">
+                                        <div className="max-w-2xl rounded-2xl border border-primary/20 bg-background/80 p-4 shadow-xl backdrop-blur-md sm:p-6 lg:p-8">
                                             <h3 className="font-heading text-xl font-black text-foreground">
                                                 Unlock Full Lesson for Free
                                             </h3>
@@ -214,7 +214,7 @@ export default function LearnShow({ module, recommended }: LearnShowProps) {
                         </article>
                     </div>
 
-                    <aside className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 flex min-w-0 flex-col gap-3 sm:gap-6">
+                    <aside className="group flex min-w-0 flex-col gap-3 transition-all duration-300 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95 sm:gap-6">
                         <Card className="p-5 shadow-xs">
                             <div className="flex items-center gap-2 border-b border-border pb-3">
                                 <BookMarked className="size-4 text-blue-600 dark:text-blue-400" />
@@ -273,7 +273,7 @@ export default function LearnShow({ module, recommended }: LearnShowProps) {
                                         <Link
                                             key={ri}
                                             href={`/learn/${rec.slug}`}
-                                            className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 group block border-b border-border/40 pb-3 last:border-0 last:pb-0"
+                                            className="group group block border-b border-border/40 pb-3 transition-all duration-300 last:border-0 last:pb-0 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95"
                                         >
                                             <h4 className="line-clamp-2 text-sm font-black text-foreground transition group-hover:text-blue-600 dark:text-blue-400 dark:group-hover:text-blue-400">
                                                 {rec.title}

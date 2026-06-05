@@ -54,7 +54,7 @@ export function HubView({
             </div>
 
             {activeCategories.length > 0 ? (
-                <div className="grid grid-cols-1 gap-3 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
                     {activeCategories.map((cat) => {
                         const meta = categoryMeta[cat.name] || {
                             icon: Brain,
@@ -77,14 +77,14 @@ export function HubView({
                             <Card
                                 key={cat.id}
                                 onClick={() => handleCategoryClick(cat.name)}
-                                className="group relative flex cursor-pointer flex-col justify-between overflow-hidden p-4 sm:p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/5"
+                                className="group relative flex cursor-pointer flex-col justify-between overflow-hidden p-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/5 sm:p-6"
                             >
                                 <div>
                                     <div className="flex items-start justify-between">
                                         <div
                                             className={`rounded-xl ${meta.bgColor} p-3 text-white shadow-xs`}
                                         >
-                                            <CardIcon className="transition-transform group-hover:scale-110 size-6" />
+                                            <CardIcon className="size-6 transition-transform group-hover:scale-110" />
                                         </div>
                                         <span className="flex items-center gap-1 rounded-full bg-slate-100 px-2.5 py-1 text-[10px] font-extrabold text-muted-foreground dark:bg-slate-800">
                                             <FileText className="size-3" />{' '}

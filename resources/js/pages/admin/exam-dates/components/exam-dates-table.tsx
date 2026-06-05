@@ -39,7 +39,7 @@ export function ExamDatesTable({
                         <tr>
                             <td
                                 colSpan={4}
-                                className="px-4 py-4 sm:py-8 text-center text-muted-foreground"
+                                className="px-4 py-4 text-center text-muted-foreground sm:py-8"
                             >
                                 No exam dates configured yet.
                             </td>

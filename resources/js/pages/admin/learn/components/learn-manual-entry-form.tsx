@@ -42,7 +42,7 @@ export function LearnManualEntryForm({
             className="grid max-w-7xl grid-cols-1 items-start gap-3 sm:gap-6 lg:grid-cols-12"
         >
             <div className="flex flex-col gap-3 sm:gap-6 lg:col-span-8">
-                <div className="rounded-2xl border border-border bg-card p-4 sm:p-6 shadow-xs">
+                <div className="rounded-2xl border border-border bg-card p-4 shadow-xs sm:p-6">
                     <h2 className="mb-4 inline-flex items-center gap-2 border-b border-border pb-3 text-base font-bold text-foreground">
                         <PenLine className="size-4.5 text-emerald-600 dark:text-emerald-400" />
                         Manual Lesson Curator
@@ -59,7 +59,7 @@ export function LearnManualEntryForm({
             </div>
 
             <div className="flex flex-col gap-3 sm:gap-6 lg:col-span-4">
-                <div className="rounded-2xl border border-border bg-card p-4 sm:p-6 shadow-xs">
+                <div className="rounded-2xl border border-border bg-card p-4 shadow-xs sm:p-6">
                     <h2 className="mb-4 border-b border-slate-100 pb-3 text-base font-bold">
                         Categorization
                     </h2>

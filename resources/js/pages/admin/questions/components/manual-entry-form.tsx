@@ -45,7 +45,7 @@ export function ManualEntryForm({
         >
             {/* CONTENT EDITORS (8/12 cols) */}
             <div className="flex flex-col gap-3 sm:gap-6 lg:col-span-8">
-                <div className="rounded-2xl border border-border bg-card p-4 sm:p-6 shadow-xs">
+                <div className="rounded-2xl border border-border bg-card p-4 shadow-xs sm:p-6">
                     <h2 className="mb-4 inline-flex items-center gap-2 border-b border-border pb-3 text-base font-bold text-foreground">
                         <FileText className="size-4.5 text-emerald-600 dark:text-emerald-400" />
                         Question Content
@@ -62,25 +62,25 @@ export function ManualEntryForm({
                             <div className="flex items-center gap-1 rounded-lg border border-border bg-muted p-1">
                                 <button
                                     type="button"
-                                    className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 rounded px-2 py-0.5 text-xs font-black text-muted-foreground transition select-none hover:bg-card"
+                                    className="group rounded px-2 py-0.5 text-xs font-black text-muted-foreground transition transition-all duration-300 select-none hover:bg-card focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95"
                                 >
                                     B
                                 </button>
                                 <button
                                     type="button"
-                                    className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 rounded px-2 py-0.5 text-xs text-muted-foreground italic transition select-none hover:bg-card"
+                                    className="group rounded px-2 py-0.5 text-xs text-muted-foreground italic transition transition-all duration-300 select-none hover:bg-card focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95"
                                 >
                                     I
                                 </button>
                                 <button
                                     type="button"
-                                    className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 rounded px-2 py-0.5 font-mono text-xs text-muted-foreground transition select-none hover:bg-card"
+                                    className="group rounded px-2 py-0.5 font-mono text-xs text-muted-foreground transition transition-all duration-300 select-none hover:bg-card focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95"
                                 >
                                     List
                                 </button>
                                 <button
                                     type="button"
-                                    className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 rounded px-2 py-0.5 text-xs text-muted-foreground transition select-none hover:bg-card"
+                                    className="group rounded px-2 py-0.5 text-xs text-muted-foreground transition transition-all duration-300 select-none hover:bg-card focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95"
                                 >
                                     Link
                                 </button>
@@ -108,7 +108,7 @@ export function ManualEntryForm({
                 </div>
 
                 {/* Answer Options Card */}
-                <div className="rounded-2xl border border-border bg-card p-4 sm:p-6 shadow-xs">
+                <div className="rounded-2xl border border-border bg-card p-4 shadow-xs sm:p-6">
                     <div className="mb-4 flex items-center justify-between border-b border-border pb-3">
                         <h2 className="inline-flex items-center gap-2 text-base font-bold text-foreground">
                             <CheckCircle2 className="size-4.5 text-emerald-600 dark:text-emerald-400" />
@@ -183,7 +183,7 @@ export function ManualEntryForm({
 
                 {/* Explanation Card */}
                 {!isDemographic && (
-                    <div className="rounded-2xl border border-border bg-card p-4 sm:p-6 shadow-xs">
+                    <div className="rounded-2xl border border-border bg-card p-4 shadow-xs sm:p-6">
                         <h2 className="mb-4 border-b border-border pb-3 text-base font-bold text-foreground">
                             Explanation & Rationale
                         </h2>
@@ -221,7 +221,7 @@ export function ManualEntryForm({
 
             {/* METADATA, ATTACHMENT & SUBMISSIONS (4/12 cols) */}
             <div className="flex flex-col gap-3 sm:gap-6 lg:col-span-4">
-                <div className="rounded-2xl border border-border bg-card p-4 sm:p-6 shadow-xs">
+                <div className="rounded-2xl border border-border bg-card p-4 shadow-xs sm:p-6">
                     <h2 className="mb-4 border-b border-slate-100 pb-3 text-base font-bold">
                         Metadata
                     </h2>

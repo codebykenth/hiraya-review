@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use Closure;
 use ErrorException;
 use Illuminate\Foundation\Http\Middleware\PreventRequestsDuringMaintenance as BaseMiddleware;
+use Illuminate\Http\Request;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class CheckMaintenanceMode extends BaseMiddleware
@@ -22,22 +23,21 @@ class CheckMaintenanceMode extends BaseMiddleware
     /**
      * Handle an incoming request.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
+     * @param  Request  $request
      * @return mixed
      *
-     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+     * @throws HttpException
      */
     public function handle($request, Closure $next)
     {
         // Check if the application is in maintenance mode
         if ($this->app->maintenanceMode()->active()) {
-            
+
             // 1. Allow if user is already authenticated as an Admin
             if ($request->user() && $request->user()->role === 'admin') {
                 return $next($request);
             }
-            
+
             // 2. Allow if they are accessing standard bypass routes
             if ($this->inExceptArray($request)) {
                 return $next($request);
@@ -52,7 +52,7 @@ class CheckMaintenanceMode extends BaseMiddleware
                 }
                 throw $exception;
             }
-            
+
             // 3. Fallback to Laravel's native bypass token logic
             if (isset($data['secret']) && $request->path() === $data['secret']) {
                 return $this->bypassResponse($data['secret']);

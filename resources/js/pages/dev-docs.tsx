@@ -7,7 +7,7 @@ export default function DevDocs() {
             <div className="min-h-screen bg-gray-100 p-5 font-sans leading-relaxed text-gray-800">
                 <div className="mx-auto flex max-w-[1200px] flex-col gap-3 sm:gap-6">
                     <header className="rounded-xl border-t-[6px] border-blue-600 bg-white p-10 text-center shadow-[0_4px_6px_-1px_rgba(0,0,0,0.1)] dark:bg-slate-950">
-                        <h1 className="m-0 mb-4 text-2xl sm:text-4xl font-bold text-gray-900">
+                        <h1 className="m-0 mb-4 text-2xl font-bold text-gray-900 sm:text-4xl">
                             Civil Service Exam Reviewer Blueprint
                         </h1>
                         <div className="flex flex-wrap justify-center gap-3">
@@ -23,8 +23,8 @@ export default function DevDocs() {
                         </div>
                     </header>
 
-                    <section className="rounded-xl bg-white p-4 sm:p-6 lg:p-8 shadow-sm dark:bg-slate-950">
-                        <h2 className="mt-0 mb-4 border-b-2 border-gray-200 pb-3 text-2xl sm:text-4xl font-black tracking-tight text-blue-600 sm:text-5xl dark:text-blue-400">
+                    <section className="rounded-xl bg-white p-4 shadow-sm sm:p-6 lg:p-8 dark:bg-slate-950">
+                        <h2 className="mt-0 mb-4 border-b-2 border-gray-200 pb-3 text-2xl font-black tracking-tight text-blue-600 sm:text-4xl sm:text-5xl dark:text-blue-400">
                             1. Current State Assessment
                         </h2>
                         <div className="my-6 overflow-hidden rounded-lg border border-gray-100 bg-white shadow-[0_1px_3px_rgba(0,0,0,0.1)] dark:bg-slate-950">
@@ -158,8 +158,8 @@ export default function DevDocs() {
                         </div>
                     </section>
 
-                    <section className="rounded-xl bg-white p-4 sm:p-6 lg:p-8 shadow-sm dark:bg-slate-950">
-                        <h2 className="mt-0 mb-4 border-b-2 border-gray-200 pb-3 text-2xl sm:text-4xl font-black tracking-tight text-blue-600 sm:text-5xl dark:text-blue-400">
+                    <section className="rounded-xl bg-white p-4 shadow-sm sm:p-6 lg:p-8 dark:bg-slate-950">
+                        <h2 className="mt-0 mb-4 border-b-2 border-gray-200 pb-3 text-2xl font-black tracking-tight text-blue-600 sm:text-4xl sm:text-5xl dark:text-blue-400">
                             2. Architectural Design Decisions
                         </h2>
                         <ul className="mb-5 list-disc space-y-2 pl-6">
@@ -194,8 +194,8 @@ export default function DevDocs() {
                         </ul>
                     </section>
 
-                    <section className="rounded-xl bg-white p-4 sm:p-6 lg:p-8 shadow-sm dark:bg-slate-950">
-                        <h2 className="mt-0 mb-4 border-b-2 border-gray-200 pb-3 text-2xl sm:text-4xl font-black tracking-tight text-blue-600 sm:text-5xl dark:text-blue-400">
+                    <section className="rounded-xl bg-white p-4 shadow-sm sm:p-6 lg:p-8 dark:bg-slate-950">
+                        <h2 className="mt-0 mb-4 border-b-2 border-gray-200 pb-3 text-2xl font-black tracking-tight text-blue-600 sm:text-4xl sm:text-5xl dark:text-blue-400">
                             3. Database Schema & JSONB Structures
                         </h2>
                         <h3 className="mt-7 mb-3 text-2xl font-black tracking-tight text-gray-700 sm:text-3xl">
@@ -1572,8 +1572,8 @@ export default function DevDocs() {
                         </pre>
                     </section>
 
-                    <section className="rounded-xl bg-white p-4 sm:p-6 lg:p-8 shadow-sm dark:bg-slate-950">
-                        <h2 className="mt-0 mb-4 border-b-2 border-gray-200 pb-3 text-2xl sm:text-4xl font-black tracking-tight text-blue-600 sm:text-5xl dark:text-blue-400">
+                    <section className="rounded-xl bg-white p-4 shadow-sm sm:p-6 lg:p-8 dark:bg-slate-950">
+                        <h2 className="mt-0 mb-4 border-b-2 border-gray-200 pb-3 text-2xl font-black tracking-tight text-blue-600 sm:text-4xl sm:text-5xl dark:text-blue-400">
                             4. Configurations & Relationships
                         </h2>
                         <h3 className="mt-7 mb-3 text-2xl font-black tracking-tight text-gray-700 sm:text-3xl">
@@ -1812,8 +1812,8 @@ export default function DevDocs() {
                         </div>
                     </section>
 
-                    <section className="rounded-xl bg-white p-4 sm:p-6 lg:p-8 shadow-sm dark:bg-slate-950">
-                        <h2 className="mt-0 mb-4 border-b-2 border-gray-200 pb-3 text-2xl sm:text-4xl font-black tracking-tight text-blue-600 sm:text-5xl dark:text-blue-400">
+                    <section className="rounded-xl bg-white p-4 shadow-sm sm:p-6 lg:p-8 dark:bg-slate-950">
+                        <h2 className="mt-0 mb-4 border-b-2 border-gray-200 pb-3 text-2xl font-black tracking-tight text-blue-600 sm:text-4xl sm:text-5xl dark:text-blue-400">
                             5. Backend Architecture
                         </h2>
                         <h3 className="mt-7 mb-3 text-2xl font-black tracking-tight text-gray-700 sm:text-3xl">
@@ -2988,8 +2988,8 @@ export default function DevDocs() {
                         </ul>
                     </section>
 
-                    <section className="rounded-xl bg-white p-4 sm:p-6 lg:p-8 shadow-sm dark:bg-slate-950">
-                        <h2 className="mt-0 mb-4 border-b-2 border-gray-200 pb-3 text-2xl sm:text-4xl font-black tracking-tight text-blue-600 sm:text-5xl dark:text-blue-400">
+                    <section className="rounded-xl bg-white p-4 shadow-sm sm:p-6 lg:p-8 dark:bg-slate-950">
+                        <h2 className="mt-0 mb-4 border-b-2 border-gray-200 pb-3 text-2xl font-black tracking-tight text-blue-600 sm:text-4xl sm:text-5xl dark:text-blue-400">
                             5. Frontend Architecture
                         </h2>
                         <h3 className="mt-7 mb-3 text-2xl font-black tracking-tight text-gray-700 sm:text-3xl">
@@ -3397,8 +3397,8 @@ export default function DevDocs() {
                         </div>
                     </section>
 
-                    <section className="rounded-xl bg-white p-4 sm:p-6 lg:p-8 shadow-sm dark:bg-slate-950">
-                        <h2 className="mt-0 mb-4 border-b-2 border-gray-200 pb-3 text-2xl sm:text-4xl font-black tracking-tight text-blue-600 sm:text-5xl dark:text-blue-400">
+                    <section className="rounded-xl bg-white p-4 shadow-sm sm:p-6 lg:p-8 dark:bg-slate-950">
+                        <h2 className="mt-0 mb-4 border-b-2 border-gray-200 pb-3 text-2xl font-black tracking-tight text-blue-600 sm:text-4xl sm:text-5xl dark:text-blue-400">
                             6. Client-Side Exam State Machine
                         </h2>
 
@@ -3714,8 +3714,8 @@ export default function DevDocs() {
                         </div>
                     </section>
 
-                    <section className="rounded-xl bg-white p-4 sm:p-6 lg:p-8 shadow-sm dark:bg-slate-950">
-                        <h2 className="mt-0 mb-4 border-b-2 border-gray-200 pb-3 text-2xl sm:text-4xl font-black tracking-tight text-blue-600 sm:text-5xl dark:text-blue-400">
+                    <section className="rounded-xl bg-white p-4 shadow-sm sm:p-6 lg:p-8 dark:bg-slate-950">
+                        <h2 className="mt-0 mb-4 border-b-2 border-gray-200 pb-3 text-2xl font-black tracking-tight text-blue-600 sm:text-4xl sm:text-5xl dark:text-blue-400">
                             7. Phase-by-Phase Implementation Plan
                         </h2>
 
@@ -4069,8 +4069,8 @@ export default function DevDocs() {
                         </ul>
                     </section>
 
-                    <section className="rounded-xl bg-white p-4 sm:p-6 lg:p-8 shadow-sm dark:bg-slate-950">
-                        <h2 className="mt-0 mb-4 border-b-2 border-gray-200 pb-3 text-2xl sm:text-4xl font-black tracking-tight text-blue-600 sm:text-5xl dark:text-blue-400">
+                    <section className="rounded-xl bg-white p-4 shadow-sm sm:p-6 lg:p-8 dark:bg-slate-950">
+                        <h2 className="mt-0 mb-4 border-b-2 border-gray-200 pb-3 text-2xl font-black tracking-tight text-blue-600 sm:text-4xl sm:text-5xl dark:text-blue-400">
                             8. Verification Plan
                         </h2>
 

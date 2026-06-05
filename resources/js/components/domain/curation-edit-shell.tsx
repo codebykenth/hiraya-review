@@ -39,7 +39,7 @@ export function CurationEditShell({
             {/* Back Link */}
             <Link
                 href={backUrl}
-                className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 flex w-fit items-center gap-1 text-xs font-black text-foreground transition hover:text-blue-600 focus:outline-none dark:text-blue-400"
+                className="group flex w-fit items-center gap-1 text-xs font-black text-foreground transition transition-all duration-300 hover:text-blue-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95 dark:text-blue-400"
             >
                 <ChevronLeft className="size-4" />
                 {backLabel}
@@ -54,11 +54,11 @@ export function CurationEditShell({
             <div className="max-w-4xl">
                 <form
                     onSubmit={onSaveSubmit}
-                    className="flex flex-col gap-3 sm:gap-6 rounded-2xl border border-border bg-card p-4 sm:p-6 shadow-sm"
+                    className="flex flex-col gap-3 rounded-2xl border border-border bg-card p-4 shadow-sm sm:gap-6 sm:p-6"
                 >
                     <div className="flex items-center justify-between border-b border-border pb-3.5">
                         <span className="flex items-center gap-1.5 text-xs font-black text-foreground uppercase">
-                            <HeaderIcon className="transition-transform group-hover:scale-110 size-4.5 animate-pulse text-blue-600 dark:text-blue-400" />
+                            <HeaderIcon className="size-4.5 animate-pulse text-blue-600 transition-transform group-hover:scale-110 dark:text-blue-400" />
                             {headerTitle}
                         </span>
 

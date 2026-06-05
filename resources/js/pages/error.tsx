@@ -56,7 +56,7 @@ export default function ErrorPage({ status }: ErrorPageProps) {
             <div className="mx-auto w-full max-w-2xl text-center">
                 <div className="mb-8">{icon}</div>
 
-                <h1 className="font-heading text-2xl sm:text-4xl font-black tracking-tight text-slate-900 sm:text-5xl dark:text-white">
+                <h1 className="font-heading text-2xl font-black tracking-tight text-slate-900 sm:text-4xl sm:text-5xl dark:text-white">
                     {title}
                 </h1>
 
@@ -71,7 +71,7 @@ export default function ErrorPage({ status }: ErrorPageProps) {
                                 href="/logout"
                                 method="post"
                                 as="button"
-                                className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 inline-flex w-full items-center justify-center gap-2 rounded-xl border-2 border-rose-200 bg-transparent px-4 sm:px-6 py-3 text-sm font-semibold text-rose-700 transition hover:bg-rose-50 sm:w-auto dark:border-rose-900 dark:text-rose-400 dark:hover:bg-rose-950/50"
+                                className="group inline-flex w-full items-center justify-center gap-2 rounded-xl border-2 border-rose-200 bg-transparent px-4 py-3 text-sm font-semibold text-rose-700 transition transition-all duration-300 hover:bg-rose-50 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95 sm:w-auto sm:px-6 dark:border-rose-900 dark:text-rose-400 dark:hover:bg-rose-950/50"
                             >
                                 Log Out
                             </Link>
@@ -80,7 +80,7 @@ export default function ErrorPage({ status }: ErrorPageProps) {
                         <>
                             <button
                                 onClick={() => window.history.back()}
-                                className="inline-flex w-full items-center justify-center gap-2 rounded-xl border-2 border-slate-200 bg-transparent px-4 sm:px-6 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 sm:w-auto dark:border-slate-800 dark:text-slate-300 dark:hover:bg-slate-800/50"
+                                className="inline-flex w-full items-center justify-center gap-2 rounded-xl border-2 border-slate-200 bg-transparent px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 sm:w-auto sm:px-6 dark:border-slate-800 dark:text-slate-300 dark:hover:bg-slate-800/50"
                             >
                                 <ArrowLeft className="size-4" />
                                 Go Back
@@ -89,7 +89,7 @@ export default function ErrorPage({ status }: ErrorPageProps) {
                             {auth?.user && (
                                 <Link
                                     href="/dashboard"
-                                    className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 sm:px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700 focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2 sm:w-auto"
+                                    className="group inline-flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-3 text-sm font-semibold text-white shadow-sm transition transition-all duration-300 hover:bg-blue-700 focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none active:scale-95 sm:w-auto sm:px-6"
                                 >
                                     <Home className="size-4" />
                                     Back to Home
@@ -107,7 +107,9 @@ export default function ErrorPage({ status }: ErrorPageProps) {
         return (
             <div className="flex min-h-screen flex-col bg-slate-50 dark:bg-[#0a0a0a]">
                 <Head title={title} />
-                <main className="flex-1 flex items-center justify-center">{content}</main>
+                <main className="flex flex-1 items-center justify-center">
+                    {content}
+                </main>
             </div>
         );
     }

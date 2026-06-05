@@ -10,7 +10,7 @@ export default function Section({ children, id, className }: SectionProps) {
     return (
         <section
             className={cn(
-                'container mx-auto px-4 sm:px-6 py-16 md:py-24 lg:py-32',
+                'container mx-auto px-4 py-16 sm:px-6 md:py-24 lg:py-32',
                 className,
             )}
             id={id}

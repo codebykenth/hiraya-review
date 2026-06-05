@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\CheckMaintenanceMode;
 use App\Http\Middleware\CheckUserActive;
 use App\Http\Middleware\CompressResponse;
 use App\Http\Middleware\ConfirmPasswordForNonSocialUsers;
@@ -12,6 +13,7 @@ use App\Http\Middleware\VerifyTurnstile;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Foundation\Http\Middleware\PreventRequestsDuringMaintenance;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets;
 use Illuminate\Http\Request;
@@ -33,14 +35,14 @@ return Application::configure(basePath: dirname(__DIR__))
             'turnstile.verify' => VerifyTurnstile::class,
         ]);
 
-        $middleware->remove(\Illuminate\Foundation\Http\Middleware\PreventRequestsDuringMaintenance::class);
+        $middleware->remove(PreventRequestsDuringMaintenance::class);
 
         $middleware->encryptCookies(except: ['appearance', 'sidebar_state']);
 
         $middleware->web(append: [
             HandleAppearance::class,
             CheckUserActive::class,
-            \App\Http\Middleware\CheckMaintenanceMode::class,
+            CheckMaintenanceMode::class,
             HandleInertiaRequests::class,
             AddLinkHeadersForPreloadedAssets::class,
             VerifyCsrfToken::class,

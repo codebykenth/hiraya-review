@@ -53,7 +53,7 @@ export function ScopeSettingsModal({
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-xs">
             <div className="relative flex h-[600px] w-full max-w-4xl animate-in flex-col overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-2xl duration-200 zoom-in-95 fade-in dark:border-slate-800 dark:bg-slate-900">
                 {/* Modal Header */}
-                <div className="flex items-center justify-between border-b border-slate-100 bg-slate-50/50 px-4 sm:px-6 py-4.5 dark:border-slate-900 dark:bg-slate-900/35">
+                <div className="flex items-center justify-between border-b border-slate-100 bg-slate-50/50 px-4 py-4.5 sm:px-6 dark:border-slate-900 dark:bg-slate-900/35">
                     <div>
                         <h2 className="flex items-center gap-2 text-xl font-black tracking-tight text-slate-900 dark:text-white">
                             <Database className="size-5 text-blue-600 dark:text-blue-400 dark:text-blue-500" />
@@ -67,7 +67,7 @@ export function ScopeSettingsModal({
                     <button
                         type="button"
                         onClick={onClose}
-                        className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 dark:hover:text-slate-250 rounded-lg p-1.5 text-slate-400 transition hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-900"
+                        className="group dark:hover:text-slate-250 rounded-lg p-1.5 text-slate-400 transition transition-all duration-300 hover:bg-slate-100 hover:text-slate-600 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95 dark:hover:bg-slate-900"
                     >
                         <X className="size-5" />
                     </button>
@@ -97,7 +97,7 @@ export function ScopeSettingsModal({
                             />
                             <button
                                 type="submit"
-                                className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 shadow-3xs inline-flex shrink-0 cursor-pointer items-center justify-center rounded-xl bg-blue-600 px-4 text-sm font-bold text-white transition hover:bg-blue-700 active:bg-blue-800"
+                                className="group shadow-3xs inline-flex shrink-0 cursor-pointer items-center justify-center rounded-xl bg-blue-600 px-4 text-sm font-bold text-white transition transition-all duration-300 hover:bg-blue-700 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95 active:bg-blue-800"
                             >
                                 <Plus className="size-4" />
                             </button>
@@ -167,7 +167,7 @@ export function ScopeSettingsModal({
                                     />
                                     <button
                                         type="submit"
-                                        className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 shadow-3xs inline-flex shrink-0 cursor-pointer items-center justify-center rounded-xl bg-blue-600 px-4 text-sm font-bold text-white transition hover:bg-blue-700 active:bg-blue-800"
+                                        className="group shadow-3xs inline-flex shrink-0 cursor-pointer items-center justify-center rounded-xl bg-blue-600 px-4 text-sm font-bold text-white transition transition-all duration-300 hover:bg-blue-700 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95 active:bg-blue-800"
                                     >
                                         <Plus className="size-4" />
                                     </button>

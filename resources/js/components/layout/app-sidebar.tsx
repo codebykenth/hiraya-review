@@ -11,7 +11,6 @@ import {
     Target,
     ListChecks,
     Users,
-    Settings,
     Compass,
     Database,
     Calendar as CalendarIcon,

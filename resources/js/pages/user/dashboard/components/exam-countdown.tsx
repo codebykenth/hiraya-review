@@ -60,7 +60,7 @@ export function ExamCountdown({
 
     if (timeLeft.isExpired) {
         return (
-            <div className="dark:border-rose-900/50/60 dark:bg-rose-950/30/60 relative overflow-hidden rounded-2xl border border-rose-200 bg-rose-50 p-4 sm:p-6 shadow-sm backdrop-blur-xl dark:border-rose-900/40">
+            <div className="dark:border-rose-900/50/60 dark:bg-rose-950/30/60 relative overflow-hidden rounded-2xl border border-rose-200 bg-rose-50 p-4 shadow-sm backdrop-blur-xl sm:p-6 dark:border-rose-900/40">
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <div className="flex items-center gap-4">
                         <div className="dark:border-rose-900/50/50 flex size-12 shrink-0 items-center justify-center rounded-full border border-rose-200 bg-rose-100/50 backdrop-blur-md dark:border-rose-500/30 dark:bg-rose-500/20">
@@ -91,7 +91,7 @@ export function ExamCountdown({
 
     return (
         <div
-            className={`relative overflow-hidden rounded-2xl border p-4 sm:p-6 shadow-sm backdrop-blur-xl transition-all hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/5 ${
+            className={`relative overflow-hidden rounded-2xl border p-4 shadow-sm backdrop-blur-xl transition-all hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/5 sm:p-6 ${
                 isUrgent
                     ? 'dark:border-amber-900/50/60 dark:bg-amber-950/30/60 border-amber-200 bg-amber-50 dark:border-amber-900/40'
                     : 'dark:bg-blue-950/30/40 border-blue-100/60 bg-blue-50 dark:border-slate-800 dark:bg-slate-900/60'

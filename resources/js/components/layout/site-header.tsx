@@ -113,14 +113,17 @@ export default function SiteHeader({
             >
                 <nav className="container mx-auto flex items-center justify-between gap-2 px-4 py-3 lg:px-6 lg:py-4 xl:gap-4">
                     <div className="flex items-center">
-                        <Link href={home()} className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 flex items-center gap-2">
+                        <Link
+                            href={home()}
+                            className="group flex items-center gap-2 transition-all duration-300 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95"
+                        >
                             <AppLogo />
                         </Link>
                     </div>
 
                     {!auth.user && (
                         <div className="hidden xl:block">
-                            <ul className="flex gap-3 sm:gap-6 font-medium">
+                            <ul className="flex gap-3 font-medium sm:gap-6">
                                 {navLinks.map((link) => {
                                     const isLinkActive =
                                         activeNav === link.id ||
@@ -166,7 +169,7 @@ export default function SiteHeader({
                         {auth.user ? (
                             <Link
                                 href={dashboardIndex()}
-                                className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 inline-block rounded-sm border border-[#19140035] px-5 py-1.5 text-sm leading-normal text-[#1b1b18] hover:border-[#1915014a] dark:border-[#3E3E3A] dark:text-[#EDEDEC] dark:hover:border-[#62605b]"
+                                className="group inline-block rounded-sm border border-[#19140035] px-5 py-1.5 text-sm leading-normal text-[#1b1b18] transition-all duration-300 hover:border-[#1915014a] focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95 dark:border-[#3E3E3A] dark:text-[#EDEDEC] dark:hover:border-[#62605b]"
                             >
                                 Dashboard
                             </Link>
@@ -175,7 +178,7 @@ export default function SiteHeader({
                                 <Button variant="ghost" asChild>
                                     <Link
                                         href={login()}
-                                        className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 font-bold text-primary"
+                                        className="group font-bold text-primary transition-all duration-300 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95"
                                     >
                                         Log in
                                     </Link>
@@ -183,7 +186,7 @@ export default function SiteHeader({
                                 <Button asChild>
                                     <Link
                                         href={register()}
-                                        className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 font-bold"
+                                        className="group font-bold transition-all duration-300 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95"
                                     >
                                         Register
                                     </Link>
@@ -216,7 +219,7 @@ export default function SiteHeader({
                             : 'pointer-events-none -translate-y-10 opacity-0'
                     }`}
                 >
-                    <div className="container mx-auto flex flex-col gap-3 sm:gap-6 px-4 sm:px-6 py-4 sm:py-6">
+                    <div className="container mx-auto flex flex-col gap-3 px-4 py-4 sm:gap-6 sm:px-6 sm:py-6">
                         {!auth.user && (
                             <>
                                 <ul className="flex flex-col gap-4 text-base font-semibold">
@@ -276,7 +279,7 @@ export default function SiteHeader({
                                 <>
                                     <Button
                                         variant="ghost"
-                                        className="w-full rounded-xl py-4 sm:py-6 text-base font-bold text-primary"
+                                        className="w-full rounded-xl py-4 text-base font-bold text-primary sm:py-6"
                                         asChild
                                     >
                                         <Link
@@ -287,7 +290,7 @@ export default function SiteHeader({
                                         </Link>
                                     </Button>
                                     <Button
-                                        className="w-full rounded-xl py-4 sm:py-6 text-base font-bold"
+                                        className="w-full rounded-xl py-4 text-base font-bold sm:py-6"
                                         asChild
                                     >
                                         <Link

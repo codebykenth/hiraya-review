@@ -13,7 +13,7 @@ export type Props = {
 
 const EmptyState = () => {
     return (
-        <div className="p-4 sm:p-6 lg:p-8 text-center">
+        <div className="p-4 text-center sm:p-6 lg:p-8">
             <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-muted">
                 <KeyRound className="h-7 w-7 text-muted-foreground" />
             </div>

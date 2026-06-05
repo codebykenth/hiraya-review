@@ -106,7 +106,7 @@ export function LiveExamView({
                                 <TooltipTrigger asChild>
                                     <button
                                         onClick={handleExitExam}
-                                        className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 rounded-lg p-1.5 text-muted-foreground transition hover:bg-accent"
+                                        className="group rounded-lg p-1.5 text-muted-foreground transition transition-all duration-300 hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95"
                                     >
                                         <X className="size-5" />
                                     </button>
@@ -189,7 +189,7 @@ export function LiveExamView({
                     <div className="flex flex-1 flex-col justify-between overflow-y-auto bg-background p-4 sm:p-6 md:p-10">
                         <div className="mx-auto w-full max-w-3xl">
                             {activeQuestion ? (
-                                <div className="flex animate-in flex-col gap-3 sm:gap-6 duration-150 fade-in">
+                                <div className="flex animate-in flex-col gap-3 duration-150 fade-in sm:gap-6">
                                     {/* Question stem container */}
                                     <div className="shadow-3xs relative rounded-2xl border border-border bg-card p-4 sm:p-6">
                                         <div className="mb-4 flex items-center justify-between">
@@ -308,7 +308,7 @@ export function LiveExamView({
                             {isFreeAttempt && currentIdx === 19 ? (
                                 <button
                                     onClick={() => setShowRegisterModal(true)}
-                                    className="shadow-3xs flex items-center gap-1.5 rounded-lg bg-emerald-600 px-4 sm:px-6 py-2.5 text-xs font-bold text-white transition hover:bg-emerald-700 focus:outline-none"
+                                    className="shadow-3xs flex items-center gap-1.5 rounded-lg bg-emerald-600 px-4 py-2.5 text-xs font-bold text-white transition hover:bg-emerald-700 focus:outline-none sm:px-6"
                                 >
                                     <CheckCircle2 className="size-4" />
                                     Finish Preview
@@ -326,7 +326,7 @@ export function LiveExamView({
                             ) : !isFreeAttempt ? (
                                 <button
                                     onClick={() => handleSubmitExam(false)}
-                                    className="flex items-center gap-1.5 rounded-lg bg-emerald-600 px-4 sm:px-6 py-2.5 text-xs font-bold text-white shadow-xs transition hover:bg-emerald-700 focus:outline-none"
+                                    className="flex items-center gap-1.5 rounded-lg bg-emerald-600 px-4 py-2.5 text-xs font-bold text-white shadow-xs transition hover:bg-emerald-700 focus:outline-none sm:px-6"
                                 >
                                     <CheckCircle2 className="size-4" />
                                     Submit Exam
@@ -379,7 +379,7 @@ export function LiveExamView({
                         onClick={() => setShowLockedModal(false)}
                     >
                         <div
-                            className="relative w-full max-w-2xl animate-in rounded-xl border border-slate-200 bg-white p-4 sm:p-6 shadow-xl duration-200 zoom-in-95 dark:border-slate-800 dark:bg-slate-950"
+                            className="relative w-full max-w-2xl animate-in rounded-xl border border-slate-200 bg-white p-4 shadow-xl duration-200 zoom-in-95 sm:p-6 dark:border-slate-800 dark:bg-slate-950"
                             onClick={(e) => e.stopPropagation()}
                         >
                             <div className="mb-1 flex items-center gap-2">
@@ -404,7 +404,7 @@ export function LiveExamView({
                                 <button
                                     type="button"
                                     onClick={handleRegisterFromFreeExam}
-                                    className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 rounded-lg bg-blue-600 px-5 py-2.5 text-xs font-bold text-white transition hover:bg-blue-700 focus:outline-none"
+                                    className="group rounded-lg bg-blue-600 px-5 py-2.5 text-xs font-bold text-white transition transition-all duration-300 hover:bg-blue-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95"
                                 >
                                     Register Now
                                 </button>
@@ -420,7 +420,7 @@ export function LiveExamView({
                         onClick={() => setShowRegisterModal(false)}
                     >
                         <div
-                            className="relative w-full max-w-2xl animate-in rounded-xl border border-slate-200 bg-white p-4 sm:p-6 shadow-xl duration-200 zoom-in-95 dark:border-slate-800 dark:bg-slate-950"
+                            className="relative w-full max-w-2xl animate-in rounded-xl border border-slate-200 bg-white p-4 shadow-xl duration-200 zoom-in-95 sm:p-6 dark:border-slate-800 dark:bg-slate-950"
                             onClick={(e) => e.stopPropagation()}
                         >
                             <div className="mb-1 flex items-center gap-2">
@@ -443,14 +443,14 @@ export function LiveExamView({
                                 <button
                                     type="button"
                                     onClick={handleCancelFreeExam}
-                                    className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 rounded-lg border border-slate-200 px-5 py-2.5 text-xs font-bold text-slate-600 transition hover:bg-slate-50 dark:border-slate-800 dark:text-slate-400 dark:hover:bg-slate-900"
+                                    className="group rounded-lg border border-slate-200 px-5 py-2.5 text-xs font-bold text-slate-600 transition transition-all duration-300 hover:bg-slate-50 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95 dark:border-slate-800 dark:text-slate-400 dark:hover:bg-slate-900"
                                 >
                                     Exit to Home
                                 </button>
                                 <button
                                     type="button"
                                     onClick={handleRegisterFromFreeExam}
-                                    className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-5 py-2.5 text-xs font-bold text-white shadow-sm transition hover:bg-blue-700 focus:outline-none"
+                                    className="group flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-5 py-2.5 text-xs font-bold text-white shadow-sm transition transition-all duration-300 hover:bg-blue-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95"
                                 >
                                     <LogIn className="size-4" />
                                     Register Free Account

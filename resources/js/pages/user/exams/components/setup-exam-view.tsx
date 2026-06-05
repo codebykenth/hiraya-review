@@ -155,7 +155,7 @@ export function SetupExamView({
                     </div>
 
                     {/* Right Panel: Simulation Overview */}
-                    <div className="dark:bg-blue-950/30/30 flex min-h-[380px] flex-col justify-between rounded-xl border border-blue-100/50 bg-blue-50 p-4 sm:p-6 shadow-sm dark:border-blue-950/20 dark:bg-blue-950/10">
+                    <div className="dark:bg-blue-950/30/30 flex min-h-[380px] flex-col justify-between rounded-xl border border-blue-100/50 bg-blue-50 p-4 shadow-sm sm:p-6 dark:border-blue-950/20 dark:bg-blue-950/10">
                         <div>
                             <h2 className="mb-4 border-b border-blue-100/40 pb-2 font-heading text-xl font-black tracking-tight text-slate-900 dark:border-blue-950/20 dark:text-white">
                                 Simulation Overview
@@ -220,7 +220,7 @@ export function SetupExamView({
                             {/* Action CTA Button */}
                             <button
                                 onClick={handleBeginExam}
-                                className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 py-3 text-xs font-semibold text-white shadow-sm transition duration-150 hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none"
+                                className="group flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 py-3 text-xs font-semibold text-white shadow-sm transition transition-all duration-150 duration-300 hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95"
                             >
                                 Begin Exam
                                 <ArrowRight className="size-4" />

@@ -114,7 +114,7 @@ export default function Profile({
                                             <Link
                                                 href={send()}
                                                 as="button"
-                                                className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 text-foreground underline decoration-neutral-300 underline-offset-4 transition-colors duration-300 ease-out hover:decoration-current! dark:decoration-neutral-500"
+                                                className="group text-foreground underline decoration-neutral-300 underline-offset-4 transition-all transition-colors duration-300 ease-out hover:decoration-current! focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95 dark:decoration-neutral-500"
                                             >
                                                 Click here to re-send the
                                                 verification email.

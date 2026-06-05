@@ -1,4 +1,4 @@
-import { X, ShieldAlert } from 'lucide-react';
+import { ShieldAlert } from 'lucide-react';
 import React from 'react';
 import { Button } from '@/components/ui/button';
 
@@ -62,16 +62,12 @@ export function ConfirmModal({
                         <ShieldAlert className={`size-5 ${config.iconColor}`} />
                         <DialogTitle>{title}</DialogTitle>
                     </div>
-                    <DialogDescription className="text-left mt-2.5 whitespace-pre-line">
+                    <DialogDescription className="mt-2.5 text-left whitespace-pre-line">
                         {message}
                     </DialogDescription>
                 </DialogHeader>
                 <DialogFooter className="mt-4 gap-2 sm:gap-2">
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={onClose}
-                    >
+                    <Button variant="outline" size="sm" onClick={onClose}>
                         {cancelLabel}
                     </Button>
                     <Button

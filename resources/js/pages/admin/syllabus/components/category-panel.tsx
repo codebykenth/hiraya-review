@@ -54,7 +54,7 @@ export function CategoryPanel({
                     />
                     <button
                         type="submit"
-                        className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 shadow-3xs inline-flex shrink-0 cursor-pointer items-center justify-center rounded-xl bg-blue-600 px-4 text-sm font-bold text-white transition hover:bg-blue-700 active:bg-blue-800"
+                        className="group shadow-3xs inline-flex shrink-0 cursor-pointer items-center justify-center rounded-xl bg-blue-600 px-4 text-sm font-bold text-white transition transition-all duration-300 hover:bg-blue-700 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95 active:bg-blue-800"
                     >
                         <Plus className="size-4" />
                     </button>
@@ -114,7 +114,7 @@ export function CategoryPanel({
                                 />
                                 <button
                                     type="submit"
-                                    className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 cursor-pointer rounded-lg p-1.5 text-emerald-600 hover:bg-emerald-50 dark:bg-emerald-950/30 dark:text-emerald-400 dark:hover:bg-emerald-950/30"
+                                    className="group cursor-pointer rounded-lg p-1.5 text-emerald-600 transition-all duration-300 hover:bg-emerald-50 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95 dark:bg-emerald-950/30 dark:text-emerald-400 dark:hover:bg-emerald-950/30"
                                 >
                                     <Check className="size-4" />
                                 </button>

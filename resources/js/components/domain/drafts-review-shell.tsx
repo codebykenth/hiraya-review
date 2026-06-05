@@ -187,7 +187,7 @@ export function DraftsReviewShell<T extends BaseDraftItem>({
                 <div>
                     <Link
                         href={backUrl}
-                        className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 flex w-fit cursor-pointer items-center gap-1 text-xs font-black text-foreground transition hover:text-blue-600 focus:outline-none dark:text-blue-400"
+                        className="group flex w-fit cursor-pointer items-center gap-1 text-xs font-black text-foreground transition transition-all duration-300 hover:text-blue-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95 dark:text-blue-400"
                     >
                         <ChevronLeft className="size-4" />
                         {backLabel}
@@ -421,9 +421,9 @@ export function DraftsReviewShell<T extends BaseDraftItem>({
                         </p>
                         <Link
                             href={emptyStateActionUrl}
-                            className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 mt-6 inline-flex cursor-pointer items-center gap-1.5 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-bold text-white shadow-md transition hover:bg-blue-700"
+                            className="group mt-6 inline-flex cursor-pointer items-center gap-1.5 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-bold text-white shadow-md transition transition-all duration-300 hover:bg-blue-700 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95"
                         >
-                            <EmptyStateActionIcon className="transition-transform group-hover:scale-110 size-4" />
+                            <EmptyStateActionIcon className="size-4 transition-transform group-hover:scale-110" />
                             {emptyStateActionLabel}
                         </Link>
                     </div>
@@ -462,7 +462,7 @@ export function DraftsReviewShell<T extends BaseDraftItem>({
 
                         {/* Pagination bar */}
                         {filteredDrafts.length > 0 && (
-                            <div className="mt-4 flex flex-col items-center justify-between gap-3 rounded-b-xl border-t border-border bg-muted px-4 sm:px-6 py-4 sm:flex-row">
+                            <div className="mt-4 flex flex-col items-center justify-between gap-3 rounded-b-xl border-t border-border bg-muted px-4 py-4 sm:flex-row sm:px-6">
                                 <span className="text-xs font-bold text-muted-foreground">
                                     Showing{' '}
                                     <strong className="text-foreground">

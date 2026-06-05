@@ -23,7 +23,7 @@ export default function Footer() {
                     <div className="flex flex-col gap-3 lg:col-span-4">
                         <Link
                             href="/"
-                            className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 flex items-center gap-2 text-base font-black tracking-tight text-foreground transition hover:opacity-90"
+                            className="group flex items-center gap-2 text-base font-black tracking-tight text-foreground transition transition-all duration-300 hover:opacity-90 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95"
                         >
                             <AppLogo />
                         </Link>
@@ -87,7 +87,7 @@ export default function Footer() {
                     <div className="order-1 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 md:order-2">
                         <Link
                             href="/terms"
-                            className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 inline-flex items-center gap-1.5 underline decoration-border underline-offset-4 transition hover:text-foreground hover:decoration-foreground"
+                            className="group inline-flex items-center gap-1.5 underline decoration-border underline-offset-4 transition transition-all duration-300 hover:text-foreground hover:decoration-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95"
                         >
                             <Scale className="size-3.5" />
                             Terms of Service
@@ -95,7 +95,7 @@ export default function Footer() {
 
                         <Link
                             href="/privacy"
-                            className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 inline-flex items-center gap-1.5 underline decoration-border underline-offset-4 transition hover:text-foreground hover:decoration-foreground"
+                            className="group inline-flex items-center gap-1.5 underline decoration-border underline-offset-4 transition transition-all duration-300 hover:text-foreground hover:decoration-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95"
                         >
                             <ShieldCheck className="size-3.5" />
                             Privacy Policy
@@ -103,7 +103,7 @@ export default function Footer() {
 
                         <Link
                             href="/support"
-                            className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 inline-flex items-center gap-1.5 underline decoration-border underline-offset-4 transition hover:text-foreground hover:decoration-foreground"
+                            className="group inline-flex items-center gap-1.5 underline decoration-border underline-offset-4 transition transition-all duration-300 hover:text-foreground hover:decoration-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95"
                         >
                             <Mail className="size-3.5" />
                             Contact Support
@@ -122,7 +122,7 @@ export default function Footer() {
                             href="https://kenthalexisosila.dev"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 inline-flex items-center gap-1 font-bold underline transition hover:text-blue-600 dark:text-blue-400"
+                            className="group inline-flex items-center gap-1 font-bold underline transition transition-all duration-300 hover:text-blue-600 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95 dark:text-blue-400"
                         >
                             Kenth Alexis Osila
                             <ExternalLink className="size-2.5" />

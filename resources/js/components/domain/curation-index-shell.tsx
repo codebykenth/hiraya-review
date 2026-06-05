@@ -240,7 +240,7 @@ export function CurationIndexShell<T>({
             {/* 1. CREATION ACTIONS CARDS */}
             <div className="grid grid-cols-1 gap-3 sm:gap-6 lg:grid-cols-2">
                 {/* AI Generator Card */}
-                <div className="relative flex overflow-hidden rounded-2xl border border-border bg-card p-4 sm:p-6 shadow-xs transition hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/5">
+                <div className="relative flex overflow-hidden rounded-2xl border border-border bg-card p-4 shadow-xs transition hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/5 sm:p-6">
                     <div className="pointer-events-none absolute right-0 bottom-0 opacity-10">
                         <Sparkles className="size-32 text-indigo-300 dark:text-indigo-900" />
                     </div>
@@ -257,7 +257,7 @@ export function CurationIndexShell<T>({
                             </p>
                             <Link
                                 href={aiGenerator.href}
-                                className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 mt-2 block"
+                                className="group mt-2 block transition-all duration-300 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95"
                             >
                                 <Button
                                     type="button"
@@ -272,7 +272,7 @@ export function CurationIndexShell<T>({
                 </div>
 
                 {/* Manual Entry Card */}
-                <div className="relative flex overflow-hidden rounded-2xl border border-border bg-card p-4 sm:p-6 shadow-xs transition hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/5">
+                <div className="relative flex overflow-hidden rounded-2xl border border-border bg-card p-4 shadow-xs transition hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/5 sm:p-6">
                     <div className="pointer-events-none absolute right-0 bottom-0 opacity-5">
                         <FileText className="size-32 text-emerald-300 dark:text-emerald-900" />
                     </div>
@@ -289,7 +289,7 @@ export function CurationIndexShell<T>({
                             </p>
                             <Link
                                 href={manualEntry.href}
-                                className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 mt-2 block"
+                                className="group mt-2 block transition-all duration-300 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95"
                             >
                                 <Button
                                     type="button"
@@ -457,7 +457,7 @@ export function CurationIndexShell<T>({
                     bulkActionRender={
                         onBulkDeleteConfirm
                             ? (selected) => (
-                                  <div className="flex items-center justify-between border-b border-border bg-blue-50/50 px-4 sm:px-6 py-2 dark:bg-blue-950/10">
+                                  <div className="flex items-center justify-between border-b border-border bg-blue-50/50 px-4 py-2 sm:px-6 dark:bg-blue-950/10">
                                       <span className="text-xs font-bold text-blue-700 dark:text-blue-400">
                                           {selected.length} selected
                                       </span>

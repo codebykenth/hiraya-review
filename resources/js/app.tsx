@@ -38,7 +38,9 @@ router.on('httpException', (event) => {
 
     // 503 is handled via the full-page Error component
     // 429 is handled via TrafficOverloadGuard
-    if (status === 503 || status === 429) return;
+    if (status === 503 || status === 429) {
+        return;
+    }
 
     // Non-200, non-validation responses (403, 500, etc)
     toast.error(`Unexpected Error (${status})`, {

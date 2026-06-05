@@ -30,7 +30,7 @@ export default function SocialConsentModal({
                 role="dialog"
                 aria-modal="true"
                 aria-labelledby="consent-modal-title"
-                className="relative w-full max-w-2xl rounded-2xl border border-slate-200 bg-white p-4 sm:p-6 shadow-2xl dark:border-slate-800 dark:bg-slate-950"
+                className="relative w-full max-w-2xl rounded-2xl border border-slate-200 bg-white p-4 shadow-2xl sm:p-6 dark:border-slate-800 dark:bg-slate-950"
             >
                 <h2
                     id="consent-modal-title"

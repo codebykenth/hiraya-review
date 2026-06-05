@@ -102,7 +102,7 @@ export function ReviewExamView({
                     <div className="flex flex-1 flex-col justify-between overflow-y-auto bg-background p-4 sm:p-6 md:p-10">
                         <div className="mx-auto w-full max-w-3xl">
                             {currentQuestion ? (
-                                <div className="flex animate-in flex-col gap-3 sm:gap-6 duration-150 fade-in">
+                                <div className="flex animate-in flex-col gap-3 duration-150 fade-in sm:gap-6">
                                     {/* Question stem container */}
                                     <div className="shadow-3xs relative rounded-2xl border border-border bg-card p-4 sm:p-6">
                                         <div className="mb-4 flex flex-wrap items-center justify-between gap-2">

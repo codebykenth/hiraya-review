@@ -148,7 +148,7 @@ export default function Login({
                                     window.location.href = '/auth/google';
                                 }}
                             >
-                                <GoogleIcon className="transition-transform group-hover:scale-110 mr-2 h-4 w-4" />
+                                <GoogleIcon className="mr-2 h-4 w-4 transition-transform group-hover:scale-110" />
                                 Google
                             </Button>
                             <Button
@@ -159,7 +159,7 @@ export default function Login({
                                     window.location.href = '/auth/facebook';
                                 }}
                             >
-                                <FacebookIcon className="transition-transform group-hover:scale-110 mr-2 h-4 w-4 text-blue-600 dark:text-blue-400" />
+                                <FacebookIcon className="mr-2 h-4 w-4 text-blue-600 transition-transform group-hover:scale-110 dark:text-blue-400" />
                                 Facebook
                             </Button>
                         </div>

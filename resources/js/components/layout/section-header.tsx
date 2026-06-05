@@ -21,7 +21,7 @@ export default function SectionHeader({
         <div
             className={`mb-16 flex w-full flex-col gap-3 ${alignmentClasses[align]} ${className}`}
         >
-            <h2 className="font-heading text-xl sm:text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+            <h2 className="font-heading text-xl font-extrabold tracking-tight text-slate-900 sm:text-3xl dark:text-white">
                 {title}
             </h2>
             {subtitle && (

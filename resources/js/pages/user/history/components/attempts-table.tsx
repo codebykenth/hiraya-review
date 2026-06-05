@@ -70,7 +70,7 @@ export function AttemptsTable({
             </div>
 
             {selectedIds.length > 0 && (
-                <div className="flex items-center justify-between border-b border-border bg-blue-50/50 px-4 sm:px-6 py-2 dark:bg-blue-950/10">
+                <div className="flex items-center justify-between border-b border-border bg-blue-50/50 px-4 py-2 sm:px-6 dark:bg-blue-950/10">
                     <span className="text-xs font-bold text-blue-700 dark:text-blue-400">
                         {selectedIds.length} selected
                     </span>
@@ -90,7 +90,7 @@ export function AttemptsTable({
                 <table className="w-full border-collapse text-left">
                     <thead>
                         <tr className="border-b border-border bg-slate-50/50 text-[10px] font-black tracking-wider text-muted-foreground uppercase dark:bg-slate-900/30">
-                            <th className="w-12 px-4 sm:px-6 py-4">
+                            <th className="w-12 px-4 py-4 sm:px-6">
                                 <Checkbox
                                     checked={
                                         attempts.length > 0 &&
@@ -102,13 +102,15 @@ export function AttemptsTable({
                                     aria-label="Select all"
                                 />
                             </th>
-                            <th className="px-4 sm:px-6 py-4">Date & Time</th>
-                            <th className="px-4 sm:px-6 py-4">Track</th>
-                            <th className="px-4 sm:px-6 py-4">Category</th>
-                            <th className="px-4 sm:px-6 py-4">Score & Categories</th>
-                            <th className="px-4 sm:px-6 py-4">Status</th>
-                            <th className="px-4 sm:px-6 py-4">Duration</th>
-                            <th className="px-4 sm:px-6 py-4 pr-8 text-right">
+                            <th className="px-4 py-4 sm:px-6">Date & Time</th>
+                            <th className="px-4 py-4 sm:px-6">Track</th>
+                            <th className="px-4 py-4 sm:px-6">Category</th>
+                            <th className="px-4 py-4 sm:px-6">
+                                Score & Categories
+                            </th>
+                            <th className="px-4 py-4 sm:px-6">Status</th>
+                            <th className="px-4 py-4 sm:px-6">Duration</th>
+                            <th className="px-4 py-4 pr-8 text-right sm:px-6">
                                 Actions
                             </th>
                         </tr>
@@ -118,7 +120,7 @@ export function AttemptsTable({
                             <tr>
                                 <td
                                     colSpan={8}
-                                    className="px-4 sm:px-6 py-20 text-center"
+                                    className="px-4 py-20 text-center sm:px-6"
                                 >
                                     <div className="mx-auto flex max-w-2xl flex-col items-center justify-center">
                                         <div className="text-blue-650 mb-4 flex size-14 items-center justify-center rounded-full bg-blue-50 dark:bg-blue-950/20 dark:text-blue-400">
@@ -135,7 +137,7 @@ export function AttemptsTable({
                                         </p>
                                         <Link
                                             href="/exams"
-                                            className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 mt-5 inline-flex items-center gap-1.5 rounded-lg bg-blue-600 px-4 py-2 text-xs font-bold text-white shadow-xs transition hover:bg-blue-700"
+                                            className="group mt-5 inline-flex items-center gap-1.5 rounded-lg bg-blue-600 px-4 py-2 text-xs font-bold text-white shadow-xs transition transition-all duration-300 hover:bg-blue-700 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95"
                                         >
                                             Start New Test
                                         </Link>
@@ -150,7 +152,7 @@ export function AttemptsTable({
                                         className={`transition hover:bg-slate-50/20 dark:hover:bg-slate-900/10 ${selectedIds.includes(att.id) ? 'bg-blue-50/30 dark:bg-blue-950/20' : ''}`}
                                     >
                                         {/* CHECKBOX */}
-                                        <td className="px-4 sm:px-6 py-4.5">
+                                        <td className="px-4 py-4.5 sm:px-6">
                                             <Checkbox
                                                 checked={selectedIds.includes(
                                                     att.id,
@@ -166,7 +168,7 @@ export function AttemptsTable({
                                         </td>
 
                                         {/* DATE & TIME */}
-                                        <td className="px-4 sm:px-6 py-4.5 whitespace-nowrap">
+                                        <td className="px-4 py-4.5 whitespace-nowrap sm:px-6">
                                             <div className="text-xs leading-normal font-black text-foreground">
                                                 {att.date}
                                             </div>
@@ -176,12 +178,12 @@ export function AttemptsTable({
                                         </td>
 
                                         {/* TRACK */}
-                                        <td className="px-4 sm:px-6 py-4.5 whitespace-nowrap">
+                                        <td className="px-4 py-4.5 whitespace-nowrap sm:px-6">
                                             <TrackBadge track={att.track} />
                                         </td>
 
                                         {/* CATEGORY */}
-                                        <td className="px-4 sm:px-6 py-4.5">
+                                        <td className="px-4 py-4.5 sm:px-6">
                                             <span
                                                 className="block max-w-[280px] text-xs leading-relaxed font-extrabold break-words whitespace-normal text-foreground"
                                                 title={att.category}
@@ -191,7 +193,7 @@ export function AttemptsTable({
                                         </td>
 
                                         {/* SCORE */}
-                                        <td className="px-4 sm:px-6 py-4.5">
+                                        <td className="px-4 py-4.5 sm:px-6">
                                             <ScoreProgress
                                                 score={att.score}
                                                 status={att.status}
@@ -202,25 +204,25 @@ export function AttemptsTable({
                                         </td>
 
                                         {/* STATUS */}
-                                        <td className="px-4 sm:px-6 py-4.5 whitespace-nowrap">
+                                        <td className="px-4 py-4.5 whitespace-nowrap sm:px-6">
                                             <StatusBadge status={att.status} />
                                         </td>
 
                                         {/* DURATION */}
-                                        <td className="px-4 sm:px-6 py-4.5 whitespace-nowrap">
+                                        <td className="px-4 py-4.5 whitespace-nowrap sm:px-6">
                                             <span className="text-xs font-bold text-muted-foreground">
                                                 {att.duration}
                                             </span>
                                         </td>
 
                                         {/* ACTIONS */}
-                                        <td className="px-4 sm:px-6 py-4.5 pr-8 text-right whitespace-nowrap">
+                                        <td className="px-4 py-4.5 pr-8 text-right whitespace-nowrap sm:px-6">
                                             <div className="flex items-center justify-end gap-2">
                                                 <Tooltip>
                                                     <TooltipTrigger asChild>
                                                         <Link
                                                             href={`/exams?attempt_id=${att.id}`}
-                                                            className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 flex size-8 cursor-pointer items-center justify-center rounded-lg border border-blue-200 bg-blue-50 text-blue-700 shadow-2xs transition hover:bg-blue-100 hover:text-blue-800 focus:outline-none dark:border-blue-900/30 dark:border-blue-900/50 dark:bg-blue-950/20 dark:bg-blue-950/30 dark:text-blue-400 dark:hover:bg-blue-900/30 dark:hover:text-blue-300"
+                                                            className="group flex size-8 cursor-pointer items-center justify-center rounded-lg border border-blue-200 bg-blue-50 text-blue-700 shadow-2xs transition transition-all duration-300 hover:bg-blue-100 hover:text-blue-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95 dark:border-blue-900/30 dark:border-blue-900/50 dark:bg-blue-950/20 dark:bg-blue-950/30 dark:text-blue-400 dark:hover:bg-blue-900/30 dark:hover:text-blue-300"
                                                         >
                                                             <BookOpen className="size-3.5" />
                                                             <span className="sr-only">
@@ -274,7 +276,7 @@ export function AttemptsTable({
 
             {/* 4. FOOTER PAGINATION CONTROL */}
             {pagination.total > 0 && (
-                <div className="flex flex-col items-center justify-between gap-3 border-t border-border px-4 sm:px-6 py-4 sm:flex-row">
+                <div className="flex flex-col items-center justify-between gap-3 border-t border-border px-4 py-4 sm:flex-row sm:px-6">
                     <span className="text-xs font-bold text-muted-foreground">
                         Showing{' '}
                         <strong className="text-foreground">

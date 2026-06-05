@@ -100,7 +100,7 @@ export default function QuestionsIndex({
                             <TooltipTrigger asChild>
                                 <Link
                                     href={questionsShow(q.id).url}
-                                    className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 cursor-pointer rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted hover:text-blue-600 dark:text-blue-400"
+                                    className="group cursor-pointer rounded-lg p-1.5 text-muted-foreground transition transition-all duration-300 hover:bg-muted hover:text-blue-600 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95 dark:text-blue-400"
                                 >
                                     <Eye className="size-4" />
                                 </Link>
@@ -112,7 +112,7 @@ export default function QuestionsIndex({
                             <TooltipTrigger asChild>
                                 <Link
                                     href={questionsEdit(q.id).url}
-                                    className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 cursor-pointer rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted hover:text-blue-600 dark:text-blue-400"
+                                    className="group cursor-pointer rounded-lg p-1.5 text-muted-foreground transition transition-all duration-300 hover:bg-muted hover:text-blue-600 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95 dark:text-blue-400"
                                 >
                                     <Edit2 className="size-4" />
                                 </Link>

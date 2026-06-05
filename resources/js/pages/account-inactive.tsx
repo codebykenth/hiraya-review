@@ -25,8 +25,8 @@ export default function AccountInactive({ adminEmail }: AccountInactiveProps) {
             <Head title="Account Inactive" />
             <div className="flex min-h-[90vh] items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 px-4 py-4 sm:py-8">
                 <div className="w-full max-w-2xl">
-                    <div className="rounded-lg border border-slate-200 bg-white p-4 sm:p-6 lg:p-8 shadow-lg dark:bg-slate-950">
-                        <h1 className="mb-2 text-center text-2xl sm:text-4xl font-black tracking-tight text-slate-900 sm:text-5xl">
+                    <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-lg sm:p-6 lg:p-8 dark:bg-slate-950">
+                        <h1 className="mb-2 text-center text-2xl font-black tracking-tight text-slate-900 sm:text-4xl sm:text-5xl">
                             Account Inactive
                         </h1>
                         <p className="mb-6 text-center text-slate-600">
@@ -63,7 +63,7 @@ export default function AccountInactive({ adminEmail }: AccountInactiveProps) {
                                 <div className="space-y-3">
                                     <a
                                         href={`mailto:${adminEmail}`}
-                                        className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 inline-flex items-center gap-2 rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+                                        className="group inline-flex items-center gap-2 rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-all transition-colors duration-300 hover:bg-blue-700 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95"
                                     >
                                         <Mail className="h-4 w-4" />
                                         {adminEmail}

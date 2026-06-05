@@ -132,7 +132,7 @@ export default function Calendar() {
                     <ExamCountdown nextExam={calendarNextExam} />
                 </div>
 
-                <Card className="border-border bg-white p-4 sm:p-6 shadow-sm sm:p-6 dark:bg-slate-900">
+                <Card className="border-border bg-white p-4 shadow-sm sm:p-6 dark:bg-slate-900">
                     {/* Header with navigation */}
                     <div className="mb-6 flex flex-col justify-between gap-4 md:flex-row md:items-center">
                         <div className="flex items-center gap-4">

@@ -76,7 +76,7 @@ export function AIGeneratorPanel({
         <div className="grid grid-cols-1 items-start gap-3 sm:gap-6 lg:grid-cols-12">
             {/* Config panel (7/12 cols) */}
             <div className="flex flex-col gap-3 sm:gap-6 lg:col-span-7">
-                <div className="relative overflow-hidden rounded-2xl border border-border bg-card p-4 sm:p-6 shadow-xs">
+                <div className="relative overflow-hidden rounded-2xl border border-border bg-card p-4 shadow-xs sm:p-6">
                     <div className="pointer-events-none absolute top-0 right-0 -mt-16 -mr-16 h-44 w-44 rounded-full bg-blue-500/5 blur-3xl" />
 
                     <div className="mb-4 flex items-center justify-between border-b border-border pb-4">
@@ -269,7 +269,7 @@ export function AIGeneratorPanel({
                                     <DialogTrigger asChild>
                                         <button
                                             type="button"
-                                            className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 inline-flex cursor-pointer items-center gap-1 text-[10px] font-bold tracking-wider text-blue-500 uppercase underline transition-colors hover:text-blue-700"
+                                            className="group inline-flex cursor-pointer items-center gap-1 text-[10px] font-bold tracking-wider text-blue-500 uppercase underline transition-all transition-colors duration-300 hover:text-blue-700 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95"
                                         >
                                             <HelpCircle className="size-3" />
                                             Which model to use?
@@ -779,7 +779,7 @@ export function AIGeneratorPanel({
                                     </span>
                                     <Link
                                         href={questionsDrafts().url}
-                                        className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 mt-1 inline-flex items-center gap-1 font-extrabold text-emerald-700 underline transition hover:text-emerald-900"
+                                        className="group mt-1 inline-flex items-center gap-1 font-extrabold text-emerald-700 underline transition transition-all duration-300 hover:text-emerald-900 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95"
                                     >
                                         Go to Drafts Review &rarr;
                                     </Link>
@@ -838,7 +838,7 @@ export function AIGeneratorPanel({
 
             {/* Informational Column (5/12 cols) */}
             <div className="flex flex-col gap-3 sm:gap-6 lg:col-span-5">
-                <div className="border-slate-250 relative overflow-hidden rounded-2xl border bg-gradient-to-br from-blue-950 to-slate-900 p-4 sm:p-6 text-white shadow-md">
+                <div className="border-slate-250 relative overflow-hidden rounded-2xl border bg-gradient-to-br from-blue-950 to-slate-900 p-4 text-white shadow-md sm:p-6">
                     <div className="pointer-events-none absolute -top-12 -right-12 h-48 w-48 rounded-full bg-blue-600/10 blur-2xl" />
                     <div className="pointer-events-none absolute -bottom-16 -left-16 h-56 w-56 rounded-full bg-emerald-600/5 blur-3xl" />
 

@@ -106,7 +106,7 @@ export default function AdminLearnIndex({
                             <TooltipTrigger asChild>
                                 <Link
                                     href={learnShow(mod.slug).url}
-                                    className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted hover:text-foreground"
+                                    className="group rounded-lg p-1.5 text-muted-foreground transition transition-all duration-300 hover:bg-muted hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95"
                                 >
                                     <Eye className="size-4" />
                                 </Link>
@@ -118,7 +118,7 @@ export default function AdminLearnIndex({
                             <TooltipTrigger asChild>
                                 <Link
                                     href={adminLearnEdit(mod.id).url}
-                                    className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted hover:text-blue-600 dark:text-blue-400"
+                                    className="group rounded-lg p-1.5 text-muted-foreground transition transition-all duration-300 hover:bg-muted hover:text-blue-600 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95 dark:text-blue-400"
                                 >
                                     <Edit2 className="size-4" />
                                 </Link>

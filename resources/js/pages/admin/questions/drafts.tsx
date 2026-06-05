@@ -335,7 +335,7 @@ export default function DraftsQuestionList({
                 renderItem={(q) => (
                     <div
                         key={q.id}
-                        className={`rounded-2xl border bg-card p-4 sm:p-6 shadow-xs transition duration-205 ${
+                        className={`rounded-2xl border bg-card p-4 shadow-xs transition duration-205 sm:p-6 ${
                             q.approved
                                 ? 'border-emerald-250 ring-1 shadow-emerald-50/10 ring-emerald-500/10 dark:border-emerald-800'
                                 : 'hover:border-slate-350 border-border dark:hover:border-slate-700'

@@ -67,7 +67,7 @@ export default function AcceptTermsModal({ isOpen }: Props) {
                                     your account.{' '}
                                     <Link
                                         href="/terms"
-                                        className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 text-blue-600 underline dark:text-blue-400"
+                                        className="group text-blue-600 underline transition-all duration-300 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95 dark:text-blue-400"
                                     >
                                         Read full terms of service →
                                     </Link>
@@ -86,7 +86,7 @@ export default function AcceptTermsModal({ isOpen }: Props) {
                                     consent.{' '}
                                     <Link
                                         href="/privacy"
-                                        className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 text-blue-600 underline dark:text-blue-400"
+                                        className="group text-blue-600 underline transition-all duration-300 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95 dark:text-blue-400"
                                     >
                                         Read full privacy policy →
                                     </Link>

@@ -13,6 +13,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Schema;
 use Inertia\Inertia;
 
@@ -251,7 +252,7 @@ class StudyScheduleController
 
     public function destroy(StudySchedule $studySchedule)
     {
-        \Illuminate\Support\Facades\Gate::allowIf(fn ($user) => $user->id === $studySchedule->user_id);
+        Gate::allowIf(fn ($user) => $user->id === $studySchedule->user_id);
 
         $studySchedule->delete();
 

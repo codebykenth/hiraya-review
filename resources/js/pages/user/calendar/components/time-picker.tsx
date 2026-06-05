@@ -188,7 +188,7 @@ export function TimePicker({ value, onChange }: TimePickerProps) {
                             <button
                                 type="button"
                                 onClick={incrementHour}
-                                className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 rounded p-1 hover:bg-slate-100 dark:hover:bg-slate-900"
+                                className="group rounded p-1 transition-all duration-300 hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95 dark:hover:bg-slate-900"
                             >
                                 <ChevronUp className="h-5 w-5 text-slate-600 dark:text-slate-400" />
                             </button>
@@ -205,13 +205,13 @@ export function TimePicker({ value, onChange }: TimePickerProps) {
                             <button
                                 type="button"
                                 onClick={decrementHour}
-                                className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 rounded p-1 hover:bg-slate-100 dark:hover:bg-slate-900"
+                                className="group rounded p-1 transition-all duration-300 hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95 dark:hover:bg-slate-900"
                             >
                                 <ChevronDown className="h-5 w-5 text-slate-600 dark:text-slate-400" />
                             </button>
                         </div>
 
-                        <div className="text-xl sm:text-3xl font-black tracking-tight text-slate-600 sm:text-4xl dark:text-slate-400">
+                        <div className="text-xl font-black tracking-tight text-slate-600 sm:text-3xl sm:text-4xl dark:text-slate-400">
                             :
                         </div>
 
@@ -220,7 +220,7 @@ export function TimePicker({ value, onChange }: TimePickerProps) {
                             <button
                                 type="button"
                                 onClick={incrementMinute}
-                                className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 rounded p-1 hover:bg-slate-100 dark:hover:bg-slate-900"
+                                className="group rounded p-1 transition-all duration-300 hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95 dark:hover:bg-slate-900"
                             >
                                 <ChevronUp className="h-5 w-5 text-slate-600 dark:text-slate-400" />
                             </button>
@@ -237,7 +237,7 @@ export function TimePicker({ value, onChange }: TimePickerProps) {
                             <button
                                 type="button"
                                 onClick={decrementMinute}
-                                className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 rounded p-1 hover:bg-slate-100 dark:hover:bg-slate-900"
+                                className="group rounded p-1 transition-all duration-300 hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95 dark:hover:bg-slate-900"
                             >
                                 <ChevronDown className="h-5 w-5 text-slate-600 dark:text-slate-400" />
                             </button>

@@ -117,7 +117,7 @@ export default function AiReadinessCard({ aiAnalysis }: AiReadinessCardProps) {
                     <div>
                         <Link
                             href="/analytics/ai-analysis?retry=1"
-                            className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 inline-flex items-center gap-1 rounded-lg bg-blue-600 px-3 py-1 text-xs font-extrabold text-white transition hover:bg-blue-700"
+                            className="group inline-flex items-center gap-1 rounded-lg bg-blue-600 px-3 py-1 text-xs font-extrabold text-white transition transition-all duration-300 hover:bg-blue-700 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95"
                         >
                             Retry &rarr;
                         </Link>
@@ -163,7 +163,7 @@ export default function AiReadinessCard({ aiAnalysis }: AiReadinessCardProps) {
                 {/* Background decorative glows */}
                 <div className="pointer-events-none absolute -top-24 -right-24 h-48 w-48 rounded-full bg-blue-500/5 blur-3xl dark:bg-blue-500/10" />
 
-                <div className="flex flex-col items-center justify-center gap-4 py-4 sm:py-8 text-center">
+                <div className="flex flex-col items-center justify-center gap-4 py-4 text-center sm:py-8">
                     <div className="relative flex items-center justify-center">
                         <div className="absolute size-16 animate-ping rounded-full border border-blue-200 dark:border-blue-500/20 dark:border-blue-900/50" />
                         <div className="flex size-14 items-center justify-center rounded-full border border-blue-200 bg-blue-50 text-blue-600 dark:border-blue-500/30 dark:border-blue-900/50 dark:bg-blue-500/10 dark:bg-blue-950/30 dark:text-blue-400">
@@ -257,14 +257,14 @@ export default function AiReadinessCard({ aiAnalysis }: AiReadinessCardProps) {
                         <div
                             className={`flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-bold ${trendColor}`}
                         >
-                            <TrendIcon className="transition-transform group-hover:scale-110 size-3.5" />
+                            <TrendIcon className="size-3.5 transition-transform group-hover:scale-110" />
                             {trendLabel}
                         </div>
 
                         {/* Full Report Link */}
                         <Link
                             href="/analytics/ai-analysis"
-                            className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 inline-flex items-center gap-1 rounded-lg bg-blue-600 px-3 py-1 text-xs font-extrabold text-white transition hover:bg-blue-700"
+                            className="group inline-flex items-center gap-1 rounded-lg bg-blue-600 px-3 py-1 text-xs font-extrabold text-white transition transition-all duration-300 hover:bg-blue-700 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95"
                         >
                             Full Report &rarr;
                         </Link>
@@ -427,7 +427,7 @@ export default function AiReadinessCard({ aiAnalysis }: AiReadinessCardProps) {
                                         <Link
                                             key={module}
                                             href={`/learn?search=${encodeURIComponent(module)}`}
-                                            className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-xs font-bold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900 dark:border-slate-700 dark:bg-slate-800/80 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:text-white"
+                                            className="group inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-xs font-bold text-slate-700 transition transition-all duration-300 hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95 dark:border-slate-700 dark:bg-slate-800/80 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:text-white"
                                         >
                                             {module}
                                             <ChevronRight className="size-3" />

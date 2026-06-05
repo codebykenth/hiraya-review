@@ -52,6 +52,7 @@ Route::middleware('throttle:global-views')->group(function () {
     Route::get('clear-cache-temp-route', function () {
         Artisan::call('cache:clear');
         Artisan::call('optimize:clear');
+
         return response()->json(['status' => 'success', 'message' => 'Caches cleared!']);
     });
 });
@@ -76,12 +77,12 @@ Route::inertia('dev-docs', 'dev-docs')
     ->middleware(['auth', 'verified', 'can:access-dev-docs']);
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    
+
     // --- USER DASHBOARD & ANALYTICS ---
     Route::middleware('throttle:global-views')->group(function () {
         Route::get('dashboard', [UserDashboardController::class, 'index'])->name('dashboard.index');
         Route::get('drills', [DrillController::class, 'index'])->name('drills.index');
-        
+
         Route::controller(AnalyticsController::class)->prefix('analytics')->name('analytics.')->group(function () {
             Route::get('/', 'index')->name('index');
             Route::get('ai-analysis', 'aiAnalysisReport')->name('ai-analysis');
@@ -129,16 +130,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // ADMINISTRATOR ROUTES
     // ============================================================================
     Route::middleware('admin')->group(function () {
-        
+
         // --- ADMIN READ-ONLY VIEWS ---
         Route::middleware('throttle:global-views')->prefix('admin')->name('admin.')->group(function () {
             Route::get('dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
             Route::get('syllabus', [SyllabusController::class, 'index'])->name('syllabus.index');
-            
+
             Route::controller(UserController::class)->prefix('users')->name('users.')->group(function () {
                 Route::get('/', 'index')->name('index');
             });
-            
+
             Route::controller(ExamDateController::class)->prefix('exam-dates')->name('exam-dates.')->group(function () {
                 Route::get('/', 'index')->name('index');
             });
@@ -166,7 +167,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         // --- ADMIN MUTATIONS ---
         Route::middleware('throttle:global-mutations')->group(function () {
-            
+
             // Admin System Mutations
             Route::controller(SystemController::class)->prefix('admin/system')->name('admin.system.')->group(function () {
                 Route::post('clear-cache', 'clearCache')->name('clear-cache');
@@ -204,7 +205,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
                 Route::post('questions/categories', 'storeCategory')->name('questions.categories.store');
                 Route::put('questions/categories/{category}', 'updateCategory')->name('questions.categories.update');
                 Route::delete('questions/categories/{category}', 'destroyCategory')->name('questions.categories.destroy');
-                
+
                 Route::post('questions/subcategories', 'storeSubcategory')->name('questions.subcategories.store');
                 Route::put('questions/subcategories/{subcategory}', 'updateSubcategory')->name('questions.subcategories.update');
                 Route::delete('questions/subcategories/{subcategory}', 'destroySubcategory')->name('questions.subcategories.destroy');

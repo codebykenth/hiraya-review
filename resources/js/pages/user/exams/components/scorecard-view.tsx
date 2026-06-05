@@ -52,7 +52,7 @@ export function ScorecardView({
             {savedAttempt && (
                 <Link
                     href="/history"
-                    className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 mb-4 flex w-fit cursor-pointer items-center gap-1 text-xs font-black text-slate-800 transition hover:text-blue-600 focus:outline-none dark:text-blue-400 dark:text-white dark:hover:text-blue-400"
+                    className="group mb-4 flex w-fit cursor-pointer items-center gap-1 text-xs font-black text-slate-800 transition transition-all duration-300 hover:text-blue-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95 dark:text-blue-400 dark:text-white dark:hover:text-blue-400"
                 >
                     <ChevronLeft className="size-4" /> Back to History
                 </Link>
@@ -63,7 +63,7 @@ export function ScorecardView({
                     <span className="inline-flex items-center gap-1 rounded-full bg-blue-50 px-2.5 py-0.5 text-xs font-bold text-blue-600 dark:bg-blue-950/30 dark:bg-blue-950/40 dark:text-blue-400">
                         <Award className="size-3" /> Review Panel
                     </span>
-                    <h1 className="mt-1 font-heading text-xl sm:text-3xl font-black tracking-tight text-slate-900 sm:text-4xl md:text-3xl dark:text-white">
+                    <h1 className="mt-1 font-heading text-xl font-black tracking-tight text-slate-900 sm:text-3xl sm:text-4xl md:text-3xl dark:text-white">
                         {isDrillSession ? 'Drill Results' : 'Exam Results'}
                     </h1>
                     <p className="mt-0.5 text-sm leading-relaxed text-slate-500">

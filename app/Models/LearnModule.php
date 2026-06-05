@@ -24,8 +24,6 @@ class LearnModule extends Model
         });
     }
 
-
-
     /**
      * Get the attributes that should be cast.
      *
