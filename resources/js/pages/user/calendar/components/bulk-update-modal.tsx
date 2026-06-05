@@ -1,4 +1,4 @@
-import { Clock } from 'lucide-react';
+﻿import { Clock } from 'lucide-react';
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import {
@@ -48,7 +48,7 @@ export function BulkUpdateModal({
                         <Clock className="h-5 w-5 text-blue-600" />
                         Bulk Update Study Time
                     </DialogTitle>
-                    <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                    <p className="mt-1 text-sm leading-relaxed text-slate-500 dark:text-slate-400">
                         Batch update the scheduled study times of multiple
                         sessions at once.
                     </p>

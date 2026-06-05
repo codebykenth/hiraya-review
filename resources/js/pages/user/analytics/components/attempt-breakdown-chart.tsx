@@ -1,4 +1,4 @@
-import { Layers } from 'lucide-react';
+﻿import { Layers } from 'lucide-react';
 import React from 'react';
 import {
     BarChart,
@@ -39,7 +39,7 @@ export function AttemptBreakdownChart({ data }: AttemptBreakdownChartProps) {
                     <h3 className="text-lg font-black tracking-tight text-slate-900 dark:text-white">
                         Run Composition
                     </h3>
-                    <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">
+                    <p className="text-sm leading-relaxed font-semibold text-slate-500 dark:text-slate-400">
                         Category score contribution per attempt
                     </p>
                 </div>

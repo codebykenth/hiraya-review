@@ -259,7 +259,7 @@ export function UserDetailModal({
                             <h3 className="font-heading text-xl font-black tracking-tight text-slate-900 dark:text-white">
                                 User Details
                             </h3>
-                            <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                            <p className="mt-1 text-sm leading-relaxed text-slate-500 dark:text-slate-400">
                                 Complete profile information for {user.name}
                             </p>
                         </div>
@@ -317,7 +317,7 @@ export function UserDetailModal({
                                 <label className="text-[10px] font-bold text-slate-500 uppercase dark:text-slate-400">
                                     Full Name
                                 </label>
-                                <p className="mt-1 text-sm font-bold text-slate-900 dark:text-white">
+                                <p className="mt-1 text-base leading-relaxed font-bold text-slate-900 dark:text-white">
                                     {user.name}
                                     {isCurrentUser && (
                                         <span className="ml-2 inline-block rounded-sm bg-blue-100 px-1.5 text-[8px] font-extrabold text-blue-700 uppercase dark:bg-blue-900/30 dark:text-blue-400">
@@ -332,7 +332,7 @@ export function UserDetailModal({
                                 <label className="text-[10px] font-bold text-slate-500 uppercase dark:text-slate-400">
                                     Email Address
                                 </label>
-                                <p className="mt-1 text-sm font-bold text-slate-900 dark:text-white">
+                                <p className="mt-1 text-base leading-relaxed font-bold text-slate-900 dark:text-white">
                                     {user.email}
                                 </p>
                             </div>
@@ -355,7 +355,7 @@ export function UserDetailModal({
                                 <label className="text-[10px] font-bold text-slate-500 uppercase dark:text-slate-400">
                                     Last Login
                                 </label>
-                                <p className="mt-1 text-sm font-bold text-slate-900 dark:text-white">
+                                <p className="mt-1 text-base leading-relaxed font-bold text-slate-900 dark:text-white">
                                     {formatDate(user.last_login_at)}
                                 </p>
                             </div>
@@ -365,7 +365,7 @@ export function UserDetailModal({
                                 <label className="text-[10px] font-bold text-slate-500 uppercase dark:text-slate-400">
                                     Terms Accepted
                                 </label>
-                                <p className="mt-1 text-sm font-bold text-slate-900 dark:text-white">
+                                <p className="mt-1 text-base leading-relaxed font-bold text-slate-900 dark:text-white">
                                     {termsAccepted
                                         ? formatDate(user.terms_accepted_at)
                                         : 'Not accepted'}
@@ -377,7 +377,7 @@ export function UserDetailModal({
                                 <label className="text-[10px] font-bold text-slate-500 uppercase dark:text-slate-400">
                                     Mock Attempts
                                 </label>
-                                <p className="mt-1 text-sm font-bold text-slate-900 dark:text-white">
+                                <p className="mt-1 text-base leading-relaxed font-bold text-slate-900 dark:text-white">
                                     {user.attempts_count} exam
                                     {user.attempts_count !== 1 ? 's' : ''}
                                 </p>

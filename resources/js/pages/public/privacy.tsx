@@ -21,7 +21,7 @@ export default function Privacy() {
                                 <h1 className="font-heading text-4xl font-black tracking-tight text-foreground sm:text-5xl md:text-4xl">
                                     Privacy Policy
                                 </h1>
-                                <p className="mt-1.5 text-xs text-muted-foreground">
+                                <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
                                     Last Updated: May 29, 2026
                                 </p>
                             </div>
@@ -32,7 +32,7 @@ export default function Privacy() {
                                 <h2 className="text-2xl font-black tracking-tight text-foreground sm:text-3xl">
                                     1. Introduction
                                 </h2>
-                                <p className="text-sm text-muted-foreground">
+                                <p className="text-base leading-relaxed text-muted-foreground">
                                     Welcome to the Hiraya Review portal. Hiraya
                                     Review values your privacy and is committed
                                     to protecting your personal data. This
@@ -47,7 +47,7 @@ export default function Privacy() {
                                 <h2 className="text-2xl font-black tracking-tight text-foreground sm:text-3xl">
                                     2. Information Hiraya Review Collects
                                 </h2>
-                                <p className="text-sm text-muted-foreground">
+                                <p className="text-base leading-relaxed text-muted-foreground">
                                     To provide mock exams, custom study logs,
                                     and AI analytics, Hiraya Review collects:
                                 </p>
@@ -92,7 +92,7 @@ export default function Privacy() {
                                 <h2 className="text-2xl font-black tracking-tight text-foreground sm:text-3xl">
                                     3. How Hiraya Review Uses Your Information
                                 </h2>
-                                <p className="text-sm text-muted-foreground">
+                                <p className="text-base leading-relaxed text-muted-foreground">
                                     Hiraya Review uses the gathered information
                                     to:
                                 </p>
@@ -122,7 +122,7 @@ export default function Privacy() {
                                 <h2 className="text-2xl font-black tracking-tight text-foreground sm:text-3xl">
                                     4. Data Sharing & Security
                                 </h2>
-                                <p className="text-sm text-muted-foreground">
+                                <p className="text-base leading-relaxed text-muted-foreground">
                                     Hiraya Review does not sell, rent, or trade
                                     your personal data with third parties. Your
                                     account records and score history are fully
@@ -137,7 +137,7 @@ export default function Privacy() {
                                 <h2 className="text-2xl font-black tracking-tight text-foreground sm:text-3xl">
                                     5. Your Choices & Rights
                                 </h2>
-                                <p className="text-sm text-muted-foreground">
+                                <p className="text-base leading-relaxed text-muted-foreground">
                                     You have full control over your data. At any
                                     time, you can edit your profile settings or
                                     choose to permanently clear your historical

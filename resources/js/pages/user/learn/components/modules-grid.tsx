@@ -46,7 +46,7 @@ export function ModulesGrid({
                                         href={`/learn/${mod.slug}`}
                                         className="group block"
                                     >
-                                        <Card className="flex h-full flex-col justify-between overflow-hidden p-6 transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-md">
+                                        <Card className="flex h-full flex-col justify-between overflow-hidden p-6 transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-xl hover:-translate-y-1 hover:shadow-primary/5">
                                             <div>
                                                 {/* Badges row */}
                                                 <div className="flex flex-wrap items-center gap-2">
@@ -77,7 +77,7 @@ export function ModulesGrid({
                                                     </span>
                                                 </div>
 
-                                                <p className="mt-3 line-clamp-3 text-xs leading-relaxed text-muted-foreground">
+                                                <p className="mt-3 line-clamp-3 text-sm leading-relaxed text-muted-foreground">
                                                     {mod.summary}
                                                 </p>
                                             </div>
@@ -121,7 +121,7 @@ export function ModulesGrid({
                 <h3 className="font-heading text-xl font-black tracking-tight text-foreground">
                     No Learning Modules Available
                 </h3>
-                <p className="mx-auto mt-2 max-w-2xl text-xs leading-relaxed text-muted-foreground">
+                <p className="mx-auto mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground">
                     Hiraya Review is currently designing bite-sized conceptual
                     lessons, strategy guides, and detailed category rationales.
                 </p>
@@ -135,7 +135,7 @@ export function ModulesGrid({
             <h3 className="mt-4 text-sm font-black text-foreground">
                 No learning modules match your search
             </h3>
-            <p className="mt-1 max-w-2xl text-center text-xs leading-normal text-muted-foreground">
+            <p className="mt-1 max-w-2xl text-center text-sm leading-normal leading-relaxed text-muted-foreground">
                 Try checking other categories or adjust your keyword search.
                 Admins will curate more review topics shortly!
             </p>

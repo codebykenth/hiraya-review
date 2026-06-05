@@ -80,7 +80,7 @@ export default function PasskeyRegistration({ onSuccess }: Props) {
                     className="mt-1 block w-full border-foreground/20"
                     autoFocus
                 />
-                <p className="text-xs text-muted-foreground">
+                <p className="text-sm leading-relaxed text-muted-foreground">
                     A name helps you identify this passkey later.
                 </p>
             </div>

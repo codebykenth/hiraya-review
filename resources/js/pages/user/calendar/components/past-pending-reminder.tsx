@@ -1,4 +1,4 @@
-import { Lightbulb } from 'lucide-react';
+﻿import { Lightbulb } from 'lucide-react';
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import {
@@ -53,7 +53,7 @@ export function PastPendingReminder({
                         <Lightbulb className="h-5 w-5 animate-bounce" />
                         Uncompleted Study Tasks
                     </DialogTitle>
-                    <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
+                    <p className="mt-2 text-base leading-relaxed text-slate-600 dark:text-slate-400">
                         You have some scheduled study sessions from previous
                         days that were not marked as done. Would you like to
                         update them?
@@ -68,7 +68,7 @@ export function PastPendingReminder({
                         >
                             <div className="flex items-start justify-between gap-2">
                                 <div>
-                                    <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">
+                                    <p className="text-sm leading-relaxed font-semibold text-slate-500 dark:text-slate-400">
                                         {parseScheduleDate(
                                             task.study_date,
                                         ).toLocaleDateString('en-US', {

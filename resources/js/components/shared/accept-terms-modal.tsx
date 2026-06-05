@@ -1,4 +1,4 @@
-import { router, Link } from '@inertiajs/react';
+﻿import { router, Link } from '@inertiajs/react';
 import { useCallback, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -59,7 +59,7 @@ export default function AcceptTermsModal({ isOpen }: Props) {
                                 <h3 className="mb-2 font-semibold text-slate-900 dark:text-white">
                                     Terms of Service
                                 </h3>
-                                <p className="text-xs leading-relaxed">
+                                <p className="text-sm leading-relaxed">
                                     By using Hiraya Review, you agree to comply
                                     with the terms and policies. You are
                                     responsible for maintaining account
@@ -78,7 +78,7 @@ export default function AcceptTermsModal({ isOpen }: Props) {
                                 <h3 className="mb-2 font-semibold text-slate-900 dark:text-white">
                                     Privacy Policy
                                 </h3>
-                                <p className="text-xs leading-relaxed">
+                                <p className="text-sm leading-relaxed">
                                     Hiraya Review collects and processes
                                     personal data to provide and improve the
                                     services. Your data is protected and will
@@ -97,7 +97,7 @@ export default function AcceptTermsModal({ isOpen }: Props) {
                                 <h3 className="mb-2 font-semibold text-slate-900 dark:text-white">
                                     Your Rights
                                 </h3>
-                                <p className="text-xs leading-relaxed">
+                                <p className="text-sm leading-relaxed">
                                     You have the right to access, modify, or
                                     delete your personal data at any time
                                     through settings or by contacting our

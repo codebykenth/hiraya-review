@@ -1,4 +1,4 @@
-import {
+﻿import {
     Award,
     Target,
     FileText,
@@ -15,7 +15,7 @@ interface MetricsGridProps {
 
 export function MetricsGrid({ activeStats }: MetricsGridProps) {
     const cardClass =
-        'relative overflow-hidden rounded-2xl border border-slate-200/80 bg-gradient-to-br from-blue-50/70 via-indigo-50/40 to-slate-50/80 p-5 shadow-sm transition hover:shadow-md dark:border-slate-800 dark:from-slate-900 dark:via-slate-900/80 dark:to-indigo-950/20 backdrop-blur-md';
+        'relative overflow-hidden rounded-2xl border border-slate-200/80 bg-gradient-to-br from-blue-50/70 via-indigo-50/40 to-slate-50/80 p-5 shadow-sm transition hover:shadow-xl hover:shadow-primary/5 hover:-translate-y-1 dark:border-slate-800 dark:from-slate-900 dark:via-slate-900/80 dark:to-indigo-950/20 backdrop-blur-md';
 
     return (
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">

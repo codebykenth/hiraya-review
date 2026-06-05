@@ -1,4 +1,4 @@
-import { Head, Link, router, usePage } from '@inertiajs/react';
+﻿import { Head, Link, router, usePage } from '@inertiajs/react';
 import Echo from 'laravel-echo';
 import {
     Brain,
@@ -496,7 +496,7 @@ export default function AiAnalysisReport({
                         <h3 className="text-2xl font-black tracking-tight text-slate-900 sm:text-3xl dark:text-white">
                             AI Diagnostic Report Locked
                         </h3>
-                        <p className="mt-2 max-w-2xl text-sm text-slate-500 dark:text-slate-400">
+                        <p className="mt-2 max-w-2xl text-base leading-relaxed text-slate-500 dark:text-slate-400">
                             We need at least one exam attempt to analyze your
                             scores, identify weak areas, and generate your
                             predictive analysis.
@@ -522,7 +522,7 @@ export default function AiAnalysisReport({
                         <h3 className="text-2xl font-black tracking-tight text-slate-900 sm:text-3xl dark:text-white">
                             Creating Your Predictive AI Diagnostic
                         </h3>
-                        <p className="mt-2 max-w-2xl text-sm leading-relaxed text-slate-500 dark:text-slate-400">
+                        <p className="mt-2 max-w-2xl text-base leading-relaxed text-slate-500 dark:text-slate-400">
                             Hiraya AI is evaluating your historical exam
                             responses, calculating subtopic performance, and
                             scheduling your personalized study pathway. This
@@ -539,7 +539,7 @@ export default function AiAnalysisReport({
                         <h3 className="text-2xl font-black tracking-tight text-slate-900 sm:text-3xl dark:text-white">
                             AI Diagnostic Report Failed
                         </h3>
-                        <p className="text-slate-550 mt-2 max-w-2xl text-sm dark:text-slate-400">
+                        <p className="text-slate-550 mt-2 max-w-2xl text-base leading-relaxed dark:text-slate-400">
                             {errorMessage ||
                                 'Our AI systems are currently highly loaded or rate-limited across all fallbacks. Please try again.'}
                         </p>
@@ -581,7 +581,7 @@ export default function AiAnalysisReport({
                                                 Active Coach
                                             </span>
                                         </div>
-                                        <p className="mt-1.5 max-w-2xl text-sm text-slate-500 dark:text-slate-400">
+                                        <p className="mt-1.5 max-w-2xl text-base leading-relaxed text-slate-500 dark:text-slate-400">
                                             Comprehensive predictive report
                                             analyzing accuracy, confidence
                                             intervals, remediation pathways, and
@@ -740,7 +740,7 @@ export default function AiAnalysisReport({
                             {/* Detailed predictive metrics: 8 cols */}
                             <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:col-span-8">
                                 {/* Estimated Exam Score */}
-                                <Card className="flex flex-col justify-between p-6 transition hover:shadow-md">
+                                <Card className="flex flex-col justify-between p-6 transition hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/5">
                                     <div className="flex items-center gap-3">
                                         <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-indigo-50 text-indigo-600 dark:bg-indigo-950/40 dark:text-indigo-400">
                                             <Target className="size-5" />
@@ -756,7 +756,7 @@ export default function AiAnalysisReport({
                                             </h4>
                                         </div>
                                     </div>
-                                    <p className="mt-4 text-xs leading-relaxed text-slate-500 dark:text-slate-400">
+                                    <p className="mt-4 text-sm leading-relaxed text-slate-500 dark:text-slate-400">
                                         Calculated based on your subtopic
                                         weights and simulated exam durations.
                                         Philippine CSE passing threshold is 80%.
@@ -764,7 +764,7 @@ export default function AiAnalysisReport({
                                 </Card>
 
                                 {/* Days to Readiness */}
-                                <Card className="flex flex-col justify-between p-6 transition hover:shadow-md">
+                                <Card className="flex flex-col justify-between p-6 transition hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/5">
                                     <div className="flex items-center gap-3">
                                         <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-emerald-50 text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400">
                                             <Clock className="size-5" />
@@ -780,7 +780,7 @@ export default function AiAnalysisReport({
                                             </h4>
                                         </div>
                                     </div>
-                                    <p className="mt-4 text-xs leading-relaxed text-slate-500 dark:text-slate-400">
+                                    <p className="mt-4 text-sm leading-relaxed text-slate-500 dark:text-slate-400">
                                         Estimated number of daily study cycles
                                         and category drills needed to reliably
                                         hit over 80% accuracy.
@@ -788,7 +788,7 @@ export default function AiAnalysisReport({
                                 </Card>
 
                                 {/* Completion Pace */}
-                                <Card className="flex flex-col justify-between p-6 transition hover:shadow-md">
+                                <Card className="flex flex-col justify-between p-6 transition hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/5">
                                     <div className="flex items-center gap-3">
                                         <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-amber-50 text-amber-600 dark:bg-amber-950/40 dark:text-amber-400">
                                             <Activity className="size-5" />
@@ -804,7 +804,7 @@ export default function AiAnalysisReport({
                                             </h4>
                                         </div>
                                     </div>
-                                    <p className="mt-4 text-xs leading-relaxed text-slate-500 dark:text-slate-400">
+                                    <p className="mt-4 text-sm leading-relaxed text-slate-500 dark:text-slate-400">
                                         Analyzes the relationship between
                                         correct solutions and response times per
                                         category to catch careless patterns.
@@ -812,7 +812,7 @@ export default function AiAnalysisReport({
                                 </Card>
 
                                 {/* Timeline / Milestone */}
-                                <Card className="flex flex-col justify-between p-6 transition hover:shadow-md">
+                                <Card className="flex flex-col justify-between p-6 transition hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/5">
                                     <div className="flex items-center gap-3">
                                         <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-blue-50 text-blue-600 dark:bg-blue-950/40 dark:text-blue-400">
                                             <Zap className="size-5" />
@@ -828,7 +828,7 @@ export default function AiAnalysisReport({
                                             </h4>
                                         </div>
                                     </div>
-                                    <p className="mt-4 text-xs leading-relaxed text-slate-500 dark:text-slate-400">
+                                    <p className="mt-4 text-sm leading-relaxed text-slate-500 dark:text-slate-400">
                                         Milestone:{' '}
                                         {data.timeline_prediction
                                             ?.milestone_prediction ||
@@ -850,7 +850,7 @@ export default function AiAnalysisReport({
                                 <h4 className="text-sm font-black text-slate-900 dark:text-white">
                                     AI Coach Diagnostic Verdict
                                 </h4>
-                                <p className="mt-1 text-sm leading-relaxed font-medium text-slate-700 dark:text-slate-300">
+                                <p className="mt-1 text-base leading-relaxed font-medium text-slate-700 dark:text-slate-300">
                                     {data.verdict}
                                 </p>
                             </div>
@@ -893,7 +893,7 @@ export default function AiAnalysisReport({
                                             return (
                                                 <Card
                                                     key={item.subject}
-                                                    className="flex flex-col justify-between gap-4 p-5 transition hover:shadow-md dark:border-slate-800 dark:bg-slate-900/60"
+                                                    className="flex flex-col justify-between gap-4 p-5 transition hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/5 dark:border-slate-800 dark:bg-slate-900/60"
                                                 >
                                                     <div>
                                                         <div className="flex items-center justify-between gap-2 border-b border-slate-100 pb-3 dark:border-slate-800">
@@ -909,7 +909,7 @@ export default function AiAnalysisReport({
                                                                 {item.rating}
                                                             </span>
                                                         </div>
-                                                        <p className="mt-3 text-xs leading-relaxed text-slate-500 dark:text-slate-400">
+                                                        <p className="mt-3 text-sm leading-relaxed text-slate-500 dark:text-slate-400">
                                                             {item.insight}
                                                         </p>
                                                         {item.recommended_action && (
@@ -918,7 +918,7 @@ export default function AiAnalysisReport({
                                                                     <Zap className="size-3" />
                                                                     Action Step
                                                                 </span>
-                                                                <p className="mt-1 text-xs leading-relaxed font-bold text-slate-800 dark:text-slate-200">
+                                                                <p className="mt-1 text-sm leading-relaxed font-bold text-slate-800 dark:text-slate-200">
                                                                     {
                                                                         item.recommended_action
                                                                     }
@@ -1080,7 +1080,7 @@ export default function AiAnalysisReport({
                                                                                 task.focus_topic
                                                                             }
                                                                         </span>
-                                                                        <p className="text-xs leading-relaxed text-slate-700 dark:text-slate-200">
+                                                                        <p className="text-sm leading-relaxed text-slate-700 dark:text-slate-200">
                                                                             {
                                                                                 task.activity
                                                                             }
@@ -1187,13 +1187,13 @@ export default function AiAnalysisReport({
                                 AI Coach Under Heavy Load
                             </h3>
 
-                            <p className="text-slate-650 mt-3 text-sm leading-relaxed dark:text-slate-400">
+                            <p className="text-slate-650 mt-3 text-base leading-relaxed dark:text-slate-400">
                                 Our AI coaching system is currently experiencing
                                 extremely high traffic from other civil service
                                 review students.
                             </p>
 
-                            <p className="mt-2 border-t border-slate-100 pt-3 text-sm leading-relaxed text-slate-500 dark:border-slate-800 dark:text-slate-400">
+                            <p className="mt-2 border-t border-slate-100 pt-3 text-base leading-relaxed text-slate-500 dark:border-slate-800 dark:text-slate-400">
                                 To ensure highly accurate predictions and
                                 prevent system failures, generation requests are
                                 queued. Your analysis is currently delayed or
@@ -1202,7 +1202,7 @@ export default function AiAnalysisReport({
 
                             <div className="mt-4 flex items-start gap-2 rounded-lg bg-indigo-50/50 p-3 text-indigo-700 dark:bg-indigo-950/30 dark:text-indigo-400">
                                 <Lightbulb className="mt-0.5 size-4 shrink-0" />
-                                <p className="text-xs leading-relaxed font-bold">
+                                <p className="text-sm leading-relaxed font-bold">
                                     Tip: You can close this, continue practicing
                                     drills, and check back in a few minutes!
                                 </p>

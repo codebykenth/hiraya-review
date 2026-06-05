@@ -54,7 +54,7 @@ export default function Support() {
                                 <h1 className="font-heading text-4xl font-black tracking-tight text-foreground sm:text-5xl md:text-4xl">
                                     Contact Support
                                 </h1>
-                                <p className="mt-1.5 text-sm text-muted-foreground">
+                                <p className="mt-1.5 text-base leading-relaxed text-muted-foreground">
                                     Have a question or feedback? Hiraya Review
                                     is here to help you succeed.
                                 </p>
@@ -72,7 +72,7 @@ export default function Support() {
                                         <h3 className="font-bold text-foreground">
                                             Community & Feedback
                                         </h3>
-                                        <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+                                        <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
                                             Found a buggy question or want to
                                             suggest an explanation improvement?
                                             Contact Hiraya Review directly.
@@ -88,7 +88,7 @@ export default function Support() {
                                         <h3 className="font-bold text-foreground">
                                             Unofficial Portal Note
                                         </h3>
-                                        <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+                                        <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
                                             Please note that Hiraya Review
                                             cannot answer official Civil Service
                                             Commission schedule or processing
@@ -110,7 +110,7 @@ export default function Support() {
                                             <h2 className="text-2xl font-black tracking-tight text-foreground sm:text-3xl">
                                                 Message Received!
                                             </h2>
-                                            <p className="animate-fade-in mt-2 max-w-2xl text-sm text-muted-foreground">
+                                            <p className="animate-fade-in mt-2 max-w-2xl text-base leading-relaxed text-muted-foreground">
                                                 Thanks for reaching out,{' '}
                                                 {submittedData?.name}. Hiraya
                                                 Review will review your message

@@ -1,4 +1,4 @@
-import { Head } from '@inertiajs/react';
+﻿import { Head } from '@inertiajs/react';
 import {
     ChevronLeft,
     ChevronRight,
@@ -226,7 +226,7 @@ export function ReviewExamView({
                                                             {letter}
                                                         </span>
                                                         <div className="flex flex-1 items-center justify-between">
-                                                            <p className="text-sm font-bold transition md:text-base">
+                                                            <p className="text-base leading-relaxed font-bold transition md:text-base">
                                                                 {renderFormattedText(
                                                                     opt,
                                                                     false,
@@ -351,7 +351,7 @@ export function ReviewExamView({
                                     <h3 className="text-base font-bold text-foreground">
                                         No questions match filters
                                     </h3>
-                                    <p className="mt-1 text-xs text-muted-foreground">
+                                    <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
                                         Try switching to a different category or
                                         status pill.
                                     </p>

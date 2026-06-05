@@ -1,4 +1,4 @@
-import { router } from '@inertiajs/react';
+﻿import { router } from '@inertiajs/react';
 import { AlertCircle, RefreshCw } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
@@ -136,13 +136,13 @@ export function TrafficOverloadGuard() {
                                     : 'Server Under Heavy Load'}
                             </h3>
 
-                            <p className="mt-3 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
+                            <p className="mt-3 text-base leading-relaxed text-slate-600 dark:text-slate-400">
                                 {errorType === 'rate_limit'
                                     ? 'You have made too many requests in a short period. Our security rate-limiter is currently pacing your access.'
                                     : 'Our servers are currently experiencing extremely high traffic from civil service review students.'}
                             </p>
 
-                            <p className="mt-2 border-t border-slate-100 pt-3 text-sm leading-relaxed text-slate-500 dark:border-slate-800 dark:text-slate-400">
+                            <p className="mt-2 border-t border-slate-100 pt-3 text-base leading-relaxed text-slate-500 dark:border-slate-800 dark:text-slate-400">
                                 To protect database stability and ensure active
                                 study tools work correctly, access is
                                 temporarily queued. Please wait a few moments

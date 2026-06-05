@@ -37,6 +37,7 @@ When revamping a page or component, follow these priorities to upgrade the UI fr
 1. **Headings:** Upgrade from basic `text-xl font-bold` to `text-2xl sm:text-3xl font-black tracking-tight`. Use gradients for emphasis where appropriate (e.g., `bg-gradient-to-br from-slate-900 to-slate-600 bg-clip-text text-transparent dark:from-white dark:to-slate-400`).
 2. **Subtitles:** Make them subtle but legible. Use `text-sm font-medium text-slate-500 dark:text-slate-400`.
 3. **Data/Stats:** Use large, bold numbers (`text-4xl font-black`) paired with small, uppercase, widely tracked labels (`text-xs font-bold uppercase tracking-wider`).
+4. **Body Text & Readability:** Avoid excessively small fonts for multi-line content. Upgrade tiny `text-xs` paragraphs to `text-sm leading-relaxed`, and upgrade basic `text-sm` body copy to `text-base leading-relaxed` to ensure effortless reading.
 
 ### Priority 2: Card & Container Modernization
 1. **Move away from generic Shadcn defaults:** The default Shadcn `Card` is just a starting point. Enhance it.

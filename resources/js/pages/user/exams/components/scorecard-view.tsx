@@ -66,7 +66,7 @@ export function ScorecardView({
                     <h1 className="mt-1 font-heading text-3xl font-black tracking-tight text-slate-900 sm:text-4xl md:text-3xl dark:text-white">
                         {isDrillSession ? 'Drill Results' : 'Exam Results'}
                     </h1>
-                    <p className="mt-0.5 text-xs text-slate-500">
+                    <p className="mt-0.5 text-sm leading-relaxed text-slate-500">
                         Completed on{' '}
                         {savedAttempt?.created_at
                             ? new Date(
@@ -163,7 +163,7 @@ export function ScorecardView({
                                                         ? 'PASSED'
                                                         : 'FAILED'}
                                                 </span>
-                                                <p className="mt-0.5 text-center text-[10px] leading-tight font-semibold text-slate-500 sm:mt-1 sm:text-xs dark:text-slate-400">
+                                                <p className="mt-0.5 text-center text-[10px] leading-relaxed leading-tight font-semibold text-slate-500 sm:mt-1 sm:text-sm dark:text-slate-400">
                                                     Final Grade
                                                 </p>
                                             </div>

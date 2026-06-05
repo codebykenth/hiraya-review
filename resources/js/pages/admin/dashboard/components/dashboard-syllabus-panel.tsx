@@ -1,4 +1,4 @@
-import { Database } from 'lucide-react';
+﻿import { Database } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import type { CategoryStat, Metrics } from '../types';
 
@@ -17,7 +17,7 @@ export function DashboardSyllabusPanel({
                 <h2 className="text-md font-bold text-slate-900 dark:text-white">
                     Syllabus Scope Dispersal
                 </h2>
-                <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
+                <p className="mt-0.5 text-sm leading-relaxed text-slate-500 dark:text-slate-400">
                     Distribution density of active review questions.
                 </p>
             </div>

@@ -524,7 +524,7 @@ export default function DraftsLearnList({
                                         <h2 className="text-lg leading-tight font-black text-foreground">
                                             {m.title}
                                         </h2>
-                                        <p className="mt-0.5 text-xs font-bold text-muted-foreground">
+                                        <p className="mt-0.5 text-sm leading-relaxed font-bold text-muted-foreground">
                                             Focus: {m.topic}
                                         </p>
                                     </div>
@@ -615,7 +615,7 @@ export default function DraftsLearnList({
                         <DialogTitle className="text-red-600">
                             Error
                         </DialogTitle>
-                        <p className="mt-2 text-sm text-slate-600">
+                        <p className="mt-2 text-base leading-relaxed text-slate-600">
                             {errorMessage}
                         </p>
                     </DialogHeader>

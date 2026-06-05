@@ -195,7 +195,9 @@ export function DraftsReviewShell<T extends BaseDraftItem>({
                     <h1 className="mt-2 text-2xl font-black tracking-tight text-foreground">
                         {title}
                     </h1>
-                    <p className="text-sm text-muted-foreground">{subtitle}</p>
+                    <p className="text-base leading-relaxed text-muted-foreground">
+                        {subtitle}
+                    </p>
                 </div>
 
                 {/* BULK ACTIONS HEADER DECK */}
@@ -414,7 +416,7 @@ export function DraftsReviewShell<T extends BaseDraftItem>({
                         <h3 className="text-xl font-black tracking-tight text-foreground">
                             {emptyStateTitle}
                         </h3>
-                        <p className="mt-1.5 max-w-2xl text-sm text-muted-foreground">
+                        <p className="mt-1.5 max-w-2xl text-base leading-relaxed text-muted-foreground">
                             {emptyStateDescription}
                         </p>
                         <Link
@@ -434,7 +436,7 @@ export function DraftsReviewShell<T extends BaseDraftItem>({
                         <h3 className="font-bold text-foreground">
                             No Matching Drafts
                         </h3>
-                        <p className="mt-1 text-xs text-muted-foreground">
+                        <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
                             No drafts match your active filters.
                         </p>
                         <Button

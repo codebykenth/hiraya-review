@@ -67,7 +67,7 @@ export default function AdminExamDatesIndex({
                         <h1 className="text-3xl font-black tracking-tight text-foreground sm:text-4xl">
                             Exam Dates
                         </h1>
-                        <p className="text-sm text-muted-foreground">
+                        <p className="text-base leading-relaxed text-muted-foreground">
                             Manage the civil service exam dates that appear in
                             the study planner.
                         </p>

@@ -80,7 +80,7 @@ export function SetupExamView({
                         {/* Professional Level Card */}
                         <div
                             onClick={() => setSelectedExamId(1)}
-                            className={`flex cursor-pointer items-center justify-between rounded-xl border-2 p-5 shadow-sm transition hover:shadow-md ${
+                            className={`flex cursor-pointer items-center justify-between rounded-xl border-2 p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/5 ${
                                 selectedExamId === 1
                                     ? 'border-blue-600 bg-blue-50/10 dark:border-blue-500 dark:bg-blue-950/10'
                                     : 'border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900'
@@ -94,7 +94,7 @@ export function SetupExamView({
                                     <h3 className="font-heading text-xl font-black tracking-tight text-slate-900 dark:text-white">
                                         Professional Level
                                     </h3>
-                                    <p className="mt-1 max-w-2xl text-xs leading-relaxed text-slate-500 md:text-sm dark:text-slate-400">
+                                    <p className="mt-1 max-w-2xl text-sm leading-relaxed text-slate-500 md:text-base dark:text-slate-400">
                                         Comprehensive assessment for supervisory
                                         and advanced technical positions.
                                     </p>
@@ -118,7 +118,7 @@ export function SetupExamView({
                         {/* Subprofessional Level Card */}
                         <div
                             onClick={() => setSelectedExamId(2)}
-                            className={`flex cursor-pointer items-center justify-between rounded-xl border-2 p-5 shadow-sm transition hover:shadow-md ${
+                            className={`flex cursor-pointer items-center justify-between rounded-xl border-2 p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/5 ${
                                 selectedExamId === 2
                                     ? 'border-blue-600 bg-blue-50/10 dark:border-blue-500 dark:bg-blue-950/10'
                                     : 'border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900'
@@ -132,7 +132,7 @@ export function SetupExamView({
                                     <h3 className="font-heading text-xl font-black tracking-tight text-slate-900 dark:text-white">
                                         Subprofessional Level
                                     </h3>
-                                    <p className="mt-1 max-w-2xl text-xs leading-relaxed text-slate-500 md:text-sm dark:text-slate-400">
+                                    <p className="mt-1 max-w-2xl text-sm leading-relaxed text-slate-500 md:text-base dark:text-slate-400">
                                         Standardized assessment for clerical,
                                         routine, and manual service positions.
                                     </p>

@@ -94,7 +94,7 @@ export default function ExamIndex(props: ExamIndexProps) {
             <div className="flex h-screen items-center justify-center bg-slate-50 dark:bg-slate-950">
                 <div className="flex flex-col items-center gap-4">
                     <div className="h-12 w-12 animate-spin rounded-full border-4 border-blue-600 border-t-transparent"></div>
-                    <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
+                    <p className="text-base leading-relaxed font-medium text-slate-500 dark:text-slate-400">
                         Loading your session...
                     </p>
                 </div>
@@ -200,7 +200,7 @@ export default function ExamIndex(props: ExamIndexProps) {
                         <DialogTitle className="text-red-600">
                             Error
                         </DialogTitle>
-                        <p className="mt-2 text-sm text-slate-600">
+                        <p className="mt-2 text-base leading-relaxed text-slate-600">
                             {errorMessage}
                         </p>
                     </DialogHeader>

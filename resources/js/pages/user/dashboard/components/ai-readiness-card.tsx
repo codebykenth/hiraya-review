@@ -89,7 +89,7 @@ export default function AiReadinessCard({ aiAnalysis }: AiReadinessCardProps) {
 
     // Container style sharing across all states to guarantee consistent glassmorphism
     const containerClasses =
-        'relative overflow-hidden rounded-2xl border border-slate-200/80 bg-gradient-to-br from-blue-50/70 via-indigo-50/40 to-slate-50 p-6 text-slate-900 shadow-sm transition-all hover:shadow-md dark:border-slate-800 dark:from-slate-900 dark:via-slate-900/80 dark:to-indigo-950/20 dark:text-white dark:shadow-xl backdrop-blur-md';
+        'relative overflow-hidden rounded-2xl border border-slate-200/80 bg-gradient-to-br from-blue-50/70 via-indigo-50/40 to-slate-50 p-6 text-slate-900 shadow-sm transition-all hover:shadow-xl hover:shadow-primary/5 hover:-translate-y-1 dark:border-slate-800 dark:from-slate-900 dark:via-slate-900/80 dark:to-indigo-950/20 dark:text-white dark:shadow-xl backdrop-blur-md';
 
     if (localStatus === 'failed') {
         return (
@@ -108,7 +108,7 @@ export default function AiReadinessCard({ aiAnalysis }: AiReadinessCardProps) {
                                     Failed
                                 </span>
                             </h3>
-                            <p className="dark:text-slate-450 mt-1 text-sm font-medium text-slate-500 dark:text-slate-400">
+                            <p className="dark:text-slate-450 mt-1 text-base leading-relaxed font-medium text-slate-500 dark:text-slate-400">
                                 {errorMessage ||
                                     'Report generation failed. Please try again later.'}
                             </p>
@@ -146,7 +146,7 @@ export default function AiReadinessCard({ aiAnalysis }: AiReadinessCardProps) {
                                     Locked
                                 </span>
                             </h3>
-                            <p className="dark:text-slate-450 mt-1 text-sm font-medium text-slate-500 dark:text-slate-400">
+                            <p className="dark:text-slate-450 mt-1 text-base leading-relaxed font-medium text-slate-500 dark:text-slate-400">
                                 Complete your first exam to unlock your AI
                                 Readiness Report.
                             </p>
@@ -174,7 +174,7 @@ export default function AiReadinessCard({ aiAnalysis }: AiReadinessCardProps) {
                         <h3 className="text-xl font-black tracking-tight text-slate-900 dark:text-white">
                             Analyzing Performance...
                         </h3>
-                        <p className="mt-1.5 max-w-2xl text-sm text-slate-500 dark:text-slate-400">
+                        <p className="mt-1.5 max-w-2xl text-base leading-relaxed text-slate-500 dark:text-slate-400">
                             Our AI is analyzing your answers, calculating
                             scores, and crafting your readiness report. This
                             takes only a few seconds...
@@ -244,7 +244,7 @@ export default function AiReadinessCard({ aiAnalysis }: AiReadinessCardProps) {
                                     Weekly Update
                                 </span>
                             </h3>
-                            <p className="text-xs text-slate-500 dark:text-slate-400">
+                            <p className="text-sm leading-relaxed text-slate-500 dark:text-slate-400">
                                 Smart coaching insights tailored to your exam
                                 history
                             </p>
@@ -405,7 +405,7 @@ export default function AiReadinessCard({ aiAnalysis }: AiReadinessCardProps) {
                         <span className="text-xs font-bold tracking-wider text-amber-700 uppercase dark:text-amber-400">
                             Priority Action Item
                         </span>
-                        <p className="mt-0.5 text-sm font-semibold text-slate-800 dark:text-slate-200">
+                        <p className="mt-0.5 text-base leading-relaxed font-semibold text-slate-800 dark:text-slate-200">
                             {data.priority_action}
                         </p>
                     </div>

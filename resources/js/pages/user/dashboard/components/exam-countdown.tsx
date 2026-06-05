@@ -91,7 +91,7 @@ export function ExamCountdown({
 
     return (
         <div
-            className={`relative overflow-hidden rounded-2xl border p-6 shadow-sm backdrop-blur-xl transition-all hover:shadow-md ${
+            className={`relative overflow-hidden rounded-2xl border p-6 shadow-sm backdrop-blur-xl transition-all hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/5 ${
                 isUrgent
                     ? 'border-amber-200/60 bg-amber-50/60 dark:border-amber-900/40 dark:bg-amber-950/30'
                     : 'border-blue-100/60 bg-blue-50/40 dark:border-slate-800 dark:bg-slate-900/60'
@@ -184,7 +184,7 @@ export function ExamCountdown({
                     </div>
 
                     <div className="hidden max-w-[200px] border-l border-slate-200 py-1 pl-4 md:block dark:border-slate-800">
-                        <p className="text-xs leading-snug font-bold text-slate-600 dark:text-slate-400">
+                        <p className="text-sm leading-relaxed leading-snug font-bold text-slate-600 dark:text-slate-400">
                             {motivationText ||
                                 (isUrgent
                                     ? '🚨 Time is running short! Focus on your weakest topics now.'

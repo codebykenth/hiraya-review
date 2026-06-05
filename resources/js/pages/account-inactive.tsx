@@ -36,25 +36,25 @@ export default function AccountInactive({ adminEmail }: AccountInactiveProps) {
 
                         <div className="mb-8 space-y-3 rounded-md bg-slate-50 p-4">
                             <div>
-                                <p className="text-xs font-medium tracking-wide text-slate-500 uppercase">
+                                <p className="text-sm leading-relaxed font-medium tracking-wide text-slate-500 uppercase">
                                     Account Email
                                 </p>
-                                <p className="mt-1 text-sm font-medium text-slate-900">
+                                <p className="mt-1 text-base leading-relaxed font-medium text-slate-900">
                                     {user.email}
                                 </p>
                             </div>
                             <div>
-                                <p className="text-xs font-medium tracking-wide text-slate-500 uppercase">
+                                <p className="text-sm leading-relaxed font-medium tracking-wide text-slate-500 uppercase">
                                     Account Name
                                 </p>
-                                <p className="mt-1 text-sm font-medium text-slate-900">
+                                <p className="mt-1 text-base leading-relaxed font-medium text-slate-900">
                                     {user.name}
                                 </p>
                             </div>
                         </div>
 
                         <div className="mb-8 space-y-4 rounded-md border border-blue-200 bg-blue-50 p-4">
-                            <p className="text-sm text-slate-700">
+                            <p className="text-base leading-relaxed text-slate-700">
                                 If you believe this is an error, please contact
                                 an administrator or reach out to support.
                             </p>

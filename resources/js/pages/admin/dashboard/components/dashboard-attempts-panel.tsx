@@ -1,4 +1,4 @@
-import { Activity, Users } from 'lucide-react';
+﻿import { Activity, Users } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import type { RecentAttempt } from '../types';
 
@@ -16,7 +16,7 @@ export function DashboardAttemptsPanel({
                     <h2 className="text-md font-bold text-slate-900 dark:text-white">
                         Recent Exam Attempts
                     </h2>
-                    <p className="mt-0.5 text-xs text-slate-500">
+                    <p className="mt-0.5 text-sm leading-relaxed text-slate-500">
                         Real-time grades & completion status for standard test
                         takers.
                     </p>

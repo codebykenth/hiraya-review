@@ -1,4 +1,4 @@
-import { Link } from '@inertiajs/react';
+﻿import { Link } from '@inertiajs/react';
 import {
     ShieldAlert,
     Heart,
@@ -28,7 +28,7 @@ export default function Footer() {
                             <AppLogo />
                         </Link>
 
-                        <p className="max-w-2xl text-xs leading-relaxed font-medium text-muted-foreground">
+                        <p className="max-w-2xl text-sm leading-relaxed font-medium text-muted-foreground">
                             An interactive reviewer platform designed to help
                             Filipino examinees strengthen core competencies for
                             Professional and Sub-Professional Civil Service
@@ -46,7 +46,7 @@ export default function Footer() {
                                     Legal Disclaimer & Educational Use Only
                                 </span>
 
-                                <p className="text-xs leading-relaxed font-medium text-amber-950/80 dark:text-slate-300">
+                                <p className="text-sm leading-relaxed font-medium text-amber-950/80 dark:text-slate-300">
                                     Hiraya Review is an independent educational
                                     learning platform created solely for
                                     examination preparation and reviewer
@@ -61,7 +61,7 @@ export default function Footer() {
                                     or any government agency in the Philippines.
                                 </p>
 
-                                <p className="text-xs leading-relaxed font-medium text-amber-950/80 dark:text-slate-300">
+                                <p className="text-sm leading-relaxed font-medium text-amber-950/80 dark:text-slate-300">
                                     All mock examinations, reviewer materials,
                                     explanations, and practice content are
                                     independently created for educational

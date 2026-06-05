@@ -182,7 +182,7 @@ export default function LearnShow({ module, recommended }: LearnShowProps) {
                                             <h3 className="font-heading text-xl font-black text-foreground">
                                                 Unlock Full Lesson for Free
                                             </h3>
-                                            <p className="mt-3 text-sm leading-relaxed font-semibold text-muted-foreground">
+                                            <p className="mt-3 text-base leading-relaxed font-semibold text-muted-foreground">
                                                 Create a free account to read
                                                 this full lesson, unlock
                                                 realistic mock exams, and build

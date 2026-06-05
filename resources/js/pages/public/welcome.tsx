@@ -274,7 +274,7 @@ export default function Welcome() {
                                                     <p className="font-bold text-foreground">
                                                         Professional Level
                                                     </p>
-                                                    <p className="text-sm text-muted-foreground">
+                                                    <p className="text-base leading-relaxed text-muted-foreground">
                                                         170 questions &bull; 3
                                                         hrs 10 mins
                                                     </p>
@@ -296,7 +296,7 @@ export default function Welcome() {
                                                     <p className="font-bold text-foreground">
                                                         Subprofessional Level
                                                     </p>
-                                                    <p className="text-sm text-muted-foreground">
+                                                    <p className="text-base leading-relaxed text-muted-foreground">
                                                         165 questions &bull; 2
                                                         hrs 40 mins
                                                     </p>
@@ -338,7 +338,7 @@ export default function Welcome() {
                                 <p className="text-4xl font-black text-primary">
                                     500+
                                 </p>
-                                <p className="mt-1 text-xs font-bold tracking-wider text-muted-foreground uppercase">
+                                <p className="mt-1 text-sm leading-relaxed font-bold tracking-wider text-muted-foreground uppercase">
                                     Questions
                                 </p>
                             </div>
@@ -347,7 +347,7 @@ export default function Welcome() {
                                 <p className="text-4xl font-black text-primary">
                                     2
                                 </p>
-                                <p className="mt-1 text-xs font-bold tracking-wider text-muted-foreground uppercase">
+                                <p className="mt-1 text-sm leading-relaxed font-bold tracking-wider text-muted-foreground uppercase">
                                     Study Tracks
                                 </p>
                             </div>
@@ -356,7 +356,7 @@ export default function Welcome() {
                                 <p className="text-4xl font-black text-primary">
                                     6
                                 </p>
-                                <p className="mt-1 text-xs font-bold tracking-wider text-muted-foreground uppercase">
+                                <p className="mt-1 text-sm leading-relaxed font-bold tracking-wider text-muted-foreground uppercase">
                                     Categories
                                 </p>
                             </div>
@@ -365,7 +365,7 @@ export default function Welcome() {
                                 <p className="text-4xl font-black text-primary">
                                     Free
                                 </p>
-                                <p className="mt-1 text-xs font-bold tracking-wider text-muted-foreground uppercase">
+                                <p className="mt-1 text-sm leading-relaxed font-bold tracking-wider text-muted-foreground uppercase">
                                     Forever Base Access
                                 </p>
                             </div>
@@ -480,7 +480,7 @@ export default function Welcome() {
                                         hoveredStep === 1
                                             ? 'border-l-primary'
                                             : 'border-l-primary'
-                                    } hover:shadow-md`}
+                                    } hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/5`}
                                 >
                                     <div
                                         className={`z-10 flex h-12 w-12 items-center justify-center rounded-full text-xl font-black tracking-tight shadow-md transition-colors duration-300 ${
@@ -509,7 +509,7 @@ export default function Welcome() {
                                         hoveredStep === 2
                                             ? 'border-l-primary'
                                             : 'border-l-primary'
-                                    } hover:shadow-md`}
+                                    } hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/5`}
                                 >
                                     <div
                                         className={`z-10 flex h-12 w-12 items-center justify-center rounded-full text-xl font-black tracking-tight shadow-sm transition-colors duration-300 ${
@@ -537,7 +537,7 @@ export default function Welcome() {
                                         hoveredStep === 3
                                             ? 'border-l-primary'
                                             : 'border-l-primary'
-                                    } hover:shadow-md`}
+                                    } hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/5`}
                                 >
                                     <div
                                         className={`z-10 flex h-12 w-12 items-center justify-center rounded-full text-xl font-black tracking-tight shadow-sm transition-colors duration-300 ${
@@ -588,7 +588,7 @@ export default function Welcome() {
                                 return (
                                     <div
                                         key={index}
-                                        className="overflow-hidden rounded-xl border border-slate-200/80 bg-white shadow-sm transition-all duration-300 dark:border-slate-800 dark:bg-slate-900/40"
+                                        className="overflow-hidden rounded-2xl border border-slate-200/50 bg-white/70 shadow-sm backdrop-blur-xl transition-all duration-300 dark:border-slate-800 dark:border-slate-800/50 dark:bg-slate-900/40 dark:bg-slate-950/50"
                                     >
                                         <button
                                             onClick={() =>

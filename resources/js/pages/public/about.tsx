@@ -144,7 +144,7 @@ export default function About() {
                             {values.map((val, idx) => (
                                 <div
                                     key={idx}
-                                    className="rounded-2xl border border-slate-200 bg-slate-50 p-6 transition-all hover:shadow-md dark:border-slate-800 dark:bg-slate-900/50"
+                                    className="rounded-2xl border border-slate-200 bg-slate-50 p-6 transition-all hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/5 dark:border-slate-800 dark:bg-slate-900/50"
                                 >
                                     <div
                                         className={`mb-6 inline-flex rounded-xl p-3 ${val.bg}`}

@@ -388,7 +388,7 @@ export function LiveExamView({
                                     Premium Feature Locked
                                 </h3>
                             </div>
-                            <p className="mt-2 text-xs leading-relaxed text-slate-500 dark:text-slate-400">
+                            <p className="mt-2 text-sm leading-relaxed text-slate-500 dark:text-slate-400">
                                 Register a free account to unlock all questions,
                                 track your progress, and access more premium
                                 features of the mock exam.
@@ -429,7 +429,7 @@ export function LiveExamView({
                                     Free Preview Limit Reached
                                 </h3>
                             </div>
-                            <p className="mt-2 text-xs leading-relaxed text-slate-500 dark:text-slate-400">
+                            <p className="mt-2 text-sm leading-relaxed text-slate-500 dark:text-slate-400">
                                 You've completed the first 20 questions of the
                                 free mock exam preview. Register a free account
                                 to unlock the full exam, submit your answers,

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import ConsentCheckbox from '@/components/auth/consent-checkbox';
 import { Button } from '@/components/ui/button';
 
@@ -38,7 +38,7 @@ export default function SocialConsentModal({
                 >
                     Continue with {providerLabel}
                 </h2>
-                <p className="mb-5 text-sm text-slate-500 dark:text-slate-400">
+                <p className="mb-5 text-base leading-relaxed text-slate-500 dark:text-slate-400">
                     Before proceeding, please review and accept our policies.
                 </p>
 

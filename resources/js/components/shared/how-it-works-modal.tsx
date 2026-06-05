@@ -1,4 +1,4 @@
-import { HelpCircle } from 'lucide-react';
+﻿import { HelpCircle } from 'lucide-react';
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import {
@@ -75,7 +75,7 @@ export function HowItWorksModal({
                                     <h4 className="text-sm font-bold text-foreground">
                                         {tip.title}
                                     </h4>
-                                    <p className="mt-0.5 text-xs text-muted-foreground">
+                                    <p className="mt-0.5 text-sm leading-relaxed text-muted-foreground">
                                         {tip.text}
                                     </p>
                                 </div>

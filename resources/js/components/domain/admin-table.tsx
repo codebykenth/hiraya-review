@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { generatePaginationLinks } from '@/lib/utils';
@@ -214,7 +214,7 @@ export function AdminTable<T>({
                                         <h3 className="text-sm font-bold text-slate-800 dark:text-white">
                                             {emptyState.title}
                                         </h3>
-                                        <p className="text-slate-550 mt-1 max-w-2xl text-xs leading-relaxed dark:text-slate-400">
+                                        <p className="text-slate-550 mt-1 max-w-2xl text-sm leading-relaxed dark:text-slate-400">
                                             {emptyState.description}
                                         </p>
                                         {emptyState.action && (

@@ -1,4 +1,4 @@
-import { Link } from '@inertiajs/react';
+﻿import { Link } from '@inertiajs/react';
 import {
     BookOpen,
     ClipboardList,
@@ -253,7 +253,7 @@ export function ReviewerGuideTabs({
                             <h3 className="text-sm font-semibold text-blue-900 dark:text-blue-300">
                                 Recommended Study Pathway
                             </h3>
-                            <p className="mt-1 text-xs leading-relaxed text-blue-700/95 dark:text-blue-400/90">
+                            <p className="mt-1 text-sm leading-relaxed text-blue-700/95 dark:text-blue-400/90">
                                 Studies show that taking a diagnostic test first
                                 helps identify exact focus subcategories, which
                                 prevents wasting time reviewing areas you have
@@ -284,7 +284,7 @@ export function ReviewerGuideTabs({
                                         <h3 className="font-heading text-lg font-black text-foreground">
                                             {step.title}
                                         </h3>
-                                        <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
+                                        <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
                                             {step.description}
                                         </p>
                                     </div>
@@ -339,7 +339,7 @@ export function ReviewerGuideTabs({
                                     <Award className="size-5 text-blue-600 dark:text-blue-400" />
                                     {examStructure.professional.title}
                                 </h3>
-                                <p className="text-xs text-muted-foreground">
+                                <p className="text-sm leading-relaxed text-muted-foreground">
                                     Qualifies eligibility for both first-level
                                     (clerical) and second-level
                                     (technical/scientific) government positions.
@@ -410,7 +410,7 @@ export function ReviewerGuideTabs({
                                     <Award className="size-5 text-indigo-600 dark:text-indigo-400" />
                                     {examStructure.subprofessional.title}
                                 </h3>
-                                <p className="text-xs text-muted-foreground">
+                                <p className="text-sm leading-relaxed text-muted-foreground">
                                     Qualifies eligibility exclusively for
                                     first-level government positions (clerical,
                                     custodial, trade services).
@@ -495,7 +495,7 @@ export function ReviewerGuideTabs({
                                         {tip.title}
                                     </h3>
                                 </div>
-                                <p className="text-xs leading-relaxed text-muted-foreground">
+                                <p className="text-sm leading-relaxed text-muted-foreground">
                                     {tip.description}
                                 </p>
                             </Card>

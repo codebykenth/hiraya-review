@@ -21,7 +21,7 @@ export default function Terms() {
                                 <h1 className="font-heading text-4xl font-black tracking-tight text-foreground sm:text-5xl md:text-4xl">
                                     Terms of Service
                                 </h1>
-                                <p className="mt-1.5 text-xs text-muted-foreground">
+                                <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
                                     Last Updated: May 29, 2026
                                 </p>
                             </div>
@@ -32,7 +32,7 @@ export default function Terms() {
                                 <h2 className="text-2xl font-black tracking-tight text-foreground sm:text-3xl">
                                     1. Acceptance of Terms
                                 </h2>
-                                <p className="text-sm text-muted-foreground">
+                                <p className="text-base leading-relaxed text-muted-foreground">
                                     By accessing or using the Hiraya Review
                                     portal, you agree to comply with and be
                                     bound by these Terms of Service. If you do
@@ -45,7 +45,7 @@ export default function Terms() {
                                 <h2 className="text-2xl font-black tracking-tight text-foreground sm:text-3xl">
                                     2. Description of Service
                                 </h2>
-                                <p className="text-sm text-muted-foreground">
+                                <p className="text-base leading-relaxed text-muted-foreground">
                                     Hiraya Review provides practice exams,
                                     category-specific drills, AI-assisted
                                     question generation, and score analytics
@@ -61,7 +61,7 @@ export default function Terms() {
                                 <h2 className="text-2xl font-black tracking-tight text-foreground sm:text-3xl">
                                     3. Unofficial Study Aid Disclaimer
                                 </h2>
-                                <p className="text-rose-650 text-sm font-semibold text-foreground text-muted-foreground dark:text-rose-400">
+                                <p className="text-rose-650 text-base leading-relaxed font-semibold text-foreground text-muted-foreground dark:text-rose-400">
                                     This platform is an independent study
                                     resource. Hiraya Review is not officially
                                     connected to, endorsed by, or affiliated
@@ -77,7 +77,7 @@ export default function Terms() {
                                 <h2 className="text-2xl font-black tracking-tight text-foreground sm:text-3xl">
                                     4. Account Rules & Google/Facebook Logins
                                 </h2>
-                                <p className="text-sm text-muted-foreground">
+                                <p className="text-base leading-relaxed text-muted-foreground">
                                     When registering, you may create a native
                                     profile or sign in using a Google or
                                     Facebook account. You agree that:
@@ -104,7 +104,7 @@ export default function Terms() {
                                 <h2 className="text-2xl font-black tracking-tight text-foreground sm:text-3xl">
                                     5. Fair Use & Prohibited Acts
                                 </h2>
-                                <p className="text-sm text-muted-foreground">
+                                <p className="text-base leading-relaxed text-muted-foreground">
                                     Hiraya Review's question bank and study
                                     materials are protected by intellectual
                                     property guidelines. You are prohibited from
@@ -120,7 +120,7 @@ export default function Terms() {
                                 <h2 className="text-2xl font-black tracking-tight text-foreground sm:text-3xl">
                                     6. Modifications and Termination of Service
                                 </h2>
-                                <p className="text-sm text-muted-foreground">
+                                <p className="text-base leading-relaxed text-muted-foreground">
                                     Hiraya Review reserves the right to modify,
                                     suspend, discontinue, or completely close
                                     this project and terminate the service (or

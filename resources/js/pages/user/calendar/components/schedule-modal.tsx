@@ -1,4 +1,4 @@
-import { ChevronDown, Lightbulb, Plus, Check } from 'lucide-react';
+﻿import { ChevronDown, Lightbulb, Plus, Check } from 'lucide-react';
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import {
@@ -253,7 +253,7 @@ export function ScheduleModal({
                         {isEditMode ? 'Edit Study Item' : 'Add Study Item'}
                     </DialogTitle>
                     {selectedDate && (
-                        <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
+                        <p className="mt-2 text-base leading-relaxed text-slate-600 dark:text-slate-400">
                             {parseScheduleDate(selectedDate).toLocaleDateString(
                                 'en-US',
                                 {
@@ -512,7 +512,7 @@ export function ScheduleModal({
 
                     {suggestedModules.length > 0 && (
                         <div className="mt-2 space-y-2 rounded-lg border border-blue-100 bg-blue-50/50 p-3">
-                            <p className="flex items-center text-xs font-semibold text-blue-800">
+                            <p className="flex items-center text-sm leading-relaxed font-semibold text-blue-800">
                                 <Lightbulb className="mr-1.5 h-3.5 w-3.5 text-amber-500" />
                                 Suggested Learn Modules
                             </p>

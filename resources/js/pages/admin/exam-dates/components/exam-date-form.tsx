@@ -1,4 +1,4 @@
-import { Calendar } from 'lucide-react';
+﻿import { Calendar } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import type { ExamDateFormData } from '../types';
@@ -46,7 +46,7 @@ export function ExamDateForm({
                         required
                     />
                     {errors.date && (
-                        <p className="mt-1 text-xs text-red-500">
+                        <p className="mt-1 text-sm leading-relaxed text-red-500">
                             {errors.date}
                         </p>
                     )}
@@ -65,7 +65,7 @@ export function ExamDateForm({
                         required
                     />
                     {errors.description && (
-                        <p className="mt-1 text-xs text-red-500">
+                        <p className="mt-1 text-sm leading-relaxed text-red-500">
                             {errors.description}
                         </p>
                     )}

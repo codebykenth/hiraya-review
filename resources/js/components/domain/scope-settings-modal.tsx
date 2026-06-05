@@ -59,7 +59,7 @@ export function ScopeSettingsModal({
                             <Database className="size-5 text-blue-600 dark:text-blue-500" />
                             Dynamic Syllabus Scope Settings
                         </h2>
-                        <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
+                        <p className="mt-0.5 text-sm leading-relaxed text-slate-500 dark:text-slate-400">
                             Customize your exam blueprint and automatically tune
                             the Gemini AI review questions writer.
                         </p>

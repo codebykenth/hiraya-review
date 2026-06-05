@@ -1,4 +1,4 @@
-import { router } from '@inertiajs/react';
+﻿import { router } from '@inertiajs/react';
 import { Coffee, X } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
@@ -100,14 +100,14 @@ export function SupportWidget() {
             {showBubble && (
                 <div className="relative mb-1 flex max-w-[220px] animate-in items-start gap-2 rounded-2xl border border-border bg-card p-3 shadow-xl duration-500 fade-in slide-in-from-bottom-4">
                     <div className="flex-1">
-                        <p className="text-sm leading-tight font-bold text-foreground">
+                        <p className="text-base leading-relaxed leading-tight font-bold text-foreground">
                             Find{' '}
                             <span className="text-blue-600 dark:text-blue-400">
                                 {appName}
                             </span>{' '}
                             helpful?
                         </p>
-                        <p className="mt-1 text-xs font-semibold text-muted-foreground">
+                        <p className="mt-1 text-sm leading-relaxed font-semibold text-muted-foreground">
                             Support the project! ☕
                         </p>
                     </div>

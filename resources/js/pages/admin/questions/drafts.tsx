@@ -625,7 +625,7 @@ export default function DraftsQuestionList({
                         <DialogTitle className="text-red-600">
                             Error
                         </DialogTitle>
-                        <p className="mt-2 text-sm text-slate-600">
+                        <p className="mt-2 text-base leading-relaxed text-slate-600">
                             {errorMessage}
                         </p>
                     </DialogHeader>

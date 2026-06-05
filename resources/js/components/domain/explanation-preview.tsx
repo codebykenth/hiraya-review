@@ -1,4 +1,4 @@
-import { ArrowRight } from 'lucide-react';
+﻿import { ArrowRight } from 'lucide-react';
 import React from 'react';
 import { parseLatexString } from '@/lib/latex-parser';
 
@@ -78,7 +78,7 @@ export function ExplanationPreview({ text }: ExplanationPreviewProps) {
                     <span className="mb-1 block text-[11px] font-black tracking-wider text-rose-800 uppercase dark:text-rose-300">
                         🧠 Mental Math Shortcut
                     </span>
-                    <p className="text-sm leading-relaxed font-bold text-foreground">
+                    <p className="text-base leading-relaxed font-bold text-foreground">
                         {parseInlineBold(content)}
                     </p>
                 </div>,

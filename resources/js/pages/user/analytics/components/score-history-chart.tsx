@@ -1,4 +1,4 @@
-import { TrendingUp } from 'lucide-react';
+﻿import { TrendingUp } from 'lucide-react';
 import React from 'react';
 import {
     AreaChart,
@@ -40,7 +40,7 @@ export function ScoreHistoryChart({
                         <h4 className="text-lg font-black text-slate-900 dark:text-white">
                             Sample Data Displayed
                         </h4>
-                        <p className="mt-1 text-sm font-semibold text-slate-500 dark:text-slate-400">
+                        <p className="mt-1 text-base leading-relaxed font-semibold text-slate-500 dark:text-slate-400">
                             Complete an exam to see your real performance.
                         </p>
                     </div>
@@ -54,7 +54,7 @@ export function ScoreHistoryChart({
                         <h3 className="text-lg font-black tracking-tight text-slate-900 dark:text-white">
                             Performance Trajectory
                         </h3>
-                        <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">
+                        <p className="text-sm leading-relaxed font-semibold text-slate-500 dark:text-slate-400">
                             Your overall score progression across recent
                             attempts.
                         </p>

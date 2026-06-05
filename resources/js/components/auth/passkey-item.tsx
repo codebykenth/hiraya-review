@@ -1,4 +1,4 @@
-import { KeyRound, Trash2 } from 'lucide-react';
+﻿import { KeyRound, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import {
@@ -42,7 +42,7 @@ export default function PasskeyItem({ passkey, onDelete }: Props) {
                             </span>
                         )}
                     </div>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-base leading-relaxed text-muted-foreground">
                         Added {passkey.created_at_diff}
                         {passkey.last_used_at_diff && (
                             <>

@@ -1,4 +1,4 @@
-import { Brain, Zap, Clock, Lightbulb, FileText } from 'lucide-react';
+﻿import { Brain, Zap, Clock, Lightbulb, FileText } from 'lucide-react';
 import React from 'react';
 import { PageHeader } from '@/components/layout/page-header';
 import { HowItWorksModal } from '@/components/shared/how-it-works-modal';
@@ -77,7 +77,7 @@ export function HubView({
                             <Card
                                 key={cat.id}
                                 onClick={() => handleCategoryClick(cat.name)}
-                                className="group relative flex cursor-pointer flex-col justify-between overflow-hidden p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-md"
+                                className="group relative flex cursor-pointer flex-col justify-between overflow-hidden p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/5"
                             >
                                 <div>
                                     <div className="flex items-start justify-between">
@@ -95,7 +95,7 @@ export function HubView({
                                     <h3 className="mt-5 font-heading text-2xl font-black tracking-tight text-foreground transition group-hover:text-blue-600 sm:text-3xl dark:group-hover:text-blue-400">
                                         {cat.name}
                                     </h3>
-                                    <p className="mt-2 text-sm font-medium text-slate-500 dark:text-slate-400">
+                                    <p className="mt-2 text-base leading-relaxed font-medium text-slate-500 dark:text-slate-400">
                                         {meta.description}
                                     </p>
                                 </div>
@@ -126,7 +126,7 @@ export function HubView({
                     <h3 className="font-heading text-xl font-black tracking-tight text-foreground">
                         No Practice Drills Available
                     </h3>
-                    <p className="mx-auto mt-2 max-w-2xl text-xs leading-relaxed text-muted-foreground">
+                    <p className="mx-auto mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground">
                         Practice drill modules are coming soon! Hiraya Review is
                         currently compiling comprehensive exam question banks.
                     </p>

@@ -1,4 +1,4 @@
-import { Link, router } from '@inertiajs/react';
+﻿import { Link, router } from '@inertiajs/react';
 import { BookOpen, Trash2, Clock } from 'lucide-react';
 import React from 'react';
 import { Button } from '@/components/ui/button';
@@ -127,7 +127,7 @@ export function AttemptsTable({
                                         <h3 className="text-sm font-black text-foreground">
                                             No attempts found
                                         </h3>
-                                        <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">
+                                        <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
                                             We couldn't find any completed tests
                                             or practice drills matching your
                                             current filters. Spin up a new exam
