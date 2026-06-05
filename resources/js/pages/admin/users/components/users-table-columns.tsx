@@ -132,7 +132,7 @@ export function getUsersTableColumns({
                                         <TooltipTrigger asChild>
                                             <button
                                                 onClick={() => onRestore(u)}
-                                                className="cursor-pointer rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted hover:text-emerald-600"
+                                                className="cursor-pointer rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted hover:text-emerald-600 dark:text-emerald-400"
                                             >
                                                 <RotateCcw className="size-4" />
                                             </button>
@@ -171,7 +171,7 @@ export function getUsersTableColumns({
                                                     disabled={
                                                         u.id === currentUserId
                                                     }
-                                                    className="cursor-pointer rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted hover:text-emerald-600 disabled:cursor-not-allowed disabled:opacity-30"
+                                                    className="cursor-pointer rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted hover:text-emerald-600 disabled:cursor-not-allowed disabled:opacity-30 dark:text-emerald-400"
                                                 >
                                                     <Unlock className="size-4" />
                                                 </button>
@@ -190,7 +190,7 @@ export function getUsersTableColumns({
                                                     disabled={
                                                         u.id === currentUserId
                                                     }
-                                                    className="cursor-pointer rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted hover:text-indigo-600 disabled:cursor-not-allowed disabled:opacity-30"
+                                                    className="cursor-pointer rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted hover:text-indigo-600 disabled:cursor-not-allowed disabled:opacity-30 dark:text-indigo-400"
                                                 >
                                                     <Lock className="size-4" />
                                                 </button>
@@ -212,8 +212,8 @@ export function getUsersTableColumns({
                                                 }
                                                 className={`cursor-pointer rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted disabled:cursor-not-allowed disabled:opacity-30 ${
                                                     u.is_active
-                                                        ? 'hover:text-amber-600'
-                                                        : 'hover:text-emerald-600'
+                                                        ? 'hover:text-amber-600 dark:text-amber-400'
+                                                        : 'hover:text-emerald-600 dark:text-emerald-400'
                                                 }`}
                                             >
                                                 {u.is_active ? (

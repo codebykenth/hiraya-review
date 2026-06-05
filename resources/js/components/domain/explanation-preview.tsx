@@ -73,7 +73,7 @@ export function ExplanationPreview({ text }: ExplanationPreviewProps) {
             elements.push(
                 <div
                     key={`shortcut-${idx}`}
-                    className="my-4 rounded-xl border border-rose-200 bg-rose-50/40 p-4 dark:border-rose-900/40 dark:bg-rose-950/20"
+                    className="dark:bg-rose-950/30/40 my-4 rounded-xl border border-rose-200 bg-rose-50 p-4 dark:border-rose-900/40 dark:border-rose-900/50 dark:bg-rose-950/20"
                 >
                     <span className="mb-1 block text-[11px] font-black tracking-wider text-rose-800 uppercase dark:text-rose-300">
                         🧠 Mental Math Shortcut
@@ -93,7 +93,7 @@ export function ExplanationPreview({ text }: ExplanationPreviewProps) {
             elements.push(
                 <div
                     key={`chain-${idx}`}
-                    className="my-4 flex flex-wrap items-center gap-2 rounded-xl border border-blue-100 bg-blue-50/10 p-3.5 dark:border-blue-900/20 dark:bg-blue-950/10"
+                    className="dark:bg-blue-950/30/10 my-4 flex flex-wrap items-center gap-2 rounded-xl border border-blue-100 bg-blue-50 p-3.5 dark:border-blue-900/20 dark:bg-blue-950/10"
                 >
                     {nodes.map((node, nIdx) => (
                         <React.Fragment key={nIdx}>
@@ -101,7 +101,7 @@ export function ExplanationPreview({ text }: ExplanationPreviewProps) {
                                 {parseLatexString(node)}
                             </span>
                             {nIdx < nodes.length - 1 && (
-                                <ArrowRight className="size-4 shrink-0 text-blue-400 dark:text-blue-600" />
+                                <ArrowRight className="size-4 shrink-0 text-blue-400 dark:text-blue-400 dark:text-blue-600" />
                             )}
                         </React.Fragment>
                     ))}

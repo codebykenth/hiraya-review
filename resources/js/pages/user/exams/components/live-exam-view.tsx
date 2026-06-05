@@ -116,14 +116,14 @@ export function LiveExamView({
                         </TooltipProvider>
                         <div className="hidden h-6 w-px bg-border md:block" />
                         <span className="text-md hidden items-center gap-1.5 font-heading font-bold text-foreground md:flex">
-                            <Award className="size-4.5 text-blue-600" />
+                            <Award className="size-4.5 text-blue-600 dark:text-blue-400" />
                             {details.title}
                         </span>
                     </div>
 
                     {activeQuestion && (
                         <div className="flex items-center gap-2 sm:gap-3">
-                            <span className="hidden inline-flex items-center gap-1 rounded-full border border-blue-100/30 bg-blue-50/80 px-3 py-1 text-xs font-bold text-blue-600 sm:inline-flex dark:bg-blue-950/40 dark:text-blue-400">
+                            <span className="dark:bg-blue-950/30/80 hidden inline-flex items-center gap-1 rounded-full border border-blue-100/30 bg-blue-50 px-3 py-1 text-xs font-bold text-blue-600 sm:inline-flex dark:bg-blue-950/40 dark:text-blue-400">
                                 <BookOpen className="size-3" />
                                 {activeQuestion.category}
                             </span>
@@ -147,7 +147,7 @@ export function LiveExamView({
                             <div
                                 className={`shadow-3xs flex items-center gap-1.5 rounded-lg border px-2 py-1.5 text-sm font-black sm:px-3 ${
                                     timeLeft < 600
-                                        ? 'animate-pulse border-rose-200 bg-rose-50 text-rose-700 dark:border-rose-900/30 dark:bg-rose-950/20 dark:text-rose-400'
+                                        ? 'animate-pulse border-rose-200 bg-rose-50 text-rose-700 dark:border-rose-900/30 dark:border-rose-900/50 dark:bg-rose-950/20 dark:bg-rose-950/30 dark:text-rose-400'
                                         : 'border-border bg-background text-foreground'
                                 }`}
                             >
@@ -202,14 +202,14 @@ export function LiveExamView({
                                                 }
                                                 className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[11px] font-bold transition focus:outline-none ${
                                                     flagged[currentIdx]
-                                                        ? 'border border-rose-200/50 bg-rose-50 text-rose-700 dark:bg-rose-950/30 dark:text-rose-400'
+                                                        ? 'dark:border-rose-900/50/50 border border-rose-200 bg-rose-50 text-rose-700 dark:bg-rose-950/30 dark:text-rose-400'
                                                         : 'text-muted-foreground hover:bg-muted'
                                                 }`}
                                             >
                                                 <Flag
                                                     className={`size-3.5 ${
                                                         flagged[currentIdx]
-                                                            ? 'fill-rose-600 text-rose-600'
+                                                            ? 'fill-rose-600 text-rose-600 dark:text-rose-400'
                                                             : ''
                                                     }`}
                                                 />
@@ -247,7 +247,7 @@ export function LiveExamView({
                                                         }
                                                         className={`shadow-3xs flex cursor-pointer items-center gap-4 rounded-xl border p-4 transition-all ${
                                                             isSelected
-                                                                ? 'border-blue-600 bg-blue-50/15 dark:border-blue-500 dark:bg-blue-950/20'
+                                                                ? 'dark:bg-blue-950/30/15 border-blue-600 bg-blue-50 dark:border-blue-500 dark:bg-blue-950/20'
                                                                 : 'border-border bg-card hover:bg-muted'
                                                         }`}
                                                     >
@@ -383,7 +383,7 @@ export function LiveExamView({
                             onClick={(e) => e.stopPropagation()}
                         >
                             <div className="mb-1 flex items-center gap-2">
-                                <Lock className="size-5 text-blue-600" />
+                                <Lock className="size-5 text-blue-600 dark:text-blue-400" />
                                 <h3 className="font-heading text-xl font-black tracking-tight text-slate-900 dark:text-white">
                                     Premium Feature Locked
                                 </h3>
@@ -424,7 +424,7 @@ export function LiveExamView({
                             onClick={(e) => e.stopPropagation()}
                         >
                             <div className="mb-1 flex items-center gap-2">
-                                <Lock className="size-5 text-blue-600" />
+                                <Lock className="size-5 text-blue-600 dark:text-blue-400" />
                                 <h3 className="font-heading text-xl font-black tracking-tight text-slate-900 dark:text-white">
                                     Free Preview Limit Reached
                                 </h3>

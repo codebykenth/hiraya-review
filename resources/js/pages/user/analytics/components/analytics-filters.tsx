@@ -1,4 +1,4 @@
-import { ChevronDown } from 'lucide-react';
+﻿import { ChevronDown } from 'lucide-react';
 import React, { useState } from 'react';
 
 interface AnalyticsFiltersProps {
@@ -47,7 +47,7 @@ export function AnalyticsFilters({
                                     }}
                                     className={`flex w-full items-center rounded-md px-3 py-2 text-left text-xs transition ${
                                         currentTrack === opt
-                                            ? 'bg-blue-50 font-bold text-blue-600 dark:bg-blue-950/50 dark:text-blue-400'
+                                            ? 'bg-blue-50 font-bold text-blue-600 dark:bg-blue-950/30 dark:bg-blue-950/50 dark:text-blue-400'
                                             : 'text-slate-700 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800'
                                     }`}
                                 >
@@ -90,7 +90,7 @@ export function AnalyticsFilters({
                                     }}
                                     className={`flex w-full items-center rounded-md px-3 py-2 text-left text-xs transition ${
                                         currentRuns === opt.value
-                                            ? 'bg-blue-50 font-bold text-blue-600 dark:bg-blue-950/50 dark:text-blue-400'
+                                            ? 'bg-blue-50 font-bold text-blue-600 dark:bg-blue-950/30 dark:bg-blue-950/50 dark:text-blue-400'
                                             : 'text-slate-700 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800'
                                     }`}
                                 >

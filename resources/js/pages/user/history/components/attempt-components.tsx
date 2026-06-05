@@ -1,4 +1,4 @@
-import { CheckCircle2, XCircle } from 'lucide-react';
+﻿import { CheckCircle2, XCircle } from 'lucide-react';
 
 export function TrackBadge({ track }: { track: string }) {
     const lowerTrack = track.toLowerCase();
@@ -35,18 +35,18 @@ export function StatusBadge({ status }: { status: string }) {
 
     if (normalized === 'pass' || normalized === 'passed') {
         badgeClass =
-            'bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20';
+            'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 border border-emerald-200 dark:border-emerald-900/50 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20';
         StatusIcon = CheckCircle2;
         text = 'Pass';
     } else if (normalized === 'fail' || normalized === 'failed') {
         badgeClass =
-            'bg-rose-50 text-rose-700 border border-rose-200 dark:bg-rose-500/10 dark:text-rose-400 dark:border-rose-500/20';
+            'bg-rose-50 dark:bg-rose-950/30 text-rose-700 border border-rose-200 dark:border-rose-900/50 dark:bg-rose-500/10 dark:text-rose-400 dark:border-rose-500/20';
         StatusIcon = XCircle;
         text = 'Fail';
     } else {
         // Completed
         badgeClass =
-            'bg-blue-50 text-blue-700 border border-blue-200 dark:bg-blue-500/10 dark:text-blue-400 dark:border-blue-500/20';
+            'bg-blue-50 dark:bg-blue-950/30 text-blue-700 border border-blue-200 dark:border-blue-900/50 dark:bg-blue-500/10 dark:text-blue-400 dark:border-blue-500/20';
         StatusIcon = CheckCircle2;
         text = 'Completed';
     }
@@ -88,8 +88,8 @@ export function ScoreProgress({
     const scoreColor = isPass
         ? 'text-emerald-700 dark:text-emerald-400'
         : isFail
-          ? 'text-rose-600 dark:text-rose-400'
-          : 'text-blue-600 dark:text-blue-400';
+          ? 'text-rose-600 dark:text-rose-400 dark:text-rose-400'
+          : 'text-blue-600 dark:text-blue-400 dark:text-blue-400';
 
     const scoreBarColor = isPass
         ? 'bg-emerald-600'

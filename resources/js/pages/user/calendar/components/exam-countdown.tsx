@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 
 interface ExamCountdownProps {
     nextExam: {
@@ -31,10 +31,10 @@ export function ExamCountdown({ nextExam }: ExamCountdownProps) {
         }
 
         if (days <= 30) {
-            return 'text-amber-600 dark:text-amber-400 font-bold';
+            return 'text-amber-600 dark:text-amber-400 dark:text-amber-400 font-bold';
         }
 
-        return 'text-blue-600 dark:text-blue-400 font-bold';
+        return 'text-blue-600 dark:text-blue-400 dark:text-blue-400 font-bold';
     };
 
     const getExamBadgeStyles = (days: number) => {

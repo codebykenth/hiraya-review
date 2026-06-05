@@ -320,18 +320,18 @@ export default function DraftsLearnList({
                                 <span className="rounded-full border border-border bg-muted px-3 py-0.5 text-xs font-semibold text-foreground">
                                     {m.category}
                                 </span>
-                                <span className="rounded-full border border-blue-100 bg-blue-50 px-3 py-0.5 text-xs font-semibold text-blue-700 dark:border-blue-900/30 dark:bg-blue-950/20 dark:text-blue-400">
+                                <span className="rounded-full border border-blue-100 bg-blue-50 px-3 py-0.5 text-xs font-semibold text-blue-700 dark:border-blue-900/30 dark:bg-blue-950/20 dark:bg-blue-950/30 dark:text-blue-400">
                                     {m.subcategory}
                                 </span>
                                 <span className="rounded-full border border-border bg-muted px-3 py-0.5 text-xs font-semibold text-foreground">
                                     â±ï¸ {m.estimated_minutes} mins
                                 </span>
                                 {m.approved ? (
-                                    <span className="bg-emerald-550/10 rounded-full border border-emerald-200 px-3 py-0.5 text-xs font-bold text-emerald-700 dark:border-emerald-900/30 dark:bg-emerald-950/20 dark:text-emerald-400">
+                                    <span className="bg-emerald-550/10 rounded-full border border-emerald-200 px-3 py-0.5 text-xs font-bold text-emerald-700 dark:border-emerald-900/30 dark:border-emerald-900/50 dark:bg-emerald-950/20 dark:text-emerald-400">
                                         Approved
                                     </span>
                                 ) : (
-                                    <span className="dark:text-amber-450 rounded-full border border-amber-100 bg-amber-50 px-3 py-0.5 text-xs font-bold text-amber-700 dark:border-amber-900/30 dark:bg-amber-950/20">
+                                    <span className="dark:text-amber-450 rounded-full border border-amber-100 bg-amber-50 px-3 py-0.5 text-xs font-bold text-amber-700 dark:border-amber-900/30 dark:bg-amber-950/20 dark:bg-amber-950/30">
                                         Pending Review
                                     </span>
                                 )}
@@ -351,7 +351,7 @@ export default function DraftsLearnList({
                                                                 m.id,
                                                             )
                                                         }
-                                                        className="border-emerald-250 cursor-pointer rounded-lg border bg-emerald-50 text-emerald-700 transition dark:border-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-400"
+                                                        className="border-emerald-250 cursor-pointer rounded-lg border bg-emerald-50 text-emerald-700 transition dark:border-emerald-800 dark:bg-emerald-950/30 dark:bg-emerald-950/40 dark:text-emerald-400"
                                                     >
                                                         <Save className="size-4" />
                                                     </button>
@@ -393,7 +393,7 @@ export default function DraftsLearnList({
                                                         }
                                                         className={`cursor-pointer rounded-lg border p-1.5 transition ${
                                                             m.approved
-                                                                ? 'border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-900/40 dark:bg-emerald-950/20 dark:text-emerald-400'
+                                                                ? 'border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-900/40 dark:border-emerald-900/50 dark:bg-emerald-950/20 dark:bg-emerald-950/30 dark:text-emerald-400'
                                                                 : 'border-border bg-card text-muted-foreground hover:text-foreground'
                                                         }`}
                                                     >
@@ -557,7 +557,7 @@ export default function DraftsLearnList({
                                                         (previewMode[m.id] ||
                                                             'preview') ===
                                                         'preview'
-                                                            ? 'shadow-3xs bg-card text-blue-600 dark:text-white'
+                                                            ? 'shadow-3xs bg-card text-blue-600 dark:text-blue-400 dark:text-white'
                                                             : 'text-muted-foreground hover:text-foreground'
                                                     }`}
                                                 >
@@ -576,7 +576,7 @@ export default function DraftsLearnList({
                                                     className={`cursor-pointer rounded-md px-2 py-1 text-[9.5px] font-extrabold uppercase transition ${
                                                         previewMode[m.id] ===
                                                         'raw'
-                                                            ? 'shadow-3xs bg-card text-blue-600 dark:text-white'
+                                                            ? 'shadow-3xs bg-card text-blue-600 dark:text-blue-400 dark:text-white'
                                                             : 'text-muted-foreground hover:text-foreground'
                                                     }`}
                                                 >

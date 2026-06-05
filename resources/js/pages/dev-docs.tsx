@@ -6,28 +6,28 @@ export default function DevDocs() {
             <Head title="Developer Docs" />
             <div className="min-h-screen bg-gray-100 p-5 font-sans leading-relaxed text-gray-800">
                 <div className="mx-auto flex max-w-[1200px] flex-col gap-6">
-                    <header className="rounded-xl border-t-[6px] border-blue-600 bg-white p-10 text-center shadow-[0_4px_6px_-1px_rgba(0,0,0,0.1)]">
+                    <header className="rounded-xl border-t-[6px] border-blue-600 bg-white p-10 text-center shadow-[0_4px_6px_-1px_rgba(0,0,0,0.1)] dark:bg-slate-950">
                         <h1 className="m-0 mb-4 text-4xl font-bold text-gray-900">
                             Civil Service Exam Reviewer Blueprint
                         </h1>
                         <div className="flex flex-wrap justify-center gap-3">
-                            <span className="rounded-full bg-blue-50 px-3.5 py-1.5 text-sm font-semibold text-blue-600">
+                            <span className="rounded-full bg-blue-50 px-3.5 py-1.5 text-sm font-semibold text-blue-600 dark:bg-blue-950/30 dark:text-blue-400">
                                 Timeline: May 23 - Jun 26, 2026
                             </span>
-                            <span className="rounded-full bg-blue-50 px-3.5 py-1.5 text-sm font-semibold text-blue-600">
+                            <span className="rounded-full bg-blue-50 px-3.5 py-1.5 text-sm font-semibold text-blue-600 dark:bg-blue-950/30 dark:text-blue-400">
                                 Stack: Laravel 13 + Inertia v3 + React 19 + Neon
                             </span>
-                            <span className="rounded-full bg-blue-50 px-3.5 py-1.5 text-sm font-semibold text-blue-600">
+                            <span className="rounded-full bg-blue-50 px-3.5 py-1.5 text-sm font-semibold text-blue-600 dark:bg-blue-950/30 dark:text-blue-400">
                                 Budget: $0
                             </span>
                         </div>
                     </header>
 
-                    <section className="rounded-xl bg-white p-8 shadow-sm">
-                        <h2 className="mt-0 mb-4 border-b-2 border-gray-200 pb-3 text-4xl font-black tracking-tight text-blue-600 sm:text-5xl">
+                    <section className="rounded-xl bg-white p-8 shadow-sm dark:bg-slate-950">
+                        <h2 className="mt-0 mb-4 border-b-2 border-gray-200 pb-3 text-4xl font-black tracking-tight text-blue-600 sm:text-5xl dark:text-blue-400">
                             1. Current State Assessment
                         </h2>
-                        <div className="my-6 overflow-hidden rounded-lg border border-gray-100 bg-white shadow-[0_1px_3px_rgba(0,0,0,0.1)]">
+                        <div className="my-6 overflow-hidden rounded-lg border border-gray-100 bg-white shadow-[0_1px_3px_rgba(0,0,0,0.1)] dark:bg-slate-950">
                             <table className="w-full border-collapse text-left">
                                 <thead className="bg-slate-50">
                                     <tr>
@@ -158,8 +158,8 @@ export default function DevDocs() {
                         </div>
                     </section>
 
-                    <section className="rounded-xl bg-white p-8 shadow-sm">
-                        <h2 className="mt-0 mb-4 border-b-2 border-gray-200 pb-3 text-4xl font-black tracking-tight text-blue-600 sm:text-5xl">
+                    <section className="rounded-xl bg-white p-8 shadow-sm dark:bg-slate-950">
+                        <h2 className="mt-0 mb-4 border-b-2 border-gray-200 pb-3 text-4xl font-black tracking-tight text-blue-600 sm:text-5xl dark:text-blue-400">
                             2. Architectural Design Decisions
                         </h2>
                         <ul className="mb-5 list-disc space-y-2 pl-6">
@@ -182,7 +182,7 @@ export default function DevDocs() {
                             <li>
                                 <strong>Admin Identification:</strong> Managed
                                 via{' '}
-                                <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                     role
                                 </code>{' '}
                                 column (enum: user, admin) on users table.
@@ -194,8 +194,8 @@ export default function DevDocs() {
                         </ul>
                     </section>
 
-                    <section className="rounded-xl bg-white p-8 shadow-sm">
-                        <h2 className="mt-0 mb-4 border-b-2 border-gray-200 pb-3 text-4xl font-black tracking-tight text-blue-600 sm:text-5xl">
+                    <section className="rounded-xl bg-white p-8 shadow-sm dark:bg-slate-950">
+                        <h2 className="mt-0 mb-4 border-b-2 border-gray-200 pb-3 text-4xl font-black tracking-tight text-blue-600 sm:text-5xl dark:text-blue-400">
                             3. Database Schema & JSONB Structures
                         </h2>
                         <h3 className="mt-7 mb-3 text-2xl font-black tracking-tight text-gray-700 sm:text-3xl">
@@ -208,7 +208,7 @@ export default function DevDocs() {
                             <strong>
                                 all user exam answers and item states are stored
                                 as a single JSONB record within a single{' '}
-                                <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                     exam_attempts
                                 </code>{' '}
                                 table row
@@ -265,11 +265,11 @@ export default function DevDocs() {
                         {/* 1. users */}
                         <h4 className="mt-6 mb-2 flex items-center gap-2 text-xl font-black tracking-tight text-gray-700">
                             <span>Table:</span>
-                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                 users
                             </code>
                         </h4>
-                        <div className="my-4 overflow-hidden rounded-lg border border-gray-100 bg-white shadow-[0_1px_3px_rgba(0,0,0,0.1)]">
+                        <div className="my-4 overflow-hidden rounded-lg border border-gray-100 bg-white shadow-[0_1px_3px_rgba(0,0,0,0.1)] dark:bg-slate-950">
                             <table className="w-full border-collapse text-left text-sm">
                                 <thead className="bg-slate-50">
                                     <tr>
@@ -296,7 +296,7 @@ export default function DevDocs() {
                                 <tbody>
                                     <tr className="hover:bg-slate-50">
                                         <td className="border-b border-gray-200 p-3 font-medium">
-                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                                 id
                                             </code>
                                         </td>
@@ -312,7 +312,7 @@ export default function DevDocs() {
                                             Auto-incrementing unique identifier.
                                         </td>
                                         <td className="border-b border-gray-200 p-3">
-                                            <code className="rounded bg-slate-100 px-1 py-0.5 font-mono text-[0.85em] text-emerald-600">
+                                            <code className="rounded bg-slate-100 px-1 py-0.5 font-mono text-[0.85em] text-emerald-600 dark:text-emerald-400">
                                                 1
                                             </code>
                                         </td>
@@ -324,7 +324,7 @@ export default function DevDocs() {
                                     </tr>
                                     <tr className="hover:bg-slate-50">
                                         <td className="border-b border-gray-200 p-3 font-medium">
-                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                                 name
                                             </code>
                                         </td>
@@ -340,7 +340,7 @@ export default function DevDocs() {
                                             The full name of the user.
                                         </td>
                                         <td className="border-b border-gray-200 p-3">
-                                            <code className="rounded bg-slate-100 px-1 py-0.5 font-mono text-[0.85em] text-emerald-600">
+                                            <code className="rounded bg-slate-100 px-1 py-0.5 font-mono text-[0.85em] text-emerald-600 dark:text-emerald-400">
                                                 "Jane Doe"
                                             </code>
                                         </td>
@@ -352,7 +352,7 @@ export default function DevDocs() {
                                     </tr>
                                     <tr className="hover:bg-slate-50">
                                         <td className="border-b border-gray-200 p-3 font-medium">
-                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                                 email
                                             </code>
                                         </td>
@@ -368,7 +368,7 @@ export default function DevDocs() {
                                             Unique email address of the user.
                                         </td>
                                         <td className="border-b border-gray-200 p-3">
-                                            <code className="rounded bg-slate-100 px-1 py-0.5 font-mono text-[0.85em] text-emerald-600">
+                                            <code className="rounded bg-slate-100 px-1 py-0.5 font-mono text-[0.85em] text-emerald-600 dark:text-emerald-400">
                                                 "jane.doe@example.com"
                                             </code>
                                         </td>
@@ -380,7 +380,7 @@ export default function DevDocs() {
                                     </tr>
                                     <tr className="hover:bg-slate-50">
                                         <td className="border-b border-gray-200 p-3 font-medium">
-                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                                 email_verified_at
                                             </code>
                                         </td>
@@ -397,7 +397,7 @@ export default function DevDocs() {
                                             completed.
                                         </td>
                                         <td className="border-b border-gray-200 p-3">
-                                            <code className="rounded bg-slate-100 px-1 py-0.5 font-mono text-[0.85em] text-emerald-600">
+                                            <code className="rounded bg-slate-100 px-1 py-0.5 font-mono text-[0.85em] text-emerald-600 dark:text-emerald-400">
                                                 "2026-05-24 03:00:00"
                                             </code>
                                         </td>
@@ -408,7 +408,7 @@ export default function DevDocs() {
                                     </tr>
                                     <tr className="hover:bg-slate-50">
                                         <td className="border-b border-gray-200 p-3 font-medium">
-                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                                 password
                                             </code>
                                         </td>
@@ -425,7 +425,7 @@ export default function DevDocs() {
                                             to support social login accounts.
                                         </td>
                                         <td className="border-b border-gray-200 p-3">
-                                            <code className="rounded bg-slate-100 px-1 py-0.5 font-mono text-[0.85em] text-emerald-600">
+                                            <code className="rounded bg-slate-100 px-1 py-0.5 font-mono text-[0.85em] text-emerald-600 dark:text-emerald-400">
                                                 "$2y$12$e..."
                                             </code>
                                         </td>
@@ -436,7 +436,7 @@ export default function DevDocs() {
                                     </tr>
                                     <tr className="hover:bg-slate-50">
                                         <td className="border-b border-gray-200 p-3 font-medium">
-                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                                 provider
                                             </code>
                                         </td>
@@ -453,7 +453,7 @@ export default function DevDocs() {
                                             identification.
                                         </td>
                                         <td className="border-b border-gray-200 p-3">
-                                            <code className="rounded bg-slate-100 px-1 py-0.5 font-mono text-[0.85em] text-emerald-600">
+                                            <code className="rounded bg-slate-100 px-1 py-0.5 font-mono text-[0.85em] text-emerald-600 dark:text-emerald-400">
                                                 "google"
                                             </code>
                                         </td>
@@ -465,7 +465,7 @@ export default function DevDocs() {
                                     </tr>
                                     <tr className="hover:bg-slate-50">
                                         <td className="border-b border-gray-200 p-3 font-medium">
-                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                                 provider_id
                                             </code>
                                         </td>
@@ -482,7 +482,7 @@ export default function DevDocs() {
                                             social provider.
                                         </td>
                                         <td className="border-b border-gray-200 p-3">
-                                            <code className="rounded bg-slate-100 px-1 py-0.5 font-mono text-[0.85em] text-emerald-600">
+                                            <code className="rounded bg-slate-100 px-1 py-0.5 font-mono text-[0.85em] text-emerald-600 dark:text-emerald-400">
                                                 "1092839284"
                                             </code>
                                         </td>
@@ -494,7 +494,7 @@ export default function DevDocs() {
                                     </tr>
                                     <tr className="hover:bg-slate-50">
                                         <td className="border-b border-gray-200 p-3 font-medium">
-                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                                 role
                                             </code>
                                         </td>
@@ -510,7 +510,7 @@ export default function DevDocs() {
                                             Authorization access group.
                                         </td>
                                         <td className="border-b border-gray-200 p-3">
-                                            <code className="rounded bg-slate-100 px-1 py-0.5 font-mono text-[0.85em] text-emerald-600">
+                                            <code className="rounded bg-slate-100 px-1 py-0.5 font-mono text-[0.85em] text-emerald-600 dark:text-emerald-400">
                                                 "user"
                                             </code>
                                         </td>
@@ -521,7 +521,7 @@ export default function DevDocs() {
                                     </tr>
                                     <tr className="hover:bg-slate-50">
                                         <td className="border-b border-gray-200 p-3 font-medium">
-                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                                 remember_token
                                             </code>
                                         </td>
@@ -538,7 +538,7 @@ export default function DevDocs() {
                                             session.
                                         </td>
                                         <td className="border-b border-gray-200 p-3">
-                                            <code className="rounded bg-slate-100 px-1 py-0.5 font-mono text-[0.85em] text-emerald-600">
+                                            <code className="rounded bg-slate-100 px-1 py-0.5 font-mono text-[0.85em] text-emerald-600 dark:text-emerald-400">
                                                 "f4Ea2s1..."
                                             </code>
                                         </td>
@@ -554,11 +554,11 @@ export default function DevDocs() {
                         {/* 2. categories */}
                         <h4 className="mt-6 mb-2 flex items-center gap-2 text-xl font-black tracking-tight text-gray-700">
                             <span>Table:</span>
-                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                 categories
                             </code>
                         </h4>
-                        <div className="my-4 overflow-hidden rounded-lg border border-gray-100 bg-white shadow-[0_1px_3px_rgba(0,0,0,0.1)]">
+                        <div className="my-4 overflow-hidden rounded-lg border border-gray-100 bg-white shadow-[0_1px_3px_rgba(0,0,0,0.1)] dark:bg-slate-950">
                             <table className="w-full border-collapse text-left text-sm">
                                 <thead className="bg-slate-50">
                                     <tr>
@@ -585,7 +585,7 @@ export default function DevDocs() {
                                 <tbody>
                                     <tr className="hover:bg-slate-50">
                                         <td className="border-b border-gray-200 p-3 font-medium">
-                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                                 id
                                             </code>
                                         </td>
@@ -601,7 +601,7 @@ export default function DevDocs() {
                                             Auto-incrementing unique identifier.
                                         </td>
                                         <td className="border-b border-gray-200 p-3">
-                                            <code className="rounded bg-slate-100 px-1 py-0.5 font-mono text-[0.85em] text-emerald-600">
+                                            <code className="rounded bg-slate-100 px-1 py-0.5 font-mono text-[0.85em] text-emerald-600 dark:text-emerald-400">
                                                 1
                                             </code>
                                         </td>
@@ -613,7 +613,7 @@ export default function DevDocs() {
                                     </tr>
                                     <tr className="hover:bg-slate-50">
                                         <td className="border-b border-gray-200 p-3 font-medium">
-                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                                 name
                                             </code>
                                         </td>
@@ -629,7 +629,7 @@ export default function DevDocs() {
                                             Human-readable name of the category.
                                         </td>
                                         <td className="border-b border-gray-200 p-3">
-                                            <code className="rounded bg-slate-100 px-1 py-0.5 font-mono text-[0.85em] text-emerald-600">
+                                            <code className="rounded bg-slate-100 px-1 py-0.5 font-mono text-[0.85em] text-emerald-600 dark:text-emerald-400">
                                                 "Verbal Ability"
                                             </code>
                                         </td>
@@ -641,7 +641,7 @@ export default function DevDocs() {
                                     </tr>
                                     <tr className="hover:bg-slate-50">
                                         <td className="border-b border-gray-200 p-3 font-medium">
-                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                                 slug
                                             </code>
                                         </td>
@@ -658,7 +658,7 @@ export default function DevDocs() {
                                             identification.
                                         </td>
                                         <td className="border-b border-gray-200 p-3">
-                                            <code className="rounded bg-slate-100 px-1 py-0.5 font-mono text-[0.85em] text-emerald-600">
+                                            <code className="rounded bg-slate-100 px-1 py-0.5 font-mono text-[0.85em] text-emerald-600 dark:text-emerald-400">
                                                 "verbal-ability"
                                             </code>
                                         </td>
@@ -670,7 +670,7 @@ export default function DevDocs() {
                                     </tr>
                                     <tr className="hover:bg-slate-50">
                                         <td className="border-b border-gray-200 p-3 font-medium">
-                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                                 is_demographic
                                             </code>
                                         </td>
@@ -687,7 +687,7 @@ export default function DevDocs() {
                                             the demographic survey (EDQ).
                                         </td>
                                         <td className="border-b border-gray-200 p-3">
-                                            <code className="rounded bg-slate-100 px-1 py-0.5 font-mono text-[0.85em] text-emerald-600">
+                                            <code className="rounded bg-slate-100 px-1 py-0.5 font-mono text-[0.85em] text-emerald-600 dark:text-emerald-400">
                                                 false
                                             </code>
                                         </td>
@@ -699,7 +699,7 @@ export default function DevDocs() {
                                     </tr>
                                     <tr className="hover:bg-slate-50">
                                         <td className="border-b border-gray-200 p-3 font-medium">
-                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                                 sort_order
                                             </code>
                                         </td>
@@ -715,7 +715,7 @@ export default function DevDocs() {
                                             Determines display sorting order.
                                         </td>
                                         <td className="border-b border-gray-200 p-3">
-                                            <code className="rounded bg-slate-100 px-1 py-0.5 font-mono text-[0.85em] text-emerald-600">
+                                            <code className="rounded bg-slate-100 px-1 py-0.5 font-mono text-[0.85em] text-emerald-600 dark:text-emerald-400">
                                                 1
                                             </code>
                                         </td>
@@ -732,11 +732,11 @@ export default function DevDocs() {
                         {/* 3. subcategories */}
                         <h4 className="mt-6 mb-2 flex items-center gap-2 text-xl font-black tracking-tight text-gray-700">
                             <span>Table:</span>
-                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                 subcategories
                             </code>
                         </h4>
-                        <div className="my-4 overflow-hidden rounded-lg border border-gray-100 bg-white shadow-[0_1px_3px_rgba(0,0,0,0.1)]">
+                        <div className="my-4 overflow-hidden rounded-lg border border-gray-100 bg-white shadow-[0_1px_3px_rgba(0,0,0,0.1)] dark:bg-slate-950">
                             <table className="w-full border-collapse text-left text-sm">
                                 <thead className="bg-slate-50">
                                     <tr>
@@ -763,7 +763,7 @@ export default function DevDocs() {
                                 <tbody>
                                     <tr className="hover:bg-slate-50">
                                         <td className="border-b border-gray-200 p-3 font-medium">
-                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                                 category_id
                                             </code>
                                         </td>
@@ -783,7 +783,7 @@ export default function DevDocs() {
                                             .
                                         </td>
                                         <td className="border-b border-gray-200 p-3">
-                                            <code className="rounded bg-slate-100 px-1 py-0.5 font-mono text-[0.85em] text-emerald-600">
+                                            <code className="rounded bg-slate-100 px-1 py-0.5 font-mono text-[0.85em] text-emerald-600 dark:text-emerald-400">
                                                 1
                                             </code>
                                         </td>
@@ -795,7 +795,7 @@ export default function DevDocs() {
                                     </tr>
                                     <tr className="hover:bg-slate-50">
                                         <td className="border-b border-gray-200 p-3 font-medium">
-                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                                 name
                                             </code>
                                         </td>
@@ -811,7 +811,7 @@ export default function DevDocs() {
                                             Name of the subcategory.
                                         </td>
                                         <td className="border-b border-gray-200 p-3">
-                                            <code className="rounded bg-slate-100 px-1 py-0.5 font-mono text-[0.85em] text-emerald-600">
+                                            <code className="rounded bg-slate-100 px-1 py-0.5 font-mono text-[0.85em] text-emerald-600 dark:text-emerald-400">
                                                 "Word Meaning"
                                             </code>
                                         </td>
@@ -823,7 +823,7 @@ export default function DevDocs() {
                                     </tr>
                                     <tr className="hover:bg-slate-50">
                                         <td className="border-b border-gray-200 p-3 font-medium">
-                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                                 slug
                                             </code>
                                         </td>
@@ -839,7 +839,7 @@ export default function DevDocs() {
                                             URL-friendly slug.
                                         </td>
                                         <td className="border-b border-gray-200 p-3">
-                                            <code className="rounded bg-slate-100 px-1 py-0.5 font-mono text-[0.85em] text-emerald-600">
+                                            <code className="rounded bg-slate-100 px-1 py-0.5 font-mono text-[0.85em] text-emerald-600 dark:text-emerald-400">
                                                 "word-meaning"
                                             </code>
                                         </td>
@@ -850,7 +850,7 @@ export default function DevDocs() {
                                     </tr>
                                     <tr className="hover:bg-slate-50">
                                         <td className="border-b border-gray-200 p-3 font-medium">
-                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                                 language
                                             </code>
                                         </td>
@@ -866,7 +866,7 @@ export default function DevDocs() {
                                             Language of instruction.
                                         </td>
                                         <td className="border-b border-gray-200 p-3">
-                                            <code className="rounded bg-slate-100 px-1 py-0.5 font-mono text-[0.85em] text-emerald-600">
+                                            <code className="rounded bg-slate-100 px-1 py-0.5 font-mono text-[0.85em] text-emerald-600 dark:text-emerald-400">
                                                 "English"
                                             </code>
                                         </td>
@@ -877,7 +877,7 @@ export default function DevDocs() {
                                     </tr>
                                     <tr className="hover:bg-slate-50">
                                         <td className="border-b border-gray-200 p-3 font-medium">
-                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                                 sort_order
                                             </code>
                                         </td>
@@ -893,7 +893,7 @@ export default function DevDocs() {
                                             Determines display sorting order.
                                         </td>
                                         <td className="border-b border-gray-200 p-3">
-                                            <code className="rounded bg-slate-100 px-1 py-0.5 font-mono text-[0.85em] text-emerald-600">
+                                            <code className="rounded bg-slate-100 px-1 py-0.5 font-mono text-[0.85em] text-emerald-600 dark:text-emerald-400">
                                                 1
                                             </code>
                                         </td>
@@ -910,11 +910,11 @@ export default function DevDocs() {
                         {/* 4. questions */}
                         <h4 className="mt-6 mb-2 flex items-center gap-2 text-xl font-black tracking-tight text-gray-700">
                             <span>Table:</span>
-                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                 questions
                             </code>
                         </h4>
-                        <div className="my-4 overflow-hidden rounded-lg border border-gray-100 bg-white shadow-[0_1px_3px_rgba(0,0,0,0.1)]">
+                        <div className="my-4 overflow-hidden rounded-lg border border-gray-100 bg-white shadow-[0_1px_3px_rgba(0,0,0,0.1)] dark:bg-slate-950">
                             <table className="w-full border-collapse text-left text-sm">
                                 <thead className="bg-slate-50">
                                     <tr>
@@ -941,7 +941,7 @@ export default function DevDocs() {
                                 <tbody>
                                     <tr className="hover:bg-slate-50">
                                         <td className="border-b border-gray-200 p-3 font-medium">
-                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                                 subcategory_id
                                             </code>
                                         </td>
@@ -961,7 +961,7 @@ export default function DevDocs() {
                                             .
                                         </td>
                                         <td className="border-b border-gray-200 p-3">
-                                            <code className="rounded bg-slate-100 px-1 py-0.5 font-mono text-[0.85em] text-emerald-600">
+                                            <code className="rounded bg-slate-100 px-1 py-0.5 font-mono text-[0.85em] text-emerald-600 dark:text-emerald-400">
                                                 2
                                             </code>
                                         </td>
@@ -973,7 +973,7 @@ export default function DevDocs() {
                                     </tr>
                                     <tr className="hover:bg-slate-50">
                                         <td className="border-b border-gray-200 p-3 font-medium">
-                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                                 language
                                             </code>
                                         </td>
@@ -989,7 +989,7 @@ export default function DevDocs() {
                                             Language of the question.
                                         </td>
                                         <td className="border-b border-gray-200 p-3">
-                                            <code className="rounded bg-slate-100 px-1 py-0.5 font-mono text-[0.85em] text-emerald-600">
+                                            <code className="rounded bg-slate-100 px-1 py-0.5 font-mono text-[0.85em] text-emerald-600 dark:text-emerald-400">
                                                 "English"
                                             </code>
                                         </td>
@@ -1001,7 +1001,7 @@ export default function DevDocs() {
                                     </tr>
                                     <tr className="hover:bg-slate-50">
                                         <td className="border-b border-gray-200 p-3 font-medium">
-                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                                 stem
                                             </code>
                                         </td>
@@ -1017,7 +1017,7 @@ export default function DevDocs() {
                                             The core question text or prompt.
                                         </td>
                                         <td className="border-b border-gray-200 p-3">
-                                            <code className="rounded bg-slate-100 px-1 py-0.5 font-mono text-[0.85em] text-emerald-600">
+                                            <code className="rounded bg-slate-100 px-1 py-0.5 font-mono text-[0.85em] text-emerald-600 dark:text-emerald-400">
                                                 "What is the synonym of
                                                 'benevolent'?"
                                             </code>
@@ -1029,7 +1029,7 @@ export default function DevDocs() {
                                     </tr>
                                     <tr className="hover:bg-slate-50">
                                         <td className="border-b border-gray-200 p-3 font-medium">
-                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                                 options
                                             </code>
                                         </td>
@@ -1045,7 +1045,7 @@ export default function DevDocs() {
                                             Ordered choices array.
                                         </td>
                                         <td className="border-b border-gray-200 p-3">
-                                            <code className="rounded bg-slate-100 px-1 py-0.5 font-mono text-[0.85em] text-emerald-600">
+                                            <code className="rounded bg-slate-100 px-1 py-0.5 font-mono text-[0.85em] text-emerald-600 dark:text-emerald-400">
                                                 ["Kind", "Cruel", "Lazy",
                                                 "Smart"]
                                             </code>
@@ -1058,7 +1058,7 @@ export default function DevDocs() {
                                     </tr>
                                     <tr className="hover:bg-slate-50">
                                         <td className="border-b border-gray-200 p-3 font-medium">
-                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                                 correct_option
                                             </code>
                                         </td>
@@ -1074,7 +1074,7 @@ export default function DevDocs() {
                                             0-based index of correct option.
                                         </td>
                                         <td className="border-b border-gray-200 p-3">
-                                            <code className="rounded bg-slate-100 px-1 py-0.5 font-mono text-[0.85em] text-emerald-600">
+                                            <code className="rounded bg-slate-100 px-1 py-0.5 font-mono text-[0.85em] text-emerald-600 dark:text-emerald-400">
                                                 0
                                             </code>
                                         </td>
@@ -1086,7 +1086,7 @@ export default function DevDocs() {
                                     </tr>
                                     <tr className="hover:bg-slate-50">
                                         <td className="border-b border-gray-200 p-3 font-medium">
-                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                                 explanation
                                             </code>
                                         </td>
@@ -1102,7 +1102,7 @@ export default function DevDocs() {
                                             Explanation for the correct option.
                                         </td>
                                         <td className="border-b border-gray-200 p-3">
-                                            <code className="rounded bg-slate-100 px-1 py-0.5 font-mono text-[0.85em] text-emerald-600">
+                                            <code className="rounded bg-slate-100 px-1 py-0.5 font-mono text-[0.85em] text-emerald-600 dark:text-emerald-400">
                                                 "'Benevolent' means kind and
                                                 generous."
                                             </code>
@@ -1114,7 +1114,7 @@ export default function DevDocs() {
                                     </tr>
                                     <tr className="hover:bg-slate-50">
                                         <td className="border-b border-gray-200 p-3 font-medium">
-                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                                 created_by
                                             </code>
                                         </td>
@@ -1134,7 +1134,7 @@ export default function DevDocs() {
                                             .
                                         </td>
                                         <td className="border-b border-gray-200 p-3">
-                                            <code className="rounded bg-slate-100 px-1 py-0.5 font-mono text-[0.85em] text-emerald-600">
+                                            <code className="rounded bg-slate-100 px-1 py-0.5 font-mono text-[0.85em] text-emerald-600 dark:text-emerald-400">
                                                 1
                                             </code>
                                         </td>
@@ -1150,11 +1150,11 @@ export default function DevDocs() {
                         {/* 5. track_configs */}
                         <h4 className="mt-6 mb-2 flex items-center gap-2 text-xl font-black tracking-tight text-gray-700">
                             <span>Table:</span>
-                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                 track_configs
                             </code>
                         </h4>
-                        <div className="my-4 overflow-hidden rounded-lg border border-gray-100 bg-white shadow-[0_1px_3px_rgba(0,0,0,0.1)]">
+                        <div className="my-4 overflow-hidden rounded-lg border border-gray-100 bg-white shadow-[0_1px_3px_rgba(0,0,0,0.1)] dark:bg-slate-950">
                             <table className="w-full border-collapse text-left text-sm">
                                 <thead className="bg-slate-50">
                                     <tr>
@@ -1181,7 +1181,7 @@ export default function DevDocs() {
                                 <tbody>
                                     <tr className="hover:bg-slate-50">
                                         <td className="border-b border-gray-200 p-3 font-medium">
-                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                                 id
                                             </code>
                                         </td>
@@ -1197,7 +1197,7 @@ export default function DevDocs() {
                                             Auto-incrementing unique identifier.
                                         </td>
                                         <td className="border-b border-gray-200 p-3">
-                                            <code className="rounded bg-slate-100 px-1 py-0.5 font-mono text-[0.85em] text-emerald-600">
+                                            <code className="rounded bg-slate-100 px-1 py-0.5 font-mono text-[0.85em] text-emerald-600 dark:text-emerald-400">
                                                 1
                                             </code>
                                         </td>
@@ -1208,7 +1208,7 @@ export default function DevDocs() {
                                     </tr>
                                     <tr className="hover:bg-slate-50">
                                         <td className="border-b border-gray-200 p-3 font-medium">
-                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                                 track
                                             </code>
                                         </td>
@@ -1226,7 +1226,7 @@ export default function DevDocs() {
                                             configuration.
                                         </td>
                                         <td className="border-b border-gray-200 p-3">
-                                            <code className="rounded bg-slate-100 px-1 py-0.5 font-mono text-[0.85em] text-emerald-600">
+                                            <code className="rounded bg-slate-100 px-1 py-0.5 font-mono text-[0.85em] text-emerald-600 dark:text-emerald-400">
                                                 "Professional"
                                             </code>
                                         </td>
@@ -1237,7 +1237,7 @@ export default function DevDocs() {
                                     </tr>
                                     <tr className="hover:bg-slate-50">
                                         <td className="border-b border-gray-200 p-3 font-medium">
-                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                                 category_id
                                             </code>
                                         </td>
@@ -1257,7 +1257,7 @@ export default function DevDocs() {
                                             .
                                         </td>
                                         <td className="border-b border-gray-200 p-3">
-                                            <code className="rounded bg-slate-100 px-1 py-0.5 font-mono text-[0.85em] text-emerald-600">
+                                            <code className="rounded bg-slate-100 px-1 py-0.5 font-mono text-[0.85em] text-emerald-600 dark:text-emerald-400">
                                                 1
                                             </code>
                                         </td>
@@ -1268,7 +1268,7 @@ export default function DevDocs() {
                                     </tr>
                                     <tr className="hover:bg-slate-50">
                                         <td className="border-b border-gray-200 p-3 font-medium">
-                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                                 item_count
                                             </code>
                                         </td>
@@ -1284,7 +1284,7 @@ export default function DevDocs() {
                                             Target number of questions.
                                         </td>
                                         <td className="border-b border-gray-200 p-3">
-                                            <code className="rounded bg-slate-100 px-1 py-0.5 font-mono text-[0.85em] text-emerald-600">
+                                            <code className="rounded bg-slate-100 px-1 py-0.5 font-mono text-[0.85em] text-emerald-600 dark:text-emerald-400">
                                                 45
                                             </code>
                                         </td>
@@ -1296,7 +1296,7 @@ export default function DevDocs() {
                                     </tr>
                                     <tr className="hover:bg-slate-50">
                                         <td className="border-b border-gray-200 p-3 font-medium">
-                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                                 time_limit_secs
                                             </code>
                                         </td>
@@ -1312,7 +1312,7 @@ export default function DevDocs() {
                                             Time limit in seconds.
                                         </td>
                                         <td className="border-b border-gray-200 p-3">
-                                            <code className="rounded bg-slate-100 px-1 py-0.5 font-mono text-[0.85em] text-emerald-600">
+                                            <code className="rounded bg-slate-100 px-1 py-0.5 font-mono text-[0.85em] text-emerald-600 dark:text-emerald-400">
                                                 11400
                                             </code>
                                         </td>
@@ -1328,11 +1328,11 @@ export default function DevDocs() {
                         {/* 6. exam_attempts */}
                         <h4 className="mt-6 mb-2 flex items-center gap-2 text-xl font-black tracking-tight text-gray-700">
                             <span>Table:</span>
-                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                 exam_attempts
                             </code>
                         </h4>
-                        <div className="my-4 overflow-hidden rounded-lg border border-gray-100 bg-white shadow-[0_1px_3px_rgba(0,0,0,0.1)]">
+                        <div className="my-4 overflow-hidden rounded-lg border border-gray-100 bg-white shadow-[0_1px_3px_rgba(0,0,0,0.1)] dark:bg-slate-950">
                             <table className="w-full border-collapse text-left text-sm">
                                 <thead className="bg-slate-50">
                                     <tr>
@@ -1359,7 +1359,7 @@ export default function DevDocs() {
                                 <tbody>
                                     <tr className="hover:bg-slate-50">
                                         <td className="border-b border-gray-200 p-3 font-medium">
-                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                                 category_id
                                             </code>
                                         </td>
@@ -1376,7 +1376,7 @@ export default function DevDocs() {
                                             drill; null for full mock exams.
                                         </td>
                                         <td className="border-b border-gray-200 p-3">
-                                            <code className="rounded bg-slate-100 px-1 py-0.5 font-mono text-[0.85em] text-emerald-600">
+                                            <code className="rounded bg-slate-100 px-1 py-0.5 font-mono text-[0.85em] text-emerald-600 dark:text-emerald-400">
                                                 null
                                             </code>
                                         </td>
@@ -1388,7 +1388,7 @@ export default function DevDocs() {
                                     </tr>
                                     <tr className="hover:bg-slate-50">
                                         <td className="border-b border-gray-200 p-3 font-medium">
-                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                                 user_id
                                             </code>
                                         </td>
@@ -1404,7 +1404,7 @@ export default function DevDocs() {
                                             References user who took this exam.
                                         </td>
                                         <td className="border-b border-gray-200 p-3">
-                                            <code className="rounded bg-slate-100 px-1 py-0.5 font-mono text-[0.85em] text-emerald-600">
+                                            <code className="rounded bg-slate-100 px-1 py-0.5 font-mono text-[0.85em] text-emerald-600 dark:text-emerald-400">
                                                 1
                                             </code>
                                         </td>
@@ -1415,7 +1415,7 @@ export default function DevDocs() {
                                     </tr>
                                     <tr className="hover:bg-slate-50">
                                         <td className="border-b border-gray-200 p-3 font-medium">
-                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                                 question_ids
                                             </code>
                                         </td>
@@ -1432,7 +1432,7 @@ export default function DevDocs() {
                                             this attempt.
                                         </td>
                                         <td className="border-b border-gray-200 p-3">
-                                            <code className="rounded bg-slate-100 px-1 py-0.5 font-mono text-[0.85em] text-emerald-600">
+                                            <code className="rounded bg-slate-100 px-1 py-0.5 font-mono text-[0.85em] text-emerald-600 dark:text-emerald-400">
                                                 [101, 102, 103]
                                             </code>
                                         </td>
@@ -1444,7 +1444,7 @@ export default function DevDocs() {
                                     </tr>
                                     <tr className="hover:bg-slate-50">
                                         <td className="border-b border-gray-200 p-3 font-medium">
-                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                                 answers
                                             </code>
                                         </td>
@@ -1461,7 +1461,7 @@ export default function DevDocs() {
                                             ID string to option index.
                                         </td>
                                         <td className="border-b border-gray-200 p-3">
-                                            <code className="rounded bg-slate-100 px-1 py-0.5 font-mono text-[0.85em] text-emerald-600">
+                                            <code className="rounded bg-slate-100 px-1 py-0.5 font-mono text-[0.85em] text-emerald-600 dark:text-emerald-400">
                                                 {'{"101": 2, "103": 0}'}
                                             </code>
                                         </td>
@@ -1473,7 +1473,7 @@ export default function DevDocs() {
                                     </tr>
                                     <tr className="hover:bg-slate-50">
                                         <td className="border-b border-gray-200 p-3 font-medium">
-                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                                 cat_scores
                                             </code>
                                         </td>
@@ -1490,7 +1490,7 @@ export default function DevDocs() {
                                             scoring breakdown.
                                         </td>
                                         <td className="border-b border-gray-200 p-3">
-                                            <code className="rounded bg-slate-100 px-1 py-0.5 font-mono text-[0.85em] text-emerald-600">
+                                            <code className="rounded bg-slate-100 px-1 py-0.5 font-mono text-[0.85em] text-emerald-600 dark:text-emerald-400">
                                                 {
                                                     '{"verbal_ability": {"total": 45, "correct": 38}}'
                                                 }
@@ -1572,14 +1572,14 @@ export default function DevDocs() {
                         </pre>
                     </section>
 
-                    <section className="rounded-xl bg-white p-8 shadow-sm">
-                        <h2 className="mt-0 mb-4 border-b-2 border-gray-200 pb-3 text-4xl font-black tracking-tight text-blue-600 sm:text-5xl">
+                    <section className="rounded-xl bg-white p-8 shadow-sm dark:bg-slate-950">
+                        <h2 className="mt-0 mb-4 border-b-2 border-gray-200 pb-3 text-4xl font-black tracking-tight text-blue-600 sm:text-5xl dark:text-blue-400">
                             4. Configurations & Relationships
                         </h2>
                         <h3 className="mt-7 mb-3 text-2xl font-black tracking-tight text-gray-700 sm:text-3xl">
                             Subcategory & Distribution Seed Matrices
                         </h3>
-                        <div className="my-6 overflow-hidden rounded-lg border border-gray-100 bg-white shadow-[0_1px_3px_rgba(0,0,0,0.1)]">
+                        <div className="my-6 overflow-hidden rounded-lg border border-gray-100 bg-white shadow-[0_1px_3px_rgba(0,0,0,0.1)] dark:bg-slate-950">
                             <table className="w-full border-collapse text-left">
                                 <thead className="bg-slate-50">
                                     <tr>
@@ -1729,12 +1729,12 @@ export default function DevDocs() {
 
                         <h3 className="mt-7 mb-3 text-2xl font-black tracking-tight text-gray-700 sm:text-3xl">
                             Timer Configuration (stored in{' '}
-                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                 track_configs
                             </code>
                             )
                         </h3>
-                        <div className="my-6 overflow-hidden rounded-lg border border-gray-100 bg-white shadow-[0_1px_3px_rgba(0,0,0,0.1)]">
+                        <div className="my-6 overflow-hidden rounded-lg border border-gray-100 bg-white shadow-[0_1px_3px_rgba(0,0,0,0.1)] dark:bg-slate-950">
                             <table className="w-full border-collapse text-left">
                                 <thead className="bg-slate-50">
                                     <tr>
@@ -1812,8 +1812,8 @@ export default function DevDocs() {
                         </div>
                     </section>
 
-                    <section className="rounded-xl bg-white p-8 shadow-sm">
-                        <h2 className="mt-0 mb-4 border-b-2 border-gray-200 pb-3 text-4xl font-black tracking-tight text-blue-600 sm:text-5xl">
+                    <section className="rounded-xl bg-white p-8 shadow-sm dark:bg-slate-950">
+                        <h2 className="mt-0 mb-4 border-b-2 border-gray-200 pb-3 text-4xl font-black tracking-tight text-blue-600 sm:text-5xl dark:text-blue-400">
                             5. Backend Architecture
                         </h2>
                         <h3 className="mt-7 mb-3 text-2xl font-black tracking-tight text-gray-700 sm:text-3xl">
@@ -1823,9 +1823,11 @@ export default function DevDocs() {
                         {/* 1. User Model */}
                         <h4 className="mt-6 mb-2 flex items-center gap-2 text-xl font-black tracking-tight text-gray-700">
                             <span>Model:</span>
-                            <strong className="text-blue-600">User</strong>
+                            <strong className="text-blue-600 dark:text-blue-400">
+                                User
+                            </strong>
                         </h4>
-                        <div className="my-4 overflow-hidden rounded-lg border border-gray-100 bg-white shadow-[0_1px_3px_rgba(0,0,0,0.1)]">
+                        <div className="my-4 overflow-hidden rounded-lg border border-gray-100 bg-white shadow-[0_1px_3px_rgba(0,0,0,0.1)] dark:bg-slate-950">
                             <table className="w-full border-collapse text-left text-sm">
                                 <thead className="bg-slate-50">
                                     <tr>
@@ -1847,10 +1849,10 @@ export default function DevDocs() {
                                     <tr className="hover:bg-slate-50">
                                         <td className="border-b border-gray-200 p-3">
                                             <div className="flex flex-col gap-1.5">
-                                                <code className="w-fit rounded bg-slate-100 px-1.5 py-0.5 font-mono text-[0.85em] text-blue-600">
+                                                <code className="w-fit rounded bg-slate-100 px-1.5 py-0.5 font-mono text-[0.85em] text-blue-600 dark:text-blue-400">
                                                     hasMany(ExamAttempt)
                                                 </code>
-                                                <code className="w-fit rounded bg-slate-100 px-1.5 py-0.5 font-mono text-[0.85em] text-blue-600">
+                                                <code className="w-fit rounded bg-slate-100 px-1.5 py-0.5 font-mono text-[0.85em] text-blue-600 dark:text-blue-400">
                                                     hasMany(Question,
                                                     'created_by')
                                                 </code>
@@ -1901,7 +1903,7 @@ export default function DevDocs() {
                                                         email_verified_at
                                                     </code>{' '}
                                                     &rarr;{' '}
-                                                    <code className="rounded bg-slate-100 px-1 font-mono text-[0.9em] text-emerald-600">
+                                                    <code className="rounded bg-slate-100 px-1 font-mono text-[0.9em] text-emerald-600 dark:text-emerald-400">
                                                         datetime
                                                     </code>
                                                 </div>
@@ -1910,7 +1912,7 @@ export default function DevDocs() {
                                                         password
                                                     </code>{' '}
                                                     &rarr;{' '}
-                                                    <code className="rounded bg-slate-100 px-1 font-mono text-[0.9em] text-emerald-600">
+                                                    <code className="rounded bg-slate-100 px-1 font-mono text-[0.9em] text-emerald-600 dark:text-emerald-400">
                                                         hashed
                                                     </code>
                                                 </div>
@@ -1919,7 +1921,7 @@ export default function DevDocs() {
                                                         two_factor_confirmed_at
                                                     </code>{' '}
                                                     &rarr;{' '}
-                                                    <code className="rounded bg-slate-100 px-1 font-mono text-[0.9em] text-emerald-600">
+                                                    <code className="rounded bg-slate-100 px-1 font-mono text-[0.9em] text-emerald-600 dark:text-emerald-400">
                                                         datetime
                                                     </code>
                                                 </div>
@@ -1933,9 +1935,11 @@ export default function DevDocs() {
                         {/* 2. Category Model */}
                         <h4 className="mt-6 mb-2 flex items-center gap-2 text-xl font-black tracking-tight text-gray-700">
                             <span>Model:</span>
-                            <strong className="text-blue-600">Category</strong>
+                            <strong className="text-blue-600 dark:text-blue-400">
+                                Category
+                            </strong>
                         </h4>
-                        <div className="my-4 overflow-hidden rounded-lg border border-gray-100 bg-white shadow-[0_1px_3px_rgba(0,0,0,0.1)]">
+                        <div className="my-4 overflow-hidden rounded-lg border border-gray-100 bg-white shadow-[0_1px_3px_rgba(0,0,0,0.1)] dark:bg-slate-950">
                             <table className="w-full border-collapse text-left text-sm">
                                 <thead className="bg-slate-50">
                                     <tr>
@@ -1957,10 +1961,10 @@ export default function DevDocs() {
                                     <tr className="hover:bg-slate-50">
                                         <td className="border-b border-gray-200 p-3">
                                             <div className="flex flex-col gap-1.5">
-                                                <code className="w-fit rounded bg-slate-100 px-1.5 py-0.5 font-mono text-[0.85em] text-blue-600">
+                                                <code className="w-fit rounded bg-slate-100 px-1.5 py-0.5 font-mono text-[0.85em] text-blue-600 dark:text-blue-400">
                                                     hasMany(Subcategory)
                                                 </code>
-                                                <code className="w-fit rounded bg-slate-100 px-1.5 py-0.5 font-mono text-[0.85em] text-blue-600">
+                                                <code className="w-fit rounded bg-slate-100 px-1.5 py-0.5 font-mono text-[0.85em] text-blue-600 dark:text-blue-400">
                                                     hasMany(TrackConfig)
                                                 </code>
                                             </div>
@@ -1991,7 +1995,7 @@ export default function DevDocs() {
                                                         is_demographic
                                                     </code>{' '}
                                                     &rarr;{' '}
-                                                    <code className="rounded bg-slate-100 px-1 font-mono text-[0.9em] text-emerald-600">
+                                                    <code className="rounded bg-slate-100 px-1 font-mono text-[0.9em] text-emerald-600 dark:text-emerald-400">
                                                         boolean
                                                     </code>
                                                 </div>
@@ -2000,7 +2004,7 @@ export default function DevDocs() {
                                                         sort_order
                                                     </code>{' '}
                                                     &rarr;{' '}
-                                                    <code className="rounded bg-slate-100 px-1 font-mono text-[0.9em] text-emerald-600">
+                                                    <code className="rounded bg-slate-100 px-1 font-mono text-[0.9em] text-emerald-600 dark:text-emerald-400">
                                                         integer
                                                     </code>
                                                 </div>
@@ -2014,11 +2018,11 @@ export default function DevDocs() {
                         {/* 3. Subcategory Model */}
                         <h4 className="mt-6 mb-2 flex items-center gap-2 text-xl font-black tracking-tight text-gray-700">
                             <span>Model:</span>
-                            <strong className="text-blue-600">
+                            <strong className="text-blue-600 dark:text-blue-400">
                                 Subcategory
                             </strong>
                         </h4>
-                        <div className="my-4 overflow-hidden rounded-lg border border-gray-100 bg-white shadow-[0_1px_3px_rgba(0,0,0,0.1)]">
+                        <div className="my-4 overflow-hidden rounded-lg border border-gray-100 bg-white shadow-[0_1px_3px_rgba(0,0,0,0.1)] dark:bg-slate-950">
                             <table className="w-full border-collapse text-left text-sm">
                                 <thead className="bg-slate-50">
                                     <tr>
@@ -2040,10 +2044,10 @@ export default function DevDocs() {
                                     <tr className="hover:bg-slate-50">
                                         <td className="border-b border-gray-200 p-3">
                                             <div className="flex flex-col gap-1.5">
-                                                <code className="w-fit rounded bg-slate-100 px-1.5 py-0.5 font-mono text-[0.85em] text-blue-600">
+                                                <code className="w-fit rounded bg-slate-100 px-1.5 py-0.5 font-mono text-[0.85em] text-blue-600 dark:text-blue-400">
                                                     belongsTo(Category)
                                                 </code>
-                                                <code className="w-fit rounded bg-slate-100 px-1.5 py-0.5 font-mono text-[0.85em] text-blue-600">
+                                                <code className="w-fit rounded bg-slate-100 px-1.5 py-0.5 font-mono text-[0.85em] text-blue-600 dark:text-blue-400">
                                                     hasMany(Question)
                                                 </code>
                                             </div>
@@ -2077,7 +2081,7 @@ export default function DevDocs() {
                                                         category_id
                                                     </code>{' '}
                                                     &rarr;{' '}
-                                                    <code className="rounded bg-slate-100 px-1 font-mono text-[0.9em] text-emerald-600">
+                                                    <code className="rounded bg-slate-100 px-1 font-mono text-[0.9em] text-emerald-600 dark:text-emerald-400">
                                                         integer
                                                     </code>
                                                 </div>
@@ -2086,7 +2090,7 @@ export default function DevDocs() {
                                                         sort_order
                                                     </code>{' '}
                                                     &rarr;{' '}
-                                                    <code className="rounded bg-slate-100 px-1 font-mono text-[0.9em] text-emerald-600">
+                                                    <code className="rounded bg-slate-100 px-1 font-mono text-[0.9em] text-emerald-600 dark:text-emerald-400">
                                                         integer
                                                     </code>
                                                 </div>
@@ -2100,11 +2104,11 @@ export default function DevDocs() {
                         {/* 4. TrackConfig Model */}
                         <h4 className="mt-6 mb-2 flex items-center gap-2 text-xl font-black tracking-tight text-gray-700">
                             <span>Model:</span>
-                            <strong className="text-blue-600">
+                            <strong className="text-blue-600 dark:text-blue-400">
                                 TrackConfig
                             </strong>
                         </h4>
-                        <div className="my-4 overflow-hidden rounded-lg border border-gray-100 bg-white shadow-[0_1px_3px_rgba(0,0,0,0.1)]">
+                        <div className="my-4 overflow-hidden rounded-lg border border-gray-100 bg-white shadow-[0_1px_3px_rgba(0,0,0,0.1)] dark:bg-slate-950">
                             <table className="w-full border-collapse text-left text-sm">
                                 <thead className="bg-slate-50">
                                     <tr>
@@ -2126,7 +2130,7 @@ export default function DevDocs() {
                                     <tr className="hover:bg-slate-50">
                                         <td className="border-b border-gray-200 p-3">
                                             <div className="flex flex-col gap-1.5">
-                                                <code className="w-fit rounded bg-slate-100 px-1.5 py-0.5 font-mono text-[0.85em] text-blue-600">
+                                                <code className="w-fit rounded bg-slate-100 px-1.5 py-0.5 font-mono text-[0.85em] text-blue-600 dark:text-blue-400">
                                                     belongsTo(Category)
                                                 </code>
                                             </div>
@@ -2157,7 +2161,7 @@ export default function DevDocs() {
                                                         category_id
                                                     </code>{' '}
                                                     &rarr;{' '}
-                                                    <code className="rounded bg-slate-100 px-1 font-mono text-[0.9em] text-emerald-600">
+                                                    <code className="rounded bg-slate-100 px-1 font-mono text-[0.9em] text-emerald-600 dark:text-emerald-400">
                                                         integer
                                                     </code>
                                                 </div>
@@ -2166,7 +2170,7 @@ export default function DevDocs() {
                                                         item_count
                                                     </code>{' '}
                                                     &rarr;{' '}
-                                                    <code className="rounded bg-slate-100 px-1 font-mono text-[0.9em] text-emerald-600">
+                                                    <code className="rounded bg-slate-100 px-1 font-mono text-[0.9em] text-emerald-600 dark:text-emerald-400">
                                                         integer
                                                     </code>
                                                 </div>
@@ -2175,7 +2179,7 @@ export default function DevDocs() {
                                                         time_limit_secs
                                                     </code>{' '}
                                                     &rarr;{' '}
-                                                    <code className="rounded bg-slate-100 px-1 font-mono text-[0.9em] text-emerald-600">
+                                                    <code className="rounded bg-slate-100 px-1 font-mono text-[0.9em] text-emerald-600 dark:text-emerald-400">
                                                         integer
                                                     </code>
                                                 </div>
@@ -2189,9 +2193,11 @@ export default function DevDocs() {
                         {/* 5. Question Model */}
                         <h4 className="mt-6 mb-2 flex items-center gap-2 text-xl font-black tracking-tight text-gray-700">
                             <span>Model:</span>
-                            <strong className="text-blue-600">Question</strong>
+                            <strong className="text-blue-600 dark:text-blue-400">
+                                Question
+                            </strong>
                         </h4>
-                        <div className="my-4 overflow-hidden rounded-lg border border-gray-100 bg-white shadow-[0_1px_3px_rgba(0,0,0,0.1)]">
+                        <div className="my-4 overflow-hidden rounded-lg border border-gray-100 bg-white shadow-[0_1px_3px_rgba(0,0,0,0.1)] dark:bg-slate-950">
                             <table className="w-full border-collapse text-left text-sm">
                                 <thead className="bg-slate-50">
                                     <tr>
@@ -2213,10 +2219,10 @@ export default function DevDocs() {
                                     <tr className="hover:bg-slate-50">
                                         <td className="border-b border-gray-200 p-3">
                                             <div className="flex flex-col gap-1.5">
-                                                <code className="w-fit rounded bg-slate-100 px-1.5 py-0.5 font-mono text-[0.85em] text-blue-600">
+                                                <code className="w-fit rounded bg-slate-100 px-1.5 py-0.5 font-mono text-[0.85em] text-blue-600 dark:text-blue-400">
                                                     belongsTo(Subcategory)
                                                 </code>
-                                                <code className="w-fit rounded bg-slate-100 px-1.5 py-0.5 font-mono text-[0.85em] text-blue-600">
+                                                <code className="w-fit rounded bg-slate-100 px-1.5 py-0.5 font-mono text-[0.85em] text-blue-600 dark:text-blue-400">
                                                     belongsTo(User,
                                                     'created_by')
                                                 </code>
@@ -2257,7 +2263,7 @@ export default function DevDocs() {
                                                         subcategory_id
                                                     </code>{' '}
                                                     &rarr;{' '}
-                                                    <code className="rounded bg-slate-100 px-1 font-mono text-[0.9em] text-emerald-600">
+                                                    <code className="rounded bg-slate-100 px-1 font-mono text-[0.9em] text-emerald-600 dark:text-emerald-400">
                                                         integer
                                                     </code>
                                                 </div>
@@ -2266,7 +2272,7 @@ export default function DevDocs() {
                                                         options
                                                     </code>{' '}
                                                     &rarr;{' '}
-                                                    <code className="rounded bg-slate-100 px-1 font-mono text-[0.9em] text-emerald-600">
+                                                    <code className="rounded bg-slate-100 px-1 font-mono text-[0.9em] text-emerald-600 dark:text-emerald-400">
                                                         array
                                                     </code>
                                                 </div>
@@ -2275,7 +2281,7 @@ export default function DevDocs() {
                                                         correct_option
                                                     </code>{' '}
                                                     &rarr;{' '}
-                                                    <code className="rounded bg-slate-100 px-1 font-mono text-[0.9em] text-emerald-600">
+                                                    <code className="rounded bg-slate-100 px-1 font-mono text-[0.9em] text-emerald-600 dark:text-emerald-400">
                                                         integer
                                                     </code>
                                                 </div>
@@ -2284,7 +2290,7 @@ export default function DevDocs() {
                                                         created_by
                                                     </code>{' '}
                                                     &rarr;{' '}
-                                                    <code className="rounded bg-slate-100 px-1 font-mono text-[0.9em] text-emerald-600">
+                                                    <code className="rounded bg-slate-100 px-1 font-mono text-[0.9em] text-emerald-600 dark:text-emerald-400">
                                                         integer
                                                     </code>
                                                 </div>
@@ -2298,11 +2304,11 @@ export default function DevDocs() {
                         {/* 6. ExamAttempt Model */}
                         <h4 className="mt-6 mb-2 flex items-center gap-2 text-xl font-black tracking-tight text-gray-700">
                             <span>Model:</span>
-                            <strong className="text-blue-600">
+                            <strong className="text-blue-600 dark:text-blue-400">
                                 ExamAttempt
                             </strong>
                         </h4>
-                        <div className="my-4 overflow-hidden rounded-lg border border-gray-100 bg-white shadow-[0_1px_3px_rgba(0,0,0,0.1)]">
+                        <div className="my-4 overflow-hidden rounded-lg border border-gray-100 bg-white shadow-[0_1px_3px_rgba(0,0,0,0.1)] dark:bg-slate-950">
                             <table className="w-full border-collapse text-left text-sm">
                                 <thead className="bg-slate-50">
                                     <tr>
@@ -2324,10 +2330,10 @@ export default function DevDocs() {
                                     <tr className="hover:bg-slate-50">
                                         <td className="border-b border-gray-200 p-3">
                                             <div className="flex flex-col gap-1.5">
-                                                <code className="w-fit rounded bg-slate-100 px-1.5 py-0.5 font-mono text-[0.85em] text-blue-600">
+                                                <code className="w-fit rounded bg-slate-100 px-1.5 py-0.5 font-mono text-[0.85em] text-blue-600 dark:text-blue-400">
                                                     belongsTo(User)
                                                 </code>
-                                                <code className="w-fit rounded bg-slate-100 px-1.5 py-0.5 font-mono text-[0.85em] text-blue-600">
+                                                <code className="w-fit rounded bg-slate-100 px-1.5 py-0.5 font-mono text-[0.85em] text-blue-600 dark:text-blue-400">
                                                     belongsTo(Category)
                                                 </code>
                                             </div>
@@ -2361,7 +2367,7 @@ export default function DevDocs() {
                                                         category_id
                                                     </code>{' '}
                                                     &rarr;{' '}
-                                                    <code className="rounded bg-slate-100 px-1 font-mono text-[0.9em] text-emerald-600">
+                                                    <code className="rounded bg-slate-100 px-1 font-mono text-[0.9em] text-emerald-600 dark:text-emerald-400">
                                                         integer
                                                     </code>
                                                 </div>
@@ -2370,7 +2376,7 @@ export default function DevDocs() {
                                                         user_id
                                                     </code>{' '}
                                                     &rarr;{' '}
-                                                    <code className="rounded bg-slate-100 px-1 font-mono text-[0.9em] text-emerald-600">
+                                                    <code className="rounded bg-slate-100 px-1 font-mono text-[0.9em] text-emerald-600 dark:text-emerald-400">
                                                         integer
                                                     </code>
                                                 </div>
@@ -2379,7 +2385,7 @@ export default function DevDocs() {
                                                         question_ids
                                                     </code>{' '}
                                                     &rarr;{' '}
-                                                    <code className="rounded bg-slate-100 px-1 font-mono text-[0.9em] text-emerald-600">
+                                                    <code className="rounded bg-slate-100 px-1 font-mono text-[0.9em] text-emerald-600 dark:text-emerald-400">
                                                         array
                                                     </code>
                                                 </div>
@@ -2388,7 +2394,7 @@ export default function DevDocs() {
                                                         answers
                                                     </code>{' '}
                                                     &rarr;{' '}
-                                                    <code className="rounded bg-slate-100 px-1 font-mono text-[0.9em] text-emerald-600">
+                                                    <code className="rounded bg-slate-100 px-1 font-mono text-[0.9em] text-emerald-600 dark:text-emerald-400">
                                                         array
                                                     </code>
                                                 </div>
@@ -2397,7 +2403,7 @@ export default function DevDocs() {
                                                         cat_scores
                                                     </code>{' '}
                                                     &rarr;{' '}
-                                                    <code className="rounded bg-slate-100 px-1 font-mono text-[0.9em] text-emerald-600">
+                                                    <code className="rounded bg-slate-100 px-1 font-mono text-[0.9em] text-emerald-600 dark:text-emerald-400">
                                                         array
                                                     </code>
                                                 </div>
@@ -2413,40 +2419,40 @@ export default function DevDocs() {
                         </h3>
                         <p>
                             The{' '}
-                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                 users.role
                             </code>{' '}
                             column uses a string enum (
-                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                 user
                             </code>{' '}
                             |{' '}
-                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                 admin
                             </code>
                             ). The{' '}
-                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                 User
                             </code>{' '}
                             model exposes:
                         </p>
                         <ul className="mb-5 list-disc space-y-2 pl-6">
                             <li>
-                                <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                     isAdmin(): bool
                                 </code>{' '}
                                 checks{' '}
-                                <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                     $this-&gt;role === 'admin'
                                 </code>
                             </li>
                             <li>
                                 Role is shared to the frontend via{' '}
-                                <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                     HandleInertiaRequests
                                 </code>{' '}
                                 middleware in{' '}
-                                <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                     auth.user
                                 </code>
                             </li>
@@ -2455,7 +2461,7 @@ export default function DevDocs() {
                         <h3 className="mt-7 mb-3 text-2xl font-black tracking-tight text-gray-700 sm:text-3xl">
                             Controllers
                         </h3>
-                        <div className="my-6 overflow-hidden rounded-lg border border-gray-100 bg-white shadow-[0_1px_3px_rgba(0,0,0,0.1)]">
+                        <div className="my-6 overflow-hidden rounded-lg border border-gray-100 bg-white shadow-[0_1px_3px_rgba(0,0,0,0.1)] dark:bg-slate-950">
                             <table className="w-full border-collapse text-left">
                                 <thead className="bg-slate-50">
                                     <tr>
@@ -2476,7 +2482,7 @@ export default function DevDocs() {
                                             <strong>DashboardController</strong>
                                         </td>
                                         <td className="border-b border-gray-200 p-3.5">
-                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                                 index
                                             </code>
                                         </td>
@@ -2490,27 +2496,27 @@ export default function DevDocs() {
                                             <strong>ExamController</strong>
                                         </td>
                                         <td className="border-b border-gray-200 p-3.5">
-                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                                 setup
                                             </code>
                                             ,{' '}
-                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                                 assemble
                                             </code>
                                             ,{' '}
-                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                                 submit
                                             </code>
                                             ,{' '}
-                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                                 results
                                             </code>
                                             ,{' '}
-                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                                 review
                                             </code>
                                             ,{' '}
-                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                                 retake
                                             </code>
                                         </td>
@@ -2524,15 +2530,15 @@ export default function DevDocs() {
                                             <strong>DrillController</strong>
                                         </td>
                                         <td className="border-b border-gray-200 p-3.5">
-                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                                 index
                                             </code>
                                             ,{' '}
-                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                                 assemble
                                             </code>
                                             ,{' '}
-                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                                 submit
                                             </code>
                                         </td>
@@ -2546,7 +2552,7 @@ export default function DevDocs() {
                                             <strong>HistoryController</strong>
                                         </td>
                                         <td className="border-b border-gray-200 p-3.5">
-                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                                 index
                                             </code>
                                         </td>
@@ -2561,7 +2567,7 @@ export default function DevDocs() {
                                             </strong>
                                         </td>
                                         <td className="border-b border-gray-200 p-3.5">
-                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                                 index
                                             </code>
                                         </td>
@@ -2577,27 +2583,27 @@ export default function DevDocs() {
                                             </strong>
                                         </td>
                                         <td className="border-b border-gray-200 p-3.5">
-                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                                 index
                                             </code>
                                             ,{' '}
-                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                                 create
                                             </code>
                                             ,{' '}
-                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                                 store
                                             </code>
                                             ,{' '}
-                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                                 edit
                                             </code>
                                             ,{' '}
-                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                                 update
                                             </code>
                                             ,{' '}
-                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                                 destroy
                                             </code>
                                         </td>
@@ -2612,15 +2618,15 @@ export default function DevDocs() {
                                             </strong>
                                         </td>
                                         <td className="border-b border-gray-200 p-3.5">
-                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                                 index
                                             </code>
                                             ,{' '}
-                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                                 generate
                                             </code>
                                             ,{' '}
-                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                                 commit
                                             </code>
                                         </td>
@@ -2636,7 +2642,7 @@ export default function DevDocs() {
                         <h3 className="mt-7 mb-3 text-2xl font-black tracking-tight text-gray-700 sm:text-3xl">
                             Middleware
                         </h3>
-                        <div className="my-6 overflow-hidden rounded-lg border border-gray-100 bg-white shadow-[0_1px_3px_rgba(0,0,0,0.1)]">
+                        <div className="my-6 overflow-hidden rounded-lg border border-gray-100 bg-white shadow-[0_1px_3px_rgba(0,0,0,0.1)] dark:bg-slate-950">
                             <table className="w-full border-collapse text-left">
                                 <thead className="bg-slate-50">
                                     <tr>
@@ -2655,11 +2661,11 @@ export default function DevDocs() {
                                         </td>
                                         <td className="border-b border-gray-200 p-3.5">
                                             Gates routes behind{' '}
-                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                                 $user-&gt;role
                                             </code>{' '}
                                             check. Usage:{' '}
-                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                                 -&gt;middleware('role:admin')
                                             </code>
                                         </td>
@@ -2678,7 +2684,7 @@ export default function DevDocs() {
                             Constructs a balanced question set for a full mock
                             exam or category drill.
                         </p>
-                        <div className="my-5 rounded-r-lg border-l-4 border-amber-500 bg-amber-50 p-4 text-gray-800">
+                        <div className="my-5 rounded-r-lg border-l-4 border-amber-500 bg-amber-50 p-4 text-gray-800 dark:bg-amber-950/30">
                             <strong>Minimum Question Threshold:</strong> Before
                             assembly, validate the bank has enough published
                             questions per category. Return error: "Verbal
@@ -2691,22 +2697,22 @@ export default function DevDocs() {
                                 <ul className="mt-2 list-disc space-y-2 pl-6">
                                     <li>
                                         Accept{' '}
-                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                             track
                                         </code>{' '}
                                         parameter and optional{' '}
-                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                             exclude_attempt_id
                                         </code>{' '}
                                         (for fresh retake exclusion).
                                     </li>
                                     <li>
                                         Load all{' '}
-                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                             track_configs
                                         </code>{' '}
                                         for that track, ordered by{' '}
-                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                             sort_order
                                         </code>
                                         .
@@ -2729,7 +2735,7 @@ export default function DevDocs() {
                                             </li>
                                             <li>
                                                 Proportionally distribute{' '}
-                                                <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                                <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                                     item_count
                                                 </code>{' '}
                                                 across subcategories using floor
@@ -2763,7 +2769,7 @@ export default function DevDocs() {
                                 <ul className="mt-2 list-disc space-y-2 pl-6">
                                     <li>
                                         "Retake Same Exam": Load{' '}
-                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                             question_ids
                                         </code>{' '}
                                         from the original ExamAttempt, re-serve
@@ -2771,7 +2777,7 @@ export default function DevDocs() {
                                     </li>
                                     <li>
                                         "Take Fresh Exam": Call assembler with{' '}
-                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                             exclude_attempt_id
                                         </code>{' '}
                                         to avoid overlap where possible.
@@ -2783,11 +2789,11 @@ export default function DevDocs() {
                                 <ul className="mt-2 list-disc space-y-2 pl-6">
                                     <li>
                                         Accept{' '}
-                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                             category_id
                                         </code>{' '}
                                         (or{' '}
-                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                             subcategory_id
                                         </code>
                                         ) and count.
@@ -2816,19 +2822,19 @@ export default function DevDocs() {
                                 <ul className="mt-2 list-disc space-y-2 pl-6">
                                     <li>
                                         Accept:{' '}
-                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                             track
                                         </code>
                                         ,{' '}
-                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                             question_ids[]
                                         </code>
                                         ,{' '}
-                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                             answers&#123;&#125;
                                         </code>
                                         ,{' '}
-                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                             time_spent_seconds
                                         </code>
                                         .
@@ -2843,11 +2849,11 @@ export default function DevDocs() {
                                     </li>
                                     <li>
                                         For each scored question: compare{' '}
-                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                             answers[question_id]
                                         </code>{' '}
                                         against{' '}
-                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                             question.correct_option
                                         </code>
                                         .
@@ -2855,29 +2861,29 @@ export default function DevDocs() {
                                     <li>
                                         Aggregate by category and subcategory
                                         into the{' '}
-                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                             category_scores
                                         </code>{' '}
                                         JSONB structure.
                                     </li>
                                     <li>
                                         Compute:{' '}
-                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                             scored_items
                                         </code>{' '}
                                         (150 for Pro, 145 for SubPro),{' '}
-                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                             correct_count
                                         </code>
                                         ,{' '}
-                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                             score_percentage
                                         </code>
                                         .
                                     </li>
                                     <li>
                                         Apply pass threshold: passed ={' '}
-                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                             score_percentage &gt;= 80.00
                                         </code>
                                         .
@@ -2902,18 +2908,18 @@ export default function DevDocs() {
                                 <ul className="mt-2 list-disc space-y-2 pl-6">
                                     <li>
                                         Uses Laravel{' '}
-                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                             Http::withToken()
                                         </code>{' '}
                                         to call{' '}
-                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                             generativelanguage.googleapis.com
                                         </code>
                                         .
                                     </li>
                                     <li>
                                         Model:{' '}
-                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                             gemini-2.0-flash
                                         </code>{' '}
                                         (free tier).
@@ -2921,26 +2927,26 @@ export default function DevDocs() {
                                     <li>
                                         Structured prompt requesting JSON array
                                         output with:{' '}
-                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                             stem
                                         </code>
                                         ,{' '}
-                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                             options[]
                                         </code>
                                         ,{' '}
-                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                             correct_option
                                         </code>
                                         ,{' '}
-                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                             explanation
                                         </code>
                                         .
                                     </li>
                                     <li>
                                         Validates response (exactly 4 options,{' '}
-                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                             correct_option
                                         </code>{' '}
                                         0-3, non-empty fields).
@@ -2959,7 +2965,7 @@ export default function DevDocs() {
                                     <li>
                                         Daily call count tracked in cache table
                                         (key:{' '}
-                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                             gemini_calls_&#123;date&#125;
                                         </code>
                                         , TTL: 24h).
@@ -2982,14 +2988,14 @@ export default function DevDocs() {
                         </ul>
                     </section>
 
-                    <section className="rounded-xl bg-white p-8 shadow-sm">
-                        <h2 className="mt-0 mb-4 border-b-2 border-gray-200 pb-3 text-4xl font-black tracking-tight text-blue-600 sm:text-5xl">
+                    <section className="rounded-xl bg-white p-8 shadow-sm dark:bg-slate-950">
+                        <h2 className="mt-0 mb-4 border-b-2 border-gray-200 pb-3 text-4xl font-black tracking-tight text-blue-600 sm:text-5xl dark:text-blue-400">
                             5. Frontend Architecture
                         </h2>
                         <h3 className="mt-7 mb-3 text-2xl font-black tracking-tight text-gray-700 sm:text-3xl">
                             Page Routing & Layout Map
                         </h3>
-                        <div className="my-6 overflow-hidden rounded-lg border border-gray-100 bg-white shadow-[0_1px_3px_rgba(0,0,0,0.1)]">
+                        <div className="my-6 overflow-hidden rounded-lg border border-gray-100 bg-white shadow-[0_1px_3px_rgba(0,0,0,0.1)] dark:bg-slate-950">
                             <table className="w-full border-collapse text-left">
                                 <thead className="bg-slate-50">
                                     <tr>
@@ -3252,9 +3258,9 @@ export default function DevDocs() {
                             </table>
                         </div>
 
-                        <div className="my-5 rounded-r-lg border-l-4 border-amber-500 bg-amber-50 p-4 text-gray-800">
+                        <div className="my-5 rounded-r-lg border-l-4 border-amber-500 bg-amber-50 p-4 text-gray-800 dark:bg-amber-950/30">
                             <strong>NOTE:</strong>{' '}
-                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                 ExamLayout
                             </code>{' '}
                             is a new minimal fullscreen layout (no sidebar, no
@@ -3269,7 +3275,7 @@ export default function DevDocs() {
                         <h4 className="font-bold text-gray-800">
                             User Section (always visible when authenticated):
                         </h4>
-                        <div className="my-6 overflow-hidden rounded-lg border border-gray-100 bg-white shadow-[0_1px_3px_rgba(0,0,0,0.1)]">
+                        <div className="my-6 overflow-hidden rounded-lg border border-gray-100 bg-white shadow-[0_1px_3px_rgba(0,0,0,0.1)] dark:bg-slate-950">
                             <table className="w-full border-collapse text-left">
                                 <thead className="bg-slate-50">
                                     <tr>
@@ -3337,7 +3343,7 @@ export default function DevDocs() {
                             Admin Section (visible only when auth.user.role ===
                             'admin'):
                         </h4>
-                        <div className="my-6 overflow-hidden rounded-lg border border-gray-100 bg-white shadow-[0_1px_3px_rgba(0,0,0,0.1)]">
+                        <div className="my-6 overflow-hidden rounded-lg border border-gray-100 bg-white shadow-[0_1px_3px_rgba(0,0,0,0.1)] dark:bg-slate-950">
                             <table className="w-full border-collapse text-left">
                                 <thead className="bg-slate-50">
                                     <tr>
@@ -3391,12 +3397,12 @@ export default function DevDocs() {
                         </div>
                     </section>
 
-                    <section className="rounded-xl bg-white p-8 shadow-sm">
-                        <h2 className="mt-0 mb-4 border-b-2 border-gray-200 pb-3 text-4xl font-black tracking-tight text-blue-600 sm:text-5xl">
+                    <section className="rounded-xl bg-white p-8 shadow-sm dark:bg-slate-950">
+                        <h2 className="mt-0 mb-4 border-b-2 border-gray-200 pb-3 text-4xl font-black tracking-tight text-blue-600 sm:text-5xl dark:text-blue-400">
                             6. Client-Side Exam State Machine
                         </h2>
 
-                        <div className="my-5 rounded-r-lg border-l-4 border-amber-500 bg-amber-50 p-4 text-gray-800">
+                        <div className="my-5 rounded-r-lg border-l-4 border-amber-500 bg-amber-50 p-4 text-gray-800 dark:bg-amber-950/30">
                             <strong>IMPORTANT:</strong> The entire active exam
                             session runs in React state with zero server
                             round-trips until final submission. This is the core
@@ -3429,7 +3435,7 @@ export default function DevDocs() {
                         <h3 className="mt-7 mb-3 text-2xl font-black tracking-tight text-gray-700 sm:text-3xl">
                             Reducer Actions
                         </h3>
-                        <div className="my-6 overflow-hidden rounded-lg border border-gray-100 bg-white shadow-[0_1px_3px_rgba(0,0,0,0.1)]">
+                        <div className="my-6 overflow-hidden rounded-lg border border-gray-100 bg-white shadow-[0_1px_3px_rgba(0,0,0,0.1)] dark:bg-slate-950">
                             <table className="w-full border-collapse text-left">
                                 <thead className="bg-slate-50">
                                     <tr>
@@ -3448,7 +3454,7 @@ export default function DevDocs() {
                                         </td>
                                         <td className="border-b border-gray-200 p-3.5">
                                             Sets{' '}
-                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                                 answers[questionId] =
                                                 optionIndex
                                             </code>
@@ -3460,7 +3466,7 @@ export default function DevDocs() {
                                         </td>
                                         <td className="border-b border-gray-200 p-3.5">
                                             Adds/removes questionId from{' '}
-                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                                 flagged
                                             </code>{' '}
                                             set
@@ -3472,7 +3478,7 @@ export default function DevDocs() {
                                         </td>
                                         <td className="border-b border-gray-200 p-3.5">
                                             Sets{' '}
-                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                                 currentIndex
                                             </code>{' '}
                                             to target index
@@ -3484,7 +3490,7 @@ export default function DevDocs() {
                                         </td>
                                         <td className="border-b border-gray-200 p-3.5">
                                             Increments/decrements{' '}
-                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                                 currentIndex
                                             </code>
                                         </td>
@@ -3495,7 +3501,7 @@ export default function DevDocs() {
                                         </td>
                                         <td className="border-b border-gray-200 p-3.5">
                                             Decrements{' '}
-                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                                 timeRemaining
                                             </code>{' '}
                                             by 1
@@ -3507,7 +3513,7 @@ export default function DevDocs() {
                                         </td>
                                         <td className="border-b border-gray-200 p-3.5">
                                             Sets status to{' '}
-                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                                 submitting
                                             </code>
                                             , triggers POST
@@ -3529,15 +3535,15 @@ export default function DevDocs() {
                         <ul className="mb-5 list-disc space-y-2 pl-6">
                             <li>
                                 <strong>localStorage Backup:</strong> On every{' '}
-                                <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                     SELECT_ANSWER
                                 </code>{' '}
                                 and{' '}
-                                <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                     TOGGLE_FLAG
                                 </code>
                                 , persist state to localStorage under{' '}
-                                <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                     cse_exam_session
                                 </code>
                                 . On mount, check for existing session and offer
@@ -3550,11 +3556,11 @@ export default function DevDocs() {
                                     <li>
                                         <strong>"Retake Same Exam"</strong>{' '}
                                         navigates to{' '}
-                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                             /exams/session
                                         </code>{' '}
                                         with{' '}
-                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                             ?retake=&#123;attemptId&#125;
                                         </code>
                                         . Backend loads the same question_ids
@@ -3563,11 +3569,11 @@ export default function DevDocs() {
                                     <li>
                                         <strong>"Take Fresh Exam"</strong>{' '}
                                         navigates to{' '}
-                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                             /exams/session
                                         </code>{' '}
                                         with{' '}
-                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                             ?fresh=1&amp;exclude=&#123;attemptId&#125;
                                         </code>
                                         . Backend assembles new questions,
@@ -3593,11 +3599,11 @@ export default function DevDocs() {
                                     <li>
                                         <strong>Blade-level:</strong> CSS-only
                                         pulsing animation in{' '}
-                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                             app.blade.php
                                         </code>{' '}
                                         inside the{' '}
-                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                             #app
                                         </code>{' '}
                                         div. React hydration replaces it
@@ -3605,7 +3611,7 @@ export default function DevDocs() {
                                     </li>
                                     <li>
                                         <strong>React-level:</strong>{' '}
-                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                             &lt;ServerAwakeningOverlay&gt;
                                         </code>{' '}
                                         component triggered by Inertia global
@@ -3621,7 +3627,7 @@ export default function DevDocs() {
                         <h3 className="mt-7 mb-3 text-2xl font-black tracking-tight text-gray-700 sm:text-3xl">
                             Free-Tier Constraint Solutions
                         </h3>
-                        <div className="my-6 overflow-hidden rounded-lg border border-gray-100 bg-white shadow-[0_1px_3px_rgba(0,0,0,0.1)]">
+                        <div className="my-6 overflow-hidden rounded-lg border border-gray-100 bg-white shadow-[0_1px_3px_rgba(0,0,0,0.1)] dark:bg-slate-950">
                             <table className="w-full border-collapse text-left">
                                 <thead className="bg-slate-50">
                                     <tr>
@@ -3708,8 +3714,8 @@ export default function DevDocs() {
                         </div>
                     </section>
 
-                    <section className="rounded-xl bg-white p-8 shadow-sm">
-                        <h2 className="mt-0 mb-4 border-b-2 border-gray-200 pb-3 text-4xl font-black tracking-tight text-blue-600 sm:text-5xl">
+                    <section className="rounded-xl bg-white p-8 shadow-sm dark:bg-slate-950">
+                        <h2 className="mt-0 mb-4 border-b-2 border-gray-200 pb-3 text-4xl font-black tracking-tight text-blue-600 sm:text-5xl dark:text-blue-400">
                             7. Phase-by-Phase Implementation Plan
                         </h2>
 
@@ -3726,7 +3732,7 @@ export default function DevDocs() {
                                 <strong>Migrations (6 new files):</strong>
                                 <ul className="mt-2 list-disc space-y-2 pl-6">
                                     <li>
-                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                             add_profile_fields_to_users_table
                                         </code>
                                         : Add role (string, default 'user'),
@@ -3734,7 +3740,7 @@ export default function DevDocs() {
                                         exam_date (date nullable).
                                     </li>
                                     <li>
-                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                             create_categories_table
                                         </code>
                                         : id, name, slug (unique),
@@ -3742,14 +3748,14 @@ export default function DevDocs() {
                                         timestamps.
                                     </li>
                                     <li>
-                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                             create_subcategories_table
                                         </code>
                                         : id, category_id (FK), name, slug,
                                         language, sort_order, timestamps.
                                     </li>
                                     <li>
-                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                             create_track_configs_table
                                         </code>
                                         : id, track, category_id (FK),
@@ -3758,7 +3764,7 @@ export default function DevDocs() {
                                         category_id].
                                     </li>
                                     <li>
-                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                             create_questions_table
                                         </code>
                                         : id, subcategory_id (FK), language,
@@ -3768,7 +3774,7 @@ export default function DevDocs() {
                                         timestamps.
                                     </li>
                                     <li>
-                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                             create_exam_attempts_table
                                         </code>
                                         : All fields from schema with FKs, JSONB
@@ -3787,27 +3793,27 @@ export default function DevDocs() {
                                 <strong>Seeders:</strong>
                                 <ul className="mt-2 list-disc space-y-2 pl-6">
                                     <li>
-                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                             CategorySeeder
                                         </code>
                                         : 6 categories with is_demographic flag.
                                     </li>
                                     <li>
-                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                             SubcategorySeeder
                                         </code>
                                         : All subcategories with language and
                                         sort_order.
                                     </li>
                                     <li>
-                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                             TrackConfigSeeder
                                         </code>
                                         : Both track mappings with exact item
                                         counts and timer values.
                                     </li>
                                     <li>
-                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                             DemographicQuestionSeeder
                                         </code>
                                         : 20 fixed EDQ survey questions
@@ -3820,21 +3826,21 @@ export default function DevDocs() {
                                 <ul className="mt-2 list-disc space-y-2 pl-6">
                                     <li>
                                         Modify{' '}
-                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                             CreateNewUser
                                         </code>
                                         : accept target_track field.
                                     </li>
                                     <li>
                                         Modify{' '}
-                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                             register.tsx
                                         </code>
                                         : add track selector dropdown.
                                     </li>
                                     <li>
                                         Update{' '}
-                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                             HandleInertiaRequests
                                         </code>
                                         : share role and target_track in
@@ -3848,12 +3854,12 @@ export default function DevDocs() {
                             </li>
                             <li>
                                 <strong>Middleware:</strong> Create{' '}
-                                <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                     EnsureRole
                                 </code>{' '}
                                 middleware, register in bootstrap/app.php.
                                 Update{' '}
-                                <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                     app-sidebar.tsx
                                 </code>{' '}
                                 with user nav items + conditional admin section.
@@ -3885,33 +3891,33 @@ export default function DevDocs() {
                                 <strong>Admin Pages:</strong>
                                 <ul className="mt-2 list-disc space-y-2 pl-6">
                                     <li>
-                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                             admin/dashboard.tsx
                                         </code>
                                         : Metric cards + coverage gap table.
                                     </li>
                                     <li>
-                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                             admin/questions/index.tsx
                                         </code>
                                         : Filterable data table with status
                                         badges.
                                     </li>
                                     <li>
-                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                             admin/questions/create.tsx
                                         </code>
                                         : Manual question form with cascade
                                         dropdowns.
                                     </li>
                                     <li>
-                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                             admin/questions/edit.tsx
                                         </code>
                                         : Edit form pre-populated.
                                     </li>
                                     <li>
-                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                             admin/generator/index.tsx
                                         </code>
                                         : Parameter dropdowns, generate button,
@@ -3945,26 +3951,26 @@ export default function DevDocs() {
                                 <strong>Frontend (Exam Session):</strong>
                                 <ul className="mt-2 list-disc space-y-2 pl-6">
                                     <li>
-                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                             useExamReducer
                                         </code>{' '}
                                         hook: Full state machine.
                                     </li>
                                     <li>
-                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                             ExamTimer
                                         </code>
                                         : Countdown (3:10:00 or 2:40:00),
                                         auto-submit at zero.
                                     </li>
                                     <li>
-                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                             QuestionPanel
                                         </code>
                                         : Stem, 4 radio options, flag toggle.
                                     </li>
                                     <li>
-                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                             ItemGridNavigator
                                         </code>
                                         : Numbered grid (gray=unvisited,
@@ -3973,7 +3979,7 @@ export default function DevDocs() {
                                         green-border=current).
                                     </li>
                                     <li>
-                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                                        <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                             SubmitConfirmDialog
                                         </code>
                                         : X answered, Y unanswered, Z flagged.
@@ -4063,8 +4069,8 @@ export default function DevDocs() {
                         </ul>
                     </section>
 
-                    <section className="rounded-xl bg-white p-8 shadow-sm">
-                        <h2 className="mt-0 mb-4 border-b-2 border-gray-200 pb-3 text-4xl font-black tracking-tight text-blue-600 sm:text-5xl">
+                    <section className="rounded-xl bg-white p-8 shadow-sm dark:bg-slate-950">
+                        <h2 className="mt-0 mb-4 border-b-2 border-gray-200 pb-3 text-4xl font-black tracking-tight text-blue-600 sm:text-5xl dark:text-blue-400">
                             8. Verification Plan
                         </h2>
 
@@ -4073,7 +4079,7 @@ export default function DevDocs() {
                         </h3>
                         <p>
                             Run{' '}
-                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
+                            <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                 php artisan test --compact
                             </code>{' '}
                             after each phase.

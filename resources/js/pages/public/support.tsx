@@ -65,7 +65,7 @@ export default function Support() {
                             {/* Left Side: Support Channels Info */}
                             <div className="space-y-6 lg:col-span-1">
                                 <Card className="space-y-4 p-6">
-                                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400">
+                                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600 dark:bg-emerald-950/30 dark:bg-emerald-950/40 dark:text-emerald-400">
                                         <MessageSquare className="h-5 w-5" />
                                     </div>
                                     <div>
@@ -81,7 +81,7 @@ export default function Support() {
                                 </Card>
 
                                 <Card className="space-y-4 p-6">
-                                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-rose-50 text-rose-600 dark:bg-rose-950/40 dark:text-rose-400">
+                                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-rose-50 text-rose-600 dark:bg-rose-950/30 dark:bg-rose-950/40 dark:text-rose-400">
                                         <ShieldAlert className="h-5 w-5" />
                                     </div>
                                     <div>
@@ -104,7 +104,7 @@ export default function Support() {
                                 <Card className="p-8 md:p-10">
                                     {submitted ? (
                                         <div className="flex flex-col items-center justify-center py-10 text-center">
-                                            <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-emerald-50 text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400">
+                                            <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-emerald-50 text-emerald-600 dark:bg-emerald-950/30 dark:bg-emerald-950/40 dark:text-emerald-400">
                                                 <Mail className="h-6 w-6" />
                                             </div>
                                             <h2 className="text-2xl font-black tracking-tight text-foreground sm:text-3xl">
@@ -118,7 +118,7 @@ export default function Support() {
                                                 {submittedData?.email} within 24
                                                 hours.
                                             </p>
-                                            <div className="mt-6 flex max-w-2xl items-start gap-2.5 rounded-lg border border-amber-200/50 bg-amber-50/50 p-3 text-xs font-semibold text-amber-800 dark:border-amber-900/30 dark:bg-amber-950/20 dark:text-amber-400">
+                                            <div className="dark:border-amber-900/50/50 dark:bg-amber-950/30/50 mt-6 flex max-w-2xl items-start gap-2.5 rounded-lg border border-amber-200 bg-amber-50 p-3 text-xs font-semibold text-amber-800 dark:border-amber-900/30 dark:bg-amber-950/20 dark:text-amber-400">
                                                 <span>
                                                     You have successfully sent
                                                     your support request. You

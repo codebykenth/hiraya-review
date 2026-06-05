@@ -151,7 +151,7 @@ export function AdvancedFilters({
                                     onClick={() => handleStatusChange(value)}
                                     className={`rounded-lg border-2 px-3 py-2 text-xs font-bold transition ${
                                         filters.status === value
-                                            ? 'border-blue-500 bg-blue-50 text-blue-700 dark:border-blue-400 dark:bg-blue-950/20 dark:text-blue-400'
+                                            ? 'border-blue-500 bg-blue-50 text-blue-700 dark:border-blue-400 dark:bg-blue-950/20 dark:bg-blue-950/30 dark:text-blue-400'
                                             : 'border-slate-200 bg-slate-50 text-slate-700 hover:border-slate-300 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-400 dark:hover:border-slate-700'
                                     }`}
                                 >
@@ -182,7 +182,7 @@ export function AdvancedFilters({
                                     }
                                     className={`rounded-lg border-2 px-3 py-2 text-xs font-bold transition ${
                                         filters.termsAcceptance === value
-                                            ? 'border-blue-500 bg-blue-50 text-blue-700 dark:border-blue-400 dark:bg-blue-950/20 dark:text-blue-400'
+                                            ? 'border-blue-500 bg-blue-50 text-blue-700 dark:border-blue-400 dark:bg-blue-950/20 dark:bg-blue-950/30 dark:text-blue-400'
                                             : 'border-slate-200 bg-slate-50 text-slate-700 hover:border-slate-300 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-400 dark:hover:border-slate-700'
                                     }`}
                                 >
@@ -211,7 +211,7 @@ export function AdvancedFilters({
                                     onClick={() => handleRoleChange(value)}
                                     className={`rounded-lg border-2 px-3 py-2 text-xs font-bold transition ${
                                         filters.role === value
-                                            ? 'border-blue-500 bg-blue-50 text-blue-700 dark:border-blue-400 dark:bg-blue-950/20 dark:text-blue-400'
+                                            ? 'border-blue-500 bg-blue-50 text-blue-700 dark:border-blue-400 dark:bg-blue-950/20 dark:bg-blue-950/30 dark:text-blue-400'
                                             : 'border-slate-200 bg-slate-50 text-slate-700 hover:border-slate-300 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-400 dark:hover:border-slate-700'
                                     }`}
                                 >

@@ -50,7 +50,7 @@ export function AttemptsTable({
                 <div className="flex flex-wrap items-center gap-4 text-[10px] font-extrabold tracking-wider uppercase">
                     <span className="text-muted-foreground/80">Legend:</span>
 
-                    <div className="flex items-center gap-1.5 rounded-lg border border-blue-100 bg-blue-50/55 px-2 py-1 dark:border-blue-900/20 dark:bg-blue-950/10">
+                    <div className="dark:bg-blue-950/30/55 flex items-center gap-1.5 rounded-lg border border-blue-100 bg-blue-50 px-2 py-1 dark:border-blue-900/20 dark:bg-blue-950/10">
                         <span className="border-blue-250 flex size-5.5 items-center justify-center rounded-md border bg-blue-100 text-blue-700 dark:border-blue-900/30 dark:bg-blue-950/20 dark:text-blue-400">
                             <BookOpen className="size-3" />
                         </span>
@@ -58,7 +58,7 @@ export function AttemptsTable({
                             Review Answers
                         </span>
                     </div>
-                    <div className="flex items-center gap-1.5 rounded-lg border border-rose-100 bg-rose-50/55 px-2 py-1 dark:border-rose-900/20 dark:bg-rose-950/10">
+                    <div className="dark:bg-rose-950/30/55 flex items-center gap-1.5 rounded-lg border border-rose-100 bg-rose-50 px-2 py-1 dark:border-rose-900/20 dark:bg-rose-950/10">
                         <span className="border-rose-250 flex size-5.5 items-center justify-center rounded-md border bg-rose-100 text-rose-700 dark:border-rose-900/30 dark:bg-rose-950/20 dark:text-rose-400">
                             <Trash2 className="size-3" />
                         </span>
@@ -220,7 +220,7 @@ export function AttemptsTable({
                                                     <TooltipTrigger asChild>
                                                         <Link
                                                             href={`/exams?attempt_id=${att.id}`}
-                                                            className="flex size-8 cursor-pointer items-center justify-center rounded-lg border border-blue-200 bg-blue-50 text-blue-700 shadow-2xs transition hover:bg-blue-100 hover:text-blue-800 focus:outline-none dark:border-blue-900/30 dark:bg-blue-950/20 dark:text-blue-400 dark:hover:bg-blue-900/30 dark:hover:text-blue-300"
+                                                            className="flex size-8 cursor-pointer items-center justify-center rounded-lg border border-blue-200 bg-blue-50 text-blue-700 shadow-2xs transition hover:bg-blue-100 hover:text-blue-800 focus:outline-none dark:border-blue-900/30 dark:border-blue-900/50 dark:bg-blue-950/20 dark:bg-blue-950/30 dark:text-blue-400 dark:hover:bg-blue-900/30 dark:hover:text-blue-300"
                                                         >
                                                             <BookOpen className="size-3.5" />
                                                             <span className="sr-only">

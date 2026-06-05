@@ -105,7 +105,7 @@ export function TrafficOverloadGuard() {
         <>
             {/* Background Retrying Toast Notification */}
             {isRetrying && !isOpen && (
-                <div className="fixed right-4 bottom-4 z-[9999] flex animate-bounce items-center gap-3 rounded-2xl border border-amber-200 bg-amber-50/90 px-4 py-3 shadow-lg backdrop-blur transition-all dark:border-amber-900/50 dark:bg-amber-950/95">
+                <div className="dark:bg-amber-950/30/90 fixed right-4 bottom-4 z-[9999] flex animate-bounce items-center gap-3 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 shadow-lg backdrop-blur transition-all dark:border-amber-900/50 dark:bg-amber-950/95">
                     <RefreshCw className="size-4 animate-spin text-amber-600 dark:text-amber-400" />
                     <div className="flex flex-col">
                         <span className="text-xs font-black text-amber-900 dark:text-amber-300">
@@ -126,7 +126,7 @@ export function TrafficOverloadGuard() {
                         <div className="pointer-events-none absolute -top-24 -right-24 h-48 w-48 rounded-full bg-amber-500/5 blur-3xl" />
 
                         <div className="flex flex-col items-center p-2 text-center">
-                            <div className="mb-5 flex size-16 animate-bounce items-center justify-center rounded-2xl border border-amber-200 bg-amber-50 text-amber-600 dark:border-amber-900/40 dark:bg-amber-950/40 dark:text-amber-400">
+                            <div className="mb-5 flex size-16 animate-bounce items-center justify-center rounded-2xl border border-amber-200 bg-amber-50 text-amber-600 dark:border-amber-900/40 dark:border-amber-900/50 dark:bg-amber-950/30 dark:bg-amber-950/40 dark:text-amber-400">
                                 <AlertCircle className="size-8" />
                             </div>
 

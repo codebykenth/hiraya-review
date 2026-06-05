@@ -39,7 +39,7 @@ export default function Footer() {
                     {/* Legal Disclaimer */}
                     <div className="shadow-3xs rounded-2xl border border-amber-500/20 bg-amber-500/5 p-5 lg:col-span-8 dark:bg-amber-950/10">
                         <div className="flex gap-3">
-                            <ShieldAlert className="mt-0.5 size-5 shrink-0 text-amber-600 dark:text-amber-500" />
+                            <ShieldAlert className="mt-0.5 size-5 shrink-0 text-amber-600 dark:text-amber-400 dark:text-amber-500" />
 
                             <div className="flex flex-col gap-2">
                                 <span className="text-xs font-black tracking-wider text-amber-800 uppercase dark:text-amber-400">
@@ -122,7 +122,7 @@ export default function Footer() {
                             href="https://kenthalexisosila.dev"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1 font-bold underline transition hover:text-blue-600"
+                            className="inline-flex items-center gap-1 font-bold underline transition hover:text-blue-600 dark:text-blue-400"
                         >
                             Kenth Alexis Osila
                             <ExternalLink className="size-2.5" />

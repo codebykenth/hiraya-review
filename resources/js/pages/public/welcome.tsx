@@ -392,7 +392,7 @@ export default function Welcome() {
                                 cardOneTitle="Realistic Mock Exams"
                                 cardOneDescription="Experience the exact timing, format, and pressure of the actual civil service exam. Build stamina and confidence in our distraction-free testing interface."
                                 cardTwoIcon={
-                                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 dark:bg-indigo-950/40 dark:text-indigo-400">
+                                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 dark:bg-indigo-950/30 dark:bg-indigo-950/40 dark:text-indigo-400">
                                         <BookOpen className="h-6 w-6" />
                                     </div>
                                 }
@@ -404,7 +404,7 @@ export default function Welcome() {
                             <FeatureGrid
                                 reversed={true}
                                 cardOneIcon={
-                                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-50 text-blue-600 dark:bg-blue-950/40 dark:text-blue-400">
+                                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-50 text-blue-600 dark:bg-blue-950/30 dark:bg-blue-950/40 dark:text-blue-400">
                                         <Dumbbell className="h-6 w-6" />
                                     </div>
                                 }
@@ -428,7 +428,7 @@ export default function Welcome() {
                                     </div>
                                 }
                                 cardTwoIcon={
-                                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-amber-50 text-amber-600 dark:bg-amber-950/40 dark:text-amber-400">
+                                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-amber-50 text-amber-600 dark:bg-amber-950/30 dark:bg-amber-950/40 dark:text-amber-400">
                                         <History className="h-6 w-6" />
                                     </div>
                                 }
@@ -447,7 +447,7 @@ export default function Welcome() {
                                 cardOneTitle="Smart Study Plan"
                                 cardOneDescription="Generate a dynamic, customizable study schedule that maps out your topics day by day, preventing burnout and ensuring you cover the entire syllabus before exam day."
                                 cardTwoIcon={
-                                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400">
+                                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 dark:bg-emerald-950/30 dark:bg-emerald-950/40 dark:text-emerald-400">
                                         <BrainCircuit className="h-6 w-6" />
                                     </div>
                                 }

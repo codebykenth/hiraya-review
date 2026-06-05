@@ -66,7 +66,7 @@ export function ConfigView({
                     setViewState('hub');
                     setIsRetakeConfig(false);
                 }}
-                className="flex w-fit cursor-pointer items-center gap-1 text-xs font-black text-foreground transition hover:text-blue-600 focus:outline-none dark:hover:text-blue-400"
+                className="flex w-fit cursor-pointer items-center gap-1 text-xs font-black text-foreground transition hover:text-blue-600 focus:outline-none dark:text-blue-400 dark:hover:text-blue-400"
             >
                 <ChevronLeft className="size-4" />
                 Back to Drill Hub
@@ -74,7 +74,7 @@ export function ConfigView({
 
             {/* Retake Mode Status Banner */}
             {isRetakeConfig && (
-                <div className="flex flex-col justify-between gap-3 rounded-xl border border-amber-200 bg-amber-50/50 p-4 text-xs font-semibold text-amber-800 shadow-2xs sm:flex-row sm:items-center dark:border-amber-900/30 dark:bg-amber-950/10 dark:text-amber-400">
+                <div className="dark:bg-amber-950/30/50 flex flex-col justify-between gap-3 rounded-xl border border-amber-200 bg-amber-50 p-4 text-xs font-semibold text-amber-800 shadow-2xs sm:flex-row sm:items-center dark:border-amber-900/30 dark:border-amber-900/50 dark:bg-amber-950/10 dark:text-amber-400">
                     <div className="flex items-center gap-2">
                         <span className="text-sm">ðŸ”„</span>
                         <span>
@@ -131,7 +131,7 @@ export function ConfigView({
                                                 : ''
                                         } ${
                                             isSelected
-                                                ? 'border-blue-600 bg-blue-50 text-blue-700 dark:border-blue-500 dark:bg-blue-500/15 dark:text-blue-400'
+                                                ? 'border-blue-600 bg-blue-50 text-blue-700 dark:border-blue-500 dark:bg-blue-500/15 dark:bg-blue-950/30 dark:text-blue-400'
                                                 : 'border-border bg-white text-muted-foreground hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900/50 dark:text-slate-400 dark:hover:bg-slate-800'
                                         }`}
                                     >
@@ -151,7 +151,7 @@ export function ConfigView({
                             <span className="text-[10px] font-extrabold tracking-wider text-muted-foreground uppercase">
                                 ðŸ”¢ Question Count
                             </span>
-                            <span className="rounded-md bg-blue-50/50 px-2 py-0.5 text-[10px] font-bold text-blue-600 dark:bg-blue-950/20 dark:text-blue-400">
+                            <span className="dark:bg-blue-950/30/50 rounded-md bg-blue-50 px-2 py-0.5 text-[10px] font-bold text-blue-600 dark:bg-blue-950/20 dark:text-blue-400">
                                 Total Questions:{' '}
                                 {questionCount === 'all'
                                     ? filteredQCount
@@ -291,7 +291,7 @@ export function ConfigView({
                                                         | 'Both',
                                                 )
                                             }
-                                            className="size-4 border-border text-blue-600 focus:ring-blue-500 dark:border-slate-800 dark:bg-slate-900"
+                                            className="size-4 border-border text-blue-600 focus:ring-blue-500 dark:border-slate-800 dark:bg-slate-900 dark:text-blue-400"
                                         />
                                         {lang === 'Both'
                                             ? 'Both (Mixed)'
@@ -318,7 +318,7 @@ export function ConfigView({
                                         : ''
                                 } ${
                                     isTimed
-                                        ? 'border-blue-600 bg-blue-50/10 dark:border-blue-500 dark:bg-blue-950/10'
+                                        ? 'dark:bg-blue-950/30/10 border-blue-600 bg-blue-50 dark:border-blue-500 dark:bg-blue-950/10'
                                         : 'border-border bg-card hover:bg-slate-50/50 dark:hover:bg-slate-900/40'
                                 }`}
                             >
@@ -349,7 +349,7 @@ export function ConfigView({
                                         : ''
                                 } ${
                                     !isTimed
-                                        ? 'border-emerald-600 bg-emerald-50/10 dark:border-emerald-500 dark:bg-emerald-950/10'
+                                        ? 'dark:bg-emerald-950/30/10 border-emerald-600 bg-emerald-50 dark:border-emerald-500 dark:bg-emerald-950/10'
                                         : 'border-border bg-card hover:bg-slate-50/50 dark:hover:bg-slate-900/40'
                                 }`}
                             >

@@ -1,4 +1,4 @@
-import { router, usePage } from '@inertiajs/react';
+﻿import { router, usePage } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
 import { index as dashboardIndex } from '@/routes/dashboard';
 import type { Auth } from '@/types';

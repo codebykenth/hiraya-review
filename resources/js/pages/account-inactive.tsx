@@ -25,7 +25,7 @@ export default function AccountInactive({ adminEmail }: AccountInactiveProps) {
             <Head title="Account Inactive" />
             <div className="flex min-h-[90vh] items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 px-4 py-8">
                 <div className="w-full max-w-2xl">
-                    <div className="rounded-lg border border-slate-200 bg-white p-8 shadow-lg">
+                    <div className="rounded-lg border border-slate-200 bg-white p-8 shadow-lg dark:bg-slate-950">
                         <h1 className="mb-2 text-center text-4xl font-black tracking-tight text-slate-900 sm:text-5xl">
                             Account Inactive
                         </h1>
@@ -53,7 +53,7 @@ export default function AccountInactive({ adminEmail }: AccountInactiveProps) {
                             </div>
                         </div>
 
-                        <div className="mb-8 space-y-4 rounded-md border border-blue-200 bg-blue-50 p-4">
+                        <div className="mb-8 space-y-4 rounded-md border border-blue-200 bg-blue-50 p-4 dark:border-blue-900/50 dark:bg-blue-950/30">
                             <p className="text-base leading-relaxed text-slate-700">
                                 If you believe this is an error, please contact
                                 an administrator or reach out to support.

@@ -347,15 +347,15 @@ export default function DraftsQuestionList({
                                 <span className="rounded-full border border-border bg-muted px-3 py-0.5 text-xs font-semibold text-foreground">
                                     {q.category}
                                 </span>
-                                <span className="rounded-full border border-blue-100 bg-blue-50 px-3 py-0.5 text-xs font-semibold text-blue-700 dark:border-blue-900/30 dark:bg-blue-950/40 dark:text-blue-300">
+                                <span className="rounded-full border border-blue-100 bg-blue-50 px-3 py-0.5 text-xs font-semibold text-blue-700 dark:border-blue-900/30 dark:bg-blue-950/30 dark:bg-blue-950/40 dark:text-blue-300">
                                     {q.subcategory}
                                 </span>
                                 {q.approved ? (
-                                    <span className="bg-emerald-555/10 rounded-full border border-emerald-200 px-3 py-0.5 text-xs font-bold text-emerald-700 dark:border-emerald-900/30 dark:bg-emerald-950/40 dark:text-emerald-300">
+                                    <span className="bg-emerald-555/10 rounded-full border border-emerald-200 px-3 py-0.5 text-xs font-bold text-emerald-700 dark:border-emerald-900/30 dark:border-emerald-900/50 dark:bg-emerald-950/40 dark:text-emerald-300">
                                         Approved
                                     </span>
                                 ) : (
-                                    <span className="rounded-full border border-amber-100 bg-amber-50 px-3 py-0.5 text-xs font-bold text-amber-700 dark:border-amber-900/30 dark:bg-amber-950/40 dark:text-amber-300">
+                                    <span className="rounded-full border border-amber-100 bg-amber-50 px-3 py-0.5 text-xs font-bold text-amber-700 dark:border-amber-900/30 dark:bg-amber-950/30 dark:bg-amber-950/40 dark:text-amber-300">
                                         Pending Review
                                     </span>
                                 )}
@@ -375,7 +375,7 @@ export default function DraftsQuestionList({
                                                                 q.id,
                                                             )
                                                         }
-                                                        className="cursor-pointer rounded-lg border border-emerald-200 bg-emerald-50 p-1.5 text-emerald-700 transition dark:border-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-400"
+                                                        className="cursor-pointer rounded-lg border border-emerald-200 bg-emerald-50 p-1.5 text-emerald-700 transition dark:border-emerald-800 dark:border-emerald-900/50 dark:bg-emerald-950/30 dark:bg-emerald-950/40 dark:text-emerald-400"
                                                     >
                                                         <Save className="size-4" />
                                                     </button>
@@ -417,7 +417,7 @@ export default function DraftsQuestionList({
                                                         }
                                                         className={`cursor-pointer rounded-lg border p-1.5 transition ${
                                                             q.approved
-                                                                ? 'border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-400'
+                                                                ? 'border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-800 dark:border-emerald-900/50 dark:bg-emerald-950/30 dark:bg-emerald-950/40 dark:text-emerald-400'
                                                                 : 'border-border bg-card text-muted-foreground hover:text-foreground'
                                                         }`}
                                                     >
@@ -548,7 +548,7 @@ export default function DraftsQuestionList({
                                                 }
                                                 className={`flex w-full items-center justify-between rounded-xl border px-4 py-3 text-left transition ${
                                                     isCorrect
-                                                        ? 'border-emerald-250 bg-emerald-50/70 font-bold text-emerald-950 dark:border-emerald-900/40 dark:bg-emerald-950/20 dark:text-emerald-400'
+                                                        ? 'border-emerald-250 dark:bg-emerald-950/30/70 bg-emerald-50 font-bold text-emerald-950 dark:border-emerald-900/40 dark:bg-emerald-950/20 dark:text-emerald-400'
                                                         : 'border-border bg-muted font-semibold text-foreground hover:border-slate-200'
                                                 }`}
                                             >

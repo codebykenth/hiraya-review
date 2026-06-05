@@ -1,4 +1,4 @@
-import type { DragEndEvent } from '@dnd-kit/core';
+﻿import type { DragEndEvent } from '@dnd-kit/core';
 import {
     DndContext,
     useDroppable,
@@ -400,7 +400,7 @@ export function CalendarGrid({
                                             examDates.includes(calendarDay.date)
                                                 ? 'border-red-400 bg-red-50 dark:border-red-900/50 dark:bg-red-950/20'
                                                 : isToday(calendarDay.date)
-                                                  ? 'border-blue-400 bg-blue-50 dark:border-blue-800 dark:bg-blue-900/20'
+                                                  ? 'border-blue-400 bg-blue-50 dark:border-blue-800 dark:bg-blue-900/20 dark:bg-blue-950/30'
                                                   : calendarDay.isCurrentMonth
                                                     ? 'border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-800/40'
                                                     : 'border-slate-100 bg-slate-50 opacity-60 dark:border-slate-800/50 dark:bg-slate-900/20'
@@ -530,7 +530,7 @@ export function CalendarGrid({
                                                                                             calendarDay.date,
                                                                                         );
                                                                                     }}
-                                                                                    className="mt-0.5 h-3.5 w-3.5 shrink-0 cursor-pointer rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
+                                                                                    className="mt-0.5 h-3.5 w-3.5 shrink-0 cursor-pointer rounded border-slate-300 text-emerald-600 focus:ring-emerald-500 dark:text-emerald-400"
                                                                                 />
                                                                             </TooltipTrigger>
                                                                             <TooltipContent>
@@ -718,7 +718,7 @@ export function CalendarGrid({
                                                                                                         schedule.is_done
                                                                                                             ? 'bg-emerald-50/20 text-emerald-700/60 line-through decoration-emerald-500/20 dark:bg-emerald-950/20 dark:text-emerald-400/60'
                                                                                                             : l.isAuto
-                                                                                                              ? 'bg-amber-50 text-amber-700 hover:text-amber-900 dark:bg-amber-900/40 dark:text-amber-400 dark:hover:text-amber-300'
+                                                                                                              ? 'bg-amber-50 text-amber-700 hover:text-amber-900 dark:bg-amber-900/40 dark:bg-amber-950/30 dark:text-amber-400 dark:hover:text-amber-300'
                                                                                                               : 'bg-white/50 text-blue-700 hover:text-blue-900 dark:bg-blue-900/40 dark:text-blue-300 dark:hover:text-blue-200'
                                                                                                     }`}
                                                                                                     onClick={(

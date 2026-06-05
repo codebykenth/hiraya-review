@@ -1,4 +1,4 @@
-import { Users, Shield, UserPlus, CheckCircle } from 'lucide-react';
+﻿import { Users, Shield, UserPlus, CheckCircle } from 'lucide-react';
 
 import type { StatsSummary } from '@/pages/admin/users/user';
 import { StatsCard } from '../../dashboard/components/stats-card';
@@ -32,7 +32,7 @@ export function UsersStatsGrid({ stats }: UsersStatsGridProps) {
                 value={stats.total_admins}
                 icon={Shield}
                 iconBgColor="bg-indigo-50 dark:bg-indigo-950/20"
-                iconTextColor="text-indigo-600 dark:text-indigo-400"
+                iconTextColor="text-indigo-600 dark:text-indigo-400 dark:text-indigo-400"
             />
 
             {/* Students Count */}
@@ -41,7 +41,7 @@ export function UsersStatsGrid({ stats }: UsersStatsGridProps) {
                 value={stats.total_students}
                 icon={UserPlus}
                 iconBgColor="bg-emerald-50 dark:bg-emerald-950/20"
-                iconTextColor="text-emerald-600 dark:text-emerald-400"
+                iconTextColor="text-emerald-600 dark:text-emerald-400 dark:text-emerald-400"
             />
 
             {/* Compliance Rate */}
@@ -50,7 +50,7 @@ export function UsersStatsGrid({ stats }: UsersStatsGridProps) {
                 value={`${complianceRate}%`}
                 icon={CheckCircle}
                 iconBgColor="bg-blue-50 dark:bg-blue-950/20"
-                iconTextColor="text-blue-600 dark:text-blue-400"
+                iconTextColor="text-blue-600 dark:text-blue-400 dark:text-blue-400"
             />
         </div>
     );

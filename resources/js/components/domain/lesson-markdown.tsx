@@ -1,4 +1,4 @@
-import {
+﻿import {
     BookOpen,
     CheckCircle2,
     HelpCircle,
@@ -88,7 +88,7 @@ function RevealableAnswer({
 
     return (
         <div className="mt-3 ml-0 animate-in duration-200 zoom-in-95 fade-in md:ml-8">
-            <div className="flex items-start gap-3 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-base leading-7 font-bold text-emerald-900 dark:border-emerald-900/40 dark:bg-emerald-950/20 dark:text-emerald-200">
+            <div className="flex items-start gap-3 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-base leading-7 font-bold text-emerald-900 dark:border-emerald-900/40 dark:border-emerald-900/50 dark:bg-emerald-950/20 dark:bg-emerald-950/30 dark:text-emerald-200">
                 <CheckCircle2 className="mt-1 size-5 shrink-0" />
                 <span>{answerContent}</span>
             </div>
@@ -546,7 +546,7 @@ export function LessonMarkdown({ content = '' }: LessonMarkdownProps) {
                             key={`h2-${idx}`}
                             className={`mt-8 mb-4 flex items-center gap-2 border-b pb-3 text-xl leading-tight font-black dark:border-slate-800 dark:text-white ${
                                 isCheckSection
-                                    ? 'border-blue-200 text-blue-800 dark:text-blue-300'
+                                    ? 'border-blue-200 text-blue-800 dark:border-blue-900/50 dark:text-blue-300'
                                     : 'border-slate-200 text-slate-950'
                             }`}
                         >
@@ -589,7 +589,7 @@ export function LessonMarkdown({ content = '' }: LessonMarkdownProps) {
                 rendered.push(
                     <div
                         key={`callout-${idx}`}
-                        className="my-7 rounded-lg border border-amber-200 bg-amber-50 p-5 dark:border-amber-900/40 dark:bg-amber-950/20"
+                        className="my-7 rounded-lg border border-amber-200 bg-amber-50 p-5 dark:border-amber-900/40 dark:border-amber-900/50 dark:bg-amber-950/20 dark:bg-amber-950/30"
                     >
                         <span className="mb-2 flex items-center gap-2 text-sm font-black tracking-wide text-amber-800 uppercase dark:text-amber-300">
                             <Lightbulb className="size-4" />
@@ -608,7 +608,7 @@ export function LessonMarkdown({ content = '' }: LessonMarkdownProps) {
                 rendered.push(
                     <div
                         key={`q-${idx}`}
-                        className="mt-7 rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-900/50 dark:bg-blue-950/20"
+                        className="mt-7 rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-900/50 dark:bg-blue-950/20 dark:bg-blue-950/30"
                     >
                         <div className="flex items-start gap-3 text-base leading-7 font-extrabold text-slate-950 dark:text-white">
                             <HelpCircle className="mt-1 size-5 shrink-0 text-blue-700 dark:text-blue-300" />

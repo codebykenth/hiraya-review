@@ -31,7 +31,7 @@ export function MetricsGrid({ activeStats }: MetricsGridProps) {
                     <span className="font-heading text-2xl font-extrabold tracking-tight text-slate-900 dark:text-white">
                         {activeStats.avgScore}%
                     </span>
-                    <span className="inline-flex items-center gap-0.5 rounded-full border border-emerald-200/30 bg-emerald-50 px-2 py-0.5 text-[9px] font-extrabold text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400">
+                    <span className="dark:border-emerald-900/50/30 inline-flex items-center gap-0.5 rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[9px] font-extrabold text-emerald-700 dark:bg-emerald-950/30 dark:bg-emerald-950/40 dark:text-emerald-400">
                         <TrendingUp className="size-2.5" />
                         Live
                     </span>

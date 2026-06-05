@@ -1,4 +1,4 @@
-import { Database, Plus, Edit2, Trash2, Check, X } from 'lucide-react';
+﻿import { Database, Plus, Edit2, Trash2, Check, X } from 'lucide-react';
 import React from 'react';
 import type { SyllabusFormState } from '../hooks/use-syllabus-form';
 import type { CategoryItem } from '../types';
@@ -92,7 +92,7 @@ export function SubcategoryPanel({
                                         />
                                         <button
                                             type="submit"
-                                            className="cursor-pointer rounded-lg p-1.5 text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/30"
+                                            className="cursor-pointer rounded-lg p-1.5 text-emerald-600 hover:bg-emerald-50 dark:bg-emerald-950/30 dark:text-emerald-400 dark:hover:bg-emerald-950/30"
                                         >
                                             <Check className="size-4" />
                                         </button>
@@ -118,7 +118,7 @@ export function SubcategoryPanel({
                                                         sub.name,
                                                     );
                                                 }}
-                                                className="cursor-pointer rounded-lg p-1 text-muted-foreground transition hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-blue-950/30 dark:hover:text-blue-400"
+                                                className="cursor-pointer rounded-lg p-1 text-muted-foreground transition hover:bg-blue-50 hover:text-blue-600 dark:bg-blue-950/30 dark:text-blue-400 dark:hover:bg-blue-950/30 dark:hover:text-blue-400"
                                             >
                                                 <Edit2 className="size-3.5" />
                                             </button>

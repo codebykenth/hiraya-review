@@ -47,7 +47,7 @@ export function ManualEntryForm({
             <div className="flex flex-col gap-6 lg:col-span-8">
                 <div className="rounded-2xl border border-border bg-card p-6 shadow-xs">
                     <h2 className="mb-4 inline-flex items-center gap-2 border-b border-border pb-3 text-base font-bold text-foreground">
-                        <FileText className="size-4.5 text-emerald-600" />
+                        <FileText className="size-4.5 text-emerald-600 dark:text-emerald-400" />
                         Question Content
                     </h2>
 
@@ -111,7 +111,7 @@ export function ManualEntryForm({
                 <div className="rounded-2xl border border-border bg-card p-6 shadow-xs">
                     <div className="mb-4 flex items-center justify-between border-b border-border pb-3">
                         <h2 className="inline-flex items-center gap-2 text-base font-bold text-foreground">
-                            <CheckCircle2 className="size-4.5 text-emerald-600" />
+                            <CheckCircle2 className="size-4.5 text-emerald-600 dark:text-emerald-400" />
                             Answer Options
                         </h2>
                         {!isDemographic && (
@@ -127,7 +127,7 @@ export function ManualEntryForm({
                                 key={idx}
                                 className={`flex items-center gap-4 rounded-xl border p-3.5 transition duration-200 ${
                                     data.correct_option === idx
-                                        ? 'border-emerald-250 bg-emerald-50/20'
+                                        ? 'border-emerald-250 dark:bg-emerald-950/30/20 bg-emerald-50'
                                         : 'border-border'
                                 }`}
                             >
@@ -281,7 +281,7 @@ export function ManualEntryForm({
                                     onClick={() => setData('status', 'draft')}
                                     className={`cursor-pointer rounded-lg py-2 text-xs font-bold transition ${
                                         data.status === 'draft'
-                                            ? 'bg-white text-slate-900 shadow-xs'
+                                            ? 'bg-white text-slate-900 shadow-xs dark:bg-slate-950'
                                             : 'text-slate-500 hover:text-slate-900'
                                     }`}
                                 >

@@ -1,4 +1,4 @@
-import { Head, usePage, router } from '@inertiajs/react';
+﻿import { Head, usePage, router } from '@inertiajs/react';
 import Echo from 'laravel-echo';
 import { BookOpen, CheckCircle, BarChart } from 'lucide-react';
 import Pusher from 'pusher-js';
@@ -162,7 +162,7 @@ export default function LearnIndex(props: LearnIndexProps) {
                                 <span className="font-heading text-sm font-bold text-foreground">
                                     Overall Study Progress
                                 </span>
-                                <span className="rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-extrabold text-blue-700 dark:bg-blue-950/40 dark:text-blue-400">
+                                <span className="rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-extrabold text-blue-700 dark:bg-blue-950/30 dark:bg-blue-950/40 dark:text-blue-400">
                                     {completedCount} / {totalCount} Completed
                                 </span>
                             </div>

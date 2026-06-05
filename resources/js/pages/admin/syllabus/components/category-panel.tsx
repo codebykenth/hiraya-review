@@ -1,4 +1,4 @@
-import { Plus, Edit2, Trash2, Check, X } from 'lucide-react';
+﻿import { Plus, Edit2, Trash2, Check, X } from 'lucide-react';
 import React from 'react';
 import type { SyllabusFormState } from '../hooks/use-syllabus-form';
 import type { CategoryItem } from '../types';
@@ -69,7 +69,7 @@ export function CategoryPanel({
                                 e.target.checked,
                             )
                         }
-                        className="size-4 cursor-pointer rounded border-border text-blue-600 focus:ring-blue-500"
+                        className="size-4 cursor-pointer rounded border-border text-blue-600 focus:ring-blue-500 dark:text-blue-400"
                     />
                     <span className="text-xs font-semibold text-muted-foreground">
                         Is demographic?
@@ -89,7 +89,7 @@ export function CategoryPanel({
                         className={`flex cursor-pointer items-center justify-between rounded-xl border p-3 transition select-none ${
                             selectedCategoryId === cat.id &&
                             formState.editingCategory !== cat.id
-                                ? 'shadow-3xs border-blue-200 bg-blue-50/50 text-blue-900 dark:border-blue-900/40 dark:bg-blue-950/20 dark:text-blue-200'
+                                ? 'shadow-3xs dark:bg-blue-950/30/50 border-blue-200 bg-blue-50 text-blue-900 dark:border-blue-900/40 dark:border-blue-900/50 dark:bg-blue-950/20 dark:text-blue-200'
                                 : 'border-border bg-card text-foreground hover:bg-muted/50'
                         }`}
                     >
@@ -114,7 +114,7 @@ export function CategoryPanel({
                                 />
                                 <button
                                     type="submit"
-                                    className="cursor-pointer rounded-lg p-1.5 text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/30"
+                                    className="cursor-pointer rounded-lg p-1.5 text-emerald-600 hover:bg-emerald-50 dark:bg-emerald-950/30 dark:text-emerald-400 dark:hover:bg-emerald-950/30"
                                 >
                                     <Check className="size-4" />
                                 </button>
@@ -141,7 +141,7 @@ export function CategoryPanel({
                                             e.stopPropagation();
                                             onStartEdit(cat.id, cat.name);
                                         }}
-                                        className="cursor-pointer rounded-lg p-1 text-muted-foreground transition hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-blue-950/30 dark:hover:text-blue-400"
+                                        className="cursor-pointer rounded-lg p-1 text-muted-foreground transition hover:bg-blue-50 hover:text-blue-600 dark:bg-blue-950/30 dark:text-blue-400 dark:hover:bg-blue-950/30 dark:hover:text-blue-400"
                                     >
                                         <Edit2 className="size-3.5" />
                                     </button>

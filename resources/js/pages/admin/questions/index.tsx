@@ -81,11 +81,11 @@ export default function QuestionsIndex({
             header: 'Status',
             render: (q) =>
                 q.status === 'ACTIVE' ? (
-                    <span className="inline-flex items-center gap-1 rounded-md border border-emerald-100 bg-emerald-50 px-2 py-0.5 text-[9px] font-extrabold text-emerald-700 uppercase dark:border-emerald-900/30 dark:bg-emerald-950/20 dark:text-emerald-400">
+                    <span className="inline-flex items-center gap-1 rounded-md border border-emerald-100 bg-emerald-50 px-2 py-0.5 text-[9px] font-extrabold text-emerald-700 uppercase dark:border-emerald-900/30 dark:bg-emerald-950/20 dark:bg-emerald-950/30 dark:text-emerald-400">
                         Active
                     </span>
                 ) : (
-                    <span className="text-blue-650 inline-flex items-center gap-1 rounded-md border border-blue-100 bg-blue-50 px-2 py-0.5 text-[9px] font-extrabold uppercase dark:border-blue-900/30 dark:bg-blue-950/20 dark:text-blue-400">
+                    <span className="text-blue-650 inline-flex items-center gap-1 rounded-md border border-blue-100 bg-blue-50 px-2 py-0.5 text-[9px] font-extrabold uppercase dark:border-blue-900/30 dark:bg-blue-950/20 dark:bg-blue-950/30 dark:text-blue-400">
                         Draft
                     </span>
                 ),
@@ -100,7 +100,7 @@ export default function QuestionsIndex({
                             <TooltipTrigger asChild>
                                 <Link
                                     href={questionsShow(q.id).url}
-                                    className="cursor-pointer rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted hover:text-blue-600"
+                                    className="cursor-pointer rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted hover:text-blue-600 dark:text-blue-400"
                                 >
                                     <Eye className="size-4" />
                                 </Link>
@@ -112,7 +112,7 @@ export default function QuestionsIndex({
                             <TooltipTrigger asChild>
                                 <Link
                                     href={questionsEdit(q.id).url}
-                                    className="cursor-pointer rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted hover:text-blue-600"
+                                    className="cursor-pointer rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted hover:text-blue-600 dark:text-blue-400"
                                 >
                                     <Edit2 className="size-4" />
                                 </Link>

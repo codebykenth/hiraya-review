@@ -19,28 +19,34 @@ export default function About() {
             title: 'Excellence in Education',
             description:
                 'Hiraya Review believes in providing the highest quality review materials tailored strictly to the Philippine Civil Service Commission scope.',
-            icon: <Target className="size-6 text-blue-600" />,
+            icon: (
+                <Target className="size-6 text-blue-600 dark:text-blue-400" />
+            ),
             bg: 'bg-blue-100 dark:bg-blue-900/30',
         },
         {
             title: 'Radical Accessibility',
             description:
                 'Education should not be a luxury. Hiraya Review provides powerful, AI-driven study tools completely free to help every Filipino succeed.',
-            icon: <Heart className="size-6 text-rose-600" />,
+            icon: <Heart className="size-6 text-rose-600 dark:text-rose-400" />,
             bg: 'bg-rose-100 dark:bg-rose-900/30',
         },
         {
             title: 'Continuous Innovation',
             description:
                 'By leveraging modern technology, Hiraya Review adapts the learning engine to target your specific weaknesses dynamically.',
-            icon: <Sparkles className="size-6 text-amber-600" />,
+            icon: (
+                <Sparkles className="size-6 text-amber-600 dark:text-amber-400" />
+            ),
             bg: 'bg-amber-100 dark:bg-amber-900/30',
         },
         {
             title: 'Data Privacy',
             description:
                 'Hiraya Review respects your data. The platform runs securely without selling your information to third-party brokers.',
-            icon: <ShieldCheck className="size-6 text-emerald-600" />,
+            icon: (
+                <ShieldCheck className="size-6 text-emerald-600 dark:text-emerald-400" />
+            ),
             bg: 'bg-emerald-100 dark:bg-emerald-900/30',
         },
     ];
@@ -109,7 +115,7 @@ export default function About() {
                                 <div className="absolute inset-0 -m-4 rotate-3 transform rounded-3xl bg-gradient-to-tr from-blue-100 to-indigo-50 dark:from-blue-950/40 dark:to-indigo-900/20" />
                                 <div className="relative rounded-2xl border border-slate-200 bg-white p-8 shadow-sm dark:border-slate-800 dark:bg-slate-900/50">
                                     <div className="flex flex-col items-center justify-center py-10 text-center">
-                                        <Users className="mb-6 size-16 text-blue-600 dark:text-blue-500" />
+                                        <Users className="mb-6 size-16 text-blue-600 dark:text-blue-400 dark:text-blue-500" />
                                         <h3 className="mb-4 text-3xl font-black tracking-tight text-slate-900 sm:text-4xl dark:text-white">
                                             Built For You
                                         </h3>
@@ -178,7 +184,7 @@ export default function About() {
                             <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
                                 <Button
                                     size="lg"
-                                    className="h-14 rounded-full bg-white px-8 text-xl font-black tracking-tight text-blue-600 hover:bg-slate-50"
+                                    className="h-14 rounded-full bg-white px-8 text-xl font-black tracking-tight text-blue-600 hover:bg-slate-50 dark:bg-slate-950 dark:text-blue-400"
                                     asChild
                                 >
                                     <Link href="/register">

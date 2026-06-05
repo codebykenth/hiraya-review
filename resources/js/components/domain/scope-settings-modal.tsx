@@ -56,7 +56,7 @@ export function ScopeSettingsModal({
                 <div className="flex items-center justify-between border-b border-slate-100 bg-slate-50/50 px-6 py-4.5 dark:border-slate-900 dark:bg-slate-900/35">
                     <div>
                         <h2 className="flex items-center gap-2 text-xl font-black tracking-tight text-slate-900 dark:text-white">
-                            <Database className="size-5 text-blue-600 dark:text-blue-500" />
+                            <Database className="size-5 text-blue-600 dark:text-blue-400 dark:text-blue-500" />
                             Dynamic Syllabus Scope Settings
                         </h2>
                         <p className="mt-0.5 text-sm leading-relaxed text-slate-500 dark:text-slate-400">
@@ -112,7 +112,7 @@ export function ScopeSettingsModal({
                                     }
                                     className={`flex cursor-pointer items-center justify-between rounded-xl border p-3 transition select-none ${
                                         selectedScopeCategory === cat.id
-                                            ? 'shadow-3xs border-blue-200 bg-blue-50/50 text-blue-900 dark:border-blue-900/40 dark:bg-blue-950/20 dark:text-blue-200'
+                                            ? 'shadow-3xs dark:bg-blue-950/30/50 border-blue-200 bg-blue-50 text-blue-900 dark:border-blue-900/40 dark:border-blue-900/50 dark:bg-blue-950/20 dark:text-blue-200'
                                             : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800/80'
                                     }`}
                                 >

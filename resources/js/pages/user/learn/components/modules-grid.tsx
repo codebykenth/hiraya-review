@@ -1,4 +1,4 @@
-﻿import { Link } from '@inertiajs/react';
+import { Link } from '@inertiajs/react';
 import { BookOpen, Clock, Tag, ArrowRight, CheckCircle2 } from 'lucide-react';
 import React from 'react';
 import { Card } from '@/components/ui/card';
@@ -66,7 +66,7 @@ export function ModulesGrid({
                                                     )}
                                                 </div>
 
-                                                <h3 className="mt-5 font-heading text-lg leading-snug font-bold text-foreground transition group-hover:text-blue-600 dark:group-hover:text-blue-400">
+                                                <h3 className="mt-5 font-heading text-lg leading-snug font-bold text-foreground transition group-hover:text-blue-600 dark:text-blue-400 dark:group-hover:text-blue-400">
                                                     {mod.title}
                                                 </h3>
 
@@ -92,10 +92,12 @@ export function ModulesGrid({
                                                     </span>
                                                 </div>
 
-                                                <span className="dark:text-blue-450 flex items-center gap-1 text-xs font-black text-blue-600 transition-all group-hover:gap-2">
-                                                    Start Lesson
-                                                    <ArrowRight className="size-3.5" />
-                                                </span>
+                                                {!mod.is_completed && (
+                                                    <span className="flex items-center gap-1 text-xs font-black text-blue-600 transition-all group-hover:gap-2 dark:text-blue-400">
+                                                        Start Lesson
+                                                        <ArrowRight className="size-3.5" />
+                                                    </span>
+                                                )}
                                             </div>
                                         </Card>
                                     </Link>
@@ -114,7 +116,7 @@ export function ModulesGrid({
                 <div className="mx-auto mb-5 flex size-14 items-center justify-center rounded-xl bg-slate-100 text-muted-foreground ring-8 dark:bg-slate-900">
                     <BookOpen className="size-6 text-blue-600 dark:text-blue-400" />
                 </div>
-                <span className="mb-3.5 inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-3.5 py-1 text-[10px] font-extrabold tracking-wider text-amber-700 uppercase dark:bg-amber-950/40 dark:text-amber-400">
+                <span className="mb-3.5 inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-3.5 py-1 text-[10px] font-extrabold tracking-wider text-amber-700 uppercase dark:bg-amber-950/30 dark:bg-amber-950/40 dark:text-amber-400">
                     <span className="size-1.5 rounded-full bg-amber-500" />
                     Coming Soon
                 </span>

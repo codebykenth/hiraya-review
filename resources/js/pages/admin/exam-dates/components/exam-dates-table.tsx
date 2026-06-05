@@ -1,4 +1,4 @@
-import { CheckCircle, XCircle, Edit2, Trash2 } from 'lucide-react';
+﻿import { CheckCircle, XCircle, Edit2, Trash2 } from 'lucide-react';
 import {
     Tooltip,
     TooltipContent,
@@ -55,7 +55,7 @@ export function ExamDatesTable({
                                 </td>
                                 <td className="px-4 py-3">
                                     {exam.is_active ? (
-                                        <span className="inline-flex items-center gap-1 rounded-md border border-emerald-100 bg-emerald-50 px-2 py-0.5 text-[9px] font-extrabold text-emerald-700 uppercase dark:border-emerald-900/30 dark:bg-emerald-950/20 dark:text-emerald-400">
+                                        <span className="inline-flex items-center gap-1 rounded-md border border-emerald-100 bg-emerald-50 px-2 py-0.5 text-[9px] font-extrabold text-emerald-700 uppercase dark:border-emerald-900/30 dark:bg-emerald-950/20 dark:bg-emerald-950/30 dark:text-emerald-400">
                                             <CheckCircle className="h-3 w-3" />
                                             Active
                                         </span>
@@ -75,7 +75,7 @@ export function ExamDatesTable({
                                                         onClick={() =>
                                                             onToggleStatus(exam)
                                                         }
-                                                        className={`rounded-md p-1.5 hover:bg-muted ${exam.is_active ? 'text-amber-600' : 'text-emerald-600'}`}
+                                                        className={`rounded-md p-1.5 hover:bg-muted ${exam.is_active ? 'text-amber-600 dark:text-amber-400' : 'text-emerald-600 dark:text-emerald-400'}`}
                                                     >
                                                         {exam.is_active ? (
                                                             <XCircle className="h-4 w-4" />
@@ -97,7 +97,7 @@ export function ExamDatesTable({
                                                         onClick={() =>
                                                             onEdit(exam)
                                                         }
-                                                        className="rounded-md p-1.5 text-blue-600 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-950/30"
+                                                        className="rounded-md p-1.5 text-blue-600 hover:bg-blue-50 dark:bg-blue-950/30 dark:text-blue-400 dark:hover:bg-blue-950/30"
                                                     >
                                                         <Edit2 className="h-4 w-4" />
                                                     </button>

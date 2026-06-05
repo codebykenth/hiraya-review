@@ -45,7 +45,7 @@ export function BulkUpdateModal({
             <DialogContent className="sm:max-w-2xl">
                 <DialogHeader>
                     <DialogTitle className="flex items-center gap-2">
-                        <Clock className="h-5 w-5 text-blue-600" />
+                        <Clock className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                         Bulk Update Study Time
                     </DialogTitle>
                     <p className="mt-1 text-sm leading-relaxed text-slate-500 dark:text-slate-400">

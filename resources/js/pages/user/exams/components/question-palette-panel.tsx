@@ -1,4 +1,4 @@
-import { CheckCircle2, ChevronRight, Lock, X } from 'lucide-react';
+﻿import { CheckCircle2, ChevronRight, Lock, X } from 'lucide-react';
 import React, { useMemo } from 'react';
 
 export interface QuestionPalettePanelProps {
@@ -186,7 +186,7 @@ export default function QuestionPalettePanel({
                         <span>Unanswered</span>
                     </div>
                     <div className="flex items-center gap-1">
-                        <div className="size-2.5 rounded border border-rose-200 bg-rose-50 dark:border-rose-900/40 dark:bg-rose-950/20" />
+                        <div className="size-2.5 rounded border border-rose-200 bg-rose-50 dark:border-rose-900/40 dark:border-rose-900/50 dark:bg-rose-950/20 dark:bg-rose-950/30" />
                         <span>Flagged</span>
                     </div>
                 </div>
@@ -284,11 +284,11 @@ export default function QuestionPalettePanel({
                                         isFilteredOut
                                             ? 'cursor-not-allowed border-border bg-background text-muted-foreground opacity-20 grayscale'
                                             : isActive
-                                              ? 'border-blue-600 bg-blue-50 bg-card font-black text-blue-600 ring-2 ring-blue-600 ring-offset-1 dark:text-blue-400 dark:ring-offset-background'
+                                              ? 'border-blue-600 bg-blue-50 bg-card font-black text-blue-600 ring-2 ring-blue-600 ring-offset-1 dark:bg-blue-950/30 dark:text-blue-400 dark:ring-offset-background'
                                               : isAnswered
                                                 ? 'border-blue-600 bg-blue-600 text-white hover:bg-blue-700'
                                                 : isFlagged
-                                                  ? 'border-rose-300 bg-rose-50 font-extrabold text-rose-700 dark:border-rose-900/40 dark:bg-rose-950/20 dark:text-rose-400'
+                                                  ? 'border-rose-300 bg-rose-50 font-extrabold text-rose-700 dark:border-rose-900/40 dark:bg-rose-950/20 dark:bg-rose-950/30 dark:text-rose-400'
                                                   : isFreeAttempt && idx >= 20
                                                     ? 'border-border bg-background text-muted-foreground/40 hover:bg-muted'
                                                     : 'border-border bg-background text-foreground hover:bg-muted'
@@ -323,13 +323,13 @@ export default function QuestionPalettePanel({
                         if (isDemographic) {
                             bgColor = isSkipped
                                 ? 'border border-border bg-slate-100 text-slate-400 dark:bg-slate-800 dark:text-slate-500'
-                                : 'border border-blue-200 bg-blue-100 text-blue-700 dark:border-blue-900/50 dark:bg-blue-900/50 dark:text-blue-400';
+                                : 'border border-blue-200 dark:border-blue-900/50 bg-blue-100 text-blue-700 dark:border-blue-900/50 dark:bg-blue-900/50 dark:text-blue-400';
                         } else {
                             bgColor = isSkipped
                                 ? 'border border-border bg-slate-100 text-slate-400 dark:bg-slate-800 dark:text-slate-500'
                                 : isCorrect
-                                  ? 'border border-emerald-200 bg-emerald-100 text-emerald-700 dark:border-emerald-900/50 dark:bg-emerald-900/50 dark:text-emerald-400'
-                                  : 'border border-rose-200 bg-rose-100 text-rose-700 dark:border-rose-900/50 dark:bg-rose-900/50 dark:text-rose-400';
+                                  ? 'border border-emerald-200 dark:border-emerald-900/50 bg-emerald-100 text-emerald-700 dark:border-emerald-900/50 dark:bg-emerald-900/50 dark:text-emerald-400'
+                                  : 'border border-rose-200 dark:border-rose-900/50 bg-rose-100 text-rose-700 dark:border-rose-900/50 dark:bg-rose-900/50 dark:text-rose-400';
                         }
 
                         if (currentIdx === idx) {

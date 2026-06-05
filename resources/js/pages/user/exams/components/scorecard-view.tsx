@@ -52,7 +52,7 @@ export function ScorecardView({
             {savedAttempt && (
                 <Link
                     href="/history"
-                    className="mb-4 flex w-fit cursor-pointer items-center gap-1 text-xs font-black text-slate-800 transition hover:text-blue-600 focus:outline-none dark:text-white dark:hover:text-blue-400"
+                    className="mb-4 flex w-fit cursor-pointer items-center gap-1 text-xs font-black text-slate-800 transition hover:text-blue-600 focus:outline-none dark:text-blue-400 dark:text-white dark:hover:text-blue-400"
                 >
                     <ChevronLeft className="size-4" /> Back to History
                 </Link>
@@ -60,7 +60,7 @@ export function ScorecardView({
 
             <div className="mb-6 flex flex-col gap-2 border-b border-slate-100 pb-5 md:flex-row md:items-center md:justify-between">
                 <div>
-                    <span className="inline-flex items-center gap-1 rounded-full bg-blue-50 px-2.5 py-0.5 text-xs font-bold text-blue-600 dark:bg-blue-950/40 dark:text-blue-400">
+                    <span className="inline-flex items-center gap-1 rounded-full bg-blue-50 px-2.5 py-0.5 text-xs font-bold text-blue-600 dark:bg-blue-950/30 dark:bg-blue-950/40 dark:text-blue-400">
                         <Award className="size-3" /> Review Panel
                     </span>
                     <h1 className="mt-1 font-heading text-3xl font-black tracking-tight text-slate-900 sm:text-4xl md:text-3xl dark:text-white">
@@ -94,7 +94,7 @@ export function ScorecardView({
             </div>
 
             {submittedByTimer && (
-                <div className="mb-6 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-xs font-semibold text-amber-800 dark:border-amber-900/40 dark:bg-amber-950/20 dark:text-amber-300">
+                <div className="mb-6 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-xs font-semibold text-amber-800 dark:border-amber-900/40 dark:border-amber-900/50 dark:bg-amber-950/20 dark:bg-amber-950/30 dark:text-amber-300">
                     Time expired — your exam was submitted automatically and
                     your scorecard is shown below.
                 </div>

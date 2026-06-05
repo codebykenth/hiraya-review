@@ -1,4 +1,4 @@
-import { Link } from '@inertiajs/react';
+﻿import { Link } from '@inertiajs/react';
 import { Checkbox } from '@/components/ui/checkbox';
 
 export default function ConsentCheckbox({

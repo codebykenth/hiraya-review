@@ -79,7 +79,7 @@ export function ReviewExamView({
                     <div className="flex items-center gap-3">
                         <button
                             onClick={() => setReviewScreenActive(false)}
-                            className="flex cursor-pointer items-center gap-1.5 rounded-lg text-xs font-black text-muted-foreground transition hover:text-blue-600 focus:outline-none"
+                            className="flex cursor-pointer items-center gap-1.5 rounded-lg text-xs font-black text-muted-foreground transition hover:text-blue-600 focus:outline-none dark:text-blue-400"
                         >
                             <ChevronLeft className="size-4" />
                             <span className="hidden sm:inline-block">
@@ -87,7 +87,7 @@ export function ReviewExamView({
                             </span>
                         </button>
                         <div className="h-4 w-px bg-border" />
-                        <span className="rounded-md bg-emerald-50 px-2 py-0.5 text-[10px] font-extrabold tracking-wider text-emerald-600 uppercase dark:bg-emerald-950/20 dark:text-emerald-400">
+                        <span className="rounded-md bg-emerald-50 px-2 py-0.5 text-[10px] font-extrabold tracking-wider text-emerald-600 uppercase dark:bg-emerald-950/20 dark:bg-emerald-950/30 dark:text-emerald-400">
                             Exam Answer Review
                         </span>
                         <span className="hidden text-sm font-bold text-foreground md:block">
@@ -107,7 +107,7 @@ export function ReviewExamView({
                                     <div className="shadow-3xs relative rounded-2xl border border-border bg-card p-6">
                                         <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
                                             <div className="flex flex-wrap items-center gap-2">
-                                                <span className="rounded-md bg-blue-50/50 px-2 py-0.5 text-[9px] font-extrabold text-blue-600 dark:bg-blue-950/20 dark:text-blue-400">
+                                                <span className="dark:bg-blue-950/30/50 rounded-md bg-blue-50 px-2 py-0.5 text-[9px] font-extrabold text-blue-600 dark:bg-blue-950/20 dark:text-blue-400">
                                                     {currentQuestion.category}
                                                 </span>
                                                 <span className="rounded-md bg-muted px-2 py-0.5 text-[9px] font-extrabold text-muted-foreground">
@@ -143,12 +143,12 @@ export function ReviewExamView({
                                                     }
                                                     className={`inline-flex cursor-pointer items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[11px] font-bold transition focus:outline-none ${
                                                         flagged[currentIdx]
-                                                            ? 'border border-rose-200/50 bg-rose-50 text-rose-700 dark:bg-rose-950/30 dark:text-rose-400'
+                                                            ? 'dark:border-rose-900/50/50 border border-rose-200 bg-rose-50 text-rose-700 dark:bg-rose-950/30 dark:text-rose-400'
                                                             : 'text-muted-foreground hover:bg-muted'
                                                     }`}
                                                 >
                                                     <Flag
-                                                        className={`size-3.5 ${flagged[currentIdx] ? 'fill-rose-600 text-rose-600' : ''}`}
+                                                        className={`size-3.5 ${flagged[currentIdx] ? 'fill-rose-600 text-rose-600 dark:text-rose-400' : ''}`}
                                                     />
                                                     {flagged[currentIdx]
                                                         ? 'Flagged for Review'
@@ -243,7 +243,7 @@ export function ReviewExamView({
                                                                                 Answer
                                                                             </span>
                                                                         )}
-                                                                        <CheckCircle2 className="dark:text-emerald-450 size-5 text-emerald-600" />
+                                                                        <CheckCircle2 className="dark:text-emerald-450 size-5 text-emerald-600 dark:text-emerald-400" />
                                                                     </div>
                                                                 )}
                                                             {!isDemographic &&
@@ -316,7 +316,7 @@ export function ReviewExamView({
                                                                                     }
                                                                                     className="flex items-center gap-2 text-xs"
                                                                                 >
-                                                                                    <span className="inline-flex size-5 items-center justify-center rounded border border-blue-100/60 bg-blue-50 font-mono text-[10px] font-black text-blue-700 dark:border-blue-900/40 dark:bg-blue-950/40 dark:text-blue-400">
+                                                                                    <span className="inline-flex size-5 items-center justify-center rounded border border-blue-100/60 bg-blue-50 font-mono text-[10px] font-black text-blue-700 dark:border-blue-900/40 dark:bg-blue-950/30 dark:bg-blue-950/40 dark:text-blue-400">
                                                                                         {
                                                                                             newLetter
                                                                                         }

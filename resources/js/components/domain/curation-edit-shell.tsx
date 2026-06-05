@@ -39,7 +39,7 @@ export function CurationEditShell({
             {/* Back Link */}
             <Link
                 href={backUrl}
-                className="flex w-fit items-center gap-1 text-xs font-black text-foreground transition hover:text-blue-600 focus:outline-none"
+                className="flex w-fit items-center gap-1 text-xs font-black text-foreground transition hover:text-blue-600 focus:outline-none dark:text-blue-400"
             >
                 <ChevronLeft className="size-4" />
                 {backLabel}
@@ -58,7 +58,7 @@ export function CurationEditShell({
                 >
                     <div className="flex items-center justify-between border-b border-border pb-3.5">
                         <span className="flex items-center gap-1.5 text-xs font-black text-foreground uppercase">
-                            <HeaderIcon className="size-4.5 animate-pulse text-blue-600" />
+                            <HeaderIcon className="size-4.5 animate-pulse text-blue-600 dark:text-blue-400" />
                             {headerTitle}
                         </span>
 
@@ -71,7 +71,7 @@ export function CurationEditShell({
                                 onClick={onStatusToggle}
                                 className={`cursor-pointer rounded-lg border px-3 py-1.5 text-[10px] font-extrabold uppercase transition ${
                                     statusValue
-                                        ? 'border-emerald-150 bg-emerald-50 text-emerald-700 dark:border-emerald-900/30 dark:bg-emerald-950/20 dark:text-emerald-400'
+                                        ? 'border-emerald-150 bg-emerald-50 text-emerald-700 dark:border-emerald-900/30 dark:bg-emerald-950/20 dark:bg-emerald-950/30 dark:text-emerald-400'
                                         : 'border-border bg-muted text-muted-foreground'
                                 }`}
                             >

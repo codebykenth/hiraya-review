@@ -85,7 +85,7 @@ export default function LearnShow({ module, recommended }: LearnShowProps) {
             <PageContainer className="bg-slate-50/30 p-4 md:p-6 dark:bg-slate-900/20">
                 <Link
                     href="/learn"
-                    className="flex w-fit items-center gap-1 text-sm font-black text-foreground transition hover:text-blue-600 focus:outline-none dark:hover:text-blue-400"
+                    className="flex w-fit items-center gap-1 text-sm font-black text-foreground transition hover:text-blue-600 focus:outline-none dark:text-blue-400 dark:hover:text-blue-400"
                 >
                     <ChevronLeft className="size-4" />
                     Back to Study Hub
@@ -217,7 +217,7 @@ export default function LearnShow({ module, recommended }: LearnShowProps) {
                     <aside className="flex min-w-0 flex-col gap-6">
                         <Card className="p-5 shadow-xs">
                             <div className="flex items-center gap-2 border-b border-border pb-3">
-                                <BookMarked className="size-4 text-blue-600" />
+                                <BookMarked className="size-4 text-blue-600 dark:text-blue-400" />
                                 <span className="text-sm font-black text-foreground uppercase">
                                     Syllabus Overview
                                 </span>
@@ -275,7 +275,7 @@ export default function LearnShow({ module, recommended }: LearnShowProps) {
                                             href={`/learn/${rec.slug}`}
                                             className="group block border-b border-border/40 pb-3 last:border-0 last:pb-0"
                                         >
-                                            <h4 className="line-clamp-2 text-sm font-black text-foreground transition group-hover:text-blue-600 dark:group-hover:text-blue-400">
+                                            <h4 className="line-clamp-2 text-sm font-black text-foreground transition group-hover:text-blue-600 dark:text-blue-400 dark:group-hover:text-blue-400">
                                                 {rec.title}
                                             </h4>
                                             <span className="mt-1 flex items-center gap-1.5 text-xs font-bold text-muted-foreground uppercase">

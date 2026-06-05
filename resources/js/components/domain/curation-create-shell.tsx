@@ -30,7 +30,7 @@ export function CurationCreateShell({
             {/* Back Link */}
             <Link
                 href={backUrl}
-                className="flex w-fit cursor-pointer items-center gap-1 text-xs font-black text-foreground transition hover:text-blue-600 focus:outline-none"
+                className="flex w-fit cursor-pointer items-center gap-1 text-xs font-black text-foreground transition hover:text-blue-600 focus:outline-none dark:text-blue-400"
             >
                 <ChevronLeft className="size-4" />
                 {backLabel}
@@ -51,7 +51,7 @@ export function CurationCreateShell({
                                 : 'dark:text-slate-450 text-slate-500 hover:text-slate-900 dark:hover:text-slate-200'
                         }`}
                     >
-                        <Sparkles className="size-4 animate-pulse text-blue-600" />
+                        <Sparkles className="size-4 animate-pulse text-blue-600 dark:text-blue-400" />
                         AI Generator
                     </button>
                     <button
@@ -63,7 +63,7 @@ export function CurationCreateShell({
                                 : 'dark:text-slate-450 text-slate-500 hover:text-slate-900 dark:hover:text-slate-200'
                         }`}
                     >
-                        <PenLine className="size-4 text-emerald-600" />
+                        <PenLine className="size-4 text-emerald-600 dark:text-emerald-400" />
                         Manual Entry
                     </button>
                 </div>

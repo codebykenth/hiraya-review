@@ -1,4 +1,4 @@
-import { Database, Activity, Users, Layers, TrendingUp } from 'lucide-react';
+﻿import { Database, Activity, Users, Layers, TrendingUp } from 'lucide-react';
 import type { Metrics } from '../types';
 import { StatsCard } from './stats-card';
 
@@ -16,12 +16,14 @@ export function DashboardStatsGrid({ metrics }: DashboardStatsGridProps) {
                 suffix="total records"
                 icon={Database}
                 iconBgColor="bg-blue-50 dark:bg-blue-950/50"
-                iconTextColor="text-blue-600 dark:text-blue-400"
+                iconTextColor="text-blue-600 dark:text-blue-400 dark:text-blue-400"
                 footer={{
                     highlight: `${metrics.active_questions} Verified`,
-                    highlightColor: 'text-emerald-600 dark:text-emerald-400',
+                    highlightColor:
+                        'text-emerald-600 dark:text-emerald-400 dark:text-emerald-400',
                     secondary: `${metrics.draft_questions} Drafts`,
-                    secondaryColor: 'text-blue-600 dark:text-blue-400',
+                    secondaryColor:
+                        'text-blue-600 dark:text-blue-400 dark:text-blue-400',
                 }}
             />
 
@@ -32,11 +34,11 @@ export function DashboardStatsGrid({ metrics }: DashboardStatsGridProps) {
                 suffix="exams taken"
                 icon={Activity}
                 iconBgColor="bg-emerald-50 dark:bg-emerald-950/50"
-                iconTextColor="text-emerald-600 dark:text-emerald-400"
+                iconTextColor="text-emerald-600 dark:text-emerald-400 dark:text-emerald-400"
                 footer={{
                     highlight: (
                         <div className="flex items-center gap-1">
-                            <TrendingUp className="size-3 text-emerald-600" />
+                            <TrendingUp className="size-3 text-emerald-600 dark:text-emerald-400" />
                             <span className="font-bold text-emerald-600 dark:text-emerald-400">
                                 Dynamic monitoring active
                             </span>
@@ -53,7 +55,7 @@ export function DashboardStatsGrid({ metrics }: DashboardStatsGridProps) {
                 suffix="registered users"
                 icon={Users}
                 iconBgColor="bg-indigo-50 dark:bg-indigo-950/50"
-                iconTextColor="text-indigo-600 dark:text-indigo-400"
+                iconTextColor="text-indigo-600 dark:text-indigo-400 dark:text-indigo-400"
                 footer={{
                     highlight: 'Examinees preparing for exam',
                     highlightColor: 'text-slate-500',

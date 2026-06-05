@@ -1,4 +1,4 @@
-import { Link } from '@inertiajs/react';
+﻿import { Link } from '@inertiajs/react';
 import {
     AlertCircle,
     BookOpen,
@@ -85,7 +85,7 @@ export function LearnAIGeneratorPanel({
 
                     <div className="mb-4 flex items-center justify-between border-b border-border pb-4">
                         <h2 className="inline-flex items-center gap-2 text-base font-bold text-foreground">
-                            <Sparkles className="size-4.5 animate-pulse text-blue-600" />
+                            <Sparkles className="size-4.5 animate-pulse text-blue-600 dark:text-blue-400" />
                             Syllabus Options
                         </h2>
                     </div>
@@ -598,7 +598,7 @@ export function LearnAIGeneratorPanel({
                         </div>
 
                         {successMsg && (
-                            <div className="border-emerald-250 shadow-3xs flex items-start gap-3 rounded-xl border border-l-4 border-l-emerald-500 bg-emerald-50/40 p-4 text-xs font-semibold text-emerald-800 dark:border-emerald-900/30 dark:bg-emerald-950/20">
+                            <div className="border-emerald-250 shadow-3xs dark:bg-emerald-950/30/40 flex items-start gap-3 rounded-xl border border-l-4 border-l-emerald-500 bg-emerald-50 p-4 text-xs font-semibold text-emerald-800 dark:border-emerald-900/30 dark:bg-emerald-950/20">
                                 <CheckCircle2 className="text-emerald-650 mt-0.5 size-4.5 shrink-0" />
                                 <div className="flex flex-1 flex-col gap-1.5">
                                     <span className="font-extrabold text-emerald-950">

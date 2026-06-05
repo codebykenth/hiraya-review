@@ -490,7 +490,7 @@ export default function AiAnalysisReport({
                 {/* Main Content States */}
                 {localStatus === 'no_data' && (
                     <Card className="flex min-h-[400px] flex-col items-center justify-center border-2 border-dashed p-12 text-center">
-                        <div className="border-blue-150 mb-5 flex size-16 items-center justify-center rounded-2xl border bg-blue-50 text-blue-600 dark:border-blue-900/40 dark:bg-blue-950/40 dark:text-blue-400">
+                        <div className="border-blue-150 mb-5 flex size-16 items-center justify-center rounded-2xl border bg-blue-50 text-blue-600 dark:border-blue-900/40 dark:bg-blue-950/30 dark:bg-blue-950/40 dark:text-blue-400">
                             <Brain className="size-8" />
                         </div>
                         <h3 className="text-2xl font-black tracking-tight text-slate-900 sm:text-3xl dark:text-white">
@@ -515,7 +515,7 @@ export default function AiAnalysisReport({
                     <Card className="flex min-h-[400px] flex-col items-center justify-center p-12 text-center">
                         <div className="relative mb-6 flex items-center justify-center">
                             <div className="absolute size-24 animate-ping rounded-full border-2 border-blue-500/20" />
-                            <div className="border-blue-150 flex size-20 items-center justify-center rounded-full border bg-blue-50 text-blue-600 dark:border-blue-900/40 dark:bg-blue-950/40 dark:text-blue-400">
+                            <div className="border-blue-150 flex size-20 items-center justify-center rounded-full border bg-blue-50 text-blue-600 dark:border-blue-900/40 dark:bg-blue-950/30 dark:bg-blue-950/40 dark:text-blue-400">
                                 <Loader2 className="size-10 animate-spin" />
                             </div>
                         </div>
@@ -532,8 +532,8 @@ export default function AiAnalysisReport({
                 )}
 
                 {localStatus === 'failed' && (
-                    <Card className="flex min-h-[400px] flex-col items-center justify-center border-rose-200/60 bg-rose-50/10 p-12 text-center dark:border-rose-900/30 dark:bg-rose-950/5">
-                        <div className="border-rose-150 mb-5 flex size-16 items-center justify-center rounded-2xl border bg-rose-50 text-rose-600 dark:border-rose-900/40 dark:bg-rose-950/40 dark:text-rose-400">
+                    <Card className="dark:border-rose-900/50/60 dark:bg-rose-950/30/10 flex min-h-[400px] flex-col items-center justify-center border-rose-200 bg-rose-50 p-12 text-center dark:border-rose-900/30 dark:bg-rose-950/5">
+                        <div className="border-rose-150 mb-5 flex size-16 items-center justify-center rounded-2xl border bg-rose-50 text-rose-600 dark:border-rose-900/40 dark:bg-rose-950/30 dark:bg-rose-950/40 dark:text-rose-400">
                             <AlertCircle className="size-8" />
                         </div>
                         <h3 className="text-2xl font-black tracking-tight text-slate-900 sm:text-3xl dark:text-white">
@@ -568,7 +568,7 @@ export default function AiAnalysisReport({
 
                             <div className="flex flex-col justify-between gap-6 md:flex-row md:items-center">
                                 <div className="flex items-start gap-4">
-                                    <div className="flex size-14 shrink-0 items-center justify-center rounded-2xl border border-blue-200 bg-blue-100 text-blue-600 dark:border-blue-500/20 dark:bg-blue-500/10 dark:text-blue-400">
+                                    <div className="flex size-14 shrink-0 items-center justify-center rounded-2xl border border-blue-200 bg-blue-100 text-blue-600 dark:border-blue-500/20 dark:border-blue-900/50 dark:bg-blue-500/10 dark:text-blue-400">
                                         <Brain className="size-8 animate-pulse" />
                                     </div>
                                     <div>
@@ -576,7 +576,7 @@ export default function AiAnalysisReport({
                                             <h1 className="text-3xl font-black tracking-tight text-slate-900 sm:text-4xl dark:text-white">
                                                 AI Diagnostic & Predictions
                                             </h1>
-                                            <span className="border-indigo-150 inline-flex items-center gap-1 rounded-full border bg-indigo-50 px-2.5 py-0.5 text-[10px] font-black tracking-wider text-indigo-700 uppercase dark:border-indigo-500/20 dark:bg-indigo-500/10 dark:text-indigo-400">
+                                            <span className="border-indigo-150 inline-flex items-center gap-1 rounded-full border bg-indigo-50 px-2.5 py-0.5 text-[10px] font-black tracking-wider text-indigo-700 uppercase dark:border-indigo-500/20 dark:bg-indigo-500/10 dark:bg-indigo-950/30 dark:text-indigo-400">
                                                 <Sparkles className="size-3" />
                                                 Active Coach
                                             </span>
@@ -742,7 +742,7 @@ export default function AiAnalysisReport({
                                 {/* Estimated Exam Score */}
                                 <Card className="flex flex-col justify-between p-6 transition hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/5">
                                     <div className="flex items-center gap-3">
-                                        <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-indigo-50 text-indigo-600 dark:bg-indigo-950/40 dark:text-indigo-400">
+                                        <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-indigo-50 text-indigo-600 dark:bg-indigo-950/30 dark:bg-indigo-950/40 dark:text-indigo-400">
                                             <Target className="size-5" />
                                         </div>
                                         <div>
@@ -766,7 +766,7 @@ export default function AiAnalysisReport({
                                 {/* Days to Readiness */}
                                 <Card className="flex flex-col justify-between p-6 transition hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/5">
                                     <div className="flex items-center gap-3">
-                                        <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-emerald-50 text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400">
+                                        <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-emerald-50 text-emerald-600 dark:bg-emerald-950/30 dark:bg-emerald-950/40 dark:text-emerald-400">
                                             <Clock className="size-5" />
                                         </div>
                                         <div>
@@ -790,7 +790,7 @@ export default function AiAnalysisReport({
                                 {/* Completion Pace */}
                                 <Card className="flex flex-col justify-between p-6 transition hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/5">
                                     <div className="flex items-center gap-3">
-                                        <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-amber-50 text-amber-600 dark:bg-amber-950/40 dark:text-amber-400">
+                                        <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-amber-50 text-amber-600 dark:bg-amber-950/30 dark:bg-amber-950/40 dark:text-amber-400">
                                             <Activity className="size-5" />
                                         </div>
                                         <div>
@@ -814,7 +814,7 @@ export default function AiAnalysisReport({
                                 {/* Timeline / Milestone */}
                                 <Card className="flex flex-col justify-between p-6 transition hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/5">
                                     <div className="flex items-center gap-3">
-                                        <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-blue-50 text-blue-600 dark:bg-blue-950/40 dark:text-blue-400">
+                                        <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-blue-50 text-blue-600 dark:bg-blue-950/30 dark:bg-blue-950/40 dark:text-blue-400">
                                             <Zap className="size-5" />
                                         </div>
                                         <div>
@@ -839,7 +839,7 @@ export default function AiAnalysisReport({
                         </div>
 
                         {/* Honesty Coach Banner */}
-                        <div className="border-blue-150 flex items-start gap-4 rounded-2xl border bg-blue-50/30 p-5 dark:border-slate-800 dark:bg-slate-900/40">
+                        <div className="border-blue-150 dark:bg-blue-950/30/30 flex items-start gap-4 rounded-2xl border bg-blue-50 p-5 dark:border-slate-800 dark:bg-slate-900/40">
                             <div className="flex size-10 shrink-0 items-center justify-center rounded-full border border-blue-500/20 bg-blue-500/10 text-blue-600 dark:text-blue-400">
                                 <Sparkles
                                     className="size-5 animate-spin"
@@ -913,7 +913,7 @@ export default function AiAnalysisReport({
                                                             {item.insight}
                                                         </p>
                                                         {item.recommended_action && (
-                                                            <div className="mt-3 rounded-lg border border-indigo-100 bg-indigo-50/50 p-3 dark:border-indigo-900/30 dark:bg-indigo-950/20">
+                                                            <div className="dark:bg-indigo-950/30/50 mt-3 rounded-lg border border-indigo-100 bg-indigo-50 p-3 dark:border-indigo-900/30 dark:bg-indigo-950/20">
                                                                 <span className="flex items-center gap-1.5 text-[10px] font-black tracking-wider text-indigo-600 uppercase dark:text-indigo-400">
                                                                     <Zap className="size-3" />
                                                                     Action Step
@@ -979,11 +979,11 @@ export default function AiAnalysisReport({
                                                                         className={`inline-flex items-center rounded-full border px-2 py-0.5 text-[9px] font-black uppercase ${
                                                                             row.difficulty_level ===
                                                                             'Hard'
-                                                                                ? 'border-rose-200 bg-rose-50 text-rose-700 dark:border-rose-900/30 dark:bg-rose-950/20 dark:text-rose-400'
+                                                                                ? 'border-rose-200 bg-rose-50 text-rose-700 dark:border-rose-900/30 dark:border-rose-900/50 dark:bg-rose-950/20 dark:bg-rose-950/30 dark:text-rose-400'
                                                                                 : row.difficulty_level ===
                                                                                     'Medium'
-                                                                                  ? 'border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-900/30 dark:bg-amber-950/20 dark:text-amber-400'
-                                                                                  : 'border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-900/30 dark:bg-emerald-950/20 dark:text-emerald-400'
+                                                                                  ? 'border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-900/30 dark:border-amber-900/50 dark:bg-amber-950/20 dark:bg-amber-950/30 dark:text-amber-400'
+                                                                                  : 'border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-900/30 dark:border-emerald-900/50 dark:bg-emerald-950/20 dark:bg-emerald-950/30 dark:text-emerald-400'
                                                                         }`}
                                                                     >
                                                                         {
@@ -1025,8 +1025,8 @@ export default function AiAnalysisReport({
                                             disabled={isBulkActionRunning}
                                             className={`flex cursor-pointer items-center justify-center gap-2 rounded-xl px-4 py-2 text-xs font-black tracking-wider uppercase transition-all duration-200 disabled:opacity-50 ${
                                                 allScheduled
-                                                    ? 'border border-rose-200 bg-rose-50 text-rose-700 hover:bg-rose-100/70 dark:border-rose-900/40 dark:bg-rose-950/20 dark:text-rose-400 dark:hover:bg-rose-950/35'
-                                                    : 'border border-indigo-200 bg-indigo-50 text-indigo-700 hover:bg-indigo-100/70 dark:border-indigo-900/40 dark:bg-indigo-950/20 dark:text-indigo-400 dark:hover:bg-indigo-950/35'
+                                                    ? 'border border-rose-200 bg-rose-50 text-rose-700 hover:bg-rose-100/70 dark:border-rose-900/40 dark:border-rose-900/50 dark:bg-rose-950/20 dark:bg-rose-950/30 dark:text-rose-400 dark:hover:bg-rose-950/35'
+                                                    : 'border border-indigo-200 bg-indigo-50 text-indigo-700 hover:bg-indigo-100/70 dark:border-indigo-900/40 dark:border-indigo-900/50 dark:bg-indigo-950/20 dark:bg-indigo-950/30 dark:text-indigo-400 dark:hover:bg-indigo-950/35'
                                             }`}
                                         >
                                             {isBulkActionRunning ? (
@@ -1108,7 +1108,7 @@ export default function AiAnalysisReport({
                                                                             .day
                                                                     ]
                                                                 }
-                                                                className="group inline-flex w-full cursor-pointer items-center justify-center gap-1.5 rounded-lg border border-emerald-200 bg-emerald-50 px-2 py-2 text-xs font-black tracking-wider text-emerald-700 uppercase transition-all duration-205 hover:border-rose-200 hover:bg-rose-50 hover:text-rose-700 disabled:opacity-50 dark:border-emerald-900/40 dark:bg-emerald-500/10 dark:text-emerald-400 dark:hover:border-rose-900/40 dark:hover:bg-rose-500/10 dark:hover:text-rose-400"
+                                                                className="group inline-flex w-full cursor-pointer items-center justify-center gap-1.5 rounded-lg border border-emerald-200 bg-emerald-50 px-2 py-2 text-xs font-black tracking-wider text-emerald-700 uppercase transition-all duration-205 hover:border-rose-200 hover:bg-rose-50 hover:text-rose-700 disabled:opacity-50 dark:border-emerald-900/40 dark:border-emerald-900/50 dark:border-rose-900/50 dark:bg-emerald-500/10 dark:bg-emerald-950/30 dark:bg-rose-950/30 dark:text-emerald-400 dark:hover:border-rose-900/40 dark:hover:bg-rose-500/10 dark:hover:text-rose-400"
                                                             >
                                                                 {togglingDays[
                                                                     dayPlan.day
@@ -1141,7 +1141,7 @@ export default function AiAnalysisReport({
                                                                             .day
                                                                     ]
                                                                 }
-                                                                className="inline-flex w-full cursor-pointer items-center justify-center gap-1.5 rounded-lg border border-indigo-200 bg-indigo-50 px-2 py-2 text-xs font-black tracking-wider text-indigo-700 uppercase transition-all duration-205 hover:bg-indigo-100 disabled:opacity-50 dark:border-indigo-900/40 dark:bg-indigo-500/10 dark:text-indigo-400 dark:hover:bg-indigo-500/20"
+                                                                className="inline-flex w-full cursor-pointer items-center justify-center gap-1.5 rounded-lg border border-indigo-200 bg-indigo-50 px-2 py-2 text-xs font-black tracking-wider text-indigo-700 uppercase transition-all duration-205 hover:bg-indigo-100 disabled:opacity-50 dark:border-indigo-900/40 dark:border-indigo-900/50 dark:bg-indigo-500/10 dark:bg-indigo-950/30 dark:text-indigo-400 dark:hover:bg-indigo-500/20"
                                                             >
                                                                 {togglingDays[
                                                                     dayPlan.day
@@ -1179,7 +1179,7 @@ export default function AiAnalysisReport({
                         <div className="pointer-events-none absolute -top-24 -right-24 h-48 w-48 rounded-full bg-amber-500/5 blur-3xl" />
 
                         <div className="flex flex-col items-center p-2 text-center">
-                            <div className="mb-5 flex size-16 animate-bounce items-center justify-center rounded-2xl border border-amber-200 bg-amber-50 text-amber-600 dark:border-amber-900/40 dark:bg-amber-950/40 dark:text-amber-400">
+                            <div className="mb-5 flex size-16 animate-bounce items-center justify-center rounded-2xl border border-amber-200 bg-amber-50 text-amber-600 dark:border-amber-900/40 dark:border-amber-900/50 dark:bg-amber-950/30 dark:bg-amber-950/40 dark:text-amber-400">
                                 <AlertCircle className="size-8" />
                             </div>
 
@@ -1200,7 +1200,7 @@ export default function AiAnalysisReport({
                                 has been successfully queued in the background.
                             </p>
 
-                            <div className="mt-4 flex items-start gap-2 rounded-lg bg-indigo-50/50 p-3 text-indigo-700 dark:bg-indigo-950/30 dark:text-indigo-400">
+                            <div className="dark:bg-indigo-950/30/50 mt-4 flex items-start gap-2 rounded-lg bg-indigo-50 p-3 text-indigo-700 dark:text-indigo-400">
                                 <Lightbulb className="mt-0.5 size-4 shrink-0" />
                                 <p className="text-sm leading-relaxed font-bold">
                                     Tip: You can close this, continue practicing

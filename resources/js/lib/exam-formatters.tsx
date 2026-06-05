@@ -336,7 +336,7 @@ export const renderFormattedText = (
                 }
 
                 return (
-                    <span className="shadow-3xs inline-flex items-center rounded-md border border-blue-100 bg-blue-50 px-1.5 py-0.5 font-mono text-xs font-bold text-blue-700 select-all">
+                    <span className="shadow-3xs inline-flex items-center rounded-md border border-blue-100 bg-blue-50 px-1.5 py-0.5 font-mono text-xs font-bold text-blue-700 select-all dark:bg-blue-950/30">
                         {letter}
                     </span>
                 );
@@ -451,7 +451,7 @@ export const renderFormattedText = (
                 const stepContent = stepMatch[2];
 
                 return (
-                    <div className="shadow-3xs my-3.5 flex items-start gap-3 rounded-r-xl border-l-3 border-blue-500 bg-blue-50/20 p-3.5 dark:bg-blue-950/10">
+                    <div className="shadow-3xs dark:bg-blue-950/30/20 my-3.5 flex items-start gap-3 rounded-r-xl border-l-3 border-blue-500 bg-blue-50 p-3.5 dark:bg-blue-950/10">
                         <span className="shadow-3xs mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full bg-blue-600 font-mono text-xs font-black text-white select-none">
                             {stepNum}
                         </span>
@@ -477,7 +477,7 @@ export const renderFormattedText = (
                 const shortcutContent = shortcutMatch[3];
 
                 return (
-                    <div className="shadow-3xs my-4 flex items-start gap-3 rounded-r-xl border-l-4 border-rose-500 bg-rose-50/40 p-4 dark:border-rose-500/80 dark:bg-rose-950/20">
+                    <div className="shadow-3xs dark:bg-rose-950/30/40 my-4 flex items-start gap-3 rounded-r-xl border-l-4 border-rose-500 bg-rose-50 p-4 dark:border-rose-500/80 dark:bg-rose-950/20">
                         <span className="shadow-3xs mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full bg-rose-500 text-[12px] text-white select-none">
                             🧠
                         </span>
@@ -529,7 +529,7 @@ export const renderFormattedText = (
                                         key={idx}
                                         className="flex items-start gap-3 rounded-lg border border-slate-100 bg-slate-50/40 p-3 transition hover:border-slate-200 dark:border-slate-900/60 dark:bg-slate-900/10"
                                     >
-                                        <span className="inline-flex size-7 shrink-0 items-center justify-center rounded-md bg-blue-50 text-xs font-black text-blue-600 dark:bg-blue-950/40 dark:text-blue-400">
+                                        <span className="inline-flex size-7 shrink-0 items-center justify-center rounded-md bg-blue-50 text-xs font-black text-blue-600 dark:bg-blue-950/30 dark:bg-blue-950/40 dark:text-blue-400">
                                             {item.marker.replace('.', '')}
                                         </span>
                                         <div className="mt-0.5 flex-1">
@@ -548,7 +548,7 @@ export const renderFormattedText = (
                         return (
                             <div
                                 key={bIdx}
-                                className="shadow-3xs my-3.5 flex items-start gap-3 rounded-r-xl border-l-3 border-blue-500 bg-blue-50/20 p-3.5 dark:bg-blue-950/10"
+                                className="shadow-3xs dark:bg-blue-950/30/20 my-3.5 flex items-start gap-3 rounded-r-xl border-l-3 border-blue-500 bg-blue-50 p-3.5 dark:bg-blue-950/10"
                             >
                                 <span className="shadow-3xs mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full bg-blue-600 font-mono text-xs font-black text-white select-none">
                                     {block.stepNum}
@@ -576,7 +576,7 @@ export const renderFormattedText = (
                         return (
                             <div
                                 key={bIdx}
-                                className="shadow-3xs my-4 flex items-start gap-3 rounded-r-xl border-l-4 border-rose-500 bg-rose-50/40 p-4 dark:border-rose-500/80 dark:bg-rose-950/20"
+                                className="shadow-3xs dark:bg-rose-950/30/40 my-4 flex items-start gap-3 rounded-r-xl border-l-4 border-rose-500 bg-rose-50 p-4 dark:border-rose-500/80 dark:bg-rose-950/20"
                             >
                                 <span className="shadow-3xs mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full bg-rose-500 text-[12px] text-white select-none">
                                     🧠

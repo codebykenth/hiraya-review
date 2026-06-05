@@ -82,7 +82,7 @@ export function SetupExamView({
                             onClick={() => setSelectedExamId(1)}
                             className={`flex cursor-pointer items-center justify-between rounded-xl border-2 p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/5 ${
                                 selectedExamId === 1
-                                    ? 'border-blue-600 bg-blue-50/10 dark:border-blue-500 dark:bg-blue-950/10'
+                                    ? 'dark:bg-blue-950/30/10 border-blue-600 bg-blue-50 dark:border-blue-500 dark:bg-blue-950/10'
                                     : 'border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900'
                             }`}
                         >
@@ -120,7 +120,7 @@ export function SetupExamView({
                             onClick={() => setSelectedExamId(2)}
                             className={`flex cursor-pointer items-center justify-between rounded-xl border-2 p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/5 ${
                                 selectedExamId === 2
-                                    ? 'border-blue-600 bg-blue-50/10 dark:border-blue-500 dark:bg-blue-950/10'
+                                    ? 'dark:bg-blue-950/30/10 border-blue-600 bg-blue-50 dark:border-blue-500 dark:bg-blue-950/10'
                                     : 'border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900'
                             }`}
                         >
@@ -155,7 +155,7 @@ export function SetupExamView({
                     </div>
 
                     {/* Right Panel: Simulation Overview */}
-                    <div className="flex min-h-[380px] flex-col justify-between rounded-xl border border-blue-100/50 bg-blue-50/30 p-6 shadow-sm dark:border-blue-950/20 dark:bg-blue-950/10">
+                    <div className="dark:bg-blue-950/30/30 flex min-h-[380px] flex-col justify-between rounded-xl border border-blue-100/50 bg-blue-50 p-6 shadow-sm dark:border-blue-950/20 dark:bg-blue-950/10">
                         <div>
                             <h2 className="mb-4 border-b border-blue-100/40 pb-2 font-heading text-xl font-black tracking-tight text-slate-900 dark:border-blue-950/20 dark:text-white">
                                 Simulation Overview

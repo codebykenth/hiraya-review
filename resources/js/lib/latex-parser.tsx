@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 
 /**
  * Find the index of the matching closing brace for the opening brace at startIndex.
@@ -257,7 +257,7 @@ export const parseLatexString = (
                 result.push(
                     <span
                         key={`display-${i}`}
-                        className="mx-1 inline-flex items-center rounded-md border border-blue-100 bg-blue-50/60 px-2 py-0.5 text-[0.95em] dark:border-blue-900/50 dark:bg-blue-950/30"
+                        className="dark:bg-blue-950/30/60 mx-1 inline-flex items-center rounded-md border border-blue-100 bg-blue-50 px-2 py-0.5 text-[0.95em] dark:border-blue-900/50"
                     >
                         {parseLaTeXToJSX(text.substring(i + 2, endIdx))}
                     </span>,
@@ -275,7 +275,7 @@ export const parseLatexString = (
                 result.push(
                     <span
                         key={`inline-${i}`}
-                        className="mx-0.5 inline-flex items-center rounded-md border border-blue-100/80 bg-blue-50/50 px-1.5 py-0.5 text-[0.95em] dark:border-blue-900/40 dark:bg-blue-950/20"
+                        className="dark:bg-blue-950/30/50 mx-0.5 inline-flex items-center rounded-md border border-blue-100/80 bg-blue-50 px-1.5 py-0.5 text-[0.95em] dark:border-blue-900/40 dark:bg-blue-950/20"
                     >
                         {parseLaTeXToJSX(text.substring(i + 1, endIdx))}
                     </span>,

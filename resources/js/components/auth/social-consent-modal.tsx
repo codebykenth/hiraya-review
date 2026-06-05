@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import ConsentCheckbox from '@/components/auth/consent-checkbox';
 import { Button } from '@/components/ui/button';
 
@@ -60,7 +60,7 @@ export default function SocialConsentModal({
                     <Button
                         type="button"
                         disabled={!accepted}
-                        className="flex-1 rounded-xl bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 dark:bg-blue-600 dark:hover:bg-blue-500"
+                        className="flex-1 rounded-xl bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 dark:bg-blue-500 dark:text-white dark:hover:bg-blue-600"
                         onClick={() => {
                             window.location.href = redirectUrl;
                         }}

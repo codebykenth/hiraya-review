@@ -489,7 +489,7 @@ export function ScheduleModal({
                         </div>
                     </div>
 
-                    <div className="flex items-center gap-2 rounded-lg border border-emerald-100 bg-emerald-50/30 p-3 dark:border-emerald-950/20 dark:bg-emerald-950/10">
+                    <div className="dark:bg-emerald-950/30/30 flex items-center gap-2 rounded-lg border border-emerald-100 bg-emerald-50 p-3 dark:border-emerald-950/20 dark:bg-emerald-950/10">
                         <input
                             type="checkbox"
                             id="is_done"
@@ -500,7 +500,7 @@ export function ScheduleModal({
                                     is_done: e.target.checked,
                                 })
                             }
-                            className="h-4 w-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500 dark:border-slate-700 dark:bg-slate-950"
+                            className="h-4 w-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500 dark:border-slate-700 dark:bg-slate-950 dark:text-emerald-400"
                         />
                         <label
                             htmlFor="is_done"
@@ -511,7 +511,7 @@ export function ScheduleModal({
                     </div>
 
                     {suggestedModules.length > 0 && (
-                        <div className="mt-2 space-y-2 rounded-lg border border-blue-100 bg-blue-50/50 p-3">
+                        <div className="dark:bg-blue-950/30/50 mt-2 space-y-2 rounded-lg border border-blue-100 bg-blue-50 p-3">
                             <p className="flex items-center text-sm leading-relaxed font-semibold text-blue-800">
                                 <Lightbulb className="mr-1.5 h-3.5 w-3.5 text-amber-500" />
                                 Suggested Learn Modules
@@ -547,8 +547,8 @@ export function ScheduleModal({
                                             }}
                                             className={`inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-semibold shadow-sm transition-all ${
                                                 isAttached
-                                                    ? 'border-emerald-200 bg-emerald-50 text-emerald-800 hover:bg-emerald-100/80 dark:border-emerald-950 dark:bg-emerald-950/40 dark:text-emerald-300'
-                                                    : 'border-blue-200 bg-white text-blue-700 hover:border-blue-300 hover:bg-blue-50 dark:border-slate-800 dark:bg-slate-950 dark:text-blue-400'
+                                                    ? 'border-emerald-200 bg-emerald-50 text-emerald-800 hover:bg-emerald-100/80 dark:border-emerald-900/50 dark:border-emerald-950 dark:bg-emerald-950/30 dark:bg-emerald-950/40 dark:text-emerald-300'
+                                                    : 'border-blue-200 bg-white text-blue-700 hover:border-blue-300 hover:bg-blue-50 dark:border-blue-900/50 dark:border-slate-800 dark:bg-blue-950/30 dark:bg-slate-950 dark:text-blue-400'
                                             }`}
                                         >
                                             {isAttached ? (

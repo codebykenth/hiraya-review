@@ -187,7 +187,7 @@ export function DraftsReviewShell<T extends BaseDraftItem>({
                 <div>
                     <Link
                         href={backUrl}
-                        className="flex w-fit cursor-pointer items-center gap-1 text-xs font-black text-foreground transition hover:text-blue-600 focus:outline-none"
+                        className="flex w-fit cursor-pointer items-center gap-1 text-xs font-black text-foreground transition hover:text-blue-600 focus:outline-none dark:text-blue-400"
                     >
                         <ChevronLeft className="size-4" />
                         {backLabel}
@@ -375,7 +375,7 @@ export function DraftsReviewShell<T extends BaseDraftItem>({
             {items.length > 0 && (
                 <div className="mt-4 flex flex-wrap items-center justify-end gap-3 rounded-xl border border-border bg-card p-3 text-[10px] font-extrabold tracking-wider uppercase">
                     <span className="text-muted-foreground">Legend:</span>
-                    <div className="flex items-center gap-1.5 rounded-lg border border-emerald-100 bg-emerald-50/50 px-2 py-1 dark:border-emerald-900/20 dark:bg-emerald-950/10">
+                    <div className="dark:bg-emerald-950/30/50 flex items-center gap-1.5 rounded-lg border border-emerald-100 bg-emerald-50 px-2 py-1 dark:border-emerald-900/20 dark:bg-emerald-950/10">
                         <span className="border-emerald-250 flex size-5.5 items-center justify-center rounded-md border bg-emerald-100 text-emerald-700 dark:border-emerald-900/30 dark:bg-emerald-950/20 dark:text-emerald-400">
                             <Check className="size-3" />
                         </span>
@@ -383,7 +383,7 @@ export function DraftsReviewShell<T extends BaseDraftItem>({
                             Approve / Unapprove Draft
                         </span>
                     </div>
-                    <div className="flex items-center gap-1.5 rounded-lg border border-blue-100 bg-blue-50/50 px-2 py-1 dark:border-blue-900/20 dark:bg-blue-950/10">
+                    <div className="dark:bg-blue-950/30/50 flex items-center gap-1.5 rounded-lg border border-blue-100 bg-blue-50 px-2 py-1 dark:border-blue-900/20 dark:bg-blue-950/10">
                         <span className="border-blue-250 flex size-5.5 items-center justify-center rounded-md border bg-blue-100 text-blue-700 dark:border-blue-900/30 dark:bg-blue-950/20 dark:text-blue-400">
                             <Edit3 className="size-3" />
                         </span>
@@ -391,7 +391,7 @@ export function DraftsReviewShell<T extends BaseDraftItem>({
                             Edit Inline
                         </span>
                     </div>
-                    <div className="flex items-center gap-1.5 rounded-lg border border-rose-100 bg-rose-50/50 px-2 py-1 dark:border-rose-900/20 dark:bg-rose-950/10">
+                    <div className="dark:bg-rose-950/30/50 flex items-center gap-1.5 rounded-lg border border-rose-100 bg-rose-50 px-2 py-1 dark:border-rose-900/20 dark:bg-rose-950/10">
                         <span className="border-rose-250 flex size-5.5 items-center justify-center rounded-md border bg-rose-100 text-rose-700 dark:border-rose-900/30 dark:bg-rose-950/20 dark:text-rose-400">
                             <X className="size-3" />
                         </span>

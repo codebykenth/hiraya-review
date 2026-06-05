@@ -65,7 +65,7 @@ export function UserDashboardPage({ stats, aiAnalysis }: DashboardProps) {
                                 query: { start: 'subprofessional' },
                             }).url
                         }
-                        className="flex items-center justify-center gap-2 rounded-lg border border-blue-200 bg-blue-50/50 px-4 py-2.5 text-xs font-semibold text-blue-600 transition hover:bg-blue-100/50 dark:border-blue-900/50 dark:bg-blue-950/20 dark:text-blue-400 dark:hover:bg-blue-900/30"
+                        className="dark:bg-blue-950/30/50 flex items-center justify-center gap-2 rounded-lg border border-blue-200 bg-blue-50 px-4 py-2.5 text-xs font-semibold text-blue-600 transition hover:bg-blue-100/50 dark:border-blue-900/50 dark:bg-blue-950/20 dark:text-blue-400 dark:hover:bg-blue-900/30"
                     >
                         Start Subprofessional Exam
                     </Link>
@@ -86,7 +86,7 @@ export function UserDashboardPage({ stats, aiAnalysis }: DashboardProps) {
                 {/* Learn Card */}
                 <Card className="flex flex-col justify-between p-6 transition hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/5 dark:bg-slate-900/60">
                     <div className="flex items-start gap-4">
-                        <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600 dark:bg-blue-950/40 dark:text-blue-400">
+                        <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600 dark:bg-blue-950/30 dark:bg-blue-950/40 dark:text-blue-400">
                             <BookOpen className="size-5" />
                         </div>
                         <div>
@@ -110,7 +110,7 @@ export function UserDashboardPage({ stats, aiAnalysis }: DashboardProps) {
                 {/* Practice Drills Card */}
                 <Card className="flex flex-col justify-between p-6 transition hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/5 dark:bg-slate-900/60">
                     <div className="flex items-start gap-4">
-                        <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 dark:bg-indigo-950/40 dark:text-indigo-400">
+                        <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 dark:bg-indigo-950/30 dark:bg-indigo-950/40 dark:text-indigo-400">
                             <Target className="size-5" />
                         </div>
                         <div>
@@ -158,7 +158,7 @@ export function UserDashboardPage({ stats, aiAnalysis }: DashboardProps) {
                 {/* Analytics Card */}
                 <Card className="flex flex-col justify-between p-6 transition hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/5 dark:bg-slate-900/60">
                     <div className="flex items-start gap-4">
-                        <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400">
+                        <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 dark:bg-emerald-950/30 dark:bg-emerald-950/40 dark:text-emerald-400">
                             <TrendingUp className="size-5" />
                         </div>
                         <div>

@@ -1,4 +1,4 @@
-import { router, usePage } from '@inertiajs/react';
+﻿import { router, usePage } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
 import type { Auth } from '@/types';
 import type { AnalyticsProps, AnalyticsStats } from '../types';

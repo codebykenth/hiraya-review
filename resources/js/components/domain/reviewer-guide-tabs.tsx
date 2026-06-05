@@ -36,7 +36,7 @@ export function ReviewerGuideTabs({
             phase: 'Phase 1',
             title: 'Diagnostic Benchmark',
             icon: ClipboardList,
-            color: 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/30',
+            color: 'text-blue-600 dark:text-blue-400 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/30',
             description:
                 'Begin by taking a full-length simulated Mock Exam to establish your baseline score. The actual exam requires an 80% passing rate.',
             actionLabel: 'Take Mock Exam',
@@ -50,7 +50,7 @@ export function ReviewerGuideTabs({
             phase: 'Phase 2',
             title: 'Conceptual Study Hub',
             icon: BookOpen,
-            color: 'text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/30',
+            color: 'text-indigo-600 dark:text-indigo-400 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/30',
             description:
                 'Navigate to the Study Hub (Learn Section) to read concise, high-yield syllabus modules generated from core civil service subjects.',
             actionLabel: 'Explore Study Hub',
@@ -64,7 +64,7 @@ export function ReviewerGuideTabs({
             phase: 'Phase 3',
             title: 'Focused Practice Drills',
             icon: Target,
-            color: 'text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/30',
+            color: 'text-emerald-600 dark:text-emerald-400 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/30',
             description:
                 'Strengthen weaker subject subcategories with Practice Drills. Create custom sets with active immediate explanations.',
             actionLabel: 'Launch Practice Drill',
@@ -78,7 +78,7 @@ export function ReviewerGuideTabs({
             phase: 'Phase 4',
             title: 'Mistake Curation & Analytics',
             icon: History,
-            color: 'text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/30',
+            color: 'text-amber-600 dark:text-amber-400 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/30',
             description:
                 'Track your scoring mastery, passing ratios, and average speed. Review every single incorrect response in Attempt History.',
             actionLabel: 'Review Attempt History',
@@ -190,21 +190,21 @@ export function ReviewerGuideTabs({
             description:
                 'Both Professional and Subprofessional examinations require a minimum rating of 80.00% to pass. Standardize your drills and mock exam benchmarks at 80% accuracy.',
             icon: Award,
-            color: 'border-l-emerald-500 text-emerald-600',
+            color: 'border-l-emerald-500 text-emerald-600 dark:text-emerald-400',
         },
         {
             title: 'Master Time Management',
             description:
                 'You have roughly 67 seconds per question on the Professional exam, and 58 seconds on the Subprofessional exam. Train your pace under the timer inside the Mock Exam mode.',
             icon: Clock,
-            color: 'border-l-blue-500 text-blue-600',
+            color: 'border-l-blue-500 text-blue-600 dark:text-blue-400',
         },
         {
             title: 'Analyze Explanations',
             description:
                 'Getting questions wrong is part of study optimization. Make it a habit to hover or click on explanations to see the mathematical formula or grammatical rule applied.',
             icon: Lightbulb,
-            color: 'border-l-indigo-500 text-indigo-600',
+            color: 'border-l-indigo-500 text-indigo-600 dark:text-indigo-400',
         },
     ];
 
@@ -247,7 +247,7 @@ export function ReviewerGuideTabs({
             {/* Tab: Reviewer Study Flow */}
             {activeTab === 'flow' && (
                 <div className="space-y-6">
-                    <div className="flex items-start gap-3.5 rounded-xl border border-blue-100 bg-blue-50/20 p-5 dark:border-blue-900/30 dark:bg-blue-950/10">
+                    <div className="dark:bg-blue-950/30/20 flex items-start gap-3.5 rounded-xl border border-blue-100 bg-blue-50 p-5 dark:border-blue-900/30 dark:bg-blue-950/10">
                         <Info className="mt-0.5 size-5 shrink-0 text-blue-600 dark:text-blue-400" />
                         <div>
                             <h3 className="text-sm font-semibold text-blue-900 dark:text-blue-300">

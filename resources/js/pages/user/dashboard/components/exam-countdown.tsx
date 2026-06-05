@@ -60,14 +60,14 @@ export function ExamCountdown({
 
     if (timeLeft.isExpired) {
         return (
-            <div className="relative overflow-hidden rounded-2xl border border-rose-200/60 bg-rose-50/60 p-6 shadow-sm backdrop-blur-xl dark:border-rose-900/40 dark:bg-rose-950/30">
+            <div className="dark:border-rose-900/50/60 dark:bg-rose-950/30/60 relative overflow-hidden rounded-2xl border border-rose-200 bg-rose-50 p-6 shadow-sm backdrop-blur-xl dark:border-rose-900/40">
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <div className="flex items-center gap-4">
-                        <div className="flex size-12 shrink-0 items-center justify-center rounded-full border border-rose-200/50 bg-rose-100/50 backdrop-blur-md dark:border-rose-500/30 dark:bg-rose-500/20">
+                        <div className="dark:border-rose-900/50/50 flex size-12 shrink-0 items-center justify-center rounded-full border border-rose-200 bg-rose-100/50 backdrop-blur-md dark:border-rose-500/30 dark:bg-rose-500/20">
                             <Clock className="size-6 animate-bounce text-rose-600 dark:text-rose-400" />
                         </div>
                         <div>
-                            <span className="text-[10px] font-bold tracking-widest text-rose-600 uppercase dark:text-rose-500">
+                            <span className="text-[10px] font-bold tracking-widest text-rose-600 uppercase dark:text-rose-400 dark:text-rose-500">
                                 Exam Day Is Here
                             </span>
                             <h3 className="mt-0.5 font-heading text-lg font-black tracking-tight text-slate-900 dark:text-white">
@@ -93,8 +93,8 @@ export function ExamCountdown({
         <div
             className={`relative overflow-hidden rounded-2xl border p-6 shadow-sm backdrop-blur-xl transition-all hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/5 ${
                 isUrgent
-                    ? 'border-amber-200/60 bg-amber-50/60 dark:border-amber-900/40 dark:bg-amber-950/30'
-                    : 'border-blue-100/60 bg-blue-50/40 dark:border-slate-800 dark:bg-slate-900/60'
+                    ? 'dark:border-amber-900/50/60 dark:bg-amber-950/30/60 border-amber-200 bg-amber-50 dark:border-amber-900/40'
+                    : 'dark:bg-blue-950/30/40 border-blue-100/60 bg-blue-50 dark:border-slate-800 dark:bg-slate-900/60'
             }`}
         >
             {/* Decorative background lights */}
@@ -104,7 +104,7 @@ export function ExamCountdown({
             <div className="relative z-10 flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
                 <div className="flex items-center gap-4">
                     <div
-                        className={`flex size-14 shrink-0 items-center justify-center rounded-full border backdrop-blur-md ${isUrgent ? 'border-amber-200/50 bg-amber-100/50 dark:border-amber-500/30 dark:bg-amber-500/20' : 'border-blue-200/50 bg-blue-100/50 dark:border-blue-500/30 dark:bg-blue-500/20'}`}
+                        className={`flex size-14 shrink-0 items-center justify-center rounded-full border backdrop-blur-md ${isUrgent ? 'dark:border-amber-900/50/50 border-amber-200 bg-amber-100/50 dark:border-amber-500/30 dark:bg-amber-500/20' : 'dark:border-blue-900/50/50 border-blue-200 bg-blue-100/50 dark:border-blue-500/30 dark:bg-blue-500/20'}`}
                     >
                         <Clock
                             className={`size-7 ${isUrgent ? 'animate-pulse text-amber-600 dark:text-amber-400' : 'text-blue-600 dark:text-blue-400'}`}
@@ -112,7 +112,7 @@ export function ExamCountdown({
                     </div>
                     <div>
                         <span
-                            className={`text-[10px] font-bold tracking-widest uppercase ${isUrgent ? 'text-amber-600 dark:text-amber-500' : 'text-blue-600 dark:text-blue-400'}`}
+                            className={`text-[10px] font-bold tracking-widest uppercase ${isUrgent ? 'text-amber-600 dark:text-amber-400 dark:text-amber-500' : 'text-blue-600 dark:text-blue-400'}`}
                         >
                             {isUrgent
                                 ? '⚠️ EXAM Nearing COUNTDOWN'
