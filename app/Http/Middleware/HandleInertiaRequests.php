@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Announcement;
 use App\Models\RolePermission;
 use App\Services\TurnstileService;
 use Illuminate\Http\Request;
@@ -64,6 +65,14 @@ class HandleInertiaRequests extends Middleware
                 'enabled' => app(TurnstileService::class)->isConfigured(),
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
+            'global_announcements' => Cache::remember('active_announcements', 300, function () {
+                return Announcement::where('is_active', true)
+                    ->where(function ($q) {
+                        $q->whereNull('expires_at')
+                            ->orWhere('expires_at', '>', now());
+                    })
+                    ->get();
+            }),
         ];
     }
 }

@@ -1,5 +1,6 @@
 import { Head, usePage } from '@inertiajs/react';
 import { ReviewerGuideTabs } from '@/components/domain/reviewer-guide-tabs';
+import { PageContainer } from '@/components/layout/page-container';
 import { PageHeader } from '@/components/layout/page-header';
 import SiteFooter from '@/components/layout/site-footer';
 import SiteHeader from '@/components/layout/site-header';
@@ -14,25 +15,21 @@ export default function Guide() {
     const { auth } = usePage<PageProps>().props;
     const isLoggedIn = !!auth.user;
     const content = (
-        <div className="mx-auto max-w-6xl space-y-8">
-            {/* Header section */}
-            <div className="flex items-start gap-4 border-b border-border pb-6 md:items-center">
+        <>
+            <div className="mb-8 flex items-start gap-3">
                 <PageHeader
                     title="Civil Service Exam Reviewer Guide"
                     description="Learn how to streamline your preparation process, navigate exam structures, and maximize your passing odds."
-                    className="flex-1"
                 />
             </div>
 
             <ReviewerGuideTabs showActions={isLoggedIn} />
-        </div>
+        </>
     );
 
     if (isLoggedIn) {
         return (
-            <AppLayout
-                breadcrumbs={[{ title: 'Reviewer Guide', href: '/guide' }]}
-            >
+            <AppLayout>
                 <Head>
                     <title>
                         Ultimate CSE Preparation Guide | Hiraya Review
@@ -50,9 +47,7 @@ export default function Guide() {
                         content="Discover the best study strategies, time-management tips, and subject coverage breakdowns for the Professional and Subprofessional Civil Service Examinations."
                     />
                 </Head>
-                <div className="min-h-screen bg-slate-50/30 px-4 py-4 sm:px-6 sm:py-6 dark:bg-slate-900/20">
-                    {content}
-                </div>
+                <PageContainer>{content}</PageContainer>
             </AppLayout>
         );
     }
@@ -76,9 +71,30 @@ export default function Guide() {
             </Head>
             <div className="flex min-h-screen flex-col bg-slate-50/30 dark:bg-slate-900/20">
                 <SiteHeader activeNav="guide" />
-                <main className="flex-1 px-4 py-12 sm:px-6">{content}</main>
+                <main className="flex-1 px-4 py-12 sm:px-6">
+                    <div className="mx-auto max-w-6xl space-y-8">
+                        <div className="flex items-start gap-4 border-b border-border pb-6 md:items-center">
+                            <PageHeader
+                                title="Civil Service Exam Reviewer Guide"
+                                description="Learn how to streamline your preparation process, navigate exam structures, and maximize your passing odds."
+                                className="flex-1"
+                            />
+                        </div>
+                        <ReviewerGuideTabs showActions={isLoggedIn} />
+                    </div>
+                </main>
                 <SiteFooter />
             </div>
         </>
     );
 }
+
+// Register layout configuration
+Guide.layout = {
+    breadcrumbs: [
+        {
+            title: 'Reviewer Guide',
+            href: '/guide',
+        },
+    ],
+};

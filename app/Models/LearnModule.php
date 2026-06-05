@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\Cache;
@@ -10,6 +11,8 @@ use Illuminate\Support\Facades\Cache;
 #[Fillable(['category_id', 'subcategory_id', 'title', 'slug', 'topic', 'summary', 'content', 'estimated_minutes', 'is_published', 'created_by', 'completed_by_user_ids'])]
 class LearnModule extends Model
 {
+    use HasFactory;
+
     /**
      * The "booted" method of the model.
      */

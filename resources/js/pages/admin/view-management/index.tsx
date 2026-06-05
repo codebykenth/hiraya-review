@@ -1,44 +1,24 @@
-import { Head, router } from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
 import { Save } from 'lucide-react';
-import React, { useState } from 'react';
 import { PageContainer } from '@/components/layout/page-container';
 import { PageHeader } from '@/components/layout/page-header';
 import { Button } from '@/components/ui/button';
 import { RoleViewCard } from './components/role-view-card';
-import type { ViewManagementProps, RolePermission } from './types';
+import { useViewManagementState } from './hooks/use-view-management-state';
+import type { ViewManagementProps } from './types';
 
 export default function ViewManagementIndex({
     permissions,
     availableViews,
 }: ViewManagementProps) {
-    const [localPermissions, setLocalPermissions] =
-        useState<RolePermission[]>(permissions);
-    const [isSaving, setIsSaving] = useState(false);
-
-    const handleToggle = (id: number) => {
-        setLocalPermissions((prev) =>
-            prev.map((p) =>
-                p.id === id ? { ...p, is_visible: !p.is_visible } : p,
-            ),
-        );
-    };
-
-    const handleSave = () => {
-        setIsSaving(true);
-        router.put(
-            '/admin/view-management',
-            { permissions: localPermissions as any },
-            {
-                preserveScroll: true,
-                onFinish: () => setIsSaving(false),
-            },
-        );
-    };
-
-    const hasChanges =
-        JSON.stringify(permissions) !== JSON.stringify(localPermissions);
-
-    const roles = Array.from(new Set(localPermissions.map((p) => p.role)));
+    const {
+        localPermissions,
+        isSaving,
+        handleToggle,
+        handleSave,
+        hasChanges,
+        roles,
+    } = useViewManagementState(permissions);
 
     return (
         <>

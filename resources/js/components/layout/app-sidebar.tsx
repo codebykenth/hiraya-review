@@ -17,6 +17,8 @@ import {
     TrendingUp,
     Activity,
     Eye,
+    Megaphone,
+    MessageSquareWarning,
 } from 'lucide-react';
 import AppLogo from '@/components/layout/app-logo';
 import { NavMain } from '@/components/layout/nav-main';
@@ -105,6 +107,16 @@ const adminCoreItems: NavItem[] = [
         title: 'Users',
         href: adminUsersIndex(),
         icon: Users,
+    },
+    {
+        title: 'Announcements',
+        href: '/admin/announcements',
+        icon: Megaphone,
+    },
+    {
+        title: 'Flagged Content',
+        href: '/admin/feedbacks',
+        icon: MessageSquareWarning,
     },
 ];
 

@@ -24,7 +24,7 @@ interface ReviewerGuideTabsProps {
 
 export function ReviewerGuideTabs({
     showActions = false,
-    className = 'mx-auto max-w-6xl space-y-8',
+    className = 'space-y-8',
     tabsClassName = 'flex border-b border-border',
 }: ReviewerGuideTabsProps) {
     const [activeTab, setActiveTab] = useState<'flow' | 'structure' | 'tips'>(

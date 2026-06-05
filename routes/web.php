@@ -1,7 +1,9 @@
 <?php
 
+use App\Http\Controllers\Admin\AnnouncementController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\ExamDateController;
+use App\Http\Controllers\Admin\FeedbackController;
 use App\Http\Controllers\Admin\LearnController as AdminLearnController;
 use App\Http\Controllers\Admin\QuestionController;
 use App\Http\Controllers\Admin\SyllabusController;
@@ -105,6 +107,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->name('learn.complete')
         ->middleware('throttle:global-mutations');
 
+    Route::post('feedbacks/submit', [FeedbackController::class, 'store'])
+        ->name('feedbacks.store')
+        ->middleware('throttle:global-mutations');
+
     // --- STUDY SCHEDULES ---
     Route::controller(StudyScheduleController::class)->prefix('study-schedules')->name('study-schedules.')->group(function () {
         Route::middleware('throttle:global-views')->group(function () {
@@ -159,6 +165,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::controller(ViewManagementController::class)->prefix('view-management')->name('view-management.')->group(function () {
                 Route::get('/', 'index')->name('index');
             });
+
+            Route::controller(FeedbackController::class)->prefix('feedbacks')->name('feedbacks.')->group(function () {
+                Route::get('/', 'index')->name('index');
+            });
+
+            Route::controller(AnnouncementController::class)->prefix('announcements')->name('announcements.')->group(function () {
+                Route::get('/', 'index')->name('index');
+            });
         });
 
         // Question resource views (No admin prefix in paths or names originally)
@@ -185,6 +199,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
             // Admin View Management Mutations
             Route::controller(ViewManagementController::class)->prefix('admin/view-management')->name('admin.view-management.')->group(function () {
                 Route::put('/', 'update')->name('update');
+            });
+
+            Route::controller(FeedbackController::class)->prefix('admin/feedbacks')->name('admin.feedbacks.')->group(function () {
+                Route::post('/', 'store')->name('store');
+                Route::put('{feedback}/status', 'updateStatus')->name('updateStatus');
+                Route::delete('{feedback}', 'destroy')->name('destroy');
+            });
+
+            Route::controller(AnnouncementController::class)->prefix('admin/announcements')->name('admin.announcements.')->group(function () {
+                Route::post('/', 'store')->name('store');
+                Route::put('{announcement}', 'update')->name('update');
+                Route::delete('{announcement}', 'destroy')->name('destroy');
             });
 
             // Admin Learn Mutations

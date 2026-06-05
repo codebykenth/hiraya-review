@@ -23,8 +23,6 @@ export interface ConfirmModalProps {
     onConfirm: () => void;
 }
 
-
-
 export function ConfirmModal({
     isOpen,
     title,

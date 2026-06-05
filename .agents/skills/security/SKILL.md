@@ -46,3 +46,5 @@ Before finalizing any feature that handles user input or data access, verify the
 4. [ ] **Authorization:** The action is protected by a Policy or Gate, preventing unauthorized access (IDOR).
 5. [ ] **XSS Safe:** No raw HTML is being blindly rendered on the frontend.
 6. [ ] **Prop Cleanliness:** The Inertia response payload does not contain hidden sensitive data.
+
+User should not be able to manipulate other users' data and should not be able to access admin routes.

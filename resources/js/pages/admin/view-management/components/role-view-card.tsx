@@ -1,4 +1,4 @@
-import { Settings, Eye, EyeOff } from 'lucide-react';
+import { Settings } from 'lucide-react';
 import React from 'react';
 import {
     Card,
@@ -7,6 +7,7 @@ import {
     CardHeader,
     CardTitle,
 } from '@/components/ui/card';
+import { Switch } from '@/components/ui/switch';
 import type { RolePermission } from '../types';
 
 interface RoleViewCardProps {
@@ -57,30 +58,11 @@ export function RoleViewCard({
                                     {perm.view_name}
                                 </p>
                             </div>
-                            <button
-                                type="button"
-                                onClick={() => onToggle(perm.id)}
-                                className={`relative inline-flex h-7 w-12 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors duration-300 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none ${
-                                    perm.is_visible
-                                        ? 'bg-blue-600 shadow-inner shadow-blue-900/20 dark:bg-blue-600'
-                                        : 'bg-slate-200 dark:bg-slate-700'
-                                }`}
-                            >
-                                <span className="sr-only">Toggle view</span>
-                                <span
-                                    className={`pointer-events-none inline-flex size-6 transform items-center justify-center rounded-full bg-white shadow-md ring-0 transition-transform duration-300 ${
-                                        perm.is_visible
-                                            ? 'translate-x-5'
-                                            : 'translate-x-0'
-                                    }`}
-                                >
-                                    {perm.is_visible ? (
-                                        <Eye className="size-3.5 text-blue-600" />
-                                    ) : (
-                                        <EyeOff className="size-3.5 text-slate-400" />
-                                    )}
-                                </span>
-                            </button>
+                            <Switch
+                                checked={perm.is_visible}
+                                onCheckedChange={() => onToggle(perm.id)}
+                                className="data-[state=checked]:bg-blue-600"
+                            />
                         </div>
                     ))}
                 </div>

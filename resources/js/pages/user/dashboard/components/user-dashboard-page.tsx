@@ -8,6 +8,7 @@ import {
     ChevronRight,
 } from 'lucide-react';
 import { useEffect } from 'react';
+import { AnnouncementsBanner } from '@/components/domain/announcements-banner';
 import { PageContainer } from '@/components/layout/page-container';
 import { PageHeader } from '@/components/layout/page-header';
 import { Card } from '@/components/ui/card';
@@ -33,6 +34,7 @@ export function UserDashboardPage({ stats, aiAnalysis }: DashboardProps) {
 
     return (
         <PageContainer>
+            <AnnouncementsBanner />
             {/* Greeting Header & Main Action Controls */}
             <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                 <PageHeader

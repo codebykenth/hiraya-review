@@ -7,12 +7,14 @@ import {
     Clock,
     Lightbulb,
     CheckCircle2,
+    Flag,
 } from 'lucide-react';
 import Pusher from 'pusher-js';
-import React from 'react';
+import React, { useState } from 'react';
 import { toast } from 'sonner';
 import { getCategoryStyles } from '@/components/domain/curation-index-shell';
 import { LessonMarkdown } from '@/components/domain/lesson-markdown';
+import { ReportIssueModal } from '@/components/domain/report-issue-modal';
 import { PageContainer } from '@/components/layout/page-container';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -24,6 +26,7 @@ export default function LearnShow({ module, recommended }: LearnShowProps) {
     const { auth, pusher } = usePage<{ auth: { user: any }; pusher?: any }>()
         .props;
     const isLoggedIn = !!auth.user;
+    const [isReportModalOpen, setIsReportModalOpen] = useState(false);
 
     React.useEffect(() => {
         if (!pusher?.key) {
@@ -91,9 +94,9 @@ export default function LearnShow({ module, recommended }: LearnShowProps) {
                     Back to Study Hub
                 </Link>
 
-                <div className="mx-auto grid w-full max-w-7xl grid-cols-1 gap-3 sm:gap-6 lg:grid-cols-[minmax(0,1fr)_19rem]">
+                <div className="mx-auto grid w-full grid-cols-1 gap-3 sm:gap-6 lg:grid-cols-[minmax(0,1fr)_19rem]">
                     <div className="min-w-0">
-                        <article className="group animate-fade-in rounded-xl border border-border bg-card p-5 shadow-sm transition-all duration-300 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95 md:p-9">
+                        <article className="group animate-fade-in rounded-xl border border-border bg-card p-5 shadow-sm transition-all duration-300 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none md:p-9">
                             <div className="flex flex-wrap items-center gap-2 border-b border-border pb-5">
                                 <span
                                     className={`rounded-full border px-3 py-0.5 text-xs font-extrabold uppercase ${getCategoryStyles(module.category)}`}
@@ -109,19 +112,19 @@ export default function LearnShow({ module, recommended }: LearnShowProps) {
                                 </span>
                             </div>
 
-                            <h1 className="mt-6 font-heading text-xl leading-tight font-black text-foreground sm:text-3xl md:text-4xl">
-                                {module.title}
-                            </h1>
-
                             {module.is_completed && (
                                 <div className="mt-4 flex items-center gap-2.5 rounded-lg border border-green-200/40 bg-green-50/50 px-4 py-3 text-sm font-semibold text-green-800 dark:border-green-900/30 dark:bg-green-950/20 dark:text-green-400">
                                     <CheckCircle2 className="size-5 shrink-0 fill-green-600/10 text-green-600 dark:text-green-400" />
                                     <span>
-                                        Lesson Completed â€” Well done! Keep
-                                        going with your study schedule.
+                                        Lesson Completed. Well done! Keep going
+                                        with your study schedule.
                                     </span>
                                 </div>
                             )}
+
+                            <h1 className="mt-6 font-heading text-xl leading-tight font-black text-foreground sm:text-3xl md:text-4xl">
+                                {module.title}
+                            </h1>
 
                             <p className="mt-4 border-l-4 border-blue-600 pl-5 text-base leading-8 font-semibold text-muted-foreground italic">
                                 {module.summary}
@@ -140,7 +143,17 @@ export default function LearnShow({ module, recommended }: LearnShowProps) {
                                         <LessonMarkdown
                                             content={module.content}
                                         />
-                                        <div className="mt-8 flex justify-end border-t border-border pt-6">
+                                        <div className="mt-8 flex items-center justify-between border-t border-border pt-6">
+                                            <Button
+                                                variant="destructive"
+                                                onClick={() =>
+                                                    setIsReportModalOpen(true)
+                                                }
+                                                className="bg-red-500 text-white hover:bg-red-600"
+                                            >
+                                                <Flag className="mr-2 size-4" />
+                                                Report Issue
+                                            </Button>
                                             <Button
                                                 onClick={() =>
                                                     router.post(
@@ -151,16 +164,10 @@ export default function LearnShow({ module, recommended }: LearnShowProps) {
                                                         },
                                                     )
                                                 }
-                                                variant={
-                                                    module.is_completed
-                                                        ? 'outline'
-                                                        : 'success'
-                                                }
+                                                variant="success"
                                                 className="flex items-center gap-2 font-bold"
                                             >
-                                                <CheckCircle2
-                                                    className={`size-4 ${module.is_completed ? 'fill-green-600/10 text-green-600 dark:text-green-400' : ''}`}
-                                                />
+                                                <CheckCircle2 className="size-4" />
                                                 {module.is_completed
                                                     ? 'Completed'
                                                     : 'Mark as Complete'}
@@ -214,7 +221,7 @@ export default function LearnShow({ module, recommended }: LearnShowProps) {
                         </article>
                     </div>
 
-                    <aside className="group flex min-w-0 flex-col gap-3 transition-all duration-300 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95 sm:gap-6">
+                    <aside className="group flex min-w-0 flex-col gap-3 transition-all duration-300 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none sm:gap-6">
                         <Card className="p-5 shadow-xs">
                             <div className="flex items-center gap-2 border-b border-border pb-3">
                                 <BookMarked className="size-4 text-blue-600 dark:text-blue-400" />
@@ -290,6 +297,15 @@ export default function LearnShow({ module, recommended }: LearnShowProps) {
                     </aside>
                 </div>
             </PageContainer>
+
+            {isLoggedIn && (
+                <ReportIssueModal
+                    isOpen={isReportModalOpen}
+                    onClose={() => setIsReportModalOpen(false)}
+                    flaggableId={module.id}
+                    flaggableType="App\Models\LearnModule"
+                />
+            )}
         </>
     );
 }

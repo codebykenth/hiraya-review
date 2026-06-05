@@ -12,12 +12,54 @@ import {
 } from '@/components/ui/dialog';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Hiraya Review';
+const SUPPORT_BUBBLE_KEY = 'support_bubble_dismissal';
 
 export function SupportWidget() {
     const [open, setOpen] = useState(false);
     const [isMounted, setIsMounted] = useState(false);
     const [showBubble, setShowBubble] = useState(false);
     const [isLiveExamActive, setIsLiveExamActive] = useState(false);
+
+    // Check if bubble should show today
+    const shouldShowBubbleToday = () => {
+        if (typeof window === 'undefined') {
+            return true;
+        }
+
+        try {
+            const stored = localStorage.getItem(SUPPORT_BUBBLE_KEY);
+
+            if (!stored) {
+                return true;
+            }
+
+            const dismissalData = JSON.parse(stored);
+            const today = new Date().toDateString();
+
+            // Show if not dismissed today
+            return dismissalData.date !== today;
+        } catch {
+            return true;
+        }
+    };
+
+    const dismissBubbleForToday = () => {
+        if (typeof window === 'undefined') {
+            return;
+        }
+
+        try {
+            localStorage.setItem(
+                SUPPORT_BUBBLE_KEY,
+                JSON.stringify({
+                    date: new Date().toDateString(),
+                    timestamp: Date.now(),
+                }),
+            );
+        } catch {
+            // Ignore localStorage errors
+        }
+    };
 
     useEffect(() => {
         const handleNavigate = () => {
@@ -28,15 +70,10 @@ export function SupportWidget() {
         const handleExamStatus = (e: any) => {
             setIsLiveExamActive(e.detail.active);
 
-            if (!e.detail.active) {
-                // Check if they already dismissed it today before showing it again
-                const lastSeen = localStorage.getItem('support_bubble_date');
-
-                if (lastSeen !== new Date().toDateString()) {
-                    setTimeout(() => {
-                        setShowBubble(true);
-                    }, 1500);
-                }
+            if (!e.detail.active && shouldShowBubbleToday()) {
+                setTimeout(() => {
+                    setShowBubble(true);
+                }, 1500);
             }
         };
 
@@ -52,10 +89,8 @@ export function SupportWidget() {
 
         // Bubble logic (show once a day, delayed by 3 seconds)
         let bubbleTimer: NodeJS.Timeout;
-        const lastSeen = localStorage.getItem('support_bubble_date');
-        const today = new Date().toDateString();
 
-        if (lastSeen !== today) {
+        if (shouldShowBubbleToday()) {
             bubbleTimer = setTimeout(() => {
                 setShowBubble(true);
             }, 3000);
@@ -76,7 +111,7 @@ export function SupportWidget() {
         e.stopPropagation();
         e.preventDefault();
         setShowBubble(false);
-        localStorage.setItem('support_bubble_date', new Date().toDateString());
+        dismissBubbleForToday();
     };
 
     const handleOpenChange = (newOpen: boolean) => {
@@ -84,10 +119,7 @@ export function SupportWidget() {
 
         if (newOpen && showBubble) {
             setShowBubble(false);
-            localStorage.setItem(
-                'support_bubble_date',
-                new Date().toDateString(),
-            );
+            dismissBubbleForToday();
         }
     };
 

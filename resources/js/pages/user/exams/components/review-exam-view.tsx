@@ -8,7 +8,8 @@ import {
     X,
     HelpCircle,
 } from 'lucide-react';
-import React from 'react';
+import React, { useState } from 'react';
+import { ReportIssueModal } from '@/components/domain/report-issue-modal';
 import {
     renderFormattedText,
     extractPropositions,
@@ -69,6 +70,7 @@ export function ReviewExamView({
 }: ReviewExamViewProps) {
     const currentQuestion = activeQuestions[currentIdx];
     const chosenOption = answers[currentIdx];
+    const [isReportModalOpen, setIsReportModalOpen] = useState(false);
 
     return (
         <>
@@ -131,29 +133,44 @@ export function ReviewExamView({
                                                     Question {currentIdx + 1} of{' '}
                                                     {activeQuestions.length}
                                                 </span>
-                                                <button
-                                                    onClick={() =>
-                                                        setFlagged((prev) => ({
-                                                            ...prev,
-                                                            [currentIdx]:
-                                                                !prev[
-                                                                    currentIdx
-                                                                ],
-                                                        }))
-                                                    }
-                                                    className={`inline-flex cursor-pointer items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[11px] font-bold transition focus:outline-none ${
-                                                        flagged[currentIdx]
-                                                            ? 'dark:border-rose-900/50/50 border border-rose-200 bg-rose-50 text-rose-700 dark:bg-rose-950/30 dark:text-rose-400'
-                                                            : 'text-muted-foreground hover:bg-muted'
-                                                    }`}
-                                                >
-                                                    <Flag
-                                                        className={`size-3.5 ${flagged[currentIdx] ? 'fill-rose-600 text-rose-600 dark:text-rose-400' : ''}`}
-                                                    />
-                                                    {flagged[currentIdx]
-                                                        ? 'Flagged for Review'
-                                                        : 'Flag for Review'}
-                                                </button>
+                                                <div className="flex items-center gap-2">
+                                                    <button
+                                                        onClick={() =>
+                                                            setIsReportModalOpen(
+                                                                true,
+                                                            )
+                                                        }
+                                                        className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[11px] font-bold text-amber-600 transition hover:bg-amber-50 focus:outline-none dark:text-amber-500 dark:hover:bg-amber-950/20"
+                                                    >
+                                                        <Flag className="size-3.5" />
+                                                        Report Issue
+                                                    </button>
+                                                    <button
+                                                        onClick={() =>
+                                                            setFlagged(
+                                                                (prev) => ({
+                                                                    ...prev,
+                                                                    [currentIdx]:
+                                                                        !prev[
+                                                                            currentIdx
+                                                                        ],
+                                                                }),
+                                                            )
+                                                        }
+                                                        className={`inline-flex cursor-pointer items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[11px] font-bold transition focus:outline-none ${
+                                                            flagged[currentIdx]
+                                                                ? 'dark:border-rose-900/50/50 border border-rose-200 bg-rose-50 text-rose-700 dark:bg-rose-950/30 dark:text-rose-400'
+                                                                : 'text-muted-foreground hover:bg-muted'
+                                                        }`}
+                                                    >
+                                                        <Flag
+                                                            className={`size-3.5 ${flagged[currentIdx] ? 'fill-rose-600 text-rose-600 dark:text-rose-400' : ''}`}
+                                                        />
+                                                        {flagged[currentIdx]
+                                                            ? 'Flagged for Review'
+                                                            : 'Flag for Review'}
+                                                    </button>
+                                                </div>
                                             </div>
                                         </div>
                                         <div className="text-sm leading-relaxed font-semibold text-foreground">
@@ -666,6 +683,15 @@ export function ReviewExamView({
                         reviewSubcategories={reviewSubcategories}
                         isMobile={true}
                         onCloseMobile={() => setIsMobilePaletteOpen(false)}
+                    />
+                )}
+
+                {currentQuestion && (
+                    <ReportIssueModal
+                        isOpen={isReportModalOpen}
+                        onClose={() => setIsReportModalOpen(false)}
+                        flaggableId={currentQuestion.id}
+                        flaggableType="App\Models\Question"
                     />
                 )}
             </div>

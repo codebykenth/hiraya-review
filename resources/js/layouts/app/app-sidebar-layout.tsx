@@ -3,6 +3,7 @@ import Echo from 'laravel-echo';
 import Pusher from 'pusher-js';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
+import { AnnouncementsBanner } from '@/components/domain/announcements-banner';
 import { AppContent } from '@/components/layout/app-content';
 import { AppShell } from '@/components/layout/app-shell';
 import { AppSidebar } from '@/components/layout/app-sidebar';
@@ -127,6 +128,7 @@ export default function AppSidebarLayout({
                 <AppSidebar />
                 <AppContent variant="sidebar" className="overflow-x-hidden">
                     <AppSidebarHeader breadcrumbs={breadcrumbs} />
+                    <AnnouncementsBanner />
                     {children}
                 </AppContent>
             </AppShell>
