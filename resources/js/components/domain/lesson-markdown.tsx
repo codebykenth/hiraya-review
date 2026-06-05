@@ -1,4 +1,4 @@
-﻿import {
+import {
     BookOpen,
     CheckCircle2,
     HelpCircle,
@@ -48,7 +48,7 @@ function ZoomableSvg({
             </DialogTrigger>
             <DialogContent className="max-w-4xl border-none bg-transparent p-0 shadow-none">
                 <div
-                    className="flex w-full justify-center rounded-2xl bg-white p-8 dark:bg-slate-900"
+                    className="flex w-full justify-center rounded-2xl bg-white p-4 sm:p-6 lg:p-8 dark:bg-slate-900"
                     dangerouslySetInnerHTML={{
                         __html: sanitizeSvg(
                             svgContent.replace(

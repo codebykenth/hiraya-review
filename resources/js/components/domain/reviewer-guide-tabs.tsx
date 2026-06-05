@@ -1,4 +1,4 @@
-﻿import { Link } from '@inertiajs/react';
+import { Link } from '@inertiajs/react';
 import {
     BookOpen,
     ClipboardList,
@@ -263,13 +263,13 @@ export function ReviewerGuideTabs({
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                    <div className="grid grid-cols-1 gap-3 sm:gap-6 md:grid-cols-2">
                         {studySteps.map((step, idx) => (
                             <Card
                                 key={idx}
                                 className="hover:border-slate-350 overflow-hidden border border-border bg-card transition duration-200 dark:hover:border-slate-700"
                             >
-                                <div className="space-y-4 p-6">
+                                <div className="space-y-4 p-4 sm:p-6">
                                     <div className="flex items-center justify-between">
                                         <span className="rounded-full bg-slate-100 px-2.5 py-1 text-[10px] font-black tracking-wider text-slate-600 uppercase dark:bg-slate-900 dark:text-slate-400">
                                             {step.phase}
@@ -331,9 +331,9 @@ export function ReviewerGuideTabs({
             {/* Tab: CSE Exam Structure */}
             {activeTab === 'structure' && (
                 <div className="space-y-6">
-                    <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
+                    <div className="grid grid-cols-1 gap-4 sm:gap-8 lg:grid-cols-2">
                         {/* Professional Section */}
-                        <Card className="space-y-6 border border-border bg-card p-6">
+                        <Card className="space-y-6 border border-border bg-card p-4 sm:p-6">
                             <div className="space-y-1.5 border-b border-border pb-4">
                                 <h3 className="flex items-center gap-2 font-heading text-xl font-extrabold text-foreground">
                                     <Award className="size-5 text-blue-600 dark:text-blue-400" />
@@ -404,7 +404,7 @@ export function ReviewerGuideTabs({
                         </Card>
 
                         {/* Subprofessional Section */}
-                        <Card className="space-y-6 border border-border bg-card p-6">
+                        <Card className="space-y-6 border border-border bg-card p-4 sm:p-6">
                             <div className="space-y-1.5 border-b border-border pb-4">
                                 <h3 className="flex items-center gap-2 font-heading text-xl font-extrabold text-foreground">
                                     <Award className="size-5 text-indigo-600 dark:text-indigo-400" />
@@ -481,11 +481,11 @@ export function ReviewerGuideTabs({
             {/* Tab: Smart Study Tips */}
             {activeTab === 'tips' && (
                 <div className="space-y-6">
-                    <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+                    <div className="grid grid-cols-1 gap-3 sm:gap-6 md:grid-cols-3">
                         {generalTips.map((tip, idx) => (
                             <Card
                                 key={idx}
-                                className={`border border-l-4 border-border bg-card p-6 ${tip.color} space-y-4`}
+                                className={`border border-l-4 border-border bg-card p-4 sm:p-6 ${tip.color} space-y-4`}
                             >
                                 <div className="flex items-center gap-3">
                                     <div className="rounded-lg bg-slate-100 p-2 dark:bg-slate-900">
@@ -502,7 +502,7 @@ export function ReviewerGuideTabs({
                         ))}
                     </div>
 
-                    <Card className="space-y-4 border border-border bg-card p-6">
+                    <Card className="space-y-4 border border-border bg-card p-4 sm:p-6">
                         <h3 className="flex items-center gap-2 font-heading text-lg font-black text-foreground">
                             <HelpCircle className="size-5 text-primary" />
                             Frequently Asked Reviewer Questions

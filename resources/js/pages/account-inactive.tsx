@@ -23,10 +23,10 @@ export default function AccountInactive({ adminEmail }: AccountInactiveProps) {
     return (
         <>
             <Head title="Account Inactive" />
-            <div className="flex min-h-[90vh] items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 px-4 py-8">
+            <div className="flex min-h-[90vh] items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 px-4 py-4 sm:py-8">
                 <div className="w-full max-w-2xl">
-                    <div className="rounded-lg border border-slate-200 bg-white p-8 shadow-lg dark:bg-slate-950">
-                        <h1 className="mb-2 text-center text-4xl font-black tracking-tight text-slate-900 sm:text-5xl">
+                    <div className="rounded-lg border border-slate-200 bg-white p-4 sm:p-6 lg:p-8 shadow-lg dark:bg-slate-950">
+                        <h1 className="mb-2 text-center text-2xl sm:text-4xl font-black tracking-tight text-slate-900 sm:text-5xl">
                             Account Inactive
                         </h1>
                         <p className="mb-6 text-center text-slate-600">

@@ -1,4 +1,4 @@
-﻿import { Head, router } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 import { Check, X, Edit3, FileText, Sparkles, Save } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { DraftsReviewShell } from '@/components/domain/drafts-review-shell';
@@ -308,7 +308,7 @@ export default function DraftsLearnList({
                 renderItem={(m) => (
                     <div
                         key={m.id}
-                        className={`rounded-2xl border bg-card p-6 shadow-xs transition duration-205 ${
+                        className={`rounded-2xl border bg-card p-4 sm:p-6 shadow-xs transition duration-205 ${
                             m.approved
                                 ? 'border-emerald-250 ring-1 shadow-emerald-50/10 ring-emerald-500/10 dark:border-emerald-900/40'
                                 : 'hover:border-slate-350 border-border dark:hover:border-slate-700'

@@ -211,7 +211,7 @@ export function TimePicker({ value, onChange }: TimePickerProps) {
                             </button>
                         </div>
 
-                        <div className="text-3xl font-black tracking-tight text-slate-600 sm:text-4xl dark:text-slate-400">
+                        <div className="text-xl sm:text-3xl font-black tracking-tight text-slate-600 sm:text-4xl dark:text-slate-400">
                             :
                         </div>
 

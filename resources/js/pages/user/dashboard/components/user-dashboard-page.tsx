@@ -82,9 +82,9 @@ export function UserDashboardPage({ stats, aiAnalysis }: DashboardProps) {
             )}
 
             {/* Simple Monitor cards pointing to core modules */}
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="grid grid-cols-1 gap-3 sm:gap-6 sm:grid-cols-2 lg:grid-cols-4">
                 {/* Learn Card */}
-                <Card className="flex flex-col justify-between p-6 transition hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/5 dark:bg-slate-900/60">
+                <Card className="flex flex-col justify-between p-4 sm:p-6 transition hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/5 dark:bg-slate-900/60">
                     <div className="flex items-start gap-4">
                         <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600 dark:bg-blue-950/30 dark:bg-blue-950/40 dark:text-blue-400">
                             <BookOpen className="size-5" />
@@ -108,7 +108,7 @@ export function UserDashboardPage({ stats, aiAnalysis }: DashboardProps) {
                 </Card>
 
                 {/* Practice Drills Card */}
-                <Card className="flex flex-col justify-between p-6 transition hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/5 dark:bg-slate-900/60">
+                <Card className="flex flex-col justify-between p-4 sm:p-6 transition hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/5 dark:bg-slate-900/60">
                     <div className="flex items-start gap-4">
                         <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 dark:bg-indigo-950/30 dark:bg-indigo-950/40 dark:text-indigo-400">
                             <Target className="size-5" />
@@ -132,7 +132,7 @@ export function UserDashboardPage({ stats, aiAnalysis }: DashboardProps) {
                 </Card>
 
                 {/* Mock Exams Card */}
-                <Card className="flex flex-col justify-between p-6 transition hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/5 dark:bg-slate-900/60">
+                <Card className="flex flex-col justify-between p-4 sm:p-6 transition hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/5 dark:bg-slate-900/60">
                     <div className="flex items-start gap-4">
                         <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-purple-50 text-purple-600 dark:bg-purple-950/40 dark:text-purple-400">
                             <ClipboardList className="size-5" />
@@ -156,7 +156,7 @@ export function UserDashboardPage({ stats, aiAnalysis }: DashboardProps) {
                 </Card>
 
                 {/* Analytics Card */}
-                <Card className="flex flex-col justify-between p-6 transition hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/5 dark:bg-slate-900/60">
+                <Card className="flex flex-col justify-between p-4 sm:p-6 transition hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/5 dark:bg-slate-900/60">
                     <div className="flex items-start gap-4">
                         <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 dark:bg-emerald-950/30 dark:bg-emerald-950/40 dark:text-emerald-400">
                             <TrendingUp className="size-5" />

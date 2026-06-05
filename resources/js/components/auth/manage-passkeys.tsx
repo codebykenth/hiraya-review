@@ -1,4 +1,4 @@
-﻿import { router } from '@inertiajs/react';
+import { router } from '@inertiajs/react';
 import { KeyRound } from 'lucide-react';
 import { destroy } from '@/actions/Laravel/Passkeys/Http/Controllers/PasskeyRegistrationController';
 import PasskeyItem from '@/components/auth/passkey-item';
@@ -13,7 +13,7 @@ export type Props = {
 
 const EmptyState = () => {
     return (
-        <div className="p-8 text-center">
+        <div className="p-4 sm:p-6 lg:p-8 text-center">
             <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-muted">
                 <KeyRound className="h-7 w-7 text-muted-foreground" />
             </div>

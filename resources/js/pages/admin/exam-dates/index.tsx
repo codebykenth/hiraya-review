@@ -1,4 +1,4 @@
-﻿import { Head, router } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 import { PageContainer } from '@/components/layout/page-container';
 import { ConfirmModal } from '@/components/shared/confirm-modal';
 import { useConfirmModal } from '@/hooks/use-confirm-modal';
@@ -64,7 +64,7 @@ export default function AdminExamDatesIndex({
             <PageContainer>
                 <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                     <div>
-                        <h1 className="text-3xl font-black tracking-tight text-foreground sm:text-4xl">
+                        <h1 className="text-xl sm:text-3xl font-black tracking-tight text-foreground sm:text-4xl">
                             Exam Dates
                         </h1>
                         <p className="text-base leading-relaxed text-muted-foreground">
@@ -74,7 +74,7 @@ export default function AdminExamDatesIndex({
                     </div>
                 </div>
 
-                <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+                <div className="grid grid-cols-1 gap-3 sm:gap-6 md:grid-cols-3">
                     {/* Form Panel */}
                     <div className="md:col-span-1">
                         <ExamDateForm

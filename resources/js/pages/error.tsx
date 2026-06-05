@@ -56,7 +56,7 @@ export default function ErrorPage({ status }: ErrorPageProps) {
             <div className="mx-auto w-full max-w-2xl text-center">
                 <div className="mb-8">{icon}</div>
 
-                <h1 className="font-heading text-4xl font-black tracking-tight text-slate-900 sm:text-5xl dark:text-white">
+                <h1 className="font-heading text-2xl sm:text-4xl font-black tracking-tight text-slate-900 sm:text-5xl dark:text-white">
                     {title}
                 </h1>
 
@@ -67,7 +67,7 @@ export default function ErrorPage({ status }: ErrorPageProps) {
                 <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
                     <button
                         onClick={() => window.history.back()}
-                        className="inline-flex w-full items-center justify-center gap-2 rounded-xl border-2 border-slate-200 bg-transparent px-6 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 sm:w-auto dark:border-slate-800 dark:text-slate-300 dark:hover:bg-slate-800/50"
+                        className="inline-flex w-full items-center justify-center gap-2 rounded-xl border-2 border-slate-200 bg-transparent px-4 sm:px-6 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 sm:w-auto dark:border-slate-800 dark:text-slate-300 dark:hover:bg-slate-800/50"
                     >
                         <ArrowLeft className="size-4" />
                         Go Back
@@ -76,7 +76,7 @@ export default function ErrorPage({ status }: ErrorPageProps) {
                     {auth?.user && (
                         <Link
                             href="/dashboard"
-                            className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700 focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2 sm:w-auto"
+                            className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 sm:px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700 focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2 sm:w-auto"
                         >
                             <Home className="size-4" />
                             Back to Home

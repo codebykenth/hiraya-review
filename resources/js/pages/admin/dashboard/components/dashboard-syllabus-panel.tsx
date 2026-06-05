@@ -1,4 +1,4 @@
-﻿import { Database } from 'lucide-react';
+import { Database } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import type { CategoryStat, Metrics } from '../types';
 
@@ -12,7 +12,7 @@ export function DashboardSyllabusPanel({
     metrics,
 }: DashboardSyllabusPanelProps) {
     return (
-        <Card className="flex flex-col p-6 shadow-xs">
+        <Card className="flex flex-col p-4 sm:p-6 shadow-xs">
             <div className="mb-5">
                 <h2 className="text-md font-bold text-slate-900 dark:text-white">
                     Syllabus Scope Dispersal

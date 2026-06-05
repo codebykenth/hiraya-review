@@ -1,4 +1,4 @@
-﻿import { usePage } from '@inertiajs/react';
+import { usePage } from '@inertiajs/react';
 import Echo from 'laravel-echo';
 import Pusher from 'pusher-js';
 import { useEffect, useState } from 'react';
@@ -115,7 +115,7 @@ export default function AppSidebarLayout({
         return (
             <div className="flex min-h-screen flex-col bg-slate-50/30 dark:bg-slate-950/20">
                 <SiteHeader activeNav={activeNav} />
-                <main className="flex-1 px-6 py-12">{children}</main>
+                <main className="flex-1 px-4 sm:px-6 py-12">{children}</main>
                 <SiteFooter />
             </div>
         );

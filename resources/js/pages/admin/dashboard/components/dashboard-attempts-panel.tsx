@@ -1,4 +1,4 @@
-﻿import { Activity, Users } from 'lucide-react';
+import { Activity, Users } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import type { RecentAttempt } from '../types';
 
@@ -10,7 +10,7 @@ export function DashboardAttemptsPanel({
     attempts,
 }: DashboardAttemptsPanelProps) {
     return (
-        <Card className="p-6 shadow-xs lg:col-span-2">
+        <Card className="p-4 sm:p-6 shadow-xs lg:col-span-2">
             <div className="mb-5 flex items-center justify-between">
                 <div>
                     <h2 className="text-md font-bold text-slate-900 dark:text-white">

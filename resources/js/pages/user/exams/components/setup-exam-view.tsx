@@ -74,7 +74,7 @@ export function SetupExamView({
                 </div>
 
                 {/* Primary Column Grid Layout */}
-                <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+                <div className="grid grid-cols-1 gap-3 sm:gap-6 lg:grid-cols-3">
                     {/* Left Panel: Level Selectors */}
                     <div className="flex flex-col gap-4 lg:col-span-2">
                         {/* Professional Level Card */}
@@ -155,7 +155,7 @@ export function SetupExamView({
                     </div>
 
                     {/* Right Panel: Simulation Overview */}
-                    <div className="dark:bg-blue-950/30/30 flex min-h-[380px] flex-col justify-between rounded-xl border border-blue-100/50 bg-blue-50 p-6 shadow-sm dark:border-blue-950/20 dark:bg-blue-950/10">
+                    <div className="dark:bg-blue-950/30/30 flex min-h-[380px] flex-col justify-between rounded-xl border border-blue-100/50 bg-blue-50 p-4 sm:p-6 shadow-sm dark:border-blue-950/20 dark:bg-blue-950/10">
                         <div>
                             <h2 className="mb-4 border-b border-blue-100/40 pb-2 font-heading text-xl font-black tracking-tight text-slate-900 dark:border-blue-950/20 dark:text-white">
                                 Simulation Overview

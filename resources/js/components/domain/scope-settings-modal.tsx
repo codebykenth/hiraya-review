@@ -53,7 +53,7 @@ export function ScopeSettingsModal({
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-xs">
             <div className="relative flex h-[600px] w-full max-w-4xl animate-in flex-col overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-2xl duration-200 zoom-in-95 fade-in dark:border-slate-800 dark:bg-slate-900">
                 {/* Modal Header */}
-                <div className="flex items-center justify-between border-b border-slate-100 bg-slate-50/50 px-6 py-4.5 dark:border-slate-900 dark:bg-slate-900/35">
+                <div className="flex items-center justify-between border-b border-slate-100 bg-slate-50/50 px-4 sm:px-6 py-4.5 dark:border-slate-900 dark:bg-slate-900/35">
                     <div>
                         <h2 className="flex items-center gap-2 text-xl font-black tracking-tight text-slate-900 dark:text-white">
                             <Database className="size-5 text-blue-600 dark:text-blue-400 dark:text-blue-500" />
@@ -76,7 +76,7 @@ export function ScopeSettingsModal({
                 {/* Modal Body (Two Column Split Layout) */}
                 <div className="flex flex-1 overflow-hidden">
                     {/* Left Column: Categories List */}
-                    <div className="flex w-1/2 flex-col overflow-y-auto border-r border-slate-100 p-6 dark:border-slate-900">
+                    <div className="flex w-1/2 flex-col overflow-y-auto border-r border-slate-100 p-4 sm:p-6 dark:border-slate-900">
                         <h3 className="mb-3.5 text-xs font-bold tracking-wider text-slate-400 uppercase dark:text-slate-500">
                             Categories
                         </h3>
@@ -141,7 +141,7 @@ export function ScopeSettingsModal({
                     </div>
 
                     {/* Right Column: Subcategories list for Selected Category */}
-                    <div className="flex w-1/2 flex-col overflow-y-auto bg-slate-50/20 p-6 dark:bg-slate-900/10">
+                    <div className="flex w-1/2 flex-col overflow-y-auto bg-slate-50/20 p-4 sm:p-6 dark:bg-slate-900/10">
                         <h3 className="mb-3.5 text-xs font-bold tracking-wider text-slate-400 uppercase dark:text-slate-500">
                             Subcategories of "
                             {activeCategory?.name || 'Select a Category'}"

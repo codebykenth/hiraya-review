@@ -1,4 +1,4 @@
-﻿import { Head, Link } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
 import {
     Target,
     Users,
@@ -62,7 +62,7 @@ export default function About() {
                     <div className="absolute inset-0 z-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-blue-100/40 via-transparent to-transparent dark:from-blue-900/20" />
                     <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8">
                         <div className="mx-auto max-w-3xl text-center">
-                            <h1 className="mb-6 font-heading text-4xl font-black tracking-tight text-slate-900 sm:text-5xl lg:text-6xl dark:text-white">
+                            <h1 className="mb-6 font-heading text-2xl sm:text-4xl font-black tracking-tight text-slate-900 sm:text-5xl lg:text-6xl dark:text-white">
                                 Empowering Filipinos to Serve the Nation
                             </h1>
                             <p className="mb-8 text-lg leading-relaxed text-slate-600 sm:text-xl dark:text-slate-400">
@@ -80,7 +80,7 @@ export default function About() {
                     <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                         <div className="mx-auto flex max-w-5xl flex-col items-center gap-12 lg:flex-row lg:gap-20">
                             <div className="flex-1 space-y-6 text-lg leading-relaxed text-slate-600 dark:text-slate-400">
-                                <h2 className="font-heading text-4xl font-black tracking-tight text-slate-900 sm:text-5xl dark:text-white">
+                                <h2 className="font-heading text-2xl sm:text-4xl font-black tracking-tight text-slate-900 sm:text-5xl dark:text-white">
                                     My Story
                                 </h2>
                                 <p>
@@ -113,10 +113,10 @@ export default function About() {
                             </div>
                             <div className="relative w-full flex-1">
                                 <div className="absolute inset-0 -m-4 rotate-3 transform rounded-3xl bg-gradient-to-tr from-blue-100 to-indigo-50 dark:from-blue-950/40 dark:to-indigo-900/20" />
-                                <div className="relative rounded-2xl border border-slate-200 bg-white p-8 shadow-sm dark:border-slate-800 dark:bg-slate-900/50">
+                                <div className="relative rounded-2xl border border-slate-200 bg-white p-4 sm:p-6 lg:p-8 shadow-sm dark:border-slate-800 dark:bg-slate-900/50">
                                     <div className="flex flex-col items-center justify-center py-10 text-center">
                                         <Users className="mb-6 size-16 text-blue-600 dark:text-blue-400 dark:text-blue-500" />
-                                        <h3 className="mb-4 text-3xl font-black tracking-tight text-slate-900 sm:text-4xl dark:text-white">
+                                        <h3 className="mb-4 text-xl sm:text-3xl font-black tracking-tight text-slate-900 sm:text-4xl dark:text-white">
                                             Built For You
                                         </h3>
                                         <p className="text-slate-600 dark:text-slate-400">
@@ -137,7 +137,7 @@ export default function About() {
                 <section className="border-t border-slate-200 bg-white py-20 lg:py-24 dark:border-slate-800 dark:bg-[#0a0a0a]">
                     <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                         <div className="mb-16 text-center">
-                            <h2 className="mb-4 font-heading text-4xl font-black tracking-tight text-slate-900 sm:text-5xl dark:text-white">
+                            <h2 className="mb-4 font-heading text-2xl sm:text-4xl font-black tracking-tight text-slate-900 sm:text-5xl dark:text-white">
                                 Core Values
                             </h2>
                             <p className="text-lg text-slate-600 dark:text-slate-400">
@@ -146,11 +146,11 @@ export default function About() {
                             </p>
                         </div>
 
-                        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
+                        <div className="grid gap-4 sm:gap-8 md:grid-cols-2 lg:grid-cols-4">
                             {values.map((val, idx) => (
                                 <div
                                     key={idx}
-                                    className="rounded-2xl border border-slate-200 bg-slate-50 p-6 transition-all hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/5 dark:border-slate-800 dark:bg-slate-900/50"
+                                    className="rounded-2xl border border-slate-200 bg-slate-50 p-4 sm:p-6 transition-all hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/5 dark:border-slate-800 dark:bg-slate-900/50"
                                 >
                                     <div
                                         className={`mb-6 inline-flex rounded-xl p-3 ${val.bg}`}
@@ -172,8 +172,8 @@ export default function About() {
                 {/* CTA */}
                 <section className="py-20 lg:py-32">
                     <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-                        <div className="mx-auto max-w-4xl rounded-3xl bg-blue-600 px-6 py-16 text-center text-white shadow-xl sm:px-12 lg:px-16">
-                            <h2 className="mb-6 font-heading text-4xl font-black tracking-tight sm:text-4xl sm:text-5xl">
+                        <div className="mx-auto max-w-4xl rounded-3xl bg-blue-600 px-4 sm:px-6 py-16 text-center text-white shadow-xl sm:px-12 lg:px-16">
+                            <h2 className="mb-6 font-heading text-2xl sm:text-4xl font-black tracking-tight sm:text-4xl sm:text-5xl">
                                 Ready to Start Your Journey?
                             </h2>
                             <p className="mx-auto mb-10 max-w-2xl text-lg text-blue-100 sm:text-xl">
@@ -184,7 +184,7 @@ export default function About() {
                             <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
                                 <Button
                                     size="lg"
-                                    className="h-14 rounded-full bg-white px-8 text-xl font-black tracking-tight text-blue-600 hover:bg-slate-50 dark:bg-slate-950 dark:text-blue-400"
+                                    className="h-14 rounded-full bg-white px-4 sm:px-8 text-xl font-black tracking-tight text-blue-600 hover:bg-slate-50 dark:bg-slate-950 dark:text-blue-400"
                                     asChild
                                 >
                                     <Link href="/register">
@@ -195,7 +195,7 @@ export default function About() {
                                 <Button
                                     size="lg"
                                     variant="outline"
-                                    className="h-14 rounded-full border-blue-400 bg-transparent px-8 text-lg font-semibold text-white hover:bg-blue-700 hover:text-white"
+                                    className="h-14 rounded-full border-blue-400 bg-transparent px-4 sm:px-8 text-lg font-semibold text-white hover:bg-blue-700 hover:text-white"
                                     asChild
                                 >
                                     <Link href="/guide">

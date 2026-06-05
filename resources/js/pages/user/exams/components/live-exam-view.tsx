@@ -186,12 +186,12 @@ export function LiveExamView({
                 {/* MAIN TWO-COLUMN SPLIT PANEL LAYOUT */}
                 <div className="flex flex-1 overflow-hidden">
                     {/* LEFT COLUMN: ACTIVE QUESTION CARD & OPTION SELECTORS */}
-                    <div className="flex flex-1 flex-col justify-between overflow-y-auto bg-background p-6 md:p-10">
+                    <div className="flex flex-1 flex-col justify-between overflow-y-auto bg-background p-4 sm:p-6 md:p-10">
                         <div className="mx-auto w-full max-w-3xl">
                             {activeQuestion ? (
-                                <div className="flex animate-in flex-col gap-6 duration-150 fade-in">
+                                <div className="flex animate-in flex-col gap-3 sm:gap-6 duration-150 fade-in">
                                     {/* Question stem container */}
-                                    <div className="shadow-3xs relative rounded-2xl border border-border bg-card p-6">
+                                    <div className="shadow-3xs relative rounded-2xl border border-border bg-card p-4 sm:p-6">
                                         <div className="mb-4 flex items-center justify-between">
                                             <span className="text-[10px] font-black tracking-wider text-blue-600 uppercase dark:text-blue-400">
                                                 Multiple Choice
@@ -308,7 +308,7 @@ export function LiveExamView({
                             {isFreeAttempt && currentIdx === 19 ? (
                                 <button
                                     onClick={() => setShowRegisterModal(true)}
-                                    className="shadow-3xs flex items-center gap-1.5 rounded-lg bg-emerald-600 px-6 py-2.5 text-xs font-bold text-white transition hover:bg-emerald-700 focus:outline-none"
+                                    className="shadow-3xs flex items-center gap-1.5 rounded-lg bg-emerald-600 px-4 sm:px-6 py-2.5 text-xs font-bold text-white transition hover:bg-emerald-700 focus:outline-none"
                                 >
                                     <CheckCircle2 className="size-4" />
                                     Finish Preview
@@ -326,7 +326,7 @@ export function LiveExamView({
                             ) : !isFreeAttempt ? (
                                 <button
                                     onClick={() => handleSubmitExam(false)}
-                                    className="flex items-center gap-1.5 rounded-lg bg-emerald-600 px-6 py-2.5 text-xs font-bold text-white shadow-xs transition hover:bg-emerald-700 focus:outline-none"
+                                    className="flex items-center gap-1.5 rounded-lg bg-emerald-600 px-4 sm:px-6 py-2.5 text-xs font-bold text-white shadow-xs transition hover:bg-emerald-700 focus:outline-none"
                                 >
                                     <CheckCircle2 className="size-4" />
                                     Submit Exam
@@ -379,7 +379,7 @@ export function LiveExamView({
                         onClick={() => setShowLockedModal(false)}
                     >
                         <div
-                            className="relative w-full max-w-2xl animate-in rounded-xl border border-slate-200 bg-white p-6 shadow-xl duration-200 zoom-in-95 dark:border-slate-800 dark:bg-slate-950"
+                            className="relative w-full max-w-2xl animate-in rounded-xl border border-slate-200 bg-white p-4 sm:p-6 shadow-xl duration-200 zoom-in-95 dark:border-slate-800 dark:bg-slate-950"
                             onClick={(e) => e.stopPropagation()}
                         >
                             <div className="mb-1 flex items-center gap-2">
@@ -420,7 +420,7 @@ export function LiveExamView({
                         onClick={() => setShowRegisterModal(false)}
                     >
                         <div
-                            className="relative w-full max-w-2xl animate-in rounded-xl border border-slate-200 bg-white p-6 shadow-xl duration-200 zoom-in-95 dark:border-slate-800 dark:bg-slate-950"
+                            className="relative w-full max-w-2xl animate-in rounded-xl border border-slate-200 bg-white p-4 sm:p-6 shadow-xl duration-200 zoom-in-95 dark:border-slate-800 dark:bg-slate-950"
                             onClick={(e) => e.stopPropagation()}
                         >
                             <div className="mb-1 flex items-center gap-2">

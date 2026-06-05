@@ -39,14 +39,14 @@ export function ModulesGrid({
                                 />
                                 {categoryName}
                             </h2>
-                            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+                            <div className="grid grid-cols-1 gap-3 sm:gap-6 md:grid-cols-2 lg:grid-cols-3">
                                 {groupMods.map((mod) => (
                                     <Link
                                         key={mod.id}
                                         href={`/learn/${mod.slug}`}
                                         className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 group block"
                                     >
-                                        <Card className="flex h-full flex-col justify-between overflow-hidden p-6 transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-xl hover:-translate-y-1 hover:shadow-primary/5">
+                                        <Card className="flex h-full flex-col justify-between overflow-hidden p-4 sm:p-6 transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-xl hover:-translate-y-1 hover:shadow-primary/5">
                                             <div>
                                                 {/* Badges row */}
                                                 <div className="flex flex-wrap items-center gap-2">

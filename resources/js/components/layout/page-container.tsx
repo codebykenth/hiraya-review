@@ -13,7 +13,7 @@ export function PageContainer({
     return (
         <div
             className={cn(
-                'flex h-full flex-1 flex-col gap-6 overflow-y-auto rounded-xl p-6',
+                'flex h-full flex-1 flex-col gap-3 sm:gap-6 overflow-y-auto rounded-xl p-4 sm:p-6',
                 className,
             )}
             {...props}

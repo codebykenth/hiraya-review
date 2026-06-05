@@ -63,7 +63,7 @@ export function ScorecardView({
                     <span className="inline-flex items-center gap-1 rounded-full bg-blue-50 px-2.5 py-0.5 text-xs font-bold text-blue-600 dark:bg-blue-950/30 dark:bg-blue-950/40 dark:text-blue-400">
                         <Award className="size-3" /> Review Panel
                     </span>
-                    <h1 className="mt-1 font-heading text-3xl font-black tracking-tight text-slate-900 sm:text-4xl md:text-3xl dark:text-white">
+                    <h1 className="mt-1 font-heading text-xl sm:text-3xl font-black tracking-tight text-slate-900 sm:text-4xl md:text-3xl dark:text-white">
                         {isDrillSession ? 'Drill Results' : 'Exam Results'}
                     </h1>
                     <p className="mt-0.5 text-sm leading-relaxed text-slate-500">

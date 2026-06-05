@@ -1,4 +1,4 @@
-﻿import { router } from '@inertiajs/react';
+import { router } from '@inertiajs/react';
 import { AlertCircle, RefreshCw } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
@@ -121,7 +121,7 @@ export function TrafficOverloadGuard() {
             {/* Final Overload Warning Modal (shown only after all retries fail) */}
             {isOpen && (
                 <div className="animate-fade-in fixed inset-0 z-[9999] flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-sm">
-                    <div className="relative w-full max-w-2xl animate-in overflow-hidden rounded-3xl border border-slate-200/80 bg-white p-6 shadow-2xl transition-all duration-200 zoom-in-95 fade-in dark:border-slate-800 dark:bg-slate-900">
+                    <div className="relative w-full max-w-2xl animate-in overflow-hidden rounded-3xl border border-slate-200/80 bg-white p-4 sm:p-6 shadow-2xl transition-all duration-200 zoom-in-95 fade-in dark:border-slate-800 dark:bg-slate-900">
                         {/* Decorative Background */}
                         <div className="pointer-events-none absolute -top-24 -right-24 h-48 w-48 rounded-full bg-amber-500/5 blur-3xl" />
 

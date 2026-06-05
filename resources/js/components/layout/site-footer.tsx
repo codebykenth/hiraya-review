@@ -18,7 +18,7 @@ export default function Footer() {
         <footer className="w-full border-t border-border bg-card text-card-foreground">
             <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
                 {/* Top Section */}
-                <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-12">
+                <div className="grid grid-cols-1 items-start gap-4 sm:gap-8 lg:grid-cols-12">
                     {/* Branding */}
                     <div className="flex flex-col gap-3 lg:col-span-4">
                         <Link

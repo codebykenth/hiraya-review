@@ -1,4 +1,4 @@
-﻿import { Head } from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
 import { Shield } from 'lucide-react';
 import SiteFooter from '@/components/layout/site-footer';
 import SiteHeader from '@/components/layout/site-header';
@@ -11,14 +11,14 @@ export default function Privacy() {
             <div className="flex min-h-screen flex-col bg-slate-50/30 dark:bg-slate-950/20">
                 <SiteHeader activeNav="" />
 
-                <main className="flex-1 px-6 py-12">
+                <main className="flex-1 px-4 sm:px-6 py-12">
                     <div className="mx-auto max-w-4xl">
                         <div className="mb-8 flex items-center gap-4">
                             <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary">
                                 <Shield className="h-6 w-6" />
                             </div>
                             <div>
-                                <h1 className="font-heading text-4xl font-black tracking-tight text-foreground sm:text-5xl md:text-4xl">
+                                <h1 className="font-heading text-2xl sm:text-4xl font-black tracking-tight text-foreground sm:text-5xl md:text-4xl">
                                     Privacy Policy
                                 </h1>
                                 <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
@@ -27,7 +27,7 @@ export default function Privacy() {
                             </div>
                         </div>
 
-                        <Card className="space-y-8 p-8 leading-relaxed md:p-10">
+                        <Card className="space-y-8 p-4 sm:p-6 lg:p-8 leading-relaxed md:p-10">
                             <section className="space-y-3">
                                 <h2 className="text-2xl font-black tracking-tight text-foreground sm:text-3xl">
                                     1. Introduction

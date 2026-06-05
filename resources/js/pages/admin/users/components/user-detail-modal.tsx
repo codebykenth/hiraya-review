@@ -253,7 +253,7 @@ export function UserDetailModal({
                         </svg>
                     </button>
 
-                    <div className="flex-1 overflow-y-auto p-6 pr-5">
+                    <div className="flex-1 overflow-y-auto p-4 sm:p-6 pr-5">
                         {/* Header */}
                         <div className="pr-6">
                             <h3 className="font-heading text-xl font-black tracking-tight text-slate-900 dark:text-white">
@@ -475,7 +475,7 @@ export function UserDetailModal({
                     </div>
 
                     {/* Footer Buttons */}
-                    <div className="flex shrink-0 justify-end gap-3 border-t border-slate-100 p-6 pt-4 dark:border-slate-900">
+                    <div className="flex shrink-0 justify-end gap-3 border-t border-slate-100 p-4 sm:p-6 pt-4 dark:border-slate-900">
                         <Button
                             variant="outline"
                             size="sm"

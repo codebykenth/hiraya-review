@@ -89,7 +89,7 @@ export default function AiReadinessCard({ aiAnalysis }: AiReadinessCardProps) {
 
     // Container style sharing across all states to guarantee consistent glassmorphism
     const containerClasses =
-        'relative overflow-hidden rounded-2xl border border-slate-200/80 bg-gradient-to-br from-blue-50/70 via-indigo-50/40 to-slate-50 p-6 text-slate-900 shadow-sm transition-all hover:shadow-xl hover:shadow-primary/5 hover:-translate-y-1 dark:border-slate-800 dark:from-slate-900 dark:via-slate-900/80 dark:to-indigo-950/20 dark:text-white dark:shadow-xl backdrop-blur-md';
+        'relative overflow-hidden rounded-2xl border border-slate-200/80 bg-gradient-to-br from-blue-50/70 via-indigo-50/40 to-slate-50 p-4 sm:p-6 text-slate-900 shadow-sm transition-all hover:shadow-xl hover:shadow-primary/5 hover:-translate-y-1 dark:border-slate-800 dark:from-slate-900 dark:via-slate-900/80 dark:to-indigo-950/20 dark:text-white dark:shadow-xl backdrop-blur-md';
 
     if (localStatus === 'failed') {
         return (
@@ -163,7 +163,7 @@ export default function AiReadinessCard({ aiAnalysis }: AiReadinessCardProps) {
                 {/* Background decorative glows */}
                 <div className="pointer-events-none absolute -top-24 -right-24 h-48 w-48 rounded-full bg-blue-500/5 blur-3xl dark:bg-blue-500/10" />
 
-                <div className="flex flex-col items-center justify-center gap-4 py-8 text-center">
+                <div className="flex flex-col items-center justify-center gap-4 py-4 sm:py-8 text-center">
                     <div className="relative flex items-center justify-center">
                         <div className="absolute size-16 animate-ping rounded-full border border-blue-200 dark:border-blue-500/20 dark:border-blue-900/50" />
                         <div className="flex size-14 items-center justify-center rounded-full border border-blue-200 bg-blue-50 text-blue-600 dark:border-blue-500/30 dark:border-blue-900/50 dark:bg-blue-500/10 dark:bg-blue-950/30 dark:text-blue-400">
@@ -271,7 +271,7 @@ export default function AiReadinessCard({ aiAnalysis }: AiReadinessCardProps) {
                     </div>
                 </div>
 
-                <div className="grid grid-cols-1 items-center gap-6 md:grid-cols-12">
+                <div className="grid grid-cols-1 items-center gap-3 sm:gap-6 md:grid-cols-12">
                     {/* Prob Meter: 3 cols */}
                     <div className="flex flex-col items-center justify-center text-center md:col-span-3">
                         <div className="relative flex size-28 items-center justify-center">

@@ -22,7 +22,7 @@ export function HubView({
     );
 
     return (
-        <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-3 sm:gap-6">
             <div className="mb-2 flex items-start gap-3">
                 <PageHeader
                     title="Practice Drill Hub"
@@ -54,7 +54,7 @@ export function HubView({
             </div>
 
             {activeCategories.length > 0 ? (
-                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                <div className="grid grid-cols-1 gap-3 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3">
                     {activeCategories.map((cat) => {
                         const meta = categoryMeta[cat.name] || {
                             icon: Brain,
@@ -77,7 +77,7 @@ export function HubView({
                             <Card
                                 key={cat.id}
                                 onClick={() => handleCategoryClick(cat.name)}
-                                className="group relative flex cursor-pointer flex-col justify-between overflow-hidden p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/5"
+                                className="group relative flex cursor-pointer flex-col justify-between overflow-hidden p-4 sm:p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/5"
                             >
                                 <div>
                                     <div className="flex items-start justify-between">

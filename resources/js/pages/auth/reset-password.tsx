@@ -1,4 +1,4 @@
-﻿import { Form, Head } from '@inertiajs/react';
+import { Form, Head } from '@inertiajs/react';
 import PasswordInput from '@/components/auth/password-input';
 import InputError from '@/components/shared/input-error';
 import { Button } from '@/components/ui/button';
@@ -24,7 +24,7 @@ export default function ResetPassword({ token, email, passwordRules }: Props) {
                 resetOnSuccess={['password', 'password_confirmation']}
             >
                 {({ processing, errors }) => (
-                    <div className="grid gap-6">
+                    <div className="grid gap-3 sm:gap-6">
                         <div className="grid gap-2">
                             <Label htmlFor="email">Email</Label>
                             <Input

@@ -1,4 +1,4 @@
-﻿import { Head, useForm } from '@inertiajs/react';
+import { Head, useForm } from '@inertiajs/react';
 import { Mail, MessageSquare, ShieldAlert, ArrowRight } from 'lucide-react';
 import { useState } from 'react';
 import SiteFooter from '@/components/layout/site-footer';
@@ -44,14 +44,14 @@ export default function Support() {
             <div className="flex min-h-screen flex-col bg-slate-50/30 dark:bg-slate-950/20">
                 <SiteHeader activeNav="" />
 
-                <main className="flex-1 px-6 py-12">
+                <main className="flex-1 px-4 sm:px-6 py-12">
                     <div className="mx-auto max-w-5xl">
                         <div className="mb-8 flex items-center gap-4">
                             <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary">
                                 <Mail className="h-6 w-6" />
                             </div>
                             <div>
-                                <h1 className="font-heading text-4xl font-black tracking-tight text-foreground sm:text-5xl md:text-4xl">
+                                <h1 className="font-heading text-2xl sm:text-4xl font-black tracking-tight text-foreground sm:text-5xl md:text-4xl">
                                     Contact Support
                                 </h1>
                                 <p className="mt-1.5 text-base leading-relaxed text-muted-foreground">
@@ -61,10 +61,10 @@ export default function Support() {
                             </div>
                         </div>
 
-                        <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+                        <div className="grid grid-cols-1 gap-4 sm:gap-8 lg:grid-cols-3">
                             {/* Left Side: Support Channels Info */}
                             <div className="space-y-6 lg:col-span-1">
-                                <Card className="space-y-4 p-6">
+                                <Card className="space-y-4 p-4 sm:p-6">
                                     <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600 dark:bg-emerald-950/30 dark:bg-emerald-950/40 dark:text-emerald-400">
                                         <MessageSquare className="h-5 w-5" />
                                     </div>
@@ -80,7 +80,7 @@ export default function Support() {
                                     </div>
                                 </Card>
 
-                                <Card className="space-y-4 p-6">
+                                <Card className="space-y-4 p-4 sm:p-6">
                                     <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-rose-50 text-rose-600 dark:bg-rose-950/30 dark:bg-rose-950/40 dark:text-rose-400">
                                         <ShieldAlert className="h-5 w-5" />
                                     </div>
@@ -101,7 +101,7 @@ export default function Support() {
 
                             {/* Right Side: Contact Form */}
                             <div className="lg:col-span-2">
-                                <Card className="p-8 md:p-10">
+                                <Card className="p-4 sm:p-6 lg:p-8 md:p-10">
                                     {submitted ? (
                                         <div className="flex flex-col items-center justify-center py-10 text-center">
                                             <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-emerald-50 text-emerald-600 dark:bg-emerald-950/30 dark:bg-emerald-950/40 dark:text-emerald-400">
@@ -142,7 +142,7 @@ export default function Support() {
                                                     </span>
                                                 </div>
                                             )}
-                                            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                                            <div className="grid grid-cols-1 gap-3 sm:gap-6 sm:grid-cols-2">
                                                 <div className="space-y-2">
                                                     <label
                                                         htmlFor="name"

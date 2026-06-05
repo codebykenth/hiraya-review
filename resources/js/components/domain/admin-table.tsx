@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { generatePaginationLinks } from '@/lib/utils';
@@ -161,7 +161,7 @@ export function AdminTable<T>({
                     <thead>
                         <tr className="border-b border-slate-100 bg-slate-50/50 text-[11px] font-bold tracking-wider text-slate-400 uppercase dark:border-slate-900 dark:bg-slate-900/40">
                             {getItemId && (
-                                <th className="w-12 px-6 py-4">
+                                <th className="w-12 px-4 sm:px-6 py-4">
                                     <Checkbox
                                         checked={
                                             data.length > 0 &&
@@ -199,7 +199,7 @@ export function AdminTable<T>({
                                     colSpan={
                                         columns.length + (getItemId ? 1 : 0)
                                     }
-                                    className="px-6 py-16 text-center"
+                                    className="px-4 sm:px-6 py-16 text-center"
                                 >
                                     <div className="flex flex-col items-center justify-center">
                                         <div className="shadow-3xs mb-4 flex size-14 items-center justify-center rounded-2xl border border-slate-100 bg-slate-50 text-slate-400 dark:border-slate-800 dark:bg-slate-900">
@@ -239,7 +239,7 @@ export function AdminTable<T>({
                                         className={`transition hover:bg-slate-50/40 dark:hover:bg-slate-900/10 ${isSelected ? 'bg-blue-50/30 dark:bg-blue-950/20' : ''}`}
                                     >
                                         {getItemId && id !== null && (
-                                            <td className="px-6 py-4.5">
+                                            <td className="px-4 sm:px-6 py-4.5">
                                                 <Checkbox
                                                     checked={isSelected}
                                                     onCheckedChange={(
@@ -272,7 +272,7 @@ export function AdminTable<T>({
 
             {/* Pagination Controls Footer */}
             {totalItems > 0 && (
-                <div className="flex flex-col items-center justify-between gap-3 border-t border-slate-100 bg-slate-50/20 px-6 py-4 sm:flex-row dark:border-slate-900/60 dark:bg-slate-900/10">
+                <div className="flex flex-col items-center justify-between gap-3 border-t border-slate-100 bg-slate-50/20 px-4 sm:px-6 py-4 sm:flex-row dark:border-slate-900/60 dark:bg-slate-900/10">
                     <span className="text-slate-555 text-xs font-bold dark:text-slate-400">
                         Showing{' '}
                         <strong className="text-slate-900 dark:text-white">

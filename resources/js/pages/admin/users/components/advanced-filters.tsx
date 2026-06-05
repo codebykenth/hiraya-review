@@ -112,7 +112,7 @@ export function AdvancedFilters({
                 aria-modal="true"
             >
                 {/* Header */}
-                <div className="flex shrink-0 items-center justify-between border-b border-slate-100 bg-slate-50/50 p-6 dark:border-slate-900 dark:bg-slate-900/10">
+                <div className="flex shrink-0 items-center justify-between border-b border-slate-100 bg-slate-50/50 p-4 sm:p-6 dark:border-slate-900 dark:bg-slate-900/10">
                     <div className="flex items-center gap-2">
                         <Filter className="size-5 text-slate-600 dark:text-slate-400" />
                         <h3 className="font-heading text-xl font-black tracking-tight text-slate-900 dark:text-white">
@@ -130,7 +130,7 @@ export function AdvancedFilters({
                 </div>
 
                 {/* Content */}
-                <div className="flex-1 space-y-6 overflow-y-auto p-6 pr-5">
+                <div className="flex-1 space-y-6 overflow-y-auto p-4 sm:p-6 pr-5">
                     {/* Account Status Filter */}
                     <div>
                         <label className="text-xs font-bold tracking-wide text-slate-700 uppercase dark:text-slate-300">
@@ -347,7 +347,7 @@ export function AdvancedFilters({
                 </div>
 
                 {/* Footer Actions */}
-                <div className="flex shrink-0 justify-between gap-3 border-t border-slate-100 bg-slate-50/50 p-6 dark:border-slate-900 dark:bg-slate-900/10">
+                <div className="flex shrink-0 justify-between gap-3 border-t border-slate-100 bg-slate-50/50 p-4 sm:p-6 dark:border-slate-900 dark:bg-slate-900/10">
                     <Button
                         variant="outline"
                         size="sm"

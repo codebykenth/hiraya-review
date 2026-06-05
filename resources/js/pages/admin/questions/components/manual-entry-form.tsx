@@ -41,11 +41,11 @@ export function ManualEntryForm({
     return (
         <form
             onSubmit={handleManualSubmit}
-            className="grid grid-cols-1 items-start gap-6 lg:grid-cols-12"
+            className="grid grid-cols-1 items-start gap-3 sm:gap-6 lg:grid-cols-12"
         >
             {/* CONTENT EDITORS (8/12 cols) */}
-            <div className="flex flex-col gap-6 lg:col-span-8">
-                <div className="rounded-2xl border border-border bg-card p-6 shadow-xs">
+            <div className="flex flex-col gap-3 sm:gap-6 lg:col-span-8">
+                <div className="rounded-2xl border border-border bg-card p-4 sm:p-6 shadow-xs">
                     <h2 className="mb-4 inline-flex items-center gap-2 border-b border-border pb-3 text-base font-bold text-foreground">
                         <FileText className="size-4.5 text-emerald-600 dark:text-emerald-400" />
                         Question Content
@@ -108,7 +108,7 @@ export function ManualEntryForm({
                 </div>
 
                 {/* Answer Options Card */}
-                <div className="rounded-2xl border border-border bg-card p-6 shadow-xs">
+                <div className="rounded-2xl border border-border bg-card p-4 sm:p-6 shadow-xs">
                     <div className="mb-4 flex items-center justify-between border-b border-border pb-3">
                         <h2 className="inline-flex items-center gap-2 text-base font-bold text-foreground">
                             <CheckCircle2 className="size-4.5 text-emerald-600 dark:text-emerald-400" />
@@ -183,7 +183,7 @@ export function ManualEntryForm({
 
                 {/* Explanation Card */}
                 {!isDemographic && (
-                    <div className="rounded-2xl border border-border bg-card p-6 shadow-xs">
+                    <div className="rounded-2xl border border-border bg-card p-4 sm:p-6 shadow-xs">
                         <h2 className="mb-4 border-b border-border pb-3 text-base font-bold text-foreground">
                             Explanation & Rationale
                         </h2>
@@ -220,8 +220,8 @@ export function ManualEntryForm({
             </div>
 
             {/* METADATA, ATTACHMENT & SUBMISSIONS (4/12 cols) */}
-            <div className="flex flex-col gap-6 lg:col-span-4">
-                <div className="rounded-2xl border border-border bg-card p-6 shadow-xs">
+            <div className="flex flex-col gap-3 sm:gap-6 lg:col-span-4">
+                <div className="rounded-2xl border border-border bg-card p-4 sm:p-6 shadow-xs">
                     <h2 className="mb-4 border-b border-slate-100 pb-3 text-base font-bold">
                         Metadata
                     </h2>

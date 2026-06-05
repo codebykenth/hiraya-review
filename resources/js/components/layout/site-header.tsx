@@ -120,7 +120,7 @@ export default function SiteHeader({
 
                     {!auth.user && (
                         <div className="hidden xl:block">
-                            <ul className="flex gap-6 font-medium">
+                            <ul className="flex gap-3 sm:gap-6 font-medium">
                                 {navLinks.map((link) => {
                                     const isLinkActive =
                                         activeNav === link.id ||
@@ -216,7 +216,7 @@ export default function SiteHeader({
                             : 'pointer-events-none -translate-y-10 opacity-0'
                     }`}
                 >
-                    <div className="container mx-auto flex flex-col gap-6 px-6 py-6">
+                    <div className="container mx-auto flex flex-col gap-3 sm:gap-6 px-4 sm:px-6 py-4 sm:py-6">
                         {!auth.user && (
                             <>
                                 <ul className="flex flex-col gap-4 text-base font-semibold">
@@ -276,7 +276,7 @@ export default function SiteHeader({
                                 <>
                                     <Button
                                         variant="ghost"
-                                        className="w-full rounded-xl py-6 text-base font-bold text-primary"
+                                        className="w-full rounded-xl py-4 sm:py-6 text-base font-bold text-primary"
                                         asChild
                                     >
                                         <Link
@@ -287,7 +287,7 @@ export default function SiteHeader({
                                         </Link>
                                     </Button>
                                     <Button
-                                        className="w-full rounded-xl py-6 text-base font-bold"
+                                        className="w-full rounded-xl py-4 sm:py-6 text-base font-bold"
                                         asChild
                                     >
                                         <Link

@@ -38,7 +38,7 @@ export default function Login({
             <Form
                 {...store.form()}
                 resetOnSuccess={['password']}
-                className="flex flex-col gap-6"
+                className="flex flex-col gap-3 sm:gap-6"
                 transform={(data) => ({
                     ...data,
                     cf_turnstile_response: turnstileToken,
@@ -46,7 +46,7 @@ export default function Login({
             >
                 {({ processing, errors }) => (
                     <>
-                        <div className="grid gap-6">
+                        <div className="grid gap-3 sm:gap-6">
                             {/* Email field */}
                             <div className="grid gap-2">
                                 <Label htmlFor="email">Email</Label>

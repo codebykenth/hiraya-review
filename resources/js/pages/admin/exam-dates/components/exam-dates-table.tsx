@@ -1,4 +1,4 @@
-﻿import { CheckCircle, XCircle, Edit2, Trash2 } from 'lucide-react';
+import { CheckCircle, XCircle, Edit2, Trash2 } from 'lucide-react';
 import {
     Tooltip,
     TooltipContent,
@@ -39,7 +39,7 @@ export function ExamDatesTable({
                         <tr>
                             <td
                                 colSpan={4}
-                                className="px-4 py-8 text-center text-muted-foreground"
+                                className="px-4 py-4 sm:py-8 text-center text-muted-foreground"
                             >
                                 No exam dates configured yet.
                             </td>

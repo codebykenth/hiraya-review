@@ -188,7 +188,7 @@ export default function Welcome() {
                     <Section id="home" className="py-2 md:py-8 lg:py-10">
                         <div className="grid grid-cols-1 items-center gap-12 md:grid-cols-2">
                             {/* Left Column */}
-                            <div className="flex flex-col items-start gap-6">
+                            <div className="flex flex-col items-start gap-3 sm:gap-6">
                                 <Badge className="inline-flex h-auto max-w-full items-start rounded-2xl border border-primary bg-primary/15 px-4 py-2 text-primary-foreground transition-colors hover:bg-primary/30 sm:items-center sm:rounded-full sm:py-1.5">
                                     <Sparkles className="mt-0.5 mr-2 h-4 w-4 shrink-0 text-primary sm:mt-0" />
                                     <span className="text-left font-bold whitespace-normal text-primary sm:text-center">
@@ -197,7 +197,7 @@ export default function Welcome() {
                                     </span>
                                 </Badge>
 
-                                <h1 className="text-4xl leading-tight font-bold text-foreground md:text-5xl lg:text-6xl">
+                                <h1 className="text-2xl sm:text-4xl leading-tight font-bold text-foreground md:text-5xl lg:text-6xl">
                                     Master the Civil Service Exam with{' '}
                                     <span className="text-primary">
                                         Confidence
@@ -332,37 +332,37 @@ export default function Welcome() {
                             </div>
                         </div>
                     </Section>
-                    <div className="container mx-auto border-y border-gray-400 px-6 py-10">
-                        <div className="flex flex-col items-center justify-evenly gap-10 md:flex-row md:gap-0">
+                    <div className="container mx-auto border-y border-gray-400 px-4 sm:px-6 py-10">
+                        <div className="flex flex-col items-center justify-evenly gap-5 sm:gap-10 md:flex-row md:gap-0">
                             <div className="flex flex-1 flex-col items-center">
-                                <p className="text-4xl font-black text-primary">
+                                <p className="text-2xl sm:text-4xl font-black text-primary">
                                     500+
                                 </p>
                                 <p className="mt-1 text-sm leading-relaxed font-bold tracking-wider text-muted-foreground uppercase">
                                     Questions
                                 </p>
                             </div>
-                            <div className="hidden h-12 w-[1px] bg-slate-300/60 md:block dark:bg-slate-800" />
+                            <div className="hidden h-12 w-full max-w-[1px] bg-slate-300/60 md:block dark:bg-slate-800" />
                             <div className="flex flex-1 flex-col items-center">
-                                <p className="text-4xl font-black text-primary">
+                                <p className="text-2xl sm:text-4xl font-black text-primary">
                                     2
                                 </p>
                                 <p className="mt-1 text-sm leading-relaxed font-bold tracking-wider text-muted-foreground uppercase">
                                     Study Tracks
                                 </p>
                             </div>
-                            <div className="hidden h-12 w-[1px] bg-slate-300/60 md:block dark:bg-slate-800" />
+                            <div className="hidden h-12 w-full max-w-[1px] bg-slate-300/60 md:block dark:bg-slate-800" />
                             <div className="flex flex-1 flex-col items-center">
-                                <p className="text-4xl font-black text-primary">
+                                <p className="text-2xl sm:text-4xl font-black text-primary">
                                     6
                                 </p>
                                 <p className="mt-1 text-sm leading-relaxed font-bold tracking-wider text-muted-foreground uppercase">
                                     Categories
                                 </p>
                             </div>
-                            <div className="hidden h-12 w-[1px] bg-slate-300/60 md:block dark:bg-slate-800" />
+                            <div className="hidden h-12 w-full max-w-[1px] bg-slate-300/60 md:block dark:bg-slate-800" />
                             <div className="flex flex-1 flex-col items-center">
-                                <p className="text-4xl font-black text-primary">
+                                <p className="text-2xl sm:text-4xl font-black text-primary">
                                     Free
                                 </p>
                                 <p className="mt-1 text-sm leading-relaxed font-bold tracking-wider text-muted-foreground uppercase">
@@ -379,7 +379,7 @@ export default function Welcome() {
                             className="mb-10"
                         />
 
-                        <div className="mt-6 flex w-full flex-col gap-6">
+                        <div className="mt-6 flex w-full flex-col gap-3 sm:gap-6">
                             {/* Row 1: Mock Exams & Learn */}
                             <FeatureGrid
                                 reversed={false}
@@ -471,12 +471,12 @@ export default function Welcome() {
                             {/* Horizontal connecting line behind cards - z-0 puts it behind cards but in front of section background */}
                             <div className="absolute top-[170px] right-[16%] left-[16%] z-0 hidden h-[2.5px] bg-primary md:block" />
 
-                            <div className="relative z-10 grid w-full grid-cols-1 gap-8 md:grid-cols-3">
+                            <div className="relative z-10 grid w-full grid-cols-1 gap-4 sm:gap-8 md:grid-cols-3">
                                 {/* Step 1 */}
                                 <Card
                                     onMouseEnter={() => setHoveredStep(1)}
                                     onMouseLeave={() => setHoveredStep(null)}
-                                    className={`relative flex flex-col items-center overflow-hidden rounded-xl border border-l-4 border-slate-200/80 bg-card p-8 text-center shadow-sm transition-all duration-300 ${
+                                    className={`relative flex flex-col items-center overflow-hidden rounded-xl border border-l-4 border-slate-200/80 bg-card p-4 sm:p-6 lg:p-8 text-center shadow-sm transition-all duration-300 ${
                                         hoveredStep === 1
                                             ? 'border-l-primary'
                                             : 'border-l-primary'
@@ -505,7 +505,7 @@ export default function Welcome() {
                                 <Card
                                     onMouseEnter={() => setHoveredStep(2)}
                                     onMouseLeave={() => setHoveredStep(null)}
-                                    className={`relative flex flex-col items-center overflow-hidden rounded-xl border border-l-4 border-slate-200/80 bg-card p-8 text-center shadow-sm transition-all duration-300 ${
+                                    className={`relative flex flex-col items-center overflow-hidden rounded-xl border border-l-4 border-slate-200/80 bg-card p-4 sm:p-6 lg:p-8 text-center shadow-sm transition-all duration-300 ${
                                         hoveredStep === 2
                                             ? 'border-l-primary'
                                             : 'border-l-primary'
@@ -533,7 +533,7 @@ export default function Welcome() {
                                 <Card
                                     onMouseEnter={() => setHoveredStep(3)}
                                     onMouseLeave={() => setHoveredStep(null)}
-                                    className={`relative flex flex-col items-center overflow-hidden rounded-xl border border-l-4 border-slate-200/80 bg-card p-8 text-center shadow-sm transition-all duration-300 ${
+                                    className={`relative flex flex-col items-center overflow-hidden rounded-xl border border-l-4 border-slate-200/80 bg-card p-4 sm:p-6 lg:p-8 text-center shadow-sm transition-all duration-300 ${
                                         hoveredStep === 3
                                             ? 'border-l-primary'
                                             : 'border-l-primary'
@@ -596,7 +596,7 @@ export default function Welcome() {
                                                     isOpen ? null : index,
                                                 )
                                             }
-                                            className="flex w-full items-center justify-between gap-4 px-6 py-5 text-left font-bold text-slate-900 transition-colors hover:text-primary dark:text-white"
+                                            className="flex w-full items-center justify-between gap-4 px-4 sm:px-6 py-5 text-left font-bold text-slate-900 transition-colors hover:text-primary dark:text-white"
                                         >
                                             <span className="text-base font-bold tracking-tight md:text-[17px]">
                                                 {faq.question}
@@ -616,7 +616,7 @@ export default function Welcome() {
                                                     : 'max-h-0'
                                             } overflow-hidden`}
                                         >
-                                            <div className="px-6 py-5 text-sm leading-relaxed font-normal text-slate-600 dark:text-slate-400">
+                                            <div className="px-4 sm:px-6 py-5 text-sm leading-relaxed font-normal text-slate-600 dark:text-slate-400">
                                                 {faq.answer}
                                             </div>
                                         </div>

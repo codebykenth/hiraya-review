@@ -145,7 +145,7 @@ export function SupportWidget() {
                             features.
                         </DialogDescription>
                     </DialogHeader>
-                    <div className="grid gap-6 py-4">
+                    <div className="grid gap-3 sm:gap-6 py-4">
                         <div className="grid grid-cols-3 gap-2 sm:gap-4">
                             <div className="flex flex-col items-center gap-1 sm:gap-2">
                                 <div className="text-center text-xs leading-tight font-semibold sm:text-sm">

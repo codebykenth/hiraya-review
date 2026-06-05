@@ -1,4 +1,4 @@
-﻿import { Head } from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
 import {
     ChevronLeft,
     ChevronRight,
@@ -75,7 +75,7 @@ export function ReviewExamView({
             <Head title={`Answer Review: ${details.title}`} />
             <div className="fixed inset-0 z-50 flex animate-in flex-col bg-background duration-200 fade-in">
                 {/* TOP NAVBAR HEADER */}
-                <div className="shadow-3xs flex h-16 shrink-0 items-center justify-between border-b border-border bg-card px-6">
+                <div className="shadow-3xs flex h-16 shrink-0 items-center justify-between border-b border-border bg-card px-4 sm:px-6">
                     <div className="flex items-center gap-3">
                         <button
                             onClick={() => setReviewScreenActive(false)}
@@ -99,12 +99,12 @@ export function ReviewExamView({
                 {/* MAIN TWO-COLUMN SPLIT PANEL LAYOUT */}
                 <div className="flex flex-1 overflow-hidden">
                     {/* LEFT COLUMN: ACTIVE QUESTION CARD & OPTION SELECTORS */}
-                    <div className="flex flex-1 flex-col justify-between overflow-y-auto bg-background p-6 md:p-10">
+                    <div className="flex flex-1 flex-col justify-between overflow-y-auto bg-background p-4 sm:p-6 md:p-10">
                         <div className="mx-auto w-full max-w-3xl">
                             {currentQuestion ? (
-                                <div className="flex animate-in flex-col gap-6 duration-150 fade-in">
+                                <div className="flex animate-in flex-col gap-3 sm:gap-6 duration-150 fade-in">
                                     {/* Question stem container */}
-                                    <div className="shadow-3xs relative rounded-2xl border border-border bg-card p-6">
+                                    <div className="shadow-3xs relative rounded-2xl border border-border bg-card p-4 sm:p-6">
                                         <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
                                             <div className="flex flex-wrap items-center gap-2">
                                                 <span className="dark:bg-blue-950/30/50 rounded-md bg-blue-50 px-2 py-0.5 text-[9px] font-extrabold text-blue-600 dark:bg-blue-950/20 dark:text-blue-400">

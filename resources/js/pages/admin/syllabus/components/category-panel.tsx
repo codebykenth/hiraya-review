@@ -32,7 +32,7 @@ export function CategoryPanel({
     onDelete,
 }: CategoryPanelProps) {
     return (
-        <div className="flex w-1/2 flex-col overflow-y-auto border-r border-border p-6">
+        <div className="flex w-1/2 flex-col overflow-y-auto border-r border-border p-4 sm:p-6">
             <h3 className="mb-3.5 text-xs font-bold tracking-wider text-muted-foreground uppercase">
                 Categories
             </h3>

@@ -65,7 +65,7 @@ export default function AnalyticsIndex({ stats, aiAnalysis }: AnalyticsProps) {
 
             {/* Performance Metrics Card Grid Layout */}
             <MetricsGrid activeStats={activeStats} />
-            <div className="mt-6 flex flex-col gap-6">
+            <div className="mt-6 flex flex-col gap-3 sm:gap-6">
                 {/* Score Trends & Category breakdown container layout */}
                 {/* Row 1: Score History (Full Width) */}
                 <ScoreHistoryChart
@@ -74,13 +74,13 @@ export default function AnalyticsIndex({ stats, aiAnalysis }: AnalyticsProps) {
                 />
 
                 {/* Row 2: Subject Mastery + Question Volume */}
-                <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                <div className="grid grid-cols-1 gap-3 sm:gap-6 md:grid-cols-2">
                     <SubjectMasteryChart categories={categories} />
                     <QuestionVolumeChart categories={categories} />
                 </div>
 
                 {/* Row 3: Radar + Pacing Trend */}
-                <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                <div className="grid grid-cols-1 gap-3 sm:gap-6 md:grid-cols-2">
                     <SubcategoryRadarChart categories={categories} />
                     <PacingTrendChart data={activeStats.pacingTrend || []} />
                 </div>

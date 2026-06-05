@@ -73,7 +73,7 @@ export default function QuestionPalettePanel({
     const content = (
         <>
             {isMobile && (
-                <div className="flex h-16 shrink-0 items-center justify-between border-b border-border bg-card px-6">
+                <div className="flex h-16 shrink-0 items-center justify-between border-b border-border bg-card px-4 sm:px-6">
                     <span className="font-heading text-sm font-bold text-foreground">
                         Question Palette
                     </span>

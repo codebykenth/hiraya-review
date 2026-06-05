@@ -1,4 +1,4 @@
-﻿import { Head, usePage } from '@inertiajs/react';
+import { Head, usePage } from '@inertiajs/react';
 import { ReviewerGuideTabs } from '@/components/domain/reviewer-guide-tabs';
 import { PageHeader } from '@/components/layout/page-header';
 import SiteFooter from '@/components/layout/site-footer';
@@ -50,7 +50,7 @@ export default function Guide() {
                         content="Discover the best study strategies, time-management tips, and subject coverage breakdowns for the Professional and Subprofessional Civil Service Examinations."
                     />
                 </Head>
-                <div className="min-h-screen bg-slate-50/30 px-6 py-6 dark:bg-slate-900/20">
+                <div className="min-h-screen bg-slate-50/30 px-4 sm:px-6 py-4 sm:py-6 dark:bg-slate-900/20">
                     {content}
                 </div>
             </AppLayout>
@@ -76,7 +76,7 @@ export default function Guide() {
             </Head>
             <div className="flex min-h-screen flex-col bg-slate-50/30 dark:bg-slate-900/20">
                 <SiteHeader activeNav="guide" />
-                <main className="flex-1 px-6 py-12">{content}</main>
+                <main className="flex-1 px-4 sm:px-6 py-12">{content}</main>
                 <SiteFooter />
             </div>
         </>

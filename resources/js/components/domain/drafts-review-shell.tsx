@@ -405,7 +405,7 @@ export function DraftsReviewShell<T extends BaseDraftItem>({
             {/* 3. DRAFT STREAM WORKSPACE */}
             <div
                 ref={tableRef}
-                className="mt-6 flex scroll-m-24 flex-col gap-6"
+                className="mt-6 flex scroll-m-24 flex-col gap-3 sm:gap-6"
             >
                 {items.length === 0 ? (
                     /* COMPLETELY EMPTY SYSTEM-WIDE DRAFTS STATE */
@@ -455,14 +455,14 @@ export function DraftsReviewShell<T extends BaseDraftItem>({
                     </div>
                 ) : (
                     /* LIST OF DRAFTS WITH PAGINATION */
-                    <div className="flex flex-col gap-6">
-                        <div className="flex flex-col gap-6">
+                    <div className="flex flex-col gap-3 sm:gap-6">
+                        <div className="flex flex-col gap-3 sm:gap-6">
                             {paginatedDrafts.map((item) => renderItem(item))}
                         </div>
 
                         {/* Pagination bar */}
                         {filteredDrafts.length > 0 && (
-                            <div className="mt-4 flex flex-col items-center justify-between gap-3 rounded-b-xl border-t border-border bg-muted px-6 py-4 sm:flex-row">
+                            <div className="mt-4 flex flex-col items-center justify-between gap-3 rounded-b-xl border-t border-border bg-muted px-4 sm:px-6 py-4 sm:flex-row">
                                 <span className="text-xs font-bold text-muted-foreground">
                                     Showing{' '}
                                     <strong className="text-foreground">

@@ -1,4 +1,4 @@
-﻿import { Users, Shield, UserPlus, CheckCircle } from 'lucide-react';
+import { Users, Shield, UserPlus, CheckCircle } from 'lucide-react';
 
 import type { StatsSummary } from '@/pages/admin/users/user';
 import { StatsCard } from '../../dashboard/components/stats-card';
@@ -16,7 +16,7 @@ export function UsersStatsGrid({ stats }: UsersStatsGridProps) {
             : 0;
 
     return (
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-3 sm:gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {/* Total Users */}
             <StatsCard
                 label="Total Users"

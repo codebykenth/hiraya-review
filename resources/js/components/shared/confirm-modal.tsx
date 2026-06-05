@@ -60,7 +60,7 @@ export function ConfirmModal({
             onClick={onClose}
         >
             <div
-                className="relative w-full max-w-2xl animate-in rounded-xl border border-slate-200 bg-white p-6 shadow-xl duration-205 zoom-in-95 dark:border-slate-800 dark:bg-slate-950"
+                className="relative w-full max-w-2xl animate-in rounded-xl border border-slate-200 bg-white p-4 sm:p-6 shadow-xl duration-205 zoom-in-95 dark:border-slate-800 dark:bg-slate-950"
                 role="dialog"
                 aria-modal="true"
                 onClick={(e) => e.stopPropagation()}

@@ -59,7 +59,7 @@ export function ConfigView({
     const CategoryIcon = meta.icon;
 
     return (
-        <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-3 sm:gap-6">
             {/* Back Link */}
             <button
                 onClick={() => {
@@ -106,7 +106,7 @@ export function ConfigView({
             </div>
 
             {/* Config Split Grid */}
-            <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+            <div className="grid grid-cols-1 gap-3 sm:gap-6 lg:grid-cols-3">
                 {/* Left Params Pane */}
                 <div className="flex flex-col gap-5 lg:col-span-2">
                     {/* 1. Subcategory Selector */}
@@ -262,7 +262,7 @@ export function ConfigView({
                         <span className="mb-3.5 block text-[10px] font-extrabold tracking-wider text-muted-foreground uppercase">
                             ðŸŒ Language
                         </span>
-                        <div className="flex flex-wrap gap-6">
+                        <div className="flex flex-wrap gap-3 sm:gap-6">
                             {(hasFilipinoQuestions
                                 ? ['English', 'Filipino', 'Both']
                                 : ['English']
@@ -375,7 +375,7 @@ export function ConfigView({
 
                 {/* Right Summary Pane (Drill Summary Card) */}
                 <div>
-                    <Card className="flex h-fit flex-col justify-between p-6">
+                    <Card className="flex h-fit flex-col justify-between p-4 sm:p-6">
                         <div>
                             <div className="flex items-center justify-between border-b border-border pb-4">
                                 <span className="font-heading text-base font-bold text-foreground">

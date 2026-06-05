@@ -1,4 +1,4 @@
-﻿import { ZoomIn } from 'lucide-react';
+import { ZoomIn } from 'lucide-react';
 import React from 'react';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { parseLatexString } from '@/lib/latex-parser';
@@ -838,7 +838,7 @@ export const renderFormattedText = (
                                                 </DialogTrigger>
                                                 <DialogContent className="max-w-5xl border-none bg-transparent p-0 shadow-none sm:max-w-[90vw] md:max-w-5xl lg:max-w-6xl">
                                                     <div
-                                                        className="flex w-full justify-center rounded-2xl bg-white p-8 dark:bg-slate-900"
+                                                        className="flex w-full justify-center rounded-2xl bg-white p-4 sm:p-6 lg:p-8 dark:bg-slate-900"
                                                         dangerouslySetInnerHTML={{
                                                             __html: sanitizeSvg(
                                                                 frame.svg.replace(
@@ -891,7 +891,7 @@ export const renderFormattedText = (
                                 </DialogTrigger>
                                 <DialogContent className="max-w-5xl border-none bg-transparent p-0 shadow-none sm:max-w-[90vw] md:max-w-5xl lg:max-w-6xl">
                                     <div
-                                        className="flex w-full justify-center rounded-2xl bg-white p-8 dark:bg-slate-900"
+                                        className="flex w-full justify-center rounded-2xl bg-white p-4 sm:p-6 lg:p-8 dark:bg-slate-900"
                                         dangerouslySetInnerHTML={{
                                             __html: sanitizeSvg(
                                                 block.content.replace(
@@ -967,7 +967,7 @@ export const renderFormattedText = (
                                 </DialogTrigger>
                                 <DialogContent className="max-w-5xl border-none bg-transparent p-0 shadow-none sm:max-w-[90vw] md:max-w-5xl lg:max-w-6xl">
                                     <div
-                                        className="flex w-full justify-center rounded-2xl bg-white p-8 dark:bg-slate-900"
+                                        className="flex w-full justify-center rounded-2xl bg-white p-4 sm:p-6 lg:p-8 dark:bg-slate-900"
                                         dangerouslySetInnerHTML={{
                                             __html: sanitizeSvg(
                                                 svgPart.replace(
@@ -1002,7 +1002,7 @@ export const renderFormattedText = (
                             </DialogTrigger>
                             <DialogContent className="max-w-5xl border-none bg-transparent p-0 shadow-none sm:max-w-[90vw] md:max-w-5xl lg:max-w-6xl">
                                 <div
-                                    className="flex w-full justify-center rounded-2xl bg-white p-8 dark:bg-slate-900"
+                                    className="flex w-full justify-center rounded-2xl bg-white p-4 sm:p-6 lg:p-8 dark:bg-slate-900"
                                     dangerouslySetInnerHTML={{
                                         __html: sanitizeSvg(
                                             svgPart.replace(

@@ -30,7 +30,7 @@ export function SubcategoryPanel({
     onDelete,
 }: SubcategoryPanelProps) {
     return (
-        <div className="flex w-1/2 flex-col overflow-y-auto bg-muted/20 p-6">
+        <div className="flex w-1/2 flex-col overflow-y-auto bg-muted/20 p-4 sm:p-6">
             <h3 className="mb-3.5 text-xs font-bold tracking-wider text-muted-foreground uppercase">
                 Subcategories of "{activeCategory?.name || 'Select a Category'}"
             </h3>

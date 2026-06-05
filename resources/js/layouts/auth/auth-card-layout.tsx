@@ -17,7 +17,7 @@ export default function AuthCardLayout({
             <SiteHeader />
 
             {/* Main content area */}
-            <main className="relative flex w-full flex-1 flex-col items-center justify-center overflow-hidden p-6 md:p-10">
+            <main className="relative flex w-full flex-1 flex-col items-center justify-center overflow-hidden p-4 sm:p-6 md:p-10">
                 {/* Ambient glows */}
                 <div className="pointer-events-none absolute top-1/4 left-1/4 h-96 w-96 -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/10 blur-[120px]" />
                 <div className="pointer-events-none absolute right-1/4 bottom-1/4 h-96 w-96 translate-x-1/2 translate-y-1/2 rounded-full bg-emerald-500/5 blur-[120px]" />
@@ -35,7 +35,7 @@ export default function AuthCardLayout({
                                 <AppLogoIcon className="transition-transform group-hover:scale-110 size-10 object-contain" />
                             </div>
 
-                            <span className="font-heading text-3xl font-black tracking-tight text-slate-900 sm:text-4xl dark:text-white">
+                            <span className="font-heading text-xl sm:text-3xl font-black tracking-tight text-slate-900 sm:text-4xl dark:text-white">
                                 <BrandName />
                             </span>
 

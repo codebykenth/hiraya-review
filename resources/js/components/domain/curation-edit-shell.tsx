@@ -54,7 +54,7 @@ export function CurationEditShell({
             <div className="max-w-4xl">
                 <form
                     onSubmit={onSaveSubmit}
-                    className="flex flex-col gap-6 rounded-2xl border border-border bg-card p-6 shadow-sm"
+                    className="flex flex-col gap-3 sm:gap-6 rounded-2xl border border-border bg-card p-4 sm:p-6 shadow-sm"
                 >
                     <div className="flex items-center justify-between border-b border-border pb-3.5">
                         <span className="flex items-center gap-1.5 text-xs font-black text-foreground uppercase">

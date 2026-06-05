@@ -91,7 +91,7 @@ export default function LearnShow({ module, recommended }: LearnShowProps) {
                     Back to Study Hub
                 </Link>
 
-                <div className="mx-auto grid w-full max-w-7xl grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_19rem]">
+                <div className="mx-auto grid w-full max-w-7xl grid-cols-1 gap-3 sm:gap-6 lg:grid-cols-[minmax(0,1fr)_19rem]">
                     <div className="min-w-0">
                         <article className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 animate-fade-in rounded-xl border border-border bg-card p-5 shadow-sm md:p-9">
                             <div className="flex flex-wrap items-center gap-2 border-b border-border pb-5">
@@ -109,7 +109,7 @@ export default function LearnShow({ module, recommended }: LearnShowProps) {
                                 </span>
                             </div>
 
-                            <h1 className="mt-6 font-heading text-3xl leading-tight font-black text-foreground md:text-4xl">
+                            <h1 className="mt-6 font-heading text-xl sm:text-3xl leading-tight font-black text-foreground md:text-4xl">
                                 {module.title}
                             </h1>
 
@@ -177,8 +177,8 @@ export default function LearnShow({ module, recommended }: LearnShowProps) {
                                 )}
 
                                 {!isLoggedIn && (
-                                    <div className="absolute inset-x-0 bottom-0 z-10 flex flex-col items-center justify-center bg-gradient-to-t from-white/95 via-white/90 to-transparent p-6 pt-32 text-center dark:from-slate-950/95 dark:via-slate-950/90">
-                                        <div className="max-w-2xl rounded-2xl border border-primary/20 bg-background/80 p-8 shadow-xl backdrop-blur-md">
+                                    <div className="absolute inset-x-0 bottom-0 z-10 flex flex-col items-center justify-center bg-gradient-to-t from-white/95 via-white/90 to-transparent p-4 sm:p-6 pt-32 text-center dark:from-slate-950/95 dark:via-slate-950/90">
+                                        <div className="max-w-2xl rounded-2xl border border-primary/20 bg-background/80 p-4 sm:p-6 lg:p-8 shadow-xl backdrop-blur-md">
                                             <h3 className="font-heading text-xl font-black text-foreground">
                                                 Unlock Full Lesson for Free
                                             </h3>
@@ -214,7 +214,7 @@ export default function LearnShow({ module, recommended }: LearnShowProps) {
                         </article>
                     </div>
 
-                    <aside className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 flex min-w-0 flex-col gap-6">
+                    <aside className="group focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none transition-all duration-300 active:scale-95 flex min-w-0 flex-col gap-3 sm:gap-6">
                         <Card className="p-5 shadow-xs">
                             <div className="flex items-center gap-2 border-b border-border pb-3">
                                 <BookMarked className="size-4 text-blue-600 dark:text-blue-400" />

@@ -1,4 +1,4 @@
-﻿import { TrendingUp } from 'lucide-react';
+import { TrendingUp } from 'lucide-react';
 import React from 'react';
 import {
     AreaChart,
@@ -36,7 +36,7 @@ export function ScoreHistoryChart({
         <Card className="relative mb-6 w-full overflow-hidden border border-slate-200/80 bg-slate-50/50 p-5 dark:border-slate-800 dark:bg-slate-950/40">
             {isDemoMode && (
                 <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/60 backdrop-blur-[2px] dark:bg-slate-950/60">
-                    <div className="rounded-2xl border border-slate-200 bg-white/90 px-6 py-4 text-center shadow-lg dark:border-slate-700 dark:bg-slate-800/90">
+                    <div className="rounded-2xl border border-slate-200 bg-white/90 px-4 sm:px-6 py-4 text-center shadow-lg dark:border-slate-700 dark:bg-slate-800/90">
                         <h4 className="text-lg font-black text-slate-900 dark:text-white">
                             Sample Data Displayed
                         </h4>
