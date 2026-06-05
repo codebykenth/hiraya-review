@@ -1,4 +1,4 @@
-import { Head, router, usePage } from '@inertiajs/react';
+﻿import { Head, router, usePage } from '@inertiajs/react';
 import { LogOut, Mail } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -26,7 +26,7 @@ export default function AccountInactive({ adminEmail }: AccountInactiveProps) {
             <div className="flex min-h-[90vh] items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 px-4 py-8">
                 <div className="w-full max-w-2xl">
                     <div className="rounded-lg border border-slate-200 bg-white p-8 shadow-lg">
-                        <h1 className="mb-2 text-center text-3xl font-bold text-slate-900">
+                        <h1 className="mb-2 text-center text-4xl font-black tracking-tight text-slate-900 sm:text-5xl">
                             Account Inactive
                         </h1>
                         <p className="mb-6 text-center text-slate-600">

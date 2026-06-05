@@ -411,7 +411,7 @@ export function DraftsReviewShell<T extends BaseDraftItem>({
                         <div className="mx-auto mb-4 flex size-16 items-center justify-center rounded-2xl bg-muted text-muted-foreground">
                             <Inbox className="size-8" />
                         </div>
-                        <h3 className="text-lg font-bold text-foreground">
+                        <h3 className="text-xl font-black tracking-tight text-foreground">
                             {emptyStateTitle}
                         </h3>
                         <p className="mt-1.5 max-w-2xl text-sm text-muted-foreground">

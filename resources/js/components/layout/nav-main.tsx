@@ -115,7 +115,7 @@ export function NavMain({
                 className={cn(
                     'transition-all duration-200',
                     label === 'Administrator' &&
-                    'text-blue-650/90 mt-4.5 mb-1.5 text-[9.5px] font-black tracking-widest uppercase dark:text-blue-400',
+                        'text-blue-650/90 mt-4.5 mb-1.5 text-[9.5px] font-black tracking-widest uppercase dark:text-blue-400',
                 )}
             >
                 {label}
@@ -139,7 +139,7 @@ export function NavMain({
                                     className={cn(
                                         'flex w-full cursor-pointer items-center justify-between transition-all duration-200',
                                         hasActiveChild &&
-                                        'font-bold text-blue-700 dark:text-blue-300',
+                                            'font-bold text-blue-700 dark:text-blue-300',
                                     )}
                                 >
                                     <div className="flex items-center gap-2">
@@ -147,7 +147,7 @@ export function NavMain({
                                             <item.icon
                                                 className={cn(
                                                     hasActiveChild &&
-                                                    'text-blue-700 dark:text-blue-400',
+                                                        'text-blue-700 dark:text-blue-400',
                                                 )}
                                             />
                                         )}
@@ -157,7 +157,7 @@ export function NavMain({
                                         className={cn(
                                             'size-3.5 shrink-0 text-slate-400 transition-transform duration-200',
                                             isOpen &&
-                                            'rotate-90 text-slate-700 dark:text-white',
+                                                'rotate-90 text-slate-700 dark:text-white',
                                         )}
                                     />
                                 </SidebarMenuButton>
@@ -181,7 +181,7 @@ export function NavMain({
                                                         className={cn(
                                                             'cursor-pointer py-1.5 transition-all duration-200',
                                                             subActive &&
-                                                            'text-blue-750 shadow-3xs bg-blue-100/50 font-normal dark:bg-blue-950/40 dark:text-blue-300',
+                                                                'text-blue-750 shadow-3xs bg-blue-100/50 font-normal dark:bg-blue-950/40 dark:text-blue-300',
                                                         )}
                                                     >
                                                         <Link href={sub.href}>
@@ -225,7 +225,7 @@ export function NavMain({
                                 className={cn(
                                     'transition-all duration-200',
                                     active &&
-                                    'rounded-l-none border-l-3 border-blue-600 bg-blue-100/70 pl-1.5 font-bold text-blue-700 shadow-xs dark:bg-blue-950/60 dark:text-blue-300',
+                                        'rounded-l-none border-l-3 border-blue-600 bg-blue-100/70 pl-1.5 font-bold text-blue-700 shadow-xs dark:bg-blue-950/60 dark:text-blue-300',
                                 )}
                             >
                                 <Link href={item.href || '#'}>
@@ -233,7 +233,7 @@ export function NavMain({
                                         <item.icon
                                             className={cn(
                                                 active &&
-                                                'text-blue-700 dark:text-blue-400',
+                                                    'text-blue-700 dark:text-blue-400',
                                             )}
                                         />
                                     )}

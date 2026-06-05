@@ -1,4 +1,4 @@
-import { Link, router, usePage } from '@inertiajs/react';
+﻿import { Link, router, usePage } from '@inertiajs/react';
 import Echo from 'laravel-echo';
 import {
     Brain,
@@ -102,13 +102,13 @@ export default function AiReadinessCard({ aiAnalysis }: AiReadinessCardProps) {
                             <Brain className="size-6" />
                         </div>
                         <div>
-                            <h3 className="flex items-center justify-center gap-2 text-lg font-bold tracking-tight text-slate-900 md:justify-start dark:text-white">
+                            <h3 className="flex items-center justify-center gap-2 text-xl font-black tracking-tight text-slate-900 md:justify-start dark:text-white">
                                 AI Readiness Report
                                 <span className="inline-flex items-center rounded-full border border-rose-200 bg-rose-50 px-2 py-0.5 text-[10px] font-medium text-rose-700 dark:border-rose-500/20 dark:bg-rose-500/10 dark:text-rose-400">
                                     Failed
                                 </span>
                             </h3>
-                            <p className="dark:text-slate-450 mt-1 text-sm text-slate-500">
+                            <p className="dark:text-slate-450 mt-1 text-sm font-medium text-slate-500 dark:text-slate-400">
                                 {errorMessage ||
                                     'Report generation failed. Please try again later.'}
                             </p>
@@ -140,13 +140,13 @@ export default function AiReadinessCard({ aiAnalysis }: AiReadinessCardProps) {
                             <Brain className="size-6 animate-pulse" />
                         </div>
                         <div>
-                            <h3 className="flex items-center justify-center gap-2 text-lg font-bold tracking-tight text-slate-900 md:justify-start dark:text-white">
+                            <h3 className="flex items-center justify-center gap-2 text-xl font-black tracking-tight text-slate-900 md:justify-start dark:text-white">
                                 AI Readiness Report
                                 <span className="inline-flex items-center rounded-full border border-blue-200 bg-blue-50 px-2 py-0.5 text-[10px] font-medium text-blue-700 dark:border-blue-500/20 dark:bg-blue-500/10 dark:text-blue-400">
                                     Locked
                                 </span>
                             </h3>
-                            <p className="dark:text-slate-450 mt-1 text-sm text-slate-500">
+                            <p className="dark:text-slate-450 mt-1 text-sm font-medium text-slate-500 dark:text-slate-400">
                                 Complete your first exam to unlock your AI
                                 Readiness Report.
                             </p>
@@ -171,7 +171,7 @@ export default function AiReadinessCard({ aiAnalysis }: AiReadinessCardProps) {
                         </div>
                     </div>
                     <div>
-                        <h3 className="text-lg font-bold tracking-tight text-slate-900 dark:text-white">
+                        <h3 className="text-xl font-black tracking-tight text-slate-900 dark:text-white">
                             Analyzing Performance...
                         </h3>
                         <p className="mt-1.5 max-w-2xl text-sm text-slate-500 dark:text-slate-400">

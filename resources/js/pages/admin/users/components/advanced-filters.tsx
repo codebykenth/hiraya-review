@@ -1,4 +1,4 @@
-import { Filter, X, Calendar, Gauge, Clock } from 'lucide-react';
+﻿import { Filter, X, Calendar, Gauge, Clock } from 'lucide-react';
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -115,7 +115,7 @@ export function AdvancedFilters({
                 <div className="flex shrink-0 items-center justify-between border-b border-slate-100 bg-slate-50/50 p-6 dark:border-slate-900 dark:bg-slate-900/10">
                     <div className="flex items-center gap-2">
                         <Filter className="size-5 text-slate-600 dark:text-slate-400" />
-                        <h3 className="font-heading text-lg font-bold text-slate-900 dark:text-white">
+                        <h3 className="font-heading text-xl font-black tracking-tight text-slate-900 dark:text-white">
                             Advanced Filters
                         </h3>
                     </div>

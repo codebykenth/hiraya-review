@@ -64,7 +64,7 @@ export default function AdminExamDatesIndex({
             <PageContainer>
                 <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                     <div>
-                        <h1 className="text-2xl font-bold tracking-tight text-foreground">
+                        <h1 className="text-3xl font-black tracking-tight text-foreground sm:text-4xl">
                             Exam Dates
                         </h1>
                         <p className="text-sm text-muted-foreground">

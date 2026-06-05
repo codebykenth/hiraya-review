@@ -1,4 +1,4 @@
-﻿import type { PropsWithChildren } from 'react';
+import type { PropsWithChildren } from 'react';
 import AppLogoIcon from '@/components/layout/app-logo-icon';
 import SiteFooter from '@/components/layout/site-footer';
 import SiteHeader from '@/components/layout/site-header';
@@ -35,12 +35,12 @@ export default function AuthCardLayout({
                                 <AppLogoIcon className="size-10 object-contain" />
                             </div>
 
-                            <span className="font-heading text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
+                            <span className="font-heading text-3xl font-black tracking-tight text-slate-900 sm:text-4xl dark:text-white">
                                 <BrandName />
                             </span>
 
                             {description && (
-                                <p className="mt-0.5 text-sm font-normal text-slate-500 dark:text-slate-400">
+                                <p className="mt-0.5 text-sm font-medium text-slate-500 dark:text-slate-400">
                                     {description}
                                 </p>
                             )}

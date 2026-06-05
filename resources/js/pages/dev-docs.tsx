@@ -1,4 +1,4 @@
-import { Head } from '@inertiajs/react';
+﻿import { Head } from '@inertiajs/react';
 
 export default function DevDocs() {
     return (
@@ -24,7 +24,7 @@ export default function DevDocs() {
                     </header>
 
                     <section className="rounded-xl bg-white p-8 shadow-sm">
-                        <h2 className="mt-0 mb-4 border-b-2 border-gray-200 pb-3 text-3xl font-bold text-blue-600">
+                        <h2 className="mt-0 mb-4 border-b-2 border-gray-200 pb-3 text-4xl font-black tracking-tight text-blue-600 sm:text-5xl">
                             1. Current State Assessment
                         </h2>
                         <div className="my-6 overflow-hidden rounded-lg border border-gray-100 bg-white shadow-[0_1px_3px_rgba(0,0,0,0.1)]">
@@ -159,7 +159,7 @@ export default function DevDocs() {
                     </section>
 
                     <section className="rounded-xl bg-white p-8 shadow-sm">
-                        <h2 className="mt-0 mb-4 border-b-2 border-gray-200 pb-3 text-3xl font-bold text-blue-600">
+                        <h2 className="mt-0 mb-4 border-b-2 border-gray-200 pb-3 text-4xl font-black tracking-tight text-blue-600 sm:text-5xl">
                             2. Architectural Design Decisions
                         </h2>
                         <ul className="mb-5 list-disc space-y-2 pl-6">
@@ -195,10 +195,10 @@ export default function DevDocs() {
                     </section>
 
                     <section className="rounded-xl bg-white p-8 shadow-sm">
-                        <h2 className="mt-0 mb-4 border-b-2 border-gray-200 pb-3 text-3xl font-bold text-blue-600">
+                        <h2 className="mt-0 mb-4 border-b-2 border-gray-200 pb-3 text-4xl font-black tracking-tight text-blue-600 sm:text-5xl">
                             3. Database Schema & JSONB Structures
                         </h2>
-                        <h3 className="mt-7 mb-3 text-xl font-bold text-gray-700">
+                        <h3 className="mt-7 mb-3 text-2xl font-black tracking-tight text-gray-700 sm:text-3xl">
                             Key Architectural Constraint
                         </h3>
                         <p>
@@ -258,12 +258,12 @@ export default function DevDocs() {
                             </code>
                         </pre>
 
-                        <h3 className="mt-8 mb-4 text-xl font-bold text-gray-700">
+                        <h3 className="mt-8 mb-4 text-2xl font-black tracking-tight text-gray-700 sm:text-3xl">
                             Database Schema Reference
                         </h3>
 
                         {/* 1. users */}
-                        <h4 className="mt-6 mb-2 flex items-center gap-2 text-lg font-bold text-gray-700">
+                        <h4 className="mt-6 mb-2 flex items-center gap-2 text-xl font-black tracking-tight text-gray-700">
                             <span>Table:</span>
                             <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
                                 users
@@ -552,7 +552,7 @@ export default function DevDocs() {
                         </div>
 
                         {/* 2. categories */}
-                        <h4 className="mt-6 mb-2 flex items-center gap-2 text-lg font-bold text-gray-700">
+                        <h4 className="mt-6 mb-2 flex items-center gap-2 text-xl font-black tracking-tight text-gray-700">
                             <span>Table:</span>
                             <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
                                 categories
@@ -730,7 +730,7 @@ export default function DevDocs() {
                         </div>
 
                         {/* 3. subcategories */}
-                        <h4 className="mt-6 mb-2 flex items-center gap-2 text-lg font-bold text-gray-700">
+                        <h4 className="mt-6 mb-2 flex items-center gap-2 text-xl font-black tracking-tight text-gray-700">
                             <span>Table:</span>
                             <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
                                 subcategories
@@ -908,7 +908,7 @@ export default function DevDocs() {
                         </div>
 
                         {/* 4. questions */}
-                        <h4 className="mt-6 mb-2 flex items-center gap-2 text-lg font-bold text-gray-700">
+                        <h4 className="mt-6 mb-2 flex items-center gap-2 text-xl font-black tracking-tight text-gray-700">
                             <span>Table:</span>
                             <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
                                 questions
@@ -1148,7 +1148,7 @@ export default function DevDocs() {
                         </div>
 
                         {/* 5. track_configs */}
-                        <h4 className="mt-6 mb-2 flex items-center gap-2 text-lg font-bold text-gray-700">
+                        <h4 className="mt-6 mb-2 flex items-center gap-2 text-xl font-black tracking-tight text-gray-700">
                             <span>Table:</span>
                             <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
                                 track_configs
@@ -1326,7 +1326,7 @@ export default function DevDocs() {
                         </div>
 
                         {/* 6. exam_attempts */}
-                        <h4 className="mt-6 mb-2 flex items-center gap-2 text-lg font-bold text-gray-700">
+                        <h4 className="mt-6 mb-2 flex items-center gap-2 text-xl font-black tracking-tight text-gray-700">
                             <span>Table:</span>
                             <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
                                 exam_attempts
@@ -1506,7 +1506,7 @@ export default function DevDocs() {
                             </table>
                         </div>
 
-                        <h3 className="mt-7 mb-3 text-xl font-bold text-gray-700">
+                        <h3 className="mt-7 mb-3 text-2xl font-black tracking-tight text-gray-700 sm:text-3xl">
                             JSONB Column Structures
                         </h3>
 
@@ -1573,10 +1573,10 @@ export default function DevDocs() {
                     </section>
 
                     <section className="rounded-xl bg-white p-8 shadow-sm">
-                        <h2 className="mt-0 mb-4 border-b-2 border-gray-200 pb-3 text-3xl font-bold text-blue-600">
+                        <h2 className="mt-0 mb-4 border-b-2 border-gray-200 pb-3 text-4xl font-black tracking-tight text-blue-600 sm:text-5xl">
                             4. Configurations & Relationships
                         </h2>
-                        <h3 className="mt-7 mb-3 text-xl font-bold text-gray-700">
+                        <h3 className="mt-7 mb-3 text-2xl font-black tracking-tight text-gray-700 sm:text-3xl">
                             Subcategory & Distribution Seed Matrices
                         </h3>
                         <div className="my-6 overflow-hidden rounded-lg border border-gray-100 bg-white shadow-[0_1px_3px_rgba(0,0,0,0.1)]">
@@ -1727,7 +1727,7 @@ export default function DevDocs() {
                             </table>
                         </div>
 
-                        <h3 className="mt-7 mb-3 text-xl font-bold text-gray-700">
+                        <h3 className="mt-7 mb-3 text-2xl font-black tracking-tight text-gray-700 sm:text-3xl">
                             Timer Configuration (stored in{' '}
                             <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600">
                                 track_configs
@@ -1813,15 +1813,15 @@ export default function DevDocs() {
                     </section>
 
                     <section className="rounded-xl bg-white p-8 shadow-sm">
-                        <h2 className="mt-0 mb-4 border-b-2 border-gray-200 pb-3 text-3xl font-bold text-blue-600">
+                        <h2 className="mt-0 mb-4 border-b-2 border-gray-200 pb-3 text-4xl font-black tracking-tight text-blue-600 sm:text-5xl">
                             5. Backend Architecture
                         </h2>
-                        <h3 className="mt-7 mb-3 text-xl font-bold text-gray-700">
+                        <h3 className="mt-7 mb-3 text-2xl font-black tracking-tight text-gray-700 sm:text-3xl">
                             Models & Relationships
                         </h3>
 
                         {/* 1. User Model */}
-                        <h4 className="mt-6 mb-2 flex items-center gap-2 text-lg font-bold text-gray-700">
+                        <h4 className="mt-6 mb-2 flex items-center gap-2 text-xl font-black tracking-tight text-gray-700">
                             <span>Model:</span>
                             <strong className="text-blue-600">User</strong>
                         </h4>
@@ -1931,7 +1931,7 @@ export default function DevDocs() {
                         </div>
 
                         {/* 2. Category Model */}
-                        <h4 className="mt-6 mb-2 flex items-center gap-2 text-lg font-bold text-gray-700">
+                        <h4 className="mt-6 mb-2 flex items-center gap-2 text-xl font-black tracking-tight text-gray-700">
                             <span>Model:</span>
                             <strong className="text-blue-600">Category</strong>
                         </h4>
@@ -2012,7 +2012,7 @@ export default function DevDocs() {
                         </div>
 
                         {/* 3. Subcategory Model */}
-                        <h4 className="mt-6 mb-2 flex items-center gap-2 text-lg font-bold text-gray-700">
+                        <h4 className="mt-6 mb-2 flex items-center gap-2 text-xl font-black tracking-tight text-gray-700">
                             <span>Model:</span>
                             <strong className="text-blue-600">
                                 Subcategory
@@ -2098,7 +2098,7 @@ export default function DevDocs() {
                         </div>
 
                         {/* 4. TrackConfig Model */}
-                        <h4 className="mt-6 mb-2 flex items-center gap-2 text-lg font-bold text-gray-700">
+                        <h4 className="mt-6 mb-2 flex items-center gap-2 text-xl font-black tracking-tight text-gray-700">
                             <span>Model:</span>
                             <strong className="text-blue-600">
                                 TrackConfig
@@ -2187,7 +2187,7 @@ export default function DevDocs() {
                         </div>
 
                         {/* 5. Question Model */}
-                        <h4 className="mt-6 mb-2 flex items-center gap-2 text-lg font-bold text-gray-700">
+                        <h4 className="mt-6 mb-2 flex items-center gap-2 text-xl font-black tracking-tight text-gray-700">
                             <span>Model:</span>
                             <strong className="text-blue-600">Question</strong>
                         </h4>
@@ -2296,7 +2296,7 @@ export default function DevDocs() {
                         </div>
 
                         {/* 6. ExamAttempt Model */}
-                        <h4 className="mt-6 mb-2 flex items-center gap-2 text-lg font-bold text-gray-700">
+                        <h4 className="mt-6 mb-2 flex items-center gap-2 text-xl font-black tracking-tight text-gray-700">
                             <span>Model:</span>
                             <strong className="text-blue-600">
                                 ExamAttempt
@@ -2408,7 +2408,7 @@ export default function DevDocs() {
                             </table>
                         </div>
 
-                        <h3 className="mt-7 mb-3 text-xl font-bold text-gray-700">
+                        <h3 className="mt-7 mb-3 text-2xl font-black tracking-tight text-gray-700 sm:text-3xl">
                             User Role System
                         </h3>
                         <p>
@@ -2452,7 +2452,7 @@ export default function DevDocs() {
                             </li>
                         </ul>
 
-                        <h3 className="mt-7 mb-3 text-xl font-bold text-gray-700">
+                        <h3 className="mt-7 mb-3 text-2xl font-black tracking-tight text-gray-700 sm:text-3xl">
                             Controllers
                         </h3>
                         <div className="my-6 overflow-hidden rounded-lg border border-gray-100 bg-white shadow-[0_1px_3px_rgba(0,0,0,0.1)]">
@@ -2633,7 +2633,7 @@ export default function DevDocs() {
                             </table>
                         </div>
 
-                        <h3 className="mt-7 mb-3 text-xl font-bold text-gray-700">
+                        <h3 className="mt-7 mb-3 text-2xl font-black tracking-tight text-gray-700 sm:text-3xl">
                             Middleware
                         </h3>
                         <div className="my-6 overflow-hidden rounded-lg border border-gray-100 bg-white shadow-[0_1px_3px_rgba(0,0,0,0.1)]">
@@ -2668,10 +2668,10 @@ export default function DevDocs() {
                             </table>
                         </div>
 
-                        <h3 className="mt-7 mb-3 text-xl font-bold text-gray-700">
+                        <h3 className="mt-7 mb-3 text-2xl font-black tracking-tight text-gray-700 sm:text-3xl">
                             Services
                         </h3>
-                        <h3 className="mt-7 mb-3 text-xl font-bold text-gray-700">
+                        <h3 className="mt-7 mb-3 text-2xl font-black tracking-tight text-gray-700 sm:text-3xl">
                             1. ExamAssemblerService
                         </h3>
                         <p>
@@ -2803,7 +2803,7 @@ export default function DevDocs() {
                             </li>
                         </ul>
 
-                        <h3 className="mt-7 mb-3 text-xl font-bold text-gray-700">
+                        <h3 className="mt-7 mb-3 text-2xl font-black tracking-tight text-gray-700 sm:text-3xl">
                             2. ScoreCalculatorService
                         </h3>
                         <p>
@@ -2890,7 +2890,7 @@ export default function DevDocs() {
                             </li>
                         </ul>
 
-                        <h3 className="mt-7 mb-3 text-xl font-bold text-gray-700">
+                        <h3 className="mt-7 mb-3 text-2xl font-black tracking-tight text-gray-700 sm:text-3xl">
                             3. GeminiService
                         </h3>
                         <p>
@@ -2983,10 +2983,10 @@ export default function DevDocs() {
                     </section>
 
                     <section className="rounded-xl bg-white p-8 shadow-sm">
-                        <h2 className="mt-0 mb-4 border-b-2 border-gray-200 pb-3 text-3xl font-bold text-blue-600">
+                        <h2 className="mt-0 mb-4 border-b-2 border-gray-200 pb-3 text-4xl font-black tracking-tight text-blue-600 sm:text-5xl">
                             5. Frontend Architecture
                         </h2>
-                        <h3 className="mt-7 mb-3 text-xl font-bold text-gray-700">
+                        <h3 className="mt-7 mb-3 text-2xl font-black tracking-tight text-gray-700 sm:text-3xl">
                             Page Routing & Layout Map
                         </h3>
                         <div className="my-6 overflow-hidden rounded-lg border border-gray-100 bg-white shadow-[0_1px_3px_rgba(0,0,0,0.1)]">
@@ -3263,7 +3263,7 @@ export default function DevDocs() {
                             Exam" confirmation button.
                         </div>
 
-                        <h3 className="mt-7 mb-3 text-xl font-bold text-gray-700">
+                        <h3 className="mt-7 mb-3 text-2xl font-black tracking-tight text-gray-700 sm:text-3xl">
                             Sidebar Navigation Structure
                         </h3>
                         <h4 className="font-bold text-gray-800">
@@ -3392,7 +3392,7 @@ export default function DevDocs() {
                     </section>
 
                     <section className="rounded-xl bg-white p-8 shadow-sm">
-                        <h2 className="mt-0 mb-4 border-b-2 border-gray-200 pb-3 text-3xl font-bold text-blue-600">
+                        <h2 className="mt-0 mb-4 border-b-2 border-gray-200 pb-3 text-4xl font-black tracking-tight text-blue-600 sm:text-5xl">
                             6. Client-Side Exam State Machine
                         </h2>
 
@@ -3404,7 +3404,7 @@ export default function DevDocs() {
                             limits.
                         </div>
 
-                        <h3 className="mt-7 mb-3 text-xl font-bold text-gray-700">
+                        <h3 className="mt-7 mb-3 text-2xl font-black tracking-tight text-gray-700 sm:text-3xl">
                             State Shape (managed via useReducer)
                         </h3>
                         <pre className="my-4 overflow-x-auto rounded-lg bg-slate-800 p-4 font-mono text-sm leading-relaxed text-slate-50">
@@ -3426,7 +3426,7 @@ export default function DevDocs() {
                             </code>
                         </pre>
 
-                        <h3 className="mt-7 mb-3 text-xl font-bold text-gray-700">
+                        <h3 className="mt-7 mb-3 text-2xl font-black tracking-tight text-gray-700 sm:text-3xl">
                             Reducer Actions
                         </h3>
                         <div className="my-6 overflow-hidden rounded-lg border border-gray-100 bg-white shadow-[0_1px_3px_rgba(0,0,0,0.1)]">
@@ -3578,7 +3578,7 @@ export default function DevDocs() {
                             </li>
                         </ul>
 
-                        <h3 className="mt-7 mb-3 text-xl font-bold text-gray-700">
+                        <h3 className="mt-7 mb-3 text-2xl font-black tracking-tight text-gray-700 sm:text-3xl">
                             Server Awakening Handler
                         </h3>
                         <ul className="mb-5 list-disc space-y-2 pl-6">
@@ -3618,7 +3618,7 @@ export default function DevDocs() {
                             </li>
                         </ul>
 
-                        <h3 className="mt-7 mb-3 text-xl font-bold text-gray-700">
+                        <h3 className="mt-7 mb-3 text-2xl font-black tracking-tight text-gray-700 sm:text-3xl">
                             Free-Tier Constraint Solutions
                         </h3>
                         <div className="my-6 overflow-hidden rounded-lg border border-gray-100 bg-white shadow-[0_1px_3px_rgba(0,0,0,0.1)]">
@@ -3709,11 +3709,11 @@ export default function DevDocs() {
                     </section>
 
                     <section className="rounded-xl bg-white p-8 shadow-sm">
-                        <h2 className="mt-0 mb-4 border-b-2 border-gray-200 pb-3 text-3xl font-bold text-blue-600">
+                        <h2 className="mt-0 mb-4 border-b-2 border-gray-200 pb-3 text-4xl font-black tracking-tight text-blue-600 sm:text-5xl">
                             7. Phase-by-Phase Implementation Plan
                         </h2>
 
-                        <h3 className="mt-7 mb-3 text-xl font-bold text-gray-700">
+                        <h3 className="mt-7 mb-3 text-2xl font-black tracking-tight text-gray-700 sm:text-3xl">
                             Phase 1: Database Foundation & Auth Updates (Week 1:
                             May 23 - 29)
                         </h3>
@@ -3860,7 +3860,7 @@ export default function DevDocs() {
                             </li>
                         </ul>
 
-                        <h3 className="mt-7 mb-3 text-xl font-bold text-gray-700">
+                        <h3 className="mt-7 mb-3 text-2xl font-black tracking-tight text-gray-700 sm:text-3xl">
                             Phase 2: Admin Panel & AI Question Generator (Week
                             2: May 30 - Jun 5)
                         </h3>
@@ -3921,7 +3921,7 @@ export default function DevDocs() {
                             </li>
                         </ul>
 
-                        <h3 className="mt-7 mb-3 text-xl font-bold text-gray-700">
+                        <h3 className="mt-7 mb-3 text-2xl font-black tracking-tight text-gray-700 sm:text-3xl">
                             Phase 3: Exam Engine & Category Drills (Week 3: Jun
                             6 - 12)
                         </h3>
@@ -3990,7 +3990,7 @@ export default function DevDocs() {
                             </li>
                         </ul>
 
-                        <h3 className="mt-7 mb-3 text-xl font-bold text-gray-700">
+                        <h3 className="mt-7 mb-3 text-2xl font-black tracking-tight text-gray-700 sm:text-3xl">
                             Phase 4: Results, Review & User Dashboard (Week 4:
                             Jun 13 - 19)
                         </h3>
@@ -4026,7 +4026,7 @@ export default function DevDocs() {
                             </li>
                         </ul>
 
-                        <h3 className="mt-7 mb-3 text-xl font-bold text-gray-700">
+                        <h3 className="mt-7 mb-3 text-2xl font-black tracking-tight text-gray-700 sm:text-3xl">
                             Phase 5: Landing Page, Polish & Deployment (Week 5:
                             Jun 20 - 26)
                         </h3>
@@ -4064,11 +4064,11 @@ export default function DevDocs() {
                     </section>
 
                     <section className="rounded-xl bg-white p-8 shadow-sm">
-                        <h2 className="mt-0 mb-4 border-b-2 border-gray-200 pb-3 text-3xl font-bold text-blue-600">
+                        <h2 className="mt-0 mb-4 border-b-2 border-gray-200 pb-3 text-4xl font-black tracking-tight text-blue-600 sm:text-5xl">
                             8. Verification Plan
                         </h2>
 
-                        <h3 className="mt-7 mb-3 text-xl font-bold text-gray-700">
+                        <h3 className="mt-7 mb-3 text-2xl font-black tracking-tight text-gray-700 sm:text-3xl">
                             Automated Tests
                         </h3>
                         <p>
@@ -4104,7 +4104,7 @@ export default function DevDocs() {
                             </li>
                         </ul>
 
-                        <h3 className="mt-7 mb-3 text-xl font-bold text-gray-700">
+                        <h3 className="mt-7 mb-3 text-2xl font-black tracking-tight text-gray-700 sm:text-3xl">
                             Manual Verification
                         </h3>
                         <ul className="mb-5 list-disc space-y-2 pl-6">

@@ -1,4 +1,4 @@
-import { Link } from '@inertiajs/react';
+﻿import { Link } from '@inertiajs/react';
 import { BookOpen, Clock, Tag, ArrowRight, CheckCircle2 } from 'lucide-react';
 import React from 'react';
 import { Card } from '@/components/ui/card';
@@ -118,7 +118,7 @@ export function ModulesGrid({
                     <span className="size-1.5 rounded-full bg-amber-500" />
                     Coming Soon
                 </span>
-                <h3 className="font-heading text-lg font-bold text-foreground">
+                <h3 className="font-heading text-xl font-black tracking-tight text-foreground">
                     No Learning Modules Available
                 </h3>
                 <p className="mx-auto mt-2 max-w-2xl text-xs leading-relaxed text-muted-foreground">

@@ -335,37 +335,37 @@ export default function Welcome() {
                     <div className="container mx-auto border-y border-gray-400 px-6 py-10">
                         <div className="flex flex-col items-center justify-evenly gap-10 md:flex-row md:gap-0">
                             <div className="flex flex-1 flex-col items-center">
-                                <p className="text-2xl font-bold text-primary">
+                                <p className="text-4xl font-black text-primary">
                                     500+
                                 </p>
-                                <p className="text-xs text-muted-foreground uppercase">
+                                <p className="mt-1 text-xs font-bold tracking-wider text-muted-foreground uppercase">
                                     Questions
                                 </p>
                             </div>
                             <div className="hidden h-12 w-[1px] bg-slate-300/60 md:block dark:bg-slate-800" />
                             <div className="flex flex-1 flex-col items-center">
-                                <p className="text-2xl font-bold text-primary">
+                                <p className="text-4xl font-black text-primary">
                                     2
                                 </p>
-                                <p className="text-xs text-muted-foreground uppercase">
+                                <p className="mt-1 text-xs font-bold tracking-wider text-muted-foreground uppercase">
                                     Study Tracks
                                 </p>
                             </div>
                             <div className="hidden h-12 w-[1px] bg-slate-300/60 md:block dark:bg-slate-800" />
                             <div className="flex flex-1 flex-col items-center">
-                                <p className="text-2xl font-bold text-primary">
+                                <p className="text-4xl font-black text-primary">
                                     6
                                 </p>
-                                <p className="text-xs text-muted-foreground uppercase">
+                                <p className="mt-1 text-xs font-bold tracking-wider text-muted-foreground uppercase">
                                     Categories
                                 </p>
                             </div>
                             <div className="hidden h-12 w-[1px] bg-slate-300/60 md:block dark:bg-slate-800" />
                             <div className="flex flex-1 flex-col items-center">
-                                <p className="text-2xl font-bold text-primary">
+                                <p className="text-4xl font-black text-primary">
                                     Free
                                 </p>
-                                <p className="text-xs text-muted-foreground uppercase">
+                                <p className="mt-1 text-xs font-bold tracking-wider text-muted-foreground uppercase">
                                     Forever Base Access
                                 </p>
                             </div>
@@ -483,7 +483,7 @@ export default function Welcome() {
                                     } hover:shadow-md`}
                                 >
                                     <div
-                                        className={`z-10 flex h-12 w-12 items-center justify-center rounded-full text-lg font-bold shadow-md transition-colors duration-300 ${
+                                        className={`z-10 flex h-12 w-12 items-center justify-center rounded-full text-xl font-black tracking-tight shadow-md transition-colors duration-300 ${
                                             hoveredStep === null ||
                                             hoveredStep === 1
                                                 ? 'bg-primary text-white'
@@ -492,7 +492,7 @@ export default function Welcome() {
                                     >
                                         1
                                     </div>
-                                    <h3 className="mt-6 font-heading text-xl font-bold text-slate-900 dark:text-white">
+                                    <h3 className="mt-6 font-heading text-2xl font-black tracking-tight text-slate-900 sm:text-3xl dark:text-white">
                                         Choose Track
                                     </h3>
                                     <p className="mt-3 max-w-65 text-[14px] leading-relaxed font-normal text-slate-600 dark:text-slate-400">
@@ -512,7 +512,7 @@ export default function Welcome() {
                                     } hover:shadow-md`}
                                 >
                                     <div
-                                        className={`z-10 flex h-12 w-12 items-center justify-center rounded-full text-lg font-bold shadow-sm transition-colors duration-300 ${
+                                        className={`z-10 flex h-12 w-12 items-center justify-center rounded-full text-xl font-black tracking-tight shadow-sm transition-colors duration-300 ${
                                             hoveredStep === 2
                                                 ? 'bg-primary text-white'
                                                 : 'border-2 border-primary bg-card text-primary'
@@ -520,7 +520,7 @@ export default function Welcome() {
                                     >
                                         2
                                     </div>
-                                    <h3 className="mt-6 font-heading text-xl font-bold text-slate-900 dark:text-white">
+                                    <h3 className="mt-6 font-heading text-2xl font-black tracking-tight text-slate-900 sm:text-3xl dark:text-white">
                                         Take Exam
                                     </h3>
                                     <p className="mt-3 max-w-65 text-[14px] leading-relaxed font-normal text-slate-600 dark:text-slate-400">
@@ -540,7 +540,7 @@ export default function Welcome() {
                                     } hover:shadow-md`}
                                 >
                                     <div
-                                        className={`z-10 flex h-12 w-12 items-center justify-center rounded-full text-lg font-bold shadow-sm transition-colors duration-300 ${
+                                        className={`z-10 flex h-12 w-12 items-center justify-center rounded-full text-xl font-black tracking-tight shadow-sm transition-colors duration-300 ${
                                             hoveredStep === 3
                                                 ? 'bg-primary text-white'
                                                 : 'border-2 border-primary bg-card text-primary'
@@ -548,7 +548,7 @@ export default function Welcome() {
                                     >
                                         3
                                     </div>
-                                    <h3 className="mt-6 font-heading text-xl font-bold text-slate-900 dark:text-white">
+                                    <h3 className="mt-6 font-heading text-2xl font-black tracking-tight text-slate-900 sm:text-3xl dark:text-white">
                                         Review & Improve
                                     </h3>
                                     <p className="mt-3 max-w-[260px] text-[14px] leading-relaxed font-normal text-slate-600 dark:text-slate-400">

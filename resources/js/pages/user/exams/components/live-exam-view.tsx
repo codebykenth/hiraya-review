@@ -1,4 +1,4 @@
-import { Head } from '@inertiajs/react';
+﻿import { Head } from '@inertiajs/react';
 import {
     Award,
     BookOpen,
@@ -384,7 +384,7 @@ export function LiveExamView({
                         >
                             <div className="mb-1 flex items-center gap-2">
                                 <Lock className="size-5 text-blue-600" />
-                                <h3 className="font-heading text-lg font-bold text-slate-900 dark:text-white">
+                                <h3 className="font-heading text-xl font-black tracking-tight text-slate-900 dark:text-white">
                                     Premium Feature Locked
                                 </h3>
                             </div>
@@ -425,7 +425,7 @@ export function LiveExamView({
                         >
                             <div className="mb-1 flex items-center gap-2">
                                 <Lock className="size-5 text-blue-600" />
-                                <h3 className="font-heading text-lg font-bold text-slate-900 dark:text-white">
+                                <h3 className="font-heading text-xl font-black tracking-tight text-slate-900 dark:text-white">
                                     Free Preview Limit Reached
                                 </h3>
                             </div>

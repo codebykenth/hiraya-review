@@ -60,7 +60,7 @@ export default function Register({ passwordRules, turnstileSiteKey }: Props) {
                                     tabIndex={1}
                                     autoComplete="name"
                                     name="name"
-                                    placeholder="Full name"
+                                    placeholder="Enter your full name"
                                     className="h-11 rounded-xl border-slate-200 bg-white/50 backdrop-blur-xs placeholder:text-slate-400 dark:border-slate-800 dark:bg-slate-900/50 dark:placeholder:text-slate-500"
                                 />
                                 <InputError
@@ -92,7 +92,7 @@ export default function Register({ passwordRules, turnstileSiteKey }: Props) {
                                     tabIndex={3}
                                     autoComplete="new-password"
                                     name="password"
-                                    placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
+                                    placeholder="Enter your password"
                                     passwordrules={passwordRules}
                                     className="h-11 rounded-xl border-slate-200 bg-white/50 backdrop-blur-xs placeholder:text-slate-400 dark:border-slate-800 dark:bg-slate-900/50 dark:placeholder:text-slate-500"
                                 />
@@ -109,7 +109,7 @@ export default function Register({ passwordRules, turnstileSiteKey }: Props) {
                                     tabIndex={4}
                                     autoComplete="new-password"
                                     name="password_confirmation"
-                                    placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
+                                    placeholder="Confirm your password"
                                     passwordrules={passwordRules}
                                     className="h-11 rounded-xl border-slate-200 bg-white/50 backdrop-blur-xs placeholder:text-slate-400 dark:border-slate-800 dark:bg-slate-900/50 dark:placeholder:text-slate-500"
                                 />

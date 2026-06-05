@@ -1,4 +1,4 @@
-import { Head } from '@inertiajs/react';
+﻿import { Head } from '@inertiajs/react';
 import {
     Award,
     ClipboardList,
@@ -91,7 +91,7 @@ export function SetupExamView({
                                     <Award className="size-6 fill-current text-white" />
                                 </div>
                                 <div>
-                                    <h3 className="font-heading text-lg font-bold text-slate-900 dark:text-white">
+                                    <h3 className="font-heading text-xl font-black tracking-tight text-slate-900 dark:text-white">
                                         Professional Level
                                     </h3>
                                     <p className="mt-1 max-w-2xl text-xs leading-relaxed text-slate-500 md:text-sm dark:text-slate-400">
@@ -129,7 +129,7 @@ export function SetupExamView({
                                     <ClipboardList className="size-6" />
                                 </div>
                                 <div>
-                                    <h3 className="font-heading text-lg font-bold text-slate-900 dark:text-white">
+                                    <h3 className="font-heading text-xl font-black tracking-tight text-slate-900 dark:text-white">
                                         Subprofessional Level
                                     </h3>
                                     <p className="mt-1 max-w-2xl text-xs leading-relaxed text-slate-500 md:text-sm dark:text-slate-400">
@@ -157,7 +157,7 @@ export function SetupExamView({
                     {/* Right Panel: Simulation Overview */}
                     <div className="flex min-h-[380px] flex-col justify-between rounded-xl border border-blue-100/50 bg-blue-50/30 p-6 shadow-sm dark:border-blue-950/20 dark:bg-blue-950/10">
                         <div>
-                            <h2 className="mb-4 border-b border-blue-100/40 pb-2 font-heading text-lg font-bold tracking-tight text-slate-900 dark:border-blue-950/20 dark:text-white">
+                            <h2 className="mb-4 border-b border-blue-100/40 pb-2 font-heading text-xl font-black tracking-tight text-slate-900 dark:border-blue-950/20 dark:text-white">
                                 Simulation Overview
                             </h2>
 

@@ -1,4 +1,4 @@
-import { Clock } from 'lucide-react';
+﻿import { Clock } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
 
 interface ExamCountdownProps {
@@ -63,7 +63,7 @@ export function ExamCountdown({
             <div className="relative overflow-hidden rounded-2xl border border-rose-200/60 bg-rose-50/60 p-6 shadow-sm backdrop-blur-xl dark:border-rose-900/40 dark:bg-rose-950/30">
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <div className="flex items-center gap-4">
-                        <div className="flex size-12 shrink-0 items-center justify-center rounded-full bg-rose-100/50 border border-rose-200/50 backdrop-blur-md dark:bg-rose-500/20 dark:border-rose-500/30">
+                        <div className="flex size-12 shrink-0 items-center justify-center rounded-full border border-rose-200/50 bg-rose-100/50 backdrop-blur-md dark:border-rose-500/30 dark:bg-rose-500/20">
                             <Clock className="size-6 animate-bounce text-rose-600 dark:text-rose-400" />
                         </div>
                         <div>
@@ -72,13 +72,13 @@ export function ExamCountdown({
                             </span>
                             <h3 className="mt-0.5 font-heading text-lg font-black tracking-tight text-slate-900 dark:text-white">
                                 Civil Service Exam date has arrived:{' '}
-                                <span className="underline decoration-slate-300 dark:decoration-white/40 decoration-2 underline-offset-4">
+                                <span className="underline decoration-slate-300 decoration-2 underline-offset-4 dark:decoration-white/40">
                                     {examDate}
                                 </span>
                             </h3>
                         </div>
                     </div>
-                    <div className="rounded-lg bg-white/60 border border-rose-100 px-4 py-2 text-sm font-bold text-rose-700 backdrop-blur-sm dark:bg-rose-900/40 dark:border-rose-800/50 dark:text-rose-300">
+                    <div className="rounded-lg border border-rose-100 bg-white/60 px-4 py-2 text-sm font-bold text-rose-700 backdrop-blur-sm dark:border-rose-800/50 dark:bg-rose-900/40 dark:text-rose-300">
                         Best of luck! 🎯
                     </div>
                 </div>
@@ -91,7 +91,7 @@ export function ExamCountdown({
 
     return (
         <div
-            className={`relative overflow-hidden rounded-2xl border p-6 shadow-sm transition-all hover:shadow-md backdrop-blur-xl ${
+            className={`relative overflow-hidden rounded-2xl border p-6 shadow-sm backdrop-blur-xl transition-all hover:shadow-md ${
                 isUrgent
                     ? 'border-amber-200/60 bg-amber-50/60 dark:border-amber-900/40 dark:bg-amber-950/30'
                     : 'border-blue-100/60 bg-blue-50/40 dark:border-slate-800 dark:bg-slate-900/60'
@@ -103,7 +103,9 @@ export function ExamCountdown({
 
             <div className="relative z-10 flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
                 <div className="flex items-center gap-4">
-                    <div className={`flex size-14 shrink-0 items-center justify-center rounded-full backdrop-blur-md border ${isUrgent ? 'bg-amber-100/50 border-amber-200/50 dark:bg-amber-500/20 dark:border-amber-500/30' : 'bg-blue-100/50 border-blue-200/50 dark:bg-blue-500/20 dark:border-blue-500/30'}`}>
+                    <div
+                        className={`flex size-14 shrink-0 items-center justify-center rounded-full border backdrop-blur-md ${isUrgent ? 'border-amber-200/50 bg-amber-100/50 dark:border-amber-500/30 dark:bg-amber-500/20' : 'border-blue-200/50 bg-blue-100/50 dark:border-blue-500/30 dark:bg-blue-500/20'}`}
+                    >
                         <Clock
                             className={`size-7 ${isUrgent ? 'animate-pulse text-amber-600 dark:text-amber-400' : 'text-blue-600 dark:text-blue-400'}`}
                         />
@@ -118,7 +120,7 @@ export function ExamCountdown({
                         </span>
                         <h3 className="mt-0.5 font-heading text-lg font-black tracking-tight text-slate-900 dark:text-white">
                             Civil Service Exam:{' '}
-                            <span className="underline decoration-slate-300 dark:decoration-white/40 decoration-2 underline-offset-4">
+                            <span className="underline decoration-slate-300 decoration-2 underline-offset-4 dark:decoration-white/40">
                                 {examDate}
                             </span>
                         </h3>
@@ -138,7 +140,7 @@ export function ExamCountdown({
                             </span>
                         </div>
 
-                        <span className="flex h-12 items-center font-mono text-lg font-bold text-slate-300 sm:h-14 sm:text-xl dark:text-slate-600">
+                        <span className="flex h-12 items-center font-mono text-xl font-black tracking-tight text-slate-300 sm:h-14 sm:text-xl dark:text-slate-600">
                             :
                         </span>
 
@@ -152,7 +154,7 @@ export function ExamCountdown({
                             </span>
                         </div>
 
-                        <span className="flex h-12 items-center font-mono text-lg font-bold text-slate-300 sm:h-14 sm:text-xl dark:text-slate-600">
+                        <span className="flex h-12 items-center font-mono text-xl font-black tracking-tight text-slate-300 sm:h-14 sm:text-xl dark:text-slate-600">
                             :
                         </span>
 
@@ -166,7 +168,7 @@ export function ExamCountdown({
                             </span>
                         </div>
 
-                        <span className="flex h-12 items-center font-mono text-lg font-bold text-slate-300 sm:h-14 sm:text-xl dark:text-slate-600">
+                        <span className="flex h-12 items-center font-mono text-xl font-black tracking-tight text-slate-300 sm:h-14 sm:text-xl dark:text-slate-600">
                             :
                         </span>
 

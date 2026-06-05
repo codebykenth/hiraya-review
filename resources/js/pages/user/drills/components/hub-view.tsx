@@ -87,14 +87,15 @@ export function HubView({
                                             <CardIcon className="size-6" />
                                         </div>
                                         <span className="flex items-center gap-1 rounded-full bg-slate-100 px-2.5 py-1 text-[10px] font-extrabold text-muted-foreground dark:bg-slate-800">
-                                            <FileText className="size-3" /> {actualCount} Qs
+                                            <FileText className="size-3" />{' '}
+                                            {actualCount} Qs
                                         </span>
                                     </div>
 
-                                    <h3 className="mt-5 font-heading text-xl font-bold text-foreground transition group-hover:text-blue-600 dark:group-hover:text-blue-400">
+                                    <h3 className="mt-5 font-heading text-2xl font-black tracking-tight text-foreground transition group-hover:text-blue-600 sm:text-3xl dark:group-hover:text-blue-400">
                                         {cat.name}
                                     </h3>
-                                    <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                                    <p className="mt-2 text-sm font-medium text-slate-500 dark:text-slate-400">
                                         {meta.description}
                                     </p>
                                 </div>
@@ -122,7 +123,7 @@ export function HubView({
                         <span className="size-1.5 rounded-full bg-amber-500" />
                         Coming Soon
                     </span>
-                    <h3 className="font-heading text-lg font-bold text-foreground">
+                    <h3 className="font-heading text-xl font-black tracking-tight text-foreground">
                         No Practice Drills Available
                     </h3>
                     <p className="mx-auto mt-2 max-w-2xl text-xs leading-relaxed text-muted-foreground">

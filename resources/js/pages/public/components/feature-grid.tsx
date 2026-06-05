@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+﻿import type { ReactNode } from 'react';
 import { Card } from '@/components/ui/card';
 
 interface FeatureGridProps {
@@ -47,7 +47,7 @@ export default function FeatureGrid({
                             <div className="w-fit">{cardOneIcon}</div>
                         )}
                         <div className="flex flex-col gap-2 text-left">
-                            <h3 className="font-heading text-xl font-bold tracking-tight text-slate-900 dark:text-white">
+                            <h3 className="font-heading text-2xl font-black tracking-tight text-slate-900 sm:text-3xl dark:text-white">
                                 {cardOneTitle}
                             </h3>
                             <p className="max-w-2xl text-[14px] leading-relaxed font-normal text-slate-600 dark:text-slate-400">
@@ -74,7 +74,7 @@ export default function FeatureGrid({
                             <div className="w-fit">{cardTwoIcon}</div>
                         )}
                         <div className="flex flex-col gap-2">
-                            <h3 className="font-heading text-xl font-bold tracking-tight text-slate-900 dark:text-white">
+                            <h3 className="font-heading text-2xl font-black tracking-tight text-slate-900 sm:text-3xl dark:text-white">
                                 {cardTwoTitle}
                             </h3>
                             <p className="text-[14px] leading-relaxed font-normal text-slate-600 dark:text-slate-400">

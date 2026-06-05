@@ -1,4 +1,4 @@
-import { X, ShieldAlert } from 'lucide-react';
+﻿import { X, ShieldAlert } from 'lucide-react';
 import React from 'react';
 import { Button } from '@/components/ui/button';
 
@@ -79,7 +79,7 @@ export function ConfirmModal({
                 <div className="flex flex-col gap-1 pr-6">
                     <div className="flex items-center gap-2">
                         <ShieldAlert className={`size-5 ${config.iconColor}`} />
-                        <h3 className="font-heading text-lg font-bold text-slate-900 dark:text-white">
+                        <h3 className="font-heading text-xl font-black tracking-tight text-slate-900 dark:text-white">
                             {title}
                         </h3>
                     </div>

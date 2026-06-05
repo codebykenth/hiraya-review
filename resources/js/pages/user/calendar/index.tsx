@@ -119,7 +119,9 @@ export default function Calendar() {
                                         text: 'Use the "Bulk Update Time" button to select multiple tasks across different days and set them all to the same time.',
                                     },
                                     {
-                                        icon: <CheckCircle2 className="size-4" />,
+                                        icon: (
+                                            <CheckCircle2 className="size-4" />
+                                        ),
                                         title: 'Mark as Complete',
                                         text: 'Click the circle next to a task to mark it done. It will turn green. Incomplete past tasks will automatically alert you!',
                                     },
@@ -261,9 +263,13 @@ export default function Calendar() {
 
                     {/* Calendar grid wrapper for mobile */}
                     <div className="mb-2 flex items-center justify-center gap-2 rounded-lg border border-slate-100 bg-slate-50 p-2 text-xs text-slate-500 md:hidden dark:border-slate-800 dark:bg-slate-900/50 dark:text-slate-400">
-                        <span className="animate-pulse"><ArrowLeft className="size-3 inline-block" /></span> Swipe
-                        horizontally to view full week{' '}
-                        <span className="animate-pulse"><ArrowRight className="size-3 inline-block" /></span>
+                        <span className="animate-pulse">
+                            <ArrowLeft className="inline-block size-3" />
+                        </span>{' '}
+                        Swipe horizontally to view full week{' '}
+                        <span className="animate-pulse">
+                            <ArrowRight className="inline-block size-3" />
+                        </span>
                     </div>
 
                     <CalendarGrid

@@ -1,4 +1,4 @@
-import { ChevronUp, ChevronDown } from 'lucide-react';
+﻿import { ChevronUp, ChevronDown } from 'lucide-react';
 import { useState, useEffect } from 'react';
 
 interface TimePickerProps {
@@ -211,7 +211,7 @@ export function TimePicker({ value, onChange }: TimePickerProps) {
                             </button>
                         </div>
 
-                        <div className="text-2xl font-bold text-slate-600 dark:text-slate-400">
+                        <div className="text-3xl font-black tracking-tight text-slate-600 sm:text-4xl dark:text-slate-400">
                             :
                         </div>
 
@@ -256,7 +256,7 @@ export function TimePicker({ value, onChange }: TimePickerProps) {
                             >
                                 {period === 'AM' ? '↓' : '↑'}
                             </button>
-                            <div className="text-lg font-bold text-slate-900 dark:text-slate-100">
+                            <div className="text-xl font-black tracking-tight text-slate-900 dark:text-slate-100">
                                 {period}
                             </div>
                             <button

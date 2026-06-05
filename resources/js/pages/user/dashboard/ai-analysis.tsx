@@ -493,7 +493,7 @@ export default function AiAnalysisReport({
                         <div className="border-blue-150 mb-5 flex size-16 items-center justify-center rounded-2xl border bg-blue-50 text-blue-600 dark:border-blue-900/40 dark:bg-blue-950/40 dark:text-blue-400">
                             <Brain className="size-8" />
                         </div>
-                        <h3 className="text-xl font-bold text-slate-900 dark:text-white">
+                        <h3 className="text-2xl font-black tracking-tight text-slate-900 sm:text-3xl dark:text-white">
                             AI Diagnostic Report Locked
                         </h3>
                         <p className="mt-2 max-w-2xl text-sm text-slate-500 dark:text-slate-400">
@@ -519,7 +519,7 @@ export default function AiAnalysisReport({
                                 <Loader2 className="size-10 animate-spin" />
                             </div>
                         </div>
-                        <h3 className="text-xl font-bold text-slate-900 dark:text-white">
+                        <h3 className="text-2xl font-black tracking-tight text-slate-900 sm:text-3xl dark:text-white">
                             Creating Your Predictive AI Diagnostic
                         </h3>
                         <p className="mt-2 max-w-2xl text-sm leading-relaxed text-slate-500 dark:text-slate-400">
@@ -536,7 +536,7 @@ export default function AiAnalysisReport({
                         <div className="border-rose-150 mb-5 flex size-16 items-center justify-center rounded-2xl border bg-rose-50 text-rose-600 dark:border-rose-900/40 dark:bg-rose-950/40 dark:text-rose-400">
                             <AlertCircle className="size-8" />
                         </div>
-                        <h3 className="text-xl font-bold text-slate-900 dark:text-white">
+                        <h3 className="text-2xl font-black tracking-tight text-slate-900 sm:text-3xl dark:text-white">
                             AI Diagnostic Report Failed
                         </h3>
                         <p className="text-slate-550 mt-2 max-w-2xl text-sm dark:text-slate-400">
@@ -573,7 +573,7 @@ export default function AiAnalysisReport({
                                     </div>
                                     <div>
                                         <div className="flex flex-wrap items-center gap-2">
-                                            <h1 className="text-2xl font-black text-slate-900 dark:text-white">
+                                            <h1 className="text-3xl font-black tracking-tight text-slate-900 sm:text-4xl dark:text-white">
                                                 AI Diagnostic & Predictions
                                             </h1>
                                             <span className="border-indigo-150 inline-flex items-center gap-1 rounded-full border bg-indigo-50 px-2.5 py-0.5 text-[10px] font-black tracking-wider text-indigo-700 uppercase dark:border-indigo-500/20 dark:bg-indigo-500/10 dark:text-indigo-400">
@@ -749,7 +749,7 @@ export default function AiAnalysisReport({
                                             <span className="text-[10px] font-black tracking-wider text-slate-400 uppercase">
                                                 Estimated Exam Score
                                             </span>
-                                            <h4 className="mt-0.5 text-xl font-bold text-slate-900 dark:text-white">
+                                            <h4 className="mt-0.5 text-2xl font-black tracking-tight text-slate-900 dark:text-white">
                                                 {data.predictive_metrics
                                                     ?.estimated_exam_score ||
                                                     '70% - 75% Projected'}
@@ -773,7 +773,7 @@ export default function AiAnalysisReport({
                                             <span className="text-[10px] font-black tracking-wider text-slate-400 uppercase">
                                                 Days to Readiness
                                             </span>
-                                            <h4 className="mt-0.5 text-xl font-bold text-slate-900 dark:text-white">
+                                            <h4 className="mt-0.5 text-2xl font-black tracking-tight text-slate-900 dark:text-white">
                                                 {data.predictive_metrics
                                                     ?.days_to_readiness ||
                                                     '18 Days to Mastery'}
@@ -1202,10 +1202,9 @@ export default function AiAnalysisReport({
 
                             <div className="mt-4 flex items-start gap-2 rounded-lg bg-indigo-50/50 p-3 text-indigo-700 dark:bg-indigo-950/30 dark:text-indigo-400">
                                 <Lightbulb className="mt-0.5 size-4 shrink-0" />
-                                <p className="text-xs font-bold leading-relaxed">
-                                    Tip: You can close this, continue
-                                    practicing drills, and check back in a few
-                                    minutes!
+                                <p className="text-xs leading-relaxed font-bold">
+                                    Tip: You can close this, continue practicing
+                                    drills, and check back in a few minutes!
                                 </p>
                             </div>
 

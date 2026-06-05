@@ -87,8 +87,7 @@ export function PastPendingReminder({
                             <div className="mt-1 flex gap-2">
                                 <Button
                                     size="sm"
-                                    variant="outline"
-                                    className="h-8 border-emerald-200 text-emerald-600 hover:bg-emerald-50 dark:border-emerald-900/50 dark:text-emerald-400 dark:hover:bg-emerald-950/20"
+                                    className="h-8 bg-emerald-600 text-white hover:bg-emerald-700 dark:bg-emerald-600 dark:text-white dark:hover:bg-emerald-700"
                                     onClick={async () => {
                                         await toggleScheduleDone(
                                             task,

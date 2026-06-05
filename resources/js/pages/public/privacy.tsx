@@ -18,7 +18,7 @@ export default function Privacy() {
                                 <Shield className="h-6 w-6" />
                             </div>
                             <div>
-                                <h1 className="font-heading text-3xl font-bold tracking-tight text-foreground md:text-4xl">
+                                <h1 className="font-heading text-4xl font-black tracking-tight text-foreground sm:text-5xl md:text-4xl">
                                     Privacy Policy
                                 </h1>
                                 <p className="mt-1.5 text-xs text-muted-foreground">
@@ -29,7 +29,7 @@ export default function Privacy() {
 
                         <Card className="space-y-8 p-8 leading-relaxed md:p-10">
                             <section className="space-y-3">
-                                <h2 className="text-xl font-bold text-foreground">
+                                <h2 className="text-2xl font-black tracking-tight text-foreground sm:text-3xl">
                                     1. Introduction
                                 </h2>
                                 <p className="text-sm text-muted-foreground">
@@ -44,7 +44,7 @@ export default function Privacy() {
                             </section>
 
                             <section className="space-y-3">
-                                <h2 className="text-xl font-bold text-foreground">
+                                <h2 className="text-2xl font-black tracking-tight text-foreground sm:text-3xl">
                                     2. Information Hiraya Review Collects
                                 </h2>
                                 <p className="text-sm text-muted-foreground">
@@ -89,7 +89,7 @@ export default function Privacy() {
                             </section>
 
                             <section className="space-y-3">
-                                <h2 className="text-xl font-bold text-foreground">
+                                <h2 className="text-2xl font-black tracking-tight text-foreground sm:text-3xl">
                                     3. How Hiraya Review Uses Your Information
                                 </h2>
                                 <p className="text-sm text-muted-foreground">
@@ -119,7 +119,7 @@ export default function Privacy() {
                             </section>
 
                             <section className="space-y-3">
-                                <h2 className="text-xl font-bold text-foreground">
+                                <h2 className="text-2xl font-black tracking-tight text-foreground sm:text-3xl">
                                     4. Data Sharing & Security
                                 </h2>
                                 <p className="text-sm text-muted-foreground">
@@ -134,7 +134,7 @@ export default function Privacy() {
                             </section>
 
                             <section className="space-y-3">
-                                <h2 className="text-xl font-bold text-foreground">
+                                <h2 className="text-2xl font-black tracking-tight text-foreground sm:text-3xl">
                                     5. Your Choices & Rights
                                 </h2>
                                 <p className="text-sm text-muted-foreground">

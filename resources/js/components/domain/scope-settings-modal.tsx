@@ -1,4 +1,4 @@
-import { X, Database, Plus, Trash2 } from 'lucide-react';
+﻿import { X, Database, Plus, Trash2 } from 'lucide-react';
 import React from 'react';
 
 export interface CategoryItem {
@@ -55,7 +55,7 @@ export function ScopeSettingsModal({
                 {/* Modal Header */}
                 <div className="flex items-center justify-between border-b border-slate-100 bg-slate-50/50 px-6 py-4.5 dark:border-slate-900 dark:bg-slate-900/35">
                     <div>
-                        <h2 className="flex items-center gap-2 text-lg font-bold text-slate-900 dark:text-white">
+                        <h2 className="flex items-center gap-2 text-xl font-black tracking-tight text-slate-900 dark:text-white">
                             <Database className="size-5 text-blue-600 dark:text-blue-500" />
                             Dynamic Syllabus Scope Settings
                         </h2>

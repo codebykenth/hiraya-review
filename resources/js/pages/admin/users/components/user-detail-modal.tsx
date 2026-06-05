@@ -256,7 +256,7 @@ export function UserDetailModal({
                     <div className="flex-1 overflow-y-auto p-6 pr-5">
                         {/* Header */}
                         <div className="pr-6">
-                            <h3 className="font-heading text-lg font-bold text-slate-900 dark:text-white">
+                            <h3 className="font-heading text-xl font-black tracking-tight text-slate-900 dark:text-white">
                                 User Details
                             </h3>
                             <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">

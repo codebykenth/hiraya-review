@@ -249,7 +249,7 @@ export function CurationIndexShell<T>({
                             <Sparkles className="size-7" />
                         </div>
                         <div className="flex flex-col gap-2">
-                            <h3 className="text-lg font-bold text-foreground">
+                            <h3 className="text-xl font-black tracking-tight text-foreground">
                                 {aiGenerator.title}
                             </h3>
                             <p className="text-sm leading-relaxed text-muted-foreground">
@@ -281,7 +281,7 @@ export function CurationIndexShell<T>({
                             <PenLine className="size-7" />
                         </div>
                         <div className="flex flex-col gap-2">
-                            <h3 className="text-lg font-bold text-foreground">
+                            <h3 className="text-xl font-black tracking-tight text-foreground">
                                 {manualEntry.title}
                             </h3>
                             <p className="text-sm leading-relaxed text-muted-foreground">

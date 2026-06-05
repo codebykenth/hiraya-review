@@ -51,7 +51,7 @@ export default function Support() {
                                 <Mail className="h-6 w-6" />
                             </div>
                             <div>
-                                <h1 className="font-heading text-3xl font-bold tracking-tight text-foreground md:text-4xl">
+                                <h1 className="font-heading text-4xl font-black tracking-tight text-foreground sm:text-5xl md:text-4xl">
                                     Contact Support
                                 </h1>
                                 <p className="mt-1.5 text-sm text-muted-foreground">
@@ -107,7 +107,7 @@ export default function Support() {
                                             <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-emerald-50 text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400">
                                                 <Mail className="h-6 w-6" />
                                             </div>
-                                            <h2 className="text-xl font-bold text-foreground">
+                                            <h2 className="text-2xl font-black tracking-tight text-foreground sm:text-3xl">
                                                 Message Received!
                                             </h2>
                                             <p className="animate-fade-in mt-2 max-w-2xl text-sm text-muted-foreground">

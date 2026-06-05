@@ -1,4 +1,4 @@
-import { ZoomIn } from 'lucide-react';
+﻿import { ZoomIn } from 'lucide-react';
 import React from 'react';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { parseLatexString } from '@/lib/latex-parser';
@@ -806,7 +806,7 @@ export const renderFormattedText = (
                                             key={`seq-frag-${fIdx}`}
                                         >
                                             {fIdx > 0 && (
-                                                <span className="self-center text-lg font-bold text-slate-400 select-none dark:text-slate-600">
+                                                <span className="self-center text-xl font-black tracking-tight text-slate-400 select-none dark:text-slate-600">
                                                     ➔
                                                 </span>
                                             )}
