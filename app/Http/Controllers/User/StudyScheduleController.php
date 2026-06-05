@@ -251,9 +251,7 @@ class StudyScheduleController
 
     public function destroy(StudySchedule $studySchedule)
     {
-        if ($studySchedule->user_id !== Auth::id()) {
-            return response()->json(['message' => 'Unauthorized'], 403);
-        }
+        \Illuminate\Support\Facades\Gate::allowIf(fn ($user) => $user->id === $studySchedule->user_id);
 
         $studySchedule->delete();
 

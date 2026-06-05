@@ -125,9 +125,7 @@ class ExamHistoryController
      */
     public function destroy(ExamAttempt $attempt)
     {
-        if ($attempt->user_id !== auth()->id()) {
-            abort(403, 'Unauthorized action.');
-        }
+        \Illuminate\Support\Facades\Gate::allowIf(fn ($user) => $user->id === $attempt->user_id);
 
         $attempt->delete();
 
