@@ -147,8 +147,9 @@ test('creating duplicate study schedule returns existing schedule and does not d
         'description' => 'Second one',
     ]);
 
-    $response->assertStatus(200);
-    $response->assertJsonPath('id', $s1->id);
+    $response->assertStatus(409);
+    $response->assertJsonPath('message', 'A study item with the same title already exists on this date.');
+    $response->assertJsonPath('duplicate.id', $s1->id);
 
     $this->assertEquals(1, StudySchedule::where('user_id', $user->id)->count());
 });

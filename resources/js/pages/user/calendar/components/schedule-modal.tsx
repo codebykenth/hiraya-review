@@ -247,13 +247,13 @@ export function ScheduleModal({
 
     return (
         <Dialog open={isOpen} onOpenChange={onOpenChange}>
-            <DialogContent>
+            <DialogContent className="max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
-                    <DialogTitle>
+                    <DialogTitle className="text-2xl font-black tracking-tight">
                         {isEditMode ? 'Edit Study Item' : 'Add Study Item'}
                     </DialogTitle>
                     {selectedDate && (
-                        <p className="mt-2 text-base leading-relaxed text-slate-600 dark:text-slate-400">
+                        <p className="mt-2 text-sm font-medium text-slate-500 dark:text-slate-400">
                             {parseScheduleDate(selectedDate).toLocaleDateString(
                                 'en-US',
                                 {
@@ -266,14 +266,14 @@ export function ScheduleModal({
                     )}
                 </DialogHeader>
 
-                <div className="space-y-4 py-4">
+                <div className="space-y-6 py-4">
                     {errorMessage && (
-                        <div className="rounded-lg border border-red-200 bg-red-50 p-3 text-xs font-semibold text-red-800 dark:border-red-950/20 dark:bg-red-950/20 dark:text-red-400">
+                        <div className="rounded-xl border border-red-200/50 bg-red-50/80 p-4 text-sm font-semibold text-red-800 backdrop-blur-sm dark:border-red-900/30 dark:bg-red-950/20 dark:text-red-400">
                             {errorMessage}
                         </div>
                     )}
                     <div>
-                        <label className="block text-sm font-medium text-slate-900 dark:text-slate-200">
+                        <label className="block text-sm font-semibold text-slate-900 dark:text-slate-200">
                             Subject / Topic (optional)
                         </label>
                         <div className="relative mt-2">
@@ -284,7 +284,7 @@ export function ScheduleModal({
                                         !isSubjectDropdownOpen,
                                     )
                                 }
-                                className="flex w-full items-center justify-between rounded-lg border border-slate-300 bg-white px-3 py-2 text-left text-sm text-slate-900 focus:border-blue-500 focus:outline-none dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
+                                className="flex w-full items-center justify-between rounded-xl border border-slate-200 bg-white/80 px-4 py-3 text-left text-sm text-slate-900 transition-all focus:border-blue-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 dark:border-slate-800 dark:bg-slate-950/80 dark:text-slate-100"
                             >
                                 <span>
                                     {(() => {
@@ -437,7 +437,7 @@ export function ScheduleModal({
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-slate-900 dark:text-slate-200">
+                        <label className="block text-sm font-semibold text-slate-900 dark:text-slate-200">
                             What will you study?
                         </label>
                         <input
@@ -455,7 +455,7 @@ export function ScheduleModal({
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-slate-900 dark:text-slate-200">
+                        <label className="block text-sm font-semibold text-slate-900 dark:text-slate-200">
                             Details (optional)
                         </label>
                         <textarea

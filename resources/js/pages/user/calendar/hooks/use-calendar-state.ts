@@ -451,7 +451,12 @@ export function useCalendarState(initialProps: CalendarPageProps) {
             } else {
                 const errData = await response.json();
 
-                if (errData.errors) {
+                if (response.status === 409 && errData.duplicate) {
+                    const duplicate = errData.duplicate;
+                    setErrorMessage(
+                        `Duplicate study item: "${duplicate.title}" already exists on ${duplicate.study_date}. Please use a different title or edit the existing item.`,
+                    );
+                } else if (errData.errors) {
                     const firstError = Object.values(errData.errors)[0];
                     setErrorMessage(
                         Array.isArray(firstError)

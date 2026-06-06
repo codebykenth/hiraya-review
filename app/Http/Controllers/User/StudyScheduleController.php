@@ -172,7 +172,10 @@ class StudyScheduleController
             ->first();
 
         if ($existing) {
-            return response()->json($this->formatScheduleForCalendar($existing), 200);
+            return response()->json([
+                'message' => 'A study item with the same title already exists on this date.',
+                'duplicate' => $this->formatScheduleForCalendar($existing),
+            ], 409);
         }
 
         $schedule = StudySchedule::create([

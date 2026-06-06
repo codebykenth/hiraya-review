@@ -164,12 +164,16 @@ export default function LearnShow({ module, recommended }: LearnShowProps) {
                                                         },
                                                     )
                                                 }
-                                                variant="success"
+                                                variant={
+                                                    module.is_completed
+                                                        ? 'outline'
+                                                        : 'success'
+                                                }
                                                 className="flex items-center gap-2 font-bold"
                                             >
                                                 <CheckCircle2 className="size-4" />
                                                 {module.is_completed
-                                                    ? 'Completed'
+                                                    ? 'Mark as Incomplete'
                                                     : 'Mark as Complete'}
                                             </Button>
                                         </div>
@@ -282,7 +286,7 @@ export default function LearnShow({ module, recommended }: LearnShowProps) {
                                             href={`/learn/${rec.slug}`}
                                             className="group group block border-b border-border/40 pb-3 transition-all duration-300 last:border-0 last:pb-0 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95"
                                         >
-                                            <h4 className="line-clamp-2 text-sm font-black text-foreground transition group-hover:text-blue-600 dark:text-blue-400 dark:group-hover:text-blue-400">
+                                            <h4 className="line-clamp-2 text-sm font-black text-foreground transition hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-400">
                                                 {rec.title}
                                             </h4>
                                             <span className="mt-1 flex items-center gap-1.5 text-xs font-bold text-muted-foreground uppercase">
