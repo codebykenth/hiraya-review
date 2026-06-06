@@ -18,6 +18,13 @@ import { Label } from '@/components/ui/label';
 
 export default function DeleteUser() {
     const [confirmation, setConfirmation] = useState('');
+    const [copied, setCopied] = useState(false);
+
+    const handleCopy = () => {
+        navigator.clipboard.writeText('delete account');
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+    };
 
     return (
         <div className="space-y-6">
@@ -52,8 +59,16 @@ export default function DeleteUser() {
                             and data will also be permanently deleted. Please
                             confirm you would like to permanently delete your
                             account by typing "
-                            <span className="font-bold text-foreground">
-                                delete account
+                            <span className="group relative inline-block">
+                                <span
+                                    onClick={handleCopy}
+                                    className="cursor-pointer font-bold text-foreground underline decoration-slate-300 underline-offset-2 transition-colors hover:decoration-slate-400 dark:decoration-slate-700 dark:hover:decoration-slate-600"
+                                >
+                                    delete account
+                                </span>
+                                <span className="invisible absolute bottom-full left-1/2 mb-2 -translate-x-1/2 rounded-lg bg-slate-900 px-2 py-1 text-xs font-medium whitespace-nowrap text-white opacity-0 transition-all duration-200 group-hover:visible group-hover:opacity-100 dark:bg-white dark:text-slate-900">
+                                    {copied ? 'Copied!' : 'Click to copy'}
+                                </span>
                             </span>
                             ".
                         </DialogDescription>

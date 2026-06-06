@@ -75,12 +75,12 @@ export default function Terms() {
 
                             <section className="space-y-3">
                                 <h2 className="text-2xl font-black tracking-tight text-foreground sm:text-3xl">
-                                    4. Account Rules & Google/Facebook Logins
+                                    4. Account Rules & Google Login
                                 </h2>
                                 <p className="text-base leading-relaxed text-muted-foreground">
                                     When registering, you may create a native
-                                    profile or sign in using a Google or
-                                    Facebook account. You agree that:
+                                    profile or sign in using a Google account.
+                                    You agree that:
                                 </p>
                                 <ul className="list-disc space-y-1 pl-5 text-sm text-muted-foreground">
                                     <li>

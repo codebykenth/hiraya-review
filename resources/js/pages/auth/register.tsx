@@ -1,7 +1,6 @@
 import { Form, Head } from '@inertiajs/react';
 import { useState } from 'react';
 import ConsentCheckbox from '@/components/auth/consent-checkbox';
-import FacebookIcon from '@/components/auth/facebook-icon';
 import GoogleIcon from '@/components/auth/google-icon';
 import PasswordInput from '@/components/auth/password-input';
 import SocialConsentModal from '@/components/auth/social-consent-modal';
@@ -45,6 +44,7 @@ export default function Register({ passwordRules, turnstileSiteKey }: Props) {
                 transform={(data) => ({
                     ...data,
                     cf_turnstile_response: turnstileToken,
+                    terms_accepted: termsAccepted,
                 })}
             >
                 {({ processing, errors }) => (
@@ -158,17 +158,17 @@ export default function Register({ passwordRules, turnstileSiteKey }: Props) {
                             <div className="flex-grow border-t border-slate-200 dark:border-slate-800"></div>
                         </div>
 
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="">
                             <Button
                                 type="button"
                                 variant="outline"
-                                className="h-11 rounded-xl border-slate-200 font-medium transition-colors hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-slate-900"
+                                className="h-11 w-full rounded-xl border-slate-200 font-medium transition-colors hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-slate-900"
                                 onClick={() => setSocialModal('google')}
                             >
                                 <GoogleIcon className="mr-2 h-4 w-4 transition-transform group-hover:scale-110" />
                                 Google
                             </Button>
-                            <Button
+                            {/* <Button
                                 type="button"
                                 variant="outline"
                                 className="h-11 rounded-xl border-slate-200 font-medium transition-colors hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-slate-900"
@@ -176,7 +176,7 @@ export default function Register({ passwordRules, turnstileSiteKey }: Props) {
                             >
                                 <FacebookIcon className="mr-2 h-4 w-4 text-blue-600 transition-transform group-hover:scale-110 dark:text-blue-400" />
                                 Facebook
-                            </Button>
+                            </Button> */}
                         </div>
 
                         <div className="text-center text-sm text-slate-500 dark:text-slate-400">

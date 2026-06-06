@@ -220,6 +220,16 @@ export function NavMain({
                         }
                     }
 
+                    // Support highlighting Learn when on Study Tutorial page
+                    const currentPath = url.split('?')[0];
+
+                    if (
+                        item.title === 'Learn' &&
+                        currentPath.startsWith('/learn/')
+                    ) {
+                        active = true;
+                    }
+
                     return (
                         <SidebarMenuItem key={item.title}>
                             <SidebarMenuButton

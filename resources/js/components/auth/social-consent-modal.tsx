@@ -62,7 +62,12 @@ export default function SocialConsentModal({
                         disabled={!accepted}
                         className="flex-1 rounded-xl bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 dark:bg-blue-500 dark:text-white dark:hover:bg-blue-600"
                         onClick={() => {
-                            window.location.href = redirectUrl;
+                            const url = new URL(
+                                redirectUrl,
+                                window.location.origin,
+                            );
+                            url.searchParams.set('terms_accepted', '1');
+                            window.location.href = url.toString();
                         }}
                     >
                         Continue

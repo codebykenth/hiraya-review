@@ -46,6 +46,9 @@ class AuthController extends Controller
             ]);
         }
 
+        // Check if user accepted terms during social login
+        $termsAccepted = request()->query('terms_accepted') === '1';
+
         // Look for user by provider details
         $user = User::where('provider', $provider)
             ->where('provider_id', $socialUser->getId())
@@ -60,7 +63,6 @@ class AuthController extends Controller
                 $user->update([
                     'provider' => $provider,
                     'provider_id' => $socialUser->getId(),
-                    'terms_accepted_at' => $user->terms_accepted_at ?? now(),
                 ]);
             } else {
                 // Create new user
@@ -71,7 +73,7 @@ class AuthController extends Controller
                     'role' => 'user',
                     'provider' => $provider,
                     'provider_id' => $socialUser->getId(),
-                    'terms_accepted_at' => now(),
+                    'terms_accepted_at' => $termsAccepted ? now() : null,
                 ]);
 
                 $user->email_verified_at = now();

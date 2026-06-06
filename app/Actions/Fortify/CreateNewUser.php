@@ -28,7 +28,7 @@ class CreateNewUser implements CreatesNewUsers
             'name' => $input['name'],
             'email' => $input['email'],
             'password' => $input['password'],
-            'terms_accepted_at' => now(),
+            'terms_accepted_at' => isset($input['terms_accepted']) && $input['terms_accepted'] ? now() : null,
         ]);
     }
 }

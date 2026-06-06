@@ -60,15 +60,14 @@ export default function Privacy() {
                                     <li>
                                         <strong>Social Sign-In Data:</strong>{' '}
                                         Hiraya Review offers third-party
-                                        authentication via Google and Facebook.
-                                        When you use Google or Facebook to sign
-                                        in, Hiraya Review receives and securely
-                                        store basic profile details (such as
-                                        your name, email address, and profile
-                                        picture) to personalize your account and
-                                        metrics dashboard. Hiraya Review will
-                                        never post or publish to your social
-                                        feed.
+                                        authentication via Google. When you use
+                                        Google to sign in, Hiraya Review
+                                        receives and securely store basic
+                                        profile details (such as your name and
+                                        email address) to personalize your
+                                        account and metrics dashboard. Hiraya
+                                        Review will never post or publish to
+                                        your social feed.
                                     </li>
                                     <li>
                                         <strong>Practice Data:</strong> Your
