@@ -118,6 +118,11 @@ const adminCoreItems: NavItem[] = [
         href: '/admin/feedbacks',
         icon: MessageSquareWarning,
     },
+    {
+        title: 'Legal Content',
+        href: '/admin/legal-content/edit',
+        icon: FileText,
+    },
 ];
 
 const adminContentItems: NavItem[] = [

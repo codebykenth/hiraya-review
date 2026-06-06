@@ -1,5 +1,5 @@
 ---
-name: lint-resolver
+name: linting
 description: Systematically resolves ESLint, TypeScript, and Prettier errors across the codebase while preserving application logic.
 ---
 

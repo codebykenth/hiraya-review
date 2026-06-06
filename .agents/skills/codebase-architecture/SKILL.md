@@ -172,8 +172,14 @@ resources/js/
 │   │   │       ├── learn-ai-generator-panel.tsx
 │   │   │       ├── learn-manual-entry-form.tsx
 │   │   │       └── learn-module-fields.tsx
+│   │   ├── legal-content/
+│   │   │   └── edit.tsx
 │   │   ├── users/
 │   │   ├── exam-dates/
+│   │   ├── feedbacks/
+│   │   ├── announcements/
+│   │   ├── system/
+│   │   ├── view-management/
 │   │   └── syllabus/
 │   │
 │   ├── auth/          # Flat — no module subfolders needed
@@ -394,7 +400,12 @@ app/
 │   │   │   ├── LearnController.php
 │   │   │   ├── UserController.php
 │   │   │   ├── ExamDateController.php
-│   │   │   └── SyllabusController.php
+│   │   │   ├── SyllabusController.php
+│   │   │   ├── AnnouncementController.php
+│   │   │   ├── FeedbackController.php
+│   │   │   ├── SystemController.php
+│   │   │   ├── ViewManagementController.php
+│   │   │   └── LegalContentController.php
 │   │   ├── User/            # User role controllers
 │   │   │   ├── AnalyticsController.php
 │   │   │   ├── DashboardController.php
@@ -404,11 +415,33 @@ app/
 │   │   │   ├── LearnController.php
 │   │   │   ├── StudyScheduleController.php
 │   │   │   └── StudySuggestionController.php
+│   │   ├── PublicController.php
+│   │   ├── AuthController.php
+│   │   ├── SitemapController.php
+│   │   ├── SupportController.php
 │   │   └── Settings/
 │   └── Requests/            # Mirror controller structure
 │       ├── Admin/
+│       │   └── LegalContentRequest.php
 │       └── User/
-├── Models/                  # 10 models (flat is fine at this scale)
+├── Models/                  # Models
+│   ├── User.php
+│   ├── Question.php
+│   ├── Category.php
+│   ├── Subcategory.php
+│   ├── LearnModule.php
+│   ├── ExamAttempt.php
+│   ├── ExamDate.php
+│   ├── Feedback.php
+│   ├── Announcement.php
+│   └── LegalContent.php
+├── Policies/                # Authorization policies
+│   ├── QuestionPolicy.php
+│   ├── LearnModulePolicy.php
+│   ├── ExamDatePolicy.php
+│   ├── FeedbackPolicy.php
+│   ├── AnnouncementPolicy.php
+│   └── LegalContentPolicy.php
 └── ...
 ```
 

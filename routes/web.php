@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\AnnouncementController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\ExamDateController;
 use App\Http\Controllers\Admin\FeedbackController;
+use App\Http\Controllers\Admin\LegalContentController;
 use App\Http\Controllers\Admin\LearnController as AdminLearnController;
 use App\Http\Controllers\Admin\QuestionController;
 use App\Http\Controllers\Admin\SyllabusController;
@@ -11,6 +12,7 @@ use App\Http\Controllers\Admin\SystemController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\ViewManagementController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\PublicController;
 use App\Http\Controllers\Settings\AcceptTermsController;
 use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\SupportController;
@@ -31,12 +33,12 @@ use Inertia\Inertia;
 // ============================================================================
 Route::middleware('throttle:global-views')->group(function () {
     // Static Pages
-    Route::inertia('/', 'public/welcome')->name('home');
-    Route::inertia('about', 'public/about')->name('about');
-    Route::inertia('privacy', 'public/privacy')->name('privacy');
-    Route::inertia('terms', 'public/terms')->name('terms');
-    Route::inertia('support', 'public/support')->name('support');
-    Route::inertia('guide', 'guide')->name('guide');
+    Route::get('/', [PublicController::class, 'welcome'])->name('home');
+    Route::get('about', [PublicController::class, 'about'])->name('about');
+    Route::get('privacy', [PublicController::class, 'privacy'])->name('privacy');
+    Route::get('terms', [PublicController::class, 'terms'])->name('terms');
+    Route::get('support', [PublicController::class, 'support'])->name('support');
+    Route::get('guide', [PublicController::class, 'guide'])->name('guide');
     Route::inertia('account-inactive', 'account-inactive', [
         'adminEmail' => env('MAIL_FROM_ADDRESS', env('DEV_EMAIL')),
     ])->name('account-inactive');
@@ -173,6 +175,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
             Route::controller(AnnouncementController::class)->prefix('announcements')->name('announcements.')->group(function () {
                 Route::get('/', 'index')->name('index');
             });
+
+            Route::controller(LegalContentController::class)->prefix('legal-content')->name('legal-content.')->group(function () {
+                Route::get('edit', 'edit')->name('edit');
+            });
         });
 
         // Question resource views (No admin prefix in paths or names originally)
@@ -194,6 +200,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
                 Route::post('run-migrations', 'runMigrations')->name('run-migrations');
                 Route::post('rollback-migrations', 'rollbackMigrations')->name('rollback-migrations');
                 Route::post('toggle-maintenance', 'toggleMaintenance')->name('toggle-maintenance');
+            });
+
+            // Admin Legal Content Mutations
+            Route::controller(LegalContentController::class)->prefix('admin/legal-content')->name('admin.legal-content.')->group(function () {
+                Route::put('/', 'update')->name('update');
             });
 
             // Admin View Management Mutations

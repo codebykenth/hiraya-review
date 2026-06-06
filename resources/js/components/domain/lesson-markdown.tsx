@@ -9,7 +9,28 @@ import React, { useCallback, useMemo, useState } from 'react';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { formatMathInline } from '@/lib/exam-formatters';
 import { parseLaTeXToJSX } from '@/lib/latex-parser';
-import { sanitizeSvg } from '@/lib/sanitize-svg';
+import DOMPurify from 'dompurify';
+
+// Configure DOMPurify to allow SVG tags and attributes
+DOMPurify.addHook('uponSanitizeAttribute', (node, data) => {
+    if (data.attrName === 'href' || data.attrName === 'xlink:href') {
+        if (data.attrValue?.toLowerCase().startsWith('javascript:')) {
+            data.keepAttr = false;
+        }
+    }
+});
+
+const svgConfig = {
+    USE_PROFILES: { svg: true, svgFilters: true },
+    ADD_TAGS: ['svg', 'path', 'rect', 'circle', 'ellipse', 'line', 'polyline', 'polygon', 'text', 'tspan', 'g', 'defs', 'linearGradient', 'radialGradient', 'stop', 'clipPath', 'mask', 'pattern', 'use', 'image', 'foreignObject'],
+    ADD_ATTR: ['viewBox', 'width', 'height', 'x', 'y', 'cx', 'cy', 'r', 'rx', 'ry', 'd', 'fill', 'stroke', 'stroke-width', 'stroke-linecap', 'stroke-linejoin', 'stroke-dasharray', 'opacity', 'transform', 'transform-origin', 'points', 'x1', 'y1', 'x2', 'y2', 'text-anchor', 'font-family', 'font-size', 'font-weight', 'font-style', 'letter-spacing', 'dominant-baseline', 'alignment-baseline', 'baseline-shift', 'dx', 'dy', 'rotate', 'scale', 'translate', 'skewX', 'skewY', 'fill-opacity', 'stroke-opacity', 'stroke-miterlimit', 'clip-path', 'mask', 'filter', 'href', 'xlink:href', 'id', 'class', 'style', 'preserveAspectRatio', 'patternTransform', 'patternUnits', 'gradientTransform', 'gradientUnits', 'spreadMethod', 'offset', 'stop-color', 'stop-opacity'],
+    FORBID_TAGS: ['script', 'iframe', 'object', 'embed', 'form', 'input', 'button', 'style', 'link', 'meta', 'set', 'animate', 'animateMotion', 'animateTransform'],
+    FORBID_ATTR: ['onload', 'onerror', 'onclick', 'onmouseover', 'onmouseout', 'onfocus', 'onblur', 'onkeydown', 'onkeyup', 'onkeypress', 'onsubmit', 'onreset', 'onchange', 'onselect'],
+};
+
+const sanitizeSvg = (svg: string): string => {
+    return DOMPurify.sanitize(svg, svgConfig);
+};
 
 function ZoomableSvg({
     svgContent,
@@ -27,11 +48,10 @@ function ZoomableSvg({
         <Dialog>
             <DialogTrigger asChild>
                 <div
-                    className={`group relative cursor-pointer overflow-hidden transition-all hover:scale-[1.02] active:scale-95 ${
-                        isOption
+                    className={`group relative cursor-pointer overflow-hidden transition-all hover:scale-[1.02] active:scale-95 ${isOption
                             ? 'my-1 flex w-full justify-center'
                             : 'mx-auto my-4 flex w-full max-w-2xl justify-center rounded-xl border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900'
-                    }`}
+                        }`}
                 >
                     <div
                         className="flex w-full items-center justify-center"
@@ -544,11 +564,10 @@ export function LessonMarkdown({ content = '' }: LessonMarkdownProps) {
                     rendered.push(
                         <h2
                             key={`h2-${idx}`}
-                            className={`mt-8 mb-4 flex items-center gap-2 border-b pb-3 text-xl leading-tight font-black dark:border-slate-800 dark:text-white ${
-                                isCheckSection
+                            className={`mt-8 mb-4 flex items-center gap-2 border-b pb-3 text-xl leading-tight font-black dark:border-slate-800 dark:text-white ${isCheckSection
                                     ? 'border-blue-200 text-blue-800 dark:border-blue-900/50 dark:text-blue-300'
                                     : 'border-slate-200 text-slate-950'
-                            }`}
+                                }`}
                         >
                             {isCheckSection ? (
                                 <HelpCircle className="size-6 shrink-0" />
@@ -881,11 +900,10 @@ export function LessonMarkdown({ content = '' }: LessonMarkdownProps) {
             rendered.push(
                 <p
                     key={`p-${idx}`}
-                    className={`${
-                        isMathLine
+                    className={`${isMathLine
                             ? 'my-0 font-mono text-lg tracking-widest whitespace-pre'
                             : 'my-4 text-base'
-                    } leading-8 text-slate-700 dark:text-slate-300`}
+                        } leading-8 text-slate-700 dark:text-slate-300`}
                 >
                     {isMathLine ? rawLine : parseLineContent(trimmed)}
                 </p>,
