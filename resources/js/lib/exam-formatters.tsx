@@ -1,8 +1,8 @@
+import DOMPurify from 'dompurify';
 import { ZoomIn } from 'lucide-react';
 import React from 'react';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { parseLatexString } from '@/lib/latex-parser';
-import DOMPurify from 'dompurify';
 
 // Configure DOMPurify to allow SVG tags and attributes
 DOMPurify.addHook('uponSanitizeAttribute', (node, data) => {
@@ -15,10 +15,124 @@ DOMPurify.addHook('uponSanitizeAttribute', (node, data) => {
 
 const svgConfig = {
     USE_PROFILES: { svg: true, svgFilters: true },
-    ADD_TAGS: ['svg', 'path', 'rect', 'circle', 'ellipse', 'line', 'polyline', 'polygon', 'text', 'tspan', 'g', 'defs', 'linearGradient', 'radialGradient', 'stop', 'clipPath', 'mask', 'pattern', 'use', 'image', 'foreignObject'],
-    ADD_ATTR: ['viewBox', 'width', 'height', 'x', 'y', 'cx', 'cy', 'r', 'rx', 'ry', 'd', 'fill', 'stroke', 'stroke-width', 'stroke-linecap', 'stroke-linejoin', 'stroke-dasharray', 'opacity', 'transform', 'transform-origin', 'points', 'x1', 'y1', 'x2', 'y2', 'text-anchor', 'font-family', 'font-size', 'font-weight', 'font-style', 'letter-spacing', 'dominant-baseline', 'alignment-baseline', 'baseline-shift', 'dx', 'dy', 'rotate', 'scale', 'translate', 'skewX', 'skewY', 'fill-opacity', 'stroke-opacity', 'stroke-miterlimit', 'clip-path', 'mask', 'filter', 'href', 'xlink:href', 'id', 'class', 'style', 'preserveAspectRatio', 'patternTransform', 'patternUnits', 'gradientTransform', 'gradientUnits', 'spreadMethod', 'offset', 'stop-color', 'stop-opacity'],
-    FORBID_TAGS: ['script', 'iframe', 'object', 'embed', 'form', 'input', 'button', 'style', 'link', 'meta', 'set', 'animate', 'animateMotion', 'animateTransform'],
-    FORBID_ATTR: ['onload', 'onerror', 'onclick', 'onmouseover', 'onmouseout', 'onfocus', 'onblur', 'onkeydown', 'onkeyup', 'onkeypress', 'onsubmit', 'onreset', 'onchange', 'onselect'],
+    ADD_TAGS: [
+        'svg',
+        'path',
+        'rect',
+        'circle',
+        'ellipse',
+        'line',
+        'polyline',
+        'polygon',
+        'text',
+        'tspan',
+        'g',
+        'defs',
+        'linearGradient',
+        'radialGradient',
+        'stop',
+        'clipPath',
+        'mask',
+        'pattern',
+        'use',
+        'image',
+        'foreignObject',
+    ],
+    ADD_ATTR: [
+        'viewBox',
+        'width',
+        'height',
+        'x',
+        'y',
+        'cx',
+        'cy',
+        'r',
+        'rx',
+        'ry',
+        'd',
+        'fill',
+        'stroke',
+        'stroke-width',
+        'stroke-linecap',
+        'stroke-linejoin',
+        'stroke-dasharray',
+        'opacity',
+        'transform',
+        'transform-origin',
+        'points',
+        'x1',
+        'y1',
+        'x2',
+        'y2',
+        'text-anchor',
+        'font-family',
+        'font-size',
+        'font-weight',
+        'font-style',
+        'letter-spacing',
+        'dominant-baseline',
+        'alignment-baseline',
+        'baseline-shift',
+        'dx',
+        'dy',
+        'rotate',
+        'scale',
+        'translate',
+        'skewX',
+        'skewY',
+        'fill-opacity',
+        'stroke-opacity',
+        'stroke-miterlimit',
+        'clip-path',
+        'mask',
+        'filter',
+        'href',
+        'xlink:href',
+        'id',
+        'class',
+        'style',
+        'preserveAspectRatio',
+        'patternTransform',
+        'patternUnits',
+        'gradientTransform',
+        'gradientUnits',
+        'spreadMethod',
+        'offset',
+        'stop-color',
+        'stop-opacity',
+    ],
+    FORBID_TAGS: [
+        'script',
+        'iframe',
+        'object',
+        'embed',
+        'form',
+        'input',
+        'button',
+        'style',
+        'link',
+        'meta',
+        'set',
+        'animate',
+        'animateMotion',
+        'animateTransform',
+    ],
+    FORBID_ATTR: [
+        'onload',
+        'onerror',
+        'onclick',
+        'onmouseover',
+        'onmouseout',
+        'onfocus',
+        'onblur',
+        'onkeydown',
+        'onkeyup',
+        'onkeypress',
+        'onsubmit',
+        'onreset',
+        'onchange',
+        'onselect',
+    ],
 };
 
 const sanitizeSvg = (svg: string): string => {
@@ -817,8 +931,8 @@ export const renderFormattedText = (
                                 {block.frames.map((frame, fIdx) => {
                                     const cleanLabel = frame.label
                                         ? frame.label
-                                            .replace(/\*\*|:/g, '')
-                                            .trim()
+                                              .replace(/\*\*|:/g, '')
+                                              .trim()
                                         : '';
 
                                     return (

@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\LegalContent;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class LegalContentSeeder extends Seeder
@@ -112,15 +111,15 @@ HTML;
         // Remove dangerous tags and their content
         $dangerousTags = ['script', 'iframe', 'object', 'embed', 'form', 'input', 'button', 'style', 'link', 'meta'];
         foreach ($dangerousTags as $tag) {
-            $html = preg_replace('#<' . $tag . '.*?>.*?</' . $tag . '>#is', '', $html);
-            $html = preg_replace('#<' . $tag . '.*?/>#is', '', $html);
+            $html = preg_replace('#<'.$tag.'.*?>.*?</'.$tag.'>#is', '', $html);
+            $html = preg_replace('#<'.$tag.'.*?/>#is', '', $html);
         }
 
         // Remove dangerous attributes from remaining tags
         $dangerousAttributes = ['on\w+', 'javascript:', 'data:', 'vbscript:', 'onclick', 'onload', 'onerror', 'onmouseover'];
         foreach ($dangerousAttributes as $attr) {
-            $html = preg_replace('#\s' . $attr . '\s*=\s*["\'][^"\']*["\']#is', '', $html);
-            $html = preg_replace('#\s' . $attr . '\s*=\s*[^\s>]#is', '', $html);
+            $html = preg_replace('#\s'.$attr.'\s*=\s*["\'][^"\']*["\']#is', '', $html);
+            $html = preg_replace('#\s'.$attr.'\s*=\s*[^\s>]#is', '', $html);
         }
 
         return $html;

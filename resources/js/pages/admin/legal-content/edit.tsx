@@ -1,15 +1,20 @@
 import { Head, useForm, router } from '@inertiajs/react';
+import DOMPurify from 'dompurify';
+import { Loader2, Save, FileText, Shield, Eye, Code } from 'lucide-react';
+import { useState } from 'react';
 import { PageContainer } from '@/components/layout/page-container';
 import { PageHeader } from '@/components/layout/page-header';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Loader2, Save, FileText, Shield, Eye, Code } from 'lucide-react';
-import { useState } from 'react';
-import DOMPurify from 'dompurify';
+import { Textarea } from '@/components/ui/textarea';
 
 interface LegalContent {
     id?: number;
@@ -24,15 +29,20 @@ interface EditProps {
 }
 
 export default function Edit({ privacy, terms }: EditProps) {
-    const { data, setData, put, processing, errors, recentlySuccessful } = useForm({
-        content: {
-            privacy: privacy?.content || '',
-            terms: terms?.content || '',
-        },
-    });
+    const { data, setData, processing, errors, recentlySuccessful } =
+        useForm({
+            content: {
+                privacy: privacy?.content || '',
+                terms: terms?.content || '',
+            },
+        });
 
-    const [activePrivacyTab, setActivePrivacyTab] = useState<'edit' | 'preview'>('edit');
-    const [activeTermsTab, setActiveTermsTab] = useState<'edit' | 'preview'>('edit');
+    const [activePrivacyTab, setActivePrivacyTab] = useState<
+        'edit' | 'preview'
+    >('edit');
+    const [activeTermsTab, setActiveTermsTab] = useState<'edit' | 'preview'>(
+        'edit',
+    );
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -68,8 +78,8 @@ export default function Edit({ privacy, terms }: EditProps) {
                                         <CardDescription>
                                             {privacy?.updated_at
                                                 ? `Last updated: ${new Date(
-                                                    privacy.updated_at
-                                                ).toLocaleDateString()}`
+                                                      privacy.updated_at,
+                                                  ).toLocaleDateString()}`
                                                 : 'Not yet created'}
                                         </CardDescription>
                                     </div>
@@ -79,7 +89,9 @@ export default function Edit({ privacy, terms }: EditProps) {
                                 <Tabs
                                     value={activePrivacyTab}
                                     onValueChange={(v) =>
-                                        setActivePrivacyTab(v as 'edit' | 'preview')
+                                        setActivePrivacyTab(
+                                            v as 'edit' | 'preview',
+                                        )
                                     }
                                 >
                                     <TabsList className="grid w-full grid-cols-2">
@@ -92,7 +104,10 @@ export default function Edit({ privacy, terms }: EditProps) {
                                             Preview
                                         </TabsTrigger>
                                     </TabsList>
-                                    <TabsContent value="edit" className="space-y-4">
+                                    <TabsContent
+                                        value="edit"
+                                        className="space-y-4"
+                                    >
                                         <div className="space-y-2">
                                             <Label htmlFor="privacy-content">
                                                 Content (HTML)
@@ -103,7 +118,7 @@ export default function Edit({ privacy, terms }: EditProps) {
                                                 onChange={(e) =>
                                                     setData(
                                                         'content.privacy',
-                                                        e.target.value
+                                                        e.target.value,
                                                     )
                                                 }
                                                 placeholder="Enter privacy policy content in HTML format..."
@@ -124,7 +139,8 @@ export default function Edit({ privacy, terms }: EditProps) {
                                                     <div
                                                         dangerouslySetInnerHTML={{
                                                             __html: DOMPurify.sanitize(
-                                                                data.content.privacy
+                                                                data.content
+                                                                    .privacy,
                                                             ),
                                                         }}
                                                         className="prose prose-slate dark:prose-invert max-w-none"
@@ -153,8 +169,8 @@ export default function Edit({ privacy, terms }: EditProps) {
                                         <CardDescription>
                                             {terms?.updated_at
                                                 ? `Last updated: ${new Date(
-                                                    terms.updated_at
-                                                ).toLocaleDateString()}`
+                                                      terms.updated_at,
+                                                  ).toLocaleDateString()}`
                                                 : 'Not yet created'}
                                         </CardDescription>
                                     </div>
@@ -164,7 +180,9 @@ export default function Edit({ privacy, terms }: EditProps) {
                                 <Tabs
                                     value={activeTermsTab}
                                     onValueChange={(v) =>
-                                        setActiveTermsTab(v as 'edit' | 'preview')
+                                        setActiveTermsTab(
+                                            v as 'edit' | 'preview',
+                                        )
                                     }
                                 >
                                     <TabsList className="grid w-full grid-cols-2">
@@ -177,7 +195,10 @@ export default function Edit({ privacy, terms }: EditProps) {
                                             Preview
                                         </TabsTrigger>
                                     </TabsList>
-                                    <TabsContent value="edit" className="space-y-4">
+                                    <TabsContent
+                                        value="edit"
+                                        className="space-y-4"
+                                    >
                                         <div className="space-y-2">
                                             <Label htmlFor="terms-content">
                                                 Content (HTML)
@@ -188,7 +209,7 @@ export default function Edit({ privacy, terms }: EditProps) {
                                                 onChange={(e) =>
                                                     setData(
                                                         'content.terms',
-                                                        e.target.value
+                                                        e.target.value,
                                                     )
                                                 }
                                                 placeholder="Enter terms of service content in HTML format..."
@@ -209,7 +230,8 @@ export default function Edit({ privacy, terms }: EditProps) {
                                                     <div
                                                         dangerouslySetInnerHTML={{
                                                             __html: DOMPurify.sanitize(
-                                                                data.content.terms
+                                                                data.content
+                                                                    .terms,
                                                             ),
                                                         }}
                                                         className="prose prose-slate dark:prose-invert max-w-none"

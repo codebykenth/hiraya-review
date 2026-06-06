@@ -1,9 +1,9 @@
 import { Head } from '@inertiajs/react';
+import DOMPurify from 'dompurify';
 import { FileText } from 'lucide-react';
 import SiteFooter from '@/components/layout/site-footer';
 import SiteHeader from '@/components/layout/site-header';
 import { Card } from '@/components/ui/card';
-import DOMPurify from 'dompurify';
 
 interface LegalContent {
     id?: number;
@@ -36,8 +36,8 @@ export default function Terms({ terms }: TermsProps) {
                                 <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
                                     {terms?.updated_at
                                         ? `Last Updated: ${new Date(
-                                            terms.updated_at
-                                        ).toLocaleDateString()}`
+                                              terms.updated_at,
+                                          ).toLocaleDateString()}`
                                         : 'Last Updated: June 6, 2026'}
                                 </p>
                             </div>
@@ -48,7 +48,9 @@ export default function Terms({ terms }: TermsProps) {
                                 <div
                                     className="prose prose-slate dark:prose-invert max-w-none"
                                     dangerouslySetInnerHTML={{
-                                        __html: DOMPurify.sanitize(terms.content),
+                                        __html: DOMPurify.sanitize(
+                                            terms.content,
+                                        ),
                                     }}
                                 />
                             ) : (
@@ -72,15 +74,15 @@ export default function Terms({ terms }: TermsProps) {
                                             2. Description of Service
                                         </h2>
                                         <p className="text-base leading-relaxed text-muted-foreground">
-                                            Hiraya Review provides practice exams,
-                                            category-specific drills, AI-assisted
-                                            question generation, and score
-                                            analytics tailored for the Philippine
-                                            Civil Service Exam (Professional and
-                                            Sub-Professional levels). Hiraya
-                                            Review provides both free base
-                                            resources and customizable exam
-                                            simulators.
+                                            Hiraya Review provides practice
+                                            exams, category-specific drills,
+                                            AI-assisted question generation, and
+                                            score analytics tailored for the
+                                            Philippine Civil Service Exam
+                                            (Professional and Sub-Professional
+                                            levels). Hiraya Review provides both
+                                            free base resources and customizable
+                                            exam simulators.
                                         </p>
                                     </section>
 
@@ -89,15 +91,16 @@ export default function Terms({ terms }: TermsProps) {
                                             3. Unofficial Study Aid Disclaimer
                                         </h2>
                                         <p className="text-rose-650 text-base leading-relaxed font-semibold text-foreground text-muted-foreground dark:text-rose-400">
-                                            This platform is an independent study
-                                            resource. Hiraya Review is not
-                                            officially connected to, endorsed by,
-                                            or affiliated with the Civil Service
-                                            Commission (CSC) of the Philippines.
-                                            Hiraya Review does not guarantee
-                                            passing scores on actual CSC
-                                            examinations; all material is intended
-                                            for practice and education only.
+                                            This platform is an independent
+                                            study resource. Hiraya Review is not
+                                            officially connected to, endorsed
+                                            by, or affiliated with the Civil
+                                            Service Commission (CSC) of the
+                                            Philippines. Hiraya Review does not
+                                            guarantee passing scores on actual
+                                            CSC examinations; all material is
+                                            intended for practice and education
+                                            only.
                                         </p>
                                     </section>
 
@@ -113,8 +116,8 @@ export default function Terms({ terms }: TermsProps) {
                                         <ul className="list-disc space-y-1 pl-5 text-sm text-muted-foreground">
                                             <li>
                                                 You will provide accurate,
-                                                current, and complete registration
-                                                info.
+                                                current, and complete
+                                                registration info.
                                             </li>
                                             <li>
                                                 You are responsible for keeping
@@ -136,14 +139,14 @@ export default function Terms({ terms }: TermsProps) {
                                         <p className="text-base leading-relaxed text-muted-foreground">
                                             Hiraya Review's question bank and
                                             study materials are protected by
-                                            intellectual property guidelines. You
-                                            are prohibited from using
+                                            intellectual property guidelines.
+                                            You are prohibited from using
                                             web-scrapers, spiders, or automated
                                             scripts to download or clone Hiraya
-                                            Review's practice sets for commercial
-                                            use. Standard manual study and
-                                            personal mock testing are fully
-                                            permitted.
+                                            Review's practice sets for
+                                            commercial use. Standard manual
+                                            study and personal mock testing are
+                                            fully permitted.
                                         </p>
                                     </section>
 
@@ -156,16 +159,17 @@ export default function Terms({ terms }: TermsProps) {
                                             Hiraya Review reserves the right to
                                             modify, suspend, discontinue, or
                                             completely close this project and
-                                            terminate the service (or any portion
-                                            thereof) at any time, for any reason,
-                                            with or without prior notice, and
-                                            without any form of liability to you.
-                                            As a free educational platform, you
-                                            agree that Hiraya Review has no
-                                            obligation to maintain, host, or
-                                            guarantee continuous availability of
-                                            the platform or your historical
-                                            practice metrics.
+                                            terminate the service (or any
+                                            portion thereof) at any time, for
+                                            any reason, with or without prior
+                                            notice, and without any form of
+                                            liability to you. As a free
+                                            educational platform, you agree that
+                                            Hiraya Review has no obligation to
+                                            maintain, host, or guarantee
+                                            continuous availability of the
+                                            platform or your historical practice
+                                            metrics.
                                         </p>
                                     </section>
                                 </div>
