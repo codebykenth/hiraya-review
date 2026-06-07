@@ -3,7 +3,7 @@
 use App\Models\User;
 
 test('guest can access the exams page', function () {
-    $response = $this->get(route('exams.index'));
+    $response = $this->get(route('exams.index', ['free_attempt' => '1']));
 
     $response->assertOk();
 });
@@ -15,7 +15,7 @@ test('guest cannot POST to exams/attempts', function () {
         'cat_scores' => ['metadata' => ['is_timed' => true]],
     ]);
 
-    $response->assertStatus(401);
+    $response->assertStatus(404);
 });
 
 test('authenticated user can POST to exams/attempts', function () {

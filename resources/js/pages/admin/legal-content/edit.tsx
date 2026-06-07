@@ -29,13 +29,12 @@ interface EditProps {
 }
 
 export default function Edit({ privacy, terms }: EditProps) {
-    const { data, setData, processing, errors, recentlySuccessful } =
-        useForm({
-            content: {
-                privacy: privacy?.content || '',
-                terms: terms?.content || '',
-            },
-        });
+    const { data, setData, processing, errors, recentlySuccessful } = useForm({
+        content: {
+            privacy: privacy?.content || '',
+            terms: terms?.content || '',
+        },
+    });
 
     const [activePrivacyTab, setActivePrivacyTab] = useState<
         'edit' | 'preview'

@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Middleware\AllowFreeAttempt;
+use App\Http\Middleware\AuthOrFail;
 use App\Http\Middleware\CheckMaintenanceMode;
 use App\Http\Middleware\CheckUserActive;
 use App\Http\Middleware\CheckViewAccess;
@@ -37,6 +39,8 @@ return Application::configure(basePath: dirname(__DIR__))
             'admin' => EnsureUserIsAdmin::class,
             'turnstile.verify' => VerifyTurnstile::class,
             'view.access' => CheckViewAccess::class,
+            'free.attempt' => AllowFreeAttempt::class,
+            'auth.or.fail' => AuthOrFail::class,
         ]);
 
         $middleware->remove(PreventRequestsDuringMaintenance::class);

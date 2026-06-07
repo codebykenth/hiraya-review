@@ -10,7 +10,7 @@ test('guests cannot store an exam attempt', function () {
         'cat_scores' => ['metadata' => ['is_timed' => true]],
     ]);
 
-    $response->assertStatus(401);
+    $response->assertStatus(404);
 });
 
 test('authenticated users can store a timed exam attempt', function () {

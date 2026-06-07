@@ -116,7 +116,7 @@ test('study schedule requires valid date', function () {
 test('unauthenticated user cannot view calendar page', function () {
     $response = $this->get('/study-schedules');
 
-    $response->assertRedirect('/login');
+    $response->assertStatus(404);
 });
 
 test('unauthenticated user cannot create study schedule', function () {
@@ -127,7 +127,7 @@ test('unauthenticated user cannot create study schedule', function () {
         'title' => 'Math Study',
     ]);
 
-    $response->assertRedirect('/login');
+    $response->assertStatus(404);
 });
 
 test('creating duplicate study schedule returns existing schedule and does not duplicate', function () {

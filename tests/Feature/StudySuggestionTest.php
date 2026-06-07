@@ -67,10 +67,10 @@ it('validates suggestion fields on apply', function () {
 
 it('requires authentication for suggestion endpoints', function () {
     $response = $this->getJson('/study-suggestions');
-    expect($response->status())->toBe(401); // Unauthenticated
+    expect($response->status())->toBe(404); // Unauthenticated
 
     $response = $this->postJson('/study-suggestions/apply', [
         'suggestions' => [],
     ]);
-    expect($response->status())->toBe(401); // Unauthenticated
+    expect($response->status())->toBe(404); // Unauthenticated
 });

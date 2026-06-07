@@ -43,13 +43,16 @@ Route::middleware('throttle:global-views')->group(function () {
         'adminEmail' => env('MAIL_FROM_ADDRESS', env('DEV_EMAIL')),
     ])->name('account-inactive');
 
-    // Publicly accessible Exams & Learn Modules
-    Route::get('exams', [ExamController::class, 'index'])->name('exams.index');
-
+    // Publicly accessible Learn Modules
     Route::controller(UserLearnController::class)->prefix('learn')->name('learn.')->group(function () {
         Route::get('/', 'index')->name('index');
         Route::get('{slug}', 'show')->name('show');
     });
+
+    // Publicly accessible Exams (with free_attempt bypass)
+    Route::get('exams', [ExamController::class, 'index'])
+        ->name('exams.index')
+        ->middleware('throttle:global-views', 'free.attempt');
 
     // Utilities
     Route::get('sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
@@ -74,14 +77,14 @@ Route::middleware('throttle:10,1')->controller(AuthController::class)->prefix('a
 // AUTHENTICATED ROUTES
 // ============================================================================
 Route::post('accept-terms', [AcceptTermsController::class, 'store'])
-    ->middleware(['auth', 'throttle:global-mutations'])
+    ->middleware(['auth.or.fail', 'throttle:global-mutations'])
     ->name('accept-terms');
 
 Route::inertia('dev-docs', 'dev-docs')
     ->name('dev-docs')
-    ->middleware(['auth', 'verified', 'can:access-dev-docs']);
+    ->middleware(['auth.or.fail', 'verified', 'can:access-dev-docs']);
 
-Route::middleware(['auth', 'verified'])->group(function () {
+Route::middleware(['auth.or.fail', 'verified'])->group(function () {
 
     // --- USER DASHBOARD & ANALYTICS ---
     Route::middleware('throttle:global-views')->group(function () {

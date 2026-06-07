@@ -11,14 +11,16 @@ import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { formatMathInline } from '@/lib/exam-formatters';
 import { parseLaTeXToJSX } from '@/lib/latex-parser';
 
-// Configure DOMPurify to allow SVG tags and attributes
-DOMPurify.addHook('uponSanitizeAttribute', (node, data) => {
-    if (data.attrName === 'href' || data.attrName === 'xlink:href') {
-        if (data.attrValue?.toLowerCase().startsWith('javascript:')) {
-            data.keepAttr = false;
+// Configure DOMPurify to allow SVG tags and attributes (browser-only)
+if (typeof window !== 'undefined') {
+    DOMPurify.addHook('uponSanitizeAttribute', (node, data) => {
+        if (data.attrName === 'href' || data.attrName === 'xlink:href') {
+            if (data.attrValue?.toLowerCase().startsWith('javascript:')) {
+                data.keepAttr = false;
+            }
         }
-    }
-});
+    });
+}
 
 const svgConfig = {
     USE_PROFILES: { svg: true, svgFilters: true },

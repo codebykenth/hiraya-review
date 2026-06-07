@@ -9,7 +9,7 @@ use Inertia\Testing\AssertableInertia as Assert;
 
 test('guests are redirected to the login page', function () {
     $response = $this->get(route('dashboard.index'));
-    $response->assertRedirect(route('login'));
+    $response->assertStatus(404);
 });
 
 test('authenticated users can visit the dashboard', function () {
