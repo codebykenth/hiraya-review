@@ -13,13 +13,24 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 import type { Feedback } from '../types';
 
 interface FeedbackViewModalProps {
     feedback: Feedback | null;
     isOpen: boolean;
     onClose: () => void;
-    onStatusChange: (id: number, status: string) => void;
+    onStatusChange: (
+        id: number,
+        status: string,
+        currentStatus?: string,
+    ) => void;
     onDelete: (id: number) => void;
 }
 
@@ -74,7 +85,7 @@ export function FeedbackViewModal({
     }
 
     return (
-        <DialogContent className="sm:max-w-2xl">
+        <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
             <DialogHeader>
                 <div className="flex items-center justify-between pr-6">
                     <DialogTitle className="flex items-center gap-2 text-xl">
@@ -209,14 +220,35 @@ export function FeedbackViewModal({
                     <Button variant="outline" onClick={onClose}>
                         Close
                     </Button>
-                    <Button
-                        onClick={() => {
-                            onStatusChange(feedback.id, 'resolved');
+                    <Select
+                        value={feedback.status}
+                        onValueChange={(value) => {
+                            onStatusChange(feedback.id, value, feedback.status);
                             onClose();
                         }}
                     >
-                        Mark as Resolved
-                    </Button>
+                        <SelectTrigger className="w-40">
+                            <SelectValue>
+                                {feedback.status.charAt(0).toUpperCase() +
+                                    feedback.status.slice(1)}
+                            </SelectValue>
+                        </SelectTrigger>
+                        <SelectContent>
+                            {feedback.status !== 'pending' && (
+                                <SelectItem value="pending">Pending</SelectItem>
+                            )}
+                            {feedback.status !== 'resolved' && (
+                                <SelectItem value="resolved">
+                                    Resolved
+                                </SelectItem>
+                            )}
+                            {feedback.status !== 'dismissed' && (
+                                <SelectItem value="dismissed">
+                                    Dismissed
+                                </SelectItem>
+                            )}
+                        </SelectContent>
+                    </Select>
                 </div>
             </DialogFooter>
         </DialogContent>

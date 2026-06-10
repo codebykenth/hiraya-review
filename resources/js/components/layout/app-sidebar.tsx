@@ -117,6 +117,7 @@ const adminCoreItems: NavItem[] = [
         title: 'Flagged Content',
         href: '/admin/feedbacks',
         icon: MessageSquareWarning,
+        badge: 0, // Will be set dynamically
     },
     {
         title: 'Legal Content',
@@ -194,10 +195,30 @@ const viewMap: Record<string, string> = {
     Analytics: 'analytics',
 };
 
-export function AppSidebar() {
-    const { auth } = usePage<{ auth: any }>().props;
+interface AppSidebarProps {
+    feedbackCount?: number;
+}
+
+export function AppSidebar({ feedbackCount }: AppSidebarProps) {
+    const { auth, pending_feedback_count } = usePage<{
+        auth: any;
+        pending_feedback_count?: number;
+    }>().props;
     const isAdmin = auth.user?.role === 'admin';
     const rolePermissions = auth.permissions?.[auth.user?.role || 'user'] || {};
+
+    // Update Flagged Content badge with pending count
+    const flaggedContentItem = adminCoreItems.find(
+        (item) => item.title === 'Flagged Content',
+    );
+    const count =
+        feedbackCount !== undefined ? feedbackCount : pending_feedback_count;
+
+    if (flaggedContentItem && count !== undefined && count > 0) {
+        flaggedContentItem.badge = count;
+    } else if (flaggedContentItem) {
+        flaggedContentItem.badge = undefined;
+    }
 
     const visibleGeneralItems = generalNavItems.filter((item) => {
         const viewId = viewMap[item.title];

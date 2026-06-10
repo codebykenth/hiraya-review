@@ -26,7 +26,7 @@ export function useAnnouncementsState() {
         id: number | null;
     }>({ isOpen: false, id: null });
 
-    const { data, setData, post, processing, errors, reset, clearErrors } =
+    const { data, setData, post, put, processing, errors, reset, clearErrors } =
         useForm({
             title: '',
             message: '',
@@ -79,7 +79,7 @@ export function useAnnouncementsState() {
             return;
         }
 
-        router.put(updateAnnouncement.url(editingAnnouncement.id), data, {
+        put(updateAnnouncement.url(editingAnnouncement.id), {
             onSuccess: () => {
                 setIsEditModalOpen(false);
                 setEditingAnnouncement(null);
@@ -122,6 +122,12 @@ export function useAnnouncementsState() {
         );
     };
 
+    const openCreateModal = () => {
+        reset();
+        clearErrors();
+        setIsSheetOpen(true);
+    };
+
     const closeCreateModal = () => {
         reset();
         clearErrors();
@@ -149,6 +155,7 @@ export function useAnnouncementsState() {
         errors,
         handleCreate,
         openEditModal,
+        openCreateModal,
         handleUpdate,
         confirmDelete,
         handleDelete,

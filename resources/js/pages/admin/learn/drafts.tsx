@@ -337,7 +337,7 @@ export default function DraftsLearnList({
                                     {m.subcategory}
                                 </span>
                                 <span className="rounded-full border border-border bg-muted px-3 py-0.5 text-xs font-semibold text-foreground">
-                                    â±ï¸ {m.estimated_minutes} mins
+                                    {m.estimated_minutes} mins
                                 </span>
                                 {m.approved ? (
                                     <span className="bg-emerald-550/10 rounded-full border border-emerald-200 px-3 py-0.5 text-xs font-bold text-emerald-700 dark:border-emerald-900/30 dark:border-emerald-900/50 dark:bg-emerald-950/20 dark:text-emerald-400">

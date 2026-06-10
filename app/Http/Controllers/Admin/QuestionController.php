@@ -52,6 +52,7 @@ class QuestionController
                     'category' => $q->subcategory?->category?->name ?? 'Analytical Ability',
                     'subcategory' => $q->subcategory?->name ?? 'Word analogy',
                     'status' => strtoupper($q->status),
+                    'updated_at' => $q->updated_at->format('Y-m-d H:i:s'),
                 ];
             })->toArray();
         });
@@ -406,6 +407,30 @@ class QuestionController
         }
 
         return redirect()->route('questions.index')->with('success', 'Selected questions deleted successfully!');
+    }
+
+    /**
+     * Bulk update question status.
+     */
+    public function bulkUpdateStatus(Request $request)
+    {
+        $validated = $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'integer',
+            'status' => 'required|in:active,draft',
+        ]);
+
+        Question::whereIn('id', $validated['ids'])->update([
+            'status' => $validated['status'],
+        ]);
+
+        $this->clearCache();
+
+        if (request()->wantsJson()) {
+            return response()->json(['success' => true]);
+        }
+
+        return redirect()->route('questions.index')->with('success', 'Selected questions updated successfully!');
     }
 
     /**

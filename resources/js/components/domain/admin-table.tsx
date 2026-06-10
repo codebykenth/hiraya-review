@@ -164,17 +164,19 @@ export function AdminTable<T>({
                                 <th className="w-12 px-4 py-4 sm:px-6">
                                     <Checkbox
                                         checked={
-                                            data.length > 0 &&
-                                            selectedIds.length > 0 &&
-                                            data.every((item) =>
-                                                selectedIds.includes(
-                                                    getItemId(item),
-                                                ),
-                                            )
+                                            selectedIds.length === 0
+                                                ? false
+                                                : data.every((item) =>
+                                                        selectedIds.includes(
+                                                            getItemId(item),
+                                                        ),
+                                                    )
+                                                  ? true
+                                                  : 'indeterminate'
                                         }
                                         onCheckedChange={(checked) =>
                                             onSelectAll?.(
-                                                !!checked,
+                                                checked === true,
                                                 data.map(getItemId),
                                             )
                                         }

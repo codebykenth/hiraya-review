@@ -217,6 +217,8 @@ Route::middleware(['auth.or.fail', 'verified'])->group(function () {
 
             Route::controller(FeedbackController::class)->prefix('admin/feedbacks')->name('admin.feedbacks.')->group(function () {
                 Route::post('/', 'store')->name('store');
+                Route::put('bulk-update', 'bulkUpdate')->name('bulkUpdate');
+                Route::delete('bulk-delete', 'bulkDestroy')->name('bulkDestroy');
                 Route::put('{feedback}/status', 'updateStatus')->name('updateStatus');
                 Route::delete('{feedback}', 'destroy')->name('destroy');
             });

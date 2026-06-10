@@ -252,6 +252,11 @@ export function NavMain({
                                         />
                                     )}
                                     <span>{item.title}</span>
+                                    {item.badge && item.badge > 0 && (
+                                        <span className="ml-auto flex size-5 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
+                                            {item.badge}
+                                        </span>
+                                    )}
                                 </Link>
                             </SidebarMenuButton>
                         </SidebarMenuItem>

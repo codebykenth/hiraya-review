@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Models\Announcement;
+use App\Models\Feedback;
 use App\Models\RolePermission;
 use App\Services\TurnstileService;
 use Illuminate\Http\Request;
@@ -72,6 +73,9 @@ class HandleInertiaRequests extends Middleware
                             ->orWhere('expires_at', '>', now());
                     })
                     ->get();
+            }),
+            'pending_feedback_count' => Cache::remember('pending_feedback_count', 60, function () {
+                return Feedback::where('status', 'pending')->count();
             }),
         ];
     }

@@ -287,6 +287,26 @@ class LearnController
         return redirect()->route('admin.learn.index')->with('success', 'Selected learning modules deleted successfully!');
     }
 
+    /**
+     * Bulk update learning module status.
+     */
+    public function bulkUpdateStatus(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'integer',
+            'is_published' => 'required|boolean',
+        ]);
+
+        LearnModule::whereIn('id', $validated['ids'])->update([
+            'is_published' => $validated['is_published'],
+        ]);
+
+        $this->clearCache();
+
+        return redirect()->route('admin.learn.index')->with('success', 'Selected learning modules updated successfully!');
+    }
+
     public function generate(GenerateLearnModuleRequest $request)
     {
         $validated = $request->validated();

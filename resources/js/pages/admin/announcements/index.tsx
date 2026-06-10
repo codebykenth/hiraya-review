@@ -46,6 +46,7 @@ export default function AnnouncementsIndex({
         errors,
         handleCreate,
         openEditModal,
+        openCreateModal,
         handleUpdate,
         confirmDelete,
         handleDelete,
@@ -66,7 +67,7 @@ export default function AnnouncementsIndex({
                     />
                     <Dialog open={isSheetOpen} onOpenChange={setIsSheetOpen}>
                         <Button
-                            onClick={() => setIsSheetOpen(true)}
+                            onClick={openCreateModal}
                             className="w-full shrink-0 shadow-lg shadow-blue-500/20 sm:w-auto"
                         >
                             <Plus className="mr-2 size-4" />
@@ -87,7 +88,7 @@ export default function AnnouncementsIndex({
                 </div>
 
                 {announcements.data.length === 0 ? (
-                    <EmptyState onCreate={() => setIsSheetOpen(true)} />
+                    <EmptyState onCreate={openCreateModal} />
                 ) : (
                     <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
                         {announcements.data.map((announcement) => (
