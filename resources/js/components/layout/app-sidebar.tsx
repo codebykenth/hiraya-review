@@ -20,6 +20,7 @@ import {
     Megaphone,
     MessageSquareWarning,
 } from 'lucide-react';
+import React from 'react';
 import AppLogo from '@/components/layout/app-logo';
 import { NavMain } from '@/components/layout/nav-main';
 import { NavUser } from '@/components/layout/nav-user';
@@ -207,18 +208,21 @@ export function AppSidebar({ feedbackCount }: AppSidebarProps) {
     const isAdmin = auth.user?.role === 'admin';
     const rolePermissions = auth.permissions?.[auth.user?.role || 'user'] || {};
 
-    // Update Flagged Content badge with pending count
-    const flaggedContentItem = adminCoreItems.find(
-        (item) => item.title === 'Flagged Content',
-    );
     const count =
         feedbackCount !== undefined ? feedbackCount : pending_feedback_count;
 
-    if (flaggedContentItem && count !== undefined && count > 0) {
-        flaggedContentItem.badge = count;
-    } else if (flaggedContentItem) {
-        flaggedContentItem.badge = undefined;
-    }
+    const adminCoreItemsWithBadge = React.useMemo(() => {
+        return adminCoreItems.map((item) => {
+            if (item.title === 'Flagged Content') {
+                return {
+                    ...item,
+                    badge: count !== undefined && count > 0 ? count : undefined,
+                };
+            }
+
+            return item;
+        });
+    }, [count]);
 
     const visibleGeneralItems = generalNavItems.filter((item) => {
         const viewId = viewMap[item.title];
@@ -257,7 +261,7 @@ export function AppSidebar({ feedbackCount }: AppSidebarProps) {
                             <SidebarSeparator className="my-2" />
                         )}
                         <NavMain
-                            items={adminCoreItems}
+                            items={adminCoreItemsWithBadge}
                             label="Administration"
                         />
                         <NavMain

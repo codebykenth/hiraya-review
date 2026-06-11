@@ -4,7 +4,7 @@ import { PageContainer } from '@/components/layout/page-container';
 import { PageHeader } from '@/components/layout/page-header';
 import { HowItWorksModal } from '@/components/shared/how-it-works-modal';
 import { AnalyticsFilters } from './components/analytics-filters';
-import { AttemptBreakdownChart } from './components/attempt-breakdown-chart';
+
 import { MetricsGrid } from './components/metrics-grid';
 import { PacingTrendChart } from './components/pacing-trend-chart';
 import { QuestionVolumeChart } from './components/question-volume-chart';
@@ -79,16 +79,11 @@ export default function AnalyticsIndex({ stats, aiAnalysis }: AnalyticsProps) {
                     <QuestionVolumeChart categories={categories} />
                 </div>
 
-                {/* Row 3: Radar + Pacing Trend */}
+                {/* Row 3: Weakest Subcategories + Pacing Trend */}
                 <div className="grid grid-cols-1 gap-3 sm:gap-6 md:grid-cols-2">
                     <SubcategoryRadarChart categories={categories} />
                     <PacingTrendChart data={activeStats.pacingTrend || []} />
                 </div>
-
-                {/* Row 4: Attempt Breakdown (Full Width) */}
-                <AttemptBreakdownChart
-                    data={activeStats.attemptBreakdowns || []}
-                />
             </div>
         </PageContainer>
     );

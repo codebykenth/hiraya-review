@@ -1,4 +1,4 @@
-﻿import { ChevronDown } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 import React, { useState } from 'react';
 
 interface AnalyticsFiltersProps {
@@ -67,7 +67,9 @@ export function AnalyticsFilters({
                 >
                     {currentRuns === 'all'
                         ? 'All Runs'
-                        : `Last ${currentRuns} Runs`}
+                        : currentRuns === '1'
+                          ? 'Last 1 Run (Latest)'
+                          : `Last ${currentRuns} Runs`}
                     <ChevronDown className="size-3.5" />
                 </button>
                 {isRunsOpen && (
@@ -78,6 +80,7 @@ export function AnalyticsFilters({
                         />
                         <div className="absolute right-0 z-20 mt-2 w-36 origin-top-right rounded-lg border border-slate-200 bg-white p-1 shadow-lg ring-1 ring-black/5 focus:outline-none dark:border-slate-800 dark:bg-slate-900">
                             {[
+                                { value: '1', label: 'Last 1 Run (Latest)' },
                                 { value: '6', label: 'Last 6 Runs' },
                                 { value: '12', label: 'Last 12 Runs' },
                                 { value: 'all', label: 'All Runs' },

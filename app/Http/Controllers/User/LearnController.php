@@ -208,6 +208,11 @@ class LearnController
             if ($mod) {
                 $module['is_completed'] = $mod->isCompletedBy($userId);
             }
+        } else {
+            // Truncate content for guests to prevent inspecting element
+            // We take the first few blocks (separated by double newlines) to avoid cutting mid-sentence or mid-markdown-tag
+            $paragraphs = explode("\n\n", $module['content']);
+            $module['content'] = implode("\n\n", array_slice($paragraphs, 0, 4));
         }
 
         return Inertia::render('user/learn/show', [

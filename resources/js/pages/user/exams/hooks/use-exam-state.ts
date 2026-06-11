@@ -1658,31 +1658,31 @@ export function useExamState({
                 ).length;
                 const unansweredCount = totalQuestions - answeredCount;
 
-                let confirmMsg =
-                    'Are you sure you want to finish and submit your exam?';
-                let title = 'Submit Exam?';
+                if (unansweredCount > 0) {
+                    setConfirmModal({
+                        isOpen: true,
+                        title: 'Incomplete Exam',
+                        message: `You still have ${unansweredCount} unanswered questions out of ${totalQuestions}. Please answer all questions before submitting.`,
+                        confirmLabel: 'Return to Exam',
+                        variant: 'danger',
+                        onConfirm: () => {
+                            setConfirmModal((prev) => ({
+                                ...prev,
+                                isOpen: false,
+                            }));
+                        },
+                    });
 
-                if (
-                    totalQuestions > 0 &&
-                    answeredCount / totalQuestions < 0.5
-                ) {
-                    confirmMsg = `⚠️ DUMMY ATTEMPT WARNING: You have only answered ${answeredCount} out of ${totalQuestions} questions (less than half). \n\nBecause so few questions are answered, this will be considered a "Dummy Attempt" and IT WILL NOT BE SAVED to your permanent history or dashboard metrics.\n\nAre you sure you want to end the session now and view the scorecard?`;
-                    title = 'Submit Dummy Attempt?';
-                } else if (unansweredCount > 0) {
-                    confirmMsg = `⚠️ WARNING: You have ${unansweredCount} unanswered questions out of ${totalQuestions} total questions. Unanswered questions will be marked as incorrect.\n\nAre you absolutely sure you want to submit the exam now?`;
-                    title = 'Submit with Unanswered Items?';
-                } else {
-                    confirmMsg =
-                        'All questions have been answered! Are you ready to submit your exam and view your scorecard?';
-                    title = 'Ready to Submit?';
+                    return;
                 }
 
                 setConfirmModal({
                     isOpen: true,
-                    title,
-                    message: confirmMsg,
+                    title: 'Ready to Submit?',
+                    message:
+                        'All questions have been answered! Are you ready to submit your exam and view your scorecard?',
                     confirmLabel: 'Yes, Submit',
-                    variant: unansweredCount > 0 ? 'danger' : 'success',
+                    variant: 'success',
                     onConfirm: () => {
                         executeSubmit();
                     },

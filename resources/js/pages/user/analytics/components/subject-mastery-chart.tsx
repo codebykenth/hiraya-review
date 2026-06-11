@@ -1,12 +1,9 @@
 import { Award } from 'lucide-react';
 import React from 'react';
 import {
-    BarChart,
-    Bar,
-    XAxis,
-    YAxis,
-    CartesianGrid,
-    Cell,
+    RadialBarChart,
+    RadialBar,
+    PolarAngleAxis,
     ResponsiveContainer,
 } from 'recharts';
 import { Card } from '@/components/ui/card';
@@ -21,23 +18,28 @@ interface SubjectMasteryChartProps {
     categories: AnalyticsCategory[];
 }
 
+const RING_COLORS = [
+    'hsl(221, 83%, 53%)', // blue-600
+    'hsl(160, 84%, 39%)', // emerald-600
+    'hsl(24, 95%, 53%)', // orange-500
+    'hsl(239, 84%, 67%)', // indigo-500
+    'hsl(173, 80%, 40%)', // teal-600
+];
+
 export function SubjectMasteryChart({ categories }: SubjectMasteryChartProps) {
-    const segments = categories.map((cat, idx) => ({
+    const data = categories.map((cat, idx) => ({
         name: cat.name.replace(' Ability', '').replace(' Information', ''),
         percentage: cat.percentage,
-        colorHex: `var(--chart-${(idx % 5) + 1})`,
+        fill: RING_COLORS[idx % RING_COLORS.length],
     }));
 
-    const config = segments.reduce(
-        (acc, seg) => {
-            acc[seg.name] = { label: seg.name, color: seg.colorHex };
+    const config = data.reduce(
+        (acc, item) => {
+            acc[item.name] = { label: item.name, color: item.fill };
 
             return acc;
         },
-        { percentage: { label: 'Accuracy' } } as Record<
-            string,
-            { label: string; color?: string }
-        >,
+        {} as Record<string, { label: string; color: string }>,
     );
 
     return (
@@ -54,63 +56,70 @@ export function SubjectMasteryChart({ categories }: SubjectMasteryChartProps) {
                 </div>
             </div>
 
-            <div className="h-[250px] w-full">
-                <ChartContainer config={config} className="h-full w-full">
-                    <ResponsiveContainer width="100%" height="100%">
-                        <BarChart
-                            layout="vertical"
-                            data={segments}
-                            margin={{ top: 0, right: 30, left: 10, bottom: 0 }}
-                        >
-                            <CartesianGrid
-                                strokeDasharray="3 3"
-                                horizontal={false}
-                                stroke="var(--border)"
-                                opacity={0.5}
-                            />
-                            <XAxis
-                                type="number"
-                                domain={[0, 100]}
-                                tickLine={false}
-                                axisLine={false}
-                                tickMargin={10}
-                                tick={{
-                                    fontSize: 11,
-                                    fill: 'var(--muted-foreground)',
-                                }}
-                                tickFormatter={(val) => `${val}%`}
-                            />
-                            <YAxis
-                                type="category"
-                                dataKey="name"
-                                tickLine={false}
-                                axisLine={false}
-                                tickMargin={10}
-                                tick={{
-                                    fontSize: 11,
-                                    fill: 'var(--foreground)',
-                                    fontWeight: 600,
-                                }}
-                            />
-                            <ChartTooltip
-                                cursor={{ fill: 'var(--muted)', opacity: 0.2 }}
-                                content={<ChartTooltipContent hideLabel />}
-                            />
-                            <Bar
-                                dataKey="percentage"
-                                radius={[0, 4, 4, 0]}
-                                barSize={24}
+            <div className="flex flex-col items-center gap-4 sm:flex-row">
+                <div className="h-[220px] w-full max-w-[220px] shrink-0">
+                    <ChartContainer config={config} className="h-full w-full">
+                        <ResponsiveContainer width="100%" height="100%">
+                            <RadialBarChart
+                                cx="50%"
+                                cy="50%"
+                                innerRadius="20%"
+                                outerRadius="100%"
+                                barSize={14}
+                                data={data}
+                                startAngle={90}
+                                endAngle={-270}
                             >
-                                {segments.map((entry, index) => (
-                                    <Cell
-                                        key={`cell-${index}`}
-                                        fill={entry.colorHex}
-                                    />
-                                ))}
-                            </Bar>
-                        </BarChart>
-                    </ResponsiveContainer>
-                </ChartContainer>
+                                <PolarAngleAxis
+                                    type="number"
+                                    domain={[0, 100]}
+                                    angleAxisId={0}
+                                    tick={false}
+                                />
+                                <RadialBar
+                                    background={{
+                                        fill: 'var(--muted)',
+                                        opacity: 0.3,
+                                    }}
+                                    dataKey="percentage"
+                                    cornerRadius={8}
+                                    angleAxisId={0}
+                                />
+                                <ChartTooltip
+                                    content={
+                                        <ChartTooltipContent
+                                            nameKey="name"
+                                            formatter={(value) => `${value}%`}
+                                        />
+                                    }
+                                />
+                            </RadialBarChart>
+                        </ResponsiveContainer>
+                    </ChartContainer>
+                </div>
+
+                {/* Legend */}
+                <div className="flex flex-1 flex-col gap-2">
+                    {data.map((item) => (
+                        <div
+                            key={item.name}
+                            className="flex items-center justify-between gap-3 rounded-lg border border-border/40 bg-white/60 px-3 py-2 dark:bg-slate-900/40"
+                        >
+                            <div className="flex items-center gap-2">
+                                <div
+                                    className="size-2.5 shrink-0 rounded-full"
+                                    style={{ backgroundColor: item.fill }}
+                                />
+                                <span className="text-xs font-bold text-slate-700 dark:text-slate-300">
+                                    {item.name}
+                                </span>
+                            </div>
+                            <span className="text-sm font-extrabold text-slate-900 dark:text-white">
+                                {item.percentage}%
+                            </span>
+                        </div>
+                    ))}
+                </div>
             </div>
         </Card>
     );

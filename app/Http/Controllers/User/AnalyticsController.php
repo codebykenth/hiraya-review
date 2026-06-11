@@ -27,7 +27,7 @@ class AnalyticsController
     {
         $userId = auth()->id();
         $trackFilter = $request->query('track', 'Professional');
-        $runsFilter = $request->query('runs', '6'); // Default to 6 runs
+        $runsFilter = $request->query('runs', '1'); // Default to 1 run
 
         // Fetch user attempts
         $query = ExamAttempt::where('user_id', $userId)->latest();
@@ -215,39 +215,21 @@ class AnalyticsController
                 $total = $totals['total'];
                 $percentage = $total > 0 ? round(($correct / $total) * 100) : 0;
 
-                // Format subcategories
+                // Build subcategories from real attempt data only
                 $subcatsData = [];
-                $defaults = [];
-                if ($catName === 'Verbal Ability') {
-                    $defaults = ['Reading Comprehension', 'Vocabulary', 'Grammar & Usage', 'Paragraph Organization'];
-                } elseif ($catName === 'Clerical Ability') {
-                    $defaults = ['Spelling', 'Filing', 'Clerical Operations'];
-                } elseif ($catName === 'General Information') {
-                    $defaults = ['Philippine Constitution', 'Code of Conduct (RA 6713)', 'Environmental Conservation'];
-                } elseif ($catName === 'Numerical Ability') {
-                    $defaults = ['Basic Operations', 'Word Problems', 'Data Interpretation'];
-                } elseif ($catName === 'Analytical Ability') {
-                    $defaults = ['Word Analogy', 'Symbolic Logic', 'Number Series'];
-                }
-
-                foreach ($defaults as $subName) {
-                    $subCorrect = $subcategoryTotals[$catName][$subName]['correct'] ?? 0;
-                    $subTotal = $subcategoryTotals[$catName][$subName]['total'] ?? 0;
-
-                    // If total is 0 but we have category data, generate proportional data
-                    if ($subTotal === 0 && $total > 0) {
-                        $subTotal = max(5, round($total / count($defaults)));
-                        $subCorrect = round($subTotal * ($percentage / 100));
+                if (isset($subcategoryTotals[$catName])) {
+                    foreach ($subcategoryTotals[$catName] as $subName => $subTotals) {
+                        $subCorrect = $subTotals['correct'];
+                        $subTotal = $subTotals['total'];
+                        if ($subTotal > 0) {
+                            $subcatsData[] = [
+                                'name' => $subName,
+                                'correct' => (int) $subCorrect,
+                                'total' => (int) $subTotal,
+                                'percentage' => (int) round(($subCorrect / $subTotal) * 100),
+                            ];
+                        }
                     }
-
-                    $subPct = $subTotal > 0 ? round(($subCorrect / $subTotal) * 100) : 0;
-
-                    $subcatsData[] = [
-                        'name' => $subName,
-                        'correct' => (int) $subCorrect,
-                        'total' => (int) $subTotal,
-                        'percentage' => (int) $subPct,
-                    ];
                 }
 
                 $formattedCategories[] = [

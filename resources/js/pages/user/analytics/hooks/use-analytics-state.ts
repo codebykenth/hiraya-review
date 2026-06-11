@@ -1,4 +1,4 @@
-﻿import { router, usePage } from '@inertiajs/react';
+import { router, usePage } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
 import type { Auth } from '@/types';
 import type { AnalyticsProps, AnalyticsStats } from '../types';
@@ -109,7 +109,7 @@ export function useAnalyticsState({ stats }: AnalyticsProps) {
     const [isRunsOpen, setIsRunsOpen] = useState(false);
 
     const currentTrack = stats?.filters?.track || 'Professional';
-    const currentRuns = stats?.filters?.runs || '6';
+    const currentRuns = stats?.filters?.runs || '1';
 
     const updateFilter = (key: 'track' | 'runs', value: string) => {
         router.get(

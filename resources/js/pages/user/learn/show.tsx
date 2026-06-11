@@ -155,15 +155,31 @@ export default function LearnShow({ module, recommended }: LearnShowProps) {
                                                 Report Issue
                                             </Button>
                                             <Button
-                                                onClick={() =>
+                                                onClick={() => {
+                                                    const isCompleting =
+                                                        !module.is_completed;
                                                     router.post(
                                                         `/learn/${module.slug}/complete`,
                                                         {},
                                                         {
-                                                            preserveScroll: true,
+                                                            preserveScroll:
+                                                                !isCompleting,
+                                                            onSuccess: () => {
+                                                                if (
+                                                                    isCompleting
+                                                                ) {
+                                                                    window.scrollTo(
+                                                                        {
+                                                                            top: 0,
+                                                                            behavior:
+                                                                                'smooth',
+                                                                        },
+                                                                    );
+                                                                }
+                                                            },
                                                         },
-                                                    )
-                                                }
+                                                    );
+                                                }}
                                                 variant={
                                                     module.is_completed
                                                         ? 'outline'

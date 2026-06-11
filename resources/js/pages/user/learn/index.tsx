@@ -130,28 +130,32 @@ export default function LearnIndex(props: LearnIndexProps) {
                         description="Dive deep into core subjects, learn mental shortcuts, and master exam theories with our dedicated curated study guides."
                         tooltip="Access comprehensive study modules, lessons, formulas, and progress metrics for each major civil service topic."
                     />
-                    <div className="mt-1">
-                        <HowItWorksModal
-                            title="How the Study Hub Works"
-                            tips={[
-                                {
-                                    icon: <BookOpen className="size-4" />,
-                                    title: 'Review Lessons',
-                                    text: 'Access high-yield lessons, key conceptual breakdowns, and core exam strategies designed to target specific Civil Service subjects.',
-                                },
-                                {
-                                    icon: <CheckCircle className="size-4" />,
-                                    title: 'Track Progress',
-                                    text: 'Click "Mark as Complete" inside any lesson to record your progress, update your overall progress bar, and display completed badges.',
-                                },
-                                {
-                                    icon: <BarChart className="size-4" />,
-                                    title: 'Smart Filtering',
-                                    text: 'Filter lessons by specific categories to view individual completion percentages, or search keywords to find specific topics.',
-                                },
-                            ]}
-                        />
-                    </div>
+                    {isLoggedIn && (
+                        <div className="mt-1">
+                            <HowItWorksModal
+                                title="How the Study Hub Works"
+                                tips={[
+                                    {
+                                        icon: <BookOpen className="size-4" />,
+                                        title: 'Review Lessons',
+                                        text: 'Access high-yield lessons, key conceptual breakdowns, and core exam strategies designed to target specific Civil Service subjects.',
+                                    },
+                                    {
+                                        icon: (
+                                            <CheckCircle className="size-4" />
+                                        ),
+                                        title: 'Track Progress',
+                                        text: 'Click "Mark as Complete" inside any lesson to record your progress, update your overall progress bar, and display completed badges.',
+                                    },
+                                    {
+                                        icon: <BarChart className="size-4" />,
+                                        title: 'Smart Filtering',
+                                        text: 'Filter lessons by specific categories to view individual completion percentages, or search keywords to find specific topics.',
+                                    },
+                                ]}
+                            />
+                        </div>
+                    )}
                 </div>
 
                 {/* Overall Progress Card */}
@@ -178,53 +182,70 @@ export default function LearnIndex(props: LearnIndexProps) {
                         </div>
 
                         {/* Category Progress Grid */}
-                        <div className="mt-5 grid grid-cols-1 gap-3 border-t border-border pt-4 sm:grid-cols-2 lg:grid-cols-5">
-                            {activeCategories.map((cat) => {
-                                const stats = categoryStats[cat.name] || {
-                                    completed: 0,
-                                    total: 0,
-                                };
-                                const pct =
-                                    stats.total > 0
-                                        ? Math.round(
-                                              (stats.completed / stats.total) *
-                                                  100,
-                                          )
-                                        : 0;
-                                const barColor =
-                                    progressBarColors[cat.name] ||
-                                    'bg-slate-500 dark:bg-slate-400';
+                        {(() => {
+                            const visibleCategories = activeCategories.filter(
+                                (cat) =>
+                                    cat.name !== 'Clerical Ability' ||
+                                    (categoryStats[cat.name]?.total ?? 0) > 0,
+                            );
 
-                                return (
-                                    <div
-                                        key={cat.id}
-                                        className="flex flex-col gap-1.5 rounded-lg border border-border/40 bg-slate-50/20 p-3.5 dark:bg-slate-900/10"
-                                    >
-                                        <div className="flex items-center justify-between text-sm font-bold">
-                                            <span
-                                                className="truncate text-muted-foreground"
-                                                title={cat.name}
-                                            >
-                                                {cat.name}
-                                            </span>
-                                            <span className="ml-1 shrink-0 font-extrabold text-foreground">
-                                                {pct}%
-                                            </span>
-                                        </div>
-                                        <div className="mt-1 h-2 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800/80">
+                            return (
+                                <div
+                                    className={`mt-5 grid grid-cols-1 gap-3 border-t border-border pt-4 sm:grid-cols-2 ${visibleCategories.length >= 5 ? 'lg:grid-cols-5' : 'lg:grid-cols-4'}`}
+                                >
+                                    {visibleCategories.map((cat) => {
+                                        const stats = categoryStats[
+                                            cat.name
+                                        ] || {
+                                            completed: 0,
+                                            total: 0,
+                                        };
+                                        const pct =
+                                            stats.total > 0
+                                                ? Math.round(
+                                                      (stats.completed /
+                                                          stats.total) *
+                                                          100,
+                                                  )
+                                                : 0;
+                                        const barColor =
+                                            progressBarColors[cat.name] ||
+                                            'bg-slate-500 dark:bg-slate-400';
+
+                                        return (
                                             <div
-                                                className={`${barColor} h-full rounded-full transition-all duration-500`}
-                                                style={{ width: `${pct}%` }}
-                                            />
-                                        </div>
-                                        <span className="mt-0.5 text-xs font-semibold text-muted-foreground/80">
-                                            {stats.completed} of {stats.total}{' '}
-                                            modules
-                                        </span>
-                                    </div>
-                                );
-                            })}
-                        </div>
+                                                key={cat.id}
+                                                className="flex flex-col gap-1.5 rounded-lg border border-border/40 bg-slate-50/20 p-3.5 dark:bg-slate-900/10"
+                                            >
+                                                <div className="flex items-center justify-between text-sm font-bold">
+                                                    <span
+                                                        className="truncate text-muted-foreground"
+                                                        title={cat.name}
+                                                    >
+                                                        {cat.name}
+                                                    </span>
+                                                    <span className="ml-1 shrink-0 font-extrabold text-foreground">
+                                                        {pct}%
+                                                    </span>
+                                                </div>
+                                                <div className="mt-1 h-2 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800/80">
+                                                    <div
+                                                        className={`${barColor} h-full rounded-full transition-all duration-500`}
+                                                        style={{
+                                                            width: `${pct}%`,
+                                                        }}
+                                                    />
+                                                </div>
+                                                <span className="mt-0.5 text-xs font-semibold text-muted-foreground/80">
+                                                    {stats.completed} of{' '}
+                                                    {stats.total} modules
+                                                </span>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            );
+                        })()}
                     </div>
                 )}
 

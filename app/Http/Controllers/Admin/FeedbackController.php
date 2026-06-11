@@ -3,11 +3,12 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\BulkDestroyFeedbackRequest;
+use App\Http\Requests\Admin\BulkUpdateFeedbackRequest;
 use App\Http\Requests\Admin\StoreFeedbackRequest;
 use App\Http\Requests\Admin\UpdateFeedbackStatusRequest;
 use App\Models\Feedback;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -66,30 +67,19 @@ class FeedbackController extends Controller
         return back()->with('success', 'Feedback deleted.');
     }
 
-    public function bulkUpdate(Request $request): RedirectResponse
+    public function bulkUpdate(BulkUpdateFeedbackRequest $request): RedirectResponse
     {
-        $validated = $request->validate([
-            'ids' => 'required|array',
-            'ids.*' => 'integer|exists:feedbacks,id',
-            'status' => 'required|in:pending,resolved,dismissed',
-        ]);
-
-        Feedback::whereIn('id', $validated['ids'])->update([
-            'status' => $validated['status'],
+        Feedback::whereIn('id', $request->validated('ids'))->update([
+            'status' => $request->validated('status'),
         ]);
         Cache::forget('pending_feedback_count');
 
         return back()->with('success', 'Feedback status updated.');
     }
 
-    public function bulkDestroy(Request $request): RedirectResponse
+    public function bulkDestroy(BulkDestroyFeedbackRequest $request): RedirectResponse
     {
-        $validated = $request->validate([
-            'ids' => 'required|array',
-            'ids.*' => 'integer|exists:feedbacks,id',
-        ]);
-
-        Feedback::whereIn('id', $validated['ids'])->delete();
+        Feedback::whereIn('id', $request->validated('ids'))->delete();
         Cache::forget('pending_feedback_count');
 
         return back()->with('success', 'Feedback deleted.');
