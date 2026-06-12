@@ -9,6 +9,8 @@ class PublicController extends Controller
 {
     public function welcome()
     {
+        session()->forget('is_free_attempt_active');
+
         return Inertia::render('public/welcome');
     }
 

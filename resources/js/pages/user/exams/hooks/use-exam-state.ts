@@ -6,7 +6,18 @@ import type { Auth } from '@/types';
 import type { Question, ExamResults, ExamIndexProps } from '../types';
 
 const shuffleOptionsForQuestion = (q: Question): Question => {
-    const indices = q.options.map((_, i) => i);
+    let options = q.options;
+    let correctOption = q.correct_option;
+
+    if (options.length > 5) {
+        options = options.slice(0, 5);
+
+        if (correctOption >= 5) {
+            correctOption = 0;
+        }
+    }
+
+    const indices = options.map((_, i) => i);
 
     // Fisher-Yates shuffle
     for (let i = indices.length - 1; i > 0; i--) {
@@ -14,8 +25,8 @@ const shuffleOptionsForQuestion = (q: Question): Question => {
         [indices[i], indices[j]] = [indices[j], indices[i]];
     }
 
-    const shuffledOptions = indices.map((i) => q.options[i]);
-    const newCorrect = indices.indexOf(q.correct_option);
+    const shuffledOptions = indices.map((i) => options[i]);
+    const newCorrect = indices.indexOf(correctOption);
 
     return {
         ...q,
@@ -74,6 +85,18 @@ export function useExamState({
                         session.questionIds &&
                         session.questionIds.length > 0
                     ) {
+                        const currentUserId = auth?.user?.id ?? null;
+                        const sessionUserId =
+                            session.userId !== undefined
+                                ? session.userId
+                                : null;
+
+                        if (sessionUserId !== currentUserId) {
+                            localStorage.removeItem('active_exam_session');
+
+                            return null;
+                        }
+
                         const isDrillUrl = params.get('drill') === 'true';
 
                         if (isDrillUrl && params.has('category_id')) {
@@ -212,6 +235,10 @@ export function useExamState({
     }, [isExamActive]);
     const [activeQuestions, setActiveQuestions] = useState<Question[]>(() => {
         if (restoredSession) {
+            if (restoredSession.activeQuestions) {
+                return restoredSession.activeQuestions;
+            }
+
             const pool = getRestoredQuestions(restoredSession.questionIds);
 
             return pool.map(shuffleOptionsForQuestion);
@@ -472,6 +499,7 @@ export function useExamState({
 
         if (isExamActive && activeQuestions.length > 0) {
             const state = {
+                userId: auth?.user?.id ?? null,
                 selectedExamId,
                 drillCategoryId,
                 drillCategoryName,
@@ -479,6 +507,7 @@ export function useExamState({
                 drillLanguage,
                 drillQuestionCount,
                 questionIds: activeQuestions.map((q) => q.id),
+                activeQuestions,
                 answers,
                 flagged,
                 currentIdx,
@@ -509,6 +538,7 @@ export function useExamState({
         sessionTimeLimitSecs,
         isFreeAttempt,
         isExamSubmitted,
+        auth?.user?.id,
     ]);
 
     // Clear auto-save session on successful submission
@@ -1291,12 +1321,16 @@ export function useExamState({
             localStorage.removeItem('pending_free_exam');
 
             const sourcePool = [...questions, ...demographicQuestions];
-            const pool: Question[] = state.questionIds
-                .map((id: number) =>
-                    sourcePool.find((q: Question) => q.id === id),
-                )
-                .filter((q: Question | undefined): q is Question => Boolean(q))
-                .map(shuffleOptionsForQuestion);
+            const pool: Question[] =
+                state.activeQuestions ||
+                state.questionIds
+                    .map((id: number) =>
+                        sourcePool.find((q: Question) => q.id === id),
+                    )
+                    .filter((q: Question | undefined): q is Question =>
+                        Boolean(q),
+                    )
+                    .map(shuffleOptionsForQuestion);
 
             if (pool.length === 0) {
                 return;
@@ -1398,38 +1432,10 @@ export function useExamState({
     };
 
     const handleQuestionNavigate = (targetIdx: number) => {
-        if (!isFreeAttempt) {
-            setCurrentIdx(targetIdx);
-
-            return;
-        }
-
-        if (targetIdx <= currentIdx) {
-            setCurrentIdx(targetIdx);
-
-            return;
-        }
-
-        if (targetIdx >= 20) {
-            setShowLockedModal(true);
-
-            return;
-        }
-
         setCurrentIdx(targetIdx);
     };
 
     const handleCategoryChange = (category: string) => {
-        if (
-            isFreeAttempt &&
-            category !== 'All Categories' &&
-            category !== 'Demographic Profile'
-        ) {
-            setShowLockedModal(true);
-
-            return;
-        }
-
         setSelectedPaletteCategory(category);
 
         if (category !== 'All Categories') {
@@ -1447,6 +1453,7 @@ export function useExamState({
         const state = {
             selectedExamId,
             questionIds: activeQuestions.map((q) => q.id),
+            activeQuestions,
             answers,
             currentIdx,
             timeLeft: timeLeftRef.current,
@@ -1460,8 +1467,6 @@ export function useExamState({
 
     const handleCancelFreeExam = () => {
         setShowRegisterModal(false);
-        setIsExamActive(false);
-        setIsFreeAttempt(false);
         router.visit('/');
     };
 
@@ -1615,10 +1620,6 @@ export function useExamState({
             },
         };
 
-        if (isFreeAttemptRef.current) {
-            return;
-        }
-
         fetch('/exams/attempts', {
             method: 'POST',
             headers: {
@@ -1636,6 +1637,10 @@ export function useExamState({
             .then((data) => {
                 if (data.attempt_id) {
                     setLastStoredAttemptId(data.attempt_id);
+                    const url = new URL(window.location.href);
+                    url.searchParams.delete('free_attempt');
+                    url.searchParams.set('attempt_id', String(data.attempt_id));
+                    window.history.replaceState({}, '', url.toString());
                 }
             })
             .catch(() => {
@@ -1711,8 +1716,6 @@ export function useExamState({
                 variant: 'danger',
                 onConfirm: () => {
                     localStorage.removeItem('active_exam_session');
-                    setIsExamActive(false);
-                    setIsFreeAttempt(false);
                     router.visit('/');
                 },
             });

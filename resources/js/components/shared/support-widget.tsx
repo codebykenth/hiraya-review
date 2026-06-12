@@ -18,7 +18,13 @@ export function SupportWidget() {
     const [open, setOpen] = useState(false);
     const [isMounted, setIsMounted] = useState(false);
     const [showBubble, setShowBubble] = useState(false);
-    const [isLiveExamActive, setIsLiveExamActive] = useState(false);
+    const [isLiveExamActive, setIsLiveExamActive] = useState(() => {
+        if (typeof window !== 'undefined') {
+            return localStorage.getItem('active_exam_session') !== null;
+        }
+
+        return false;
+    });
 
     // Check if bubble should show today
     const shouldShowBubbleToday = () => {

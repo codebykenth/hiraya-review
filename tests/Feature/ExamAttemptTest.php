@@ -3,14 +3,26 @@
 use App\Models\ExamAttempt;
 use App\Models\User;
 
-test('guests cannot store an exam attempt', function () {
+test('guests can store an exam attempt', function () {
     $response = $this->postJson(route('exams.attempts.store'), [
         'question_ids' => [1, 2, 3],
-        'answers' => [1 => 0, 2 => 2],
-        'cat_scores' => ['metadata' => ['is_timed' => true]],
+        'answers' => [1 => 0, 2 => 2, 3 => 1],
+        'cat_scores' => [
+            'categoryScoreMap' => [],
+            'metadata' => [
+                'track' => 'Professional',
+                'category_name' => 'Professional Level Reviewer',
+                'correct_count' => 2,
+                'total_questions' => 3,
+                'skipped_count' => 0,
+                'duration_secs' => 180,
+                'is_timed' => true,
+            ],
+        ],
     ]);
 
-    $response->assertStatus(404);
+    $response->assertOk();
+    $response->assertJson(['success' => true]);
 });
 
 test('authenticated users can store a timed exam attempt', function () {

@@ -320,15 +320,7 @@ export function LiveExamView({
                                 Previous Question
                             </button>
 
-                            {isFreeAttempt && currentIdx === 19 ? (
-                                <button
-                                    onClick={() => setShowRegisterModal(true)}
-                                    className="shadow-3xs flex items-center gap-1.5 rounded-lg bg-emerald-600 px-4 py-2.5 text-xs font-bold text-white transition hover:bg-emerald-700 focus:outline-none sm:px-6"
-                                >
-                                    <CheckCircle2 className="size-4" />
-                                    Finish Preview
-                                </button>
-                            ) : currentIdx < activeQuestions.length - 1 ? (
+                            {currentIdx < activeQuestions.length - 1 ? (
                                 <button
                                     onClick={() =>
                                         handleQuestionNavigate(currentIdx + 1)
@@ -338,7 +330,7 @@ export function LiveExamView({
                                     Next Question
                                     <ChevronRight className="size-4" />
                                 </button>
-                            ) : !isFreeAttempt ? (
+                            ) : (
                                 <button
                                     onClick={() => handleSubmitExam(false)}
                                     className="flex items-center gap-1.5 rounded-lg bg-emerald-600 px-4 py-2.5 text-xs font-bold text-white shadow-xs transition hover:bg-emerald-700 focus:outline-none sm:px-6"
@@ -346,7 +338,7 @@ export function LiveExamView({
                                     <CheckCircle2 className="size-4" />
                                     Submit Exam
                                 </button>
-                            ) : null}
+                            )}
                         </div>
                     </div>
 

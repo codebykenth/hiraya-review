@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Models\Category;
+use App\Models\ExamAttempt;
 use App\Models\ExamDate;
 use App\Models\LearnModule;
 use App\Models\Question;
@@ -57,6 +58,13 @@ class AppServiceProvider extends ServiceProvider
         Event::listen(function (Login $event) {
             if ($event->user instanceof User) {
                 $event->user->forceFill(['last_login_at' => now()])->save();
+
+                $guestAttemptId = session()->pull('pending_guest_attempt_id');
+                if ($guestAttemptId) {
+                    ExamAttempt::where('id', $guestAttemptId)
+                        ->whereNull('user_id')
+                        ->update(['user_id' => $event->user->id]);
+                }
             }
         });
 

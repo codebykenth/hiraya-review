@@ -48,9 +48,19 @@ class ExamController
         $retakeSource = null;
 
         if ($request->has('attempt_id')) {
-            $attempt = ExamAttempt::where('user_id', auth()->id())
-                ->with('category')
-                ->findOrFail($request->attempt_id);
+            if (! auth()->check()) {
+                $pendingId = $request->session()->get('pending_guest_attempt_id');
+                if (! $pendingId || $pendingId != $request->attempt_id) {
+                    abort(403, 'Unauthorized access to scorecard.');
+                }
+                $attempt = ExamAttempt::whereNull('user_id')
+                    ->with('category')
+                    ->findOrFail($request->attempt_id);
+            } else {
+                $attempt = ExamAttempt::where('user_id', auth()->id())
+                    ->with('category')
+                    ->findOrFail($request->attempt_id);
+            }
 
             if ($attempt) {
                 // In-memory filter of cached pool
@@ -141,11 +151,16 @@ class ExamController
 
         $attempt = ExamAttempt::create([
             'user_id' => auth()->id(),
-            'category_id' => $validated['category_id'],
+            'category_id' => $validated['category_id'] ?? null,
             'question_ids' => $validated['question_ids'],
             'answers' => $validated['answers'],
             'cat_scores' => $validated['cat_scores'],
         ]);
+
+        if (! auth()->check()) {
+            session(['pending_guest_attempt_id' => $attempt->id]);
+            session()->forget('is_free_attempt_active');
+        }
 
         return response()->json([
             'success' => true,

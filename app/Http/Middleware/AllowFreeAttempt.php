@@ -18,6 +18,18 @@ class AllowFreeAttempt
     {
         // Allow access if free_attempt parameter is present
         if ($request->has('free_attempt') && $request->query('free_attempt') == '1') {
+            $request->session()->put('is_free_attempt_active', true);
+
+            return $next($request);
+        }
+
+        // Allow access if there is an active free attempt session flag
+        if ($request->session()->get('is_free_attempt_active') === true) {
+            return $next($request);
+        }
+
+        // Allow access if there is a pending guest attempt in session (for viewing the scorecard)
+        if ($request->session()->has('pending_guest_attempt_id')) {
             return $next($request);
         }
 

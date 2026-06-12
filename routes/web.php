@@ -54,6 +54,10 @@ Route::middleware('throttle:global-views')->group(function () {
         ->name('exams.index')
         ->middleware('throttle:global-views', 'free.attempt');
 
+    Route::post('exams/attempts', [ExamController::class, 'storeAttempt'])
+        ->name('exams.attempts.store')
+        ->middleware('throttle:global-mutations');
+
     // Utilities
     Route::get('sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
     Route::get('ping', fn () => response()->json(['status' => 'alive', 'timestamp' => now()->toIso8601String()]));
@@ -102,10 +106,6 @@ Route::middleware(['auth.or.fail', 'verified'])->group(function () {
         Route::get('history', 'index')->name('history.index')->middleware('throttle:global-views');
         Route::post('exams/attempts/bulk-delete', 'bulkDestroy')->name('exams.attempts.bulkDestroy')->middleware('throttle:global-mutations');
         Route::delete('exams/attempts/{attempt}', 'destroy')->name('exams.attempts.destroy')->middleware('throttle:global-mutations');
-    });
-
-    Route::controller(ExamController::class)->group(function () {
-        Route::post('exams/attempts', 'storeAttempt')->name('exams.attempts.store')->middleware('throttle:global-mutations');
     });
 
     Route::post('learn/{slug}/complete', [UserLearnController::class, 'toggleComplete'])

@@ -1,4 +1,4 @@
-import { CheckCircle2, ChevronRight, Lock, X } from 'lucide-react';
+import { CheckCircle2, ChevronRight, X } from 'lucide-react';
 import React, { useMemo } from 'react';
 
 export interface QuestionPalettePanelProps {
@@ -38,7 +38,6 @@ export default function QuestionPalettePanel({
     onCategoryChange,
     allowedCategories,
 
-    isFreeAttempt,
     onSubmitExam,
 
     reviewStatusFilter,
@@ -289,20 +288,13 @@ export default function QuestionPalettePanel({
                                                 ? 'border-blue-600 bg-blue-600 text-white hover:bg-blue-700'
                                                 : isFlagged
                                                   ? 'border-rose-300 bg-rose-50 font-extrabold text-rose-700 dark:border-rose-900/40 dark:bg-rose-950/20 dark:bg-rose-950/30 dark:text-rose-400'
-                                                  : isFreeAttempt && idx >= 20
-                                                    ? 'border-border bg-background text-muted-foreground/40 hover:bg-muted'
-                                                    : 'border-border bg-background text-foreground hover:bg-muted'
+                                                  : 'border-border bg-background text-foreground hover:bg-muted'
                                     }`}
                                 >
                                     {idx + 1}
                                     {isFlagged && (
                                         <div
                                             className={`absolute top-0.5 right-0.5 size-2 rounded-full border border-white shadow-xs dark:border-slate-950 ${isFilteredOut ? 'bg-slate-400' : 'bg-rose-500'}`}
-                                        />
-                                    )}
-                                    {isFreeAttempt && idx >= 20 && (
-                                        <Lock
-                                            className={`absolute -top-1 -right-1 size-3 text-muted-foreground ${isFilteredOut ? 'opacity-50' : ''}`}
                                         />
                                     )}
                                 </button>
@@ -362,7 +354,7 @@ export default function QuestionPalettePanel({
                 </div>
             </div>
 
-            {!isMobile && mode === 'exam' && !isFreeAttempt && onSubmitExam && (
+            {!isMobile && mode === 'exam' && onSubmitExam && (
                 <div className="shrink-0 border-t border-border bg-card p-4">
                     <button
                         onClick={onSubmitExam}

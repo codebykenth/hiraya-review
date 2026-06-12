@@ -28,9 +28,12 @@ class DashboardController
             'total_categories' => Category::count(),
             'total_subcategories' => Subcategory::count(),
             'total_examinees' => User::where('role', '!=', 'admin')->count(),
-            'total_attempts' => ExamAttempt::whereHas('user', function ($q) {
-                $q->where('role', '!=', 'admin');
+            'total_attempts' => ExamAttempt::where(function ($query) {
+                $query->whereHas('user', function ($q) {
+                    $q->where('role', '!=', 'admin');
+                })->orWhereNull('user_id');
             })->count(),
+            'guest_attempts' => ExamAttempt::whereNull('user_id')->count(),
             'track_configs' => TrackConfig::count(),
         ];
 
@@ -47,8 +50,10 @@ class DashboardController
         });
 
         // 3. Recent examinee attempt activities with grade computations
-        $recentAttempts = ExamAttempt::whereHas('user', function ($q) {
-            $q->where('role', '!=', 'admin');
+        $recentAttempts = ExamAttempt::where(function ($query) {
+            $query->whereHas('user', function ($q) {
+                $q->where('role', '!=', 'admin');
+            })->orWhereNull('user_id');
         })
             ->with(['user', 'category'])
             ->latest()
@@ -77,8 +82,8 @@ class DashboardController
                 return [
                     'id' => $attempt->id,
                     'user' => [
-                        'name' => $attempt->user?->name ?? 'Examinee',
-                        'email' => $attempt->user?->email ?? '',
+                        'name' => $attempt->user?->name ?? 'Guest User',
+                        'email' => $attempt->user?->email ?? 'Guest',
                     ],
                     'category' => $categoryName,
                     'percentage' => $percentage,

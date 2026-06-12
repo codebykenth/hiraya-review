@@ -221,7 +221,7 @@ export function AttemptsTable({
                                                 <Tooltip>
                                                     <TooltipTrigger asChild>
                                                         <Link
-                                                            href={`/exams?attempt_id=${att.id}`}
+                                                            href={`/exams?attempt_id=${att.id}&from=history`}
                                                             className="group flex size-8 cursor-pointer items-center justify-center rounded-lg border border-blue-200 bg-blue-50 text-blue-700 shadow-2xs transition transition-all duration-300 hover:bg-blue-100 hover:text-blue-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95 dark:border-blue-900/30 dark:border-blue-900/50 dark:bg-blue-950/20 dark:bg-blue-950/30 dark:text-blue-400 dark:hover:bg-blue-900/30 dark:hover:text-blue-300"
                                                         >
                                                             <BookOpen className="size-3.5" />

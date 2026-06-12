@@ -1,5 +1,6 @@
-import { Head, Link } from '@inertiajs/react';
-import { Award, BookOpen, ChevronLeft } from 'lucide-react';
+import { Head, Link, usePage } from '@inertiajs/react';
+import { Award, BookOpen, ChevronLeft, LogIn, Trophy } from 'lucide-react';
+import { useState } from 'react';
 import { formatDuration } from '@/lib/exam-formatters';
 
 interface ScorecardViewProps {
@@ -26,6 +27,18 @@ export function ScorecardView({
     submittedByTimer,
     setReviewScreenActive,
 }: ScorecardViewProps) {
+    const { auth } = usePage<{ auth: any }>().props;
+    const isGuest = !auth?.user;
+    const GUEST_PROMPT_KEY = 'guest_prompt_dismissed';
+    const [showGuestPrompt, setShowGuestPrompt] = useState(
+        () => isGuest && sessionStorage.getItem(GUEST_PROMPT_KEY) !== '1',
+    );
+
+    const dismissGuestPrompt = () => {
+        sessionStorage.setItem(GUEST_PROMPT_KEY, '1');
+        setShowGuestPrompt(false);
+    };
+
     const elapsedSecs = results?.elapsedSecs ?? 0;
     const remainingSecs = isTimed
         ? Math.max(0, getActiveTimeLimitSecs() - elapsedSecs)
@@ -49,14 +62,25 @@ export function ScorecardView({
                 }
             />
 
-            {savedAttempt && (
-                <Link
-                    href="/history"
-                    className="group mb-4 flex w-fit cursor-pointer items-center gap-1 text-xs font-black text-slate-800 transition transition-all duration-300 hover:text-blue-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95 dark:text-blue-400 dark:text-white dark:hover:text-blue-400"
-                >
-                    <ChevronLeft className="size-4" /> Back to History
-                </Link>
-            )}
+            {(() => {
+                const params = new URLSearchParams(
+                    typeof window !== 'undefined' ? window.location.search : '',
+                );
+                const fromHistory = params.get('from') === 'history';
+
+                if (savedAttempt && fromHistory) {
+                    return (
+                        <Link
+                            href="/history"
+                            className="group mb-4 flex w-fit cursor-pointer items-center gap-1 text-xs font-black text-slate-800 transition transition-all duration-300 hover:text-blue-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95 dark:text-blue-400 dark:text-white dark:hover:text-blue-400"
+                        >
+                            <ChevronLeft className="size-4" /> Back to History
+                        </Link>
+                    );
+                }
+
+                return null;
+            })()}
 
             <div className="mb-6 flex flex-col gap-2 border-b border-slate-100 pb-5 md:flex-row md:items-center md:justify-between">
                 <div>
@@ -68,19 +92,29 @@ export function ScorecardView({
                     </h1>
                     <p className="mt-0.5 text-sm leading-relaxed text-slate-500">
                         Completed on{' '}
-                        {savedAttempt?.created_at
-                            ? new Date(
-                                  savedAttempt.created_at,
-                              ).toLocaleDateString('en-US', {
-                                  month: 'long',
-                                  day: 'numeric',
-                                  year: 'numeric',
-                              })
-                            : new Date().toLocaleDateString('en-US', {
-                                  month: 'long',
-                                  day: 'numeric',
-                                  year: 'numeric',
-                              })}
+                        {(() => {
+                            const dateObj = savedAttempt?.created_at
+                                ? new Date(savedAttempt.created_at)
+                                : new Date();
+                            const formattedDate = dateObj.toLocaleDateString(
+                                'en-US',
+                                {
+                                    month: 'long',
+                                    day: 'numeric',
+                                    year: 'numeric',
+                                },
+                            );
+                            const formattedTime = dateObj.toLocaleTimeString(
+                                'en-US',
+                                {
+                                    hour: 'numeric',
+                                    minute: '2-digit',
+                                    hour12: true,
+                                },
+                            );
+
+                            return `${formattedDate} at ${formattedTime}`;
+                        })()}
                     </p>
                 </div>
                 <div className="flex items-center gap-3">
@@ -116,9 +150,9 @@ export function ScorecardView({
                         <div className="mt-4 flex flex-col gap-4">
                             <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-xs sm:p-5 md:p-6 dark:border-slate-800 dark:bg-slate-900">
                                 {/* Top Section: Circle & Categories */}
-                                <div className="flex flex-row items-center gap-4 sm:gap-8">
+                                <div className="flex flex-col items-center gap-6 sm:flex-row sm:gap-8">
                                     {/* Circle Percentage */}
-                                    <div className="flex w-28 shrink-0 flex-col items-center sm:w-64 lg:w-72">
+                                    <div className="flex w-full shrink-0 flex-col items-center sm:w-64 lg:w-72">
                                         <div className="relative flex flex-col items-center justify-center">
                                             <div className="relative flex size-24 items-center justify-center sm:size-40">
                                                 <svg
@@ -278,10 +312,96 @@ export function ScorecardView({
                                         </span>
                                     </div>
                                 </div>
+                                <div className="mt-5 flex flex-col items-center justify-between gap-3 border-t border-slate-100 pt-4 sm:flex-row dark:border-slate-800">
+                                    <div className="flex items-center gap-2">
+                                        <img
+                                            src="/images/hiraya_logo_cropped.png"
+                                            alt="Hiraya Review Logo"
+                                            className="size-5 shrink-0 object-contain dark:brightness-110"
+                                        />
+                                        <span className="font-heading text-xs font-black tracking-widest text-slate-700 uppercase dark:text-slate-300">
+                                            Hiraya Review
+                                        </span>
+                                    </div>
+                                    <span className="text-[10px] font-bold text-slate-400/90 dark:text-slate-500">
+                                        hirayareview.com • Civil Service Exam
+                                        Simulator
+                                    </span>
+                                </div>
                             </div>
+                            {isGuest && (
+                                <div className="mt-6 overflow-hidden rounded-2xl border border-blue-100 bg-gradient-to-br from-blue-50/80 via-white to-blue-50/30 p-6 text-center shadow-lg dark:border-blue-950/40 dark:from-slate-900 dark:to-slate-950">
+                                    <div className="mx-auto mb-4 flex size-12 items-center justify-center rounded-full bg-blue-600 text-white shadow-md shadow-blue-500/20 dark:bg-blue-500">
+                                        <Trophy className="size-6 animate-pulse" />
+                                    </div>
+                                    <h3 className="font-heading text-lg font-black tracking-tight text-slate-900 sm:text-xl dark:text-white">
+                                        Don't Lose Your Mock Exam Score!
+                                    </h3>
+                                    <p className="mx-auto mt-2 max-w-2xl text-sm leading-relaxed text-slate-600 dark:text-slate-400">
+                                        Register a free account now to instantly
+                                        save this attempt to your progress
+                                        history, view item-by-item analytics,
+                                        and access AI-powered diagnostic
+                                        reviews.
+                                    </p>
+                                    <div className="mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row">
+                                        <Link
+                                            href="/register"
+                                            className="group flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-6 py-3 text-sm font-bold text-white shadow-md shadow-blue-500/20 transition-all duration-300 hover:bg-blue-700 hover:shadow-lg hover:shadow-blue-500/35 focus:outline-none active:scale-95 sm:w-auto"
+                                        >
+                                            <LogIn className="size-4 transition-transform group-hover:translate-x-0.5" />
+                                            Register Free Account & Save
+                                        </Link>
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     );
                 })()}
+
+            {showGuestPrompt && (
+                <div className="fixed inset-0 z-[100] flex animate-in items-center justify-center bg-slate-900/60 p-4 backdrop-blur-xs duration-200 fade-in">
+                    <div
+                        className="relative w-full max-w-2xl animate-in rounded-xl border border-slate-200 bg-white p-6 shadow-xl duration-200 zoom-in-95 dark:border-slate-800 dark:bg-slate-950"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <div className="mb-4 flex flex-col items-center text-center">
+                            <div className="mb-3 rounded-full bg-blue-50 p-3 text-blue-600 dark:bg-blue-950/50 dark:text-blue-400">
+                                <Trophy className="size-8" />
+                            </div>
+                            <h3 className="font-heading text-xl font-black tracking-tight text-slate-900 dark:text-white">
+                                Mock Exam Completed!
+                            </h3>
+                            <p className="mt-2 text-sm leading-relaxed text-slate-500 dark:text-slate-400">
+                                Great job on finishing the exam! Your score is
+                                shown behind this window.
+                            </p>
+                            <p className="mt-3 text-xs leading-relaxed font-semibold text-amber-600 dark:text-amber-400">
+                                ⚠️ To save this attempt permanently in your
+                                history, access detailed performance analytics,
+                                and use our AI Diagnostic features, please
+                                create an account.
+                            </p>
+                        </div>
+                        <div className="mt-6 flex flex-col gap-2.5">
+                            <Link
+                                href="/register"
+                                className="group flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 py-2.5 text-xs font-bold text-white shadow-sm transition transition-all duration-300 hover:bg-blue-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95"
+                            >
+                                <LogIn className="size-4" />
+                                Create a Free Account
+                            </Link>
+                            <button
+                                type="button"
+                                onClick={dismissGuestPrompt}
+                                className="group flex w-full items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white py-2.5 text-xs font-bold text-slate-700 transition transition-all duration-300 hover:bg-slate-50 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800"
+                            >
+                                View Scorecard
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

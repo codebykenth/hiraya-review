@@ -253,9 +253,9 @@ export default function Welcome() {
                                                 Choose Your Exam Level
                                             </DialogTitle>
                                             <DialogDescription>
-                                                Try a free mock exam preview.
-                                                Answer the first 20 questions to
-                                                experience the platform.
+                                                Try a free mock exam. Experience
+                                                the full simulator and view your
+                                                scorecard upon completion.
                                             </DialogDescription>
                                         </DialogHeader>
                                         <div className="grid gap-3 py-4">
