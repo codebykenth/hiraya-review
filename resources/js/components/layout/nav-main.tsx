@@ -230,6 +230,15 @@ export function NavMain({
                         active = true;
                     }
 
+                    // Support highlighting Dashboard when on AI Diagnostic Report page (/ai-analysis)
+                    if (
+                        item.title === 'Dashboard' &&
+                        item.href === '/dashboard' &&
+                        currentPath === '/ai-analysis'
+                    ) {
+                        active = true;
+                    }
+
                     return (
                         <SidebarMenuItem key={item.title}>
                             <SidebarMenuButton

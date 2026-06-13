@@ -16,6 +16,16 @@ class AllowFreeAttempt
      */
     public function handle(Request $request, Closure $next): Response
     {
+        // If they already have a completed guest attempt, redirect them to its scorecard
+        if (! Auth::check() && $request->session()->has('pending_guest_attempt_id')) {
+            $pendingId = $request->session()->get('pending_guest_attempt_id');
+            if ($request->query('attempt_id') != $pendingId) {
+                return redirect()->route('exams.index', ['attempt_id' => $pendingId, 'limit' => '1']);
+            }
+
+            return $next($request);
+        }
+
         // Allow access if free_attempt parameter is present
         if ($request->has('free_attempt') && $request->query('free_attempt') == '1') {
             $request->session()->put('is_free_attempt_active', true);

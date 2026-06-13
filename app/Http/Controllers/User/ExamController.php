@@ -140,13 +140,29 @@ class ExamController
         $totalQuestions = count($validated['question_ids']);
         $completionRate = $totalQuestions > 0 ? ($answeredCount / $totalQuestions) * 100 : 0;
 
-        // Ignore empty or dummy attempts (less than 50% answered)
-        if ($completionRate < 50) {
-            return response()->json([
-                'success' => true,
-                'attempt_id' => null,
-                'message' => 'Dummy attempt ignored.',
-            ]);
+        if (! auth()->check()) {
+            if ($request->session()->has('pending_guest_attempt_id')) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'You have already completed your free guest attempt.',
+                ], 403);
+            }
+
+            if ($answeredCount < $totalQuestions) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Guest attempt must be complete (all questions answered).',
+                ], 422);
+            }
+        } else {
+            // Ignore empty or dummy attempts (less than 50% answered)
+            if ($completionRate < 50) {
+                return response()->json([
+                    'success' => true,
+                    'attempt_id' => null,
+                    'message' => 'Dummy attempt ignored.',
+                ]);
+            }
         }
 
         $attempt = ExamAttempt::create([

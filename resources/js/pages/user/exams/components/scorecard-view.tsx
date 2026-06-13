@@ -82,6 +82,62 @@ export function ScorecardView({
                 return null;
             })()}
 
+            {(() => {
+                const params = new URLSearchParams(
+                    typeof window !== 'undefined' ? window.location.search : '',
+                );
+                const limitReached = params.get('limit') === '1';
+
+                if (limitReached) {
+                    return (
+                        <div className="mb-6 rounded-xl border border-blue-200 bg-blue-50/80 p-4 dark:border-blue-900/40 dark:bg-blue-950/20">
+                            <div className="flex items-start gap-3">
+                                <div className="rounded-full bg-blue-100 p-1 text-blue-600 dark:bg-blue-950 dark:text-blue-400">
+                                    <svg
+                                        className="size-4"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth="2"
+                                            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                                        />
+                                    </svg>
+                                </div>
+                                <div className="flex-1">
+                                    <h4 className="text-xs font-black text-blue-800 dark:text-blue-300">
+                                        Free Guest Attempt Limit Reached
+                                    </h4>
+                                    <p className="mt-1 text-xs leading-relaxed text-blue-700 dark:text-blue-400">
+                                        You are limited to 1 free guest mock
+                                        exam attempt. Please{' '}
+                                        <Link
+                                            href="/register"
+                                            className="font-bold underline hover:text-blue-800 dark:hover:text-blue-200"
+                                        >
+                                            register a free account
+                                        </Link>{' '}
+                                        or{' '}
+                                        <Link
+                                            href="/login"
+                                            className="font-bold underline hover:text-blue-800 dark:hover:text-blue-200"
+                                        >
+                                            sign in
+                                        </Link>{' '}
+                                        to take more mock exams.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    );
+                }
+
+                return null;
+            })()}
+
             <div className="mb-6 flex flex-col gap-2 border-b border-slate-100 pb-5 md:flex-row md:items-center md:justify-between">
                 <div>
                     <span className="inline-flex items-center gap-1 rounded-full bg-blue-50 px-2.5 py-0.5 text-xs font-bold text-blue-600 dark:bg-blue-950/30 dark:bg-blue-950/40 dark:text-blue-400">
