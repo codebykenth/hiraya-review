@@ -1,4 +1,4 @@
-﻿import { Head, useForm } from '@inertiajs/react';
+import { Head, useForm } from '@inertiajs/react';
 import { HelpCircle } from 'lucide-react';
 import React, { useState } from 'react';
 import { CurationEditShell } from '@/components/domain/curation-edit-shell';
@@ -89,7 +89,9 @@ export default function QuestionEdit({
     const [selectedSubcategoryName, setSelectedSubcategoryName] = useState(
         question.subcategory || cseCategoriesTree[selectedCategoryName]?.[0],
     );
-
+    const params = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '');
+    const page = params.get('page') || '1';
+    const backUrl = `${questionsIndex().url}?page=${page}`;
     // Main Form Setup
     const { data, setData, put, processing, errors, transform } = useForm({
         category: selectedCategoryName,
@@ -170,7 +172,7 @@ export default function QuestionEdit({
             <CurationEditShell
                 title="Edit Question Content"
                 description="Update syllabus classifications, multiple-choice distractors, correct answers, or rationales."
-                backUrl={questionsIndex().url}
+                backUrl={backUrl}
                 backLabel="Back to Question Management"
                 headerTitle="Edit Question Details"
                 headerIcon={HelpCircle}

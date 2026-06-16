@@ -56,7 +56,14 @@ export default function AdminLearnIndex({
     >('all');
     const [filterCategory, setFilterCategory] = useState<string>('all');
     const [filterSubcategory, setFilterSubcategory] = useState<string>('all');
-    const [currentPage, setCurrentPage] = useState(1);
+    const [currentPage, setCurrentPage] = useState(() => {
+        const params = new URLSearchParams(
+            typeof window !== 'undefined' ? window.location.search : '',
+        );
+        const p = params.get('page');
+
+        return p ? Number(p) : 1;
+    });
     const [deleteModal, setDeleteModal] = useState<{
         isOpen: boolean;
         id: number | null;
@@ -183,6 +190,10 @@ export default function AdminLearnIndex({
     const handlePageChange = (page: number) => {
         setCurrentPage(page);
         window.scrollTo({ top: 0, behavior: 'smooth' });
+
+        const url = new URL(window.location.href);
+        url.searchParams.set('page', String(page));
+        window.history.replaceState({}, '', url.toString());
     };
 
     const promptDelete = (id: number) => {
@@ -636,10 +647,7 @@ export default function AdminLearnIndex({
                                             <Tooltip>
                                                 <TooltipTrigger asChild>
                                                     <Link
-                                                        href={
-                                                            learnShow(mod.slug)
-                                                                .url
-                                                        }
+                                                        href={`${learnShow(mod.slug).url}?page=${currentPage}`}
                                                         className="group/btn cursor-pointer rounded-lg p-1.5 text-muted-foreground transition-all duration-300 hover:bg-muted hover:text-blue-600 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95 dark:text-blue-400"
                                                     >
                                                         <Eye className="size-4" />
@@ -653,11 +661,7 @@ export default function AdminLearnIndex({
                                             <Tooltip>
                                                 <TooltipTrigger asChild>
                                                     <Link
-                                                        href={
-                                                            adminLearnEdit(
-                                                                mod.id,
-                                                            ).url
-                                                        }
+                                                        href={`${adminLearnEdit(mod.id).url}?page=${currentPage}`}
                                                         className="group/btn cursor-pointer rounded-lg p-1.5 text-muted-foreground transition-all duration-300 hover:bg-muted hover:text-blue-600 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95 dark:text-blue-400"
                                                     >
                                                         <Edit2 className="size-4" />

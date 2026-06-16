@@ -86,13 +86,22 @@ export default function LearnShow({ module, recommended }: LearnShowProps) {
             />
 
             <PageContainer className="bg-slate-50/30 p-4 md:p-6 dark:bg-slate-900/20">
-                <Link
-                    href="/learn"
-                    className="group flex w-fit items-center gap-1 text-sm font-black text-foreground transition transition-all duration-300 hover:text-blue-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95 dark:text-blue-400 dark:hover:text-blue-400"
-                >
-                    <ChevronLeft className="size-4" />
-                    Back to Study Hub
-                </Link>
+                {(() => {
+                    const params = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '');
+                    const page = params.get('page');
+                    const backUrl = page ? `/admin/learn?page=${page}` : '/learn';
+                    const label = page ? 'Back to Module Management' : 'Back to Study Hub';
+
+                    return (
+                        <Link
+                            href={backUrl}
+                            className="group flex w-fit items-center gap-1 text-sm font-black text-foreground transition transition-all duration-300 hover:text-blue-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95 dark:text-blue-400 dark:hover:text-blue-400"
+                        >
+                            <ChevronLeft className="size-4" />
+                            {label}
+                        </Link>
+                    );
+                })()}
 
                 <div className="mx-auto grid w-full grid-cols-1 gap-3 sm:gap-6 lg:grid-cols-[minmax(0,1fr)_19rem]">
                     <div className="min-w-0">
@@ -318,7 +327,7 @@ export default function LearnShow({ module, recommended }: LearnShowProps) {
                 </div>
             </PageContainer>
 
-            {isLoggedIn && (
+            {isReportModalOpen && isLoggedIn && (
                 <ReportIssueModal
                     isOpen={isReportModalOpen}
                     onClose={() => setIsReportModalOpen(false)}

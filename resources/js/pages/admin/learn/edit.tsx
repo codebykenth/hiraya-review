@@ -1,4 +1,4 @@
-﻿import { Head, useForm } from '@inertiajs/react';
+import { Head, useForm } from '@inertiajs/react';
 import { BookOpen } from 'lucide-react';
 import React from 'react';
 import { CurationEditShell } from '@/components/domain/curation-edit-shell';
@@ -45,6 +45,10 @@ export default function AdminLearnEdit({
         put(adminLearnUpdate(module.id).url);
     };
 
+    const params = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '');
+    const page = params.get('page') || '1';
+    const backUrl = `${adminLearnIndex().url}?page=${page}`;
+
     return (
         <>
             <Head title="Edit Learning Module" />
@@ -52,7 +56,7 @@ export default function AdminLearnEdit({
             <CurationEditShell
                 title="Edit Study Module"
                 description="Update the lesson title, syllabus categorization, preview summaries, or core Markdown content material."
-                backUrl={adminLearnIndex().url}
+                backUrl={backUrl}
                 backLabel="Back to Module Management"
                 headerTitle="Edit Module Details"
                 headerIcon={BookOpen}

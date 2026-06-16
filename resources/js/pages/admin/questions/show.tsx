@@ -41,13 +41,20 @@ export default function QuestionShow({ question }: QuestionShowProps) {
             <Head title={`Question Details #${question.id}`} />
             <PageContainer>
                 {/* Back Link */}
-                <Link
-                    href={questionsIndex().url}
-                    className="group flex w-fit items-center gap-1 text-xs font-black text-foreground transition transition-all duration-300 hover:text-blue-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95 dark:text-blue-400"
-                >
-                    <ChevronLeft className="size-4" />
-                    Back to Curation Manager
-                </Link>
+                {(() => {
+                    const params = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '');
+                    const page = params.get('page') || '1';
+
+                    return (
+                        <Link
+                            href={`${questionsIndex().url}?page=${page}`}
+                            className="group flex w-fit items-center gap-1 text-xs font-black text-foreground transition transition-all duration-300 hover:text-blue-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95 dark:text-blue-400"
+                        >
+                            <ChevronLeft className="size-4" />
+                            Back to Curation Manager
+                        </Link>
+                    );
+                })()}
 
                 {/* Title & Edit Actions */}
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">

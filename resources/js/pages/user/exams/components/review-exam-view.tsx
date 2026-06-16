@@ -688,7 +688,7 @@ export function ReviewExamView({
                     />
                 )}
 
-                {currentQuestion && (
+                {isReportModalOpen && currentQuestion && (
                     <ReportIssueModal
                         isOpen={isReportModalOpen}
                         onClose={() => setIsReportModalOpen(false)}

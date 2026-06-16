@@ -467,7 +467,7 @@ export function LiveExamView({
                     </div>
                 )}
 
-                {activeQuestion && (
+                {isReportModalOpen && activeQuestion && (
                     <ReportIssueModal
                         isOpen={isReportModalOpen}
                         onClose={() => setIsReportModalOpen(false)}
