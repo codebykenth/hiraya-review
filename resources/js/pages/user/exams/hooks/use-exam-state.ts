@@ -265,6 +265,10 @@ export function useExamState({
             return restoredSession.flagged || {};
         }
 
+        if (savedAttempt) {
+            return savedAttempt.cat_scores?.flagged || {};
+        }
+
         return {};
     });
     const [isMobilePaletteOpen, setIsMobilePaletteOpen] = useState(false);
@@ -280,7 +284,7 @@ export function useExamState({
     const [isExamSubmitted, setIsExamSubmitted] = useState(false);
     const [reviewScreenActive, setReviewScreenActive] = useState(false);
     const [reviewStatusFilter, setReviewStatusFilter] = useState<
-        'all' | 'correct' | 'incorrect'
+        'all' | 'correct' | 'incorrect' | 'flagged'
     >('all');
     const [reviewCategoryFilter, setReviewCategoryFilter] =
         useState('All Categories');
@@ -614,6 +618,12 @@ export function useExamState({
                 }
             }
 
+            if (reviewStatusFilter === 'flagged') {
+                if (!flagged[idx]) {
+                    return false;
+                }
+            }
+
             return true;
         };
 
@@ -639,6 +649,7 @@ export function useExamState({
         activeQuestions,
         currentIdx,
         answers,
+        flagged,
     ]);
 
     const [submittedByTimer, setSubmittedByTimer] = useState(false);
@@ -767,6 +778,7 @@ export function useExamState({
             setTimeout(() => {
                 setActiveQuestions(loadedQuestions);
                 setAnswers(savedAttempt.answers);
+                setFlagged(savedAttempt.cat_scores?.flagged || {});
                 setIsTimed(isTimedSaved);
 
                 if (meta.track === 'Drill') {
@@ -1595,6 +1607,7 @@ export function useExamState({
             answers: originalAnswers,
             cat_scores: {
                 categoryScoreMap: catMap,
+                flagged: flagged,
                 metadata: {
                     track: trackName,
                     category_name: finalCategoryName,
@@ -1648,7 +1661,7 @@ export function useExamState({
                     'Failed to connect to server. Your progress may not have been saved.',
                 );
             });
-    }, []);
+    }, [flagged]);
 
     const handleSubmitExam = useCallback(
         (auto = false) => {

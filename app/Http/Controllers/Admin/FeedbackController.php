@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Events\NewFeedbackSubmitted;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\BulkDestroyFeedbackRequest;
 use App\Http\Requests\Admin\BulkUpdateFeedbackRequest;
@@ -46,7 +47,7 @@ class FeedbackController extends Controller
         $feedback = $request->user()->feedbacks()->create($request->validated());
 
         // Broadcast new feedback event for real-time admin notifications
-        NewFeedbackSubmitted($feedback);
+        NewFeedbackSubmitted::dispatch($feedback);
 
         return back()->with('success', 'Feedback submitted successfully.');
     }

@@ -16,9 +16,11 @@ export interface QuestionPalettePanelProps {
     isFreeAttempt?: boolean;
     onSubmitExam?: () => void;
 
-    reviewStatusFilter?: 'all' | 'correct' | 'incorrect';
+    reviewStatusFilter?: 'all' | 'correct' | 'incorrect' | 'flagged';
     reviewSubcategoryFilter?: string;
-    onReviewStatusChange?: (status: 'all' | 'correct' | 'incorrect') => void;
+    onReviewStatusChange?: (
+        status: 'all' | 'correct' | 'incorrect' | 'flagged',
+    ) => void;
     onReviewSubcategoryChange?: (subcat: string) => void;
     reviewSubcategories?: string[];
 
@@ -148,16 +150,16 @@ export default function QuestionPalettePanel({
                         <span className="mb-2 block text-[10px] font-extrabold tracking-wider text-muted-foreground uppercase">
                             Status Filter
                         </span>
-                        <div className="flex rounded-lg bg-muted/50 p-1">
+                        <div className="grid grid-cols-4 gap-0.5 rounded-lg bg-muted/50 p-1">
                             <button
                                 onClick={() => onReviewStatusChange('all')}
-                                className={`flex-1 rounded-md py-1.5 text-xs font-bold transition ${reviewStatusFilter === 'all' ? 'bg-background text-foreground shadow-xs' : 'text-muted-foreground hover:text-foreground'}`}
+                                className={`rounded-md py-1.5 text-xs font-bold transition ${reviewStatusFilter === 'all' ? 'bg-background text-foreground shadow-xs' : 'text-muted-foreground hover:text-foreground'}`}
                             >
                                 All
                             </button>
                             <button
                                 onClick={() => onReviewStatusChange('correct')}
-                                className={`flex-1 rounded-md py-1.5 text-xs font-bold transition ${reviewStatusFilter === 'correct' ? 'bg-background text-emerald-600 shadow-xs dark:text-emerald-400' : 'text-muted-foreground hover:text-foreground'}`}
+                                className={`rounded-md py-1.5 text-xs font-bold transition ${reviewStatusFilter === 'correct' ? 'bg-background text-emerald-600 shadow-xs dark:text-emerald-400' : 'text-muted-foreground hover:text-foreground'}`}
                             >
                                 Correct
                             </button>
@@ -165,9 +167,15 @@ export default function QuestionPalettePanel({
                                 onClick={() =>
                                     onReviewStatusChange('incorrect')
                                 }
-                                className={`flex-1 rounded-md py-1.5 text-xs font-bold transition ${reviewStatusFilter === 'incorrect' ? 'bg-background text-rose-600 shadow-xs dark:text-rose-400' : 'text-muted-foreground hover:text-foreground'}`}
+                                className={`rounded-md py-1.5 text-xs font-bold transition ${reviewStatusFilter === 'incorrect' ? 'bg-background text-rose-600 shadow-xs dark:text-rose-400' : 'text-muted-foreground hover:text-foreground'}`}
                             >
                                 Incorrect
+                            </button>
+                            <button
+                                onClick={() => onReviewStatusChange('flagged')}
+                                className={`rounded-md py-1.5 text-xs font-bold transition ${reviewStatusFilter === 'flagged' ? 'dark:text-rose-455 bg-background text-rose-700 shadow-xs' : 'text-muted-foreground hover:text-foreground'}`}
+                            >
+                                Flagged
                             </button>
                         </div>
                     </div>
@@ -258,6 +266,12 @@ export default function QuestionPalettePanel({
 
                             if (reviewStatusFilter === 'incorrect') {
                                 if (isDemographic || isCorrect) {
+                                    isFilteredOut = true;
+                                }
+                            }
+
+                            if (reviewStatusFilter === 'flagged') {
+                                if (!flagged[idx]) {
                                     isFilteredOut = true;
                                 }
                             }

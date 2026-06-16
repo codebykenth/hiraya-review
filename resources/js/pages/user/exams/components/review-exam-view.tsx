@@ -41,8 +41,10 @@ interface ReviewExamViewProps {
     setReviewCategoryFilter: (cat: string) => void;
     reviewSubcategoryFilter: string;
     setReviewSubcategoryFilter: (subcat: string) => void;
-    reviewStatusFilter: 'all' | 'correct' | 'incorrect';
-    setReviewStatusFilter: (status: 'all' | 'correct' | 'incorrect') => void;
+    reviewStatusFilter: 'all' | 'correct' | 'incorrect' | 'flagged';
+    setReviewStatusFilter: (
+        status: 'all' | 'correct' | 'incorrect' | 'flagged',
+    ) => void;
     reviewSubcategories: string[];
     isMobilePaletteOpen: boolean;
     setIsMobilePaletteOpen: (val: boolean) => void;
