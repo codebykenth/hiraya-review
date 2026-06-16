@@ -3,14 +3,8 @@
 namespace App\Jobs;
 
 use App\Events\AiGenerationCompleted;
-use App\Events\AiGenerationFailed;
-use App\Models\Category;
-use App\Models\ExamAttempt;
-use App\Models\ExamDate;
-use App\Models\Question;
-use App\Models\Subcategory;
 use App\Models\UserAiAnalysis;
-use Carbon\Carbon;
+use App\Services\DeterministicAnalysisService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -19,7 +13,6 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Schema;
 
 class GenerateUserAnalysisJob implements ShouldQueue
 {
@@ -40,287 +33,42 @@ class GenerateUserAnalysisJob implements ShouldQueue
         set_time_limit(300);
         Log::info("GenerateUserAnalysisJob: Started for user {$this->userId} with attempt {$this->latestAttemptId}");
 
+        $deterministicService = new DeterministicAnalysisService;
+        $deterministicData = $deterministicService->generate($this->userId, $this->latestAttemptId);
+
         $groqKey = config('services.groq.key') ?: env('GROQ_API_KEY');
         $geminiKey = config('services.gemini.key') ?: env('GEMINI_API_KEY');
-        if (! $groqKey && ! $geminiKey) {
-            Log::error('GenerateUserAnalysisJob: Both GROQ_API_KEY and GEMINI_API_KEY are missing.');
-            event(new AiGenerationFailed($this->userId, 'analysis', 'analysis'));
+        $aiAnalysisEnabled = config('services.ai.analysis_enabled');
+
+        if (! $aiAnalysisEnabled || (! $groqKey && ! $geminiKey)) {
+            Log::info('GenerateUserAnalysisJob: AI analysis is disabled or API keys are missing. Saving deterministic analysis directly.');
+            UserAiAnalysis::updateOrCreate(
+                ['user_id' => $this->userId],
+                [
+                    'last_exam_attempt_id' => $this->latestAttemptId,
+                    'analysis_json' => $deterministicData,
+                ]
+            );
+            event(new AiGenerationCompleted($this->userId, 'analysis', 'analysis'));
+            Cache::forget("ai-analysis-generating-{$this->userId}");
 
             return;
-        }
-
-        $allAttempts = ExamAttempt::where('user_id', $this->userId)->orderBy('created_at', 'asc')->get();
-        $totalAttempts = $allAttempts->count();
-
-        if ($totalAttempts === 0) {
-            return;
-        }
-
-        $scores = [];
-        $totalScoreSum = 0;
-        $mockExamCount = 0;
-        $passCount = 0;
-
-        $categoriesMap = Category::all()->keyBy('id');
-
-        $categoryTotals = [
-            'Verbal Ability' => ['correct' => 0, 'total' => 0],
-            'Clerical Ability' => ['correct' => 0, 'total' => 0],
-            'General Information' => ['correct' => 0, 'total' => 0],
-            'Numerical Ability' => ['correct' => 0, 'total' => 0],
-            'Analytical Ability' => ['correct' => 0, 'total' => 0],
-        ];
-
-        foreach ($allAttempts as $attempt) {
-            $meta = $attempt->cat_scores['metadata'] ?? [];
-            $correct = $meta['correct_count'] ?? 0;
-            $total = $meta['total_questions'] ?? count($attempt->question_ids);
-            $percentage = $total > 0 ? round(($correct / $total) * 100) : 0;
-
-            $scores[] = $percentage;
-            $totalScoreSum += $percentage;
-
-            $track = $meta['track'] ?? 'Drill';
-            if ($attempt->category_id !== null && ! isset($meta['track'])) {
-                $track = 'Drill';
-            }
-
-            if ($track !== 'Drill') {
-                $mockExamCount++;
-                if ($percentage >= 80) {
-                    $passCount++;
-                }
-            }
-
-            $scoreMap = $attempt->cat_scores['categoryScoreMap'] ?? [];
-            if (! empty($scoreMap)) {
-                foreach ($scoreMap as $catName => $scoreData) {
-                    $normalizedCat = $catName;
-                    if (str_contains($catName, 'Verbal')) {
-                        $normalizedCat = 'Verbal Ability';
-                    }
-                    if (str_contains($catName, 'Clerical')) {
-                        $normalizedCat = 'Clerical Ability';
-                    }
-                    if (str_contains($catName, 'General')) {
-                        $normalizedCat = 'General Information';
-                    }
-                    if (str_contains($catName, 'Numerical')) {
-                        $normalizedCat = 'Numerical Ability';
-                    }
-                    if (str_contains($catName, 'Analytical')) {
-                        $normalizedCat = 'Analytical Ability';
-                    }
-
-                    if (isset($categoryTotals[$normalizedCat])) {
-                        $categoryTotals[$normalizedCat]['correct'] += $scoreData['correct'] ?? 0;
-                        $categoryTotals[$normalizedCat]['total'] += $scoreData['total'] ?? 0;
-                    }
-                }
-            } else {
-                $drillCatId = $attempt->category_id;
-                $drillCategoryName = null;
-                if ($drillCatId && isset($categoriesMap[$drillCatId])) {
-                    $drillCategoryName = $categoriesMap[$drillCatId]->name;
-                } elseif (isset($meta['category_name'])) {
-                    $drillCategoryName = $meta['category_name'];
-                }
-
-                if ($drillCategoryName) {
-                    $normalizedCat = $drillCategoryName;
-                    if (str_contains($drillCategoryName, 'Verbal')) {
-                        $normalizedCat = 'Verbal Ability';
-                    }
-                    if (str_contains($drillCategoryName, 'Clerical')) {
-                        $normalizedCat = 'Clerical Ability';
-                    }
-                    if (str_contains($drillCategoryName, 'General')) {
-                        $normalizedCat = 'General Information';
-                    }
-                    if (str_contains($drillCategoryName, 'Numerical')) {
-                        $normalizedCat = 'Numerical Ability';
-                    }
-                    if (str_contains($drillCategoryName, 'Analytical')) {
-                        $normalizedCat = 'Analytical Ability';
-                    }
-
-                    if (isset($categoryTotals[$normalizedCat])) {
-                        $categoryTotals[$normalizedCat]['correct'] += $correct;
-                        $categoryTotals[$normalizedCat]['total'] += $total;
-                    }
-                }
-            }
-        }
-
-        $avgScore = round($totalScoreSum / $totalAttempts);
-        $passingRate = $mockExamCount > 0 ? round(($passCount / $mockExamCount) * 100) : 0;
-
-        $categoryBreakdown = [];
-        foreach ($categoryTotals as $catName => $data) {
-            if ($data['total'] > 0) {
-                $categoryBreakdown[$catName] = [
-                    'correct' => $data['correct'],
-                    'total' => $data['total'],
-                    'percentage' => round(($data['correct'] / $data['total']) * 100).'%',
-                ];
-            }
-        }
-
-        // Calculate accurate per-subtopic correctness from historical responses
-        $subtopicStats = [];
-        $allQuestionIds = [];
-        foreach ($allAttempts as $attempt) {
-            if ($attempt->question_ids) {
-                $allQuestionIds = array_merge($allQuestionIds, $attempt->question_ids);
-            }
-        }
-        $allQuestionIds = array_unique($allQuestionIds);
-
-        $questionsMap = [];
-        if (! empty($allQuestionIds)) {
-            $questionsMap = Question::whereIn('id', $allQuestionIds)
-                ->with('subcategory')
-                ->get()
-                ->keyBy('id');
-        }
-
-        foreach ($allAttempts as $attempt) {
-            $answers = $attempt->answers ?? [];
-            if (empty($answers)) {
-                continue;
-            }
-            foreach ($attempt->question_ids as $qId) {
-                if (! isset($questionsMap[$qId])) {
-                    continue;
-                }
-                $q = $questionsMap[$qId];
-                $subcatName = $q->subcategory?->name ?? 'General Info';
-                $userAns = $answers[$qId] ?? null;
-                $isCorrect = ($userAns === $q->correct_option);
-
-                if (! isset($subtopicStats[$subcatName])) {
-                    $subtopicStats[$subcatName] = ['correct' => 0, 'total' => 0];
-                }
-                $subtopicStats[$subcatName]['total']++;
-                if ($isCorrect) {
-                    $subtopicStats[$subcatName]['correct']++;
-                }
-            }
-        }
-
-        $subtopicBreakdown = [];
-        foreach ($subtopicStats as $subcatName => $data) {
-            if ($data['total'] > 0) {
-                $pct = round(($data['correct'] / $data['total']) * 100);
-                $subtopicBreakdown[$subcatName] = "{$pct}% accuracy ({$data['correct']}/{$data['total']} correct)";
-            }
-        }
-
-        // Fetch available subcategories in the system database with parent categories
-        $availableSubcategories = Subcategory::with('category')->get()->map(fn ($s) => [
-            'id' => $s->id,
-            'name' => $s->name,
-            'category_name' => $s->category?->name,
-        ])->toArray();
-
-        $daysUntilExam = null;
-        $examDateStr = 'Not set';
-        if (Schema::hasTable('exam_dates')) {
-            $examDate = ExamDate::where('is_active', true)
-                ->where('date', '>', now())
-                ->orderBy('date')
-                ->first();
-            if ($examDate) {
-                $examDateCarbon = Carbon::parse($examDate->date);
-                $daysUntilExam = now()->diffInDays($examDateCarbon, false);
-                $examDateStr = $examDateCarbon->format('F j, Y');
-            }
         }
 
         $systemPrompt = "
-        You are an expert Civil Service Exam (CSE) coach in the Philippines. Analyze the student's exam performance data and produce a highly comprehensive and predictive diagnostic report. Be direct, encouraging but honest. Do not sugarcoat poor performance. Respond ONLY with a valid JSON object.
+        You are an expert Civil Service Exam (CSE) coach in the Philippines. We have computed standard diagnostic metrics, category mastery levels, and a 7-day study plan.
+        Your task is to rewrite the verbal commentary fields to make them highly personalized, coaching-oriented, professional, and natural.
+        
+        CRITICAL RULES:
+        1. Rewrite only the following text fields: `verdict`, `encouragement`, the `insight` and `recommended_action` in `subject_mastery`, and the `reason_for_struggle` and `coaching_tip` in `remediation_matrix`.
+        2. Keep the mathematical values, percentages, category/subject names, and study plan structure EXACTLY as provided. Do not invent new subjects or category names.
+        3. Every subject name in `subject_mastery`, `strengths`, and `critical_weaknesses` must strictly use the exact spelling of the 5 standard categories: 'Verbal Ability', 'Clerical Ability', 'General Information', 'Numerical Ability', and 'Analytical Ability'.
+        4. You must respond ONLY with a valid JSON object matching the provided schema.";
 
-        CRITICAL ACCURACY RULES:
-        1. You MUST evaluate and base the subject_mastery rating and color strictly on the actual categoryBreakdown accuracy percentages passed to you:
-        - 80% or above accuracy: 'Mastered' (emerald)
-        - 60% to 79% accuracy: 'Needs Practice' (amber)
-        - below 60% accuracy: 'Critical Concern' (rose)
-        - No attempts or 0% total questions: 'Insufficient Data' (sky)
-        2. You must NOT guess or make up rating scores, mock pass confidence levels, or trends outside these direct relationships.
-        3. Make sure all recommendations and action plans correspond exactly to the available subcategories provided. Do not invent subtopics that are not in the list.
-        4. Every subcategory listed in recommended_modules MUST strictly belong to one of the category names listed in critical_weaknesses to prevent student confusion. Do not suggest subcategories from outside your identified critical weaknesses.
-        5. All subject names in subject_mastery, strengths, and critical_weaknesses MUST strictly use the exact spelling of the 5 standard categories: 'Verbal Ability', 'Clerical Ability', 'General Information', 'Numerical Ability', and 'Analytical Ability'. Do not abbreviate or invent category names.";
-
-        $userPrompt = "Analyze this student's exam performance:
-        - Total Attempts: {$totalAttempts}
-        - Average Score: {$avgScore}%
-        - Passing Rate (Full Mock Exams): {$passingRate}%
-        - Score Trend (oldest to newest): ".json_encode($scores).'
-        - Per-category accuracy breakdown across all attempts: '.json_encode($categoryBreakdown).'
-        - Detailed subtopic performance (actual answers): '.json_encode($subtopicBreakdown).'
-        - Days Until Next Exam: " . ($daysUntilExam !== null ? "{$daysUntilExam} days (Exam Date: {$examDateStr})" : "No active exam date set") . "
-        - Available subcategories in our database: '.json_encode($availableSubcategories)."
-
-        Expected JSON response schema:
-        {
-            \"pass_probability\": integer 0-100,
-            \"verdict\": \"1-2 sentence honest assessment\",
-            \"trend\": \"improving|declining|stable|insufficient_data\",
-            \"strengths\": [\"category name\"],
-            \"critical_weaknesses\": [\"worst category first, max 3\"],
-            \"priority_action\": \"one specific actionable thing to do today\",
-            \"recommended_modules\": [\"subcategory names to study, max 3\"],
-            \"encouragement\": \"1 sentence motivation\",
-            
-            \"predictive_metrics\": {
-                \"estimated_exam_score\": \"string (e.g., '72% - 76% predicted actual score')\",
-                \"days_to_readiness\": \"string (e.g., '25 days of targeted practice')\",
-                \"completion_pace\": \"string (1 concise sentence explaining pace, e.g., 'Fast but prone to careless errors.')\",
-                \"mock_pass_confidence\": \"high|moderate|low\"
-            },
-            \"subject_mastery\": [
-                {
-                \"subject\": \"string (e.g., 'Numerical Ability')\",
-                \"rating\": \"string (e.g., 'Needs Practice' or 'Mastered' or 'Critical Concern')\",
-                \"color\": \"rose|amber|emerald|sky\",
-                \"insight\": \"1 sentence explanation of why this rating was given\",
-                \"recommended_action\": \"1 specific actionable step to improve or maintain this subject\"
-                }
-            ],
-            \"timeline_prediction\": {
-                \"current_stage\": \"string (e.g., 'Foundation Building')\",
-                \"milestone_prediction\": \"1 sentence prediction of what they can achieve in 10 days if they study\",
-                \"potential_score_improvement\": \"string (e.g., '+15% with consistent practice')\"
-            },
-            \"remediation_matrix\": [
-                {
-                \"subtopic\": \"string (e.g., 'Word Analogy')\",
-                \"difficulty_level\": \"Hard|Medium|Easy\",
-                \"reason_for_struggle\": \"1 concise reason why they might be failing\",
-                \"coaching_tip\": \"1 highly specific study tactic for this subtopic\"
-                }
-            ],
-            \"personalized_study_plan\": [
-                // IMPORTANT: Generate a highly actionable 7-day study roadmap (Day 1 to Day 7) that directly maps to their diagnostic performance, is fully coherent with the 'days_to_readiness' estimation, and critically factors in the number of days remaining until their exam.
-                // Coherence & Urgency Rules:
-                // 1. Weakness Prioritization: Heavily prioritize the student's weakest categories and subtopics (specifically those identified under 'critical_weaknesses' or having the lowest accuracy scores in the breakdown). Day 1, Day 2, and Day 3 MUST focus primarily on these highest-priority weak areas.
-                // 2. Density & Urgency: If the user requires a lot of prep (e.g., 'days_to_readiness' indicates they need 30+ or 60+ days of intensive practice, or their weaknesses are severe), OR if their actual exam is very close (e.g., less than 30 days away), do NOT suggest just 1 simple topic per day. Instead, suggest multiple intensive study tasks per day (e.g., 2 or 3 distinct subtopics or activities on Day 1, Day 2, etc.) to match the density and urgency of their study timeline.
-                // 3. Extreme Urgency: If the exam is extremely close (e.g., under 10 days away) and they still have critical concern areas, prioritize maximum density (3+ distinct tasks covering key weak areas daily) to cover as much ground as possible.
-                // 4. Stable Maintenance: Conversely, if they are close to passing and the exam is far away, suggest lighter focus areas (1 targeted topic per day).
-                // 5. Strict Uniqueness Rule: Ensure each focus_topic and subcategory suggested across the entire 7 days is completely unique. Do NOT duplicate or repeat the exact same subcategory_id or focus_topic (e.g., if you suggest 'Numerical Ability: Fractions' on Day 1, do NOT suggest it again on Day 3; instead, suggest different subtopics like 'Decimals', 'Word Problems', etc.). Every day should cover distinct topics to maximize breadth of study coverage.
-                // Do NOT limit yourself to short descriptions; write detailed, clear, and fully descriptive focus_topic names and activity descriptions so the student knows exactly what to study.
-                {
-                \"day\": \"string (e.g., 'Day 1')\",
-                \"tasks\": [
-                    {
-                    \"focus_topic\": \"string (e.g., 'Numerical Ability: Fractions & Decimals Word Problems')\",
-                    \"activity\": \"string (e.g., 'Review fractional conversions, work on 15 long-form practice drills, and note time spent per question.')\",
-                    \"subcategory_id\": integer|null (referencing the matching ID from the available subcategories list provided, or null if none fit)
-                    }
-                ]
-                }
-            ]
-        }";
+        $userPrompt = 'Here is the computed deterministic analysis data for the student:
+        '.json_encode($deterministicData).'
+        
+        Please rewrite the verbal fields to make them sound like a highly supportive, professional, and personalized Philippines CSE coach. Make sure all numerical facts and structure are strictly preserved.';
 
         try {
             $resultText = null;
@@ -507,9 +255,15 @@ class GenerateUserAnalysisJob implements ShouldQueue
             }
 
             if (! $success) {
-                Log::error('GenerateUserAnalysisJob: AI generation model failed: '.$errorMsg);
-                Cache::put("ai-analysis-failed-{$this->userId}", true, 300);
-                event(new AiGenerationFailed($this->userId, 'analysis', 'analysis'));
+                Log::warning('GenerateUserAnalysisJob: AI generation model failed, falling back to deterministic data: '.$errorMsg);
+                UserAiAnalysis::updateOrCreate(
+                    ['user_id' => $this->userId],
+                    [
+                        'last_exam_attempt_id' => $this->latestAttemptId,
+                        'analysis_json' => $deterministicData,
+                    ]
+                );
+                event(new AiGenerationCompleted($this->userId, 'analysis', 'analysis'));
 
                 return;
             }
@@ -537,14 +291,26 @@ class GenerateUserAnalysisJob implements ShouldQueue
                 return;
             }
 
-            Log::error('GenerateUserAnalysisJob: API failed or returned invalid JSON structure. Raw output: '.substr($text, 0, 500));
-            Cache::put("ai-analysis-failed-{$this->userId}", true, 300);
-            event(new AiGenerationFailed($this->userId, 'analysis', 'analysis'));
+            Log::warning('GenerateUserAnalysisJob: AI returned invalid JSON structure, falling back to deterministic data.');
+            UserAiAnalysis::updateOrCreate(
+                ['user_id' => $this->userId],
+                [
+                    'last_exam_attempt_id' => $this->latestAttemptId,
+                    'analysis_json' => $deterministicData,
+                ]
+            );
+            event(new AiGenerationCompleted($this->userId, 'analysis', 'analysis'));
 
         } catch (\Exception $e) {
-            Log::error('GenerateUserAnalysisJob Exception: '.$e->getMessage()."\n".$e->getTraceAsString());
-            Cache::put("ai-analysis-failed-{$this->userId}", true, 300);
-            event(new AiGenerationFailed($this->userId, 'analysis', 'analysis'));
+            Log::error('GenerateUserAnalysisJob Exception, falling back to deterministic data: '.$e->getMessage());
+            UserAiAnalysis::updateOrCreate(
+                ['user_id' => $this->userId],
+                [
+                    'last_exam_attempt_id' => $this->latestAttemptId,
+                    'analysis_json' => $deterministicData,
+                ]
+            );
+            event(new AiGenerationCompleted($this->userId, 'analysis', 'analysis'));
         } finally {
             Cache::forget("ai-analysis-generating-{$this->userId}");
         }

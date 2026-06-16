@@ -45,7 +45,9 @@ export default function AdminLearnEdit({
         put(adminLearnUpdate(module.id).url);
     };
 
-    const params = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '');
+    const params = new URLSearchParams(
+        typeof window !== 'undefined' ? window.location.search : '',
+    );
     const page = params.get('page') || '1';
     const backUrl = `${adminLearnIndex().url}?page=${page}`;
 

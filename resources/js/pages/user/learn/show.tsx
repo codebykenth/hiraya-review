@@ -87,10 +87,18 @@ export default function LearnShow({ module, recommended }: LearnShowProps) {
 
             <PageContainer className="bg-slate-50/30 p-4 md:p-6 dark:bg-slate-900/20">
                 {(() => {
-                    const params = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '');
+                    const params = new URLSearchParams(
+                        typeof window !== 'undefined'
+                            ? window.location.search
+                            : '',
+                    );
                     const page = params.get('page');
-                    const backUrl = page ? `/admin/learn?page=${page}` : '/learn';
-                    const label = page ? 'Back to Module Management' : 'Back to Study Hub';
+                    const backUrl = page
+                        ? `/admin/learn?page=${page}`
+                        : '/learn';
+                    const label = page
+                        ? 'Back to Module Management'
+                        : 'Back to Study Hub';
 
                     return (
                         <Link

@@ -64,4 +64,8 @@ return [
         'secret_key' => env('TURNSTILE_SECRET_KEY'),
     ],
 
+    'ai' => [
+        'analysis_enabled' => env('AI_ANALYSIS_ENABLED', false),
+    ],
+
 ];

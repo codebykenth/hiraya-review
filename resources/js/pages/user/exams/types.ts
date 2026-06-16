@@ -27,6 +27,7 @@ export interface ExamIndexProps {
         Subprofessional: number[];
         Drill: number[];
     };
+    aiAnalysis?: any;
 }
 
 export interface ExamResults {

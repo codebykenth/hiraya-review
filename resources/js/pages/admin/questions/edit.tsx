@@ -89,7 +89,9 @@ export default function QuestionEdit({
     const [selectedSubcategoryName, setSelectedSubcategoryName] = useState(
         question.subcategory || cseCategoriesTree[selectedCategoryName]?.[0],
     );
-    const params = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '');
+    const params = new URLSearchParams(
+        typeof window !== 'undefined' ? window.location.search : '',
+    );
     const page = params.get('page') || '1';
     const backUrl = `${questionsIndex().url}?page=${page}`;
     // Main Form Setup

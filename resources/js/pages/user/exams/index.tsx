@@ -1,4 +1,4 @@
-﻿import { PageContainer } from '@/components/layout/page-container';
+import { PageContainer } from '@/components/layout/page-container';
 import { ConfirmModal } from '@/components/shared/confirm-modal';
 import { Button } from '@/components/ui/button';
 import {
@@ -174,6 +174,7 @@ export default function ExamIndex(props: ExamIndexProps) {
                     submittedByTimer={submittedByTimer}
                     setReviewScreenActive={setReviewScreenActive}
                     handleBeginExam={handleBeginExam}
+                    aiAnalysis={props.aiAnalysis}
                 />
             </PageContainer>
         );

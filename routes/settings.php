@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Settings\PreferencesController;
 use App\Http\Controllers\Settings\ProfileController;
 use App\Http\Controllers\Settings\SecurityController;
 use App\Http\Middleware\ConfirmPasswordForNonSocialUsers;
@@ -21,6 +22,7 @@ Route::middleware(['auth', 'verified', 'throttle:global-views'])->group(function
         ->name('security.edit');
 
     Route::inertia('settings/appearance', 'settings/appearance')->name('appearance.edit');
+    Route::get('settings/preferences', [PreferencesController::class, 'edit'])->name('preferences.edit');
 });
 
 Route::middleware(['auth', 'verified', 'throttle:global-mutations'])->group(function () {
@@ -29,4 +31,6 @@ Route::middleware(['auth', 'verified', 'throttle:global-mutations'])->group(func
     Route::put('settings/password', [SecurityController::class, 'update'])
         ->middleware('throttle:6,1')
         ->name('user-password.update');
+
+    Route::patch('settings/preferences', [PreferencesController::class, 'update'])->name('preferences.update');
 });

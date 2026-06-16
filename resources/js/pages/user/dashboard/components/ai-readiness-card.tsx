@@ -10,9 +10,15 @@ import {
     Zap,
     ChevronRight,
     Minus,
+    Settings,
 } from 'lucide-react';
 import Pusher from 'pusher-js';
 import { useEffect, useState } from 'react';
+import {
+    Tooltip,
+    TooltipTrigger,
+    TooltipContent,
+} from '@/components/ui/tooltip';
 import type { Auth } from '@/types';
 
 interface AiReadinessCardProps {
@@ -29,9 +35,15 @@ interface AiReadinessCardProps {
             encouragement: string;
         } | null;
     };
+    analysisMode?: 'ai' | 'instant';
+    attemptId?: number;
 }
 
-export default function AiReadinessCard({ aiAnalysis }: AiReadinessCardProps) {
+export default function AiReadinessCard({
+    aiAnalysis,
+    analysisMode = 'instant',
+    attemptId,
+}: AiReadinessCardProps) {
     const { auth, pusher } = usePage<{ auth: Auth; pusher?: any }>().props;
     const initialStatus = aiAnalysis?.status || 'no_data';
     const [localStatus, setLocalStatus] = useState<
@@ -103,7 +115,9 @@ export default function AiReadinessCard({ aiAnalysis }: AiReadinessCardProps) {
                         </div>
                         <div>
                             <h3 className="flex items-center justify-center gap-2 text-xl font-black tracking-tight text-slate-900 md:justify-start dark:text-white">
-                                AI Readiness Report
+                                {analysisMode === 'ai'
+                                    ? 'AI Readiness Report'
+                                    : 'Readiness Report'}
                                 <span className="inline-flex items-center rounded-full border border-rose-200 bg-rose-50 px-2 py-0.5 text-[10px] font-medium text-rose-700 dark:border-rose-500/20 dark:border-rose-900/50 dark:bg-rose-500/10 dark:bg-rose-950/30 dark:text-rose-400">
                                     Failed
                                 </span>
@@ -141,14 +155,19 @@ export default function AiReadinessCard({ aiAnalysis }: AiReadinessCardProps) {
                         </div>
                         <div>
                             <h3 className="flex items-center justify-center gap-2 text-xl font-black tracking-tight text-slate-900 md:justify-start dark:text-white">
-                                AI Readiness Report
-                                <span className="inline-flex items-center rounded-full border border-blue-200 bg-blue-50 px-2 py-0.5 text-[10px] font-medium text-blue-700 dark:border-blue-500/20 dark:border-blue-900/50 dark:bg-blue-500/10 dark:bg-blue-950/30 dark:text-blue-400">
+                                {analysisMode === 'ai'
+                                    ? 'AI Readiness Report'
+                                    : 'Readiness Report'}
+                                <span className="inline-flex items-center rounded-full border border-blue-200 bg-blue-50 px-2 py-0.5 text-[10px] font-medium text-blue-700 dark:border-blue-500/20 dark:border-blue-900/50 dark:bg-blue-500/10 dark:bg-rose-950/30 dark:text-blue-400">
                                     Locked
                                 </span>
                             </h3>
                             <p className="dark:text-slate-450 mt-1 text-base leading-relaxed font-medium text-slate-500 dark:text-slate-400">
-                                Complete your first exam to unlock your AI
-                                Readiness Report.
+                                Complete your first exam to unlock your{' '}
+                                {analysisMode === 'ai'
+                                    ? 'AI Readiness Report'
+                                    : 'Readiness Report'}
+                                .
                             </p>
                         </div>
                     </div>
@@ -172,12 +191,14 @@ export default function AiReadinessCard({ aiAnalysis }: AiReadinessCardProps) {
                     </div>
                     <div>
                         <h3 className="text-xl font-black tracking-tight text-slate-900 dark:text-white">
-                            Analyzing Performance...
+                            {analysisMode === 'ai'
+                                ? 'Analyzing Performance via AI...'
+                                : 'Analyzing Performance...'}
                         </h3>
                         <p className="mt-1.5 max-w-2xl text-base leading-relaxed text-slate-500 dark:text-slate-400">
-                            Our AI is analyzing your answers, calculating
-                            scores, and crafting your readiness report. This
-                            takes only a few seconds...
+                            {analysisMode === 'ai'
+                                ? 'Our AI is analyzing your answers, calculating scores, and crafting your readiness report. This takes only a few seconds...'
+                                : 'Our algorithms are analyzing your answers and calculating your readiness report. This takes only a few seconds...'}
                         </p>
                     </div>
                 </div>
@@ -239,11 +260,30 @@ export default function AiReadinessCard({ aiAnalysis }: AiReadinessCardProps) {
                         </div>
                         <div>
                             <h3 className="flex items-center gap-2 text-base font-bold tracking-tight text-slate-900 dark:text-white">
-                                AI Readiness Report
-                                <span className="inline-flex items-center gap-1 rounded-full border border-indigo-200 bg-indigo-50 px-2 py-0.5 text-[9px] font-black tracking-wider text-indigo-700 uppercase dark:border-indigo-500/20 dark:border-indigo-900/50 dark:bg-indigo-500/10 dark:bg-indigo-950/30 dark:text-indigo-400">
-                                    <Sparkles className="size-2.5" />
-                                    Weekly Update
-                                </span>
+                                {analysisMode === 'ai'
+                                    ? 'AI Readiness Report'
+                                    : 'Readiness Report'}
+                                <Link
+                                    href="/settings/preferences"
+                                    title="Change analysis mode preference"
+                                    className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[9px] font-black tracking-wider uppercase transition-all duration-200 hover:scale-105 hover:bg-slate-100 dark:hover:bg-slate-800 ${
+                                        analysisMode === 'ai'
+                                            ? 'border-indigo-200 bg-indigo-50 text-indigo-700 dark:border-indigo-500/20 dark:bg-indigo-500/10 dark:text-indigo-400'
+                                            : 'border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-500/20 dark:bg-emerald-500/10 dark:text-emerald-400'
+                                    }`}
+                                >
+                                    {analysisMode === 'ai' ? (
+                                        <>
+                                            <Sparkles className="size-2.5" /> AI
+                                            Weekly
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Sparkles className="size-2.5" />{' '}
+                                            Instant
+                                        </>
+                                    )}
+                                </Link>
                             </h3>
                             <p className="text-sm leading-relaxed text-slate-500 dark:text-slate-400">
                                 Smart coaching insights tailored to your exam
@@ -261,13 +301,40 @@ export default function AiReadinessCard({ aiAnalysis }: AiReadinessCardProps) {
                             {trendLabel}
                         </div>
 
+                        {/* Preferences Cog Link */}
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Link
+                                    href="/settings/preferences"
+                                    title="Change analysis mode preference"
+                                    className="inline-flex size-7 items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700 focus-visible:ring-2 focus-visible:ring-ring dark:border-slate-800 dark:bg-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200"
+                                >
+                                    <Settings className="size-4" />
+                                </Link>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                Change analysis mode preference
+                            </TooltipContent>
+                        </Tooltip>
+
                         {/* Full Report Link */}
-                        <Link
-                            href="/analytics/ai-analysis"
-                            className="group inline-flex items-center gap-1 rounded-lg bg-blue-600 px-3 py-1 text-xs font-extrabold text-white transition transition-all duration-300 hover:bg-blue-700 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95"
-                        >
-                            Full Report &rarr;
-                        </Link>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Link
+                                    href={
+                                        attemptId
+                                            ? `/analytics/ai-analysis?attempt_id=${attemptId}`
+                                            : '/analytics/ai-analysis'
+                                    }
+                                    className="group inline-flex items-center gap-1 rounded-lg bg-blue-600 px-3 py-1 text-xs font-extrabold text-white transition transition-all duration-300 hover:bg-blue-700 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95"
+                                >
+                                    Full Report &rarr;
+                                </Link>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                                View comprehensive diagnostic report
+                            </TooltipContent>
+                        </Tooltip>
                     </div>
                 </div>
 

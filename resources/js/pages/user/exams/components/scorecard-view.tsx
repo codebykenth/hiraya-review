@@ -2,6 +2,7 @@ import { Head, Link, usePage } from '@inertiajs/react';
 import { Award, BookOpen, ChevronLeft, LogIn, Trophy } from 'lucide-react';
 import { useState } from 'react';
 import { formatDuration } from '@/lib/exam-formatters';
+import AiReadinessCard from '@/pages/user/dashboard/components/ai-readiness-card';
 
 interface ScorecardViewProps {
     details: any;
@@ -14,6 +15,7 @@ interface ScorecardViewProps {
     submittedByTimer: boolean;
     setReviewScreenActive: (val: boolean) => void;
     handleBeginExam: () => void;
+    aiAnalysis?: any;
 }
 
 export function ScorecardView({
@@ -26,6 +28,7 @@ export function ScorecardView({
     getActiveTimeLimitSecs,
     submittedByTimer,
     setReviewScreenActive,
+    aiAnalysis,
 }: ScorecardViewProps) {
     const { auth } = usePage<{ auth: any }>().props;
     const isGuest = !auth?.user;
@@ -385,6 +388,18 @@ export function ScorecardView({
                                     </span>
                                 </div>
                             </div>
+
+                            {/* AI / Deterministic Readiness Report Card */}
+                            {!isGuest && aiAnalysis && (
+                                <div className="mt-4">
+                                    <AiReadinessCard
+                                        aiAnalysis={aiAnalysis}
+                                        analysisMode={auth?.user?.analysis_mode}
+                                        attemptId={savedAttempt?.id}
+                                    />
+                                </div>
+                            )}
+
                             {isGuest && (
                                 <div className="mt-6 overflow-hidden rounded-2xl border border-blue-100 bg-gradient-to-br from-blue-50/80 via-white to-blue-50/30 p-6 text-center shadow-lg dark:border-blue-950/40 dark:from-slate-900 dark:to-slate-950">
                                     <div className="mx-auto mb-4 flex size-12 items-center justify-center rounded-full bg-blue-600 text-white shadow-md shadow-blue-500/20 dark:bg-blue-500">

@@ -7,6 +7,7 @@ use App\Models\Category;
 use App\Models\ExamAttempt;
 use App\Models\Question;
 use App\Models\TrackConfig;
+use App\Services\DeterministicAnalysisService;
 use App\Services\ExamAttemptFormatter;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -111,6 +112,27 @@ class ExamController
 
         $seenQuestionIdsByTrack = $this->formatter->seenQuestionIdsByTrack(auth()->id());
 
+        $aiAnalysis = [
+            'status' => 'no_data',
+            'data' => null,
+        ];
+
+        if (auth()->check()) {
+            $targetAttemptId = $request->query('attempt_id');
+            if (! $targetAttemptId) {
+                $targetAttemptId = ExamAttempt::where('user_id', auth()->id())->latest()->value('id');
+            }
+
+            if ($targetAttemptId) {
+                $deterministicService = new DeterministicAnalysisService;
+                $analysisData = $deterministicService->generate(auth()->id(), $targetAttemptId, true);
+                $aiAnalysis = [
+                    'status' => 'ready',
+                    'data' => $analysisData,
+                ];
+            }
+        }
+
         return Inertia::render('user/exams/index', [
             'questions' => $questions,
             'categories' => $categories,
@@ -122,6 +144,7 @@ class ExamController
                 ['id' => 1, 'title' => 'Professional Level Reviewer', 'questions' => 170],
                 ['id' => 2, 'title' => 'Sub-Professional Level Reviewer', 'questions' => 150],
             ],
+            'aiAnalysis' => $aiAnalysis,
         ]);
     }
 

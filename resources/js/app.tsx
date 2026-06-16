@@ -1,4 +1,4 @@
-import { createInertiaApp, router } from '@inertiajs/react';
+import { createInertiaApp, router, usePage } from '@inertiajs/react';
 import { toast } from 'sonner';
 import { SupportWidget } from '@/components/shared/support-widget';
 import { TrafficOverloadGuard } from '@/components/shared/traffic-overload-guard';
@@ -8,6 +8,7 @@ import { initializeTheme } from '@/hooks/use-appearance';
 import AppLayout from '@/layouts/app-layout';
 import AuthLayout from '@/layouts/auth-layout';
 import SettingsLayout from '@/layouts/settings/layout';
+import type { Auth } from './types/auth';
 // Echo initialization moved to specific components to save connections
 
 const appName = import.meta.env.VITE_APP_NAME || 'Hiraya Review';
@@ -48,6 +49,43 @@ router.on('httpException', (event) => {
             'The server returned an error while processing your request.',
     });
 });
+
+const PageLayoutWrapper = ({
+    name,
+    metadata,
+    page,
+}: {
+    name: string;
+    metadata: any;
+    page: any;
+}) => {
+    const { auth } = usePage<{ auth: Auth }>().props;
+    const userAnalysisMode = auth?.user?.analysis_mode ?? 'instant';
+    const pageBreadcrumbs = (metadata.breadcrumbs || []).map((b: any) => {
+        if (
+            userAnalysisMode === 'instant' &&
+            b.title === 'AI Diagnostic Report'
+        ) {
+            return { ...b, title: 'Diagnostic Report' };
+        }
+
+        return b;
+    });
+
+    const hasAttemptId =
+        typeof window !== 'undefined' &&
+        new URLSearchParams(window.location.search).has('attempt_id');
+
+    if (
+        name === 'user/dashboard/ai-analysis' &&
+        hasAttemptId &&
+        pageBreadcrumbs.length > 0
+    ) {
+        pageBreadcrumbs[0] = { title: 'History', href: '/history' };
+    }
+
+    return <AppLayout breadcrumbs={pageBreadcrumbs}>{page}</AppLayout>;
+};
 
 createInertiaApp({
     title: (title) => (title ? `${title} - ${appName}` : appName),
@@ -111,11 +149,15 @@ createInertiaApp({
                     </AuthLayout>
                 );
             } else {
-                pageLayout = (page: any) => (
-                    <AppLayout breadcrumbs={metadata.breadcrumbs}>
-                        {page}
-                    </AppLayout>
-                );
+                pageLayout = (page: any) => {
+                    return (
+                        <PageLayoutWrapper
+                            name={name}
+                            metadata={metadata}
+                            page={page}
+                        />
+                    );
+                };
             }
         }
 

@@ -7,6 +7,7 @@ use App\Models\ExamAttempt;
 use App\Models\ExamDate;
 use App\Models\StudySchedule;
 use App\Models\UserAiAnalysis;
+use App\Services\DeterministicAnalysisService;
 use App\Services\ExamAttemptFormatter;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -353,31 +354,40 @@ class AnalyticsController
         $analysisStatus = 'no_data';
         $analysisData = null;
 
+        // Per-user analysis mode (default: instant). AI only if user chose it AND server enables it.
+        $userMode = Cache::get("user-analysis-mode-{$userId}", 'instant');
+        $useAi = $userMode === 'ai' && config('services.ai.analysis_enabled');
+
         if ($latestAttemptId) {
             $cacheKey = "ai-analysis-generating-{$userId}";
             $failKey = "ai-analysis-failed-{$userId}";
 
-            if (! $analysis) {
-                if (! Cache::has($cacheKey) && ! Cache::has($failKey)) {
-                    Cache::put($cacheKey, true, 60);
-                    GenerateUserAnalysisJob::dispatchAfterResponse($userId, $latestAttemptId);
-                }
-                $analysisStatus = 'generating';
+            if (! $useAi) {
+                $deterministicService = new DeterministicAnalysisService;
+                $analysisStatus = 'ready';
+                $analysisData = $deterministicService->generate($userId, $latestAttemptId);
             } else {
-                $isRecent = $analysis->updated_at->diffInDays(now()) < 7;
-                if (! $isRecent && $analysis->last_exam_attempt_id !== $latestAttemptId) {
-                    if (! Cache::has($failKey)) {
-                        if (! Cache::has($cacheKey)) {
-                            Cache::put($cacheKey, true, 60);
-                            GenerateUserAnalysisJob::dispatchAfterResponse($userId, $latestAttemptId);
-                        }
-                        $analysisStatus = 'generating';
-                    } else {
-                        $analysisStatus = 'failed';
+                if (! $analysis) {
+                    if (! Cache::has($cacheKey) && ! Cache::has($failKey)) {
+                        Cache::put($cacheKey, true, 60);
+                        GenerateUserAnalysisJob::dispatchAfterResponse($userId, $latestAttemptId);
                     }
+                    $analysisStatus = 'generating';
                 } else {
-                    $analysisStatus = 'ready';
-                    $analysisData = $analysis->analysis_json;
+                    if ($analysis->last_exam_attempt_id !== $latestAttemptId) {
+                        if (! Cache::has($failKey)) {
+                            if (! Cache::has($cacheKey)) {
+                                Cache::put($cacheKey, true, 60);
+                                GenerateUserAnalysisJob::dispatchAfterResponse($userId, $latestAttemptId);
+                            }
+                            $analysisStatus = 'generating';
+                        } else {
+                            $analysisStatus = 'failed';
+                        }
+                    } else {
+                        $analysisStatus = 'ready';
+                        $analysisData = $analysis->analysis_json;
+                    }
                 }
             }
         }
@@ -439,11 +449,45 @@ class AnalyticsController
     public function aiAnalysisReport(Request $request)
     {
         $userId = auth()->id();
+
+        if ($request->has('attempt_id')) {
+            $attemptId = (int) $request->query('attempt_id');
+            $attempt = ExamAttempt::where('user_id', $userId)->find($attemptId);
+            if ($attempt) {
+                $deterministicService = new DeterministicAnalysisService;
+                $data = $deterministicService->generate($userId, $attemptId, true);
+                $status = 'ready';
+
+                $existingSchedules = StudySchedule::where('user_id', $userId)
+                    ->where('study_date', '>=', now()->startOfDay())
+                    ->get()
+                    ->map(fn ($s) => [
+                        'id' => $s->id,
+                        'study_date' => $s->study_date->format('Y-m-d'),
+                        'title' => $s->title,
+                        'subcategory_id' => $s->subcategory_id,
+                    ]);
+
+                return Inertia::render('user/dashboard/ai-analysis', [
+                    'status' => $status,
+                    'data' => $data,
+                    'isLocal' => app()->environment('local'),
+                    'existingSchedules' => $existingSchedules,
+                    'attempt_id' => $attemptId,
+                ]);
+            }
+        }
+
         $analysis = UserAiAnalysis::where('user_id', $userId)->first();
         $latestAttemptId = ExamAttempt::where('user_id', $userId)->latest()->value('id');
 
         $status = 'no_data';
         $data = null;
+
+        // Per-user analysis mode (default: instant). AI only if user chose it AND server enables it.
+        $userMode = Cache::get("user-analysis-mode-{$userId}", 'instant');
+        $useAi = $userMode === 'ai' && config('services.ai.analysis_enabled');
+
         if ($latestAttemptId) {
             $cacheKey = "ai-analysis-generating-{$userId}";
             $failKey = "ai-analysis-failed-{$userId}";
@@ -469,23 +513,47 @@ class AnalyticsController
             }
 
             if (! $analysis) {
-                if (! Cache::has($cacheKey)) {
-                    Cache::put($cacheKey, true, 60);
-                    GenerateUserAnalysisJob::dispatchAfterResponse($userId, $latestAttemptId);
+                if (! $useAi) {
+                    $deterministicService = new DeterministicAnalysisService;
+                    $analysis = UserAiAnalysis::updateOrCreate(
+                        ['user_id' => $userId],
+                        [
+                            'last_exam_attempt_id' => $latestAttemptId,
+                            'analysis_json' => $deterministicService->generate($userId, $latestAttemptId),
+                        ]
+                    );
+                    $status = 'ready';
+                    $data = $analysis->analysis_json;
+                } else {
+                    if (! Cache::has($cacheKey)) {
+                        Cache::put($cacheKey, true, 60);
+                        GenerateUserAnalysisJob::dispatchAfterResponse($userId, $latestAttemptId);
+                    }
+                    $status = 'generating';
                 }
-                $status = 'generating';
             } else {
-                $isRecent = $analysis->updated_at->diffInDays(now()) < 7;
-                $failKey = "ai-analysis-failed-{$userId}";
-                if (! $isRecent && $analysis->last_exam_attempt_id !== $latestAttemptId) {
-                    if (! Cache::has($failKey)) {
-                        if (! Cache::has($cacheKey)) {
-                            Cache::put($cacheKey, true, 60);
-                            GenerateUserAnalysisJob::dispatchAfterResponse($userId, $latestAttemptId);
-                        }
-                        $status = 'generating';
+                if ($analysis->last_exam_attempt_id !== $latestAttemptId) {
+                    if (! $useAi) {
+                        $deterministicService = new DeterministicAnalysisService;
+                        $analysis = UserAiAnalysis::updateOrCreate(
+                            ['user_id' => $userId],
+                            [
+                                'last_exam_attempt_id' => $latestAttemptId,
+                                'analysis_json' => $deterministicService->generate($userId, $latestAttemptId),
+                            ]
+                        );
+                        $status = 'ready';
+                        $data = $analysis->analysis_json;
                     } else {
-                        $status = 'failed';
+                        if (! Cache::has($failKey)) {
+                            if (! Cache::has($cacheKey)) {
+                                Cache::put($cacheKey, true, 60);
+                                GenerateUserAnalysisJob::dispatchAfterResponse($userId, $latestAttemptId);
+                            }
+                            $status = 'generating';
+                        } else {
+                            $status = 'failed';
+                        }
                     }
                 } else {
                     $status = 'ready';

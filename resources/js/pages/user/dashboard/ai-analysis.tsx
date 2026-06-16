@@ -148,6 +148,7 @@ interface AiAnalysisProps {
             milestone: string;
         }>;
     } | null;
+    attempt_id?: number | null;
 }
 
 export default function AiAnalysisReport({
@@ -155,8 +156,10 @@ export default function AiAnalysisReport({
     data,
     isLocal,
     existingSchedules = [],
+    attempt_id,
 }: AiAnalysisProps) {
     const { auth, pusher } = usePage<{ auth: Auth; pusher?: any }>().props;
+    const isAiMode = auth?.user?.analysis_mode === 'ai';
     const [localStatus, setLocalStatus] = useState<
         'no_data' | 'generating' | 'ready' | 'failed'
     >(status);
@@ -467,7 +470,9 @@ export default function AiAnalysisReport({
         <>
             <Head>
                 <title>
-                    AI Readiness Diagnostic & Prediction Report | Hiraya Review
+                    {isAiMode
+                        ? 'AI Readiness Diagnostic & Prediction Report | Hiraya Review'
+                        : 'Readiness Diagnostic & Prediction Report | Hiraya Review'}
                 </title>
                 <meta
                     name="description"
@@ -476,14 +481,14 @@ export default function AiAnalysisReport({
             </Head>
 
             <PageContainer>
-                {/* Back to Dashboard Link */}
+                {/* Back Link */}
                 <div className="mb-6">
                     <Link
-                        href="/dashboard"
+                        href={attempt_id ? '/history' : '/dashboard'}
                         className="group inline-flex items-center gap-2 text-sm font-semibold text-slate-500 transition transition-all duration-300 hover:text-slate-800 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95 dark:text-slate-400 dark:hover:text-slate-200"
                     >
                         <ArrowLeft className="size-4" />
-                        Back to Dashboard
+                        {attempt_id ? 'Back to History' : 'Back to Dashboard'}
                     </Link>
                 </div>
 
@@ -494,7 +499,9 @@ export default function AiAnalysisReport({
                             <Brain className="size-8" />
                         </div>
                         <h3 className="text-2xl font-black tracking-tight text-slate-900 sm:text-3xl dark:text-white">
-                            AI Diagnostic Report Locked
+                            {isAiMode
+                                ? 'AI Diagnostic Report Locked'
+                                : 'Diagnostic Report Locked'}
                         </h3>
                         <p className="mt-2 max-w-2xl text-base leading-relaxed text-slate-500 dark:text-slate-400">
                             We need at least one exam attempt to analyze your
@@ -520,13 +527,14 @@ export default function AiAnalysisReport({
                             </div>
                         </div>
                         <h3 className="text-2xl font-black tracking-tight text-slate-900 sm:text-3xl dark:text-white">
-                            Creating Your Predictive AI Diagnostic
+                            {isAiMode
+                                ? 'Creating Your Predictive AI Diagnostic'
+                                : 'Creating Your Predictive Diagnostic'}
                         </h3>
                         <p className="mt-2 max-w-2xl text-base leading-relaxed text-slate-500 dark:text-slate-400">
-                            Hiraya AI is evaluating your historical exam
-                            responses, calculating subtopic performance, and
-                            scheduling your personalized study pathway. This
-                            will auto-refresh as soon as it's completed.
+                            {isAiMode
+                                ? "Hiraya AI is evaluating your historical exam responses, calculating subtopic performance, and scheduling your personalized study pathway. This will auto-refresh as soon as it's completed."
+                                : "Our system is evaluating your historical exam responses, calculating subtopic performance, and scheduling your personalized study pathway. This will auto-refresh as soon as it's completed."}
                         </p>
                     </Card>
                 )}
@@ -537,11 +545,15 @@ export default function AiAnalysisReport({
                             <AlertCircle className="size-8" />
                         </div>
                         <h3 className="text-2xl font-black tracking-tight text-slate-900 sm:text-3xl dark:text-white">
-                            AI Diagnostic Report Failed
+                            {isAiMode
+                                ? 'AI Diagnostic Report Failed'
+                                : 'Diagnostic Report Failed'}
                         </h3>
                         <p className="text-slate-550 mt-2 max-w-2xl text-base leading-relaxed dark:text-slate-400">
                             {errorMessage ||
-                                'Our AI systems are currently highly loaded or rate-limited across all fallbacks. Please try again.'}
+                                (isAiMode
+                                    ? 'Our AI systems are currently highly loaded or rate-limited across all fallbacks. Please try again.'
+                                    : 'Our systems are currently busy or experiencing high traffic. Please try again.')}
                         </p>
                         <button
                             onClick={() => {
@@ -574,7 +586,9 @@ export default function AiAnalysisReport({
                                     <div>
                                         <div className="flex flex-wrap items-center gap-2">
                                             <h1 className="text-xl font-black tracking-tight text-slate-900 sm:text-3xl sm:text-4xl dark:text-white">
-                                                AI Diagnostic & Predictions
+                                                {isAiMode
+                                                    ? 'AI Diagnostic & Predictions'
+                                                    : 'Diagnostic & Predictions'}
                                             </h1>
                                             <span className="border-indigo-150 inline-flex items-center gap-1 rounded-full border bg-indigo-50 px-2.5 py-0.5 text-[10px] font-black tracking-wider text-indigo-700 uppercase dark:border-indigo-500/20 dark:bg-indigo-500/10 dark:bg-indigo-950/30 dark:text-indigo-400">
                                                 <Sparkles className="size-3" />
@@ -848,7 +862,9 @@ export default function AiAnalysisReport({
                             </div>
                             <div>
                                 <h4 className="text-sm font-black text-slate-900 dark:text-white">
-                                    AI Coach Diagnostic Verdict
+                                    {isAiMode
+                                        ? 'AI Coach Diagnostic Verdict'
+                                        : 'Coach Diagnostic Verdict'}
                                 </h4>
                                 <p className="mt-1 text-base leading-relaxed font-medium text-slate-700 dark:text-slate-300">
                                     {data.verdict}
@@ -1190,13 +1206,15 @@ export default function AiAnalysisReport({
                             </div>
 
                             <h3 className="text-xl font-black text-slate-900 dark:text-white">
-                                AI Coach Under Heavy Load
+                                {isAiMode
+                                    ? 'AI Coach Under Heavy Load'
+                                    : 'Diagnostic Service Under Heavy Load'}
                             </h3>
 
                             <p className="text-slate-650 mt-3 text-base leading-relaxed dark:text-slate-400">
-                                Our AI coaching system is currently experiencing
-                                extremely high traffic from other civil service
-                                review students.
+                                {isAiMode
+                                    ? 'Our AI coaching system is currently experiencing extremely high traffic from other civil service review students.'
+                                    : 'Our diagnostic generation system is currently experiencing high traffic from other civil service review students.'}
                             </p>
 
                             <p className="mt-2 border-t border-slate-100 pt-3 text-base leading-relaxed text-slate-500 dark:border-slate-800 dark:text-slate-400">

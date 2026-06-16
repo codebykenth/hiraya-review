@@ -72,7 +72,10 @@ export default function Dashboard({ stats, aiAnalysis }: DashboardProps) {
 
             {/* AI Analysis Readiness Card */}
             <div>
-                <AiReadinessCard aiAnalysis={aiAnalysis} />
+                <AiReadinessCard
+                    aiAnalysis={aiAnalysis}
+                    analysisMode={auth?.user?.analysis_mode}
+                />
             </div>
         </PageContainer>
     );

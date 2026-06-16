@@ -5,6 +5,7 @@ use App\Models\ExamAttempt;
 use App\Models\User;
 use App\Models\UserAiAnalysis;
 use Illuminate\Support\Facades\Bus;
+use Illuminate\Support\Facades\Cache;
 use Inertia\Testing\AssertableInertia as Assert;
 
 test('guests are redirected to the login page', function () {
@@ -36,9 +37,11 @@ test('dashboard status is no_data if user has no exam attempts', function () {
 });
 
 test('dashboard dispatches GenerateUserAnalysisJob if user has exam attempts but no analysis', function () {
+    config(['services.ai.analysis_enabled' => true]);
     Bus::fake();
 
     $user = User::factory()->create();
+    Cache::put("user-analysis-mode-{$user->id}", 'ai');
     $this->actingAs($user);
 
     $attempt = ExamAttempt::create([
@@ -76,6 +79,7 @@ test('dashboard dispatches GenerateUserAnalysisJob if user has exam attempts but
 
 test('dashboard serves cached analysis if generated today', function () {
     $user = User::factory()->create();
+    Cache::put("user-analysis-mode-{$user->id}", 'ai');
     $this->actingAs($user);
 
     $attempt = ExamAttempt::create([

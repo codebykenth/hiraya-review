@@ -130,7 +130,10 @@ test('GenerateUserAnalysisJob calculates subtopic stats and maps subcategory IDs
     ]);
 
     // Set temporary environment keys so model attempts do not skip
-    config(['services.groq.key' => 'fake-groq-key']);
+    config([
+        'services.groq.key' => 'fake-groq-key',
+        'services.ai.analysis_enabled' => true,
+    ]);
 
     // 5. Dispatch and run the job synchronously
     $job = new GenerateUserAnalysisJob($user->id, $attempt->id);
@@ -148,4 +151,56 @@ test('GenerateUserAnalysisJob calculates subtopic stats and maps subcategory IDs
     expect($analysis['pass_probability'])->toBe(75);
     expect($analysis['verdict'])->toContain('fractions');
     expect($analysis['personalized_7_day_plan'][0]['subcategory_id'])->toBe($subcategory2->id);
+});
+
+test('GenerateUserAnalysisJob falls back to deterministic generation when keys are missing', function () {
+    $user = User::factory()->create();
+
+    $category = Category::create([
+        'name' => 'Numerical Ability',
+        'slug' => 'numerical-ability',
+    ]);
+
+    $subcategory1 = Subcategory::create([
+        'category_id' => $category->id,
+        'name' => 'Fractions',
+        'slug' => 'fractions',
+    ]);
+
+    $attempt = ExamAttempt::create([
+        'user_id' => $user->id,
+        'category_id' => $category->id,
+        'question_ids' => [1],
+        'answers' => [1 => 0],
+        'cat_scores' => [
+            'categoryScoreMap' => [
+                'Numerical Ability' => ['correct' => 1, 'total' => 1],
+            ],
+            'metadata' => [
+                'track' => 'Drill',
+                'category_name' => 'Numerical Ability',
+                'correct_count' => 1,
+                'total_questions' => 1,
+                'duration_secs' => 60,
+            ],
+        ],
+    ]);
+
+    // Ensure API keys are null
+    config(['services.groq.key' => null]);
+    config(['services.gemini.key' => null]);
+
+    $job = new GenerateUserAnalysisJob($user->id, $attempt->id);
+    $job->handle();
+
+    $this->assertDatabaseHas('user_ai_analyses', [
+        'user_id' => $user->id,
+        'last_exam_attempt_id' => $attempt->id,
+    ]);
+
+    $cached = UserAiAnalysis::where('user_id', $user->id)->first();
+    $analysis = $cached->analysis_json;
+
+    expect($analysis['pass_probability'])->toBeGreaterThan(0);
+    expect($analysis['verdict'])->not->toBeEmpty();
 });

@@ -42,7 +42,11 @@ export default function QuestionShow({ question }: QuestionShowProps) {
             <PageContainer>
                 {/* Back Link */}
                 {(() => {
-                    const params = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '');
+                    const params = new URLSearchParams(
+                        typeof window !== 'undefined'
+                            ? window.location.search
+                            : '',
+                    );
                     const page = params.get('page') || '1';
 
                     return (

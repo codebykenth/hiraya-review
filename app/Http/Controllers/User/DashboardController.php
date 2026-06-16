@@ -6,6 +6,7 @@ use App\Jobs\GenerateUserAnalysisJob;
 use App\Models\ExamAttempt;
 use App\Models\ExamDate;
 use App\Models\UserAiAnalysis;
+use App\Services\DeterministicAnalysisService;
 use App\Services\ExamAttemptFormatter;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -55,31 +56,40 @@ class DashboardController
         $analysisStatus = 'no_data';
         $analysisData = null;
 
+        // Per-user analysis mode (default: instant). AI only if user chose it AND server enables it.
+        $userMode = Cache::get("user-analysis-mode-{$userId}", 'instant');
+        $useAi = $userMode === 'ai' && config('services.ai.analysis_enabled');
+
         if ($latestAttemptId) {
             $cacheKey = "ai-analysis-generating-{$userId}";
             $failKey = "ai-analysis-failed-{$userId}";
 
-            if (! $analysis) {
-                if (! Cache::has($cacheKey) && ! Cache::has($failKey)) {
-                    Cache::put($cacheKey, true, 60);
-                    GenerateUserAnalysisJob::dispatchAfterResponse($userId, $latestAttemptId);
-                }
-                $analysisStatus = 'generating';
+            if (! $useAi) {
+                $deterministicService = new DeterministicAnalysisService;
+                $analysisStatus = 'ready';
+                $analysisData = $deterministicService->generate($userId, $latestAttemptId);
             } else {
-                $isRecent = $analysis->updated_at->diffInDays(now()) < 7;
-                if (! $isRecent && $analysis->last_exam_attempt_id !== $latestAttemptId) {
-                    if (! Cache::has($failKey)) {
-                        if (! Cache::has($cacheKey)) {
-                            Cache::put($cacheKey, true, 60);
-                            GenerateUserAnalysisJob::dispatchAfterResponse($userId, $latestAttemptId);
-                        }
-                        $analysisStatus = 'generating';
-                    } else {
-                        $analysisStatus = 'failed';
+                if (! $analysis) {
+                    if (! Cache::has($cacheKey) && ! Cache::has($failKey)) {
+                        Cache::put($cacheKey, true, 60);
+                        GenerateUserAnalysisJob::dispatchAfterResponse($userId, $latestAttemptId);
                     }
+                    $analysisStatus = 'generating';
                 } else {
-                    $analysisStatus = 'ready';
-                    $analysisData = $analysis->analysis_json;
+                    if ($analysis->last_exam_attempt_id !== $latestAttemptId) {
+                        if (! Cache::has($failKey)) {
+                            if (! Cache::has($cacheKey)) {
+                                Cache::put($cacheKey, true, 60);
+                                GenerateUserAnalysisJob::dispatchAfterResponse($userId, $latestAttemptId);
+                            }
+                            $analysisStatus = 'generating';
+                        } else {
+                            $analysisStatus = 'failed';
+                        }
+                    } else {
+                        $analysisStatus = 'ready';
+                        $analysisData = $analysis->analysis_json;
+                    }
                 }
             }
         }
