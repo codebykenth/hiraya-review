@@ -121,7 +121,7 @@ export default function Login({
                                 type="submit"
                                 className="mt-2 h-12 w-full rounded-xl bg-blue-600 text-base font-semibold text-white shadow-md transition-all duration-200 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-500"
                                 tabIndex={4}
-                                disabled={processing || !turnstileToken}
+                                disabled={processing || !!(turnstileSiteKey && !turnstileToken)}
                                 data-test="login-button"
                             >
                                 {processing && <Spinner />}
@@ -142,9 +142,14 @@ export default function Login({
                             <Button
                                 type="button"
                                 variant="outline"
-                                className="h-11 w-full rounded-xl border-slate-200 font-medium transition-colors hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-slate-900"
+                                className="h-11 w-full rounded-xl border-slate-200 font-medium transition-colors hover:bg-slate-50 disabled:opacity-50 dark:border-slate-800 dark:hover:bg-slate-900"
+                                disabled={!!(turnstileSiteKey && !turnstileToken)}
                                 onClick={() => {
-                                    window.location.href = '/auth/google';
+                                    const redirectUrl = new URL('/auth/google', window.location.origin);
+                                    if (turnstileToken) {
+                                        redirectUrl.searchParams.set('cf_turnstile_response', turnstileToken);
+                                    }
+                                    window.location.href = redirectUrl.toString();
                                 }}
                             >
                                 <GoogleIcon className="mr-2 h-4 w-4 transition-transform group-hover:scale-110" />

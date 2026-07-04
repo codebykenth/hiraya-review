@@ -20,6 +20,16 @@ class AuthController extends Controller
             abort(404, 'Authentication provider not supported.');
         }
 
+        $turnstileService = app(\App\Services\TurnstileService::class);
+        if ($turnstileService->isConfigured()) {
+            $token = request()->query('cf_turnstile_response');
+            if (empty($token) || ! $turnstileService->verify($token)) {
+                return redirect()->back()->withErrors([
+                    'turnstile' => 'CAPTCHA verification failed. Please try again.',
+                ]);
+            }
+        }
+
         return Socialite::driver($provider)->redirect();
     }
 
