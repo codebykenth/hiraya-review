@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Services\TurnstileService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -20,7 +21,7 @@ class AuthController extends Controller
             abort(404, 'Authentication provider not supported.');
         }
 
-        $turnstileService = app(\App\Services\TurnstileService::class);
+        $turnstileService = app(TurnstileService::class);
         if ($turnstileService->isConfigured()) {
             $token = request()->query('cf_turnstile_response');
             if (empty($token) || ! $turnstileService->verify($token)) {

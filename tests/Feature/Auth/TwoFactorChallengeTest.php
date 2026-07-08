@@ -25,6 +25,7 @@ test('two factor challenge can be rendered', function () {
     $this->post(route('login'), [
         'email' => $user->email,
         'password' => 'password',
+        'cf_turnstile_response' => 'valid-token',
     ]);
 
     $this->get(route('two-factor.login'))

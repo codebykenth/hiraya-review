@@ -141,7 +141,10 @@ export default function Register({ passwordRules, turnstileSiteKey }: Props) {
 
                             <Button
                                 type="submit"
-                                disabled={!termsAccepted || !!(turnstileSiteKey && !turnstileToken)}
+                                disabled={
+                                    !termsAccepted ||
+                                    !!(turnstileSiteKey && !turnstileToken)
+                                }
                                 className="mt-2 h-12 w-full rounded-xl bg-blue-600 text-base font-semibold text-white shadow-md transition-all duration-200 hover:bg-blue-700 disabled:opacity-50 dark:bg-blue-600 dark:hover:bg-blue-500"
                                 tabIndex={6}
                                 data-test="register-user-button"
@@ -164,7 +167,9 @@ export default function Register({ passwordRules, turnstileSiteKey }: Props) {
                                 type="button"
                                 variant="outline"
                                 className="h-11 w-full rounded-xl border-slate-200 font-medium transition-colors hover:bg-slate-50 disabled:opacity-50 dark:border-slate-800 dark:hover:bg-slate-900"
-                                disabled={!!(turnstileSiteKey && !turnstileToken)}
+                                disabled={
+                                    !!(turnstileSiteKey && !turnstileToken)
+                                }
                                 onClick={() => setSocialModal('google')}
                             >
                                 <GoogleIcon className="mr-2 h-4 w-4 transition-transform group-hover:scale-110" />

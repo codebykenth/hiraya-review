@@ -69,9 +69,14 @@ export default function SocialConsentModal({
                                 window.location.origin,
                             );
                             url.searchParams.set('terms_accepted', '1');
+
                             if (turnstileToken) {
-                                url.searchParams.set('cf_turnstile_response', turnstileToken);
+                                url.searchParams.set(
+                                    'cf_turnstile_response',
+                                    turnstileToken,
+                                );
                             }
+
                             window.location.href = url.toString();
                         }}
                     >

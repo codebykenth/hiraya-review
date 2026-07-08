@@ -18,6 +18,7 @@ test('new users can register', function () {
         'email' => 'test@example.com',
         'password' => 'password',
         'password_confirmation' => 'password',
+        'cf_turnstile_response' => 'valid-token',
     ]);
 
     $this->assertAuthenticated();

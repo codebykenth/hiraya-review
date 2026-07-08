@@ -23,7 +23,7 @@ class VerifyTurnstile
         }
 
         // Verify Turnstile token for form submissions
-        if ($request->isMethod('POST') && in_array($request->route()?->getName(), ['login', 'register', 'password.email'])) {
+        if ($request->isMethod('POST') && in_array($request->route()?->getName(), ['login', 'login.store', 'register', 'register.store', 'password.email'])) {
             $token = $request->input('cf_turnstile_response');
             if (empty($token) || ! $this->turnstileService->verify($token)) {
                 return back()->withErrors([
