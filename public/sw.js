@@ -1,5 +1,5 @@
-const CACHE_NAME = 'hiraya-review-v1';
-const STATIC_CACHE_NAME = 'hiraya-review-static-v1';
+const CACHE_NAME = 'hiraya-review-v2';
+const STATIC_CACHE_NAME = 'hiraya-review-static-v2';
 const STATIC_CACHE_LIMIT = 100;
 
 const PRECACHE_ASSETS = [
