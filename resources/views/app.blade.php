@@ -34,6 +34,12 @@
     </style>
 
     <link rel="icon" href="{{ asset('images/hiraya_logo_cropped.png') }}" type="image/png">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#0f172a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Hiraya Review">
+    <link rel="apple-touch-icon" href="/images/hiraya_logo_cropped.png">
     <link rel="canonical" href="{{ request()->url() }}">
 
     <!-- Global SEO & Social Sharing Fallbacks -->

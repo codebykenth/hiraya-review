@@ -78,6 +78,7 @@ test('dashboard dispatches GenerateUserAnalysisJob if user has exam attempts but
 });
 
 test('dashboard serves cached analysis if generated today', function () {
+    config(['services.ai.analysis_enabled' => true]);
     $user = User::factory()->create();
     Cache::put("user-analysis-mode-{$user->id}", 'ai');
     $this->actingAs($user);

@@ -1,0 +1,26 @@
+{
+  "id": "/",
+  "name": "Hiraya Review",
+  "short_name": "Hiraya Review",
+  "description": "Ace the Philippine Civil Service Exam. Professional & Subprofessional mock exams, smart study plans, high-yield learning modules, and targeted drills.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0f172a",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/images/hiraya_logo_cropped.png",
+      "sizes": "any",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/images/hiraya_logo.png",
+      "sizes": "any",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
