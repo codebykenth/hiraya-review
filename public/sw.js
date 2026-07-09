@@ -4,11 +4,17 @@ const STATIC_CACHE_LIMIT = 100;
 
 const PRECACHE_ASSETS = [
     '/',
+    '/manifest.json',
     '/images/hiraya_logo_cropped.png',
     '/images/hiraya_logo.png',
     '/favicon.ico',
-    '/favicon.svg',
+    '/icons/icon-72x72.png',
+    '/icons/icon-96x96.png',
+    '/icons/icon-128x128.png',
+    '/icons/icon-144x144.png',
+    '/icons/icon-152x152.png',
     '/icons/icon-192x192.png',
+    '/icons/icon-384x384.png',
     '/icons/icon-512x512.png',
     '/icons/icon-maskable-192x192.png',
     '/icons/icon-maskable-512x512.png',
@@ -122,30 +128,32 @@ self.addEventListener('fetch', (event) => {
         return;
     }
 
-    // ---- Stale-While-Revalidate: images, fonts, favicon ----
+    // ---- Stale-While-Revalidate: images, fonts, favicon, manifest ----
     const isStaticAsset =
         url.pathname.startsWith('/images/') ||
         url.pathname.startsWith('/icons/') ||
         url.pathname.endsWith('.woff2') ||
         url.pathname.endsWith('.ico') ||
-        url.pathname.endsWith('.svg');
+        url.pathname.endsWith('.svg') ||
+        url.pathname === '/manifest.json';
 
     if (isStaticAsset) {
         event.respondWith(
-            caches.open(STATIC_CACHE_NAME).then((cache) =>
-                cache.match(event.request).then((cached) => {
-                    const networkFetch = fetch(event.request, { credentials: 'same-origin' })
-                        .then((response) => {
-                            if (response && response.status === 200 && response.type === 'basic') {
-                                cache.put(event.request, response.clone());
+            caches.match(event.request).then((cached) => {
+                const networkFetch = fetch(event.request, { credentials: 'same-origin' })
+                    .then((response) => {
+                        if (response && response.status === 200 && response.type === 'basic') {
+                            const clone = response.clone();
+                            caches.open(STATIC_CACHE_NAME).then((cache) => {
+                                cache.put(event.request, clone);
                                 trimCache(STATIC_CACHE_NAME, STATIC_CACHE_LIMIT);
-                            }
-                            return response;
-                        })
-                        .catch(() => cached);
-                    return cached || networkFetch;
-                }),
-            ),
+                            });
+                        }
+                        return response;
+                    })
+                    .catch(() => cached);
+                return cached || networkFetch;
+            }),
         );
         return;
     }

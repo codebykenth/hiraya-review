@@ -34,7 +34,6 @@
     </style>
 
     <link rel="icon" href="{{ asset('images/hiraya_logo_cropped.png') }}" type="image/png">
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#0f172a">
     <meta name="mobile-web-app-capable" content="yes">
