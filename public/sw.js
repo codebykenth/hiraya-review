@@ -16,8 +16,6 @@ const PRECACHE_ASSETS = [
     '/icons/icon-192x192.png',
     '/icons/icon-384x384.png',
     '/icons/icon-512x512.png',
-    '/icons/icon-maskable-192x192.png',
-    '/icons/icon-maskable-512x512.png',
 ];
 
 // Routes that must NEVER be served from cache (authenticated / sensitive)
