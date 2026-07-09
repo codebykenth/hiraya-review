@@ -2,13 +2,16 @@ const CACHE_NAME = 'hiraya-review-v1';
 const STATIC_CACHE_NAME = 'hiraya-review-static-v1';
 const STATIC_CACHE_LIMIT = 100;
 
-// Pre-cache critical shell assets
 const PRECACHE_ASSETS = [
     '/',
     '/images/hiraya_logo_cropped.png',
     '/images/hiraya_logo.png',
     '/favicon.ico',
     '/favicon.svg',
+    '/icons/icon-192x192.png',
+    '/icons/icon-512x512.png',
+    '/icons/icon-maskable-192x192.png',
+    '/icons/icon-maskable-512x512.png',
 ];
 
 // Routes that must NEVER be served from cache (authenticated / sensitive)
@@ -25,6 +28,11 @@ const AUTH_ROUTES = [
     '/sanctum',
     '/livewire',
     '/_debugbar',
+    '/login',
+    '/register',
+    '/logout',
+    '/auth',
+    '/broadcasting',
 ];
 
 // ---------------------------------------------------------------------------
@@ -117,6 +125,7 @@ self.addEventListener('fetch', (event) => {
     // ---- Stale-While-Revalidate: images, fonts, favicon ----
     const isStaticAsset =
         url.pathname.startsWith('/images/') ||
+        url.pathname.startsWith('/icons/') ||
         url.pathname.endsWith('.woff2') ||
         url.pathname.endsWith('.ico') ||
         url.pathname.endsWith('.svg');

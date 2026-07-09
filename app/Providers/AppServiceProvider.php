@@ -119,19 +119,6 @@ class AppServiceProvider extends ServiceProvider
                 env('DEV_EMAIL'),
             ]);
         });
-
-        // Sync PWA/favicon asset icons in public folder
-        $logoPath = public_path('images/hiraya_logo_cropped.png');
-        if (file_exists($logoPath)) {
-            $faviconPath = public_path('favicon.ico');
-            if (!file_exists($faviconPath) || md5_file($faviconPath) !== md5_file($logoPath)) {
-                copy($logoPath, $faviconPath);
-            }
-            $appleTouchPath = public_path('apple-touch-icon.png');
-            if (!file_exists($appleTouchPath) || md5_file($appleTouchPath) !== md5_file($logoPath)) {
-                copy($logoPath, $appleTouchPath);
-            }
-        }
     }
 
     /**
