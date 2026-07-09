@@ -8,6 +8,7 @@ const PRECACHE_ASSETS = [
     '/images/hiraya_logo_cropped.png',
     '/images/hiraya_logo.png',
     '/favicon.ico',
+    '/favicon.svg',
 ];
 
 // Routes that must NEVER be served from cache (authenticated / sensitive)
@@ -117,7 +118,8 @@ self.addEventListener('fetch', (event) => {
     const isStaticAsset =
         url.pathname.startsWith('/images/') ||
         url.pathname.endsWith('.woff2') ||
-        url.pathname.endsWith('.ico');
+        url.pathname.endsWith('.ico') ||
+        url.pathname.endsWith('.svg');
 
     if (isStaticAsset) {
         event.respondWith(
