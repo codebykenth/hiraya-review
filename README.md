@@ -497,8 +497,8 @@ cse_reviewer/
 
 ```bash
 # Clone the repository
-git clone https://github.com/codebykenth/civil-service-exam-reviewer.git
-cd civil-service-exam-reviewer
+git clone https://github.com/codebykenth/hiraya-review.git
+cd hiraya-review
 
 # Run the automated setup script
 composer setup
