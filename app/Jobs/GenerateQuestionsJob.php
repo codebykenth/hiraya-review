@@ -33,7 +33,7 @@ class GenerateQuestionsJob implements ShouldQueue
 
     protected ?string $lockOwner;
 
-    public function __construct(array $validated, int $userId, string $primaryModel = 'gemini-3.5-flash', ?string $lockOwner = null)
+    public function __construct(array $validated, int $userId, string $primaryModel = 'gemini-3.6-flash', ?string $lockOwner = null)
     {
         $this->validated = $validated;
         $this->userId = $userId;
@@ -229,7 +229,7 @@ class GenerateQuestionsJob implements ShouldQueue
                 $firstAttemptFailed = false;
 
                 // Define closures for both API calls
-                $attemptGemini = function ($model = 'gemini-3.5-flash') use ($apiKey, $systemPrompt, $userPrompt, $subcategory, &$resultText, &$errorMsg) {
+                $attemptGemini = function ($model = 'gemini-3.6-flash') use ($apiKey, $systemPrompt, $userPrompt, $subcategory, &$resultText, &$errorMsg) {
                     if (! $apiKey) {
                         $errorMsg = 'GEMINI_API_KEY is missing.';
 

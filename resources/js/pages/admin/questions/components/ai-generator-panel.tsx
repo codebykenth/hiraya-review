@@ -715,6 +715,10 @@ export function AIGeneratorPanel({
                                 onValueChange={setAiPrimaryModel}
                                 options={[
                                     {
+                                        value: 'gemini-3.6-flash',
+                                        label: 'Google Gemini 3.6 Flash (Latest)',
+                                    },
+                                    {
                                         value: 'gemini-3.5-flash',
                                         label: 'Google Gemini 3.5 Flash (Best for CSE & SVGs)',
                                     },
