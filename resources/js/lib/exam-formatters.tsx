@@ -462,8 +462,8 @@ export const renderFormattedText = (
 
                 if (isNegated) {
                     return (
-                        <span className="shadow-3xs inline-flex items-center rounded-md border border-red-100 bg-red-50 px-1.5 py-0.5 font-mono text-xs font-bold text-red-600 select-all">
-                            <span className="mr-0.5 text-[10px] font-bold text-red-400">
+                        <span className="shadow-3xs inline-flex items-center rounded-md border border-red-100 bg-red-50 px-1.5 py-0.5 font-mono text-xs font-bold text-red-600 select-all dark:border-red-900/50 dark:bg-red-950/30 dark:text-red-400">
+                            <span className="mr-0.5 text-[10px] font-bold text-red-400 dark:text-red-500">
                                 ¬
                             </span>
                             {letter}
@@ -484,7 +484,7 @@ export const renderFormattedText = (
                     const variables = token.split(/\s*(?:->|=>)\s*/);
 
                     return (
-                        <span className="shadow-3xs mx-1 my-0.5 inline-flex items-center gap-1 rounded-xl border border-slate-200/80 bg-slate-50 px-2 py-1 transition hover:bg-slate-100/50">
+                        <span className="shadow-3xs mx-1 my-0.5 inline-flex items-center gap-1 rounded-xl border border-slate-200/80 bg-slate-50 px-2 py-1 transition hover:bg-slate-100/50 dark:border-slate-800/80 dark:bg-slate-900/50 dark:hover:bg-slate-900/80">
                             {variables.map((v, idx) => (
                                 <span
                                     key={idx}
@@ -511,7 +511,7 @@ export const renderFormattedText = (
                 }
 
                 return (
-                    <span className="font-semibold text-slate-800">
+                    <span className="font-semibold text-slate-800 dark:text-slate-200">
                         {formatMathInlineBase(token)}
                     </span>
                 );
@@ -783,7 +783,7 @@ export const renderFormattedText = (
                                 {row.map((cell, ci) => (
                                     <td
                                         key={ci}
-                                        className="dark:text-slate-350 px-4 py-3 leading-relaxed font-semibold text-slate-700"
+                                        className="dark:text-slate-300 px-4 py-3 leading-relaxed font-semibold text-slate-700"
                                     >
                                         {formatMathInline(cell)}
                                     </td>
