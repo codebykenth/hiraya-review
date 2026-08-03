@@ -18,6 +18,7 @@ export function SupportWidget() {
     const [open, setOpen] = useState(false);
     const [isMounted, setIsMounted] = useState(false);
     const [showBubble, setShowBubble] = useState(false);
+    const [isReviewExamActive, setIsReviewExamActive] = useState(false);
     const [isLiveExamActive, setIsLiveExamActive] = useState(() => {
         if (typeof window !== 'undefined') {
             return localStorage.getItem('active_exam_session') !== null;
@@ -83,7 +84,12 @@ export function SupportWidget() {
             }
         };
 
+        const handleReviewStatus = (e: any) => {
+            setIsReviewExamActive(e.detail.active);
+        };
+
         window.addEventListener('live-exam-status', handleExamStatus);
+        window.addEventListener('review-exam-status', handleReviewStatus);
 
         // Listen for Inertia navigation events
         const removeListener = router.on('navigate', handleNavigate);
@@ -104,6 +110,7 @@ export function SupportWidget() {
 
         return () => {
             window.removeEventListener('live-exam-status', handleExamStatus);
+            window.removeEventListener('review-exam-status', handleReviewStatus);
             removeListener();
             clearTimeout(timer);
 
@@ -129,12 +136,7 @@ export function SupportWidget() {
         }
     };
 
-    const isExamPage =
-        typeof window !== 'undefined' &&
-        (window.location.pathname.includes('/exams') ||
-            window.location.pathname.includes('/drills'));
-
-    if (!isMounted || isLiveExamActive || isExamPage) {
+    if (!isMounted || isLiveExamActive || isReviewExamActive) {
         return null;
     }
 

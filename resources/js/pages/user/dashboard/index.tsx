@@ -1,4 +1,4 @@
-import { Link, usePage } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import { Play } from 'lucide-react';
 import { useEffect } from 'react';
 import { PageContainer } from '@/components/layout/page-container';
@@ -23,6 +23,7 @@ export default function Dashboard({ stats, aiAnalysis }: DashboardProps) {
 
     return (
         <PageContainer className="gap-4">
+            <Head title="Dashboard" />
             {/* Greeting Header & Main Action Controls */}
             <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                 <PageHeader
@@ -43,7 +44,7 @@ export default function Dashboard({ stats, aiAnalysis }: DashboardProps) {
                                 query: { start: 'professional' },
                             }).url
                         }
-                        className="group flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-xs font-semibold text-white shadow-sm transition transition-all duration-300 hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95"
+                        className="group flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-xs font-semibold text-white shadow-sm transition duration-300 hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95"
                     >
                         <Play className="size-3.5 fill-current" />
                         Start Professional Exam
@@ -54,7 +55,7 @@ export default function Dashboard({ stats, aiAnalysis }: DashboardProps) {
                                 query: { start: 'subprofessional' },
                             }).url
                         }
-                        className="group dark:hover:bg-slate-850 flex items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-xs font-semibold text-slate-700 shadow-sm transition transition-all duration-300 hover:bg-slate-50 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95 dark:border-slate-700 dark:bg-slate-900/60 dark:text-slate-200"
+                        className="group dark:hover:bg-slate-850 flex items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-xs font-semibold text-slate-700 shadow-sm transition duration-300 hover:bg-slate-50 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95 dark:border-slate-700 dark:bg-slate-900/60 dark:text-slate-200"
                     >
                         Start Subprofessional Exam
                     </Link>

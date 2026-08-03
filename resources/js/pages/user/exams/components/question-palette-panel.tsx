@@ -1,4 +1,4 @@
-import { CheckCircle2, ChevronRight, X } from 'lucide-react';
+import { CheckCircle2, ChevronRight, X, PanelRightClose, PanelRightOpen, LayoutGrid } from 'lucide-react';
 import React, { useMemo } from 'react';
 
 export interface QuestionPalettePanelProps {
@@ -31,6 +31,9 @@ export interface QuestionPalettePanelProps {
 
     isMobile?: boolean;
     onCloseMobile?: () => void;
+
+    isCollapsed?: boolean;
+    onToggleCollapse?: () => void;
 }
 
 export default function QuestionPalettePanel({
@@ -58,6 +61,9 @@ export default function QuestionPalettePanel({
 
     isMobile = false,
     onCloseMobile,
+
+    isCollapsed = false,
+    onToggleCollapse,
 }: QuestionPalettePanelProps) {
     const demographicCategoryName = useMemo(() => {
         const cat = questions.find(
@@ -108,7 +114,7 @@ export default function QuestionPalettePanel({
 
     const content = (
         <>
-            {isMobile && (
+            {isMobile ? (
                 <div className="flex h-16 shrink-0 items-center justify-between border-b border-border bg-card px-4 sm:px-6">
                     <span className="font-heading text-sm font-bold text-foreground">
                         Question Palette
@@ -119,6 +125,21 @@ export default function QuestionPalettePanel({
                     >
                         <X className="size-5" />
                     </button>
+                </div>
+            ) : (
+                <div className="hidden h-12 shrink-0 items-center justify-between border-b border-border bg-card px-4 lg:flex">
+                    <span className="font-heading text-xs font-bold text-foreground">
+                        Question Palette
+                    </span>
+                    {onToggleCollapse && (
+                        <button
+                            onClick={onToggleCollapse}
+                            title="Collapse Question Palette"
+                            className="rounded-md p-1.5 text-muted-foreground transition hover:bg-muted hover:text-foreground"
+                        >
+                            <PanelRightClose className="size-4" />
+                        </button>
+                    )}
                 </div>
             )}
 
@@ -190,7 +211,7 @@ export default function QuestionPalettePanel({
                                 type="button"
                                 onClick={() => onReviewStatusChange('all')}
                                 title="Show All"
-                                className={`rounded-lg px-1 py-1.5 text-[11px] font-bold tracking-tight transition sm:text-xs truncate text-center ${
+                                className={`rounded-lg px-0.5 py-1.5 text-[10px] font-bold tracking-tight transition sm:text-[11px] text-center ${
                                     reviewStatusFilter === 'all'
                                         ? 'bg-background text-foreground shadow-2xs'
                                         : 'text-muted-foreground hover:text-foreground'
@@ -202,7 +223,7 @@ export default function QuestionPalettePanel({
                                 type="button"
                                 onClick={() => onReviewStatusChange('correct')}
                                 title="Show Correct"
-                                className={`rounded-lg px-1 py-1.5 text-[11px] font-bold tracking-tight transition sm:text-xs truncate text-center ${
+                                className={`rounded-lg px-0.5 py-1.5 text-[10px] font-bold tracking-tight transition sm:text-[11px] text-center ${
                                     reviewStatusFilter === 'correct'
                                         ? 'bg-background text-emerald-600 shadow-2xs dark:text-emerald-400'
                                         : 'text-muted-foreground hover:text-foreground'
@@ -216,7 +237,7 @@ export default function QuestionPalettePanel({
                                     onReviewStatusChange('incorrect')
                                 }
                                 title="Show Incorrect"
-                                className={`rounded-lg px-1 py-1.5 text-[11px] font-bold tracking-tight transition sm:text-xs truncate text-center ${
+                                className={`rounded-lg px-0.5 py-1.5 text-[10px] font-bold tracking-tight transition sm:text-[11px] text-center ${
                                     reviewStatusFilter === 'incorrect'
                                         ? 'bg-background text-rose-600 shadow-2xs dark:text-rose-400'
                                         : 'text-muted-foreground hover:text-foreground'
@@ -228,7 +249,7 @@ export default function QuestionPalettePanel({
                                 type="button"
                                 onClick={() => onReviewStatusChange('flagged')}
                                 title="Show Flagged"
-                                className={`rounded-lg px-1 py-1.5 text-[11px] font-bold tracking-tight transition sm:text-xs truncate text-center ${
+                                className={`rounded-lg px-0.5 py-1.5 text-[10px] font-bold tracking-tight transition sm:text-[11px] text-center ${
                                     reviewStatusFilter === 'flagged'
                                         ? 'bg-background text-amber-600 shadow-2xs dark:text-amber-400'
                                         : 'text-muted-foreground hover:text-foreground'
@@ -250,7 +271,7 @@ export default function QuestionPalettePanel({
                                 type="button"
                                 onClick={() => onLiveStatusChange('all')}
                                 title="Show All"
-                                className={`rounded-lg px-1 py-1.5 text-[11px] font-bold tracking-tight transition sm:text-xs truncate text-center ${
+                                className={`rounded-lg px-0.5 py-1.5 text-[10px] font-bold tracking-tight transition sm:text-[11px] text-center ${
                                     liveStatusFilter === 'all'
                                         ? 'bg-background text-foreground shadow-2xs'
                                         : 'text-muted-foreground hover:text-foreground'
@@ -262,7 +283,7 @@ export default function QuestionPalettePanel({
                                 type="button"
                                 onClick={() => onLiveStatusChange('unanswered')}
                                 title="Show Unanswered"
-                                className={`rounded-lg px-1 py-1.5 text-[11px] font-bold tracking-tight transition sm:text-xs truncate text-center ${
+                                className={`rounded-lg px-0.5 py-1.5 text-[10px] font-bold tracking-tight transition sm:text-[11px] text-center ${
                                     liveStatusFilter === 'unanswered'
                                         ? 'bg-background text-amber-600 shadow-2xs dark:text-amber-400'
                                         : 'text-muted-foreground hover:text-foreground'
@@ -274,7 +295,7 @@ export default function QuestionPalettePanel({
                                 type="button"
                                 onClick={() => onLiveStatusChange('answered')}
                                 title="Show Answered"
-                                className={`rounded-lg px-1 py-1.5 text-[11px] font-bold tracking-tight transition sm:text-xs truncate text-center ${
+                                className={`rounded-lg px-0.5 py-1.5 text-[10px] font-bold tracking-tight transition sm:text-[11px] text-center ${
                                     liveStatusFilter === 'answered'
                                         ? 'bg-background text-blue-600 shadow-2xs dark:text-blue-400'
                                         : 'text-muted-foreground hover:text-foreground'
@@ -286,7 +307,7 @@ export default function QuestionPalettePanel({
                                 type="button"
                                 onClick={() => onLiveStatusChange('flagged')}
                                 title="Show Flagged"
-                                className={`rounded-lg px-1 py-1.5 text-[11px] font-bold tracking-tight transition sm:text-xs truncate text-center ${
+                                className={`rounded-lg px-0.5 py-1.5 text-[10px] font-bold tracking-tight transition sm:text-[11px] text-center ${
                                     liveStatusFilter === 'flagged'
                                         ? 'bg-background text-rose-600 shadow-2xs dark:text-rose-400'
                                         : 'text-muted-foreground hover:text-foreground'
@@ -338,12 +359,6 @@ export default function QuestionPalettePanel({
             )}
 
             <div className="flex-1 overflow-y-auto bg-card p-4">
-                {!isMobile && (
-                    <span className="mb-3 block text-[10px] font-extrabold tracking-wider text-muted-foreground uppercase">
-                        Question Palette
-                    </span>
-                )}
-
                 <div className="grid grid-cols-5 gap-2">
                     {questions.map((q, idx) => {
                         const isDemographic =
@@ -540,8 +555,31 @@ export default function QuestionPalettePanel({
         );
     }
 
+    if (isCollapsed) {
+        return (
+            <div className="hidden w-12 shrink-0 flex-col items-center justify-between border-l border-border bg-card py-4 transition-all duration-300 lg:flex">
+                <button
+                    onClick={onToggleCollapse}
+                    title="Expand Question Palette"
+                    className="flex size-8 items-center justify-center rounded-lg border border-border bg-background text-muted-foreground transition hover:bg-accent hover:text-foreground"
+                >
+                    <PanelRightOpen className="size-4" />
+                </button>
+
+                <div className="flex flex-col items-center gap-3">
+                    <LayoutGrid className="size-4 text-blue-600 dark:text-blue-400" />
+                    <span className="text-[10px] font-extrabold tracking-widest text-muted-foreground uppercase [writing-mode:vertical-lr] rotate-180">
+                        Question Palette
+                    </span>
+                </div>
+
+                <div className="size-2 rounded-full bg-blue-600/40" />
+            </div>
+        );
+    }
+
     return (
-        <div className="hidden w-80 shrink-0 flex-col border-l border-border bg-card lg:flex">
+        <div className="hidden w-80 shrink-0 flex-col border-l border-border bg-card transition-all duration-300 lg:flex">
             {content}
         </div>
     );

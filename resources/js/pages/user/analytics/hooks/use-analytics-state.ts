@@ -109,7 +109,7 @@ export function useAnalyticsState({ stats }: AnalyticsProps) {
     const [isRunsOpen, setIsRunsOpen] = useState(false);
 
     const currentTrack = stats?.filters?.track || 'Professional';
-    const currentRuns = stats?.filters?.runs || '1';
+    const currentRuns = stats?.filters?.runs || 'all';
 
     const updateFilter = (key: 'track' | 'runs', value: string) => {
         router.get(

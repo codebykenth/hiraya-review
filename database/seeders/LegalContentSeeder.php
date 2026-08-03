@@ -23,8 +23,9 @@ class LegalContentSeeder extends Seeder
 <p class="text-base leading-relaxed text-muted-foreground">To provide mock exams, custom study logs, and AI analytics, Hiraya Review collects:</p>
 <ul class="list-disc space-y-2 pl-5 text-sm text-muted-foreground">
 <li><strong>Account Credentials:</strong> Email addresses and passwords when you create a native account.</li>
-<li><strong>Social Sign-In Data:</strong> Hiraya Review offers third-party authentication via Google. When you use Google to sign in, Hiraya Review receives and securely store basic profile details (such as your name and email address) to personalize your account and metrics dashboard. Hiraya Review will never post or publish to your social feed.</li>
-<li><strong>Practice Data:</strong> Your test attempts, chosen tracks (Professional vs. Subprofessional), scores, categories performance, and time-per-question metrics used to generate your custom dashboard analytics.</li>
+<li><strong>Social Sign-In Data:</strong> Hiraya Review offers third-party authentication via Google. When you use Google to sign in, Hiraya Review receives and securely stores basic profile details (such as your name and email address) to personalize your account and metrics dashboard. Hiraya Review will never post or publish to your social feed.</li>
+<li><strong>Practice Data:</strong> Your test attempts, chosen tracks (Professional vs. Subprofessional), scores, category performance, and time-per-question metrics used to generate your custom dashboard analytics.</li>
+<li><strong>Essential Cookies & Preferences:</strong> Minimal technical cookies and local storage tokens used to maintain your logged-in session, CSRF protection, and UI theme preferences.</li>
 <li><strong>Log & Session Info:</strong> Minimal browser metadata to ensure system stability, rate-limiting, and security against unauthorized access.</li>
 </ul>
 </section>
@@ -35,8 +36,8 @@ class LegalContentSeeder extends Seeder
 <ul class="list-disc space-y-1 pl-5 text-sm text-muted-foreground">
 <li>Authenticate your identity and customize your preparation dashboard.</li>
 <li>Calculate your historical scores and performance percentages across exam disciplines.</li>
-<li>Train and optimize your custom AI drill generators on the sections you struggle with most.</li>
-<li>Protect the database from scraping and DDoS attacks.</li>
+<li>Generate targeted practice drills and personalized study plans focused on your identified weak subtopics.</li>
+<li>Maintain platform security, enforce API rate limits, and prevent automated abuse.</li>
 </ul>
 </section>
 

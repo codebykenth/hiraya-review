@@ -1,3 +1,4 @@
+import { Head } from '@inertiajs/react';
 import { BarChart, TrendingUp, Target } from 'lucide-react';
 import React from 'react';
 import { PageContainer } from '@/components/layout/page-container';
@@ -28,6 +29,7 @@ export default function AnalyticsIndex({ stats, aiAnalysis }: AnalyticsProps) {
 
     return (
         <PageContainer>
+            <Head title="Performance Analytics" />
             {/* Header section with layout matching Dashboard */}
             <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                 <PageHeader

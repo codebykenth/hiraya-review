@@ -28,7 +28,7 @@ class AnalyticsController
     {
         $userId = auth()->id();
         $trackFilter = $request->query('track', 'Professional');
-        $runsFilter = $request->query('runs', '1'); // Default to 1 run
+        $runsFilter = $request->query('runs', 'all'); // Default to all runs
 
         // Fetch user attempts
         $query = ExamAttempt::where('user_id', $userId)->latest();

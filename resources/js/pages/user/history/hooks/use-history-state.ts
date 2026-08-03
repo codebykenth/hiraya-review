@@ -9,7 +9,7 @@ export function useHistoryState({ attempts = [], filters }: HistoryPageProps) {
     const [selectedTrack, setSelectedTrack] = useState(
         filters.track || 'All Tracks',
     );
-    const [selectedDate, setSelectedDate] = useState(filters.date || '30');
+    const [selectedDate, setSelectedDate] = useState(filters.date || 'all');
     const [selectedIds, setSelectedIds] = useState<number[]>([]);
 
     const [confirmModal, setConfirmModal] = useState<{

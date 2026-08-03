@@ -325,7 +325,7 @@ export default function Calendar() {
                     open={!!errorMessage}
                     onOpenChange={(open) => !open && setErrorMessage(null)}
                 >
-                    <DialogContent className="max-w-2xl">
+                    <DialogContent className="sm:max-w-2xl">
                         <DialogHeader>
                             <DialogTitle className="text-red-600">
                                 Error

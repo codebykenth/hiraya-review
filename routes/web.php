@@ -60,7 +60,7 @@ Route::middleware('throttle:global-views')->group(function () {
 
     // Utilities
     Route::get('sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
-    Route::get('ping', fn () => response()->json(['status' => 'alive', 'timestamp' => now()->toIso8601String()]));
+    Route::get('ping', fn() => response()->json(['status' => 'alive', 'timestamp' => now()->toIso8601String()]));
     Route::get('clear-cache-temp-route', function () {
         Artisan::call('cache:clear');
         Artisan::call('optimize:clear');
@@ -276,7 +276,7 @@ Route::middleware(['auth.or.fail', 'verified'])->group(function () {
     });
 });
 
-require __DIR__.'/settings.php';
+require __DIR__ . '/settings.php';
 
 Route::fallback(function () {
     return Inertia::render('error', ['status' => 404])

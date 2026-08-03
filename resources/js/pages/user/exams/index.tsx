@@ -31,6 +31,7 @@ export default function ExamIndex(props: ExamIndexProps) {
         currentIdx,
         setCurrentIdx,
         answers,
+        questionTimes,
         flagged,
         setFlagged,
         isMobilePaletteOpen,
@@ -145,6 +146,8 @@ export default function ExamIndex(props: ExamIndexProps) {
                     currentIdx={currentIdx}
                     setCurrentIdx={setCurrentIdx}
                     answers={answers}
+                    questionTimes={questionTimes}
+                    results={results}
                     flagged={flagged}
                     setFlagged={setFlagged}
                     reviewCategoryFilter={reviewCategoryFilter}
@@ -196,7 +199,7 @@ export default function ExamIndex(props: ExamIndexProps) {
                 open={!!errorMessage}
                 onOpenChange={(open) => !open && setErrorMessage(null)}
             >
-                <DialogContent className="max-w-2xl">
+                <DialogContent className="sm:max-w-2xl">
                     <DialogHeader>
                         <DialogTitle className="text-red-600">
                             Error

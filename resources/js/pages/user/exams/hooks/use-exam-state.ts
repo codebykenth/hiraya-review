@@ -260,6 +260,17 @@ export function useExamState({
 
         return {};
     });
+    const [questionTimes, setQuestionTimes] = useState<Record<number, number>>(
+        () => {
+            if (restoredSession) {
+                return restoredSession.questionTimes || {};
+            }
+            if (savedAttempt?.cat_scores?.metadata?.question_times) {
+                return savedAttempt.cat_scores.metadata.question_times;
+            }
+            return {};
+        },
+    );
     const [flagged, setFlagged] = useState<Record<number, boolean>>(() => {
         if (restoredSession) {
             return restoredSession.flagged || {};
@@ -296,12 +307,18 @@ export function useExamState({
             return [];
         }
 
-        const filtered =
-            reviewCategoryFilter !== 'All Categories'
-                ? activeQuestions.filter(
-                      (q) => q.category === reviewCategoryFilter,
-                  )
-                : activeQuestions;
+        let filtered = activeQuestions.filter(
+            (q) =>
+                q.category !== 'Demographic Profile' &&
+                !q.category.toLowerCase().includes('demographic') &&
+                !q.isDemographic
+        );
+
+        if (reviewCategoryFilter !== 'All Categories') {
+            filtered = filtered.filter(
+                (q) => q.category === reviewCategoryFilter
+            );
+        }
 
         const subcats = Array.from(
             new Set(filtered.map((q) => q.subcategory || 'General Concepts')),
@@ -342,7 +359,12 @@ export function useExamState({
 
     const activeQuestionsRef = useRef<Question[]>(activeQuestions);
     const answersRef = useRef<Record<number, number>>(answers);
+    const questionTimesRef = useRef<Record<number, number>>(questionTimes);
     const sessionTimeLimitSecsRef = useRef<number>(sessionTimeLimitSecs);
+
+    useEffect(() => {
+        questionTimesRef.current = questionTimes;
+    }, [questionTimes]);
 
     const isTimedRef = useRef<boolean>(isTimed);
     const selectedExamIdRef = useRef<number | null>(selectedExamId);
@@ -495,6 +517,18 @@ export function useExamState({
         timeLeftRef.current = timeLeft;
     }, [timeLeft]);
 
+    // Per-question timer ticker effect during live active exam
+    useEffect(() => {
+        if (!isExamActive || isExamSubmitted) return;
+        const timer = setInterval(() => {
+            setQuestionTimes((prev) => ({
+                ...prev,
+                [currentIdx]: (prev[currentIdx] || 0) + 1,
+            }));
+        }, 1000);
+        return () => clearInterval(timer);
+    }, [isExamActive, isExamSubmitted, currentIdx]);
+
     // Auto-save active exam session to localStorage in real-time
     useEffect(() => {
         if (!isRestored) {
@@ -513,6 +547,7 @@ export function useExamState({
                 questionIds: activeQuestions.map((q) => q.id),
                 activeQuestions,
                 answers,
+                questionTimes,
                 flagged,
                 currentIdx,
                 timeLeft,
@@ -527,6 +562,7 @@ export function useExamState({
     }, [
         isRestored,
         isExamActive,
+        questionTimes,
         activeQuestions,
         selectedExamId,
         drillCategoryId,
@@ -1437,10 +1473,18 @@ export function useExamState({
     };
 
     const handleSelectOption = (optionIndex: number) => {
-        setAnswers((prev) => ({
-            ...prev,
-            [currentIdx]: optionIndex,
-        }));
+        setAnswers((prev) => {
+            if (prev[currentIdx] === optionIndex) {
+                const nextAnswers = { ...prev };
+                delete nextAnswers[currentIdx];
+                return nextAnswers;
+            }
+
+            return {
+                ...prev,
+                [currentIdx]: optionIndex,
+            };
+        });
     };
 
     const handleQuestionNavigate = (targetIdx: number) => {
@@ -1616,6 +1660,7 @@ export function useExamState({
                     skipped_count: skippedCount,
                     duration_secs: durationSecs,
                     is_timed: isTimedLocal,
+                    question_times: questionTimesRef.current,
                     selected_subcategories: isDrillSessionLocal
                         ? drillSubcategoriesRef.current.length > 0
                             ? drillSubcategoriesRef.current
@@ -1801,6 +1846,7 @@ export function useExamState({
         currentIdx,
         setCurrentIdx,
         answers,
+        questionTimes,
         flagged,
         setFlagged,
         isMobilePaletteOpen,

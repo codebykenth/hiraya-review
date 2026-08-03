@@ -2,6 +2,7 @@ import { Head, useForm, router } from '@inertiajs/react';
 import DOMPurify from 'dompurify';
 import { Loader2, Save, FileText, Shield, Eye, Code } from 'lucide-react';
 import { useState } from 'react';
+import { toast } from 'sonner';
 import { PageContainer } from '@/components/layout/page-container';
 import { PageHeader } from '@/components/layout/page-header';
 import { Button } from '@/components/ui/button';
@@ -45,7 +46,17 @@ export default function Edit({ privacy, terms }: EditProps) {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        router.put('/admin/legal-content', data);
+        router.put('/admin/legal-content', data, {
+            preserveScroll: true,
+            onSuccess: () => {
+                toast.success('Legal content updated successfully!');
+            },
+            onError: () => {
+                toast.error(
+                    'Failed to update legal content. Please check for errors.',
+                );
+            },
+        });
     };
 
     return (

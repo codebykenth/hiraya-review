@@ -10,6 +10,7 @@ import { AppSidebar } from '@/components/layout/app-sidebar';
 import { AppSidebarHeader } from '@/components/layout/app-sidebar-header';
 import SiteFooter from '@/components/layout/site-footer';
 import SiteHeader from '@/components/layout/site-header';
+import { CookieConsentBanner } from '@/components/shared/cookie-consent-banner';
 import TermsAcceptanceGuard from '@/components/shared/terms-acceptance-guard';
 import type { AppLayoutProps } from '@/types';
 
@@ -229,6 +230,7 @@ export default function AppSidebarLayout({
                 <SiteHeader activeNav={activeNav} />
                 <main className="flex-1 px-4 py-12 sm:px-6">{children}</main>
                 <SiteFooter />
+                <CookieConsentBanner />
             </div>
         );
     }
@@ -243,6 +245,7 @@ export default function AppSidebarLayout({
                     {children}
                 </AppContent>
             </AppShell>
+            <CookieConsentBanner />
         </TermsAcceptanceGuard>
     );
 }

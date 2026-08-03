@@ -80,11 +80,15 @@ class DeterministicAnalysisService
         // Replace references to $allAttempts with $filteredAttempts for calculations
         $allAttempts = $filteredAttempts;
 
-        // Calculate scores and trends
+        // Calculate scores and trends with volume-weighted metrics
         $scores = [];
-        $totalScoreSum = 0;
+        $mockScores = [];
         $mockExamCount = 0;
         $passCount = 0;
+        $allTotalCorrect = 0;
+        $allTotalQuestions = 0;
+        $mockTotalCorrect = 0;
+        $mockTotalQuestions = 0;
 
         $categoriesMap = Category::all()->keyBy('id');
 
@@ -99,19 +103,24 @@ class DeterministicAnalysisService
             $total = $meta['total_questions'] ?? count($attempt->question_ids);
             $percentage = $total > 0 ? round(($correct / $total) * 100) : 0;
 
-            $scores[] = (int) $percentage;
-            $totalScoreSum += $percentage;
-
             $track = $meta['track'] ?? 'Drill';
             if ($attempt->category_id !== null && ! isset($meta['track'])) {
                 $track = 'Drill';
             }
 
+            $allTotalCorrect += $correct;
+            $allTotalQuestions += $total;
+
             if ($track !== 'Drill') {
                 $mockExamCount++;
+                $mockTotalCorrect += $correct;
+                $mockTotalQuestions += $total;
+                $mockScores[] = (int) $percentage;
                 if ($percentage >= 80) {
                     $passCount++;
                 }
+            } else {
+                $scores[] = (int) $percentage;
             }
 
             $scoreMap = $attempt->cat_scores['categoryScoreMap'] ?? [];
@@ -142,7 +151,14 @@ class DeterministicAnalysisService
             }
         }
 
-        $avgScore = round($totalScoreSum / $totalAttempts);
+        // Volume-weighted overall average calculation
+        if ($mockTotalQuestions > 0) {
+            $avgScore = (int) round(($mockTotalCorrect / $mockTotalQuestions) * 100);
+            $trendScores = ! empty($mockScores) ? $mockScores : $scores;
+        } else {
+            $avgScore = $allTotalQuestions > 0 ? (int) round(($allTotalCorrect / $allTotalQuestions) * 100) : 0;
+            $trendScores = ! empty($scores) ? $scores : $mockScores;
+        }
         $passingRate = $mockExamCount > 0 ? round(($passCount / $mockExamCount) * 100) : 0;
 
         // Category breakdown
@@ -251,14 +267,14 @@ class DeterministicAnalysisService
 
         // Calculate trend direction
         $trend = 'stable';
-        if (count($scores) >= 3) {
-            $recent = array_slice($scores, -3);
+        if (count($trendScores) >= 3) {
+            $recent = array_slice($trendScores, -3);
             if ($recent[2] > $recent[0] + 5) {
                 $trend = 'improving';
             } elseif ($recent[2] < $recent[0] - 5) {
                 $trend = 'declining';
             }
-        } elseif (count($scores) < 2) {
+        } elseif (count($trendScores) < 2) {
             $trend = 'insufficient_data';
         }
 

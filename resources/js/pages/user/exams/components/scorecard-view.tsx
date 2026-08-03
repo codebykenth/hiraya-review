@@ -179,7 +179,7 @@ export function ScorecardView({
                 <div className="flex items-center gap-3">
                     <button
                         onClick={() => setReviewScreenActive(true)}
-                        className="shadow-3xs flex cursor-pointer items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-xs font-bold transition hover:bg-slate-50/60 focus:outline-none dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800"
+                        className="shadow-sm flex cursor-pointer items-center gap-1.5 rounded-lg bg-blue-600 px-5 py-2.5 text-xs font-bold text-white transition-all hover:bg-blue-700 active:scale-95 focus:outline-none dark:bg-blue-600 dark:hover:bg-blue-500"
                     >
                         <BookOpen className="size-3.5" /> View Review
                     </button>
@@ -213,7 +213,7 @@ export function ScorecardView({
                                     {/* Circle Percentage */}
                                     <div className="flex w-full shrink-0 flex-col items-center sm:w-64 lg:w-72">
                                         <div className="relative flex flex-col items-center justify-center">
-                                            <div className="relative flex size-24 items-center justify-center sm:size-40">
+                                            <div className="relative flex size-32 items-center justify-center sm:size-48">
                                                 <svg
                                                     className="size-full -rotate-90"
                                                     viewBox="0 0 100 100"
@@ -242,7 +242,7 @@ export function ScorecardView({
                                                 </svg>
                                                 <div className="absolute inset-0 flex flex-col items-center justify-center">
                                                     <span
-                                                        className={`text-xl leading-none font-black sm:text-3xl ${exactPercentage >= 80 ? 'text-slate-800 dark:text-white' : 'text-rose-600 dark:text-rose-400'}`}
+                                                        className={`text-2xl leading-none font-black tracking-tight sm:text-4xl ${exactPercentage >= 80 ? 'text-slate-800 dark:text-white' : 'text-rose-600 dark:text-rose-400'}`}
                                                     >
                                                         {formattedPercentage}%
                                                     </span>
@@ -250,13 +250,13 @@ export function ScorecardView({
                                             </div>
                                             <div className="mt-2 flex flex-col items-center gap-1 sm:mt-4 sm:gap-1.5">
                                                 <span
-                                                    className={`inline-flex rounded-full px-2 py-0.5 text-[8px] font-extrabold tracking-wider uppercase sm:px-3 sm:py-1 sm:text-[10px] ${exactPercentage >= 80 ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400' : 'bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-400'}`}
+                                                    className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-extrabold tracking-wider uppercase sm:px-3 sm:py-1 sm:text-xs ${exactPercentage >= 80 ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400' : 'bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-400'}`}
                                                 >
                                                     {exactPercentage >= 80
                                                         ? 'PASSED'
                                                         : 'FAILED'}
                                                 </span>
-                                                <p className="mt-0.5 text-center text-[10px] leading-relaxed leading-tight font-semibold text-slate-500 sm:mt-1 sm:text-sm dark:text-slate-400">
+                                                <p className="mt-0.5 text-center text-xs leading-relaxed leading-tight font-semibold text-slate-500 sm:mt-1 sm:text-sm dark:text-slate-400">
                                                     Final Grade
                                                 </p>
                                             </div>
@@ -288,11 +288,11 @@ export function ScorecardView({
                                                             className="rounded-xl border border-border bg-card p-2.5 transition-all duration-300 hover:shadow-sm sm:p-3.5"
                                                         >
                                                             <div className="mb-1.5 flex items-center justify-between sm:mb-2">
-                                                                <span className="truncate pr-2 text-[9px] font-black tracking-wider text-foreground uppercase sm:text-xs">
+                                                                <span className="truncate pr-2 text-[10px] font-black tracking-wider text-foreground uppercase sm:text-sm">
                                                                     {cat}
                                                                 </span>
                                                                 <span
-                                                                    className={`rounded-md px-1 py-0.5 text-[8px] font-bold sm:px-1.5 sm:text-[10px] ${catExactPct >= 80 ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400' : 'bg-rose-50 text-rose-700 dark:bg-rose-950/30 dark:text-rose-400'}`}
+                                                                    className={`rounded-md px-1.5 py-0.5 text-[10px] font-bold sm:px-2 sm:text-xs ${catExactPct >= 80 ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400' : 'bg-rose-50 text-rose-700 dark:bg-rose-950/30 dark:text-rose-400'}`}
                                                                 >
                                                                     {
                                                                         catFormattedPct
@@ -309,7 +309,7 @@ export function ScorecardView({
                                                                         }}
                                                                     />
                                                                 </div>
-                                                                <span className="w-6 text-right text-[8px] font-bold text-muted-foreground sm:w-8 sm:text-[10px]">
+                                                                <span className="w-8 text-right text-[10px] font-bold text-muted-foreground sm:w-10 sm:text-xs">
                                                                     {
                                                                         val.correct
                                                                     }
@@ -327,46 +327,46 @@ export function ScorecardView({
                                 {/* Bottom Section: 4 Stat Boxes */}
                                 <div className="mt-4 grid w-full grid-cols-2 gap-3 border-t border-slate-100 pt-4 sm:grid-cols-4 dark:border-slate-800">
                                     <div className="flex flex-col items-center justify-center rounded-xl border border-slate-100 bg-slate-50/50 p-4 text-center dark:border-slate-800 dark:bg-slate-950/40">
-                                        <span className="text-[10px] font-extrabold tracking-wider text-slate-400 uppercase">
+                                        <span className="text-xs font-extrabold tracking-wider text-slate-400 uppercase">
                                             Correct
                                         </span>
-                                        <p className="mt-1.5 text-xl font-black text-emerald-600 dark:text-emerald-400">
+                                        <p className="mt-1.5 text-2xl font-black text-emerald-600 sm:text-3xl dark:text-emerald-400">
                                             {results.correctCount}
                                         </p>
-                                        <span className="mt-1 text-[10px] font-bold text-slate-400">
+                                        <span className="mt-1 text-xs font-bold text-slate-400">
                                             of {results.total}
                                         </span>
                                     </div>
                                     <div className="flex flex-col items-center justify-center rounded-xl border border-slate-100 bg-slate-50/50 p-4 text-center dark:border-slate-800 dark:bg-slate-950/40">
-                                        <span className="text-[10px] font-extrabold tracking-wider text-slate-400 uppercase">
+                                        <span className="text-xs font-extrabold tracking-wider text-slate-400 uppercase">
                                             Incorrect
                                         </span>
-                                        <p className="mt-1.5 text-xl font-black text-rose-600 dark:text-rose-400">
+                                        <p className="mt-1.5 text-2xl font-black text-rose-600 sm:text-3xl dark:text-rose-400">
                                             {results.wrongCount}
                                         </p>
-                                        <span className="mt-1 text-[10px] font-bold text-slate-400">
+                                        <span className="mt-1 text-xs font-bold text-slate-400">
                                             of {results.total}
                                         </span>
                                     </div>
                                     <div className="flex flex-col items-center justify-center rounded-xl border border-slate-100 bg-slate-50/50 p-4 text-center dark:border-slate-800 dark:bg-slate-950/40">
-                                        <span className="text-[10px] font-extrabold tracking-wider text-slate-400 uppercase">
+                                        <span className="text-xs font-extrabold tracking-wider text-slate-400 uppercase">
                                             Skipped
                                         </span>
-                                        <p className="mt-1.5 text-xl font-black text-slate-500">
+                                        <p className="mt-1.5 text-2xl font-black text-slate-500 sm:text-3xl">
                                             {results.skippedCount}
                                         </p>
-                                        <span className="mt-1 text-[10px] font-bold text-slate-400">
+                                        <span className="mt-1 text-xs font-bold text-slate-400">
                                             unanswered
                                         </span>
                                     </div>
                                     <div className="flex flex-col items-center justify-center rounded-xl border border-slate-100 bg-slate-50/50 p-4 text-center dark:border-slate-800 dark:bg-slate-950/40">
-                                        <span className="text-[10px] font-extrabold tracking-wider text-slate-400 uppercase">
+                                        <span className="text-xs font-extrabold tracking-wider text-slate-400 uppercase">
                                             Time
                                         </span>
-                                        <p className="mt-1.5 text-xl font-black text-blue-600 dark:text-blue-400">
+                                        <p className="mt-1.5 text-2xl font-black text-blue-600 sm:text-3xl dark:text-blue-400">
                                             {elapsedText}
                                         </p>
-                                        <span className="mt-1 w-full truncate px-1 text-[10px] font-bold text-slate-400">
+                                        <span className="mt-1 w-full truncate px-1 text-xs font-bold text-slate-400">
                                             {underLimitText}
                                         </span>
                                     </div>
@@ -433,7 +433,7 @@ export function ScorecardView({
             {showGuestPrompt && (
                 <div className="fixed inset-0 z-[100] flex animate-in items-center justify-center bg-slate-900/60 p-4 backdrop-blur-xs duration-200 fade-in">
                     <div
-                        className="relative w-full max-w-2xl animate-in rounded-xl border border-slate-200 bg-white p-6 shadow-xl duration-200 zoom-in-95 dark:border-slate-800 dark:bg-slate-950"
+                        className="relative flex flex-col w-[calc(100vw-2rem)] sm:w-full max-w-2xl max-h-[85dvh] overflow-y-auto animate-in rounded-xl border border-slate-200 bg-white p-6 shadow-xl duration-200 zoom-in-95 dark:border-slate-800 dark:bg-slate-950"
                         onClick={(e) => e.stopPropagation()}
                     >
                         <div className="mb-4 flex flex-col items-center text-center">

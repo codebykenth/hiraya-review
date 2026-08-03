@@ -116,7 +116,7 @@ class ExamHistoryController
             'filters' => [
                 'search' => $search ?? '',
                 'track' => $track ?? 'All Tracks',
-                'date' => $dateFilter ?? '30',
+                'date' => $dateFilter ?? 'all',
             ],
         ]);
     }

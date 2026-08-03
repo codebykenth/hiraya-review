@@ -21,7 +21,8 @@ import {
     Edit3,
     EyeOff,
 } from 'lucide-react';
-import React, { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect } from 'react';
+import { toast } from 'sonner';
 import { ReportIssueModal } from '@/components/domain/report-issue-modal';
 import {
     Dialog,
@@ -30,12 +31,7 @@ import {
     DialogTitle,
     DialogDescription,
 } from '@/components/ui/dialog';
-import {
-    Tooltip,
-    TooltipContent,
-    TooltipProvider,
-    TooltipTrigger,
-} from '@/components/ui/tooltip';
+
 import { renderFormattedText } from '@/lib/exam-formatters';
 import QuestionPalettePanel from './question-palette-panel';
 
@@ -125,6 +121,7 @@ export function LiveExamView({
     });
     const [isScratchpadOpen, setIsScratchpadOpen] = useState(false);
     const [isFullscreen, setIsFullscreen] = useState(false);
+    const [isPaletteCollapsed, setIsPaletteCollapsed] = useState(false);
 
     // Auto-save scratchpad notes
     const handleScratchpadChange = (val: string) => {
@@ -242,8 +239,14 @@ export function LiveExamView({
     };
 
     const onOptionClick = (optIdx: number) => {
+        const isCurrentlySelected = answers[currentIdx] === optIdx;
         handleSelectOption(optIdx);
-        if (autoAdvance && currentIdx < activeQuestions.length - 1) {
+
+        if (
+            !isCurrentlySelected &&
+            autoAdvance &&
+            currentIdx < activeQuestions.length - 1
+        ) {
             setTimeout(() => {
                 handleQuestionNavigate(currentIdx + 1);
             }, 250);
@@ -253,6 +256,9 @@ export function LiveExamView({
     // Global Keyboard Shortcuts Listener
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
+            // Skip when modifier keys are held (Ctrl+A, Cmd+B, Alt+C, etc.)
+            if (e.ctrlKey || e.metaKey || e.altKey) return;
+
             if (
                 ['INPUT', 'TEXTAREA', 'SELECT'].includes(
                     (e.target as HTMLElement)?.tagName,
@@ -336,221 +342,239 @@ export function LiveExamView({
         <>
             <Head title={`Live Simulation: ${details.title}`} />
             <div className="fixed inset-0 z-50 flex animate-in flex-col bg-background duration-200 fade-in">
-                {/* TOP NAVBAR HEADER */}
-                <div className="shadow-3xs flex h-16 items-center justify-between border-b border-border bg-card px-3 sm:px-6">
-                    <div className="flex items-center gap-2 sm:gap-4">
-                        <TooltipProvider delayDuration={150}>
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <button
-                                        onClick={handleExitExam}
-                                        className="group rounded-lg p-1.5 text-muted-foreground transition transition-all duration-300 hover:bg-accent focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95"
-                                    >
-                                        <X className="size-5" />
-                                    </button>
-                                </TooltipTrigger>
-                                <TooltipContent>Exit Exam</TooltipContent>
-                            </Tooltip>
-                        </TooltipProvider>
-                        <div className="hidden h-6 w-px bg-border md:block" />
-                        <span className="text-md hidden items-center gap-1.5 font-heading font-bold text-foreground md:flex">
-                            <Award className="size-4.5 text-blue-600 dark:text-blue-400" />
-                            {details.title}
-                        </span>
+                {/* TOP NAVBAR HEADER: RESPONSIVE MULTI-ROW MICRO-LAYOUT */}
+                <div className="shadow-3xs flex w-full flex-col justify-center gap-2 border-b border-border bg-card px-3 py-3 sm:px-5 lg:h-[84px]">
+                    {/* ROW 1: Exit, Title, Tools & Timer */}
+                    <div className="flex w-full items-center justify-between gap-1.5 text-sm font-bold">
+                        {/* Left: Exit & Exam Title */}
+                        <div className="flex min-w-0 items-center gap-1.5">
+                            <button
+                                onClick={handleExitExam}
+                                title="Exit Exam"
+                                className="group flex h-8 shrink-0 items-center gap-1 rounded-md px-2 text-xs font-bold text-muted-foreground transition hover:bg-accent hover:text-foreground focus-visible:outline-none"
+                            >
+                                <ChevronLeft className="size-4" />
+                                <span className="hidden sm:inline">
+                                    Exit Exam
+                                </span>
+                            </button>
+
+                            <div className="h-4 w-px shrink-0 bg-border" />
+
+                            <span className="shrink-0 rounded-md bg-blue-50 px-2 py-0.5 text-[10px] font-extrabold tracking-wider text-blue-600 uppercase dark:bg-blue-950/30 dark:text-blue-400">
+                                <span className="md:hidden">Live</span>
+                                <span className="hidden md:inline">Live Simulation</span>
+                            </span>
+
+                            <span className="truncate font-heading text-sm font-bold text-foreground">
+                                {details.title}
+                            </span>
+                        </div>
+
+                        {/* Right: Compact tool icons + Timer + Palette */}
+                        <div className="flex shrink-0 items-center gap-1.5 text-xs">
+                            {/* Pace Engine */}
+                            {isTimed && stats.unanswered > 0 && (
+                                <div
+                                    title={`Target pace: ~${stats.targetPace}s per question`}
+                                    className={`inline-flex h-8 items-center gap-1 rounded-md border px-2 font-bold ${
+                                        stats.paceStatus ===
+                                        'behind'
+                                            ? 'animate-pulse border-rose-300 bg-rose-50 text-rose-700 dark:border-rose-900/50 dark:bg-rose-950/30 dark:text-rose-400'
+                                            : stats.paceStatus ===
+                                                'warn'
+                                              ? 'border-amber-300 bg-amber-50 text-amber-700 dark:border-amber-900/50 dark:bg-amber-950/30 dark:text-amber-400'
+                                              : 'border-emerald-300 bg-emerald-50 text-emerald-700 dark:border-emerald-900/50 dark:bg-emerald-950/30 dark:text-emerald-400'
+                                    }`}
+                                >
+                                    <TrendingUp className="size-4 shrink-0" />
+                                    <span className="whitespace-nowrap">
+                                        ~{stats.targetPace}s/q
+                                    </span>
+                                    <span className="hidden whitespace-nowrap md:inline">
+                                        {stats.paceStatus === 'behind'
+                                            ? '• Speed Up'
+                                            : stats.paceStatus === 'warn'
+                                              ? '• Moderate'
+                                              : '• On Track'}
+                                    </span>
+                                </div>
+                            )}
+
+                            {/* Auto-Next */}
+                            <button
+                                onClick={() => {
+                                    const nextState = !autoAdvance;
+                                    setAutoAdvance(nextState);
+                                    if (nextState) {
+                                        toast.success('Auto-Next Enabled', {
+                                            description:
+                                                'Question will automatically advance after selecting an answer.',
+                                            duration: 2500,
+                                        });
+                                    } else {
+                                        toast.info('Auto-Next Disabled', {
+                                            duration: 2000,
+                                        });
+                                    }
+                                }}
+                                title={`Auto-Advance after answering (${autoAdvance ? 'ON' : 'OFF'})`}
+                                className={`flex h-8 items-center justify-center gap-1 rounded-md border px-2 font-bold transition ${
+                                    autoAdvance
+                                        ? 'border-blue-300 bg-blue-50 text-blue-700 dark:border-blue-900/50 dark:bg-blue-950/40 dark:text-blue-400'
+                                        : 'border-border bg-background text-muted-foreground hover:bg-accent hover:text-foreground'
+                                }`}
+                            >
+                                <Zap
+                                    className={`size-4 shrink-0 ${autoAdvance ? 'fill-blue-600 text-blue-600 dark:text-blue-400' : ''}`}
+                                />
+                                <span className="hidden whitespace-nowrap sm:inline">
+                                    Auto-Next
+                                </span>
+                            </button>
+
+                            {/* Scratchpad Notes */}
+                            <button
+                                onClick={() =>
+                                    setIsScratchpadOpen(true)
+                                }
+                                title="Scratchpad / Notes"
+                                className={`flex h-8 size-8 items-center justify-center rounded-md border transition ${
+                                    scratchpadNotes.trim().length >
+                                    0
+                                        ? 'border-amber-300 bg-amber-50 text-amber-700 dark:border-amber-900/50 dark:bg-amber-950/40 dark:text-amber-400'
+                                        : 'border-border bg-background text-muted-foreground hover:bg-accent hover:text-foreground'
+                                }`}
+                            >
+                                <Edit3 className="size-4 shrink-0" />
+                            </button>
+
+                            {/* Keyboard Shortcuts — hidden on mobile */}
+                            <button
+                                onClick={() =>
+                                    setShowKeyboardModal(true)
+                                }
+                                title="Keyboard Shortcuts (?)"
+                                className="hidden h-8 size-8 items-center justify-center rounded-md border border-border bg-background text-muted-foreground transition hover:bg-accent hover:text-foreground sm:flex"
+                            >
+                                <Keyboard className="size-4 shrink-0" />
+                            </button>
+
+                            {/* Fullscreen Toggle — hidden on mobile */}
+                            <button
+                                onClick={toggleFullscreen}
+                                title={isFullscreen ? 'Exit Fullscreen' : 'Focus Mode (Fullscreen)'}
+                                className="hidden h-8 size-8 items-center justify-center rounded-md border border-border bg-background text-muted-foreground transition hover:bg-accent hover:text-foreground sm:flex"
+                            >
+                                {isFullscreen ? (
+                                    <Minimize2 className="size-4 shrink-0" />
+                                ) : (
+                                    <Maximize2 className="size-4 shrink-0" />
+                                )}
+                            </button>
+
+                            {/* Divider before timer */}
+                            <div className="mx-0.5 h-4 w-px shrink-0 bg-border/60" />
+
+                            {/* Timer */}
+                            {isTimed ? (
+                                <div
+                                    className={`shadow-3xs flex h-8 items-center gap-1.5 rounded-md border px-2.5 font-black ${
+                                        timeLeft < 600
+                                            ? 'animate-pulse border-rose-200 bg-rose-50 text-rose-700 dark:border-rose-900/50 dark:bg-rose-950/30 dark:text-rose-400'
+                                            : 'border-border bg-background text-foreground'
+                                    }`}
+                                >
+                                    <Clock className="size-4 shrink-0" />
+                                    <span className="whitespace-nowrap">
+                                        {formatTime(timeLeft)}
+                                    </span>
+                                </div>
+                            ) : (
+                                <div className="shadow-3xs flex h-8 items-center gap-1.5 rounded-md border border-border bg-background px-2.5 font-black text-foreground">
+                                    <Timer className="size-4 text-emerald-500 shrink-0" />
+                                    <span className="text-muted-foreground whitespace-nowrap">
+                                        Untimed
+                                    </span>
+                                </div>
+                            )}
+
+                            <button
+                                onClick={() => {
+                                    if (window.innerWidth >= 1024) {
+                                        setIsPaletteCollapsed((prev) => !prev);
+                                    } else {
+                                        setIsMobilePaletteOpen(true);
+                                    }
+                                }}
+                                title={
+                                    isPaletteCollapsed
+                                        ? 'Expand Question Palette'
+                                        : 'Question Palette'
+                                }
+                                className={`shadow-3xs flex h-8 cursor-pointer items-center justify-center rounded-md transition focus:outline-none ${
+                                    isPaletteCollapsed
+                                        ? 'border border-blue-300 bg-blue-50 px-2.5 text-blue-700 hover:bg-blue-100 dark:border-blue-900/50 dark:bg-blue-950/40 dark:text-blue-400'
+                                        : 'size-8 bg-blue-600 text-white hover:bg-blue-700'
+                                }`}
+                            >
+                                <LayoutGrid className="size-4 shrink-0" />
+                                {isPaletteCollapsed && (
+                                    <span className="hidden whitespace-nowrap text-xs font-bold lg:inline ml-1.5">
+                                        Show Palette
+                                    </span>
+                                )}
+                            </button>
+                        </div>
                     </div>
 
+                    {/* ROW 2: Category Pill, Question Counter & Answered Progress */}
                     {activeQuestion && (
-                        <div className="flex items-center gap-2 sm:gap-3">
-                            <span className="dark:bg-blue-950/30/80 hidden inline-flex items-center gap-1 rounded-full border border-blue-100/30 bg-blue-50 px-3 py-1 text-xs font-bold text-blue-600 sm:inline-flex dark:bg-blue-950/40 dark:text-blue-400">
-                                <BookOpen className="size-3" />
-                                {activeQuestion.category}
-                            </span>
-                            <span className="text-xs font-semibold text-muted-foreground">
-                                <span className="font-black sm:hidden">
-                                    Q: {currentIdx + 1}/{activeQuestions.length}
+                        <div className="flex w-full items-center justify-between gap-1.5 text-xs font-medium text-muted-foreground">
+                            <div className="flex min-w-0 items-center gap-1.5">
+                                <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-blue-100/40 bg-blue-50/80 px-2.5 py-0.5 text-[11px] font-bold text-blue-600 dark:border-blue-900/40 dark:bg-blue-950/40 dark:text-blue-400">
+                                    <BookOpen className="size-3" />
+                                    <span className="max-w-[120px] truncate sm:max-w-none">
+                                        {activeQuestion.category}
+                                    </span>
                                 </span>
-                                <span className="hidden sm:inline">
+
+                                <span className="text-muted-foreground/30">
+                                    •
+                                </span>
+
+                                <span className="whitespace-nowrap">
                                     Question{' '}
-                                    <strong className="text-foreground">
+                                    <strong className="font-extrabold text-foreground">
                                         {currentIdx + 1}
                                     </strong>{' '}
                                     of {activeQuestions.length}
                                 </span>
+                            </div>
+
+                            <span
+                                className={`shrink-0 whitespace-nowrap font-bold transition-colors duration-300 ${
+                                    stats.progressPct === 100
+                                        ? 'text-emerald-600 dark:text-emerald-400'
+                                        : stats.progressPct > 0
+                                          ? 'text-blue-600 dark:text-blue-400'
+                                          : 'text-muted-foreground'
+                                }`}
+                            >
+                                <span className="hidden sm:inline">Answered </span>
+                                {stats.answered}/{stats.totalGraded}{' '}
+                                <span className="hidden xs:inline">({stats.progressPct}%)</span>
                             </span>
                         </div>
                     )}
-
-                    <div className="flex items-center gap-2 sm:gap-3">
-                        {/* Pace Engine Badge */}
-                        {isTimed && stats.unanswered > 0 && (
-                            <TooltipProvider delayDuration={150}>
-                                <Tooltip>
-                                    <TooltipTrigger asChild>
-                                        <div
-                                            className={`hidden items-center gap-1.5 rounded-lg border px-2.5 py-1 text-xs font-bold sm:inline-flex ${
-                                                stats.paceStatus === 'behind'
-                                                    ? 'animate-pulse border-rose-300 bg-rose-50 text-rose-700 dark:border-rose-900/50 dark:bg-rose-950/30 dark:text-rose-400'
-                                                    : stats.paceStatus ===
-                                                        'warn'
-                                                      ? 'border-amber-300 bg-amber-50 text-amber-700 dark:border-amber-900/50 dark:bg-amber-950/30 dark:text-amber-400'
-                                                      : 'border-emerald-300 bg-emerald-50 text-emerald-700 dark:border-emerald-900/50 dark:bg-emerald-950/30 dark:text-emerald-400'
-                                            }`}
-                                        >
-                                            <TrendingUp className="size-3.5" />
-                                            <span>
-                                                ~{stats.targetPace}s / q
-                                            </span>
-                                            <span className="hidden lg:inline">
-                                                {stats.paceStatus === 'behind'
-                                                    ? '• Speed Up'
-                                                    : stats.paceStatus ===
-                                                        'warn'
-                                                      ? '• Moderate'
-                                                      : '• On Track'}
-                                            </span>
-                                        </div>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                        Target pace based on remaining time and
-                                        unanswered questions.
-                                    </TooltipContent>
-                                </Tooltip>
-                            </TooltipProvider>
-                        )}
-
-                        {/* Auto Advance Toggle */}
-                        <TooltipProvider delayDuration={150}>
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <button
-                                        onClick={() =>
-                                            setAutoAdvance((prev) => !prev)
-                                        }
-                                        className={`hidden items-center gap-1.5 rounded-lg border px-2.5 py-1 text-xs font-bold transition sm:inline-flex ${
-                                            autoAdvance
-                                                ? 'border-blue-300 bg-blue-50 text-blue-700 dark:border-blue-900/50 dark:bg-blue-950/40 dark:text-blue-400'
-                                                : 'border-border bg-background text-muted-foreground hover:text-foreground'
-                                        }`}
-                                    >
-                                        <Zap
-                                            className={`size-3.5 ${autoAdvance ? 'fill-blue-600 text-blue-600 dark:text-blue-400' : ''}`}
-                                        />
-                                        <span>Auto-Next</span>
-                                    </button>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                    Automatically advance to next question
-                                    after selecting an answer
-                                </TooltipContent>
-                            </Tooltip>
-                        </TooltipProvider>
-
-                        {/* Scratchpad Notes Button */}
-                        <TooltipProvider delayDuration={150}>
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <button
-                                        onClick={() =>
-                                            setIsScratchpadOpen(true)
-                                        }
-                                        className={`rounded-lg border p-1.5 transition ${
-                                            scratchpadNotes.trim().length > 0
-                                                ? 'border-amber-300 bg-amber-50 text-amber-700 dark:border-amber-900/50 dark:bg-amber-950/40 dark:text-amber-400'
-                                                : 'border-border bg-background text-muted-foreground hover:bg-accent hover:text-foreground'
-                                        }`}
-                                    >
-                                        <Edit3 className="size-4" />
-                                    </button>
-                                </TooltipTrigger>
-                                <TooltipContent>Scratchpad / Notes</TooltipContent>
-                            </Tooltip>
-                        </TooltipProvider>
-
-                        {/* Keyboard Shortcuts Button */}
-                        <TooltipProvider delayDuration={150}>
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <button
-                                        onClick={() =>
-                                            setShowKeyboardModal(true)
-                                        }
-                                        className="rounded-lg border border-border bg-background p-1.5 text-muted-foreground transition hover:bg-accent hover:text-foreground"
-                                    >
-                                        <Keyboard className="size-4" />
-                                    </button>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                    Keyboard Shortcuts (?)
-                                </TooltipContent>
-                            </Tooltip>
-                        </TooltipProvider>
-
-                        {/* Fullscreen Toggle Button */}
-                        <TooltipProvider delayDuration={150}>
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <button
-                                        onClick={toggleFullscreen}
-                                        className="hidden rounded-lg border border-border bg-background p-1.5 text-muted-foreground transition hover:bg-accent hover:text-foreground sm:inline-flex"
-                                    >
-                                        {isFullscreen ? (
-                                            <Minimize2 className="size-4" />
-                                        ) : (
-                                            <Maximize2 className="size-4" />
-                                        )}
-                                    </button>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                    {isFullscreen
-                                        ? 'Exit Fullscreen'
-                                        : 'Focus Mode (Fullscreen)'}
-                                </TooltipContent>
-                            </Tooltip>
-                        </TooltipProvider>
-
-                        {/* Timer */}
-                        {isTimed ? (
-                            <div
-                                className={`shadow-3xs flex items-center gap-1.5 rounded-lg border px-2 py-1.5 text-sm font-black sm:px-3 ${
-                                    timeLeft < 600
-                                        ? 'animate-pulse border-rose-200 bg-rose-50 text-rose-700 dark:border-rose-900/30 dark:border-rose-900/50 dark:bg-rose-950/20 dark:bg-rose-950/30 dark:text-rose-400'
-                                        : 'border-border bg-background text-foreground'
-                                }`}
-                            >
-                                <Clock className="size-4" />
-                                {formatTime(timeLeft)}
-                            </div>
-                        ) : (
-                            <div className="shadow-3xs flex items-center gap-1.5 rounded-lg border border-border bg-background px-2 py-1.5 text-sm font-black text-foreground sm:px-3">
-                                <Timer className="size-4 text-emerald-500" />
-                                <span className="text-xs font-bold text-muted-foreground">
-                                    Untimed
-                                </span>
-                            </div>
-                        )}
-
-                        <TooltipProvider delayDuration={150}>
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <button
-                                        onClick={() =>
-                                            setIsMobilePaletteOpen(true)
-                                        }
-                                        className="shadow-3xs flex cursor-pointer items-center justify-center rounded-lg bg-blue-600 p-2 text-white transition hover:bg-blue-700 focus:outline-none lg:hidden"
-                                    >
-                                        <LayoutGrid className="size-4" />
-                                    </button>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                    Open Question Palette
-                                </TooltipContent>
-                            </Tooltip>
-                        </TooltipProvider>
-                    </div>
                 </div>
 
                 {/* HORIZONTAL COMPLETION PROGRESS BAR */}
-                <div className="relative h-1.5 w-full overflow-hidden bg-muted/60">
+                <div
+                    title={`Exam Completion: ${stats.progressPct}% (${stats.answered} of ${stats.totalGraded} answered)`}
+                    aria-label={`Exam Completion Progress: ${stats.progressPct}%`}
+                    className="relative h-1.5 w-full overflow-hidden bg-muted/60"
+                >
                     <div
                         className="h-full bg-gradient-to-r from-blue-600 to-indigo-600 transition-all duration-300"
                         style={{ width: `${stats.progressPct}%` }}
@@ -612,7 +636,7 @@ export function LiveExamView({
                                                     }
                                                     className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[11px] font-bold transition focus:outline-none ${
                                                         flagged[currentIdx]
-                                                            ? 'dark:border-rose-900/50/50 border border-rose-200 bg-rose-50 text-rose-700 dark:bg-rose-950/30 dark:text-rose-400'
+                                                            ? 'border border-rose-200 bg-rose-50 text-rose-700 dark:border-rose-900/50 dark:bg-rose-950/30 dark:text-rose-400'
                                                             : 'text-muted-foreground hover:bg-muted'
                                                     }`}
                                                 >
@@ -663,7 +687,7 @@ export function LiveExamView({
                                                             isEliminated
                                                                 ? 'border-border/60 bg-muted/40 opacity-45'
                                                                 : isSelected
-                                                                  ? 'dark:bg-blue-950/30/15 border-blue-600 bg-blue-50 dark:border-blue-500 dark:bg-blue-950/20'
+                                                                  ? 'border-blue-600 bg-blue-50 dark:border-blue-500 dark:bg-blue-950/30'
                                                                   : 'border-border bg-card hover:bg-muted'
                                                         }`}
                                                     >
@@ -789,6 +813,10 @@ export function LiveExamView({
                         liveStatusFilter={liveStatusFilter}
                         onLiveStatusChange={setLiveStatusFilter}
                         isMobile={false}
+                        isCollapsed={isPaletteCollapsed}
+                        onToggleCollapse={() =>
+                            setIsPaletteCollapsed((prev) => !prev)
+                        }
                     />
                 </div>
 
@@ -819,7 +847,7 @@ export function LiveExamView({
                     open={showKeyboardModal}
                     onOpenChange={setShowKeyboardModal}
                 >
-                    <DialogContent className="max-w-md">
+                    <DialogContent className="sm:max-w-2xl">
                         <DialogHeader>
                             <DialogTitle className="flex items-center gap-2 font-heading text-lg font-bold">
                                 <Keyboard className="size-5 text-blue-600 dark:text-blue-400" />
@@ -908,7 +936,7 @@ export function LiveExamView({
                     open={isScratchpadOpen}
                     onOpenChange={setIsScratchpadOpen}
                 >
-                    <DialogContent className="max-w-lg">
+                    <DialogContent className="sm:max-w-2xl">
                         <DialogHeader>
                             <DialogTitle className="flex items-center gap-2 font-heading text-lg font-bold">
                                 <Edit3 className="size-5 text-amber-500" />
@@ -950,7 +978,7 @@ export function LiveExamView({
                         onClick={() => setShowLockedModal(false)}
                     >
                         <div
-                            className="relative w-full max-w-2xl animate-in rounded-xl border border-slate-200 bg-white p-4 shadow-xl duration-200 zoom-in-95 sm:p-6 dark:border-slate-800 dark:bg-slate-950"
+                            className="relative flex flex-col w-[calc(100vw-2rem)] sm:w-full max-w-2xl max-h-[85dvh] overflow-y-auto animate-in rounded-xl border border-slate-200 bg-white p-4 shadow-xl duration-200 zoom-in-95 sm:p-6 dark:border-slate-800 dark:bg-slate-950"
                             onClick={(e) => e.stopPropagation()}
                         >
                             <div className="mb-1 flex items-center gap-2">
@@ -991,7 +1019,7 @@ export function LiveExamView({
                         onClick={() => setShowRegisterModal(false)}
                     >
                         <div
-                            className="relative w-full max-w-2xl animate-in rounded-xl border border-slate-200 bg-white p-4 shadow-xl duration-200 zoom-in-95 sm:p-6 dark:border-slate-800 dark:bg-slate-950"
+                            className="relative flex flex-col w-[calc(100vw-2rem)] sm:w-full max-w-2xl max-h-[85dvh] overflow-y-auto animate-in rounded-xl border border-slate-200 bg-white p-4 shadow-xl duration-200 zoom-in-95 sm:p-6 dark:border-slate-800 dark:bg-slate-950"
                             onClick={(e) => e.stopPropagation()}
                         >
                             <div className="mb-1 flex items-center gap-2">

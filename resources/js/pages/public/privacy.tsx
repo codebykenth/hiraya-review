@@ -98,7 +98,7 @@ export default function Privacy({ privacy }: PrivacyProps) {
                                                 authentication via Google. When
                                                 you use Google to sign in,
                                                 Hiraya Review receives and
-                                                securely store basic profile
+                                                securely stores basic profile
                                                 details (such as your name and
                                                 email address) to personalize
                                                 your account and metrics
@@ -111,10 +111,20 @@ export default function Privacy({ privacy }: PrivacyProps) {
                                                 Your test attempts, chosen
                                                 tracks (Professional vs.
                                                 Subprofessional), scores,
-                                                categories performance, and
+                                                category performance, and
                                                 time-per-question metrics used
                                                 to generate your custom
                                                 dashboard analytics.
+                                            </li>
+                                            <li>
+                                                <strong>
+                                                    Essential Cookies & Preferences:
+                                                </strong>{' '}
+                                                Minimal technical cookies and
+                                                local storage tokens used to
+                                                maintain your logged-in session,
+                                                CSRF protection, and UI theme
+                                                preferences.
                                             </li>
                                             <li>
                                                 <strong>
@@ -149,13 +159,15 @@ export default function Privacy({ privacy }: PrivacyProps) {
                                                 across exam disciplines.
                                             </li>
                                             <li>
-                                                Train and optimize your custom
-                                                AI drill generators on the
-                                                sections you struggle with most.
+                                                Generate targeted practice drills
+                                                and personalized study plans
+                                                focused on your identified weak
+                                                subtopics.
                                             </li>
                                             <li>
-                                                Protect the database from
-                                                scraping and DDoS attacks.
+                                                Maintain platform security,
+                                                enforce API rate limits, and
+                                                prevent automated abuse.
                                             </li>
                                         </ul>
                                     </section>
