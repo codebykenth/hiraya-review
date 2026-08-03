@@ -1,4 +1,4 @@
-import { Head } from '@inertiajs/react';
+import { Head, usePage } from '@inertiajs/react';
 import {
     Award,
     BookOpen,
@@ -13,9 +13,23 @@ import {
     CheckCircle2,
     Lock,
     LogIn,
+    Keyboard,
+    Zap,
+    TrendingUp,
+    Maximize2,
+    Minimize2,
+    Edit3,
+    EyeOff,
 } from 'lucide-react';
-import React, { useState } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { ReportIssueModal } from '@/components/domain/report-issue-modal';
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogDescription,
+} from '@/components/ui/dialog';
 import {
     Tooltip,
     TooltipContent,
@@ -95,6 +109,228 @@ export function LiveExamView({
 }: LiveExamViewProps) {
     const activeQuestion = activeQuestions[currentIdx];
     const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+    const [liveStatusFilter, setLiveStatusFilter] = useState<
+        'all' | 'unanswered' | 'answered' | 'flagged'
+    >('all');
+    const [autoAdvance, setAutoAdvance] = useState(false);
+    const [showKeyboardModal, setShowKeyboardModal] = useState(false);
+    const [timeOnQuestion, setTimeOnQuestion] = useState(0);
+
+    // Advanced UI/UX feature states
+    const [eliminatedOptions, setEliminatedOptions] = useState<
+        Record<number, Record<number, boolean>>
+    >({});
+    const [scratchpadNotes, setScratchpadNotes] = useState<string>(() => {
+        return localStorage.getItem('exam_scratchpad_notes') || '';
+    });
+    const [isScratchpadOpen, setIsScratchpadOpen] = useState(false);
+    const [isFullscreen, setIsFullscreen] = useState(false);
+
+    // Auto-save scratchpad notes
+    const handleScratchpadChange = (val: string) => {
+        setScratchpadNotes(val);
+        localStorage.setItem('exam_scratchpad_notes', val);
+    };
+
+    // Fullscreen toggle handler
+    const toggleFullscreen = () => {
+        if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen().catch(() => {});
+            setIsFullscreen(true);
+        } else {
+            if (document.exitFullscreen) {
+                document.exitFullscreen().catch(() => {});
+            }
+            setIsFullscreen(false);
+        }
+    };
+
+    useEffect(() => {
+        const handleFsChange = () => {
+            setIsFullscreen(!!document.fullscreenElement);
+        };
+        document.addEventListener('fullscreenchange', handleFsChange);
+        return () =>
+            document.removeEventListener('fullscreenchange', handleFsChange);
+    }, []);
+
+    // Toggle option strike-through (elimination)
+    const toggleElimination = (
+        e: React.MouseEvent,
+        questionIdx: number,
+        optionIdx: number,
+    ) => {
+        e.stopPropagation();
+        setEliminatedOptions((prev) => {
+            const qElim = prev[questionIdx] || {};
+            return {
+                ...prev,
+                [questionIdx]: {
+                    ...qElim,
+                    [optionIdx]: !qElim[optionIdx],
+                },
+            };
+        });
+    };
+
+    const { user_reported_ids = [] } = usePage<{
+        user_reported_ids?: number[];
+    }>().props;
+    const isReported = activeQuestion
+        ? user_reported_ids.includes(activeQuestion.id)
+        : false;
+
+    // Active question timer
+    useEffect(() => {
+        setTimeOnQuestion(0);
+        const timer = setInterval(() => {
+            setTimeOnQuestion((prev) => prev + 1);
+        }, 1000);
+        return () => clearInterval(timer);
+    }, [currentIdx]);
+
+    // Live statistics & pacing calculations
+    const stats = useMemo(() => {
+        let answered = 0;
+        let unanswered = 0;
+        let flaggedCount = 0;
+
+        (activeQuestions || []).forEach((q, idx) => {
+            if (flagged && flagged[idx]) flaggedCount++;
+            const isDemographic =
+                q.category === 'Demographic Profile' ||
+                q.category?.toLowerCase().includes('demographic') ||
+                q.isDemographic;
+            if (isDemographic) return;
+
+            const chosen = answers ? answers[idx] : undefined;
+            if (chosen !== undefined && chosen !== null) {
+                answered++;
+            } else {
+                unanswered++;
+            }
+        });
+
+        const totalGraded = answered + unanswered;
+        const progressPct =
+            totalGraded > 0 ? Math.round((answered / totalGraded) * 100) : 0;
+
+        // Target Pace: seconds available per remaining unanswered question
+        const targetPace =
+            unanswered > 0 ? Math.round(timeLeft / unanswered) : 0;
+
+        let paceStatus: 'good' | 'warn' | 'behind' = 'good';
+        if (targetPace < 20) paceStatus = 'behind';
+        else if (targetPace < 40) paceStatus = 'warn';
+
+        return {
+            answered,
+            unanswered,
+            flagged: flaggedCount,
+            totalGraded,
+            progressPct,
+            targetPace,
+            paceStatus,
+        };
+    }, [activeQuestions, answers, flagged, timeLeft]);
+
+    // Format current question time
+    const formatQuestionTime = (secs: number) => {
+        const m = Math.floor(secs / 60);
+        const s = secs % 60;
+        return `${m}:${s < 10 ? '0' : ''}${s}`;
+    };
+
+    const onOptionClick = (optIdx: number) => {
+        handleSelectOption(optIdx);
+        if (autoAdvance && currentIdx < activeQuestions.length - 1) {
+            setTimeout(() => {
+                handleQuestionNavigate(currentIdx + 1);
+            }, 250);
+        }
+    };
+
+    // Global Keyboard Shortcuts Listener
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (
+                ['INPUT', 'TEXTAREA', 'SELECT'].includes(
+                    (e.target as HTMLElement)?.tagName,
+                )
+            ) {
+                return;
+            }
+
+            if (e.key === 'ArrowRight' || e.key === ']' || e.key === 'n') {
+                if (currentIdx < activeQuestions.length - 1) {
+                    handleQuestionNavigate(currentIdx + 1);
+                }
+            } else if (e.key === 'ArrowLeft' || e.key === '[' || e.key === 'p') {
+                if (currentIdx > 0) {
+                    handleQuestionNavigate(currentIdx - 1);
+                }
+            } else if (e.key === 'f' || e.key === 'F') {
+                toggleFlag(currentIdx);
+            } else if (e.key === '?' || e.key === '/') {
+                e.preventDefault();
+                setShowKeyboardModal((prev) => !prev);
+            } else if (
+                [
+                    '1',
+                    '2',
+                    '3',
+                    '4',
+                    '5',
+                    'a',
+                    'b',
+                    'c',
+                    'd',
+                    'e',
+                    'A',
+                    'B',
+                    'C',
+                    'D',
+                    'E',
+                ].includes(e.key)
+            ) {
+                const optionMap: Record<string, number> = {
+                    '1': 0,
+                    a: 0,
+                    A: 0,
+                    '2': 1,
+                    b: 1,
+                    B: 1,
+                    '3': 2,
+                    c: 2,
+                    C: 2,
+                    '4': 3,
+                    d: 3,
+                    D: 3,
+                    '5': 4,
+                    e: 4,
+                    E: 4,
+                };
+                const optIdx = optionMap[e.key];
+                if (
+                    optIdx !== undefined &&
+                    activeQuestion?.options?.[optIdx] !== undefined
+                ) {
+                    onOptionClick(optIdx);
+                }
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [
+        currentIdx,
+        activeQuestions,
+        activeQuestion,
+        autoAdvance,
+        handleQuestionNavigate,
+        handleSelectOption,
+        toggleFlag,
+    ]);
 
     return (
         <>
@@ -144,7 +380,135 @@ export function LiveExamView({
                         </div>
                     )}
 
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 sm:gap-3">
+                        {/* Pace Engine Badge */}
+                        {isTimed && stats.unanswered > 0 && (
+                            <TooltipProvider delayDuration={150}>
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <div
+                                            className={`hidden items-center gap-1.5 rounded-lg border px-2.5 py-1 text-xs font-bold sm:inline-flex ${
+                                                stats.paceStatus === 'behind'
+                                                    ? 'animate-pulse border-rose-300 bg-rose-50 text-rose-700 dark:border-rose-900/50 dark:bg-rose-950/30 dark:text-rose-400'
+                                                    : stats.paceStatus ===
+                                                        'warn'
+                                                      ? 'border-amber-300 bg-amber-50 text-amber-700 dark:border-amber-900/50 dark:bg-amber-950/30 dark:text-amber-400'
+                                                      : 'border-emerald-300 bg-emerald-50 text-emerald-700 dark:border-emerald-900/50 dark:bg-emerald-950/30 dark:text-emerald-400'
+                                            }`}
+                                        >
+                                            <TrendingUp className="size-3.5" />
+                                            <span>
+                                                ~{stats.targetPace}s / q
+                                            </span>
+                                            <span className="hidden lg:inline">
+                                                {stats.paceStatus === 'behind'
+                                                    ? '• Speed Up'
+                                                    : stats.paceStatus ===
+                                                        'warn'
+                                                      ? '• Moderate'
+                                                      : '• On Track'}
+                                            </span>
+                                        </div>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                        Target pace based on remaining time and
+                                        unanswered questions.
+                                    </TooltipContent>
+                                </Tooltip>
+                            </TooltipProvider>
+                        )}
+
+                        {/* Auto Advance Toggle */}
+                        <TooltipProvider delayDuration={150}>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <button
+                                        onClick={() =>
+                                            setAutoAdvance((prev) => !prev)
+                                        }
+                                        className={`hidden items-center gap-1.5 rounded-lg border px-2.5 py-1 text-xs font-bold transition sm:inline-flex ${
+                                            autoAdvance
+                                                ? 'border-blue-300 bg-blue-50 text-blue-700 dark:border-blue-900/50 dark:bg-blue-950/40 dark:text-blue-400'
+                                                : 'border-border bg-background text-muted-foreground hover:text-foreground'
+                                        }`}
+                                    >
+                                        <Zap
+                                            className={`size-3.5 ${autoAdvance ? 'fill-blue-600 text-blue-600 dark:text-blue-400' : ''}`}
+                                        />
+                                        <span>Auto-Next</span>
+                                    </button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    Automatically advance to next question
+                                    after selecting an answer
+                                </TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
+
+                        {/* Scratchpad Notes Button */}
+                        <TooltipProvider delayDuration={150}>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <button
+                                        onClick={() =>
+                                            setIsScratchpadOpen(true)
+                                        }
+                                        className={`rounded-lg border p-1.5 transition ${
+                                            scratchpadNotes.trim().length > 0
+                                                ? 'border-amber-300 bg-amber-50 text-amber-700 dark:border-amber-900/50 dark:bg-amber-950/40 dark:text-amber-400'
+                                                : 'border-border bg-background text-muted-foreground hover:bg-accent hover:text-foreground'
+                                        }`}
+                                    >
+                                        <Edit3 className="size-4" />
+                                    </button>
+                                </TooltipTrigger>
+                                <TooltipContent>Scratchpad / Notes</TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
+
+                        {/* Keyboard Shortcuts Button */}
+                        <TooltipProvider delayDuration={150}>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <button
+                                        onClick={() =>
+                                            setShowKeyboardModal(true)
+                                        }
+                                        className="rounded-lg border border-border bg-background p-1.5 text-muted-foreground transition hover:bg-accent hover:text-foreground"
+                                    >
+                                        <Keyboard className="size-4" />
+                                    </button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    Keyboard Shortcuts (?)
+                                </TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
+
+                        {/* Fullscreen Toggle Button */}
+                        <TooltipProvider delayDuration={150}>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <button
+                                        onClick={toggleFullscreen}
+                                        className="hidden rounded-lg border border-border bg-background p-1.5 text-muted-foreground transition hover:bg-accent hover:text-foreground sm:inline-flex"
+                                    >
+                                        {isFullscreen ? (
+                                            <Minimize2 className="size-4" />
+                                        ) : (
+                                            <Maximize2 className="size-4" />
+                                        )}
+                                    </button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    {isFullscreen
+                                        ? 'Exit Fullscreen'
+                                        : 'Focus Mode (Fullscreen)'}
+                                </TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
+
+                        {/* Timer */}
                         {isTimed ? (
                             <div
                                 className={`shadow-3xs flex items-center gap-1.5 rounded-lg border px-2 py-1.5 text-sm font-black sm:px-3 ${
@@ -185,6 +549,14 @@ export function LiveExamView({
                     </div>
                 </div>
 
+                {/* HORIZONTAL COMPLETION PROGRESS BAR */}
+                <div className="relative h-1.5 w-full overflow-hidden bg-muted/60">
+                    <div
+                        className="h-full bg-gradient-to-r from-blue-600 to-indigo-600 transition-all duration-300"
+                        style={{ width: `${stats.progressPct}%` }}
+                    />
+                </div>
+
                 {/* MAIN TWO-COLUMN SPLIT PANEL LAYOUT */}
                 <div className="flex flex-1 overflow-hidden">
                     {/* LEFT COLUMN: ACTIVE QUESTION CARD & OPTION SELECTORS */}
@@ -195,20 +567,44 @@ export function LiveExamView({
                                     {/* Question stem container */}
                                     <div className="shadow-3xs relative rounded-2xl border border-border bg-card p-4 sm:p-6">
                                         <div className="mb-4 flex items-center justify-between">
-                                            <span className="text-[10px] font-black tracking-wider text-blue-600 uppercase dark:text-blue-400">
-                                                Multiple Choice
-                                            </span>
+                                            <div className="flex items-center gap-2">
+                                                <span className="text-[10px] font-black tracking-wider text-blue-600 uppercase dark:text-blue-400">
+                                                    Multiple Choice
+                                                </span>
+                                                <span className="rounded-full border border-border bg-muted/60 px-2 py-0.5 text-[10px] font-bold text-muted-foreground">
+                                                    Time on question: {formatQuestionTime(timeOnQuestion)}
+                                                </span>
+                                            </div>
                                             <div className="flex items-center gap-2">
                                                 <button
+                                                    disabled={isReported}
                                                     onClick={() =>
+                                                        !isReported &&
                                                         setIsReportModalOpen(
                                                             true,
                                                         )
                                                     }
-                                                    className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[11px] font-bold text-amber-600 transition hover:bg-amber-50 focus:outline-none dark:text-amber-500 dark:hover:bg-amber-950/20"
+                                                    title={
+                                                        isReported
+                                                            ? 'You have already reported an issue for this question.'
+                                                            : undefined
+                                                    }
+                                                    className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[11px] font-bold transition focus:outline-none ${
+                                                        isReported
+                                                            ? 'cursor-not-allowed text-muted-foreground opacity-60'
+                                                            : 'text-amber-600 hover:bg-amber-50 dark:text-amber-500 dark:hover:bg-amber-950/20'
+                                                    }`}
                                                 >
-                                                    <Flag className="size-3.5" />
-                                                    Report Issue
+                                                    <Flag
+                                                        className={`size-3.5 ${
+                                                            isReported
+                                                                ? 'fill-muted-foreground text-muted-foreground'
+                                                                : ''
+                                                        }`}
+                                                    />
+                                                    {isReported
+                                                        ? 'Reported'
+                                                        : 'Report Issue'}
                                                 </button>
                                                 <button
                                                     onClick={() =>
@@ -251,44 +647,79 @@ export function LiveExamView({
                                                     );
                                                 const isSelected =
                                                     answers[currentIdx] === idx;
+                                                const isEliminated =
+                                                    !!eliminatedOptions[
+                                                        currentIdx
+                                                    ]?.[idx];
 
                                                 return (
                                                     <div
                                                         key={idx}
                                                         onClick={() =>
-                                                            handleSelectOption(
-                                                                idx,
-                                                            )
+                                                            !isEliminated &&
+                                                            onOptionClick(idx)
                                                         }
-                                                        className={`shadow-3xs flex cursor-pointer items-center gap-4 rounded-xl border p-4 transition-all ${
-                                                            isSelected
-                                                                ? 'dark:bg-blue-950/30/15 border-blue-600 bg-blue-50 dark:border-blue-500 dark:bg-blue-950/20'
-                                                                : 'border-border bg-card hover:bg-muted'
+                                                        className={`shadow-3xs relative flex cursor-pointer items-center justify-between gap-4 rounded-xl border p-4 transition-all ${
+                                                            isEliminated
+                                                                ? 'border-border/60 bg-muted/40 opacity-45'
+                                                                : isSelected
+                                                                  ? 'dark:bg-blue-950/30/15 border-blue-600 bg-blue-50 dark:border-blue-500 dark:bg-blue-950/20'
+                                                                  : 'border-border bg-card hover:bg-muted'
                                                         }`}
                                                     >
-                                                        <span
-                                                            className={`flex size-8 shrink-0 items-center justify-center rounded-full border text-xs font-black transition ${
-                                                                isSelected
-                                                                    ? 'border-blue-600 bg-blue-600 text-white'
-                                                                    : 'border-border bg-background text-muted-foreground'
+                                                        <div className="flex items-center gap-4">
+                                                            <span
+                                                                className={`flex size-8 shrink-0 items-center justify-center rounded-full border text-xs font-black transition ${
+                                                                    isEliminated
+                                                                        ? 'border-border bg-muted text-muted-foreground line-through'
+                                                                        : isSelected
+                                                                          ? 'border-blue-600 bg-blue-600 text-white'
+                                                                          : 'border-border bg-background text-muted-foreground'
+                                                                }`}
+                                                            >
+                                                                {label}
+                                                            </span>
+                                                            <p
+                                                                className={`text-sm font-bold transition md:text-base ${
+                                                                    isEliminated
+                                                                        ? 'text-muted-foreground line-through'
+                                                                        : isSelected
+                                                                          ? 'text-blue-900 dark:text-blue-200'
+                                                                          : 'text-foreground'
+                                                                }`}
+                                                            >
+                                                                {renderFormattedText(
+                                                                    opt,
+                                                                    false,
+                                                                    undefined,
+                                                                    true,
+                                                                )}
+                                                            </p>
+                                                        </div>
+
+                                                        {/* Option Elimination Strike Toggle */}
+                                                        <button
+                                                            type="button"
+                                                            onClick={(e) =>
+                                                                toggleElimination(
+                                                                    e,
+                                                                    currentIdx,
+                                                                    idx,
+                                                                )
+                                                            }
+                                                            title={
+                                                                isEliminated
+                                                                    ? 'Restore option'
+                                                                    : 'Eliminate / strike-through option'
+                                                            }
+                                                            className={`rounded-lg p-1.5 transition ${
+                                                                isEliminated
+                                                                    ? 'bg-rose-100 text-rose-700 hover:bg-rose-200 dark:bg-rose-950/40 dark:text-rose-400'
+                                                                    : 'text-muted-foreground opacity-40 hover:bg-muted hover:opacity-100'
                                                             }`}
                                                         >
-                                                            {label}
-                                                        </span>
-                                                        <p
-                                                            className={`text-sm font-bold transition md:text-base ${
-                                                                isSelected
-                                                                    ? 'text-blue-900 dark:text-blue-200'
-                                                                    : 'text-foreground'
-                                                            }`}
-                                                        >
-                                                            {renderFormattedText(
-                                                                opt,
-                                                                false,
-                                                                undefined,
-                                                                true,
-                                                            )}
-                                                        </p>
+                                                            <EyeOff className="size-4" />
+                                                        </button>
                                                     </div>
                                                 );
                                             },
@@ -355,6 +786,8 @@ export function LiveExamView({
                         allowedCategories={details.allowedCategories}
                         isFreeAttempt={isFreeAttempt}
                         onSubmitExam={() => handleSubmitExam(false)}
+                        liveStatusFilter={liveStatusFilter}
+                        onLiveStatusChange={setLiveStatusFilter}
                         isMobile={false}
                     />
                 </div>
@@ -373,11 +806,142 @@ export function LiveExamView({
                         allowedCategories={details.allowedCategories}
                         isFreeAttempt={isFreeAttempt}
                         onSubmitExam={() => handleSubmitExam(false)}
+                        liveStatusFilter={liveStatusFilter}
+                        onLiveStatusChange={setLiveStatusFilter}
                         isMobile={true}
                         onCloseMobile={() => setIsMobilePaletteOpen(false)}
                     />
                 )}
                 {customConfirmModal}
+
+                {/* Keyboard Shortcuts Reference Dialog Modal */}
+                <Dialog
+                    open={showKeyboardModal}
+                    onOpenChange={setShowKeyboardModal}
+                >
+                    <DialogContent className="max-w-md">
+                        <DialogHeader>
+                            <DialogTitle className="flex items-center gap-2 font-heading text-lg font-bold">
+                                <Keyboard className="size-5 text-blue-600 dark:text-blue-400" />
+                                Keyboard Shortcuts
+                            </DialogTitle>
+                            <DialogDescription>
+                                Speed up your test-taking with these hotkeys.
+                            </DialogDescription>
+                        </DialogHeader>
+
+                        <div className="mt-2 space-y-3">
+                            <div className="flex items-center justify-between border-b border-border pb-2 text-xs font-semibold">
+                                <span className="text-muted-foreground">
+                                    Select Option
+                                </span>
+                                <div className="flex items-center gap-1">
+                                    <kbd className="rounded border border-border bg-muted px-2 py-1 font-mono text-[11px] font-bold text-foreground">
+                                        1 - 5
+                                    </kbd>
+                                    <span className="text-muted-foreground">
+                                        or
+                                    </span>
+                                    <kbd className="rounded border border-border bg-muted px-2 py-1 font-mono text-[11px] font-bold text-foreground">
+                                        A - E
+                                    </kbd>
+                                </div>
+                            </div>
+
+                            <div className="flex items-center justify-between border-b border-border pb-2 text-xs font-semibold">
+                                <span className="text-muted-foreground">
+                                    Next Question
+                                </span>
+                                <div className="flex items-center gap-1">
+                                    <kbd className="rounded border border-border bg-muted px-2 py-1 font-mono text-[11px] font-bold text-foreground">
+                                        →
+                                    </kbd>
+                                    <kbd className="rounded border border-border bg-muted px-2 py-1 font-mono text-[11px] font-bold text-foreground">
+                                        ]
+                                    </kbd>
+                                    <kbd className="rounded border border-border bg-muted px-2 py-1 font-mono text-[11px] font-bold text-foreground">
+                                        N
+                                    </kbd>
+                                </div>
+                            </div>
+
+                            <div className="flex items-center justify-between border-b border-border pb-2 text-xs font-semibold">
+                                <span className="text-muted-foreground">
+                                    Previous Question
+                                </span>
+                                <div className="flex items-center gap-1">
+                                    <kbd className="rounded border border-border bg-muted px-2 py-1 font-mono text-[11px] font-bold text-foreground">
+                                        ←
+                                    </kbd>
+                                    <kbd className="rounded border border-border bg-muted px-2 py-1 font-mono text-[11px] font-bold text-foreground">
+                                        [
+                                    </kbd>
+                                    <kbd className="rounded border border-border bg-muted px-2 py-1 font-mono text-[11px] font-bold text-foreground">
+                                        P
+                                    </kbd>
+                                </div>
+                            </div>
+
+                            <div className="flex items-center justify-between border-b border-border pb-2 text-xs font-semibold">
+                                <span className="text-muted-foreground">
+                                    Toggle Flag for Review
+                                </span>
+                                <kbd className="rounded border border-border bg-muted px-2 py-1 font-mono text-[11px] font-bold text-foreground">
+                                    F
+                                </kbd>
+                            </div>
+
+                            <div className="flex items-center justify-between text-xs font-semibold">
+                                <span className="text-muted-foreground">
+                                    Open Shortcuts Cheatsheet
+                                </span>
+                                <kbd className="rounded border border-border bg-muted px-2 py-1 font-mono text-[11px] font-bold text-foreground">
+                                    ?
+                                </kbd>
+                            </div>
+                        </div>
+                    </DialogContent>
+                </Dialog>
+
+                {/* Scratchpad Notes Dialog Modal */}
+                <Dialog
+                    open={isScratchpadOpen}
+                    onOpenChange={setIsScratchpadOpen}
+                >
+                    <DialogContent className="max-w-lg">
+                        <DialogHeader>
+                            <DialogTitle className="flex items-center gap-2 font-heading text-lg font-bold">
+                                <Edit3 className="size-5 text-amber-500" />
+                                Exam Scratchpad & Rough Notes
+                            </DialogTitle>
+                            <DialogDescription>
+                                Write down formulas, rough calculations, or reasoning notes. Your notes auto-save locally.
+                            </DialogDescription>
+                        </DialogHeader>
+
+                        <div className="mt-2 space-y-3">
+                            <textarea
+                                value={scratchpadNotes}
+                                onChange={(e) =>
+                                    handleScratchpadChange(e.target.value)
+                                }
+                                placeholder="Type your rough calculations or notes here..."
+                                rows={8}
+                                className="w-full resize-y rounded-xl border border-border bg-muted/30 p-3 font-mono text-xs font-medium text-foreground transition focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
+                            />
+                            <div className="flex items-center justify-between text-xs text-muted-foreground">
+                                <span>{scratchpadNotes.length} characters</span>
+                                <button
+                                    type="button"
+                                    onClick={() => handleScratchpadChange('')}
+                                    className="font-bold text-rose-600 transition hover:underline dark:text-rose-400"
+                                >
+                                    Clear Notes
+                                </button>
+                            </div>
+                        </div>
+                    </DialogContent>
+                </Dialog>
 
                 {/* Guest Free Attempt: Locked Question Modal */}
                 {showLockedModal && (

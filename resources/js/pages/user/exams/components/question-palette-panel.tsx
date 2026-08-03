@@ -24,6 +24,11 @@ export interface QuestionPalettePanelProps {
     onReviewSubcategoryChange?: (subcat: string) => void;
     reviewSubcategories?: string[];
 
+    liveStatusFilter?: 'all' | 'unanswered' | 'answered' | 'flagged';
+    onLiveStatusChange?: (
+        status: 'all' | 'unanswered' | 'answered' | 'flagged',
+    ) => void;
+
     isMobile?: boolean;
     onCloseMobile?: () => void;
 }
@@ -48,6 +53,9 @@ export default function QuestionPalettePanel({
     onReviewSubcategoryChange,
     reviewSubcategories,
 
+    liveStatusFilter = 'all',
+    onLiveStatusChange,
+
     isMobile = false,
     onCloseMobile,
 }: QuestionPalettePanelProps) {
@@ -70,6 +78,33 @@ export default function QuestionPalettePanel({
                 q.isDemographic,
         );
     }, [questions]);
+
+    const stats = useMemo(() => {
+        let correct = 0;
+        let incorrect = 0;
+        let skipped = 0;
+        let flaggedCount = 0;
+
+        (questions || []).forEach((q, idx) => {
+            if (flagged && flagged[idx]) flaggedCount++;
+            const isDemographic =
+                q.category === 'Demographic Profile' ||
+                q.category?.toLowerCase().includes('demographic') ||
+                q.isDemographic;
+            if (isDemographic) return;
+
+            const chosen = answers ? answers[idx] : undefined;
+            if (chosen === undefined || chosen === null) {
+                skipped++;
+            } else if (Number(chosen) === Number(q.correct_option)) {
+                correct++;
+            } else {
+                incorrect++;
+            }
+        });
+
+        return { correct, incorrect, skipped, flagged: flaggedCount };
+    }, [questions, answers, flagged]);
 
     const content = (
         <>
@@ -150,30 +185,112 @@ export default function QuestionPalettePanel({
                         <span className="mb-2 block text-[10px] font-extrabold tracking-wider text-muted-foreground uppercase">
                             Status Filter
                         </span>
-                        <div className="grid grid-cols-4 gap-0.5 rounded-lg bg-muted/50 p-1">
+                        <div className="grid grid-cols-4 gap-1 rounded-xl bg-muted/60 p-1">
                             <button
+                                type="button"
                                 onClick={() => onReviewStatusChange('all')}
-                                className={`rounded-md py-1.5 text-xs font-bold transition ${reviewStatusFilter === 'all' ? 'bg-background text-foreground shadow-xs' : 'text-muted-foreground hover:text-foreground'}`}
+                                title="Show All"
+                                className={`rounded-lg px-1 py-1.5 text-[11px] font-bold tracking-tight transition sm:text-xs truncate text-center ${
+                                    reviewStatusFilter === 'all'
+                                        ? 'bg-background text-foreground shadow-2xs'
+                                        : 'text-muted-foreground hover:text-foreground'
+                                }`}
                             >
                                 All
                             </button>
                             <button
+                                type="button"
                                 onClick={() => onReviewStatusChange('correct')}
-                                className={`rounded-md py-1.5 text-xs font-bold transition ${reviewStatusFilter === 'correct' ? 'bg-background text-emerald-600 shadow-xs dark:text-emerald-400' : 'text-muted-foreground hover:text-foreground'}`}
+                                title="Show Correct"
+                                className={`rounded-lg px-1 py-1.5 text-[11px] font-bold tracking-tight transition sm:text-xs truncate text-center ${
+                                    reviewStatusFilter === 'correct'
+                                        ? 'bg-background text-emerald-600 shadow-2xs dark:text-emerald-400'
+                                        : 'text-muted-foreground hover:text-foreground'
+                                }`}
                             >
                                 Correct
                             </button>
                             <button
+                                type="button"
                                 onClick={() =>
                                     onReviewStatusChange('incorrect')
                                 }
-                                className={`rounded-md py-1.5 text-xs font-bold transition ${reviewStatusFilter === 'incorrect' ? 'bg-background text-rose-600 shadow-xs dark:text-rose-400' : 'text-muted-foreground hover:text-foreground'}`}
+                                title="Show Incorrect"
+                                className={`rounded-lg px-1 py-1.5 text-[11px] font-bold tracking-tight transition sm:text-xs truncate text-center ${
+                                    reviewStatusFilter === 'incorrect'
+                                        ? 'bg-background text-rose-600 shadow-2xs dark:text-rose-400'
+                                        : 'text-muted-foreground hover:text-foreground'
+                                }`}
                             >
                                 Incorrect
                             </button>
                             <button
+                                type="button"
                                 onClick={() => onReviewStatusChange('flagged')}
-                                className={`rounded-md py-1.5 text-xs font-bold transition ${reviewStatusFilter === 'flagged' ? 'dark:text-rose-455 bg-background text-rose-700 shadow-xs' : 'text-muted-foreground hover:text-foreground'}`}
+                                title="Show Flagged"
+                                className={`rounded-lg px-1 py-1.5 text-[11px] font-bold tracking-tight transition sm:text-xs truncate text-center ${
+                                    reviewStatusFilter === 'flagged'
+                                        ? 'bg-background text-amber-600 shadow-2xs dark:text-amber-400'
+                                        : 'text-muted-foreground hover:text-foreground'
+                                }`}
+                            >
+                                Flagged
+                            </button>
+                        </div>
+                    </div>
+                )}
+
+                {mode === 'exam' && onLiveStatusChange && (
+                    <div>
+                        <span className="mb-2 block text-[10px] font-extrabold tracking-wider text-muted-foreground uppercase">
+                            Status Filter
+                        </span>
+                        <div className="grid grid-cols-4 gap-1 rounded-xl bg-muted/60 p-1">
+                            <button
+                                type="button"
+                                onClick={() => onLiveStatusChange('all')}
+                                title="Show All"
+                                className={`rounded-lg px-1 py-1.5 text-[11px] font-bold tracking-tight transition sm:text-xs truncate text-center ${
+                                    liveStatusFilter === 'all'
+                                        ? 'bg-background text-foreground shadow-2xs'
+                                        : 'text-muted-foreground hover:text-foreground'
+                                }`}
+                            >
+                                All
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => onLiveStatusChange('unanswered')}
+                                title="Show Unanswered"
+                                className={`rounded-lg px-1 py-1.5 text-[11px] font-bold tracking-tight transition sm:text-xs truncate text-center ${
+                                    liveStatusFilter === 'unanswered'
+                                        ? 'bg-background text-amber-600 shadow-2xs dark:text-amber-400'
+                                        : 'text-muted-foreground hover:text-foreground'
+                                }`}
+                            >
+                                Unanswered
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => onLiveStatusChange('answered')}
+                                title="Show Answered"
+                                className={`rounded-lg px-1 py-1.5 text-[11px] font-bold tracking-tight transition sm:text-xs truncate text-center ${
+                                    liveStatusFilter === 'answered'
+                                        ? 'bg-background text-blue-600 shadow-2xs dark:text-blue-400'
+                                        : 'text-muted-foreground hover:text-foreground'
+                                }`}
+                            >
+                                Answered
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => onLiveStatusChange('flagged')}
+                                title="Show Flagged"
+                                className={`rounded-lg px-1 py-1.5 text-[11px] font-bold tracking-tight transition sm:text-xs truncate text-center ${
+                                    liveStatusFilter === 'flagged'
+                                        ? 'bg-background text-rose-600 shadow-2xs dark:text-rose-400'
+                                        : 'text-muted-foreground hover:text-foreground'
+                                }`}
                             >
                                 Flagged
                             </button>
@@ -193,25 +310,29 @@ export default function QuestionPalettePanel({
                         <span>Unanswered</span>
                     </div>
                     <div className="flex items-center gap-1">
-                        <div className="size-2.5 rounded border border-rose-200 bg-rose-50 dark:border-rose-900/40 dark:border-rose-900/50 dark:bg-rose-950/20 dark:bg-rose-950/30" />
+                        <div className="size-2.5 rounded border border-rose-200 bg-rose-50 dark:border-rose-900/40 dark:bg-rose-950/30" />
                         <span>Flagged</span>
                     </div>
                 </div>
             )}
 
             {mode === 'review' && (
-                <div className="grid shrink-0 grid-cols-3 gap-2 border-b border-border bg-muted/40 px-4 py-3 text-[10px] font-bold text-muted-foreground">
+                <div className="grid shrink-0 grid-cols-4 gap-1.5 border-b border-border bg-muted/40 px-3 py-2.5 text-[10px] font-bold text-muted-foreground">
                     <div className="flex items-center gap-1">
-                        <div className="size-2.5 rounded bg-emerald-500" />
+                        <div className="size-2 rounded bg-emerald-500" />
                         <span>Correct</span>
                     </div>
                     <div className="flex items-center gap-1">
-                        <div className="size-2.5 rounded bg-rose-500" />
+                        <div className="size-2 rounded bg-rose-500" />
                         <span>Incorrect</span>
                     </div>
                     <div className="flex items-center gap-1">
-                        <div className="size-2.5 rounded bg-slate-300 dark:bg-slate-700" />
+                        <div className="size-2 rounded bg-slate-400 dark:bg-slate-600" />
                         <span>Skipped</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                        <div className="size-2 rounded bg-amber-500" />
+                        <span>Flagged</span>
                     </div>
                 </div>
             )}
@@ -238,6 +359,27 @@ export default function QuestionPalettePanel({
                                     isFilteredOut = true;
                                 }
                             } else if (q.category !== selectedCategory) {
+                                isFilteredOut = true;
+                            }
+                        }
+
+                        if (mode === 'exam') {
+                            const isAnswered =
+                                answers[idx] !== undefined &&
+                                answers[idx] !== null;
+                            const isFlagged = flagged[idx] === true;
+
+                            if (liveStatusFilter === 'unanswered' && isAnswered) {
+                                isFilteredOut = true;
+                            } else if (
+                                liveStatusFilter === 'answered' &&
+                                !isAnswered
+                            ) {
+                                isFilteredOut = true;
+                            } else if (
+                                liveStatusFilter === 'flagged' &&
+                                !isFlagged
+                            ) {
                                 isFilteredOut = true;
                             }
                         }

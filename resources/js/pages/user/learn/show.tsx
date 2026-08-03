@@ -23,9 +23,17 @@ import type { LearnShowProps } from './types';
 
 export default function LearnShow({ module, recommended }: LearnShowProps) {
     const progressRef = useScrollProgress();
-    const { auth, pusher } = usePage<{ auth: { user: any }; pusher?: any }>()
-        .props;
+    const {
+        auth,
+        pusher,
+        user_reported_ids = [],
+    } = usePage<{
+        auth: { user: any };
+        pusher?: any;
+        user_reported_ids?: number[];
+    }>().props;
     const isLoggedIn = !!auth.user;
+    const isReported = user_reported_ids.includes(module.id);
     const [isReportModalOpen, setIsReportModalOpen] = useState(false);
 
     React.useEffect(() => {
@@ -162,14 +170,37 @@ export default function LearnShow({ module, recommended }: LearnShowProps) {
                                         />
                                         <div className="mt-8 flex items-center justify-between border-t border-border pt-6">
                                             <Button
-                                                variant="destructive"
+                                                variant={
+                                                    isReported
+                                                        ? 'outline'
+                                                        : 'destructive'
+                                                }
+                                                disabled={isReported}
                                                 onClick={() =>
+                                                    !isReported &&
                                                     setIsReportModalOpen(true)
                                                 }
-                                                className="bg-red-500 text-white hover:bg-red-600"
+                                                title={
+                                                    isReported
+                                                        ? 'You have already reported an issue for this module.'
+                                                        : undefined
+                                                }
+                                                className={
+                                                    isReported
+                                                        ? 'cursor-not-allowed text-muted-foreground opacity-60'
+                                                        : 'bg-red-500 text-white hover:bg-red-600'
+                                                }
                                             >
-                                                <Flag className="mr-2 size-4" />
-                                                Report Issue
+                                                <Flag
+                                                    className={`mr-2 size-4 ${
+                                                        isReported
+                                                            ? 'fill-muted-foreground text-muted-foreground'
+                                                            : ''
+                                                    }`}
+                                                />
+                                                {isReported
+                                                    ? 'Reported'
+                                                    : 'Report Issue'}
                                             </Button>
                                             <Button
                                                 onClick={() => {

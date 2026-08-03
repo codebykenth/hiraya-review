@@ -80,6 +80,11 @@ class HandleInertiaRequests extends Middleware
             'pending_feedback_count' => Cache::remember('pending_feedback_count', 60, function () {
                 return Feedback::where('status', 'pending')->count();
             }),
+            'user_reported_ids' => $request->user() ? Feedback::where('user_id', $request->user()->id)
+                ->pluck('flaggable_id')
+                ->unique()
+                ->values()
+                ->toArray() : [],
         ];
     }
 }

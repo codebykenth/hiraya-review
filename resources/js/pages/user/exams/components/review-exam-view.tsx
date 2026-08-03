@@ -1,4 +1,4 @@
-import { Head } from '@inertiajs/react';
+import { Head, usePage } from '@inertiajs/react';
 import {
     ChevronLeft,
     ChevronRight,
@@ -7,8 +7,12 @@ import {
     CheckCircle2,
     X,
     HelpCircle,
+    AlertCircle,
+    BarChart3,
+    ChevronDown,
+    ChevronUp,
 } from 'lucide-react';
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { ReportIssueModal } from '@/components/domain/report-issue-modal';
 import {
     renderFormattedText,
@@ -70,16 +74,130 @@ export function ReviewExamView({
     setIsMobilePaletteOpen,
     setReviewScreenActive,
 }: ReviewExamViewProps) {
-    const currentQuestion = activeQuestions[currentIdx];
+    const isCurrentMatch = (q: Question | undefined, idx: number) => {
+        if (!q) return false;
+        if (
+            reviewCategoryFilter !== 'All Categories' &&
+            q.category !== reviewCategoryFilter
+        ) {
+            return false;
+        }
+        if (
+            reviewSubcategoryFilter !== 'All Subcategories' &&
+            (q.subcategory || 'General Concepts') !== reviewSubcategoryFilter
+        ) {
+            return false;
+        }
+        const chosen = answers[idx];
+        const isCorrect =
+            chosen !== undefined &&
+            chosen !== null &&
+            Number(chosen) === Number(q.correct_option);
+        const isDemographic =
+            q.category === 'Demographic Profile' || q.isDemographic;
+
+        if (reviewStatusFilter === 'correct' && (isDemographic || !isCorrect)) {
+            return false;
+        }
+        if (
+            reviewStatusFilter === 'incorrect' &&
+            (isDemographic || isCorrect)
+        ) {
+            return false;
+        }
+        if (reviewStatusFilter === 'flagged' && !flagged[idx]) {
+            return false;
+        }
+        return true;
+    };
+
+    const rawQuestion = activeQuestions[currentIdx];
+    const currentQuestion = isCurrentMatch(rawQuestion, currentIdx)
+        ? rawQuestion
+        : undefined;
     const chosenOption = answers[currentIdx];
     const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+    const [isBreakdownExpanded, setIsBreakdownExpanded] = useState(false);
+    const [showPerformanceCard, setShowPerformanceCard] = useState(false);
+    const { user_reported_ids = [] } = usePage<{
+        user_reported_ids?: number[];
+    }>().props;
+    const isReported = currentQuestion
+        ? user_reported_ids.includes(currentQuestion.id)
+        : false;
+
+    const handleTopicClick = (topicName: string) => {
+        if (reviewSubcategories && reviewSubcategories.includes(topicName)) {
+            setReviewSubcategoryFilter(topicName);
+        } else if (
+            details.allowedCategories &&
+            details.allowedCategories.includes(topicName)
+        ) {
+            setReviewCategoryFilter(topicName);
+            setReviewSubcategoryFilter('All Subcategories');
+        }
+    };
+
+    const stats = useMemo(() => {
+        let correct = 0;
+        let incorrect = 0;
+        let skipped = 0;
+        let flaggedCount = 0;
+        const topicStats: Record<string, { total: number; correct: number }> =
+            {};
+
+        (activeQuestions || []).forEach((q, idx) => {
+            if (flagged && flagged[idx]) flaggedCount++;
+            const isDemographic =
+                q.category === 'Demographic Profile' ||
+                q.category?.toLowerCase().includes('demographic') ||
+                q.isDemographic;
+            if (isDemographic) return;
+
+            const topic = q.subcategory || q.category || 'General';
+            if (!topicStats[topic]) {
+                topicStats[topic] = { total: 0, correct: 0 };
+            }
+            topicStats[topic].total++;
+
+            const chosen = answers ? answers[idx] : undefined;
+            if (chosen === undefined || chosen === null) {
+                skipped++;
+            } else if (Number(chosen) === Number(q.correct_option)) {
+                correct++;
+                topicStats[topic].correct++;
+            } else {
+                incorrect++;
+            }
+        });
+
+        const allTopics = Object.entries(topicStats)
+            .map(([topic, data]) => ({
+                topic,
+                accuracy: Math.round((data.correct / data.total) * 100),
+                total: data.total,
+                correct: data.correct,
+            }))
+            .sort((a, b) => a.accuracy - b.accuracy);
+
+        const weakTopics = allTopics.filter((t) => t.accuracy < 70);
+
+        return {
+            correct,
+            incorrect,
+            skipped,
+            flagged: flaggedCount,
+            allTopics,
+            weakTopics,
+        };
+    }, [activeQuestions, answers, flagged]);
 
     return (
         <>
             <Head title={`Answer Review: ${details.title}`} />
             <div className="fixed inset-0 z-50 flex animate-in flex-col bg-background duration-200 fade-in">
                 {/* TOP NAVBAR HEADER */}
-                <div className="shadow-3xs flex h-16 shrink-0 items-center justify-between border-b border-border bg-card px-4 sm:px-6">
+                <div className="shadow-3xs flex h-16 shrink-0 flex-wrap items-center justify-between border-b border-border bg-card px-4 sm:px-6">
                     <div className="flex items-center gap-3">
                         <button
                             onClick={() => setReviewScreenActive(false)}
@@ -94,8 +212,73 @@ export function ReviewExamView({
                         <span className="rounded-md bg-emerald-50 px-2 py-0.5 text-[10px] font-extrabold tracking-wider text-emerald-600 uppercase dark:bg-emerald-950/20 dark:bg-emerald-950/30 dark:text-emerald-400">
                             Exam Answer Review
                         </span>
-                        <span className="hidden text-sm font-bold text-foreground md:block">
+                        <span className="hidden text-sm font-bold text-foreground lg:block">
                             {details.title}
+                        </span>
+                    </div>
+
+                    <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 text-[11px] font-bold">
+                        {stats.allTopics.length > 0 && (
+                            <button
+                                type="button"
+                                onClick={() =>
+                                    setShowPerformanceCard(!showPerformanceCard)
+                                }
+                                className={`inline-flex items-center gap-1.5 rounded-lg border px-3 py-1 text-xs font-bold transition ${
+                                    showPerformanceCard
+                                        ? 'border-blue-500 bg-blue-500/10 text-blue-600 dark:text-blue-400'
+                                        : 'border-border bg-background text-muted-foreground hover:bg-muted hover:text-foreground'
+                                }`}
+                            >
+                                <BarChart3 className="size-3.5" />
+                                <span>Topic Performance</span>
+                                {stats.weakTopics.length > 0 && (
+                                    <span className="rounded-full bg-amber-500/20 px-1.5 py-0.2 text-[10px] font-black text-amber-600 dark:text-amber-400">
+                                        {stats.weakTopics.length}
+                                    </span>
+                                )}
+                                <ChevronDown
+                                    className={`size-3.5 transition-transform duration-200 ${
+                                        showPerformanceCard ? 'rotate-180' : ''
+                                    }`}
+                                />
+                            </button>
+                        )}
+                        <span className="inline-flex items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-0.5 text-emerald-700 dark:border-emerald-900/40 dark:bg-emerald-950/30 dark:text-emerald-400">
+                            <CheckCircle2 className="size-3 text-emerald-600 dark:text-emerald-400" />
+                            <span>
+                                Correct:{' '}
+                                <strong className="font-extrabold">
+                                    {stats.correct}
+                                </strong>
+                            </span>
+                        </span>
+                        <span className="inline-flex items-center gap-1 rounded-full border border-rose-200 bg-rose-50 px-2.5 py-0.5 text-rose-700 dark:border-rose-900/40 dark:bg-rose-950/30 dark:text-rose-400">
+                            <X className="size-3 text-rose-600 dark:text-rose-400" />
+                            <span>
+                                Incorrect:{' '}
+                                <strong className="font-extrabold">
+                                    {stats.incorrect}
+                                </strong>
+                            </span>
+                        </span>
+                        <span className="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-slate-100 px-2.5 py-0.5 text-slate-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300">
+                            <HelpCircle className="size-3 text-slate-500 dark:text-slate-400" />
+                            <span>
+                                Skipped:{' '}
+                                <strong className="font-extrabold">
+                                    {stats.skipped}
+                                </strong>
+                            </span>
+                        </span>
+                        <span className="inline-flex items-center gap-1 rounded-full border border-amber-200 bg-amber-50 px-2.5 py-0.5 text-amber-700 dark:border-amber-900/40 dark:bg-amber-950/30 dark:text-amber-400">
+                            <Flag className="size-3 text-amber-600 dark:text-amber-400" />
+                            <span>
+                                Flagged:{' '}
+                                <strong className="font-extrabold">
+                                    {stats.flagged}
+                                </strong>
+                            </span>
                         </span>
                     </div>
                 </div>
@@ -107,6 +290,138 @@ export function ReviewExamView({
                         <div className="mx-auto w-full max-w-3xl">
                             {currentQuestion ? (
                                 <div className="flex animate-in flex-col gap-3 duration-150 fade-in sm:gap-6">
+                                    {/* Visual Topic Performance Breakdown Card */}
+                                    {showPerformanceCard && stats.allTopics.length > 0 && (
+                                        <div className="rounded-2xl border border-border bg-card p-4 sm:p-5 shadow-3xs transition-all animate-in fade-in duration-200">
+                                            {/* Card Header */}
+                                            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border/60 pb-3">
+                                                <div className="flex items-center gap-2.5">
+                                                    <div className="flex size-8 items-center justify-center rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400">
+                                                        <BarChart3 className="size-4" />
+                                                    </div>
+                                                    <div>
+                                                        <h3 className="font-heading text-sm font-bold text-foreground">
+                                                            Topic Performance Breakdown
+                                                        </h3>
+                                                        <p className="text-[11px] font-semibold text-muted-foreground">
+                                                            {stats.weakTopics.length > 0
+                                                                ? `${stats.weakTopics.length} topic${stats.weakTopics.length > 1 ? 's' : ''} need attention (<70% accuracy)`
+                                                                : 'Great job! All topics above 70% accuracy.'}
+                                                        </p>
+                                                    </div>
+                                                </div>
+
+                                                <div className="flex items-center gap-2">
+                                                    <button
+                                                        type="button"
+                                                        onClick={() =>
+                                                            setIsBreakdownExpanded(
+                                                                !isBreakdownExpanded,
+                                                            )
+                                                        }
+                                                        className="flex items-center gap-1.5 rounded-lg border border-border bg-background px-3 py-1.5 text-xs font-bold text-muted-foreground transition hover:bg-muted hover:text-foreground"
+                                                    >
+                                                        <span>
+                                                            {isBreakdownExpanded
+                                                                ? 'Show Top Weaknesses'
+                                                                : `View All Topics (${stats.allTopics.length})`}
+                                                        </span>
+                                                        {isBreakdownExpanded ? (
+                                                            <ChevronUp className="size-3.5" />
+                                                        ) : (
+                                                            <ChevronDown className="size-3.5" />
+                                                        )}
+                                                    </button>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() =>
+                                                            setShowPerformanceCard(false)
+                                                        }
+                                                        className="rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted hover:text-foreground"
+                                                        title="Close Topic Performance"
+                                                    >
+                                                        <X className="size-4" />
+                                                    </button>
+                                                </div>
+                                            </div>
+
+                                            {/* Visual Progress Bars Grid */}
+                                            <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                                                {(isBreakdownExpanded
+                                                    ? stats.allTopics
+                                                    : stats.weakTopics.length > 0
+                                                      ? stats.weakTopics.slice(0, 6)
+                                                      : stats.allTopics.slice(0, 6)
+                                                ).map((t, idx) => {
+                                                    const isWeak = t.accuracy < 70;
+                                                    const isCritical = t.accuracy < 50;
+
+                                                    return (
+                                                        <div
+                                                            key={idx}
+                                                            onClick={() =>
+                                                                handleTopicClick(
+                                                                    t.topic,
+                                                                )
+                                                            }
+                                                            title={`Click to filter review questions for "${t.topic}"`}
+                                                            className={`group relative flex cursor-pointer flex-col justify-between rounded-xl border p-3 transition-all hover:border-blue-500/50 hover:shadow-2xs ${
+                                                                isCritical
+                                                                    ? 'border-rose-200/80 bg-rose-50/40 hover:bg-rose-50 dark:border-rose-900/40 dark:bg-rose-950/20 dark:hover:bg-rose-950/40'
+                                                                    : isWeak
+                                                                      ? 'border-amber-200/80 bg-amber-50/40 hover:bg-amber-50 dark:border-amber-900/40 dark:bg-amber-950/20 dark:hover:bg-amber-950/40'
+                                                                      : 'border-emerald-200/80 bg-emerald-50/30 hover:bg-emerald-50 dark:border-emerald-900/40 dark:bg-emerald-950/20 dark:hover:bg-emerald-950/40'
+                                                            }`}
+                                                        >
+                                                            <div>
+                                                                <div className="flex items-start justify-between gap-2">
+                                                                    <span className="text-xs font-bold text-foreground line-clamp-1 group-hover:text-blue-600 dark:group-hover:text-blue-400">
+                                                                        {t.topic}
+                                                                    </span>
+                                                                    <span
+                                                                        className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-black ${
+                                                                            isCritical
+                                                                                ? 'bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300'
+                                                                                : isWeak
+                                                                                  ? 'bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300'
+                                                                                  : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300'
+                                                                        }`}
+                                                                    >
+                                                                        {t.accuracy}%
+                                                                    </span>
+                                                                </div>
+
+                                                                {/* Visual Progress Bar */}
+                                                                <div className="mt-2.5 h-2 w-full overflow-hidden rounded-full bg-muted/80">
+                                                                    <div
+                                                                        className={`h-full rounded-full transition-all duration-500 ${
+                                                                            isCritical
+                                                                                ? 'bg-rose-500'
+                                                                                : isWeak
+                                                                                  ? 'bg-amber-500'
+                                                                                  : 'bg-emerald-500'
+                                                                        }`}
+                                                                        style={{
+                                                                            width: `${t.accuracy}%`,
+                                                                        }}
+                                                                    />
+                                                                </div>
+                                                            </div>
+
+                                                            <div className="mt-2.5 flex items-center justify-between text-[10px] font-bold text-muted-foreground">
+                                                                <span>
+                                                                    {t.correct} of {t.total} correct
+                                                                </span>
+                                                                <span className="opacity-0 transition group-hover:opacity-100 text-blue-600 dark:text-blue-400">
+                                                                    Filter →
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    );
+                                                })}
+                                            </div>
+                                        </div>
+                                    )}
                                     {/* Question stem container */}
                                     <div className="shadow-3xs relative rounded-2xl border border-border bg-card p-4 sm:p-6">
                                         <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
@@ -137,40 +452,34 @@ export function ReviewExamView({
                                                 </span>
                                                 <div className="flex items-center gap-2">
                                                     <button
+                                                        disabled={isReported}
                                                         onClick={() =>
+                                                            !isReported &&
                                                             setIsReportModalOpen(
                                                                 true,
                                                             )
                                                         }
-                                                        className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[11px] font-bold text-amber-600 transition hover:bg-amber-50 focus:outline-none dark:text-amber-500 dark:hover:bg-amber-950/20"
-                                                    >
-                                                        <Flag className="size-3.5" />
-                                                        Report Issue
-                                                    </button>
-                                                    <button
-                                                        onClick={() =>
-                                                            setFlagged(
-                                                                (prev) => ({
-                                                                    ...prev,
-                                                                    [currentIdx]:
-                                                                        !prev[
-                                                                            currentIdx
-                                                                        ],
-                                                                }),
-                                                            )
+                                                        title={
+                                                            isReported
+                                                                ? 'You have already reported an issue for this question.'
+                                                                : undefined
                                                         }
-                                                        className={`inline-flex cursor-pointer items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[11px] font-bold transition focus:outline-none ${
-                                                            flagged[currentIdx]
-                                                                ? 'dark:border-rose-900/50/50 border border-rose-200 bg-rose-50 text-rose-700 dark:bg-rose-950/30 dark:text-rose-400'
-                                                                : 'text-muted-foreground hover:bg-muted'
+                                                        className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[11px] font-bold transition focus:outline-none ${
+                                                            isReported
+                                                                ? 'cursor-not-allowed text-muted-foreground opacity-60'
+                                                                : 'cursor-pointer text-amber-600 hover:bg-amber-50 dark:text-amber-500 dark:hover:bg-amber-950/20'
                                                         }`}
                                                     >
                                                         <Flag
-                                                            className={`size-3.5 ${flagged[currentIdx] ? 'fill-rose-600 text-rose-600 dark:text-rose-400' : ''}`}
+                                                            className={`size-3.5 ${
+                                                                isReported
+                                                                    ? 'fill-muted-foreground text-muted-foreground'
+                                                                    : ''
+                                                            }`}
                                                         />
-                                                        {flagged[currentIdx]
-                                                            ? 'Flagged for Review'
-                                                            : 'Flag for Review'}
+                                                        {isReported
+                                                            ? 'Reported'
+                                                            : 'Report Issue'}
                                                     </button>
                                                 </div>
                                             </div>
@@ -435,6 +744,14 @@ export function ReviewExamView({
                                                 continue;
                                             }
 
+                                            if (
+                                                reviewStatusFilter ===
+                                                    'flagged' &&
+                                                !flagged[i]
+                                            ) {
+                                                continue;
+                                            }
+
                                             return i;
                                         }
 
@@ -488,6 +805,14 @@ export function ReviewExamView({
                                             reviewStatusFilter ===
                                                 'incorrect' &&
                                             (isDemographic || isCorrect)
+                                        ) {
+                                            continue;
+                                        }
+
+                                        if (
+                                            reviewStatusFilter ===
+                                                'flagged' &&
+                                            !flagged[i]
                                         ) {
                                             continue;
                                         }
@@ -558,6 +883,14 @@ export function ReviewExamView({
                                                 continue;
                                             }
 
+                                            if (
+                                                reviewStatusFilter ===
+                                                    'flagged' &&
+                                                !flagged[i]
+                                            ) {
+                                                continue;
+                                            }
+
                                             return i;
                                         }
 
@@ -615,6 +948,14 @@ export function ReviewExamView({
                                             reviewStatusFilter ===
                                                 'incorrect' &&
                                             (isDemographic || isCorrect)
+                                        ) {
+                                            continue;
+                                        }
+
+                                        if (
+                                            reviewStatusFilter ===
+                                                'flagged' &&
+                                            !flagged[i]
                                         ) {
                                             continue;
                                         }

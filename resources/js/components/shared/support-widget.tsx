@@ -129,7 +129,12 @@ export function SupportWidget() {
         }
     };
 
-    if (!isMounted || isLiveExamActive) {
+    const isExamPage =
+        typeof window !== 'undefined' &&
+        (window.location.pathname.includes('/exams') ||
+            window.location.pathname.includes('/drills'));
+
+    if (!isMounted || isLiveExamActive || isExamPage) {
         return null;
     }
 

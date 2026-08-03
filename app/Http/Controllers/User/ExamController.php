@@ -93,7 +93,7 @@ class ExamController
         }
 
         // Eagerly sort by attempt questions order if loaded via deep-link
-        if ($savedAttempt && isset($attempt)) {
+        if (($savedAttempt || $retakeSource) && isset($attempt)) {
             $questions = $questions->sortBy(function ($q) use ($attempt) {
                 return array_search($q['id'], $attempt->question_ids);
             })->values();

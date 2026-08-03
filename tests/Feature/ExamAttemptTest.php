@@ -103,3 +103,37 @@ test('authenticated users can access past attempts history', function () {
     $response = $this->get(route('history.index'));
     $response->assertOk();
 });
+
+test('users cannot access or view another user attempt history', function () {
+    $userA = User::factory()->create();
+    $userB = User::factory()->create();
+
+    $attemptA = ExamAttempt::create([
+        'user_id' => $userA->id,
+        'question_ids' => [1, 2],
+        'answers' => [1 => 0],
+        'cat_scores' => ['metadata' => ['correct_count' => 1, 'total_questions' => 2]],
+    ]);
+
+    // User B cannot view User A's scorecard attempt
+    $this->actingAs($userB);
+    $response = $this->get(route('exams.index', ['attempt_id' => $attemptA->id]));
+    $response->assertNotFound();
+});
+
+test('users cannot delete another user attempt', function () {
+    $userA = User::factory()->create();
+    $userB = User::factory()->create();
+
+    $attemptA = ExamAttempt::create([
+        'user_id' => $userA->id,
+        'question_ids' => [1, 2],
+        'answers' => [1 => 0],
+        'cat_scores' => ['metadata' => ['correct_count' => 1, 'total_questions' => 2]],
+    ]);
+
+    $this->actingAs($userB);
+    $response = $this->delete(route('exams.attempts.destroy', $attemptA));
+    $response->assertForbidden();
+});
+
