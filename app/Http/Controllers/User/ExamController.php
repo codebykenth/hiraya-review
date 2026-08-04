@@ -111,6 +111,7 @@ class ExamController
         $tracks = TrackConfig::all();
 
         $seenQuestionIdsByTrack = $this->formatter->seenQuestionIdsByTrack(auth()->id());
+        $wrongQuestionIdsByTrack = $this->formatter->wrongQuestionIdsByTrack(auth()->id());
 
         $aiAnalysis = [
             'status' => 'no_data',
@@ -140,6 +141,7 @@ class ExamController
             'savedAttempt' => $savedAttempt,
             'retakeSource' => $retakeSource,
             'seenQuestionIdsByTrack' => $seenQuestionIdsByTrack,
+            'wrongQuestionIdsByTrack' => $wrongQuestionIdsByTrack,
             'exams' => [
                 ['id' => 1, 'title' => 'Professional Level Reviewer', 'questions' => 170],
                 ['id' => 2, 'title' => 'Sub-Professional Level Reviewer', 'questions' => 150],

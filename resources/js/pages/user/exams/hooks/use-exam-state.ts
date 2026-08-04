@@ -44,6 +44,11 @@ export function useExamState({
         Subprofessional: [],
         Drill: [],
     },
+    wrongQuestionIdsByTrack = {
+        Professional: [],
+        Subprofessional: [],
+        Drill: [],
+    },
 }: ExamIndexProps) {
     const { auth } = usePage<{ auth: Auth }>().props;
 
@@ -962,6 +967,19 @@ export function useExamState({
         [seenQuestionIdsByTrack, selectedExamId, activeQuestions],
     );
 
+    const getWrongIdsForExam = useCallback(
+        (examId: number | null) => {
+            const track = getTrackNameForExam(examId);
+            const fromServer =
+                wrongQuestionIdsByTrack[
+                    track as keyof typeof wrongQuestionIdsByTrack
+                ] ?? [];
+
+            return [...new Set(fromServer)];
+        },
+        [wrongQuestionIdsByTrack],
+    );
+
     const buildFreshExamPool = useCallback(
         (examId: number | null) => {
             const sourcePool =
@@ -984,26 +1002,55 @@ export function useExamState({
             );
 
             const seenSet = new Set(getSeenIdsForExam(examId));
+            const wrongSet = new Set(getWrongIdsForExam(examId));
 
-            // Helper: pick N items from a flat pool, prioritizing unseen
+            // Helper: pick N items from a flat pool, prioritizing wrong -> unseen -> seen
             const pickFlat = (
                 pool: Question[],
                 count: number,
                 catName: string,
             ): Question[] => {
+                const wrongFromSeen = pool.filter((q) => wrongSet.has(q.id));
                 const unseen = pool.filter((q) => !seenSet.has(q.id));
-                const seen = pool.filter((q) => seenSet.has(q.id));
-                let picked = [...unseen].sort(() => Math.random() - 0.5);
+                const seenCorrect = pool.filter(
+                    (q) => seenSet.has(q.id) && !wrongSet.has(q.id),
+                );
 
-                if (picked.length < count) {
-                    picked = [
-                        ...picked,
-                        ...[...seen]
-                            .sort(() => Math.random() - 0.5)
-                            .slice(0, count - picked.length),
-                    ];
+                let picked: Question[] = [];
+
+                // 1. Pick up to 30% from previously wrong
+                const wrongQuota = Math.ceil(count * 0.3);
+                let wrongPicked = [...wrongFromSeen].sort(
+                    () => Math.random() - 0.5,
+                );
+                picked.push(...wrongPicked.slice(0, wrongQuota));
+
+                // 2. Fill from unseen pool
+                let remaining = count - picked.length;
+                if (remaining > 0) {
+                    let unseenPicked = [...unseen].sort(
+                        () => Math.random() - 0.5,
+                    );
+                    picked.push(...unseenPicked.slice(0, remaining));
                 }
 
+                // 3. Backfill if still short with seen correct
+                remaining = count - picked.length;
+                if (remaining > 0) {
+                    let seenCorrectPicked = [...seenCorrect].sort(
+                        () => Math.random() - 0.5,
+                    );
+                    picked.push(...seenCorrectPicked.slice(0, remaining));
+                }
+                
+                // 4. Backfill from remaining wrong questions if we are still short
+                remaining = count - picked.length;
+                if (remaining > 0) {
+                     let extraWrong = wrongPicked.slice(wrongQuota).sort(() => Math.random() - 0.5);
+                     picked.push(...extraWrong.slice(0, remaining));
+                }
+
+                // 5. If STILL short, fallback questions
                 if (picked.length < count) {
                     const fbPool = fallbackQuestions.filter(
                         (q) =>
@@ -1024,7 +1071,7 @@ export function useExamState({
                     );
                 }
 
-                return picked.slice(0, count);
+                return picked.slice(0, count).sort(() => Math.random() - 0.5);
             };
 
             // Balanced picker: distributes evenly across subcategories

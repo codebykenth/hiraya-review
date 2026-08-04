@@ -27,6 +27,11 @@ export interface ExamIndexProps {
         Subprofessional: number[];
         Drill: number[];
     };
+    wrongQuestionIdsByTrack?: {
+        Professional: number[];
+        Subprofessional: number[];
+        Drill: number[];
+    };
     aiAnalysis?: any;
 }
 

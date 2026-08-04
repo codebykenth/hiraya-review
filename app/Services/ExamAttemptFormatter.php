@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\ExamAttempt;
+use App\Models\Question;
 
 class ExamAttemptFormatter
 {
@@ -125,6 +126,64 @@ class ExamAttemptFormatter
                 $track = 'Professional';
             }
             $byTrack[$track] = array_merge($byTrack[$track], $attempt->question_ids ?? []);
+        }
+
+        foreach ($byTrack as $track => $ids) {
+            $byTrack[$track] = array_values(array_unique($ids));
+        }
+
+        return $byTrack;
+    }
+
+    /**
+     * Collect question IDs the user has answered incorrectly, grouped by exam track.
+     *
+     * @return array{Professional: int[], Subprofessional: int[], Drill: int[]}
+     */
+    public function wrongQuestionIdsByTrack(?int $userId): array
+    {
+        $byTrack = [
+            'Professional' => [],
+            'Subprofessional' => [],
+            'Drill' => [],
+        ];
+
+        if (! $userId) {
+            return $byTrack;
+        }
+
+        $attempts = ExamAttempt::where('user_id', $userId)->get();
+
+        $allQuestionIds = [];
+        foreach ($attempts as $attempt) {
+            $allQuestionIds = array_merge($allQuestionIds, $attempt->question_ids ?? []);
+        }
+        $allQuestionIds = array_unique($allQuestionIds);
+
+        if (empty($allQuestionIds)) {
+            return $byTrack;
+        }
+
+        $questions = Question::whereIn('id', $allQuestionIds)->pluck('correct_option', 'id');
+
+        foreach ($attempts as $attempt) {
+            $meta = $attempt->cat_scores['metadata'] ?? [];
+            $track = $meta['track'] ?? ($attempt->category_id !== null ? 'Drill' : 'Professional');
+            if (! isset($byTrack[$track])) {
+                $track = 'Professional';
+            }
+
+            $qIds = $attempt->question_ids ?? [];
+            $answers = $attempt->answers ?? [];
+
+            foreach ($qIds as $idx => $qId) {
+                $chosen = $answers[$idx] ?? null;
+                $correct = $questions[$qId] ?? null;
+
+                if ($chosen === null || (string) $chosen !== (string) $correct) {
+                    $byTrack[$track][] = $qId;
+                }
+            }
         }
 
         foreach ($byTrack as $track => $ids) {

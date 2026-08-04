@@ -136,4 +136,3 @@ test('users cannot delete another user attempt', function () {
     $response = $this->delete(route('exams.attempts.destroy', $attemptA));
     $response->assertForbidden();
 });
-
