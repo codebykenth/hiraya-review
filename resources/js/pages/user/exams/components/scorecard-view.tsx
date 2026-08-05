@@ -2,7 +2,7 @@ import { Head, Link, usePage } from '@inertiajs/react';
 import { Award, BookOpen, ChevronLeft, LogIn, Trophy } from 'lucide-react';
 import { useState } from 'react';
 import { formatDuration } from '@/lib/exam-formatters';
-import AiReadinessCard from '@/pages/user/dashboard/components/ai-readiness-card';
+
 
 interface ScorecardViewProps {
     details: any;
@@ -389,16 +389,7 @@ export function ScorecardView({
                                 </div>
                             </div>
 
-                            {/* AI / Deterministic Readiness Report Card (Only for Full Mock Exams) */}
-                            {!isGuest && !isDrillSession && aiAnalysis && (
-                                <div className="mt-4">
-                                    <AiReadinessCard
-                                        aiAnalysis={aiAnalysis}
-                                        analysisMode={auth?.user?.analysis_mode}
-                                        attemptId={savedAttempt?.id}
-                                    />
-                                </div>
-                            )}
+
 
                             {isGuest && (
                                 <div className="mt-6 overflow-hidden rounded-2xl border border-blue-100 bg-gradient-to-br from-blue-50/80 via-white to-blue-50/30 p-6 text-center shadow-lg dark:border-blue-950/40 dark:from-slate-900 dark:to-slate-950">

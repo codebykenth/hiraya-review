@@ -66,69 +66,13 @@ export function useExamState({
 
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const [mounted, setMounted] = useState(false);
+
     useEffect(() => {
-        setTimeout(() => setMounted(true), 0);
-    }, []);
-
-    // Synchronously parse active session to avoid any layout flash on reload
-    const restoredSession = (() => {
         if (typeof window !== 'undefined') {
-            const params = new URLSearchParams(window.location.search);
-
-            if (params.get('attempt_id') || savedAttempt) {
-                return null;
-            }
-
-            const savedSessionStr = localStorage.getItem('active_exam_session');
-
-            if (savedSessionStr) {
-                try {
-                    const session = JSON.parse(savedSessionStr);
-
-                    if (
-                        session &&
-                        session.questionIds &&
-                        session.questionIds.length > 0
-                    ) {
-                        const currentUserId = auth?.user?.id ?? null;
-                        const sessionUserId =
-                            session.userId !== undefined
-                                ? session.userId
-                                : null;
-
-                        if (sessionUserId !== currentUserId) {
-                            localStorage.removeItem('active_exam_session');
-
-                            return null;
-                        }
-
-                        const isDrillUrl = params.get('drill') === 'true';
-
-                        if (isDrillUrl && params.has('category_id')) {
-                            const urlCategoryId = parseInt(params.get('category_id') as string, 10);
-                            
-                            // If they clicked a DIFFERENT drill, do not restore this session.
-                            if (session.drillCategoryId !== urlCategoryId) {
-                                return null;
-                            }
-                        }
-
-                        // If they are starting a Live Mock Exam, do not restore a drill session.
-                        if (params.get('start')) {
-                            return null;
-                        }
-
-                        // Otherwise, restore the session normally (like live exam).
-                        return session;
-                    }
-                } catch {
-                    return null;
-                }
-            }
+            localStorage.removeItem('active_exam_session');
         }
-
-        return null;
-    })();
+        setMounted(true);
+    }, []);
 
     const getRestoredQuestions = (sessionQuestionIds: number[]) => {
         let loadedQuestions = [...questions];
@@ -148,56 +92,21 @@ export function useExamState({
             .filter(Boolean) as Question[];
     };
 
-    const [selectedExamId, setSelectedExamId] = useState<number | null>(() => {
-        if (restoredSession) {
-            return restoredSession.selectedExamId;
+    // Clear any legacy active exam session on mount
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            localStorage.removeItem('active_exam_session');
         }
+    }, []);
 
-        return 1;
-    });
-    const [drillCategoryId, setDrillCategoryId] = useState<number | null>(
-        () => {
-            if (restoredSession) {
-                return restoredSession.drillCategoryId;
-            }
-
-            return null;
-        },
-    );
-    const [drillCategoryName, setDrillCategoryName] = useState<string | null>(
-        () => {
-            if (restoredSession) {
-                return restoredSession.drillCategoryName;
-            }
-
-            return null;
-        },
-    );
-    const [drillSubcategories, setDrillSubcategories] = useState<string[]>(
-        () => {
-            if (restoredSession) {
-                return restoredSession.drillSubcategories || [];
-            }
-
-            return [];
-        },
-    );
-    const [drillLanguage, setDrillLanguage] = useState<string>(() => {
-        if (restoredSession) {
-            return restoredSession.drillLanguage || 'English';
-        }
-
-        return 'English';
-    });
+    const [selectedExamId, setSelectedExamId] = useState<number | null>(1);
+    const [drillCategoryId, setDrillCategoryId] = useState<number | null>(null);
+    const [drillCategoryName, setDrillCategoryName] = useState<string | null>(null);
+    const [drillSubcategories, setDrillSubcategories] = useState<string[]>([]);
+    const [drillLanguage, setDrillLanguage] = useState<string>('English');
     const [drillQuestionCount, setDrillQuestionCount] = useState<
         number | 'all'
-    >(() => {
-        if (restoredSession) {
-            return restoredSession.drillQuestionCount || 30;
-        }
-
-        return 30;
-    });
+    >(30);
 
     const [confirmModal, setConfirmModal] = useState<{
         isOpen: boolean;
@@ -212,12 +121,10 @@ export function useExamState({
         message: '',
         confirmLabel: '',
         variant: 'success',
-        onConfirm: () => {},
+        onConfirm: () => { },
     });
 
-    const [isExamActive, setIsExamActive] = useState(() => {
-        return restoredSession !== null;
-    });
+    const [isExamActive, setIsExamActive] = useState(false);
 
     // Notify global layout widgets (like SupportWidget) when the user is actively taking an exam
     useEffect(() => {
@@ -235,38 +142,12 @@ export function useExamState({
             );
         };
     }, [isExamActive]);
-    const [activeQuestions, setActiveQuestions] = useState<Question[]>(() => {
-        if (restoredSession) {
-            if (restoredSession.activeQuestions) {
-                return restoredSession.activeQuestions;
-            }
 
-            const pool = getRestoredQuestions(restoredSession.questionIds);
-
-            return pool.map(shuffleOptionsForQuestion);
-        }
-
-        return [];
-    });
-    const [currentIdx, setCurrentIdx] = useState(() => {
-        if (restoredSession) {
-            return restoredSession.currentIdx;
-        }
-
-        return 0;
-    });
-    const [answers, setAnswers] = useState<Record<number, number>>(() => {
-        if (restoredSession) {
-            return restoredSession.answers || {};
-        }
-
-        return {};
-    });
+    const [activeQuestions, setActiveQuestions] = useState<Question[]>([]);
+    const [currentIdx, setCurrentIdx] = useState(0);
+    const [answers, setAnswers] = useState<Record<number, number>>({});
     const [questionTimes, setQuestionTimes] = useState<Record<number, number>>(
         () => {
-            if (restoredSession) {
-                return restoredSession.questionTimes || {};
-            }
             if (savedAttempt?.cat_scores?.metadata?.question_times) {
                 return savedAttempt.cat_scores.metadata.question_times;
             }
@@ -275,9 +156,6 @@ export function useExamState({
     );
     const [answerChanges, setAnswerChanges] = useState<Record<number, number>>(
         () => {
-            if (restoredSession) {
-                return restoredSession.answerChanges || {};
-            }
             if (savedAttempt?.cat_scores?.metadata?.answer_changes) {
                 return savedAttempt.cat_scores.metadata.answer_changes;
             }
@@ -285,10 +163,6 @@ export function useExamState({
         },
     );
     const [flagged, setFlagged] = useState<Record<number, boolean>>(() => {
-        if (restoredSession) {
-            return restoredSession.flagged || {};
-        }
-
         if (savedAttempt) {
             return savedAttempt.cat_scores?.flagged || {};
         }
@@ -296,13 +170,7 @@ export function useExamState({
         return {};
     });
     const [isMobilePaletteOpen, setIsMobilePaletteOpen] = useState(false);
-    const [isFreeAttempt, setIsFreeAttempt] = useState(() => {
-        if (restoredSession) {
-            return restoredSession.isFreeAttempt || false;
-        }
-
-        return false;
-    });
+    const [isFreeAttempt, setIsFreeAttempt] = useState(false);
     const [showRegisterModal, setShowRegisterModal] = useState(false);
     const [showLockedModal, setShowLockedModal] = useState(false);
     const [isExamSubmitted, setIsExamSubmitted] = useState(false);
@@ -344,31 +212,11 @@ export function useExamState({
     const [selectedPaletteCategory, setSelectedPaletteCategory] =
         useState('All Categories');
 
-    const [timeLeft, setTimeLeft] = useState<number>(() => {
-        if (restoredSession) {
-            return restoredSession.timeLeft;
-        }
-
-        return 11400;
-    });
-    const [sessionTimeLimitSecs, setSessionTimeLimitSecs] = useState<number>(
-        () => {
-            if (restoredSession) {
-                return restoredSession.sessionTimeLimitSecs;
-            }
-
-            return 11400;
-        },
-    );
+    const [timeLeft, setTimeLeft] = useState<number>(11400);
+    const [sessionTimeLimitSecs, setSessionTimeLimitSecs] = useState<number>(11400);
     const timeLeftRef = useRef(timeLeft);
     const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
-    const [isTimed, setIsTimed] = useState<boolean>(() => {
-        if (restoredSession) {
-            return restoredSession.isTimed !== false;
-        }
-
-        return true;
-    });
+    const [isTimed, setIsTimed] = useState<boolean>(true);
 
     const activeQuestionsRef = useRef<Question[]>(activeQuestions);
     const answersRef = useRef<Record<number, number>>(answers);
@@ -549,65 +397,22 @@ export function useExamState({
         return () => clearInterval(timer);
     }, [isExamActive, isExamSubmitted, currentIdx, answers]);
 
-    // Auto-save active exam session to localStorage in real-time
+    // Trigger browser warning dialog if user attempts to reload or leave during an active exam or drill
     useEffect(() => {
-        if (!isRestored) {
-            return;
-        }
+        if (!isExamActive || isExamSubmitted) return;
 
-        if (isExamActive && activeQuestions.length > 0) {
-            const state = {
-                userId: auth?.user?.id ?? null,
-                selectedExamId,
-                drillCategoryId,
-                drillCategoryName,
-                drillSubcategories,
-                drillLanguage,
-                drillQuestionCount,
-                questionIds: activeQuestions.map((q) => q.id),
-                activeQuestions,
-                answers,
-                questionTimes,
-                answerChanges,
-                flagged,
-                currentIdx,
-                timeLeft,
-                isTimed,
-                sessionTimeLimitSecs,
-                isFreeAttempt,
-            };
-            localStorage.setItem('active_exam_session', JSON.stringify(state));
-        } else if (!isExamActive && !isExamSubmitted) {
-            localStorage.removeItem('active_exam_session');
-        }
-    }, [
-        isRestored,
-        isExamActive,
-        questionTimes,
-        activeQuestions,
-        selectedExamId,
-        drillCategoryId,
-        drillCategoryName,
-        drillSubcategories,
-        drillLanguage,
-        drillQuestionCount,
-        answers,
-        flagged,
-        currentIdx,
-        timeLeft,
-        isTimed,
-        sessionTimeLimitSecs,
-        isFreeAttempt,
-        isExamSubmitted,
-        auth?.user?.id,
-    ]);
+        const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+            e.preventDefault();
+            e.returnValue = 'You have an active exam session. Unsaved progress will be lost if you leave or reload this page.';
+            return e.returnValue;
+        };
 
-    // Clear auto-save session on successful submission
-    useEffect(() => {
-        if (isExamSubmitted) {
-            localStorage.removeItem('active_exam_session');
-        }
-    }, [isExamSubmitted]);
+        window.addEventListener('beforeunload', handleBeforeUnload);
+
+        return () => {
+            window.removeEventListener('beforeunload', handleBeforeUnload);
+        };
+    }, [isExamActive, isExamSubmitted]);
 
     // Ensure the active question is visible in the palette, reset to All Categories if out of bounds
     useEffect(() => {
@@ -650,7 +455,7 @@ export function useExamState({
             if (
                 reviewSubcategoryFilter !== 'All Subcategories' &&
                 (q.subcategory || 'General Concepts') !==
-                    reviewSubcategoryFilter
+                reviewSubcategoryFilter
             ) {
                 return false;
             }
@@ -989,7 +794,7 @@ export function useExamState({
             const track = getTrackNameForExam(examId);
             const fromServer =
                 seenQuestionIdsByTrack[
-                    track as keyof typeof seenQuestionIdsByTrack
+                track as keyof typeof seenQuestionIdsByTrack
                 ] ?? [];
             const fromCurrentSession =
                 selectedExamId === examId && activeQuestions.length > 0
@@ -1006,7 +811,7 @@ export function useExamState({
             const track = getTrackNameForExam(examId);
             const fromServer =
                 wrongQuestionIdsByTrack[
-                    track as keyof typeof wrongQuestionIdsByTrack
+                track as keyof typeof wrongQuestionIdsByTrack
                 ] ?? [];
 
             return [...new Set(fromServer)];
@@ -1076,12 +881,12 @@ export function useExamState({
                     );
                     picked.push(...seenCorrectPicked.slice(0, remaining));
                 }
-                
+
                 // 4. Backfill from remaining wrong questions if we are still short
                 remaining = count - picked.length;
                 if (remaining > 0) {
-                     let extraWrong = wrongPicked.slice(wrongQuota).sort(() => Math.random() - 0.5);
-                     picked.push(...extraWrong.slice(0, remaining));
+                    let extraWrong = wrongPicked.slice(wrongQuota).sort(() => Math.random() - 0.5);
+                    picked.push(...extraWrong.slice(0, remaining));
                 }
 
                 // 5. If STILL short, fallback questions
@@ -1167,9 +972,9 @@ export function useExamState({
                         const filQuota =
                             filPool.length > 0
                                 ? Math.min(
-                                      Math.floor(quota / 2),
-                                      filPool.length,
-                                  )
+                                    Math.floor(quota / 2),
+                                    filPool.length,
+                                )
                                 : 0;
                         const engQuota = quota - filQuota;
 
@@ -1302,8 +1107,8 @@ export function useExamState({
                 beginExamSession(buildFreshExamPool(examId), examId);
             }, 0);
         } else if (isDrillStart && !savedAttempt) {
-            // Prevent infinite loop if already active or restored
-            if (isExamActive || restoredSession) {
+            // Prevent infinite loop if already active
+            if (isExamActive) {
                 return;
             }
 
@@ -1328,6 +1133,7 @@ export function useExamState({
 
             const url = new URL(window.location.href);
             url.search = '';
+            url.pathname = '/drills';
             window.history.replaceState({}, '', url.toString());
             const sourcePool =
                 questions.length > 0 ? questions : fallbackQuestions;
@@ -1498,7 +1304,7 @@ export function useExamState({
         isExamSubmitted,
     ]);
 
-    const handleSubmitExamRef = useRef<(auto?: boolean) => void>(() => {});
+    const handleSubmitExamRef = useRef<(auto?: boolean) => void>(() => { });
 
     // Live countdown timer
     useEffect(() => {
@@ -1714,17 +1520,17 @@ export function useExamState({
         const trackName = isDrillSessionLocal
             ? 'Drill'
             : detailsTitleLocal.includes('Sub-Professional')
-              ? 'Subprofessional'
-              : 'Professional';
+                ? 'Subprofessional'
+                : 'Professional';
         const finalCategoryId = isDrillSessionLocal
             ? drillCategoryIdRef.current ||
-              savedAttemptRef.current?.category_id ||
-              null
+            savedAttemptRef.current?.category_id ||
+            null
             : null;
         const finalCategoryName = isDrillSessionLocal
             ? drillCategoryNameRef.current ||
-              savedAttemptRef.current?.cat_scores?.metadata?.category_name ||
-              'Practice Drill'
+            savedAttemptRef.current?.cat_scores?.metadata?.category_name ||
+            'Practice Drill'
             : detailsTitleLocal;
 
         const originalAnswers: Record<number, number> = {};
@@ -1895,6 +1701,9 @@ export function useExamState({
                 confirmLabel: 'Yes, Exit',
                 variant: 'danger',
                 onConfirm: () => {
+                    setIsExamActive(false);
+                    setIsExamSubmitted(false);
+                    setResults(null);
                     localStorage.removeItem('active_exam_session');
 
                     if (isDrillSession) {
@@ -1902,10 +1711,6 @@ export function useExamState({
 
                         return;
                     }
-
-                    setIsExamActive(false);
-                    setIsExamSubmitted(false);
-                    setResults(null);
                 },
             });
 
