@@ -150,7 +150,7 @@ class GenerateQuestionsJob implements ShouldQueue
         Data topics MUST include Philippine public administration data (population, agency budgets, enrollment) OR Philippine financial / Stock Market data (e.g. Philippine Stock Exchange index / PSEi trends, company stock prices over trading days, sector shares).
         {$varietyInstruction}
         
-        CRITICAL SVG RULES: Use a wide viewBox='0 0 800 450' for charts (providing ample horizontal space so legend labels on the right side are never clipped). Ensure all text labels use <text> elements with clear font sizes, stay well within x=0 to x=780, and do not overlap with other visual elements. Keep any SVG code clean, well-structured, and minified without comments. The options should be plain text or numbers based on the data, and the explanation block must reference the specific data points.";
+        CRITICAL SVG RULES: Use a wide viewBox='0 0 800 500' for charts. You MUST leave ample margin inside the viewBox for all axes labels and titles so nothing is clipped. For example, start the chart's main axes at least at x=100 and y=80. Ensure the rotated Y-axis title and the main chart title have plenty of room within positive coordinates. Ensure all text labels use <text> elements with clear font sizes, stay well within the viewBox boundaries, and do not overlap with other visual elements. Keep any SVG code clean, well-structured, and minified without comments. The options should be plain text or numbers based on the data, and the explanation block must reference the specific data points.";
             } elseif ($subcategory === 'Identifying assumptions and drawing conclusions') {
                 $categorySpecificRules = '* Identifying assumptions and drawing conclusions: Provide realistic logical scenarios (e.g. government policies, office protocols, or formal arguments). Questions must test formal syllogistic deductions ("All A are B...", valid conclusions) or identifying unstated premises and assumptions necessary for an argument to hold true.';
             } elseif ($subcategory === 'Filing') {
@@ -164,7 +164,7 @@ class GenerateQuestionsJob implements ShouldQueue
             }
 
             if (in_array($validated['category'], ['Numerical Ability']) || $subcategory === 'Data interpretation') {
-                $categorySpecificRules .= "\n        * Numerical Ability / Data Interpretation: You MUST include a dedicated section in the explanation starting with 'Mental Math Shortcut:' that details the fastest and most efficient way to solve the problem mentally or via rapid approximation, showing standard exam cognitive shortcuts to save valuable time.";
+                $categorySpecificRules .= "\n        * Numerical Ability / Data Interpretation: You MUST include a dedicated section in the explanation starting with 'Mental Math Shortcut:' that details an actual, practical, and highly effective mental math technique or rapid approximation trick used by top exam takers. This shortcut MUST be easy to understand and genuinely help the user solve the exact problem significantly faster (e.g., divisibility rules, percentage approximations, fraction-to-decimal conversions, or elimination techniques). Do not just restate the standard solution; provide a true time-saving trick.";
             }
 
             $languageRule = '';
@@ -205,7 +205,7 @@ class GenerateQuestionsJob implements ShouldQueue
         3. 'subcategory': strictly matching the subcategory parameter.
         4. 'options': an array of exactly 5 strings for choices (A to E).
         5. 'correct_option': an integer index (0 for A, 1 for B, 2 for C, 3 for D, 4 for E) representing the correct choice.
-        6. 'explanation': a thorough explanation of the logic or steps leading to the correct answer.
+        6. 'explanation': A HIGHLY DETAILED, step-by-step explanation of the logic or steps leading to the correct answer. You MUST provide a comprehensive explanation for EVERY question. It cannot be empty or brief.
 
         Output format:
         [
