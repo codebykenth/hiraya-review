@@ -105,23 +105,20 @@ export function useExamState({
                         const isDrillUrl = params.get('drill') === 'true';
 
                         if (isDrillUrl && params.has('category_id')) {
-                            localStorage.removeItem('active_exam_session');
+                            const urlCategoryId = parseInt(params.get('category_id') as string, 10);
+                            
+                            // If they clicked a DIFFERENT drill, do not restore this session.
+                            if (session.drillCategoryId !== urlCategoryId) {
+                                return null;
+                            }
+                        }
 
+                        // If they are starting a Live Mock Exam, do not restore a drill session.
+                        if (params.get('start')) {
                             return null;
                         }
 
-                        if (
-                            !isDrillUrl &&
-                            session.drillCategoryId !== null &&
-                            session.drillCategoryId !== undefined
-                        ) {
-                            return null;
-                        }
-
-                        if (isDrillUrl && session.drillCategoryId === null) {
-                            return null;
-                        }
-
+                        // Otherwise, restore the session normally (like live exam).
                         return session;
                     }
                 } catch {
@@ -946,6 +943,22 @@ export function useExamState({
                     }, 0);
                 }
             }
+        } else if (isExamActive) {
+            const isDrill = isDrillSession;
+            const parentTitle = isDrill ? 'Practice' : 'Exams';
+            const parentHref = isDrill ? '/drills' : '/exams';
+            const activeTitle = isDrill
+                ? `${drillCategoryName || 'Practice Drill'} Active Practice`
+                : `${details.title} Active Exam`;
+
+            setTimeout(() => {
+                setLayoutProps({
+                    breadcrumbs: [
+                        { title: parentTitle, href: parentHref },
+                        { title: activeTitle, href: '#' },
+                    ],
+                });
+            }, 0);
         } else {
             setTimeout(() => {
                 setLayoutProps({
@@ -954,12 +967,14 @@ export function useExamState({
             }, 0);
         }
     }, [
+        isExamActive,
         isExamSubmitted,
         results,
         reviewScreenActive,
         savedAttempt,
         isDrillSession,
         drillCategoryName,
+        details.title,
         lastStoredAttemptId,
     ]);
 
@@ -1287,6 +1302,11 @@ export function useExamState({
                 beginExamSession(buildFreshExamPool(examId), examId);
             }, 0);
         } else if (isDrillStart && !savedAttempt) {
+            // Prevent infinite loop if already active or restored
+            if (isExamActive || restoredSession) {
+                return;
+            }
+
             const catName =
                 params.get('category_name') || 'General Information';
             const catId = params.get('category_id')
@@ -1307,15 +1327,8 @@ export function useExamState({
             }
 
             const url = new URL(window.location.href);
-            url.searchParams.delete('drill');
-            url.searchParams.delete('category_id');
-            url.searchParams.delete('category_name');
-            url.searchParams.delete('question_count');
-            url.searchParams.delete('language');
-            url.searchParams.delete('subcategories');
-            url.searchParams.delete('timed');
+            url.search = '';
             window.history.replaceState({}, '', url.toString());
-
             const sourcePool =
                 questions.length > 0 ? questions : fallbackQuestions;
 

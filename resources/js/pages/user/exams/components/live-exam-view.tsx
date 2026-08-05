@@ -547,17 +547,11 @@ export function LiveExamView({
                                 </span>
                             </div>
 
-                            <span
-                                className={`shrink-0 whitespace-nowrap font-bold transition-colors duration-300 ${
-                                    stats.progressPct === 100
-                                        ? 'text-emerald-600 dark:text-emerald-400'
-                                        : stats.progressPct > 0
-                                          ? 'text-blue-600 dark:text-blue-400'
-                                          : 'text-muted-foreground'
-                                }`}
-                            >
+                            <span className="shrink-0 whitespace-nowrap text-muted-foreground">
                                 <span className="hidden sm:inline">Answered </span>
-                                {stats.answered}/{stats.totalGraded}{' '}
+                                <strong className="font-extrabold text-foreground">
+                                    {stats.answered}/{stats.totalGraded}
+                                </strong>{' '}
                                 <span className="hidden xs:inline">({stats.progressPct}%)</span>
                             </span>
                         </div>
@@ -614,10 +608,10 @@ export function LiveExamView({
                                                             : 'text-amber-600 hover:bg-amber-50 dark:text-amber-500 dark:hover:bg-amber-950/20'
                                                     }`}
                                                 >
-                                                    <Flag
+                                                    <AlertCircle
                                                         className={`size-3.5 ${
                                                             isReported
-                                                                ? 'fill-muted-foreground text-muted-foreground'
+                                                                ? 'fill-muted-foreground/20 text-muted-foreground'
                                                                 : ''
                                                         }`}
                                                     />

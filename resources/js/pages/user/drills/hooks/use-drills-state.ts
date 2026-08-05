@@ -341,6 +341,11 @@ export function useDrillsState({
             );
         }
 
+        // Clear any existing exam session before starting a fresh drill
+        if (typeof window !== 'undefined') {
+            localStorage.removeItem('active_exam_session');
+        }
+
         router.visit(`/exams?${queryParams.toString()}`);
     };
 
