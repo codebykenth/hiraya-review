@@ -25,10 +25,11 @@ class StoreFeedbackRequest extends FormRequest
                     $exists = Feedback::where('user_id', $this->user()?->id)
                         ->where('flaggable_type', $this->input('flaggable_type'))
                         ->where('flaggable_id', $this->input('flaggable_id'))
+                        ->where('status', 'pending')
                         ->exists();
 
                     if ($exists) {
-                        $fail('You have already submitted a report for this item.');
+                        $fail('You currently have an active pending report under review for this item.');
                     }
                 },
             ],

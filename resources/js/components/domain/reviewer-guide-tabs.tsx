@@ -36,21 +36,21 @@ export function ReviewerGuideTabs({
             phase: 'Phase 1',
             title: 'Diagnostic Benchmark',
             icon: ClipboardList,
-            color: 'text-blue-600 dark:text-blue-400 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/30',
+            color: 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/30',
             description:
-                'Begin by taking a full-length simulated Mock Exam to establish your baseline score. The actual exam requires an 80% passing rate.',
-            actionLabel: 'Take Mock Exam',
+                'Begin by taking an initial diagnostic test to establish your baseline score and identify focus subcategories.',
+            actionLabel: 'Take Diagnostic Exam',
             actionUrl: '/exams',
             tips: [
-                'Choose Professional (170 questions, 3h 10m) or Subprofessional (165 questions, 2h 40m).',
-                'Take it in a quiet environment without calculators or search aids to mimic real test conditions.',
+                'Choose Professional or Subprofessional level.',
+                'Establish your starting score baseline before studying.',
             ],
         },
         {
             phase: 'Phase 2',
             title: 'Conceptual Study Hub',
             icon: BookOpen,
-            color: 'text-indigo-600 dark:text-indigo-400 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/30',
+            color: 'text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/30',
             description:
                 'Navigate to the Study Hub (Learn Section) to read concise, high-yield syllabus modules generated from core civil service subjects.',
             actionLabel: 'Explore Study Hub',
@@ -64,7 +64,7 @@ export function ReviewerGuideTabs({
             phase: 'Phase 3',
             title: 'Focused Practice Drills',
             icon: Target,
-            color: 'text-emerald-600 dark:text-emerald-400 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/30',
+            color: 'text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/30',
             description:
                 'Strengthen weaker subject subcategories with Practice Drills. Create custom sets with active immediate explanations.',
             actionLabel: 'Launch Practice Drill',
@@ -76,9 +76,23 @@ export function ReviewerGuideTabs({
         },
         {
             phase: 'Phase 4',
+            title: 'Full Timed Mock Examination',
+            icon: Clock,
+            color: 'text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/30',
+            description:
+                'Take full-length simulated Mock Exams under real time limits (170 items in 3h 10m for Professional, 165 items in 2h 40m for Subprofessional) to build test-day stamina and achieve the 80% passing mark.',
+            actionLabel: 'Take Mock Exam',
+            actionUrl: '/exams',
+            tips: [
+                'Simulate actual exam conditions in a quiet room without notes or calculators.',
+                'Pace yourself using the built-in time indicator (67 sec/item for Professional).',
+            ],
+        },
+        {
+            phase: 'Phase 5',
             title: 'Mistake Curation & Analytics',
             icon: History,
-            color: 'text-amber-600 dark:text-amber-400 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/30',
+            color: 'text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/30',
             description:
                 'Track your scoring mastery, passing ratios, and average speed. Review every single incorrect response in Attempt History.',
             actionLabel: 'Review Attempt History',

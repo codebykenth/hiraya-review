@@ -85,6 +85,12 @@ class HandleInertiaRequests extends Middleware
                 ->unique()
                 ->values()
                 ->toArray() : [],
+            'user_reports_map' => $request->user() ? Feedback::where('user_id', $request->user()->id)
+                ->latest('id')
+                ->get(['flaggable_id', 'flaggable_type', 'status'])
+                ->unique(fn ($item) => $item->flaggable_type . ':' . $item->flaggable_id)
+                ->mapWithKeys(fn ($item) => [$item->flaggable_type . ':' . $item->flaggable_id => $item->status])
+                ->toArray() : (object) [],
         ];
     }
 }

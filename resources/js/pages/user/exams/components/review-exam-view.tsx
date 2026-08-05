@@ -4,7 +4,6 @@ import {
     ChevronRight,
     Flag,
     LayoutGrid,
-    CheckCircle2,
     X,
     HelpCircle,
     AlertCircle,
@@ -13,6 +12,7 @@ import {
     ChevronUp,
     Clock,
     RotateCcw,
+    CheckCircle2,
 } from 'lucide-react';
 import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { ReportIssueModal } from '@/components/domain/report-issue-modal';
@@ -148,12 +148,12 @@ export function ReviewExamView({
 
     const touchStartRef = useRef<{ x: number; y: number } | null>(null);
 
-    const { user_reported_ids = [] } = usePage<{
-        user_reported_ids?: number[];
+    const { user_reports_map = {} } = usePage<{
+        user_reports_map?: Record<string, 'pending' | 'resolved' | 'dismissed'>;
     }>().props;
-    const isReported = currentQuestion
-        ? user_reported_ids.includes(currentQuestion.id)
-        : false;
+    const reportStatus = currentQuestion
+        ? user_reports_map[`App\\Models\\Question:${currentQuestion.id}`]
+        : undefined;
 
     const getNextMatchingIndex = useCallback(
         (fromIdx: number, direction: 'next' | 'prev') => {
@@ -785,37 +785,26 @@ export function ReviewExamView({
                                                     {activeQuestions.length}
                                                 </span>
                                                 <div className="flex items-center gap-2">
-                                                    <button
-                                                        disabled={isReported}
-                                                        onClick={() =>
-                                                            !isReported &&
-                                                            setIsReportModalOpen(
-                                                                true,
-                                                            )
-                                                        }
-                                                        title={
-                                                            isReported
-                                                                ? 'You have already reported an issue for this question.'
-                                                                : undefined
-                                                        }
-                                                        className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[11px] font-bold transition focus:outline-none ${
-                                                            isReported
-                                                                ? 'cursor-not-allowed text-muted-foreground opacity-60'
-                                                                : 'cursor-pointer text-amber-600 hover:bg-amber-50 dark:text-amber-500 dark:hover:bg-amber-950/20'
-                                                        }`}
-                                                    >
-                                                        <Flag
-                                                            className={`size-3.5 ${
-                                                                isReported
-                                                                    ? 'fill-muted-foreground text-muted-foreground'
-                                                                    : ''
-                                                            }`}
-                                                        />
-                                                        {isReported
-                                                            ? 'Reported'
-                                                            : 'Report Issue'}
-                                                    </button>
-                                                </div>
+                                                     {(() => {
+                                                         if (reportStatus === 'pending') {
+                                                             return (
+                                                                 <span className="inline-flex items-center gap-1.5 rounded-lg border border-amber-200 bg-amber-50 px-2.5 py-1.5 text-[11px] font-bold text-amber-700 dark:border-amber-900/40 dark:bg-amber-950/30 dark:text-amber-400" title="Report is currently under admin review">
+                                                                     <Clock className="size-3.5 text-amber-600 dark:text-amber-400" />
+                                                                     Report Pending
+                                                                 </span>
+                                                             );
+                                                         }
+                                                         return (
+                                                             <button
+                                                                 onClick={() => setIsReportModalOpen(true)}
+                                                                 className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[11px] font-bold text-amber-600 transition hover:bg-amber-50 focus:outline-none dark:text-amber-500 dark:hover:bg-amber-950/20"
+                                                             >
+                                                                 <Flag className="size-3.5" />
+                                                                 Report Issue
+                                                             </button>
+                                                         );
+                                                     })()}
+                                                 </div>
                                             </div>
                                         </div>
                                         <div className="text-sm leading-relaxed font-semibold text-foreground">

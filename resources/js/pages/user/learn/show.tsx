@@ -6,8 +6,8 @@ import {
     ChevronLeft,
     Clock,
     Lightbulb,
-    CheckCircle2,
     Flag,
+    CheckCircle2,
 } from 'lucide-react';
 import Pusher from 'pusher-js';
 import React, { useState } from 'react';
@@ -26,14 +26,14 @@ export default function LearnShow({ module, recommended }: LearnShowProps) {
     const {
         auth,
         pusher,
-        user_reported_ids = [],
+        user_reports_map = {},
     } = usePage<{
         auth: { user: any };
         pusher?: any;
-        user_reported_ids?: number[];
+        user_reports_map?: Record<string, 'pending' | 'resolved' | 'dismissed'>;
     }>().props;
     const isLoggedIn = !!auth.user;
-    const isReported = user_reported_ids.includes(module.id);
+    const reportStatus = user_reports_map[`App\\Models\\LearnModule:${module.id}`];
     const [isReportModalOpen, setIsReportModalOpen] = useState(false);
 
     React.useEffect(() => {
@@ -169,39 +169,26 @@ export default function LearnShow({ module, recommended }: LearnShowProps) {
                                             content={module.content}
                                         />
                                         <div className="mt-8 flex items-center justify-between border-t border-border pt-6">
-                                            <Button
-                                                variant={
-                                                    isReported
-                                                        ? 'outline'
-                                                        : 'destructive'
+                                            {(() => {
+                                                if (reportStatus === 'pending') {
+                                                    return (
+                                                        <span className="inline-flex items-center gap-1.5 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-bold text-amber-700 dark:border-amber-900/40 dark:bg-amber-950/30 dark:text-amber-400">
+                                                            <Clock className="size-4 text-amber-600 dark:text-amber-400" />
+                                                            Report Pending
+                                                        </span>
+                                                    );
                                                 }
-                                                disabled={isReported}
-                                                onClick={() =>
-                                                    !isReported &&
-                                                    setIsReportModalOpen(true)
-                                                }
-                                                title={
-                                                    isReported
-                                                        ? 'You have already reported an issue for this module.'
-                                                        : undefined
-                                                }
-                                                className={
-                                                    isReported
-                                                        ? 'cursor-not-allowed text-muted-foreground opacity-60'
-                                                        : 'bg-red-500 text-white hover:bg-red-600'
-                                                }
-                                            >
-                                                <Flag
-                                                    className={`mr-2 size-4 ${
-                                                        isReported
-                                                            ? 'fill-muted-foreground text-muted-foreground'
-                                                            : ''
-                                                    }`}
-                                                />
-                                                {isReported
-                                                    ? 'Reported'
-                                                    : 'Report Issue'}
-                                            </Button>
+                                                return (
+                                                    <Button
+                                                        variant="destructive"
+                                                        onClick={() => setIsReportModalOpen(true)}
+                                                        className="bg-red-500 text-white hover:bg-red-600 font-bold"
+                                                    >
+                                                        <Flag className="mr-2 size-4" />
+                                                        Report Issue
+                                                    </Button>
+                                                );
+                                            })()}
                                             <Button
                                                 onClick={() => {
                                                     const isCompleting =

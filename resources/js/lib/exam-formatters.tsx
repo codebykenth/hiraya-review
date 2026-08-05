@@ -983,12 +983,12 @@ export const renderFormattedText = (
                                                 </DialogTrigger>
                                                 <DialogContent className="max-w-5xl border-none bg-transparent p-0 shadow-none sm:max-w-[90vw] md:max-w-5xl lg:max-w-6xl">
                                                     <div
-                                                        className="flex w-full justify-center rounded-2xl bg-white p-4 sm:p-6 lg:p-8 dark:bg-slate-900"
+                                                        className="flex w-full justify-center overflow-visible rounded-2xl bg-white p-6 sm:p-8 lg:p-10 dark:bg-slate-900"
                                                         dangerouslySetInnerHTML={{
                                                             __html: sanitizeSvg(
                                                                 frame.svg.replace(
                                                                     /^\s*<svg/i,
-                                                                    `<svg width="100%" height="100%" class="w-full h-auto max-h-[80vh] object-contain"`,
+                                                                    `<svg width="100%" height="100%" style="overflow: visible;" class="w-full h-auto max-h-[80vh] object-contain"`,
                                                                 ),
                                                             ),
                                                         }}
@@ -1036,12 +1036,12 @@ export const renderFormattedText = (
                                 </DialogTrigger>
                                 <DialogContent className="max-w-5xl border-none bg-transparent p-0 shadow-none sm:max-w-[90vw] md:max-w-5xl lg:max-w-6xl">
                                     <div
-                                        className="flex w-full justify-center rounded-2xl bg-white p-4 sm:p-6 lg:p-8 dark:bg-slate-900"
+                                        className="flex w-full justify-center overflow-visible rounded-2xl bg-white p-6 sm:p-8 lg:p-10 dark:bg-slate-900"
                                         dangerouslySetInnerHTML={{
                                             __html: sanitizeSvg(
                                                 block.content.replace(
                                                     /^\s*<svg/i,
-                                                    `<svg width="100%" height="100%" class="w-full h-auto max-h-[80vh] object-contain"`,
+                                                    `<svg width="100%" height="100%" style="overflow: visible;" class="w-full h-auto max-h-[80vh] object-contain"`,
                                                 ),
                                             ),
                                         }}
@@ -1112,12 +1112,12 @@ export const renderFormattedText = (
                                 </DialogTrigger>
                                 <DialogContent className="max-w-5xl border-none bg-transparent p-0 shadow-none sm:max-w-[90vw] md:max-w-5xl lg:max-w-6xl">
                                     <div
-                                        className="flex w-full justify-center rounded-2xl bg-white p-4 sm:p-6 lg:p-8 dark:bg-slate-900"
+                                        className="flex w-full justify-center overflow-visible rounded-2xl bg-white p-6 sm:p-8 lg:p-10 dark:bg-slate-900"
                                         dangerouslySetInnerHTML={{
                                             __html: sanitizeSvg(
                                                 svgPart.replace(
                                                     /^\s*<svg/i,
-                                                    `<svg width="100%" height="100%" class="w-full h-auto max-h-[80vh] object-contain"`,
+                                                    `<svg width="100%" height="100%" style="overflow: visible;" class="w-full h-auto max-h-[80vh] object-contain"`,
                                                 ),
                                             ),
                                         }}
@@ -1147,12 +1147,12 @@ export const renderFormattedText = (
                             </DialogTrigger>
                             <DialogContent className="max-w-5xl border-none bg-transparent p-0 shadow-none sm:max-w-[90vw] md:max-w-5xl lg:max-w-6xl">
                                 <div
-                                    className="flex w-full justify-center rounded-2xl bg-white p-4 sm:p-6 lg:p-8 dark:bg-slate-900"
+                                    className="flex w-full justify-center overflow-visible rounded-2xl bg-white p-6 sm:p-8 lg:p-10 dark:bg-slate-900"
                                     dangerouslySetInnerHTML={{
                                         __html: sanitizeSvg(
                                             svgPart.replace(
                                                 /^\s*<svg/i,
-                                                `<svg width="100%" height="100%" class="w-full h-auto max-h-[80vh] object-contain"`,
+                                                `<svg width="100%" height="100%" style="overflow: visible;" class="w-full h-auto max-h-[80vh] object-contain"`,
                                             ),
                                         ),
                                     }}

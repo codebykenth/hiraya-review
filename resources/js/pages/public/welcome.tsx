@@ -101,7 +101,7 @@ export default function Welcome() {
         },
         {
             question: 'How realistic are the mock exams on this platform?',
-            answer: 'Our mock exams are designed to simulate the general format, timing, and structure commonly used in Civil Service Commission (CSC) examinations, with a distraction-free interface  to build real exam-day stamina.',
+            answer: 'Our mock exams are designed to simulate the general format, timing, and structure commonly used in Civil Service Commission (CSC) examinations, with a distraction-free interface to build real exam-day stamina.',
         },
         {
             question: `Is the question bank updated for the ${new Date().getFullYear()} exam syllabus?`,
@@ -110,6 +110,10 @@ export default function Welcome() {
         {
             question: 'Can I use the platform for free?',
             answer: 'Absolutely. Hiraya Review offers free access to its foundation study tracks and basic question pools.',
+        },
+        {
+            question: 'Where do the questions come from?',
+            answer: 'Our questions are AI-assisted, generated and curated using advanced AI models specifically tailored to official Philippine Civil Service Commission (CSC) competencies, coverage patterns, and standard review topics.',
         },
     ];
 
@@ -336,7 +340,7 @@ export default function Welcome() {
                         <div className="flex flex-col items-center justify-evenly gap-5 sm:gap-10 md:flex-row md:gap-0">
                             <div className="flex flex-1 flex-col items-center">
                                 <p className="text-2xl font-black text-primary sm:text-4xl">
-                                    500+
+                                    1000+
                                 </p>
                                 <p className="mt-1 text-sm leading-relaxed font-bold tracking-wider text-muted-foreground uppercase">
                                     Questions
@@ -624,6 +628,10 @@ export default function Welcome() {
                                 );
                             })}
                         </div>
+
+                        <p className="mt-8 text-center text-xs leading-relaxed text-muted-foreground">
+                            <span className="font-semibold text-foreground">Disclaimer:</span> Hiraya Review is an independent learning platform. Test questions and study modules are AI-assisted practice items structured around official Civil Service Commission (CSC) syllabus guidelines.
+                        </p>
                     </Section>
                 </main>
 

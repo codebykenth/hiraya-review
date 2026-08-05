@@ -51,6 +51,9 @@ class QuestionController
                     'stem' => $q->stem,
                     'category' => $q->subcategory?->category?->name ?? 'Analytical Ability',
                     'subcategory' => $q->subcategory?->name ?? 'Word analogy',
+                    'options' => $q->options,
+                    'correct_option' => (int) $q->correct_option,
+                    'explanation' => $q->explanation,
                     'status' => strtoupper($q->status),
                     'updated_at' => $q->updated_at->format('Y-m-d H:i:s'),
                 ];

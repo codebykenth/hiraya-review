@@ -22,8 +22,17 @@ class FeedbackController extends Controller
             ->latest()
             ->paginate(15);
 
-        // Add the correct field names to the flaggable data
-        $feedbacks->getCollection()->transform(function ($feedback) {
+        // Calculate total report count per target item across all users
+        $counts = Feedback::selectRaw('flaggable_type, flaggable_id, count(*) as aggregate_count')
+            ->groupBy('flaggable_type', 'flaggable_id')
+            ->get()
+            ->keyBy(fn ($item) => $item->flaggable_type . '_' . $item->flaggable_id);
+
+        // Add the correct field names and total report count to the flaggable data
+        $feedbacks->getCollection()->transform(function ($feedback) use ($counts) {
+            $groupKey = $feedback->flaggable_type . '_' . $feedback->flaggable_id;
+            $feedback->total_reports_count = $counts[$groupKey]->aggregate_count ?? 1;
+
             if ($feedback->flaggable_type === 'App\Models\Question' && $feedback->flaggable) {
                 $feedback->flaggable->question_text = $feedback->flaggable->stem ?? null;
                 $feedback->flaggable->options = $feedback->flaggable->options ?? [];
@@ -54,10 +63,18 @@ class FeedbackController extends Controller
 
     public function updateStatus(UpdateFeedbackStatusRequest $request, Feedback $feedback): RedirectResponse
     {
-        $feedback->update($request->validated());
+        $newStatus = $request->validated('status');
+        $feedback->update(['status' => $newStatus]);
+
+        // Auto-update all pending reports for the exact same target item
+        Feedback::where('flaggable_type', $feedback->flaggable_type)
+            ->where('flaggable_id', $feedback->flaggable_id)
+            ->where('status', 'pending')
+            ->update(['status' => $newStatus]);
+
         Cache::forget('pending_feedback_count');
 
-        return back()->with('success', 'Feedback status updated.');
+        return back()->with('success', 'Feedback status updated for this item and all related reports.');
     }
 
     public function destroy(Feedback $feedback): RedirectResponse
@@ -70,9 +87,21 @@ class FeedbackController extends Controller
 
     public function bulkUpdate(BulkUpdateFeedbackRequest $request): RedirectResponse
     {
-        Feedback::whereIn('id', $request->validated('ids'))->update([
-            'status' => $request->validated('status'),
-        ]);
+        $ids = $request->validated('ids');
+        $newStatus = $request->validated('status');
+
+        $targets = Feedback::whereIn('id', $ids)
+            ->get(['flaggable_type', 'flaggable_id']);
+
+        Feedback::whereIn('id', $ids)->update(['status' => $newStatus]);
+
+        foreach ($targets as $target) {
+            Feedback::where('flaggable_type', $target->flaggable_type)
+                ->where('flaggable_id', $target->flaggable_id)
+                ->where('status', 'pending')
+                ->update(['status' => $newStatus]);
+        }
+
         Cache::forget('pending_feedback_count');
 
         return back()->with('success', 'Feedback status updated.');

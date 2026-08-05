@@ -21,12 +21,22 @@ export interface CreateProps {
     categories?: CategoryItem[];
 }
 
+export interface QuestionOption {
+    id?: number;
+    option_text: string;
+    is_correct: boolean;
+}
+
 export interface QuestionItem {
     id: number;
     stem: string;
     category: string;
     subcategory: string;
     status: 'ACTIVE' | 'DRAFT';
+    explanation?: string;
+    correct_option?: number;
+    updated_at?: string;
+    options?: QuestionOption[];
 }
 
 export interface QuestionsIndexProps {

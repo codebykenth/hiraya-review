@@ -63,7 +63,7 @@ export function useQuestionCreateState({
     const [aiCategory, setAiCategory] = useState<string>(defaultCategory);
     const [aiSubcategory, setAiSubcategory] =
         useState<string>(defaultSubcategory);
-    const [aiCount, setAiCount] = useState<number>(3);
+    const [aiCount, setAiCount] = useState<number>(10);
     const [aiLanguage, setAiLanguage] = useState<string>('English');
     const [aiPrimaryModel, setAiPrimaryModel] =
         useState<string>('gemini-3.6-flash');
@@ -84,13 +84,6 @@ export function useQuestionCreateState({
             const timer = setTimeout(() => {
                 const newSub = validSubs[0] || '';
                 setAiSubcategory(newSub);
-
-                if (
-                    newSub === 'Symbolic logic / abstract reasoning' ||
-                    newSub === 'Data interpretation'
-                ) {
-                    setAiCount(1);
-                }
             }, 0);
 
             return () => clearTimeout(timer);
@@ -99,13 +92,6 @@ export function useQuestionCreateState({
 
     const handleSetAiSubcategory = (subcat: string) => {
         setAiSubcategory(subcat);
-
-        if (
-            subcat === 'Symbolic logic / abstract reasoning' ||
-            subcat === 'Data interpretation'
-        ) {
-            setAiCount(1);
-        }
     };
 
     const manualForm = useForm({
@@ -246,6 +232,7 @@ export function useQuestionCreateState({
         setErrorMsg('Generation canceled.');
     };
 
+    // Listen for Pusher events
     useEffect(() => {
         const handleAiComplete = () => {
             setIsGenerating(false);

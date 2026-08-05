@@ -150,7 +150,7 @@ class GenerateQuestionsJob implements ShouldQueue
         Data topics MUST include Philippine public administration data (population, agency budgets, enrollment) OR Philippine financial / Stock Market data (e.g. Philippine Stock Exchange index / PSEi trends, company stock prices over trading days, sector shares).
         {$varietyInstruction}
         
-        CRITICAL SVG RULES: Use a fixed viewBox='0 0 600 400' for charts. Ensure all text labels use <text> elements with clear font sizes and do not overlap with other visual elements. Keep any SVG code clean, well-structured, and minified without comments. The options should be plain text or numbers based on the data, and the explanation block must reference the specific data points.";
+        CRITICAL SVG RULES: Use a wide viewBox='0 0 800 450' for charts (providing ample horizontal space so legend labels on the right side are never clipped). Ensure all text labels use <text> elements with clear font sizes, stay well within x=0 to x=780, and do not overlap with other visual elements. Keep any SVG code clean, well-structured, and minified without comments. The options should be plain text or numbers based on the data, and the explanation block must reference the specific data points.";
             } elseif ($subcategory === 'Identifying assumptions and drawing conclusions') {
                 $categorySpecificRules = '* Identifying assumptions and drawing conclusions: Provide realistic logical scenarios (e.g. government policies, office protocols, or formal arguments). Questions must test formal syllogistic deductions ("All A are B...", valid conclusions) or identifying unstated premises and assumptions necessary for an argument to hold true.';
             } elseif ($subcategory === 'Filing') {
@@ -417,7 +417,7 @@ class GenerateQuestionsJob implements ShouldQueue
                         ]
                     );
 
-                    Question::create([
+                    $question = Question::create([
                         'subcategory_id' => $subcategory->id,
                         'language' => $validated['language'],
                         'stem' => $q['stem'] ?? '',

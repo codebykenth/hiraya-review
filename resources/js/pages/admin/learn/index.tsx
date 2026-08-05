@@ -7,6 +7,8 @@ import {
     ChevronRight,
     Check,
     X,
+    LayoutGrid,
+    List,
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { getCategoryStyles } from '@/components/domain/curation-index-shell';
@@ -73,7 +75,8 @@ export default function AdminLearnIndex({
         isOpen: boolean;
         action: 'setActive' | 'setInactive' | 'delete' | null;
     }>({ isOpen: false, action: null });
-    const pageSize = 6;
+    const [viewMode, setViewMode] = useState<'grid' | 'table'>('table');
+    const pageSize = 10;
 
     // Build categories tree
     const cseCategoriesTree: Record<string, string[]> = {};
@@ -210,11 +213,15 @@ export default function AdminLearnIndex({
     };
 
     const handleSelectAll = (checked: boolean) => {
+        const newSelected = new Set(selectedIds);
+
         if (checked) {
-            setSelectedIds(new Set(paginatedModules.map((mod) => mod.id)));
+            paginatedModules.forEach((mod) => newSelected.add(mod.id));
         } else {
-            setSelectedIds(new Set());
+            paginatedModules.forEach((mod) => newSelected.delete(mod.id));
         }
+
+        setSelectedIds(newSelected);
     };
 
     const handleSelectOne = (id: number, checked: boolean) => {
@@ -436,6 +443,36 @@ export default function AdminLearnIndex({
                         <span className="shrink-0 pl-1 text-xs font-bold text-muted-foreground">
                             {filteredModules.length} found
                         </span>
+
+                        {/* View Mode Toggle */}
+                        <div className="ml-auto flex items-center rounded-lg border border-border bg-background p-1">
+                            <button
+                                type="button"
+                                onClick={() => setViewMode('table')}
+                                className={`flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-bold transition cursor-pointer ${
+                                    viewMode === 'table'
+                                        ? 'bg-blue-600 text-white shadow-xs'
+                                        : 'text-muted-foreground hover:text-foreground'
+                                }`}
+                                title="Table List View"
+                            >
+                                <List className="size-3.5" />
+                                <span className="hidden sm:inline">Table</span>
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setViewMode('grid')}
+                                className={`flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-bold transition cursor-pointer ${
+                                    viewMode === 'grid'
+                                        ? 'bg-blue-600 text-white shadow-xs'
+                                        : 'text-muted-foreground hover:text-foreground'
+                                }`}
+                                title="Grid Card View"
+                            >
+                                <LayoutGrid className="size-3.5" />
+                                <span className="hidden sm:inline">Cards</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -546,27 +583,212 @@ export default function AdminLearnIndex({
                     </div>
                 ) : (
                     <div className="flex flex-col gap-6">
-                        {/* Select All Header */}
-                        <div className="flex items-center gap-3 rounded-lg border border-border bg-muted px-4 py-3">
-                            <input
-                                type="checkbox"
-                                checked={
-                                    paginatedModules.length > 0 &&
-                                    paginatedModules.every((mod) =>
-                                        selectedIds.has(mod.id),
-                                    )
-                                }
-                                onChange={(e) =>
-                                    handleSelectAll(e.target.checked)
-                                }
-                                className="size-4 cursor-pointer accent-blue-600"
-                            />
-                            <span className="text-xs font-bold text-muted-foreground">
-                                Select all on this page
-                            </span>
-                        </div>
+                        {/* Select All Header (Grid View) */}
+                        {viewMode === 'grid' && (
+                            <div className="flex items-center gap-3 rounded-lg border border-border bg-muted px-4 py-3">
+                                <input
+                                    type="checkbox"
+                                    checked={
+                                        paginatedModules.length > 0 &&
+                                        paginatedModules.every((mod) =>
+                                            selectedIds.has(mod.id),
+                                        )
+                                    }
+                                    onChange={(e) =>
+                                        handleSelectAll(e.target.checked)
+                                    }
+                                    className="size-4 cursor-pointer accent-blue-600"
+                                />
+                                <span className="text-xs font-bold text-muted-foreground">
+                                    Select all on this page
+                                </span>
+                            </div>
+                        )}
 
-                        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+                        {viewMode === 'table' ? (
+                            <div className="overflow-x-auto rounded-2xl border border-border bg-card shadow-xs">
+                                <table className="w-full border-collapse text-left text-xs">
+                                    <thead>
+                                        <tr className="border-b border-border bg-muted/60 text-muted-foreground">
+                                            <th className="w-12 px-4 py-3 text-center">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={
+                                                        paginatedModules.length >
+                                                            0 &&
+                                                        paginatedModules.every(
+                                                            (mod) =>
+                                                                selectedIds.has(
+                                                                    mod.id,
+                                                                ),
+                                                        )
+                                                    }
+                                                    onChange={(e) =>
+                                                        handleSelectAll(
+                                                            e.target.checked,
+                                                        )
+                                                    }
+                                                    className="size-4 cursor-pointer accent-blue-600"
+                                                />
+                                            </th>
+                                            <th className="w-16 px-4 py-3 font-bold">
+                                                ID
+                                            </th>
+                                            <th className="min-w-[400px] px-4 py-3 font-bold">
+                                                Module Title & Summary
+                                            </th>
+                                            <th className="w-36 px-4 py-3 font-bold">
+                                                Category
+                                            </th>
+                                            <th className="w-40 px-4 py-3 font-bold">
+                                                Subcategory
+                                            </th>
+                                            <th className="w-24 px-4 py-3 font-bold">
+                                                Read Time
+                                            </th>
+                                            <th className="w-28 px-4 py-3 font-bold">
+                                                Status
+                                            </th>
+                                            <th className="w-32 px-4 py-3 text-right font-bold">
+                                                Actions
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-border">
+                                        {paginatedModules.map((mod) => (
+                                            <tr
+                                                key={mod.id}
+                                                className={`transition hover:bg-muted/40 ${
+                                                    selectedIds.has(mod.id)
+                                                        ? 'bg-blue-50/50 dark:bg-blue-950/20'
+                                                        : ''
+                                                }`}
+                                            >
+                                                <td className="w-12 px-4 py-3 text-center">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={selectedIds.has(
+                                                            mod.id,
+                                                        )}
+                                                        onChange={(e) =>
+                                                            handleSelectOne(
+                                                                mod.id,
+                                                                e.target
+                                                                    .checked,
+                                                            )
+                                                        }
+                                                        className="size-4 cursor-pointer accent-blue-600"
+                                                    />
+                                                </td>
+                                                <td className="w-16 px-4 py-3 font-bold text-muted-foreground">
+                                                    #{mod.id}
+                                                </td>
+                                                <td className="min-w-[400px] px-4 py-3">
+                                                    <div className="line-clamp-1 font-bold text-foreground">
+                                                        {mod.title}
+                                                    </div>
+                                                    <div className="line-clamp-1 text-[11px] text-muted-foreground">
+                                                        {mod.summary ||
+                                                            'CSE Syllabus Study Module'}
+                                                    </div>
+                                                </td>
+                                                <td className="w-36 px-4 py-3">
+                                                    <span
+                                                        className={`inline-flex max-w-[130px] truncate rounded-md border px-2 py-0.5 text-[9px] font-extrabold tracking-wide uppercase ${getCategoryStyles(mod.category)}`}
+                                                    >
+                                                        {mod.category}
+                                                    </span>
+                                                </td>
+                                                <td className="w-40 px-4 py-3">
+                                                    <span className="inline-block max-w-[140px] truncate rounded-full border border-blue-100 bg-blue-50 px-2 py-0.5 text-[9px] font-semibold text-blue-700 dark:border-blue-900/30 dark:bg-blue-950/30 dark:text-blue-300">
+                                                        {mod.subcategory}
+                                                    </span>
+                                                </td>
+                                                <td className="w-24 px-4 py-3 font-semibold text-muted-foreground">
+                                                    {mod.estimated_minutes
+                                                        ? `${mod.estimated_minutes} min`
+                                                        : '-'}
+                                                </td>
+                                                <td className="px-4 py-3">
+                                                    <span
+                                                        className={`inline-flex items-center gap-1 rounded-md border px-2 py-0.5 text-[9px] font-extrabold uppercase ${
+                                                            mod.is_published
+                                                                ? 'border-emerald-100 bg-emerald-50 text-emerald-700 dark:border-emerald-900/30 dark:bg-emerald-950/30 dark:text-emerald-400'
+                                                                : 'border-blue-100 bg-blue-50 text-blue-700 dark:border-blue-900/30 dark:bg-blue-950/30 dark:text-blue-400'
+                                                        }`}
+                                                    >
+                                                        {mod.is_published
+                                                            ? 'Active'
+                                                            : 'Draft'}
+                                                    </span>
+                                                </td>
+                                                <td className="px-4 py-3 text-right">
+                                                    <div className="flex items-center justify-end gap-1">
+                                                        <TooltipProvider
+                                                            delayDuration={150}
+                                                        >
+                                                            <Tooltip>
+                                                                <TooltipTrigger
+                                                                    asChild
+                                                                >
+                                                                    <Link
+                                                                        href={`${learnShow(mod.slug).url}?page=${currentPage}`}
+                                                                        className="cursor-pointer rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted hover:text-blue-600 dark:text-blue-400"
+                                                                    >
+                                                                        <Eye className="size-4" />
+                                                                    </Link>
+                                                                </TooltipTrigger>
+                                                                <TooltipContent>
+                                                                    Student
+                                                                    Preview
+                                                                </TooltipContent>
+                                                            </Tooltip>
+                                                            <Tooltip>
+                                                                <TooltipTrigger
+                                                                    asChild
+                                                                >
+                                                                    <Link
+                                                                        href={`${adminLearnEdit(mod.id).url}?page=${currentPage}`}
+                                                                        className="cursor-pointer rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted hover:text-blue-600 dark:text-blue-400"
+                                                                    >
+                                                                        <Edit2 className="size-4" />
+                                                                    </Link>
+                                                                </TooltipTrigger>
+                                                                <TooltipContent>
+                                                                    Edit details
+                                                                </TooltipContent>
+                                                            </Tooltip>
+                                                            <Tooltip>
+                                                                <TooltipTrigger
+                                                                    asChild
+                                                                >
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={() =>
+                                                                            promptDelete(
+                                                                                mod.id,
+                                                                            )
+                                                                        }
+                                                                        className="cursor-pointer rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted hover:text-red-600"
+                                                                    >
+                                                                        <Trash2 className="size-4" />
+                                                                    </button>
+                                                                </TooltipTrigger>
+                                                                <TooltipContent>
+                                                                    Delete
+                                                                    module
+                                                                </TooltipContent>
+                                                            </Tooltip>
+                                                        </TooltipProvider>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        ) : (
+                            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
                             {paginatedModules.map((mod) => (
                                 <div
                                     key={mod.id}
@@ -693,6 +915,7 @@ export default function AdminLearnIndex({
                                 </div>
                             ))}
                         </div>
+                        )}
 
                         {/* Pagination */}
                         {filteredModules.length > pageSize && (

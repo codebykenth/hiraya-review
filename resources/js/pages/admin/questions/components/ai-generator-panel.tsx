@@ -72,10 +72,12 @@ export function AIGeneratorPanel({
     handleGenerateAI,
     handleCancelAIGeneration,
 }: AIGeneratorPanelProps) {
+    const [showCountDropdown, setShowCountDropdown] = React.useState(false);
+
     return (
-        <div className="grid grid-cols-1 items-start gap-3 sm:gap-6 lg:grid-cols-12">
-            {/* Config panel (7/12 cols) */}
-            <div className="flex flex-col gap-3 sm:gap-6 lg:col-span-7">
+        <div className="grid grid-cols-1 items-start gap-3 sm:gap-6">
+            {/* Config panel */}
+            <div className="flex flex-col gap-3 sm:gap-6">
                 <div className="relative overflow-hidden rounded-2xl border border-border bg-card p-4 shadow-xs sm:p-6">
                     <div className="pointer-events-none absolute top-0 right-0 -mt-16 -mr-16 h-44 w-44 rounded-full bg-blue-500/5 blur-3xl" />
 
@@ -84,6 +86,71 @@ export function AIGeneratorPanel({
                             <Sparkles className="size-4 animate-pulse text-blue-600 dark:text-blue-400" />
                             Configuration Options
                         </h2>
+                        
+                        <Dialog>
+                            <DialogTrigger asChild>
+                                <button type="button" className="inline-flex items-center gap-1.5 rounded-lg border border-blue-200 bg-blue-50 px-2 py-1 text-[10px] font-bold text-blue-700 transition-colors hover:bg-blue-100 dark:border-blue-900/40 dark:bg-blue-950/40 dark:text-blue-300 dark:hover:bg-blue-900/50">
+                                    <HelpCircle className="size-3" />
+                                    How it works
+                                </button>
+                            </DialogTrigger>
+                            <DialogContent className="max-w-md border-blue-200 bg-gradient-to-br from-blue-50 to-slate-50 dark:border-blue-900/40 dark:from-slate-950 dark:to-slate-900">
+                                <DialogHeader>
+                                    <DialogTitle className="inline-flex items-center gap-2">
+                                        <Cpu className="size-5 text-blue-500" />
+                                        AI Question Synthesizer
+                                    </DialogTitle>
+                                    <DialogDescription className="hidden">AI Question Synthesizer</DialogDescription>
+                                </DialogHeader>
+                                <div className="mt-4 space-y-4 text-xs leading-relaxed font-semibold text-slate-600 dark:text-slate-300">
+                                    <div className="flex gap-3.5">
+                                        <BookOpen className="mt-0.5 size-4 shrink-0 text-emerald-500 dark:text-emerald-400" />
+                                        <div>
+                                            <h4 className="mb-1 font-bold text-slate-800 dark:text-slate-200">
+                                                Standardized Exam Blueprint
+                                            </h4>
+                                            <p className="text-slate-500 dark:text-slate-400">
+                                                Questions are synthesized directly against
+                                                civil service exam guidelines, mapping to
+                                                key cognitive difficulty standards (Recall,
+                                                Application, Analysis).
+                                            </p>
+                                        </div>
+                                    </div>
+            
+                                    <div className="flex gap-3.5">
+                                        <Sparkles className="mt-0.5 size-4 shrink-0 text-purple-500 dark:text-purple-400" />
+                                        <div>
+                                            <h4 className="mb-1 font-bold text-slate-800 dark:text-slate-200">
+                                                Contextual Prompting
+                                            </h4>
+                                            <p className="text-slate-500 dark:text-slate-400">
+                                                Use the Additional Context block to hone in
+                                                on specific review modules—e.g. Philippine
+                                                Constitutional amendments, fractions, or
+                                                paragraph ordering puzzles.
+                                            </p>
+                                        </div>
+                                    </div>
+            
+                                    <div className="flex gap-3.5">
+                                        <HelpCircle className="mt-0.5 size-4 shrink-0 text-blue-500 dark:text-blue-400" />
+                                        <div>
+                                            <h4 className="mb-1 font-bold text-slate-800 dark:text-slate-200">
+                                                Interactive Review Queue
+                                            </h4>
+                                            <p className="font-medium text-slate-500 dark:text-slate-400">
+                                                Once questions are generated, they flow
+                                                straight into the{' '}
+                                                <strong>Drafts Review Center</strong>,
+                                                allowing you to edit and batch-approve them
+                                                in a unified dashboard.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </DialogContent>
+                        </Dialog>
                     </div>
 
                     <div className="space-y-4">
@@ -197,54 +264,68 @@ export function AIGeneratorPanel({
                                     : 'w-full'
                             }
                         >
-                            {/* Count Input */}
-                            <div className="flex w-full flex-col gap-1.5">
+                            {/* Count Single Input with Focus Dropdown */}
+                            <div className="relative flex w-full flex-col gap-1.5">
                                 <label className="text-xs font-bold tracking-wider text-slate-400 uppercase">
                                     Count
                                 </label>
                                 <Input
                                     type="number"
                                     min={1}
-                                    max={
-                                        aiSubcategory ===
-                                            'Symbolic logic / abstract reasoning' ||
-                                        aiSubcategory === 'Data interpretation'
-                                            ? 1
-                                            : 20
-                                    }
+                                    max={20}
                                     value={aiCount || ''}
-                                    disabled={
-                                        isGenerating ||
-                                        aiSubcategory ===
-                                            'Symbolic logic / abstract reasoning' ||
-                                        aiSubcategory === 'Data interpretation'
-                                    }
+                                    disabled={isGenerating}
+                                    onFocus={() => setShowCountDropdown(true)}
+                                    onClick={() => setShowCountDropdown(true)}
                                     onChange={(e) => {
                                         const val = parseInt(e.target.value);
                                         setAiCount(isNaN(val) ? 0 : val);
                                     }}
-                                    onBlur={(e) => {
-                                        let val = parseInt(e.target.value);
+                                    onBlur={() => {
+                                        setTimeout(() => setShowCountDropdown(false), 200);
+                                        let val = aiCount;
 
                                         if (isNaN(val) || val < 1) {
                                             val = 1;
                                         }
 
-                                        const maxVal =
-                                            aiSubcategory ===
-                                                'Symbolic logic / abstract reasoning' ||
-                                            aiSubcategory ===
-                                                'Data interpretation'
-                                                ? 1
-                                                : 20;
-
-                                        if (val > maxVal) {
-                                            val = maxVal;
+                                        if (val > 20) {
+                                            val = 20;
                                         }
 
                                         setAiCount(val);
                                     }}
+                                    placeholder="Enter count (1-20)"
                                 />
+
+                                {showCountDropdown && !isGenerating && (
+                                    <div className="absolute top-full left-0 z-50 mt-1 flex w-full flex-col overflow-hidden rounded-xl border border-border bg-card p-1 shadow-lg dark:bg-slate-950">
+                                        <div className="px-3 py-1.5 text-[11px] font-bold tracking-wider text-muted-foreground uppercase">
+                                            Common Presets
+                                        </div>
+                                        {[1, 5, 10, 15, 20].map((num) => (
+                                            <button
+                                                key={num}
+                                                type="button"
+                                                onMouseDown={(e) => {
+                                                    e.preventDefault();
+                                                    setAiCount(num);
+                                                    setShowCountDropdown(false);
+                                                }}
+                                                className={`flex items-center justify-between rounded-lg px-3 py-2 text-xs font-bold transition-colors hover:bg-primary/10 hover:text-primary ${
+                                                    aiCount === num
+                                                        ? 'bg-primary/15 font-black text-primary'
+                                                        : 'text-foreground'
+                                                }`}
+                                            >
+                                                <span>{num} {num === 1 ? 'Question' : 'Questions'}</span>
+                                                {aiCount === num && (
+                                                    <span className="text-[10px] font-black uppercase text-primary">Selected</span>
+                                                )}
+                                            </button>
+                                        ))}
+                                    </div>
+                                )}
                             </div>
 
                             {/* Language Select */}
@@ -832,67 +913,6 @@ export function AIGeneratorPanel({
                                     Generate Questions
                                 </Button>
                             )}
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            {/* Informational Column (5/12 cols) */}
-            <div className="flex flex-col gap-3 sm:gap-6 lg:col-span-5">
-                <div className="border-slate-250 relative overflow-hidden rounded-2xl border bg-gradient-to-br from-blue-950 to-slate-900 p-4 text-white shadow-md sm:p-6">
-                    <div className="pointer-events-none absolute -top-12 -right-12 h-48 w-48 rounded-full bg-blue-600/10 blur-2xl" />
-                    <div className="pointer-events-none absolute -bottom-16 -left-16 h-56 w-56 rounded-full bg-emerald-600/5 blur-3xl" />
-
-                    <h2 className="mb-4 inline-flex w-full items-center gap-2 border-b border-white/10 pb-4.5 text-base font-extrabold tracking-tight">
-                        <Cpu className="size-4.5 text-blue-400" />
-                        AI Question Synthesizer
-                    </h2>
-
-                    <div className="space-y-4 text-xs leading-relaxed font-semibold text-slate-300">
-                        <div className="flex gap-3.5">
-                            <BookOpen className="mt-0.5 size-4 shrink-0 text-emerald-400" />
-                            <div>
-                                <h4 className="mb-1 font-bold text-slate-200">
-                                    Standardized Exam Blueprint
-                                </h4>
-                                <p className="text-slate-400">
-                                    Questions are synthesized directly against
-                                    civil service exam guidelines, mapping to
-                                    key cognitive difficulty standards (Recall,
-                                    Application, Analysis).
-                                </p>
-                            </div>
-                        </div>
-
-                        <div className="flex gap-3.5">
-                            <Sparkles className="mt-0.5 size-4 shrink-0 text-purple-400" />
-                            <div>
-                                <h4 className="mb-1 font-bold text-slate-200">
-                                    Contextual Prompting
-                                </h4>
-                                <p className="text-slate-400">
-                                    Use the Additional Context block to hone in
-                                    on specific review modules—e.g. Philippine
-                                    Constitutional amendments, fractions, or
-                                    paragraph ordering puzzles.
-                                </p>
-                            </div>
-                        </div>
-
-                        <div className="flex gap-3.5">
-                            <HelpCircle className="mt-0.5 size-4 shrink-0 text-blue-400" />
-                            <div>
-                                <h4 className="mb-1 font-bold text-slate-200">
-                                    Interactive Review Queue
-                                </h4>
-                                <p className="font-medium text-slate-400">
-                                    Once questions are generated, they flow
-                                    straight into the{' '}
-                                    <strong>Drafts Review Center</strong>,
-                                    allowing you to edit and batch-approve them
-                                    in a unified dashboard.
-                                </p>
-                            </div>
                         </div>
                     </div>
                 </div>

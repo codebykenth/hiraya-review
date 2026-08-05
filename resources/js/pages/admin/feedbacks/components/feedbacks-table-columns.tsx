@@ -93,9 +93,19 @@ export function getFeedbacksTableColumns({
             header: 'Report Details',
             render: (f) => (
                 <div>
-                    <span className="block text-xs leading-snug font-black text-foreground">
-                        {f.reason}
-                    </span>
+                    <div className="flex items-center gap-1.5">
+                        <span className="block text-xs leading-snug font-black text-foreground">
+                            {f.reason}
+                        </span>
+                        {f.total_reports_count && f.total_reports_count > 1 && (
+                            <span
+                                className="rounded-full bg-rose-100 px-1.5 py-0.5 text-[9px] font-black text-rose-700 dark:bg-rose-950/40 dark:text-rose-300"
+                                title={`${f.total_reports_count} total user reports submitted for this target item`}
+                            >
+                                {f.total_reports_count} reports
+                            </span>
+                        )}
+                    </div>
                     {f.details && (
                         <p className="mt-1 line-clamp-1 text-[10px] text-muted-foreground">
                             "{f.details}"

@@ -318,6 +318,155 @@ export default function DraftsLearnList({
                 emptyStateActionUrl="/admin/learn/create"
                 emptyStateActionLabel="Generate Syllabus Modules"
                 emptyStateActionIcon={Sparkles}
+                renderTableView={(items) => (
+                    <div className="overflow-x-auto rounded-2xl border border-border bg-card shadow-xs">
+                        <table className="w-full text-left text-xs">
+                            <thead>
+                                <tr className="border-b border-border bg-muted/60 text-[11px] font-black tracking-wider text-muted-foreground uppercase">
+                                    <th className="w-16 py-3.5 pr-3 pl-4 text-center">
+                                        Approve
+                                    </th>
+                                    <th className="min-w-[280px] px-4 py-3.5">
+                                        Module Title & Topic
+                                    </th>
+                                    <th className="min-w-[320px] px-4 py-3.5">
+                                        Summary
+                                    </th>
+                                    <th className="w-44 px-4 py-3.5">
+                                        Category & Subcategory
+                                    </th>
+                                    <th className="w-28 px-4 py-3.5 text-center">
+                                        Status
+                                    </th>
+                                    <th className="w-32 py-3.5 pr-4 pl-3 text-right">
+                                        Actions
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-border">
+                                {items.map((m) => (
+                                    <tr
+                                        key={m.id}
+                                        className={`transition hover:bg-muted/30 ${
+                                            m.approved
+                                                ? 'bg-emerald-500/5 dark:bg-emerald-950/10'
+                                                : ''
+                                        }`}
+                                    >
+                                        <td className="w-16 py-4 pr-3 pl-4 text-center">
+                                            <button
+                                                type="button"
+                                                onClick={() =>
+                                                    toggleApproveDraft(m.id)
+                                                }
+                                                className={`inline-flex size-6 cursor-pointer items-center justify-center rounded-lg border transition ${
+                                                    m.approved
+                                                        ? 'border-emerald-500 bg-emerald-600 text-white dark:bg-emerald-500'
+                                                        : 'border-border bg-card text-muted-foreground hover:text-foreground'
+                                                }`}
+                                            >
+                                                <Check className="size-3.5" />
+                                            </button>
+                                        </td>
+                                        <td className="min-w-[280px] px-4 py-4 align-top">
+                                            <div className="font-bold text-foreground">
+                                                {m.title}
+                                            </div>
+                                            <div className="mt-0.5 text-[11px] font-semibold text-muted-foreground">
+                                                {m.topic}
+                                            </div>
+                                        </td>
+                                        <td className="min-w-[320px] px-4 py-4 align-top">
+                                            <div className="line-clamp-2 font-medium text-xs text-muted-foreground">
+                                                {m.summary}
+                                            </div>
+                                        </td>
+                                        <td className="w-44 px-4 py-4 align-top">
+                                            <div className="flex flex-col gap-1">
+                                                <span className="w-fit max-w-[150px] truncate rounded-full border border-border bg-muted px-2 py-0.5 text-[10px] font-bold text-foreground">
+                                                    {m.category}
+                                                </span>
+                                                <span className="w-fit max-w-[150px] truncate rounded-full border border-blue-100 bg-blue-50 px-2 py-0.5 text-[10px] font-bold text-blue-700 dark:border-blue-900/30 dark:bg-blue-950/30 dark:text-blue-400">
+                                                    {m.subcategory}
+                                                </span>
+                                            </div>
+                                        </td>
+                                        <td className="px-4 py-4 text-center align-top">
+                                            {m.approved ? (
+                                                <span className="inline-block rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-0.5 text-[10px] font-bold text-emerald-700 dark:border-emerald-900/40 dark:bg-emerald-950/30 dark:text-emerald-400">
+                                                    Approved
+                                                </span>
+                                            ) : (
+                                                <span className="inline-block rounded-full border border-amber-200 bg-amber-50 px-2.5 py-0.5 text-[10px] font-bold text-amber-700 dark:border-amber-900/40 dark:bg-amber-950/30 dark:text-amber-400">
+                                                    Pending
+                                                </span>
+                                            )}
+                                        </td>
+                                        <td className="py-4 pr-4 pl-3 text-right align-top">
+                                            <div className="flex items-center justify-end gap-1">
+                                                {m.isEditing ? (
+                                                    <>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() =>
+                                                                toggleEditDraft(
+                                                                    m.id,
+                                                                )
+                                                            }
+                                                            title="Save Edits"
+                                                            className="cursor-pointer rounded-lg border border-emerald-200 bg-emerald-50 p-1.5 text-emerald-700 transition hover:bg-emerald-100 dark:border-emerald-900/40 dark:bg-emerald-950/30 dark:text-emerald-400"
+                                                        >
+                                                            <Save className="size-4" />
+                                                        </button>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() =>
+                                                                cancelEditDraft(
+                                                                    m.id,
+                                                                )
+                                                                }
+                                                            title="Cancel Edits"
+                                                            className="cursor-pointer rounded-lg border border-red-200 bg-red-50 p-1.5 text-red-700 transition hover:bg-red-100 dark:border-red-900/40 dark:bg-red-950/30 dark:text-red-400"
+                                                        >
+                                                            <X className="size-4" />
+                                                        </button>
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() =>
+                                                                toggleEditDraft(
+                                                                    m.id,
+                                                                )
+                                                            }
+                                                            title="Edit Inline"
+                                                            className="cursor-pointer rounded-lg border border-border bg-card p-1.5 text-muted-foreground transition hover:border-blue-200 hover:text-blue-600 dark:hover:text-blue-400"
+                                                        >
+                                                            <Edit3 className="size-4" />
+                                                        </button>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() =>
+                                                                promptDeleteDraft(
+                                                                    m.id,
+                                                                )
+                                                            }
+                                                            title="Delete Draft"
+                                                            className="cursor-pointer rounded-lg border border-border bg-card p-1.5 text-muted-foreground transition hover:border-red-200 hover:text-red-600 dark:hover:text-red-400"
+                                                        >
+                                                            <X className="size-4" />
+                                                        </button>
+                                                    </>
+                                                )}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                )}
                 renderItem={(m) => (
                     <div
                         key={m.id}

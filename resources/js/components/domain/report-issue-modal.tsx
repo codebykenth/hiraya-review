@@ -93,6 +93,9 @@ export function ReportIssueModal({
                                     <SelectValue placeholder="Select an issue category" />
                                 </SelectTrigger>
                                 <SelectContent>
+                                    <SelectItem value="No question stated">
+                                        No Question Stated
+                                    </SelectItem>
                                     <SelectItem value="Typo / Spelling Error">
                                         Typo / Spelling Error
                                     </SelectItem>

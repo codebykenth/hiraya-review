@@ -19,6 +19,7 @@ interface Feedback {
     reason: string;
     details: string | null;
     status: 'pending' | 'resolved' | 'dismissed';
+    total_reports_count?: number;
     created_at: string;
     user: User;
     flaggable: Flaggable | null;

@@ -7,10 +7,19 @@ import {
     ChevronRight,
     Check,
     X,
+    LayoutGrid,
+    List,
+    FileImage,
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
 import { getCategoryStyles } from '@/components/domain/curation-index-shell';
-import type { CategoryItem } from '@/components/domain/drafts-review-shell';
+import type { CategoryItem, QuestionItem, QuestionOption, QuestionsIndexProps } from './types';
 import { PageContainer } from '@/components/layout/page-container';
 import { ConfirmModal } from '@/components/shared/confirm-modal';
 import { Button } from '@/components/ui/button';
@@ -29,22 +38,6 @@ import {
     show as questionsShow,
 } from '@/routes/questions';
 
-interface QuestionItem {
-    id: number;
-    stem: string;
-    category: string;
-    subcategory: string;
-    status: 'ACTIVE' | 'DRAFT';
-    options?: string[];
-    correct_option?: number;
-    explanation?: string;
-    updated_at: string;
-}
-
-interface QuestionsIndexProps {
-    questions?: QuestionItem[];
-    categories?: CategoryItem[];
-}
 
 export default function QuestionsIndex({
     questions = [],
@@ -74,7 +67,21 @@ export default function QuestionsIndex({
         isOpen: boolean;
         action: 'setActive' | 'setInactive' | 'delete' | null;
     }>({ isOpen: false, action: null });
-    const pageSize = 6;
+    const [viewMode, setViewMode] = useState<'grid' | 'table'>('table');
+    const [previewQuestion, setPreviewQuestion] = useState<QuestionItem | null>(null);
+    const pageSize = 10;
+
+    const getCleanStemText = (stem: string) => {
+        if (!stem) return '';
+        let text = stem.replace(/<svg[\s\S]*?<\/svg>/gi, '').trim();
+        text = text.replace(/<[^>]+>/g, '').trim();
+        text = text.replace(/#+\s*/g, '').replace(/\s+/g, ' ');
+        return text || 'Visual Question (Chart/Diagram)';
+    };
+
+    const hasSvgContent = (stem: string) => {
+        return /<svg[\s\S]*?<\/svg>/i.test(stem || '');
+    };
 
     // Build categories tree
     const cseCategoriesTree: Record<string, string[]> = {};
@@ -173,10 +180,9 @@ export default function QuestionsIndex({
             }
 
             // Then by updated_at timestamp (latest to oldest)
-            return (
-                new Date(b.updated_at).getTime() -
-                new Date(a.updated_at).getTime()
-            );
+            const timeB = b.updated_at ? new Date(b.updated_at).getTime() : 0;
+            const timeA = a.updated_at ? new Date(a.updated_at).getTime() : 0;
+            return timeB - timeA;
         });
 
     const totalPages = Math.ceil(filteredQuestions.length / pageSize);
@@ -208,11 +214,15 @@ export default function QuestionsIndex({
     };
 
     const handleSelectAll = (checked: boolean) => {
+        const newSelected = new Set(selectedIds);
+
         if (checked) {
-            setSelectedIds(new Set(paginatedQuestions.map((q) => q.id)));
+            paginatedQuestions.forEach((q) => newSelected.add(q.id));
         } else {
-            setSelectedIds(new Set());
+            paginatedQuestions.forEach((q) => newSelected.delete(q.id));
         }
+
+        setSelectedIds(newSelected);
     };
 
     const handleSelectOne = (id: number, checked: boolean) => {
@@ -438,6 +448,36 @@ export default function QuestionsIndex({
                         <span className="shrink-0 pl-1 text-xs font-bold text-muted-foreground">
                             {filteredQuestions.length} found
                         </span>
+
+                        {/* View Mode Toggle */}
+                        <div className="ml-auto flex items-center rounded-lg border border-border bg-background p-1">
+                            <button
+                                type="button"
+                                onClick={() => setViewMode('table')}
+                                className={`flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-bold transition cursor-pointer ${
+                                    viewMode === 'table'
+                                        ? 'bg-blue-600 text-white shadow-xs'
+                                        : 'text-muted-foreground hover:text-foreground'
+                                }`}
+                                title="Table List View"
+                            >
+                                <List className="size-3.5" />
+                                <span className="hidden sm:inline">Table</span>
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setViewMode('grid')}
+                                className={`flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-bold transition cursor-pointer ${
+                                    viewMode === 'grid'
+                                        ? 'bg-blue-600 text-white shadow-xs'
+                                        : 'text-muted-foreground hover:text-foreground'
+                                }`}
+                                title="Grid Card View"
+                            >
+                                <LayoutGrid className="size-3.5" />
+                                <span className="hidden sm:inline">Cards</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -548,27 +588,259 @@ export default function QuestionsIndex({
                     </div>
                 ) : (
                     <div className="flex flex-col gap-6">
-                        {/* Select All Header */}
-                        <div className="flex items-center gap-3 rounded-lg border border-border bg-muted px-4 py-3">
-                            <input
-                                type="checkbox"
-                                checked={
-                                    paginatedQuestions.length > 0 &&
-                                    paginatedQuestions.every((q) =>
-                                        selectedIds.has(q.id),
-                                    )
-                                }
-                                onChange={(e) =>
-                                    handleSelectAll(e.target.checked)
-                                }
-                                className="size-4 cursor-pointer accent-blue-600"
-                            />
-                            <span className="text-xs font-bold text-muted-foreground">
-                                Select all on this page
-                            </span>
-                        </div>
+                        {/* Select All Header (Grid View) */}
+                        {viewMode === 'grid' && (
+                            <div className="flex items-center gap-3 rounded-lg border border-border bg-muted px-4 py-3">
+                                <input
+                                    type="checkbox"
+                                    checked={
+                                        paginatedQuestions.length > 0 &&
+                                        paginatedQuestions.every((q) =>
+                                            selectedIds.has(q.id),
+                                        )
+                                    }
+                                    onChange={(e) =>
+                                        handleSelectAll(e.target.checked)
+                                    }
+                                    className="size-4 cursor-pointer accent-blue-600"
+                                />
+                                <span className="text-xs font-bold text-muted-foreground">
+                                    Select all on this page
+                                </span>
+                            </div>
+                        )}
 
-                        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+                        {viewMode === 'table' ? (
+                            <div className="overflow-x-auto rounded-2xl border border-border bg-card shadow-xs">
+                                <table className="w-full border-collapse text-left text-xs">
+                                    <thead>
+                                        <tr className="border-b border-border bg-muted/60 text-muted-foreground">
+                                            <th className="w-12 px-4 py-3 text-center">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={
+                                                        paginatedQuestions.length >
+                                                            0 &&
+                                                        paginatedQuestions.every(
+                                                            (q) =>
+                                                                selectedIds.has(
+                                                                    q.id,
+                                                                ),
+                                                        )
+                                                    }
+                                                    onChange={(e) =>
+                                                        handleSelectAll(
+                                                            e.target.checked,
+                                                        )
+                                                    }
+                                                    className="size-4 cursor-pointer accent-blue-600"
+                                                />
+                                            </th>
+                                            <th className="w-16 px-4 py-3 font-bold">
+                                                ID
+                                            </th>
+                                            <th className="min-w-[400px] px-4 py-3 font-bold">
+                                                Question Stem
+                                            </th>
+                                            <th className="w-36 px-4 py-3 font-bold">
+                                                Category
+                                            </th>
+                                            <th className="w-40 px-4 py-3 font-bold">
+                                                Subcategory
+                                            </th>
+                                            <th className="w-28 px-4 py-3 font-bold">
+                                                Status
+                                            </th>
+                                            <th className="w-32 px-4 py-3 text-right font-bold">
+                                                Actions
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-border">
+                                        {paginatedQuestions.map((q) => (
+                                            <tr
+                                                key={q.id}
+                                                className={`transition hover:bg-muted/40 ${
+                                                    selectedIds.has(q.id)
+                                                        ? 'bg-blue-50/50 dark:bg-blue-950/20'
+                                                        : ''
+                                                }`}
+                                            >
+                                                <td className="w-12 px-4 py-3 text-center">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={selectedIds.has(
+                                                            q.id,
+                                                        )}
+                                                        onChange={(e) =>
+                                                            handleSelectOne(
+                                                                q.id,
+                                                                e.target
+                                                                    .checked,
+                                                            )
+                                                        }
+                                                        className="size-4 cursor-pointer accent-blue-600"
+                                                    />
+                                                </td>
+                                                <td className="w-16 px-4 py-3 font-bold text-muted-foreground">
+                                                    #{q.id}
+                                                </td>
+                                                <td className="min-w-[400px] px-4 py-3">
+                                                    <div className="flex items-center gap-2">
+                                                        <div className="line-clamp-1 font-bold text-foreground">
+                                                            {getCleanStemText(
+                                                                q.stem,
+                                                            )}
+                                                        </div>
+                                                        {hasSvgContent(
+                                                            q.stem,
+                                                        ) && (
+                                                            <button
+                                                                type="button"
+                                                                onClick={() =>
+                                                                    setPreviewQuestion(
+                                                                        q,
+                                                                    )
+                                                                }
+                                                                className="inline-flex shrink-0 cursor-pointer items-center gap-1 rounded border border-blue-200 bg-blue-50 px-1.5 py-0.5 text-[9px] font-extrabold text-blue-700 transition hover:bg-blue-100 dark:border-blue-900/40 dark:bg-blue-950/40 dark:text-blue-300 dark:hover:bg-blue-900/50"
+                                                                title="Quick preview diagram"
+                                                            >
+                                                                <FileImage className="size-3" />
+                                                                <span>
+                                                                    Diagram
+                                                                </span>
+                                                            </button>
+                                                        )}
+                                                    </div>
+                                                    {/* Sub-line under main question stem (Options & Answer) */}
+                                                    <div className="mt-0.5 line-clamp-1 text-[11px] text-muted-foreground">
+                                                        {q.options && q.options.length > 0 ? (
+                                                            (() => {
+                                                                const choicesStr = q.options.map((opt, i) => {
+                                                                    const rawText = typeof opt === 'string' ? opt : (opt.option_text || '');
+                                                                    const cleanText = rawText ? String(rawText).replace(/<[^>]+>/g, '').trim() : '';
+                                                                    return `${String.fromCharCode(65 + i)}) ${cleanText}`;
+                                                                }).join(' • ');
+                                                                return choicesStr;
+                                                            })()
+                                                        ) : (
+                                                            <span className="text-red-400 italic">No options found for this question (Possible cache issue)</span>
+                                                        )}
+                                                    </div>
+                                                </td>
+                                                <td className="w-36 px-4 py-3">
+                                                    <span
+                                                        className={`inline-flex max-w-[130px] truncate rounded-md border px-2 py-0.5 text-[9px] font-extrabold tracking-wide uppercase ${getCategoryStyles(q.category)}`}
+                                                    >
+                                                        {q.category}
+                                                    </span>
+                                                </td>
+                                                <td className="w-40 px-4 py-3">
+                                                    <span className="inline-block max-w-[140px] truncate rounded-full border border-blue-100 bg-blue-50 px-2 py-0.5 text-[9px] font-semibold text-blue-700 dark:border-blue-900/30 dark:bg-blue-950/30 dark:text-blue-300">
+                                                        {q.subcategory}
+                                                    </span>
+                                                </td>
+                                                <td className="px-4 py-3">
+                                                    <span
+                                                        className={`inline-flex items-center gap-1 rounded-md border px-2 py-0.5 text-[9px] font-extrabold uppercase ${
+                                                            q.status ===
+                                                            'ACTIVE'
+                                                                ? 'border-emerald-100 bg-emerald-50 text-emerald-700 dark:border-emerald-900/30 dark:bg-emerald-950/30 dark:text-emerald-400'
+                                                                : 'border-blue-100 bg-blue-50 text-blue-700 dark:border-blue-900/30 dark:bg-blue-950/30 dark:text-blue-400'
+                                                        }`}
+                                                    >
+                                                        {q.status === 'ACTIVE'
+                                                            ? 'Active'
+                                                            : 'Draft'}
+                                                    </span>
+                                                </td>
+                                                <td className="px-4 py-3 text-right">
+                                                    <div className="flex items-center justify-end gap-1">
+                                                        <TooltipProvider
+                                                            delayDuration={150}
+                                                        >
+                                                            <Tooltip>
+                                                                <TooltipTrigger
+                                                                    asChild
+                                                                >
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={() =>
+                                                                            setPreviewQuestion(
+                                                                                q,
+                                                                            )
+                                                                        }
+                                                                        className="cursor-pointer rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted hover:text-blue-600 dark:text-blue-400"
+                                                                    >
+                                                                        <FileImage className="size-4" />
+                                                                    </button>
+                                                                </TooltipTrigger>
+                                                                <TooltipContent>
+                                                                    Quick preview
+                                                                </TooltipContent>
+                                                            </Tooltip>
+                                                            <Tooltip>
+                                                                <TooltipTrigger
+                                                                    asChild
+                                                                >
+                                                                    <Link
+                                                                        href={`${questionsShow(q.id).url}?page=${currentPage}`}
+                                                                        className="cursor-pointer rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted hover:text-blue-600 dark:text-blue-400"
+                                                                    >
+                                                                        <Eye className="size-4" />
+                                                                    </Link>
+                                                                </TooltipTrigger>
+                                                                <TooltipContent>
+                                                                    Full details
+                                                                </TooltipContent>
+                                                            </Tooltip>
+                                                            <Tooltip>
+                                                                <TooltipTrigger
+                                                                    asChild
+                                                                >
+                                                                    <Link
+                                                                        href={`${questionsEdit(q.id).url}?page=${currentPage}`}
+                                                                        className="cursor-pointer rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted hover:text-blue-600 dark:text-blue-400"
+                                                                    >
+                                                                        <Edit2 className="size-4" />
+                                                                    </Link>
+                                                                </TooltipTrigger>
+                                                                <TooltipContent>
+                                                                    Edit
+                                                                    question
+                                                                </TooltipContent>
+                                                            </Tooltip>
+                                                            <Tooltip>
+                                                                <TooltipTrigger
+                                                                    asChild
+                                                                >
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={() =>
+                                                                            promptDelete(
+                                                                                q.id,
+                                                                            )
+                                                                        }
+                                                                        className="cursor-pointer rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted hover:text-red-600"
+                                                                    >
+                                                                        <Trash2 className="size-4" />
+                                                                    </button>
+                                                                </TooltipTrigger>
+                                                                <TooltipContent>
+                                                                    Delete
+                                                                    question
+                                                                </TooltipContent>
+                                                            </Tooltip>
+                                                        </TooltipProvider>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        ) : (
+                            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
                             {paginatedQuestions.map((q) => (
                                 <div
                                     key={q.id}
@@ -639,27 +911,38 @@ export default function QuestionsIndex({
                                             <div className="space-y-1">
                                                 {q.options
                                                     .slice(0, 2)
-                                                    .map((opt, idx) => (
-                                                        <div
-                                                            key={idx}
-                                                            className={`flex items-center gap-1.5 rounded-lg px-2 py-1 text-[10px] leading-tight ${
-                                                                q.correct_option ===
-                                                                idx
-                                                                    ? 'bg-emerald-50 font-semibold text-emerald-900 dark:bg-emerald-950/30 dark:text-emerald-300'
-                                                                    : 'bg-muted text-muted-foreground'
-                                                            }`}
-                                                        >
-                                                            <span className="font-bold">
-                                                                {String.fromCharCode(
-                                                                    65 + idx,
-                                                                )}
-                                                                .
-                                                            </span>
-                                                            <span className="line-clamp-1">
-                                                                {opt}
-                                                            </span>
-                                                        </div>
-                                                    ))}
+                                                    .map((opt, idx) => {
+                                                        const rawText = typeof opt === 'string' ? opt : opt.option_text;
+                                                        const text = rawText ? String(rawText).replace(/<[^>]+>/g, '').trim() : '';
+                                                        const isCorrect =
+                                                            typeof opt ===
+                                                            'object'
+                                                                ? opt.is_correct
+                                                                : q.correct_option ===
+                                                                  idx;
+
+                                                        return (
+                                                            <div
+                                                                key={idx}
+                                                                className={`flex items-center gap-1.5 rounded-lg px-2 py-1 text-[10px] leading-tight ${
+                                                                    isCorrect
+                                                                        ? 'bg-emerald-50 font-semibold text-emerald-900 dark:bg-emerald-950/30 dark:text-emerald-300'
+                                                                        : 'bg-muted text-muted-foreground'
+                                                                }`}
+                                                            >
+                                                                <span className="font-bold">
+                                                                    {String.fromCharCode(
+                                                                        65 +
+                                                                            idx,
+                                                                    )}
+                                                                    .
+                                                                </span>
+                                                                <span className="line-clamp-1">
+                                                                    {text}
+                                                                </span>
+                                                            </div>
+                                                        );
+                                                    })}
                                                 {q.options.length > 2 && (
                                                     <div className="text-[10px] text-muted-foreground">
                                                         +{q.options.length - 2}{' '}
@@ -722,6 +1005,7 @@ export default function QuestionsIndex({
                                 </div>
                             ))}
                         </div>
+                        )}
 
                         {/* Pagination */}
                         {filteredQuestions.length > pageSize && (
@@ -871,6 +1155,111 @@ export default function QuestionsIndex({
                     bulkActionModal.action === 'delete' ? 'danger' : 'success'
                 }
             />
+
+            {/* Quick Preview Modal */}
+            <Dialog
+                open={!!previewQuestion}
+                onOpenChange={(open) => !open && setPreviewQuestion(null)}
+            >
+                <DialogContent className="max-w-3xl overflow-y-auto max-h-[85vh]">
+                    {previewQuestion && (
+                        <>
+                            <DialogHeader>
+                                <div className="flex flex-wrap items-center gap-2">
+                                    <DialogTitle className="text-base font-bold text-foreground">
+                                        Question #{previewQuestion.id} Preview
+                                    </DialogTitle>
+                                    <span
+                                        className={`inline-flex rounded-md border px-2 py-0.5 text-[9px] font-extrabold tracking-wide uppercase ${getCategoryStyles(previewQuestion.category)}`}
+                                    >
+                                        {previewQuestion.category}
+                                    </span>
+                                    <span className="rounded-full border border-blue-100 bg-blue-50 px-2 py-0.5 text-[9px] font-semibold text-blue-700 dark:border-blue-900/30 dark:bg-blue-950/30 dark:text-blue-300">
+                                        {previewQuestion.subcategory}
+                                    </span>
+                                </div>
+                            </DialogHeader>
+
+                            <div className="flex flex-col gap-4 py-2">
+                                <div className="rounded-xl border border-border bg-card p-4">
+                                    <div className="text-sm font-medium leading-relaxed text-foreground">
+                                        {renderFormattedText(
+                                            previewQuestion.stem,
+                                        )}
+                                    </div>
+                                </div>
+
+                                {previewQuestion.options &&
+                                    previewQuestion.options.length > 0 && (
+                                        <div className="flex flex-col gap-2">
+                                            <span className="text-xs font-bold text-muted-foreground uppercase">
+                                                Answer Options
+                                            </span>
+                                            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                                                {previewQuestion.options.map(
+                                                    (
+                                                        opt: QuestionOption,
+                                                        idx: number,
+                                                    ) => (
+                                                        <div
+                                                            key={idx}
+                                                            className={`flex items-start gap-2 rounded-lg border p-3 text-xs ${
+                                                                opt.is_correct
+                                                                    ? 'border-emerald-300 bg-emerald-50/50 text-emerald-900 dark:border-emerald-900/40 dark:bg-emerald-950/20 dark:text-emerald-300'
+                                                                    : 'border-border bg-background text-foreground'
+                                                            }`}
+                                                        >
+                                                            <span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-muted text-[10px] font-black">
+                                                                {String.fromCharCode(
+                                                                    65 + idx,
+                                                                )}
+                                                            </span>
+                                                            <span className="font-medium">
+                                                                {opt.option_text}
+                                                            </span>
+                                                            {opt.is_correct && (
+                                                                <span className="ml-auto rounded bg-emerald-600 px-1.5 py-0.5 text-[9px] font-black text-white">
+                                                                    Correct
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                    ),
+                                                )}
+                                            </div>
+                                        </div>
+                                    )}
+
+                                {previewQuestion.explanation && (
+                                    <div className="rounded-lg border border-amber-200 bg-amber-50/50 p-3 text-xs text-amber-900 dark:border-amber-900/30 dark:bg-amber-950/20 dark:text-amber-300">
+                                        <span className="font-bold">
+                                            Explanation:{' '}
+                                        </span>
+                                        {previewQuestion.explanation}
+                                    </div>
+                                )}
+                            </div>
+
+                            <div className="flex items-center justify-end gap-2 pt-2 border-t border-border">
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => setPreviewQuestion(null)}
+                                >
+                                    Close
+                                </Button>
+                                <Link
+                                    href={`${questionsEdit(previewQuestion.id).url}?page=${currentPage}`}
+                                >
+                                    <Button size="sm">
+                                        <Edit2 className="mr-1.5 size-3.5" />
+                                        Edit Question
+                                    </Button>
+                                </Link>
+                            </div>
+                        </>
+                    )}
+                </DialogContent>
+            </Dialog>
         </>
     );
 }

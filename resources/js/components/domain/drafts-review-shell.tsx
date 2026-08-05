@@ -9,6 +9,9 @@ import {
     ListChecks,
     Inbox,
     ChevronLeft,
+    LayoutGrid,
+    Table,
+    RotateCcw,
 } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
 import { PageContainer } from '@/components/layout/page-container';
@@ -57,6 +60,7 @@ interface DraftsReviewShellProps<T extends BaseDraftItem> {
     emptyStateActionLabel: string;
     emptyStateActionIcon?: React.ComponentType<any>;
     renderItem: (item: T) => React.ReactNode;
+    renderTableView?: (items: T[]) => React.ReactNode;
 }
 
 export function DraftsReviewShell<T extends BaseDraftItem>({
@@ -78,6 +82,7 @@ export function DraftsReviewShell<T extends BaseDraftItem>({
     emptyStateActionLabel,
     emptyStateActionIcon: EmptyStateActionIcon = ListChecks,
     renderItem,
+    renderTableView,
 }: DraftsReviewShellProps<T>) {
     // Build categories tree dynamically with robust static CSC fallback
     const cseCategoriesTree: Record<string, string[]> = {};
@@ -118,6 +123,7 @@ export function DraftsReviewShell<T extends BaseDraftItem>({
     }
 
     // Filtering & Pagination States
+    const [viewMode, setViewMode] = useState<'cards' | 'table'>('table');
     const [filterSearch, setFilterSearch] = useState('');
     const [debouncedFilterSearch, setDebouncedFilterSearch] = useState('');
     const [filterStatus, setFilterStatus] = useState<
@@ -126,7 +132,7 @@ export function DraftsReviewShell<T extends BaseDraftItem>({
     const [filterCategory, setFilterCategory] = useState<string>('all');
     const [filterSubcategory, setFilterSubcategory] = useState<string>('all');
     const [currentPage, setCurrentPage] = useState(1);
-    const pageSize = 5;
+    const pageSize = 10;
     const tableRef = React.useRef<HTMLDivElement>(null);
 
     const handlePageChange = (page: number) => {
@@ -364,6 +370,59 @@ export function DraftsReviewShell<T extends BaseDraftItem>({
                             <ChevronDown className="text-slate-550 pointer-events-none absolute top-1/2 right-2.5 size-3.5 -translate-y-1/2" />
                         </div>
 
+                        {/* Reset Filters button if any active */}
+                        {(filterSearch !== '' ||
+                            filterCategory !== 'all' ||
+                            filterSubcategory !== 'all' ||
+                            filterStatus !== 'all') && (
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    setFilterSearch('');
+                                    setFilterCategory('all');
+                                    setFilterSubcategory('all');
+                                    setFilterStatus('all');
+                                    setCurrentPage(1);
+                                }}
+                                className="flex cursor-pointer items-center gap-1 rounded-lg border border-red-200 bg-red-50 px-2.5 py-1 text-xs font-bold text-red-700 transition hover:bg-red-100 dark:border-red-900/30 dark:bg-red-950/30 dark:text-red-400"
+                            >
+                                <RotateCcw className="size-3" />
+                                Reset Filters
+                            </button>
+                        )}
+
+                        {/* View Mode Toggle */}
+                        {renderTableView && (
+                            <div className="inline-flex rounded-lg border border-border bg-muted p-0.5">
+                                <button
+                                    type="button"
+                                    onClick={() => setViewMode('table')}
+                                    title="Table View"
+                                    className={`flex cursor-pointer items-center gap-1.5 rounded-md px-2 py-1 transition ${
+                                        viewMode === 'table'
+                                            ? 'bg-card text-foreground shadow-xs'
+                                            : 'text-muted-foreground hover:text-foreground'
+                                    }`}
+                                >
+                                    <Table className="size-3.5" />
+                                    <span className="text-xs font-bold">Table</span>
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => setViewMode('cards')}
+                                    title="Card Grid View"
+                                    className={`flex cursor-pointer items-center gap-1.5 rounded-md px-2 py-1 transition ${
+                                        viewMode === 'cards'
+                                            ? 'bg-card text-foreground shadow-xs'
+                                            : 'text-muted-foreground hover:text-foreground'
+                                    }`}
+                                >
+                                    <LayoutGrid className="size-3.5" />
+                                    <span className="text-xs font-bold">Cards</span>
+                                </button>
+                            </div>
+                        )}
+
                         <span className="shrink-0 pl-1 text-xs font-bold text-muted-foreground">
                             {filteredDrafts.length} found
                         </span>
@@ -456,9 +515,13 @@ export function DraftsReviewShell<T extends BaseDraftItem>({
                 ) : (
                     /* LIST OF DRAFTS WITH PAGINATION */
                     <div className="flex flex-col gap-3 sm:gap-6">
-                        <div className="flex flex-col gap-3 sm:gap-6">
-                            {paginatedDrafts.map((item) => renderItem(item))}
-                        </div>
+                        {viewMode === 'cards' || !renderTableView ? (
+                            <div className="flex flex-col gap-3 sm:gap-6">
+                                {paginatedDrafts.map((item) => renderItem(item))}
+                            </div>
+                        ) : (
+                            renderTableView(paginatedDrafts)
+                        )}
 
                         {/* Pagination bar */}
                         {filteredDrafts.length > 0 && (
