@@ -36,7 +36,7 @@ const modes = [
                 text: 'Works offline — no external service dependency',
             },
         ],
-        badge: 'Recommended',
+        badge: 'Fast',
     },
     {
         value: 'ai' as const,
@@ -44,11 +44,11 @@ const modes = [
         icon: Sparkles,
         color: 'indigo',
         description:
-            'Get a richer, AI-written coaching report — refreshed once per week.',
+            'Get a richer, AI-written coaching report powered by AI.',
         features: [
             {
                 icon: Clock,
-                text: 'Regenerates once every 7 days to save API resources',
+                text: 'Regenerates automatically whenever you complete an exam',
             },
             {
                 icon: Sparkles,
@@ -63,7 +63,7 @@ const modes = [
                 text: 'Requires active AI service — falls back to Instant if unavailable',
             },
         ],
-        badge: 'Premium',
+        badge: 'Recommended',
     },
 ];
 

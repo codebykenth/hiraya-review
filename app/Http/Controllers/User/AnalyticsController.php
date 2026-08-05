@@ -349,14 +349,15 @@ class AnalyticsController
 
         // Handle AI Predictor stats on index
         $analysis = UserAiAnalysis::where('user_id', $userId)->first();
-        $latestAttemptId = ExamAttempt::where('user_id', $userId)->latest()->value('id');
+        $latestMockAttemptId = ExamAttempt::where('user_id', $userId)->whereNull('category_id')->latest()->value('id');
+        $latestAttemptId = $latestMockAttemptId ?: ExamAttempt::where('user_id', $userId)->latest()->value('id');
 
         $analysisStatus = 'no_data';
         $analysisData = null;
 
-        // Per-user analysis mode (default: instant). AI only if user chose it AND server enables it.
-        $userMode = Cache::get("user-analysis-mode-{$userId}", 'instant');
-        $useAi = $userMode === 'ai' && config('services.ai.analysis_enabled');
+        // Per-user analysis mode (default: ai). AI only if user chose it AND server enables it.
+        $userMode = Cache::get("user-analysis-mode-{$userId}", 'ai');
+        $useAi = $userMode === 'ai' && config('services.ai.analysis_enabled') && $latestMockAttemptId;
 
         if ($latestAttemptId) {
             $cacheKey = "ai-analysis-generating-{$userId}";
@@ -367,18 +368,19 @@ class AnalyticsController
                 $analysisStatus = 'ready';
                 $analysisData = $deterministicService->generate($userId, $latestAttemptId);
             } else {
+                $targetAttemptId = $latestMockAttemptId;
                 if (! $analysis) {
                     if (! Cache::has($cacheKey) && ! Cache::has($failKey)) {
                         Cache::put($cacheKey, true, 60);
-                        GenerateUserAnalysisJob::dispatchAfterResponse($userId, $latestAttemptId);
+                        GenerateUserAnalysisJob::dispatchAfterResponse($userId, $targetAttemptId);
                     }
                     $analysisStatus = 'generating';
                 } else {
-                    if ($analysis->last_exam_attempt_id !== $latestAttemptId) {
+                    if ($analysis->last_exam_attempt_id !== $targetAttemptId) {
                         if (! Cache::has($failKey)) {
                             if (! Cache::has($cacheKey)) {
                                 Cache::put($cacheKey, true, 60);
-                                GenerateUserAnalysisJob::dispatchAfterResponse($userId, $latestAttemptId);
+                                GenerateUserAnalysisJob::dispatchAfterResponse($userId, $targetAttemptId);
                             }
                             $analysisStatus = 'generating';
                         } else {
@@ -479,20 +481,23 @@ class AnalyticsController
         }
 
         $analysis = UserAiAnalysis::where('user_id', $userId)->first();
-        $latestAttemptId = ExamAttempt::where('user_id', $userId)->latest()->value('id');
+        $latestMockAttemptId = ExamAttempt::where('user_id', $userId)->whereNull('category_id')->latest()->value('id');
+        $latestAttemptId = $latestMockAttemptId ?: ExamAttempt::where('user_id', $userId)->latest()->value('id');
 
         $status = 'no_data';
         $data = null;
 
-        // Per-user analysis mode (default: instant). AI only if user chose it AND server enables it.
-        $userMode = Cache::get("user-analysis-mode-{$userId}", 'instant');
-        $useAi = $userMode === 'ai' && config('services.ai.analysis_enabled');
+        // Per-user analysis mode (default: ai). AI only if user chose it AND server enables it.
+        $userMode = Cache::get("user-analysis-mode-{$userId}", 'ai');
+        $useAi = $userMode === 'ai' && config('services.ai.analysis_enabled') && $latestMockAttemptId;
 
         if ($latestAttemptId) {
             $cacheKey = "ai-analysis-generating-{$userId}";
             $failKey = "ai-analysis-failed-{$userId}";
 
-            if ($request->has('delete')) {
+            $isAdminOrLocal = app()->environment('local') || $request->user()?->role === 'admin';
+
+            if ($isAdminOrLocal && $request->has('delete')) {
                 UserAiAnalysis::where('user_id', $userId)->delete();
                 Cache::forget($cacheKey);
                 Cache::forget($failKey);
@@ -500,7 +505,7 @@ class AnalyticsController
                 return redirect('/analytics/ai-analysis');
             }
 
-            if ($request->has('retry')) {
+            if ($isAdminOrLocal && $request->has('retry')) {
                 Cache::forget($cacheKey);
                 Cache::forget($failKey);
 

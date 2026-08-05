@@ -23,7 +23,8 @@ class DeterministicAnalysisService
 
     public function generate(int $userId, int $latestAttemptId, bool $singleAttemptOnly = false): array
     {
-        $allAttempts = ExamAttempt::where('user_id', $userId)->orderBy('created_at', 'asc')->get();
+        // Limit evaluation to the latest 10 attempts to reflect current readiness rather than stale historical scores
+        $allAttempts = ExamAttempt::where('user_id', $userId)->latest()->take(10)->get()->reverse()->values();
 
         if ($allAttempts->isEmpty()) {
             return $this->getEmptyAnalysis();
@@ -297,29 +298,45 @@ class DeterministicAnalysisService
             $examDateStr = 'August 9, 2026';
         }
 
-        // Calculate pass probability (simple heuristic)
-        $passProbability = (int) round($avgScore * 0.9);
-        if ($trend === 'improving') {
-            $passProbability = min(98, $passProbability + 5);
-        } elseif ($trend === 'declining') {
-            $passProbability = max(5, $passProbability - 8);
-        }
-        $passProbability = max(0, min(100, $passProbability));
+        // Calculate pass probability (simple heuristic) - strictly based on Mock Exams (Professional/Subprofessional)
+        if ($mockExamCount > 0 && $mockTotalQuestions > 0) {
+            $mockAvg = (int) round(($mockTotalCorrect / $mockTotalQuestions) * 100);
+            $passProbability = (int) round($mockAvg * 0.9);
+            if ($trend === 'improving') {
+                $passProbability = min(98, $passProbability + 5);
+            } elseif ($trend === 'declining') {
+                $passProbability = max(5, $passProbability - 8);
+            }
+            $passProbability = max(0, min(100, $passProbability));
 
-        // Predictive Metrics
-        $estimatedMin = max(0, $avgScore - 4);
-        $estimatedMax = min(100, $avgScore + 4);
-        $estimatedExamScore = "{$estimatedMin}% - {$estimatedMax}% predicted actual score";
+            $estimatedMin = max(0, $mockAvg - 4);
+            $estimatedMax = min(100, $mockAvg + 4);
+            $estimatedExamScore = "{$estimatedMin}% - {$estimatedMax}% predicted actual score";
 
-        $daysToReadiness = $this->pickTemplate($avgScore < 60 ? 'readiness_low' : ($avgScore >= 80 ? 'readiness_high' : 'readiness_mid'), []);
+            if ($daysUntilExam !== null && $daysUntilExam <= 7) {
+                if ($daysUntilExam <= 1) {
+                    $daysToReadiness = "Final 24-hour crunch review before exam day ({$examDateStr}).";
+                } else {
+                    $daysToReadiness = "Urgent {$daysUntilExam}-day final sprint review before exam day ({$examDateStr}).";
+                }
+            } else {
+                $daysToReadiness = $this->pickTemplate($mockAvg < 60 ? 'readiness_low' : ($mockAvg >= 80 ? 'readiness_high' : 'readiness_mid'), []);
+            }
 
-        $completionPace = $this->pickTemplate('completion_pace_'.$trend, compact('totalAttempts'));
-        $mockPassConfidence = 'moderate';
-        if ($avgScore >= 80) {
-            $mockPassConfidence = 'high';
-        } elseif ($avgScore < 60) {
+            $mockPassConfidence = 'moderate';
+            if ($mockAvg >= 80) {
+                $mockPassConfidence = 'high';
+            } elseif ($mockAvg < 60) {
+                $mockPassConfidence = 'low';
+            }
+        } else {
+            $passProbability = 0;
+            $estimatedExamScore = 'Complete a Mock Exam to unlock score prediction';
+            $daysToReadiness = 'Complete a Mock Exam to estimate readiness timeline';
             $mockPassConfidence = 'low';
         }
+
+        $completionPace = $this->pickTemplate('completion_pace_'.$trend, compact('totalAttempts'));
 
         // Remediation matrix & recommendations
         $subcategories = Subcategory::with('category')->get();
@@ -429,7 +446,16 @@ class DeterministicAnalysisService
             'mockExamCount', 'passingRate', 'trend'
         );
 
-        $verdict = $this->pickTemplate("verdict_{$scoreTier}", $templateVars);
+        if ($mockExamCount === 0) {
+            if ($allTotalQuestions > 0) {
+                $verdict = $this->pickTemplate('verdict_no_mock', $templateVars);
+            } else {
+                $verdict = $this->pickTemplate('verdict_empty', []);
+            }
+        } else {
+            $verdict = $this->pickTemplate("verdict_{$scoreTier}", $templateVars);
+        }
+
         $encouragement = $this->pickTemplate("encouragement_{$scoreTier}_{$trend}", $templateVars)
             ?? $this->pickTemplate("encouragement_{$scoreTier}", $templateVars);
         $priorityAction = count($recommendedModules) > 0
@@ -574,6 +600,11 @@ class DeterministicAnalysisService
                 'No exam attempts recorded yet. Complete your first mock exam or drill to unlock personalized analytics.',
                 'Your performance dashboard is waiting for data — take a practice exam to get started.',
                 'Start your first review session to unlock detailed readiness insights and study recommendations.',
+            ],
+            'verdict_no_mock' => [
+                'You\'ve completed practice drills, but haven\'t taken a full Mock Exam yet. Complete a Professional or Sub-Professional Mock Exam to unlock your official CSE Passing Probability.',
+                'Drill performance recorded! To unlock an accurate pass probability and exam score prediction, complete at least one full Mock Exam.',
+                'Great effort on practice drills. Complete a full-length simulation exam (Professional or Sub-Professional) to calculate your overall exam readiness.',
             ],
 
             // ── Encouragement (by score tier + trend) ─────────────

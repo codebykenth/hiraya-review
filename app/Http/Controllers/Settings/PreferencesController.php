@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Settings;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Settings\UpdatePreferencesRequest;
+use App\Jobs\GenerateUserAnalysisJob;
 use App\Models\ExamAttempt;
 use App\Models\UserAiAnalysis;
 use App\Services\DeterministicAnalysisService;
@@ -21,7 +22,7 @@ class PreferencesController extends Controller
     public function edit(Request $request): Response
     {
         $userId = $request->user()->id;
-        $analysisMode = Cache::get("user-analysis-mode-{$userId}", 'instant');
+        $analysisMode = Cache::get("user-analysis-mode-{$userId}", 'ai');
         $aiAvailable = (bool) config('services.ai.analysis_enabled');
 
         return Inertia::render('settings/preferences', [
@@ -52,6 +53,15 @@ class PreferencesController extends Controller
                         'analysis_json' => $deterministicService->generate($userId, $latestAttemptId),
                     ]
                 );
+            }
+        } elseif ($mode === 'ai') {
+            $latestMockAttemptId = ExamAttempt::where('user_id', $userId)->whereNull('category_id')->latest()->value('id');
+            if ($latestMockAttemptId && config('services.ai.analysis_enabled')) {
+                UserAiAnalysis::where('user_id', $userId)->delete();
+                Cache::forget("ai-analysis-failed-{$userId}");
+                Cache::forget("ai-analysis-generating-{$userId}");
+                Cache::put("ai-analysis-generating-{$userId}", true, 60);
+                GenerateUserAnalysisJob::dispatchAfterResponse($userId, $latestMockAttemptId);
             }
         }
 

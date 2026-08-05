@@ -52,12 +52,31 @@ export default function AiReadinessCard({
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const data = aiAnalysis?.data;
 
+    const [progress, setProgress] = useState(15);
+
     const [prevInitialStatus, setPrevInitialStatus] = useState(initialStatus);
 
     if (initialStatus !== prevInitialStatus) {
         setPrevInitialStatus(initialStatus);
         setLocalStatus(initialStatus);
     }
+
+    useEffect(() => {
+        if (localStatus !== 'generating') {
+            setProgress(15);
+            return;
+        }
+
+        const interval = setInterval(() => {
+            setProgress((prev) => {
+                if (prev >= 92) return 92;
+                const step = Math.floor(Math.random() * 8) + 4;
+                return Math.min(prev + step, 92);
+            });
+        }, 400);
+
+        return () => clearInterval(interval);
+    }, [localStatus]);
 
     useEffect(() => {
         if (localStatus !== 'generating' || !auth?.user?.id || !pusher?.key) {
@@ -81,6 +100,7 @@ export default function AiReadinessCard({
         const channel = echo.private(`App.Models.User.${auth.user.id}`);
 
         channel.listen('.ai-analysis-ready', () => {
+            setProgress(100);
             router.reload({ only: ['aiAnalysis'] });
         });
 
@@ -130,10 +150,10 @@ export default function AiReadinessCard({
                     </div>
                     <div>
                         <Link
-                            href="/analytics/ai-analysis?retry=1"
+                            href="/exams"
                             className="group inline-flex items-center gap-1 rounded-lg bg-blue-600 px-3 py-1 text-xs font-extrabold text-white transition transition-all duration-300 hover:bg-blue-700 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95"
                         >
-                            Retry &rarr;
+                            Take Exam &rarr;
                         </Link>
                     </div>
                 </div>
@@ -177,17 +197,47 @@ export default function AiReadinessCard({
     }
 
     if (localStatus === 'generating') {
+        const radius = 28;
+        const circumference = 2 * Math.PI * radius;
+        const strokeDashoffset =
+            circumference - (progress / 100) * circumference;
+
         return (
             <div className={containerClasses}>
                 {/* Background decorative glows */}
                 <div className="pointer-events-none absolute -top-24 -right-24 h-48 w-48 rounded-full bg-blue-500/5 blur-3xl dark:bg-blue-500/10" />
 
-                <div className="flex flex-col items-center justify-center gap-4 py-4 text-center sm:py-8">
-                    <div className="relative flex items-center justify-center">
-                        <div className="absolute size-16 animate-ping rounded-full border border-blue-200 dark:border-blue-500/20 dark:border-blue-900/50" />
-                        <div className="flex size-14 items-center justify-center rounded-full border border-blue-200 bg-blue-50 text-blue-600 dark:border-blue-500/30 dark:border-blue-900/50 dark:bg-blue-500/10 dark:bg-blue-950/30 dark:text-blue-400">
-                            <Loader2 className="size-7 animate-spin" />
-                        </div>
+                <div className="flex flex-col items-center justify-center gap-4 py-4 text-center sm:py-6">
+                    <div className="relative flex size-18 items-center justify-center">
+                        <svg
+                            className="absolute inset-0 size-full -rotate-90"
+                            viewBox="0 0 72 72"
+                        >
+                            <circle
+                                cx="36"
+                                cy="36"
+                                r={radius}
+                                stroke="currentColor"
+                                strokeWidth="5"
+                                fill="transparent"
+                                className="text-blue-100 dark:text-blue-950/50"
+                            />
+                            <circle
+                                cx="36"
+                                cy="36"
+                                r={radius}
+                                stroke="currentColor"
+                                strokeWidth="5"
+                                fill="transparent"
+                                strokeDasharray={circumference}
+                                strokeDashoffset={strokeDashoffset}
+                                strokeLinecap="round"
+                                className="text-blue-600 transition-all duration-300 ease-out dark:text-blue-400"
+                            />
+                        </svg>
+                        <span className="text-xs font-black tracking-tight text-blue-600 dark:text-blue-400">
+                            {progress}%
+                        </span>
                     </div>
                     <div>
                         <h3 className="text-xl font-black tracking-tight text-slate-900 dark:text-white">
@@ -197,8 +247,8 @@ export default function AiReadinessCard({
                         </h3>
                         <p className="mt-1.5 max-w-2xl text-base leading-relaxed text-slate-500 dark:text-slate-400">
                             {analysisMode === 'ai'
-                                ? 'Our AI is analyzing your answers, calculating scores, and crafting your readiness report. This takes only a few seconds...'
-                                : 'Our algorithms are analyzing your answers and calculating your readiness report. This takes only a few seconds...'}
+                                ? 'Our AI is evaluating your answers, calculating scores, and crafting your readiness report...'
+                                : 'Our algorithms are evaluating your answers and calculating your readiness report...'}
                         </p>
                     </div>
                 </div>
@@ -275,7 +325,7 @@ export default function AiReadinessCard({
                                     {analysisMode === 'ai' ? (
                                         <>
                                             <Sparkles className="size-2.5" /> AI
-                                            Weekly
+                                            Powered
                                         </>
                                     ) : (
                                         <>

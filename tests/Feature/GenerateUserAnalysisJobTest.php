@@ -169,7 +169,7 @@ test('GenerateUserAnalysisJob falls back to deterministic generation when keys a
 
     $attempt = ExamAttempt::create([
         'user_id' => $user->id,
-        'category_id' => $category->id,
+        'category_id' => null,
         'question_ids' => [1],
         'answers' => [1 => 0],
         'cat_scores' => [
@@ -177,7 +177,7 @@ test('GenerateUserAnalysisJob falls back to deterministic generation when keys a
                 'Numerical Ability' => ['correct' => 1, 'total' => 1],
             ],
             'metadata' => [
-                'track' => 'Drill',
+                'track' => 'Professional',
                 'category_name' => 'Numerical Ability',
                 'correct_count' => 1,
                 'total_questions' => 1,
@@ -203,4 +203,39 @@ test('GenerateUserAnalysisJob falls back to deterministic generation when keys a
 
     expect($analysis['pass_probability'])->toBeGreaterThan(0);
     expect($analysis['verdict'])->not->toBeEmpty();
+});
+
+test('GenerateUserAnalysisJob sets pass_probability to 0 when user has only completed drills', function () {
+    $user = User::factory()->create();
+
+    $attempt = ExamAttempt::create([
+        'user_id' => $user->id,
+        'category_id' => 1,
+        'question_ids' => [1],
+        'answers' => [1 => 0],
+        'cat_scores' => [
+            'categoryScoreMap' => [
+                'Verbal Ability' => ['correct' => 1, 'total' => 1],
+            ],
+            'metadata' => [
+                'track' => 'Drill',
+                'category_name' => 'Verbal Ability',
+                'correct_count' => 1,
+                'total_questions' => 1,
+                'duration_secs' => 60,
+            ],
+        ],
+    ]);
+
+    config(['services.groq.key' => null]);
+    config(['services.gemini.key' => null]);
+
+    $job = new GenerateUserAnalysisJob($user->id, $attempt->id);
+    $job->handle();
+
+    $cached = UserAiAnalysis::where('user_id', $user->id)->first();
+    $analysis = $cached->analysis_json;
+
+    expect($analysis['pass_probability'])->toBe(0);
+    expect($analysis['verdict'])->toContain('Mock Exam');
 });

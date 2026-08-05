@@ -33,30 +33,29 @@ class GenerateUserAnalysisJob implements ShouldQueue
         set_time_limit(300);
         Log::info("GenerateUserAnalysisJob: Started for user {$this->userId} with attempt {$this->latestAttemptId}");
 
-        $deterministicService = new DeterministicAnalysisService;
-        $deterministicData = $deterministicService->generate($this->userId, $this->latestAttemptId);
+        try {
+            $deterministicService = new DeterministicAnalysisService;
+            $deterministicData = $deterministicService->generate($this->userId, $this->latestAttemptId);
 
-        $groqKey = config('services.groq.key') ?: env('GROQ_API_KEY');
-        $geminiKey = config('services.gemini.key') ?: env('GEMINI_API_KEY');
-        $aiAnalysisEnabled = config('services.ai.analysis_enabled');
+            $groqKey = config('services.groq.key') ?: env('GROQ_API_KEY');
+            $geminiKey = config('services.gemini.key') ?: env('GEMINI_API_KEY');
+            $aiAnalysisEnabled = config('services.ai.analysis_enabled');
 
-        if (! $aiAnalysisEnabled || (! $groqKey && ! $geminiKey)) {
-            Log::info('GenerateUserAnalysisJob: AI analysis is disabled or API keys are missing. Saving deterministic analysis directly.');
-            UserAiAnalysis::updateOrCreate(
-                ['user_id' => $this->userId],
-                [
-                    'last_exam_attempt_id' => $this->latestAttemptId,
-                    'analysis_json' => $deterministicData,
-                ]
-            );
-            event(new AiGenerationCompleted($this->userId, 'analysis', 'analysis'));
-            Cache::forget("ai-analysis-generating-{$this->userId}");
+            if (! $aiAnalysisEnabled || (! $groqKey && ! $geminiKey)) {
+                Log::info('GenerateUserAnalysisJob: AI analysis is disabled or API keys are missing. Saving deterministic analysis directly.');
+                UserAiAnalysis::updateOrCreate(
+                    ['user_id' => $this->userId],
+                    [
+                        'last_exam_attempt_id' => $this->latestAttemptId,
+                        'analysis_json' => $deterministicData,
+                    ]
+                );
+                event(new AiGenerationCompleted($this->userId, 'analysis', 'analysis'));
 
-            return;
-        }
+                return;
+            }
 
-        $systemPrompt = "
-        You are an expert Civil Service Exam (CSE) coach in the Philippines. We have computed standard diagnostic metrics, category mastery levels, and a 7-day study plan.
+            $systemPrompt = "
         Your task is to rewrite the verbal commentary fields to make them highly personalized, coaching-oriented, professional, and natural.
         
         CRITICAL RULES:
@@ -70,9 +69,8 @@ class GenerateUserAnalysisJob implements ShouldQueue
         
         Please rewrite the verbal fields to make them sound like a highly supportive, professional, and personalized Philippines CSE coach. Make sure all numerical facts and structure are strictly preserved.';
 
-        try {
-            $resultText = null;
-            $errorMsg = null;
+        $resultText = null;
+        $errorMsg = null;
 
             $attemptGemini = function ($model = 'gemini-3.5-flash') use ($geminiKey, $systemPrompt, $userPrompt, &$resultText, &$errorMsg) {
                 if (! $geminiKey) {

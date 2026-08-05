@@ -48,7 +48,7 @@ class HandleInertiaRequests extends Middleware
                     $request->user()->only(['id', 'name', 'email', 'email_verified_at', 'role', 'created_at', 'updated_at', 'terms_accepted_at', 'is_active']),
                     [
                         'two_factor_enabled' => ! is_null($request->user()->two_factor_secret),
-                        'analysis_mode' => Cache::get("user-analysis-mode-{$request->user()->id}", 'instant'),
+                        'analysis_mode' => Cache::get("user-analysis-mode-{$request->user()->id}", 'ai'),
                     ]
                 ) : null,
                 'permissions' => Cache::remember('role_permissions', 3600, function () {

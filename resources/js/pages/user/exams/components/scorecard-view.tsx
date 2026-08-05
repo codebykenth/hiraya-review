@@ -389,8 +389,8 @@ export function ScorecardView({
                                 </div>
                             </div>
 
-                            {/* AI / Deterministic Readiness Report Card */}
-                            {!isGuest && aiAnalysis && (
+                            {/* AI / Deterministic Readiness Report Card (Only for Full Mock Exams) */}
+                            {!isGuest && !isDrillSession && aiAnalysis && (
                                 <div className="mt-4">
                                     <AiReadinessCard
                                         aiAnalysis={aiAnalysis}

@@ -421,6 +421,25 @@ export default function AiAnalysisReport({
         }
     }, [data, existingSchedules]);
 
+    const [progress, setProgress] = useState(15);
+
+    useEffect(() => {
+        if (localStatus !== 'generating') {
+            setProgress(15);
+            return;
+        }
+
+        const interval = setInterval(() => {
+            setProgress((prev) => {
+                if (prev >= 92) return 92;
+                const step = Math.floor(Math.random() * 8) + 4;
+                return Math.min(prev + step, 92);
+            });
+        }, 400);
+
+        return () => clearInterval(interval);
+    }, [localStatus]);
+
     useEffect(() => {
         if (localStatus !== 'generating' || !auth?.user?.id || !pusher?.key) {
             return;
@@ -443,6 +462,7 @@ export default function AiAnalysisReport({
         const channel = echo.private(`App.Models.User.${auth.user.id}`);
 
         channel.listen('.ai-analysis-ready', () => {
+            setProgress(100);
             router.reload({ only: ['data', 'status'] });
         });
 
@@ -518,26 +538,57 @@ export default function AiAnalysisReport({
                     </Card>
                 )}
 
-                {localStatus === 'generating' && (
-                    <Card className="flex min-h-[400px] flex-col items-center justify-center p-12 text-center">
-                        <div className="relative mb-6 flex items-center justify-center">
-                            <div className="absolute size-24 animate-ping rounded-full border-2 border-blue-500/20" />
-                            <div className="border-blue-150 flex size-20 items-center justify-center rounded-full border bg-blue-50 text-blue-600 dark:border-blue-900/40 dark:bg-blue-950/30 dark:bg-blue-950/40 dark:text-blue-400">
-                                <Loader2 className="size-10 animate-spin" />
+                {localStatus === 'generating' && (() => {
+                    const radius = 36;
+                    const circumference = 2 * Math.PI * radius;
+                    const strokeDashoffset = circumference - (progress / 100) * circumference;
+
+                    return (
+                        <Card className="flex min-h-[400px] flex-col items-center justify-center p-12 text-center">
+                            <div className="relative mb-6 flex size-24 items-center justify-center">
+                                <svg
+                                    className="absolute inset-0 size-full -rotate-90"
+                                    viewBox="0 0 96 96"
+                                >
+                                    <circle
+                                        cx="48"
+                                        cy="48"
+                                        r={radius}
+                                        stroke="currentColor"
+                                        strokeWidth="6"
+                                        fill="transparent"
+                                        className="text-blue-100 dark:text-blue-950/50"
+                                    />
+                                    <circle
+                                        cx="48"
+                                        cy="48"
+                                        r={radius}
+                                        stroke="currentColor"
+                                        strokeWidth="6"
+                                        fill="transparent"
+                                        strokeDasharray={circumference}
+                                        strokeDashoffset={strokeDashoffset}
+                                        strokeLinecap="round"
+                                        className="text-blue-600 transition-all duration-300 ease-out dark:text-blue-400"
+                                    />
+                                </svg>
+                                <span className="text-base font-black tracking-tight text-blue-600 dark:text-blue-400">
+                                    {progress}%
+                                </span>
                             </div>
-                        </div>
-                        <h3 className="text-2xl font-black tracking-tight text-slate-900 sm:text-3xl dark:text-white">
-                            {isAiMode
-                                ? 'Creating Your Predictive AI Diagnostic'
-                                : 'Creating Your Predictive Diagnostic'}
-                        </h3>
-                        <p className="mt-2 max-w-2xl text-base leading-relaxed text-slate-500 dark:text-slate-400">
-                            {isAiMode
-                                ? "Hiraya AI is evaluating your historical exam responses, calculating subtopic performance, and scheduling your personalized study pathway. This will auto-refresh as soon as it's completed."
-                                : "Our system is evaluating your historical exam responses, calculating subtopic performance, and scheduling your personalized study pathway. This will auto-refresh as soon as it's completed."}
-                        </p>
-                    </Card>
-                )}
+                            <h3 className="text-2xl font-black tracking-tight text-slate-900 sm:text-3xl dark:text-white">
+                                {isAiMode
+                                    ? 'Creating Your Predictive AI Diagnostic'
+                                    : 'Creating Your Predictive Diagnostic'}
+                            </h3>
+                            <p className="mt-2 max-w-2xl text-base leading-relaxed text-slate-500 dark:text-slate-400">
+                                {isAiMode
+                                    ? "Hiraya AI is evaluating your historical exam responses, calculating subtopic performance, and scheduling your personalized study pathway..."
+                                    : "Our system is evaluating your historical exam responses, calculating subtopic performance, and scheduling your personalized study pathway..."}
+                            </p>
+                        </Card>
+                    );
+                })()}
 
                 {localStatus === 'failed' && (
                     <Card className="dark:border-rose-900/50/60 dark:bg-rose-950/30/10 flex min-h-[400px] flex-col items-center justify-center border-rose-200 bg-rose-50 p-12 text-center dark:border-rose-900/30 dark:bg-rose-950/5">
@@ -555,20 +606,13 @@ export default function AiAnalysisReport({
                                     ? 'Our AI systems are currently highly loaded or rate-limited across all fallbacks. Please try again.'
                                     : 'Our systems are currently busy or experiencing high traffic. Please try again.')}
                         </p>
-                        <button
-                            onClick={() => {
-                                setLocalStatus('generating');
-                                setErrorMessage(null);
-                                router.visit('/analytics/ai-analysis?retry=1', {
-                                    replace: true,
-                                    preserveScroll: true,
-                                });
-                            }}
-                            className="mt-6 inline-flex cursor-pointer items-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-black text-white transition hover:bg-blue-700"
+                        <Link
+                            href="/dashboard"
+                            className="mt-6 inline-flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-black text-white transition hover:bg-blue-700"
                         >
-                            <Activity className="size-4 animate-pulse" />
-                            Retry Diagnostic Generation
-                        </button>
+                            <ArrowLeft className="size-4" />
+                            Back to Dashboard
+                        </Link>
                     </Card>
                 )}
 
