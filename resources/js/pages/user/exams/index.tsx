@@ -32,6 +32,7 @@ export default function ExamIndex(props: ExamIndexProps) {
         setCurrentIdx,
         answers,
         questionTimes,
+        answerChanges,
         flagged,
         setFlagged,
         isMobilePaletteOpen,
@@ -118,6 +119,7 @@ export default function ExamIndex(props: ExamIndexProps) {
                 toggleFlag={toggleFlag}
                 flagged={flagged}
                 answers={answers}
+                questionTimes={questionTimes}
                 handleSelectOption={handleSelectOption}
                 handleQuestionNavigate={handleQuestionNavigate}
                 isFreeAttempt={isFreeAttempt}
@@ -147,6 +149,7 @@ export default function ExamIndex(props: ExamIndexProps) {
                     setCurrentIdx={setCurrentIdx}
                     answers={answers}
                     questionTimes={questionTimes}
+                    answerChanges={answerChanges}
                     results={results}
                     flagged={flagged}
                     setFlagged={setFlagged}

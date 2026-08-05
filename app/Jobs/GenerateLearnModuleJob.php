@@ -96,7 +96,12 @@ Official Category & Subcategory Schema (With Exam Level context):
 * Clerical Ability (Subprofessional Level ONLY): 'Filing', 'Spelling'
 
 Philippine Context Rule:
-For Word Problems, Reading Comprehension, Data Interpretation, and any Example Scenarios, you MUST use realistic Philippine context. Use Philippine Pesos (₱), local Philippine cities (e.g., Manila, Cebu, Davao), local names (e.g., Juan, Maria, Santos), and real Philippine government agencies (e.g., CSC, BIR, DOH) to make the module authentic to the CSE. Tailor the tone of the module depending on whether the topic is exclusively for the Professional or Subprofessional exam.
+For Word Problems, Reading Comprehension, Data Interpretation, and any Example Scenarios, you MUST use realistic Philippine context. Use Philippine Pesos (₱), local Philippine cities (e.g., Manila, Cebu, Davao), generic local names (e.g., Juan, Maria, Santos), and non-partisan Philippine government agencies (e.g., CSC, BIR, DOH) to make the module authentic to the CSE. Tailor the tone of the module depending on whether the topic is exclusively for the Professional or Subprofessional exam.
+
+APOLITICAL & NON-PARTISAN RULE (STRICT ENFORCEMENT):
+- ABSOLUTELY NO political questions, partisan political debates, or political opinions/controversies.
+- ABSOLUTELY NO mention of real political figures, living or deceased politicians (e.g., presidents, senators, congressmen, mayors, or political candidates).
+- Keep all tutorial texts strictly neutral, objective, professional, and focused purely on Civil Service syllabus content (e.g., administrative procedures, public ethics under R.A. 6713, constitutional laws, or standard office logic).
 
 Use clean standard Markdown only. Do not use decorative emoji, mojibake, HTML, or code fences. Prefer short paragraphs, clear headings, bullet lists, and readable tables when helpful.
 Structure the content with:

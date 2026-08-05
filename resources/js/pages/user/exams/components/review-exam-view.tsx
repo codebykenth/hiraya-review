@@ -12,6 +12,7 @@ import {
     ChevronDown,
     ChevronUp,
     Clock,
+    RotateCcw,
 } from 'lucide-react';
 import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { ReportIssueModal } from '@/components/domain/report-issue-modal';
@@ -41,6 +42,7 @@ interface ReviewExamViewProps {
     setCurrentIdx: (idx: number) => void;
     answers: Record<number, number>;
     questionTimes?: Record<number, number>;
+    answerChanges?: Record<number, number>;
     results?: any;
     flagged: Record<number, boolean>;
     setFlagged: React.Dispatch<React.SetStateAction<Record<number, boolean>>>;
@@ -65,6 +67,7 @@ export function ReviewExamView({
     setCurrentIdx,
     answers = {},
     questionTimes,
+    answerChanges,
     results,
     flagged = {},
     setFlagged,
@@ -762,6 +765,21 @@ export function ReviewExamView({
                                                         <span>{formattedTimeSpent}</span>
                                                     </span>
                                                 )}
+                                                {(() => {
+                                                    const changeCount =
+                                                        answerChanges?.[currentIdx] ??
+                                                        results?.cat_scores?.metadata?.answer_changes?.[currentIdx];
+                                                    if (!changeCount || changeCount <= 0) return null;
+                                                    return (
+                                                        <span
+                                                            title={`Answer changed ${changeCount} time${changeCount > 1 ? 's' : ''}`}
+                                                            className="inline-flex items-center gap-1 rounded-md border border-amber-200 bg-amber-50 px-2.5 py-0.5 text-[10px] font-extrabold text-amber-700 dark:border-amber-900/40 dark:bg-amber-950/40 dark:text-amber-300"
+                                                        >
+                                                            <RotateCcw className="size-3 text-amber-600 dark:text-amber-400" />
+                                                            <span>Second-guessed ({changeCount})</span>
+                                                        </span>
+                                                    );
+                                                })()}
                                                 <span className="text-[10px] font-black tracking-wider text-muted-foreground uppercase">
                                                     Question {currentIdx + 1} of{' '}
                                                     {activeQuestions.length}

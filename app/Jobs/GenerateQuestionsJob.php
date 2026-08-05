@@ -69,7 +69,7 @@ class GenerateQuestionsJob implements ShouldQueue
                     $categorySpecificRules .= "\n        * Sentence completion (Filipino/Tagalog): Ensure the missing word tests precise Filipino/Tagalog vocabulary, appropriate affixes (panlapi), or correct transitional words (pangatnig) suitable for formal contexts.";
                 }
             } elseif ($subcategory === 'Error recognition') {
-                $categorySpecificRules = '* Error recognition: You MUST provide a single sentence in the stem with exactly four specific words or phrases enclosed in numbered brackets, such as "[1] has went", "[2] to the", "[3] store", "[4] yesterday". The first four options must strictly correspond to those four numbered choices, and the fifth option must always be "No error".';
+                $categorySpecificRules = '* Error recognition: You MUST provide a single sentence in the stem with exactly four specific words or phrases enclosed in brackets WITHOUT numbers, such as "[has went]", "[to the]", "[store]", "[yesterday]". Options A to D must contain ONLY the text of those four corresponding choices without brackets or numbers (e.g., Option A: "has went", Option B: "to the", Option C: "store", Option D: "yesterday"), and Option E must strictly be "No error".';
                 if ($validated['language'] === 'Filipino/Tagalog') {
                     $categorySpecificRules .= "\n        * Error recognition (Filipino/Tagalog): Focus on testing common, formal Filipino/Tagalog grammatical rules. Test the proper usage of 'ng' vs. 'nang', 'din/daw' vs. 'rin/raw', incorrect verb affixes (panlapi), or improper use of hyphens (gitling).";
                 }
@@ -130,26 +130,33 @@ class GenerateQuestionsJob implements ShouldQueue
                 if ($variety === 'format_a') {
                     $varietyInstruction = "CRITICAL VARIETY RULE: You MUST generate ONLY the following format. You are forbidden from generating any other format:\n        - Format A: Bar Chart. Render a clean vertical or horizontal bar chart using raw SVG. Base the data on 4 to 6 categories/years. Vertical bars must grow bottom-up from the X-axis (e.g., if X-axis is at y=250, a bar of height 100 must be positioned at y=150, height=100). Ensure it has clear axes, gridlines, data labels, and a title.";
                 } elseif ($variety === 'format_b') {
-                    $varietyInstruction = "CRITICAL VARIETY RULE: You MUST generate ONLY the following format. You are forbidden from generating any other format:\n        - Format B: Line Graph. Render a clean line graph representing trends over 4 to 6 periods using raw SVG. Draw distinct data points connected by lines, with gridlines, axes, data labels, and a title.";
+                    $varietyInstruction = "CRITICAL VARIETY RULE: You MUST generate ONLY the following format. You are forbidden from generating any other format:\n        - Format B: Line Graph. Render a clean line graph representing stock market / PSEi trends, company stock prices, or economic indicators over 4 to 6 periods using raw SVG. Draw distinct data points connected by lines, with gridlines, axes, data labels, and a title.";
                 } elseif ($variety === 'format_c') {
                     $varietyInstruction = "CRITICAL VARIETY RULE: You MUST generate ONLY the following format. You are forbidden from generating any other format:\n        - Format C: Pie Chart or Donut Chart. Render a clean pie or donut chart representing shares or percentages using raw SVG paths (<path d=\"...\">) or SVG circle segments, with different filled colors for each slice, percentage labels, a clear legend, and a title.";
                 } elseif ($variety === 'format_d') {
-                    $varietyInstruction = "CRITICAL VARIETY RULE: You MUST generate ONLY the following format. You are forbidden from generating any other format:\n        - Format D: Formatted Table. Provide a beautifully formatted markdown table with columns and rows showing statistical data (DO NOT use SVG code).";
+                    $varietyInstruction = "CRITICAL VARIETY RULE: You MUST generate ONLY the following format. You are forbidden from generating any other format:\n        - Format D: Formatted Table (Data Completion). Provide a beautifully formatted markdown table showing statistical or financial data (e.g. stock market performance, company revenues, or municipal budget). You can include missing cell values indicated by '[?]' or '[X]', requiring the user to calculate the missing value, total, or percentage.";
                 } elseif ($variety === 'format_e') {
                     $varietyInstruction = "CRITICAL VARIETY RULE: You MUST generate ONLY the following format. You are forbidden from generating any other format:\n        - Format E: Combined Table and Chart. Provide both a formatted markdown table and a matching SVG chart (bar chart or line graph) to allow comprehensive interpretation of multi-variable data.";
                 } else {
                     $varietyInstruction = 'CRITICAL VARIETY RULE: To prevent repetitive questions, randomly select one of the following formats for each question:
         - Format A: Bar Chart. Render a clean vertical or horizontal bar chart using raw SVG. Base the data on 4 to 6 categories/years. Vertical bars must grow bottom-up from the X-axis (e.g., if X-axis is at y=250, a bar of height 100 must be positioned at y=150, height=100). Ensure it has clear axes, gridlines, data labels, and a title.
-        - Format B: Line Graph. Render a clean line graph representing trends over 4 to 6 periods using raw SVG. Draw distinct data points connected by lines, with gridlines, axes, data labels, and a title.
+        - Format B: Line Graph. Render a clean line graph representing stock market / PSEi trends, stock prices over quarters/months, or economic indicators using raw SVG. Draw distinct data points connected by lines, with gridlines, axes, data labels, and a title.
         - Format C: Pie Chart or Donut Chart. Render a clean pie or donut chart representing shares or percentages using raw SVG paths (<path d="...">) or SVG circle segments, with different filled colors for each slice, percentage labels, a clear legend, and a title.
-        - Format D: Formatted Table. Provide a beautifully formatted markdown table with columns and rows showing statistical data (DO NOT use SVG code).
+        - Format D: Formatted Table (Data Completion). Provide a formatted markdown table showing statistical/financial data (e.g. stock market performance, company revenues, or municipal budget). Include missing cell values indicated by "[?]" or "[X]", where the question asks to solve for the missing cell value, total, or percentage.
         - Format E: Combined Table and Chart. Provide both a formatted markdown table and a matching SVG chart (bar chart or line graph) to allow comprehensive interpretation of multi-variable data.';
                 }
 
-                $categorySpecificRules = "* Data interpretation: You MUST provide a data source for interpretation based on realistic Philippine public administration data (e.g., population growth, budget allocation, public school enrollment rates).
+                $categorySpecificRules = "* Data interpretation (BALANCED CSE DIFFICULTY): Questions must be realistic to the official Civil Service Exam scope (moderate difficulty — challenging but fair, testing percentage change, ratios, totals, averages, or missing cell calculations).
+        Data topics MUST include Philippine public administration data (population, agency budgets, enrollment) OR Philippine financial / Stock Market data (e.g. Philippine Stock Exchange index / PSEi trends, company stock prices over trading days, sector shares).
         {$varietyInstruction}
         
         CRITICAL SVG RULES: Use a fixed viewBox='0 0 600 400' for charts. Ensure all text labels use <text> elements with clear font sizes and do not overlap with other visual elements. Keep any SVG code clean, well-structured, and minified without comments. The options should be plain text or numbers based on the data, and the explanation block must reference the specific data points.";
+            } elseif ($subcategory === 'Identifying assumptions and drawing conclusions') {
+                $categorySpecificRules = '* Identifying assumptions and drawing conclusions: Provide realistic logical scenarios (e.g. government policies, office protocols, or formal arguments). Questions must test formal syllogistic deductions ("All A are B...", valid conclusions) or identifying unstated premises and assumptions necessary for an argument to hold true.';
+            } elseif ($subcategory === 'Filing') {
+                $categorySpecificRules = '* Filing: Test standard Philippine Civil Service alphabetical filing and indexing rules (e.g., Last Name, First Name, Middle Initial; handling of titles like Dr./Atty., government agency names, hyphenated surnames, and numerical prefixes). Provide 4 to 5 names or file titles and ask for the correct alphabetical sequence.';
+            } elseif ($subcategory === 'Spelling') {
+                $categorySpecificRules = '* Spelling: Test commonly misspelled words in administrative, legal, and formal English or Tagalog contexts (e.g., double consonants, tricky vowels, homophones, or official Civil Service terminology).';
             } elseif ($subcategory === 'Reading comprehension') {
                 if ($validated['language'] === 'Filipino/Tagalog') {
                     $categorySpecificRules = '* Reading comprehension (Filipino/Tagalog): Provide authentic, formal Filipino/Tagalog passages such as excerpts from government policies, literature, or news. Questions must test the main idea (pangunahing diwa), inference (paghihinuha), or conclusion (kongklusyon).';
@@ -162,7 +169,7 @@ class GenerateQuestionsJob implements ShouldQueue
 
             $languageRule = '';
             if ($validated['language'] === 'Filipino/Tagalog') {
-                $languageRule = '* General Filipino/Tagalog formatting: When generating questions in Filipino/Tagalog, use formal, standard vocabulary (Pormal na Wika) suited for official government exams. Strictly avoid Taglish, conversational slang, and literal translations of English idioms.';
+                $languageRule = '* General Filipino/Tagalog formatting (HIGH DIFFICULTY & RIGOR): When generating questions in Filipino/Tagalog, write at a high CSC exam level. Use deep, formal, and authentic Tagalog vocabulary (Malalim at Pormal na Wika), native Filipino idioms (Sawikain/Salawikain), and figures of speech (Tayutay). Strictly test nuanced Tagalog grammatical rules (e.g. wastong gamit ng "ng" at "nang", "din/daw" at "rin/raw", "pinto" at "pintuan", "hagdan" at "hagdanan", karaniwan at di-karaniwang ayos, pokus ng pandiwa, at tamang paggigitling). Distractors must be clever and non-obvious to test true mastery. Strictly forbid Taglish, conversational slang, and literal English translations.';
             }
 
             $systemPrompt = "
@@ -177,7 +184,12 @@ class GenerateQuestionsJob implements ShouldQueue
         * Clerical Ability (Subprofessional Level ONLY): 'Filing', 'Spelling'
 
         Philippine Context Rule:
-        For Word Problems, Reading Comprehension, Data Interpretation, and Sentence texts, you MUST use realistic Philippine context. Use Philippine Pesos (₱), local Philippine cities (e.g., Manila, Cebu, Davao), local names (e.g., Juan, Maria, Santos), and real Philippine government agencies (e.g., CSC, BIR, DOH) to make the questions authentic to the CSE.
+        For Word Problems, Reading Comprehension, Data Interpretation, and Sentence texts, you MUST use realistic Philippine context. Use Philippine Pesos (₱), local Philippine cities (e.g., Manila, Cebu, Davao), generic local names (e.g., Juan, Maria, Santos), and non-partisan Philippine government agencies (e.g., CSC, BIR, DOH) to make the questions authentic to the CSE.
+
+        APOLITICAL & NON-PARTISAN RULE (STRICT ENFORCEMENT):
+        - ABSOLUTELY NO political questions, partisan political debates, or political opinions/controversies.
+        - ABSOLUTELY NO mention of real political figures, living or deceased politicians (e.g., presidents, senators, congressmen, mayors, or political candidates).
+        - Keep all scenario texts strictly neutral, objective, professional, and focused purely on Civil Service syllabus content (e.g., administrative procedures, public ethics under R.A. 6713, constitutional laws, or standard office logic).
 
         Category Specific Rules:
         {$categorySpecificRules}
@@ -209,12 +221,6 @@ class GenerateQuestionsJob implements ShouldQueue
         ";
 
             $count = $validated['count'];
-            if (
-                ($subcategory === 'Symbolic logic / abstract reasoning' || $subcategory === 'Data interpretation')
-                && $count > 1
-            ) {
-                $count = 1; // Force max 1 to prevent token exhaustion or visualization overhead
-            }
 
             $userPrompt = "
         Generate exactly {$count} multiple-choice questions for the following category and subcategory:

@@ -60,6 +60,7 @@ interface LiveExamViewProps {
     toggleFlag: (idx: number) => void;
     flagged: Record<number, boolean>;
     answers: Record<number, number>;
+    questionTimes?: Record<number, number>;
     handleSelectOption: (idx: number) => void;
     handleQuestionNavigate: (idx: number) => void;
     isFreeAttempt: boolean;
@@ -88,6 +89,7 @@ export function LiveExamView({
     toggleFlag,
     flagged,
     answers,
+    questionTimes = {},
     handleSelectOption,
     handleQuestionNavigate,
     isFreeAttempt,
@@ -110,7 +112,7 @@ export function LiveExamView({
     >('all');
     const [autoAdvance, setAutoAdvance] = useState(false);
     const [showKeyboardModal, setShowKeyboardModal] = useState(false);
-    const [timeOnQuestion, setTimeOnQuestion] = useState(0);
+    const timeOnQuestion = questionTimes[currentIdx] || 0;
 
     // Advanced UI/UX feature states
     const [eliminatedOptions, setEliminatedOptions] = useState<
@@ -177,14 +179,7 @@ export function LiveExamView({
         ? user_reported_ids.includes(activeQuestion.id)
         : false;
 
-    // Active question timer
-    useEffect(() => {
-        setTimeOnQuestion(0);
-        const timer = setInterval(() => {
-            setTimeOnQuestion((prev) => prev + 1);
-        }, 1000);
-        return () => clearInterval(timer);
-    }, [currentIdx]);
+
 
     // Live statistics & pacing calculations
     const stats = useMemo(() => {

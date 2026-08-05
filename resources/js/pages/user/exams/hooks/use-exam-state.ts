@@ -276,6 +276,17 @@ export function useExamState({
             return {};
         },
     );
+    const [answerChanges, setAnswerChanges] = useState<Record<number, number>>(
+        () => {
+            if (restoredSession) {
+                return restoredSession.answerChanges || {};
+            }
+            if (savedAttempt?.cat_scores?.metadata?.answer_changes) {
+                return savedAttempt.cat_scores.metadata.answer_changes;
+            }
+            return {};
+        },
+    );
     const [flagged, setFlagged] = useState<Record<number, boolean>>(() => {
         if (restoredSession) {
             return restoredSession.flagged || {};
@@ -365,11 +376,13 @@ export function useExamState({
     const activeQuestionsRef = useRef<Question[]>(activeQuestions);
     const answersRef = useRef<Record<number, number>>(answers);
     const questionTimesRef = useRef<Record<number, number>>(questionTimes);
+    const answerChangesRef = useRef<Record<number, number>>(answerChanges);
     const sessionTimeLimitSecsRef = useRef<number>(sessionTimeLimitSecs);
 
     useEffect(() => {
         questionTimesRef.current = questionTimes;
-    }, [questionTimes]);
+        answerChangesRef.current = answerChanges;
+    }, [questionTimes, answerChanges]);
 
     const isTimedRef = useRef<boolean>(isTimed);
     const selectedExamIdRef = useRef<number | null>(selectedExamId);
@@ -525,6 +538,11 @@ export function useExamState({
     // Per-question timer ticker effect during live active exam
     useEffect(() => {
         if (!isExamActive || isExamSubmitted) return;
+
+        const isAlreadyAnswered =
+            answers[currentIdx] !== undefined && answers[currentIdx] !== null;
+        if (isAlreadyAnswered) return;
+
         const timer = setInterval(() => {
             setQuestionTimes((prev) => ({
                 ...prev,
@@ -532,7 +550,7 @@ export function useExamState({
             }));
         }, 1000);
         return () => clearInterval(timer);
-    }, [isExamActive, isExamSubmitted, currentIdx]);
+    }, [isExamActive, isExamSubmitted, currentIdx, answers]);
 
     // Auto-save active exam session to localStorage in real-time
     useEffect(() => {
@@ -553,6 +571,7 @@ export function useExamState({
                 activeQuestions,
                 answers,
                 questionTimes,
+                answerChanges,
                 flagged,
                 currentIdx,
                 timeLeft,
@@ -1220,6 +1239,8 @@ export function useExamState({
             setActiveQuestions(examPool);
             setCurrentIdx(0);
             setAnswers({});
+            setQuestionTimes({});
+            setAnswerChanges({});
             setFlagged({});
             setSelectedPaletteCategory('All Categories');
 
@@ -1364,6 +1385,8 @@ export function useExamState({
                 setActiveQuestions(finalPool);
                 setCurrentIdx(0);
                 setAnswers({});
+                setQuestionTimes({});
+                setAnswerChanges({});
                 setFlagged({});
                 setSelectedPaletteCategory('All Categories');
                 setSessionTimeLimitSecs(limitSecs);
@@ -1437,6 +1460,8 @@ export function useExamState({
                 setActiveQuestions(pool);
                 setCurrentIdx(state.currentIdx);
                 setAnswers(state.answers || {});
+                setQuestionTimes(state.questionTimes || {});
+                setAnswerChanges(state.answerChanges || {});
                 setFlagged({});
                 setSelectedPaletteCategory('All Categories');
                 setSessionTimeLimitSecs(state.sessionTimeLimitSecs);
@@ -1521,10 +1546,19 @@ export function useExamState({
 
     const handleSelectOption = (optionIndex: number) => {
         setAnswers((prev) => {
-            if (prev[currentIdx] === optionIndex) {
+            const previousAnswer = prev[currentIdx];
+
+            if (previousAnswer === optionIndex) {
                 const nextAnswers = { ...prev };
                 delete nextAnswers[currentIdx];
                 return nextAnswers;
+            }
+
+            if (previousAnswer !== undefined && previousAnswer !== null) {
+                setAnswerChanges((changes) => ({
+                    ...changes,
+                    [currentIdx]: (changes[currentIdx] || 0) + 1,
+                }));
             }
 
             return {
@@ -1708,6 +1742,7 @@ export function useExamState({
                     duration_secs: durationSecs,
                     is_timed: isTimedLocal,
                     question_times: questionTimesRef.current,
+                    answer_changes: answerChangesRef.current,
                     selected_subcategories: isDrillSessionLocal
                         ? drillSubcategoriesRef.current.length > 0
                             ? drillSubcategoriesRef.current
@@ -1894,6 +1929,7 @@ export function useExamState({
         setCurrentIdx,
         answers,
         questionTimes,
+        answerChanges,
         flagged,
         setFlagged,
         isMobilePaletteOpen,

@@ -313,6 +313,15 @@ export const renderFormattedText = (
         return null;
     }
 
+    if (isOption) {
+        text = text
+            .replace(/^\[\d+\]\s*(?=.+)/, '')
+            .replace(/^\d+\.\s*(?=.+)/, '');
+    }
+
+    // Strip bracket numbers in Error Recognition stems (e.g. "[1] has went" -> "[has went]")
+    text = text.replace(/\[\d+\]\s*([^\]]+)\]/g, '[$1]');
+
     // Clean up literal escaped quotes that might leak from JSON/AI payloads,
     // which breaks the browser's HTML parser in dangerouslySetInnerHTML
     text = text.replace(/\\"/g, '"').replace(/\\'/g, "'");

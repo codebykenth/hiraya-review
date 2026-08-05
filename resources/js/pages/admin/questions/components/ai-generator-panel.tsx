@@ -752,15 +752,12 @@ export function AIGeneratorPanel({
                                 <label className="text-xs font-bold tracking-wider text-muted-foreground uppercase">
                                     Additional AI Context (Optional)
                                 </label>
-                                <span className="text-[10px] font-bold tracking-widest text-muted-foreground uppercase">
-                                    Max 250 Chars
-                                </span>
                             </div>
                             <textarea
                                 value={aiPrompt}
                                 disabled={isGenerating}
                                 onChange={(e) =>
-                                    setAiPrompt(e.target.value.slice(0, 250))
+                                    setAiPrompt(e.target.value)
                                 }
                                 placeholder="E.g., Focus on recent Republic Acts, make options highly tricky, or emphasize logical fallacies..."
                                 rows={4}
