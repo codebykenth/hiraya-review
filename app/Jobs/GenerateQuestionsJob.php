@@ -83,7 +83,7 @@ class GenerateQuestionsJob implements ShouldQueue
                     $categorySpecificRules = "* Sentence structure (Filipino/Tagalog): Focus on correct Filipino/Tagalog syntax, such as distinguishing between standard and inverted sentence orders (Karaniwan vs. Di-karaniwang ayos), proper placement of enclitics (mga ingklitik like 'ba', 'na', 'man', 'yata'), and correct verb focus (pokus ng pandiwa).";
                 }
             } elseif ($subcategory === 'Word analogy') {
-                $categorySpecificRules = '* Word analogy: Provide standard analytical analogies. You MUST ensure a diverse variety of relationship categories, including but not limited to: function (e.g. tool:action), degree (e.g. warm:hot), characteristics, part of a whole, antonyms/synonyms, and classification analogies.';
+                $categorySpecificRules = '* Word analogy: Provide standard analytical analogies. You MUST format the stem strictly as the analogy equation (e.g., "ARCHIVE : STORE :: TICKET : _____"). Do NOT add any explanatory text or questions like "Which word best completes the analogy?". You MUST ensure a diverse variety of relationship categories, including but not limited to: function (e.g. tool:action), degree (e.g. warm:hot), characteristics, part of a whole, antonyms/synonyms, and classification analogies.';
                 if (in_array($validated['language'], ['Filipino/Tagalog', 'Tagalog'])) {
                     $categorySpecificRules .= "\n        * Word analogy (Tagalog): Use authentic Filipino/Tagalog word relationships and formal vocabulary rather than directly translating standard English analogies. Maintain the same variety of relationship categories (function, degree, characteristics, part of a whole, antonyms/synonyms, classifications). Ensure this strictly falls under the Analytical Ability category.";
                 }
@@ -192,7 +192,7 @@ class GenerateQuestionsJob implements ShouldQueue
         - Keep all scenario texts strictly neutral, objective, professional, and focused purely on Civil Service syllabus content (e.g., administrative procedures, public ethics under R.A. 6713, constitutional laws, or standard office logic).
 
         EXPLICIT QUESTION RULE (CRITICAL):
-        Every generated 'stem' MUST end with a clear, explicit question asking the user what they need to find or solve. Do NOT just provide a statement, sentence, passage, or data table. You MUST append an actual question with a question mark at the end of the stem.
+        Every generated 'stem' MUST end with a clear, explicit question asking the user what they need to find or solve. Do NOT just provide a statement, sentence, passage, or data table. You MUST append an actual question with a question mark at the end of the stem (EXCEPT for Word analogy).
         Examples:
         - Error Recognition: 'Which part of the sentence contains a grammatical error?'
         - Word Meaning: 'What is the closest meaning of the capitalized word?'
