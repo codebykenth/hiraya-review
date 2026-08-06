@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AnnouncementController;
+use App\Http\Controllers\Admin\AttemptController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\ExamDateController;
 use App\Http\Controllers\Admin\FeedbackController;
@@ -146,6 +147,7 @@ Route::middleware(['auth.or.fail', 'verified'])->group(function () {
         // --- ADMIN READ-ONLY VIEWS ---
         Route::middleware('throttle:global-views')->prefix('admin')->name('admin.')->group(function () {
             Route::get('dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
+            Route::get('attempts', [AttemptController::class, 'index'])->name('attempts.index');
             Route::get('syllabus', [SyllabusController::class, 'index'])->name('syllabus.index');
 
             Route::controller(UserController::class)->prefix('users')->name('users.')->group(function () {

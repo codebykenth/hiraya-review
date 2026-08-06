@@ -69,7 +69,7 @@ class GenerateQuestionsJob implements ShouldQueue
                     $categorySpecificRules .= "\n        * Sentence completion (Filipino/Tagalog): Ensure the missing word tests precise Filipino/Tagalog vocabulary, appropriate affixes (panlapi), or correct transitional words (pangatnig) suitable for formal contexts.";
                 }
             } elseif ($subcategory === 'Error recognition') {
-                $categorySpecificRules = '* Error recognition: You MUST provide a single sentence in the stem with exactly four specific words or phrases enclosed in brackets WITHOUT numbers, such as "[has went]", "[to the]", "[store]", "[yesterday]". Options A to D must contain ONLY the text of those four corresponding choices without brackets or numbers (e.g., Option A: "has went", Option B: "to the", Option C: "store", Option D: "yesterday"), and Option E must strictly be "No error".';
+                $categorySpecificRules = '* Error recognition: You MUST provide a single, continuous sentence in the stem WITHOUT enclosing any words in brackets or numbers. Options A to D must contain the four distinct segments or phrases from the sentence that the user needs to evaluate (e.g., Option A: "has went", Option B: "to the", Option C: "store", Option D: "yesterday"), and Option E must strictly be "No error". Do not put brackets in the question stem or the options.';
                 if ($validated['language'] === 'Filipino/Tagalog') {
                     $categorySpecificRules .= "\n        * Error recognition (Filipino/Tagalog): Focus on testing common, formal Filipino/Tagalog grammatical rules. Test the proper usage of 'ng' vs. 'nang', 'din/daw' vs. 'rin/raw', incorrect verb affixes (panlapi), or improper use of hyphens (gitling).";
                 }
@@ -194,10 +194,11 @@ class GenerateQuestionsJob implements ShouldQueue
         EXPLICIT QUESTION RULE (CRITICAL):
         Every generated 'stem' MUST end with a clear, explicit question asking the user what they need to find or solve. Do NOT just provide a statement, sentence, passage, or data table. You MUST append an actual question with a question mark at the end of the stem.
         Examples:
-        - Error Recognition: 'Alin sa mga sumusunod na bahagi ng pangungusap ang may kamalian sa gramatika?' or 'Which part of the sentence contains a grammatical error?'
+        - Error Recognition: 'Which part of the sentence contains a grammatical error?'
         - Word Meaning: 'What is the closest meaning of the capitalized word?'
         - Reading Comprehension: 'Based on the passage, which of the following is the most logical conclusion?'
-        - Sentence Completion: 'Ano ang pinaka-angkop na salita na bubuo sa pangungusap?'
+        - Sentence Completion: 'Which word best completes the sentence?'
+        (NOTE: If the question language is Tagalog, strictly translate these explicit questions into formal Tagalog).
 
         Category Specific Rules:
         {$categorySpecificRules}

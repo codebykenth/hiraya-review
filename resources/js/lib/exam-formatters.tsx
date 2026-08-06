@@ -319,8 +319,9 @@ export const renderFormattedText = (
             .replace(/^\d+\.\s+(?=.+)/, '');
     }
 
-    // Strip bracket numbers in Error Recognition stems (e.g. "[1] has went" -> "[has went]")
-    text = text.replace(/\[\d+\]\s*([^\]]+)\]/g, '[$1]');
+    // Strip bracket numbers in Error Recognition stems (e.g. "[1] has went]" -> "[has went]")
+    // Restrict to digits 1-9 or letters A-D to prevent eating valid dates like "[2024] [across all]"
+    text = text.replace(/\[([1-9]|[A-D])\]\s*([^\]]+)\]/gi, '[$2]');
 
     // Clean up literal escaped quotes that might leak from JSON/AI payloads,
     // which breaks the browser's HTML parser in dangerouslySetInnerHTML
