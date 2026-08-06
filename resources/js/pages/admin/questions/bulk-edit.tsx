@@ -1,10 +1,30 @@
 import { Head, useForm } from '@inertiajs/react';
-import { HelpCircle, Trash2 } from 'lucide-react';
-import React, { useState } from 'react';
+import { HelpCircle, Trash2, Settings2, Regex, Type } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
 import { CurationEditShell } from '@/components/domain/curation-edit-shell';
 import InputError from '@/components/shared/input-error';
 import { SelectField } from '@/components/ui/select';
 import { index as questionsIndex } from '@/routes/questions';
+
+const AutoResizeTextarea = React.forwardRef<HTMLTextAreaElement, React.TextareaHTMLAttributes<HTMLTextAreaElement>>((props, ref) => {
+    const internalRef = useRef<HTMLTextAreaElement>(null);
+    const textareaRef = (ref as React.MutableRefObject<HTMLTextAreaElement>) || internalRef;
+
+    useEffect(() => {
+        if (textareaRef.current) {
+            textareaRef.current.style.height = 'auto';
+            textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+        }
+    }, [props.value]);
+
+    return (
+        <textarea
+            {...props}
+            ref={textareaRef}
+            className={`resize-none overflow-hidden ${props.className || ''}`}
+        />
+    );
+});
 
 interface Subcategory {
     id: number;
@@ -81,6 +101,10 @@ export default function BulkEditQuestions({
     }
 
     const [linkedFields, setLinkedFields] = useState<Set<string>>(new Set());
+    const [findText, setFindText] = useState('');
+    const [replaceText, setReplaceText] = useState('');
+    const [matchCase, setMatchCase] = useState(false);
+    const [useRegex, setUseRegex] = useState(false);
 
     const { data, setData, put, processing, errors } = useForm({
         questions: questions.map((q) => ({
@@ -95,6 +119,39 @@ export default function BulkEditQuestions({
             status: q.status === 'ACTIVE' ? 'active' : 'draft',
         })),
     });
+
+    const handleFindAndReplace = () => {
+        if (!findText) return;
+        
+        let regex: RegExp;
+        try {
+            if (useRegex) {
+                regex = new RegExp(findText, matchCase ? 'g' : 'gi');
+            } else {
+                const escapedFind = findText.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                regex = new RegExp(escapedFind, matchCase ? 'g' : 'gi');
+            }
+        } catch (e) {
+            alert("Invalid regular expression");
+            return;
+        }
+
+        const newQuestions = data.questions.map(q => {
+            const replaceAll = (str: string) => {
+                if (!str) return str;
+                return str.replace(regex, replaceText);
+            };
+            
+            return {
+                ...q,
+                stem: replaceAll(q.stem),
+                options: q.options.map(opt => replaceAll(opt)),
+                explanation: replaceAll(q.explanation)
+            };
+        });
+        
+        setData('questions', newQuestions);
+    };
 
     const toggleLinkedField = (e: React.MouseEvent, fieldKey: string) => {
         if (e.altKey) {
@@ -214,6 +271,49 @@ export default function BulkEditQuestions({
         setData('questions', newQuestions);
     };
 
+    const removeQuestion = (indexToRemove: number) => {
+        setData('questions', data.questions.filter((_, i) => i !== indexToRemove));
+        setLinkedFields(new Set());
+        // Also clear from selected if it was selected
+        if (selectedToRemove.has(indexToRemove)) {
+            setSelectedToRemove(prev => {
+                const next = new Set(prev);
+                next.delete(indexToRemove);
+                return next;
+            });
+        }
+    };
+
+    const [selectedToRemove, setSelectedToRemove] = useState<Set<number>>(new Set());
+
+    const toggleRemoveSelect = (index: number) => {
+        setSelectedToRemove(prev => {
+            const next = new Set(prev);
+            if (next.has(index)) next.delete(index);
+            else next.add(index);
+            return next;
+        });
+    };
+
+    const bulkRemoveQuestions = () => {
+        setData('questions', data.questions.filter((_, i) => !selectedToRemove.has(i)));
+        setSelectedToRemove(new Set());
+        setLinkedFields(new Set());
+    };
+
+    const handleSelectAll = () => {
+        if (selectedToRemove.size === data.questions.length) {
+            setSelectedToRemove(new Set());
+        } else {
+            setSelectedToRemove(new Set(data.questions.map((_, i) => i)));
+        }
+    };
+
+    const errorIndices = Array.from(new Set(Object.keys(errors).map(key => {
+        const match = key.match(/^questions\.(\d+)\./);
+        return match ? parseInt(match[1], 10) : null;
+    }).filter(i => i !== null))) as number[];
+
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         put('/questions/bulk-update');
@@ -248,24 +348,144 @@ export default function BulkEditQuestions({
                     )}
                 </div>
 
+                {errorIndices.length > 0 && (
+                    <div className="mb-8 rounded-xl border border-red-200 bg-red-50 p-4 shadow-sm dark:border-red-900/30 dark:bg-red-950/20">
+                        <h4 className="text-sm font-bold text-red-800 dark:text-red-300">Validation Errors Found</h4>
+                        <p className="mt-1 text-xs text-red-700 dark:text-red-400">
+                            Please fix the errors in the following questions before saving:
+                        </p>
+                        <div className="mt-2 flex flex-wrap gap-2">
+                            {errorIndices.map(index => (
+                                <button
+                                    type="button"
+                                    key={index}
+                                    onClick={() => document.getElementById(`question-${index}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' })}
+                                    className="rounded-lg bg-red-100 px-3 py-1 text-xs font-bold text-red-700 hover:bg-red-200 dark:bg-red-900/50 dark:text-red-300 dark:hover:bg-red-900/80 transition"
+                                >
+                                    Question #{data.questions[index]?.id || (index + 1)}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
+                <div className="mb-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <button
+                        type="button"
+                        onClick={handleSelectAll}
+                        className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-xs font-bold text-slate-700 shadow-sm hover:bg-slate-50 transition dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800"
+                    >
+                        {selectedToRemove.size === data.questions.length ? 'Deselect All' : 'Select All'}
+                    </button>
+                    {selectedToRemove.size > 0 && (
+                        <div className="flex items-center gap-4 rounded-xl border border-red-200 bg-red-50 px-4 py-2 dark:border-red-900/30 dark:bg-red-950/20 w-full sm:w-auto justify-between sm:justify-start">
+                            <span className="text-xs font-bold text-red-800 dark:text-red-300">
+                                {selectedToRemove.size} selected
+                            </span>
+                            <button
+                                type="button"
+                                onClick={bulkRemoveQuestions}
+                                className="flex items-center gap-2 rounded-lg bg-red-600 px-3 py-1.5 text-xs font-bold text-white shadow hover:bg-red-700 transition"
+                            >
+                                <Trash2 className="size-3.5" />
+                                Remove
+                            </button>
+                        </div>
+                    )}
+                </div>
+
+                <div className="mb-8 rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900/50">
+                    <h4 className="mb-3 text-sm font-bold text-slate-800 dark:text-slate-200">Batch Find & Replace</h4>
+                    <div className="flex flex-col sm:flex-row items-end gap-3">
+                        <div className="w-full sm:w-1/3">
+                            <label className="mb-1 block text-[10px] font-extrabold uppercase text-slate-400">Find (Exact Match)</label>
+                            <input
+                                type="text"
+                                value={findText}
+                                onChange={(e) => setFindText(e.target.value)}
+                                placeholder="e.g. ["
+                                className="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-semibold focus:border-blue-500 focus:outline-none dark:border-slate-700 dark:bg-slate-950"
+                            />
+                        </div>
+                        <div className="w-full sm:w-1/3">
+                            <label className="mb-1 block text-[10px] font-extrabold uppercase text-slate-400">Replace With</label>
+                            <input
+                                type="text"
+                                value={replaceText}
+                                onChange={(e) => setReplaceText(e.target.value)}
+                                placeholder="Leave empty to delete"
+                                className="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-semibold focus:border-blue-500 focus:outline-none dark:border-slate-700 dark:bg-slate-950"
+                            />
+                        </div>
+                        <div className="flex flex-col gap-2">
+                            <div className="flex gap-2">
+                                <button
+                                    type="button"
+                                    onClick={() => setMatchCase(!matchCase)}
+                                    className={`flex items-center gap-1 rounded-lg px-2 py-1 text-[10px] font-bold transition ${matchCase ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300' : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400'}`}
+                                    title="Match Case"
+                                >
+                                    <Type className="size-3" />
+                                    Match Case
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => setUseRegex(!useRegex)}
+                                    className={`flex items-center gap-1 rounded-lg px-2 py-1 text-[10px] font-bold transition ${useRegex ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300' : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400'}`}
+                                    title="Use Regular Expression"
+                                >
+                                    <Regex className="size-3" />
+                                    Regex
+                                </button>
+                            </div>
+                            <button
+                                type="button"
+                                disabled={!findText}
+                                onClick={handleFindAndReplace}
+                                className="w-full sm:w-auto rounded-lg bg-blue-600 px-4 py-2 text-xs font-bold text-white transition hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                Replace All
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
                 <div className="flex flex-col gap-8">
                     {data.questions.map((q, qIndex) => (
-                        <div key={q.id} className="rounded-xl border border-border bg-card p-6 shadow-sm relative">
-                            <div className="mb-4 flex items-center justify-between border-b border-border pb-4">
-                                <h3 className="text-lg font-bold">Question #{q.id}</h3>
-                                <div 
-                                    className={`flex items-center gap-2 rounded-lg p-1 transition-all cursor-pointer ${getLinkedClass(`${qIndex}-status`)}`}
-                                    onClickCapture={(e) => toggleLinkedField(e, `${qIndex}-status`)}
-                                >
-                                    <label className="text-xs font-bold uppercase text-muted-foreground">Status</label>
-                                    <select
-                                        value={q.status}
-                                        onChange={(e) => updateQuestion(qIndex, 'status', e.target.value)}
-                                        className="rounded-lg border border-border bg-background px-2 py-1 text-xs font-bold focus:outline-none"
+                        <div key={q.id} id={`question-${qIndex}`} className={`rounded-xl border p-6 shadow-sm relative transition-all ${selectedToRemove.has(qIndex) ? 'border-red-300 bg-red-50/50 dark:border-red-900/50 dark:bg-red-950/10' : 'border-border bg-card'}`}>
+                            <div className="mb-4 flex flex-wrap items-center justify-between border-b border-border pb-4 gap-4">
+                                <div className="flex items-center gap-3">
+                                    <input
+                                        type="checkbox"
+                                        checked={selectedToRemove.has(qIndex)}
+                                        onChange={() => toggleRemoveSelect(qIndex)}
+                                        className="size-4.5 rounded border-slate-300 accent-red-600 text-red-600 focus:ring-red-600 cursor-pointer"
+                                    />
+                                    <h3 className="text-lg font-bold">Question #{q.id}</h3>
+                                </div>
+                                <div className="flex items-center gap-4">
+                                    <div 
+                                        className={`flex items-center gap-2 rounded-lg p-1 transition-all cursor-pointer ${getLinkedClass(`${qIndex}-status`)}`}
+                                        onClickCapture={(e) => toggleLinkedField(e, `${qIndex}-status`)}
                                     >
-                                        <option value="active">Active</option>
-                                        <option value="draft">Draft</option>
-                                    </select>
+                                        <label className="text-xs font-bold uppercase text-muted-foreground">Status</label>
+                                        <select
+                                            value={q.status}
+                                            onChange={(e) => updateQuestion(qIndex, 'status', e.target.value)}
+                                            className="rounded-lg border border-border bg-background px-2 py-1 text-xs font-bold focus:outline-none"
+                                        >
+                                            <option value="active">Active</option>
+                                            <option value="draft">Draft</option>
+                                        </select>
+                                    </div>
+                                    <button
+                                        type="button"
+                                        onClick={() => removeQuestion(qIndex)}
+                                        className="rounded-lg p-1.5 text-red-500 hover:bg-red-50 hover:text-red-600 transition"
+                                        title="Remove from bulk edit"
+                                    >
+                                        <Trash2 className="size-4" />
+                                    </button>
                                 </div>
                             </div>
 
@@ -312,11 +532,11 @@ export default function BulkEditQuestions({
                                 <label className="block text-[10px] font-extrabold text-slate-400 uppercase mb-1">
                                     Question Stem
                                 </label>
-                                <textarea
+                                <AutoResizeTextarea
                                     value={q.stem}
                                     onClick={(e) => toggleLinkedField(e, `${qIndex}-stem`)}
                                     onChange={(e) => updateQuestion(qIndex, 'stem', e.target.value)}
-                                    rows={4}
+                                    rows={3}
                                     className={`w-full rounded-xl border bg-background p-3 text-xs font-semibold text-foreground focus:outline-none transition-all ${
                                         errors[`questions.${qIndex}.stem`] ? 'border-red-500' : 'border-border focus:border-blue-500'
                                     } ${getLinkedClass(`${qIndex}-stem`)}`}
@@ -380,9 +600,9 @@ export default function BulkEditQuestions({
                                 <label className="mb-1 block text-[10px] font-extrabold text-muted-foreground uppercase">
                                     Cognitive Explanation & Rationale
                                 </label>
-                                <textarea
+                                <AutoResizeTextarea
                                     value={q.explanation}
-                                    rows={3}
+                                    rows={2}
                                     onClick={(e) => toggleLinkedField(e, `${qIndex}-explanation`)}
                                     onChange={(e) => updateQuestion(qIndex, 'explanation', e.target.value)}
                                     className={`w-full rounded-xl border bg-background p-3 text-xs font-semibold text-foreground focus:outline-none transition-all ${
