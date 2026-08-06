@@ -40,7 +40,7 @@ class UserController
         $stats = [
             'total_users' => User::count(),
             'total_admins' => User::where('role', 'admin')->count(),
-            'total_students' => User::where('role', 'user')->count(),
+            'total_students' => User::whereIn('role', ['user', 'student'])->count(),
             'total_active' => User::where('is_active', true)->count(),
             'total_terms_accepted' => User::whereNotNull('terms_accepted_at')->count(),
             'total_attempts' => ExamAttempt::count(),

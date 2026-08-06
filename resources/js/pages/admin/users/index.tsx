@@ -247,7 +247,14 @@ export default function AdminUsersIndex({
                             <select
                                 value={selectedRole}
                                 onChange={(e) => {
-                                    setSelectedRole(e.target.value);
+                                    const val = e.target.value;
+                                    setSelectedRole(val);
+                                    
+                                    let roleFilter: 'all' | 'admin' | 'student' = 'all';
+                                    if (val === 'Admins') roleFilter = 'admin';
+                                    else if (val === 'Students') roleFilter = 'student';
+                                    
+                                    setFilters((prev) => ({ ...prev, role: roleFilter }));
                                     setCurrentPage(1);
                                 }}
                                 className="w-full appearance-none rounded-lg border border-border bg-background py-1.5 pr-8 pl-2.5 text-xs font-bold text-foreground transition focus:border-blue-500 focus:outline-none"
@@ -362,6 +369,13 @@ export default function AdminUsersIndex({
                 onClose={() => setShowFiltersModal(false)}
                 onApply={(newFilters) => {
                     setFilters(newFilters);
+                    if (newFilters.role === 'admin') {
+                        setSelectedRole('Admins');
+                    } else if (newFilters.role === 'student') {
+                        setSelectedRole('Students');
+                    } else {
+                        setSelectedRole('All Roles');
+                    }
                     setCurrentPage(1);
                 }}
                 currentFilters={filters}

@@ -50,6 +50,7 @@ export default function QuestionsIndex({
     >('all');
     const [filterCategory, setFilterCategory] = useState<string>('all');
     const [filterSubcategory, setFilterSubcategory] = useState<string>('all');
+    const [filterLanguage, setFilterLanguage] = useState<string>('all');
     const [currentPage, setCurrentPage] = useState(() => {
         const params = new URLSearchParams(
             typeof window !== 'undefined' ? window.location.search : '',
@@ -156,11 +157,17 @@ export default function QuestionsIndex({
                 filterSubcategory === 'all' ||
                 q.subcategory === filterSubcategory;
 
+            const matchesLanguage =
+                filterCategory !== 'Verbal Ability' ||
+                filterLanguage === 'all' ||
+                (q as any).language === filterLanguage;
+
             return (
                 matchesSearch &&
                 matchesStatus &&
                 matchesCategory &&
-                matchesSubcategory
+                matchesSubcategory &&
+                matchesLanguage
             );
         })
         .sort((a, b) => {
@@ -374,7 +381,16 @@ export default function QuestionsIndex({
                             <select
                                 value={filterSubcategory}
                                 onChange={(e) => {
-                                    setFilterSubcategory(e.target.value);
+                                    const val = e.target.value;
+                                    setFilterSubcategory(val);
+                                    if (val !== 'all') {
+                                        const parentCat = Object.keys(cseCategoriesTree).find(cat => 
+                                            cseCategoriesTree[cat].includes(val)
+                                        );
+                                        if (parentCat) {
+                                            setFilterCategory(parentCat);
+                                        }
+                                    }
                                     setCurrentPage(1);
                                 }}
                                 className="w-full appearance-none rounded-lg border border-border bg-background py-1.5 pr-8 pl-2.5 text-xs font-bold text-foreground transition focus:border-blue-500 focus:outline-none"
@@ -444,6 +460,25 @@ export default function QuestionsIndex({
                             </select>
                             <ChevronRight className="pointer-events-none absolute top-1/2 right-2.5 size-3.5 -translate-y-1/2 -rotate-90 text-muted-foreground" />
                         </div>
+
+                        {/* Language Filter (Only for Verbal Ability) */}
+                        {filterCategory === 'Verbal Ability' && (
+                            <div className="relative w-32">
+                                <select
+                                    value={filterLanguage}
+                                    onChange={(e) => {
+                                        setFilterLanguage(e.target.value);
+                                        setCurrentPage(1);
+                                    }}
+                                    className="w-full appearance-none rounded-lg border border-border bg-background py-1.5 pr-8 pl-2.5 text-xs font-bold text-foreground transition focus:border-blue-500 focus:outline-none"
+                                >
+                                    <option value="all" className="dark:bg-slate-950">All Languages</option>
+                                    <option value="English" className="dark:bg-slate-950">English</option>
+                                    <option value="Tagalog" className="dark:bg-slate-950">Tagalog</option>
+                                </select>
+                                <ChevronRight className="pointer-events-none absolute top-1/2 right-2.5 size-3.5 -translate-y-1/2 -rotate-90 text-muted-foreground" />
+                            </div>
+                        )}
 
                         <span className="shrink-0 pl-1 text-xs font-bold text-muted-foreground">
                             {filteredQuestions.length} found

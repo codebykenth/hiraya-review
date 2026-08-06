@@ -158,8 +158,8 @@ class GenerateQuestionsJob implements ShouldQueue
             } elseif ($subcategory === 'Spelling') {
                 $categorySpecificRules = '* Spelling: Test commonly misspelled words in administrative, legal, and formal English or Tagalog contexts (e.g., double consonants, tricky vowels, homophones, or official Civil Service terminology).';
             } elseif ($subcategory === 'Reading comprehension') {
-                if ($validated['language'] === 'Filipino/Tagalog') {
-                    $categorySpecificRules = '* Reading comprehension (Filipino/Tagalog): Provide authentic, formal Filipino/Tagalog passages such as excerpts from government policies, literature, or news. Questions must test the main idea (pangunahing diwa), inference (paghihinuha), or conclusion (kongklusyon).';
+                if ($validated['language'] === 'Tagalog') {
+                    $categorySpecificRules = '* Reading comprehension (Tagalog): Provide authentic, formal Filipino/Tagalog passages such as excerpts from government policies, literature, or news. Questions must test the main idea (pangunahing diwa), inference (paghihinuha), or conclusion (kongklusyon).';
                 }
             }
 
@@ -168,8 +168,8 @@ class GenerateQuestionsJob implements ShouldQueue
             }
 
             $languageRule = '';
-            if ($validated['language'] === 'Filipino/Tagalog') {
-                $languageRule = '* General Filipino/Tagalog formatting (HIGH DIFFICULTY & RIGOR): When generating questions in Filipino/Tagalog, write at a high CSC exam level. Use deep, formal, and authentic Tagalog vocabulary (Malalim at Pormal na Wika), native Filipino idioms (Sawikain/Salawikain), and figures of speech (Tayutay). Strictly test nuanced Tagalog grammatical rules (e.g. wastong gamit ng "ng" at "nang", "din/daw" at "rin/raw", "pinto" at "pintuan", "hagdan" at "hagdanan", karaniwan at di-karaniwang ayos, pokus ng pandiwa, at tamang paggigitling). Distractors must be clever and non-obvious to test true mastery. Strictly forbid Taglish, conversational slang, and literal English translations.';
+            if ($validated['language'] === 'Tagalog') {
+                $languageRule = '* General Filipino/Tagalog formatting (HIGH DIFFICULTY & RIGOR): When generating questions in Filipino/Tagalog, write the entire stem, options, and explanation strictly in Tagalog at a high CSC exam level. The EXPLANATION field MUST be written completely in Filipino/Tagalog. Use deep, formal, and authentic Tagalog vocabulary (Malalim at Pormal na Wika), native Filipino idioms (Sawikain/Salawikain), and figures of speech (Tayutay). Strictly test nuanced Tagalog grammatical rules (e.g. wastong gamit ng "ng" at "nang", "din/daw" at "rin/raw", "pinto" at "pintuan", "hagdan" at "hagdanan", karaniwan at di-karaniwang ayos, pokus ng pandiwa, at tamang paggigitling). Distractors must be clever and non-obvious to test true mastery. Strictly forbid Taglish, conversational slang, and literal English translations.';
             }
 
             $systemPrompt = "

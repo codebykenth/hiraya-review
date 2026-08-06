@@ -252,12 +252,14 @@ export function ManualEntryForm({
                         </div>
 
                         {/* Language Select */}
-                        <SelectField
-                            label="Language"
-                            value={data.language}
-                            onValueChange={(val) => setData('language', val)}
-                            options={['English', 'Tagalog']}
-                        />
+                        {data.category === 'Verbal Ability' && (
+                            <SelectField
+                                label="Language"
+                                value={data.language}
+                                onValueChange={(val) => setData('language', val)}
+                                options={['English', 'Tagalog']}
+                            />
+                        )}
 
                         {/* Status Toggles */}
                         <div className="flex flex-col gap-1.5">

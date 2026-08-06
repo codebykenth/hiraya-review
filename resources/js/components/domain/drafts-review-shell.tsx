@@ -133,6 +133,7 @@ export function DraftsReviewShell<T extends BaseDraftItem>({
     >('all');
     const [filterCategory, setFilterCategory] = useState<string>('all');
     const [filterSubcategory, setFilterSubcategory] = useState<string>('all');
+    const [filterLanguage, setFilterLanguage] = useState<string>('all');
     const [currentPage, setCurrentPage] = useState(1);
     const pageSize = 10;
     const tableRef = React.useRef<HTMLDivElement>(null);
@@ -172,11 +173,17 @@ export function DraftsReviewShell<T extends BaseDraftItem>({
             filterSubcategory === 'all' ||
             item.subcategory === filterSubcategory;
 
+        const matchesLanguage =
+            filterCategory !== 'Verbal Ability' ||
+            filterLanguage === 'all' ||
+            (item as any).language === filterLanguage;
+
         return (
             matchesSearch &&
             matchesStatus &&
             matchesCategory &&
-            matchesSubcategory
+            matchesSubcategory &&
+            matchesLanguage
         );
     });
 
@@ -302,7 +309,16 @@ export function DraftsReviewShell<T extends BaseDraftItem>({
                             <select
                                 value={filterSubcategory}
                                 onChange={(e) => {
-                                    setFilterSubcategory(e.target.value);
+                                    const val = e.target.value;
+                                    setFilterSubcategory(val);
+                                    if (val !== 'all') {
+                                        const parentCat = Object.keys(cseCategoriesTree).find(cat => 
+                                            cseCategoriesTree[cat].includes(val)
+                                        );
+                                        if (parentCat) {
+                                            setFilterCategory(parentCat);
+                                        }
+                                    }
                                     setCurrentPage(1);
                                 }}
                                 className="w-full appearance-none rounded-lg border border-border bg-background py-1.5 pr-8 pl-2.5 text-xs font-bold text-foreground transition focus:border-blue-500 focus:outline-none"
@@ -373,11 +389,31 @@ export function DraftsReviewShell<T extends BaseDraftItem>({
                             <ChevronDown className="text-slate-550 pointer-events-none absolute top-1/2 right-2.5 size-3.5 -translate-y-1/2" />
                         </div>
 
+                        {/* Language Filter (Only for Verbal Ability) */}
+                        {filterCategory === 'Verbal Ability' && (
+                            <div className="relative w-32">
+                                <select
+                                    value={filterLanguage}
+                                    onChange={(e) => {
+                                        setFilterLanguage(e.target.value);
+                                        setCurrentPage(1);
+                                    }}
+                                    className="w-full appearance-none rounded-lg border border-border bg-background py-1.5 pr-8 pl-2.5 text-xs font-bold text-foreground transition focus:border-blue-500 focus:outline-none"
+                                >
+                                    <option value="all" className="dark:bg-slate-950">All Languages</option>
+                                    <option value="English" className="dark:bg-slate-950">English</option>
+                                    <option value="Tagalog" className="dark:bg-slate-950">Tagalog</option>
+                                </select>
+                                <ChevronDown className="text-slate-550 pointer-events-none absolute top-1/2 right-2.5 size-3.5 -translate-y-1/2" />
+                            </div>
+                        )}
+
                         {/* Reset Filters button if any active */}
                         {(filterSearch !== '' ||
                             filterCategory !== 'all' ||
                             filterSubcategory !== 'all' ||
-                            filterStatus !== 'all') && (
+                            filterStatus !== 'all' ||
+                            filterLanguage !== 'all') && (
                             <button
                                 type="button"
                                 onClick={() => {
@@ -385,6 +421,7 @@ export function DraftsReviewShell<T extends BaseDraftItem>({
                                     setFilterCategory('all');
                                     setFilterSubcategory('all');
                                     setFilterStatus('all');
+                                    setFilterLanguage('all');
                                     setCurrentPage(1);
                                 }}
                                 className="flex cursor-pointer items-center gap-1 rounded-lg border border-red-200 bg-red-50 px-2.5 py-1 text-xs font-bold text-red-700 transition hover:bg-red-100 dark:border-red-900/30 dark:bg-red-950/30 dark:text-red-400"
