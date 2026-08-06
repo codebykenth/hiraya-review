@@ -4,6 +4,7 @@ import React from 'react';
 import { PageContainer } from '@/components/layout/page-container';
 import { PageHeader } from '@/components/layout/page-header';
 import { Card } from '@/components/ui/card';
+import { index as attemptsIndex } from '@/routes/admin/attempts';
 
 interface Attempt {
     id: number;
@@ -157,10 +158,27 @@ export default function AdminAttempts({ attempts }: AdminAttemptsProps) {
                                             />
                                         );
                                     }
+                                    // Extract query parameters from Laravel's paginator URL and use Wayfinder to generate a clean, relative path
+                                    let queryParams = {};
+                                    if (link.url) {
+                                        try {
+                                            const parsedUrl = new URL(link.url);
+                                            queryParams = Object.fromEntries(
+                                                parsedUrl.searchParams.entries(),
+                                            );
+                                        } catch (e) {
+                                            // Fallback if URL parsing fails
+                                        }
+                                    }
+
                                     return (
                                         <Link
                                             key={idx}
-                                            href={link.url}
+                                            href={
+                                                attemptsIndex({
+                                                    query: queryParams,
+                                                }).url
+                                            }
                                             preserveScroll
                                             className={`shadow-3xs rounded-lg px-3 py-1.5 text-xs font-bold transition focus:outline-none ${
                                                 link.active
