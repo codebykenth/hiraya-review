@@ -56,32 +56,45 @@ export function CurationEditShell({
                     onSubmit={onSaveSubmit}
                     className="flex flex-col gap-3 rounded-2xl border border-border bg-card p-4 shadow-sm sm:gap-6 sm:p-6"
                 >
-                    <div className="flex items-center justify-between border-b border-border pb-3.5">
+                    <div className="sticky top-0 z-10 flex items-center justify-between border-b border-border bg-card pb-3.5 pt-4">
                         <span className="flex items-center gap-1.5 text-xs font-black text-foreground uppercase">
                             <HeaderIcon className="size-4.5 animate-pulse text-blue-600 transition-transform group-hover:scale-110 dark:text-blue-400" />
                             {headerTitle}
                         </span>
 
-                        {onStatusToggle && (
-                            <div className="flex items-center gap-2">
-                                {statusLabel && (
-                                    <span className="text-[10px] font-extrabold tracking-wider text-muted-foreground uppercase">
-                                        {statusLabel}:
-                                    </span>
-                                )}
-                                <button
-                                    type="button"
-                                    onClick={onStatusToggle}
-                                    className={`cursor-pointer rounded-lg border px-3 py-1.5 text-[10px] font-extrabold uppercase transition ${
-                                        statusValue
-                                            ? 'border-emerald-150 bg-emerald-50 text-emerald-700 dark:border-emerald-900/30 dark:bg-emerald-950/20 dark:bg-emerald-950/30 dark:text-emerald-400'
-                                            : 'border-border bg-muted text-muted-foreground'
-                                    }`}
-                                >
-                                    {statusValue ? 'Active' : 'Draft'}
-                                </button>
-                            </div>
-                        )}
+                        <div className="flex items-center gap-3">
+                            {onStatusToggle && (
+                                <div className="flex items-center gap-2">
+                                    {statusLabel && (
+                                        <span className="text-[10px] font-extrabold tracking-wider text-muted-foreground uppercase">
+                                            {statusLabel}:
+                                        </span>
+                                    )}
+                                    <button
+                                        type="button"
+                                        onClick={onStatusToggle}
+                                        className={`cursor-pointer rounded-lg border px-3 py-1.5 text-[10px] font-extrabold uppercase transition ${
+                                            statusValue
+                                                ? 'border-emerald-150 bg-emerald-50 text-emerald-700 dark:border-emerald-900/30 dark:bg-emerald-950/20 dark:text-emerald-400'
+                                                : 'border-border bg-muted text-muted-foreground'
+                                        }`}
+                                    >
+                                        {statusValue ? 'Active' : 'Draft'}
+                                    </button>
+                                </div>
+                            )}
+
+                            <Button
+                                type="submit"
+                                variant="default"
+                                size="default"
+                                loading={isSaving}
+                                icon={Save}
+                                className="h-8 text-xs shadow-sm"
+                            >
+                                Save Updates
+                            </Button>
+                        </div>
                     </div>
 
                     <div className="flex flex-col gap-5 text-xs font-bold text-foreground">

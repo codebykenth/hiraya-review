@@ -259,7 +259,7 @@ export function AIGeneratorPanel({
 
                         <div
                             className={
-                                aiCategory === 'Verbal Ability'
+                                aiCategory === 'Verbal Ability' || aiSubcategory === 'Word analogy'
                                     ? 'grid grid-cols-2 gap-4'
                                     : 'w-full'
                             }
@@ -329,7 +329,7 @@ export function AIGeneratorPanel({
                             </div>
 
                             {/* Language Select */}
-                            {aiCategory === 'Verbal Ability' && (
+                            {(aiCategory === 'Verbal Ability' || aiSubcategory === 'Word analogy') && (
                                 <SelectField
                                     label="Language"
                                     value={aiLanguage}

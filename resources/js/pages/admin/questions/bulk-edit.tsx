@@ -1,5 +1,5 @@
 import { Head, useForm } from '@inertiajs/react';
-import { HelpCircle, Trash2, Settings2, Regex, Type } from 'lucide-react';
+import { HelpCircle, Trash2, Settings2, Regex, Type, ChevronDown, ChevronUp } from 'lucide-react';
 import React, { useState, useEffect, useRef } from 'react';
 import { CurationEditShell } from '@/components/domain/curation-edit-shell';
 import InputError from '@/components/shared/input-error';
@@ -105,6 +105,12 @@ export default function BulkEditQuestions({
     const [replaceText, setReplaceText] = useState('');
     const [matchCase, setMatchCase] = useState(false);
     const [useRegex, setUseRegex] = useState(false);
+    
+    // Batch Properties
+    const [batchCategory, setBatchCategory] = useState('');
+    const [batchSubcategory, setBatchSubcategory] = useState('');
+    const [batchLanguage, setBatchLanguage] = useState('');
+    const [batchStatus, setBatchStatus] = useState('');
 
     const { data, setData, put, processing, errors } = useForm({
         questions: questions.map((q) => ({
@@ -151,6 +157,48 @@ export default function BulkEditQuestions({
         });
         
         setData('questions', newQuestions);
+    };
+
+    const handleBatchApply = () => {
+        if (
+            (!batchCategory || batchCategory === '-- No Change --') &&
+            (!batchSubcategory || batchSubcategory === '-- No Change --') &&
+            (!batchLanguage || batchLanguage === '-- No Change --') &&
+            (!batchStatus || batchStatus === '-- No Change --')
+        ) return;
+
+        const newQuestions = data.questions.map((q, index) => {
+            if (selectedToRemove.size > 0 && !selectedToRemove.has(index)) {
+                return q; // Skip if not selected
+            }
+            
+            const updated = { ...q };
+            if (batchCategory && batchCategory !== '-- No Change --') {
+                updated.category = batchCategory;
+                // Auto-update subcategory if batch category is set but no subcategory is chosen
+                if ((!batchSubcategory || batchSubcategory === '-- No Change --') && cseCategoriesTree[batchCategory]) {
+                    updated.subcategory = cseCategoriesTree[batchCategory][0] || '';
+                }
+            }
+            if (batchSubcategory && batchSubcategory !== '-- No Change --') {
+                updated.subcategory = batchSubcategory;
+            }
+            if (batchLanguage && batchLanguage !== '-- No Change --') {
+                updated.language = batchLanguage;
+            }
+            if (batchStatus && batchStatus !== '-- No Change --') {
+                updated.status = batchStatus;
+            }
+            return updated;
+        });
+        setData('questions', newQuestions);
+        
+        // Reset after apply
+        setBatchCategory('');
+        setBatchSubcategory('');
+        setBatchLanguage('');
+        setBatchStatus('');
+        // Optional: clear selection? Let's keep it so they can do another action if needed.
     };
 
     const toggleLinkedField = (e: React.MouseEvent, fieldKey: string) => {
@@ -295,6 +343,43 @@ export default function BulkEditQuestions({
         });
     };
 
+    const [collapsedCards, setCollapsedCards] = useState<Set<number>>(new Set());
+
+    const toggleCollapse = (index: number) => {
+        setCollapsedCards(prev => {
+            const next = new Set(prev);
+            if (next.has(index)) next.delete(index);
+            else next.add(index);
+            return next;
+        });
+    };
+
+    const collapseSelected = () => {
+        setCollapsedCards(prev => {
+            const next = new Set(prev);
+            selectedToRemove.forEach(index => next.add(index));
+            return next;
+        });
+    };
+
+    const expandSelected = () => {
+        setCollapsedCards(prev => {
+            const next = new Set(prev);
+            selectedToRemove.forEach(index => next.delete(index));
+            return next;
+        });
+    };
+
+    const areAllSelectedCollapsed = selectedToRemove.size > 0 && Array.from(selectedToRemove).every(index => collapsedCards.has(index));
+
+    const toggleSelectedCollapse = () => {
+        if (areAllSelectedCollapsed) {
+            expandSelected();
+        } else {
+            collapseSelected();
+        }
+    };
+
     const bulkRemoveQuestions = () => {
         setData('questions', data.questions.filter((_, i) => !selectedToRemove.has(i)));
         setSelectedToRemove(new Set());
@@ -378,25 +463,46 @@ export default function BulkEditQuestions({
                         {selectedToRemove.size === data.questions.length ? 'Deselect All' : 'Select All'}
                     </button>
                     {selectedToRemove.size > 0 && (
-                        <div className="flex items-center gap-4 rounded-xl border border-red-200 bg-red-50 px-4 py-2 dark:border-red-900/30 dark:bg-red-950/20 w-full sm:w-auto justify-between sm:justify-start">
-                            <span className="text-xs font-bold text-red-800 dark:text-red-300">
-                                {selectedToRemove.size} selected
+                        <div className="flex items-center gap-4 rounded-xl border border-blue-200 bg-blue-50 px-4 py-2 dark:border-blue-900/30 dark:bg-blue-950/20 w-full sm:w-auto justify-between sm:justify-start">
+                            <span className="text-xs font-bold text-blue-800 dark:text-blue-300">
+                                {selectedToRemove.size} questions selected
                             </span>
-                            <button
-                                type="button"
-                                onClick={bulkRemoveQuestions}
-                                className="flex items-center gap-2 rounded-lg bg-red-600 px-3 py-1.5 text-xs font-bold text-white shadow hover:bg-red-700 transition"
-                            >
-                                <Trash2 className="size-3.5" />
-                                Remove
-                            </button>
+                            <div className="flex items-center gap-2">
+                                <button
+                                    type="button"
+                                    onClick={toggleSelectedCollapse}
+                                    className="flex items-center gap-1.5 rounded-lg bg-white px-3 py-1.5 text-xs font-bold text-slate-700 shadow-sm border border-slate-200 hover:bg-slate-50 transition dark:bg-slate-900 dark:border-slate-800 dark:text-slate-300 dark:hover:bg-slate-800"
+                                >
+                                    {areAllSelectedCollapsed ? (
+                                        <>
+                                            <ChevronDown className="size-3.5" />
+                                            Expand
+                                        </>
+                                    ) : (
+                                        <>
+                                            <ChevronUp className="size-3.5" />
+                                            Collapse
+                                        </>
+                                    )}
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={bulkRemoveQuestions}
+                                    className="flex items-center gap-1.5 rounded-lg bg-red-600 px-3 py-1.5 text-xs font-bold text-white shadow hover:bg-red-700 transition ml-2"
+                                >
+                                    <Trash2 className="size-3.5" />
+                                    Remove
+                                </button>
+                            </div>
                         </div>
                     )}
                 </div>
 
-                <div className="mb-8 rounded-xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900/50">
-                    <h4 className="mb-3 text-sm font-bold text-slate-800 dark:text-slate-200">Batch Find & Replace</h4>
-                    <div className="flex flex-col sm:flex-row items-end gap-3">
+                <div className="mb-8 rounded-xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900/50 flex flex-col gap-6">
+                    {/* Find & Replace Section */}
+                    <div>
+                        <h4 className="mb-3 text-sm font-bold text-slate-800 dark:text-slate-200">Batch Find & Replace</h4>
+                        <div className="flex flex-col sm:flex-row items-end gap-3">
                         <div className="w-full sm:w-1/3">
                             <label className="mb-1 block text-[10px] font-extrabold uppercase text-slate-400">Find (Exact Match)</label>
                             <input
@@ -404,7 +510,7 @@ export default function BulkEditQuestions({
                                 value={findText}
                                 onChange={(e) => setFindText(e.target.value)}
                                 placeholder="e.g. ["
-                                className="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-semibold focus:border-blue-500 focus:outline-none dark:border-slate-700 dark:bg-slate-950"
+                                className="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 h-8 text-xs font-semibold focus:border-blue-500 focus:outline-none dark:border-slate-700 dark:bg-slate-950"
                             />
                         </div>
                         <div className="w-full sm:w-1/3">
@@ -414,7 +520,7 @@ export default function BulkEditQuestions({
                                 value={replaceText}
                                 onChange={(e) => setReplaceText(e.target.value)}
                                 placeholder="Leave empty to delete"
-                                className="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-semibold focus:border-blue-500 focus:outline-none dark:border-slate-700 dark:bg-slate-950"
+                                className="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 h-8 text-xs font-semibold focus:border-blue-500 focus:outline-none dark:border-slate-700 dark:bg-slate-950"
                             />
                         </div>
                         <div className="flex flex-col gap-2">
@@ -442,12 +548,91 @@ export default function BulkEditQuestions({
                                 type="button"
                                 disabled={!findText}
                                 onClick={handleFindAndReplace}
-                                className="w-full sm:w-auto rounded-lg bg-blue-600 px-4 py-2 text-xs font-bold text-white transition hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="w-full sm:w-auto rounded-lg bg-blue-600 px-4 py-1.5 h-8 text-xs font-bold text-white shadow-sm transition hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 Replace All
                             </button>
                         </div>
                     </div>
+                    </div>
+
+                    <div className="h-px w-full bg-slate-100 dark:bg-slate-800"></div>
+
+                    {/* Batch Apply Properties Section */}
+                    <div>
+                        <h4 className="mb-3 text-sm font-bold text-slate-800 dark:text-slate-200">Batch Apply Properties</h4>
+                        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 items-end gap-3">
+                        <div className="w-full">
+                            <label className="mb-1 block text-[10px] font-extrabold uppercase text-slate-400">Category</label>
+                            <SelectField
+                                value={batchCategory}
+                                onValueChange={(val) => {
+                                    setBatchCategory(val);
+                                    setBatchSubcategory('');
+                                }}
+                                options={[
+                                    '-- No Change --',
+                                    ...Object.keys(cseCategoriesTree)
+                                ]}
+                                triggerClassName="h-8 px-3 py-1.5 text-xs rounded-lg"
+                            />
+                        </div>
+                        <div className="w-full sm:flex-1">
+                            <label className="mb-1 block text-[10px] font-extrabold uppercase text-slate-400">Subcategory</label>
+                            <SelectField
+                                value={batchSubcategory}
+                                onValueChange={setBatchSubcategory}
+                                disabled={!batchCategory || batchCategory === '-- No Change --'}
+                                options={
+                                    batchCategory && batchCategory !== '-- No Change --'
+                                        ? ['-- No Change --', ...(cseCategoriesTree[batchCategory] || [])]
+                                        : ['Select a category first']
+                                }
+                                triggerClassName="h-8 px-3 py-1.5 text-xs rounded-lg"
+                            />
+                        </div>
+                        {(batchCategory === '-- No Change --' || !batchCategory || batchCategory === 'Verbal Ability' || batchSubcategory === 'Word analogy' || batchSubcategory === 'Word Analogy') && (
+                            <div className="w-full sm:flex-1">
+                                <label className="mb-1 block text-[10px] font-extrabold uppercase text-slate-400">Language</label>
+                                <SelectField
+                                    value={batchLanguage}
+                                    onValueChange={setBatchLanguage}
+                                    options={['-- No Change --', 'English', 'Tagalog']}
+                                    triggerClassName="h-8 px-3 py-1.5 text-xs rounded-lg truncate"
+                                />
+                            </div>
+                        )}
+                        <div className="w-full">
+                            <label className="mb-1 block text-[10px] font-extrabold uppercase text-slate-400">Status</label>
+                            <SelectField
+                                value={batchStatus}
+                                onValueChange={setBatchStatus}
+                                options={[
+                                    { label: '-- No Change --', value: '-- No Change --' },
+                                    { label: 'Active', value: 'active' },
+                                    { label: 'Draft', value: 'draft' }
+                                ]}
+                                triggerClassName="h-8 px-3 py-1.5 text-xs rounded-lg"
+                            />
+                        </div>
+                        <div className="w-full sm:w-auto min-w-[140px]">
+                            <button
+                                type="button"
+                                disabled={
+                                    ((!batchCategory || batchCategory === '-- No Change --') && 
+                                    (!batchSubcategory || batchSubcategory === '-- No Change --') && 
+                                    (!batchLanguage || batchLanguage === '-- No Change --') &&
+                                    (!batchStatus || batchStatus === '-- No Change --')) ||
+                                    selectedToRemove.size === 0
+                                }
+                                onClick={handleBatchApply}
+                                className="w-full rounded-lg bg-emerald-600 px-4 py-1.5 h-8 text-xs font-bold text-white shadow-sm transition hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+                            >
+                                Apply to Selected
+                            </button>
+                        </div>
+                    </div>
+                </div>
                 </div>
 
                 <div className="flex flex-col gap-8">
@@ -480,6 +665,14 @@ export default function BulkEditQuestions({
                                     </div>
                                     <button
                                         type="button"
+                                        onClick={() => toggleCollapse(qIndex)}
+                                        className="rounded-lg p-1.5 text-slate-500 hover:bg-slate-100 hover:text-slate-700 transition dark:hover:bg-slate-800 dark:hover:text-slate-300"
+                                        title={collapsedCards.has(qIndex) ? "Expand details" : "Collapse details"}
+                                    >
+                                        {collapsedCards.has(qIndex) ? <ChevronDown className="size-4" /> : <ChevronUp className="size-4" />}
+                                    </button>
+                                    <button
+                                        type="button"
                                         onClick={() => removeQuestion(qIndex)}
                                         className="rounded-lg p-1.5 text-red-500 hover:bg-red-50 hover:text-red-600 transition"
                                         title="Remove from bulk edit"
@@ -489,7 +682,9 @@ export default function BulkEditQuestions({
                                 </div>
                             </div>
 
-                            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 mb-4">
+                            {!collapsedCards.has(qIndex) && (
+                                <>
+                                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 mb-4">
                                 <div 
                                     onClickCapture={(e) => toggleLinkedField(e, `${qIndex}-category`)}
                                     className={`rounded-lg p-1 transition-all ${getLinkedClass(`${qIndex}-category`)}`}
@@ -514,19 +709,21 @@ export default function BulkEditQuestions({
                                 </div>
                             </div>
 
-                            <div className="mb-4">
-                                <div 
-                                    onClickCapture={(e) => toggleLinkedField(e, `${qIndex}-language`)}
-                                    className={`rounded-lg p-1 transition-all ${getLinkedClass(`${qIndex}-language`)}`}
-                                >
-                                    <SelectField
-                                        label="Exam Language"
-                                        value={q.language}
-                                        onValueChange={(val) => updateQuestion(qIndex, 'language', val)}
-                                        options={['English', 'Tagalog']}
-                                    />
+                            {(q.category === 'Verbal Ability' || q.subcategory === 'Word analogy' || q.subcategory === 'Word Analogy') && (
+                                <div className="mb-4">
+                                    <div 
+                                        onClickCapture={(e) => toggleLinkedField(e, `${qIndex}-language`)}
+                                        className={`rounded-lg p-1 transition-all ${getLinkedClass(`${qIndex}-language`)}`}
+                                    >
+                                        <SelectField
+                                            label="Exam Language"
+                                            value={q.language}
+                                            onValueChange={(val) => updateQuestion(qIndex, 'language', val)}
+                                            options={['English', 'Tagalog']}
+                                        />
+                                    </div>
                                 </div>
-                            </div>
+                            )}
 
                             <div className="mb-4">
                                 <label className="block text-[10px] font-extrabold text-slate-400 uppercase mb-1">
@@ -614,6 +811,8 @@ export default function BulkEditQuestions({
                                     <p className="mt-1 text-[10px] font-medium text-red-500">{errors[`questions.${qIndex}.explanation`]}</p>
                                 )}
                             </div>
+                                </>
+                            )}
                         </div>
                     ))}
                 </div>

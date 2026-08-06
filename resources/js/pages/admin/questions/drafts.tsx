@@ -1,4 +1,4 @@
-import { Head, router } from '@inertiajs/react';
+import { Head, router, Link } from '@inertiajs/react';
 import { Check, X, Edit3, ListChecks, Save, Eye, FileImage, Sparkles } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { DraftsReviewShell } from '@/components/domain/drafts-review-shell';
@@ -22,6 +22,7 @@ import {
 import { renderFormattedText } from '@/lib/exam-formatters';
 import {
     index as questionsIndex,
+    show as questionsShow,
     store as questionsStore,
     create as questionsCreate,
     destroy as questionsDestroy,
@@ -358,7 +359,7 @@ export default function DraftsQuestionList({
                 customActions={
                     <Button
                         type="button"
-                        variant="secondary"
+                        variant="outline"
                         size="sm"
                         disabled={draftQuestions.filter((q) => q.approved).length === 0}
                         icon={Edit3}
@@ -384,22 +385,35 @@ export default function DraftsQuestionList({
                 emptyStateActionUrl={questionsCreate().url}
                 emptyStateActionLabel="Generate or Create Questions"
                 emptyStateActionIcon={ListChecks}
-                renderTableView={(items) => (
-                    <div className="overflow-x-auto rounded-2xl border border-border bg-card shadow-xs">
-                        <table className="w-full text-left text-xs">
-                            <thead>
-                                <tr className="border-b border-border bg-muted/60 text-[11px] font-black tracking-wider text-muted-foreground uppercase">
-                                    <th className="w-12 px-4 py-3 text-center">
-                                        <input
-                                            type="checkbox"
-                                            checked={items.length > 0 && items.every((q) => q.approved)}
-                                            onChange={handleToggleAllDrafts}
-                                            className="size-4 cursor-pointer accent-blue-600"
-                                        />
-                                    </th>
-                                    <th className="min-w-[400px] px-4 py-3.5">
-                                        Question Stem
-                                    </th>
+                renderTableView={(items) => {
+                    const handleTogglePageDrafts = () => {
+                        const pageIds = items.map(q => q.id);
+                        const allPageApproved = items.length > 0 && items.every(q => q.approved);
+                        setDraftQuestions(prev => prev.map(q => 
+                            pageIds.includes(q.id) ? { ...q, approved: !allPageApproved } : q
+                        ));
+                    };
+
+                    return (
+                        <div className="overflow-x-auto rounded-2xl border border-border bg-card shadow-xs">
+                            <table className="w-full text-left text-xs">
+                                <thead>
+                                    <tr className="border-b border-border bg-muted/60 text-[11px] font-black tracking-wider text-muted-foreground uppercase">
+                                        <th className="w-12 px-4 py-3 text-center">
+                                            <input
+                                                type="checkbox"
+                                                checked={items.length > 0 && items.every((q) => q.approved)}
+                                                onChange={handleTogglePageDrafts}
+                                                className="size-4 cursor-pointer accent-blue-600"
+                                                title="Select all on this page"
+                                            />
+                                        </th>
+                                        <th className="w-20 px-4 py-3.5 text-left text-xs font-black tracking-wider text-muted-foreground uppercase">
+                                            ID
+                                        </th>
+                                        <th className="min-w-[400px] px-4 py-3.5">
+                                            Question Stem
+                                        </th>
                                     <th className="w-48 px-4 py-3.5">
                                         Correct Option
                                     </th>
@@ -436,25 +450,43 @@ export default function DraftsQuestionList({
                                                     className="size-4 mt-1 cursor-pointer accent-blue-600"
                                                 />
                                             </td>
+                                            <td className="w-20 px-4 py-4 font-mono text-xs text-muted-foreground align-top">
+                                                #{q.id}
+                                            </td>
                                             <td className="min-w-[400px] px-4 py-4 align-top">
-                                                <div className="flex flex-col">
-                                                    <div className="flex flex-wrap items-center gap-2">
-                                                        <div className="line-clamp-2 font-semibold text-foreground">
-                                                            {getCleanStemText(q.stem)}
-                                                        </div>
-                                                        {hasSvgContent(q.stem) && (
-                                                            <button
-                                                                type="button"
-                                                                onClick={() => setPreviewQuestion(q)}
-                                                                className="inline-flex shrink-0 cursor-pointer items-center gap-1 rounded border border-blue-200 bg-blue-50 px-1.5 py-0.5 text-[9px] font-extrabold text-blue-700 transition hover:bg-blue-100 dark:border-blue-900/40 dark:bg-blue-950/40 dark:text-blue-300 dark:hover:bg-blue-900/50"
-                                                                title="Quick preview diagram"
-                                                            >
-                                                                <FileImage className="size-3" />
-                                                                <span>Diagram</span>
-                                                            </button>
-                                                        )}
+                                                {q.isEditing ? (
+                                                    <div className="flex flex-col gap-1">
+                                                        <textarea
+                                                            value={q.stem}
+                                                            onChange={(e) =>
+                                                                handleUpdateDraftStem(
+                                                                    q.id,
+                                                                    e.target.value,
+                                                                )
+                                                            }
+                                                            className="w-full rounded-md border border-border bg-background p-2 text-xs font-medium text-foreground focus:border-blue-500 focus:outline-none"
+                                                            rows={3}
+                                                        />
                                                     </div>
-                                                    <div className="mt-1 line-clamp-1 text-[11px] text-muted-foreground">
+                                                ) : (
+                                                    <div className="flex flex-col">
+                                                        <div className="flex flex-wrap items-center gap-2">
+                                                            <div className="line-clamp-2 font-semibold text-foreground">
+                                                                {getCleanStemText(q.stem)}
+                                                            </div>
+                                                            {hasSvgContent(q.stem) && (
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => setPreviewQuestion(q)}
+                                                                    className="inline-flex shrink-0 cursor-pointer items-center gap-1 rounded border border-blue-200 bg-blue-50 px-1.5 py-0.5 text-[9px] font-extrabold text-blue-700 transition hover:bg-blue-100 dark:border-blue-900/40 dark:bg-blue-950/40 dark:text-blue-300 dark:hover:bg-blue-900/50"
+                                                                    title="Quick preview diagram"
+                                                                >
+                                                                    <FileImage className="size-3" />
+                                                                    <span>Diagram</span>
+                                                                </button>
+                                                            )}
+                                                        </div>
+                                                        <div className="mt-1 line-clamp-1 text-[11px] text-muted-foreground">
                                                         {q.options && q.options.length > 0 ? (
                                                             (() => {
                                                                 const choicesStr = q.options.map((opt, i) => {
@@ -468,6 +500,7 @@ export default function DraftsQuestionList({
                                                         )}
                                                     </div>
                                                 </div>
+                                                )}
                                             </td>
                                             <td className="w-48 px-4 py-4 align-top">
                                                 <span className="inline-flex items-center gap-1.5 rounded-lg border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-800 dark:border-emerald-900/40 dark:bg-emerald-950/30 dark:text-emerald-300">
@@ -547,10 +580,17 @@ export default function DraftsQuestionList({
                                                                     )
                                                                 }
                                                                 title="Quick Preview"
-                                                                className="cursor-pointer rounded-lg border border-border bg-card p-1.5 text-muted-foreground transition hover:border-blue-200 hover:text-blue-600 dark:hover:text-blue-400"
+                                                                className="cursor-pointer rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted hover:text-blue-600 dark:text-blue-400"
+                                                            >
+                                                                <FileImage className="size-4" />
+                                                            </button>
+                                                            <Link
+                                                                href={questionsShow(q.id).url}
+                                                                title="Full Details"
+                                                                className="cursor-pointer rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted hover:text-blue-600 dark:text-blue-400"
                                                             >
                                                                 <Eye className="size-4" />
-                                                            </button>
+                                                            </Link>
                                                             <button
                                                                 type="button"
                                                                 onClick={() =>
@@ -559,7 +599,7 @@ export default function DraftsQuestionList({
                                                                     )
                                                                 }
                                                                 title="Edit Inline"
-                                                                className="cursor-pointer rounded-lg border border-border bg-card p-1.5 text-muted-foreground transition hover:border-blue-200 hover:text-blue-600 dark:hover:text-blue-400"
+                                                                className="cursor-pointer rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted hover:text-blue-600 dark:text-blue-400"
                                                             >
                                                                 <Edit3 className="size-4" />
                                                             </button>
@@ -571,7 +611,7 @@ export default function DraftsQuestionList({
                                                                     )
                                                                 }
                                                                 title="Delete Draft"
-                                                                className="cursor-pointer rounded-lg border border-border bg-card p-1.5 text-muted-foreground transition hover:border-red-200 hover:text-red-600 dark:hover:text-red-400"
+                                                                className="cursor-pointer rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted hover:text-red-600"
                                                             >
                                                                 <X className="size-4" />
                                                             </button>
@@ -585,7 +625,8 @@ export default function DraftsQuestionList({
                             </tbody>
                         </table>
                     </div>
-                )}
+                );
+                }}
                 renderItem={(q) => (
                     <div
                         key={q.id}
@@ -608,11 +649,14 @@ export default function DraftsQuestionList({
 
                         {/* Card Header metadata */}
                         <div className="mb-4 flex items-center justify-between border-b border-border pb-3 pr-8">
-                            <div className="flex items-center gap-2">
-                                <span className="rounded-full border border-border bg-muted px-3 py-0.5 text-xs font-semibold text-foreground">
+                            <div className="flex flex-wrap items-center gap-2">
+                                <span className="font-mono text-[11px] font-black tracking-widest text-muted-foreground uppercase">
+                                    #{q.id}
+                                </span>
+                                <span className="rounded-full border border-border bg-muted px-3 py-0.5 text-[10px] font-extrabold uppercase text-foreground">
                                     {q.category}
                                 </span>
-                                <span className="rounded-full border border-blue-100 bg-blue-50 px-3 py-0.5 text-xs font-semibold text-blue-700 dark:border-blue-900/30 dark:bg-blue-950/30 dark:bg-blue-950/40 dark:text-blue-300">
+                                <span className="rounded-full border border-blue-100 bg-blue-50 px-3 py-0.5 text-[10px] font-bold text-blue-700 dark:border-blue-900/30 dark:bg-blue-950/30 dark:bg-blue-950/40 dark:text-blue-300">
                                     {q.subcategory}
                                 </span>
                                 {q.approved ? (
@@ -676,11 +720,44 @@ export default function DraftsQuestionList({
                                                     <button
                                                         type="button"
                                                         onClick={() =>
+                                                            setPreviewQuestion(
+                                                                q,
+                                                            )
+                                                        }
+                                                        className="cursor-pointer rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted hover:text-blue-600 dark:text-blue-400"
+                                                    >
+                                                        <FileImage className="size-4" />
+                                                    </button>
+                                                </TooltipTrigger>
+                                                <TooltipContent>
+                                                    Quick Preview
+                                                </TooltipContent>
+                                            </Tooltip>
+
+                                            <Tooltip>
+                                                <TooltipTrigger asChild>
+                                                    <Link
+                                                        href={questionsShow(q.id).url}
+                                                        className="cursor-pointer rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted hover:text-blue-600 dark:text-blue-400"
+                                                    >
+                                                        <Eye className="size-4" />
+                                                    </Link>
+                                                </TooltipTrigger>
+                                                <TooltipContent>
+                                                    Full Details
+                                                </TooltipContent>
+                                            </Tooltip>
+
+                                            <Tooltip>
+                                                <TooltipTrigger asChild>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() =>
                                                             toggleEditDraft(
                                                                 q.id,
                                                             )
                                                         }
-                                                        className="cursor-pointer rounded-lg border border-border bg-card p-1.5 text-muted-foreground transition hover:text-foreground hover:border-blue-200 hover:text-blue-600 dark:hover:text-blue-400"
+                                                        className="cursor-pointer rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted hover:text-blue-600 dark:text-blue-400"
                                                     >
                                                         <Edit3 className="size-4" />
                                                     </button>
@@ -699,7 +776,7 @@ export default function DraftsQuestionList({
                                                                 q.id,
                                                             )
                                                         }
-                                                        className="cursor-pointer rounded-lg border border-border bg-card p-1.5 text-muted-foreground transition hover:border-red-200 hover:text-red-600 dark:hover:border-red-900/50"
+                                                        className="cursor-pointer rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted hover:text-red-600"
                                                     >
                                                         <X className="size-4" />
                                                     </button>

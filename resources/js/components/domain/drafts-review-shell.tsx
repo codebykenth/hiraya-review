@@ -12,6 +12,7 @@ import {
     LayoutGrid,
     Table,
     RotateCcw,
+    Eye,
 } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
 import { PageContainer } from '@/components/layout/page-container';
@@ -174,7 +175,7 @@ export function DraftsReviewShell<T extends BaseDraftItem>({
             item.subcategory === filterSubcategory;
 
         const matchesLanguage =
-            filterCategory !== 'Verbal Ability' ||
+            !(filterCategory === 'Verbal Ability' || filterSubcategory === 'Word analogy' || (item as any).subcategory === 'Word analogy') ||
             filterLanguage === 'all' ||
             (item as any).language === filterLanguage;
 
@@ -389,8 +390,8 @@ export function DraftsReviewShell<T extends BaseDraftItem>({
                             <ChevronDown className="text-slate-550 pointer-events-none absolute top-1/2 right-2.5 size-3.5 -translate-y-1/2" />
                         </div>
 
-                        {/* Language Filter (Only for Verbal Ability) */}
-                        {filterCategory === 'Verbal Ability' && (
+                        {/* Language Filter (Only for Verbal Ability and Word Analogy) */}
+                        {(filterCategory === 'Verbal Ability' || filterSubcategory === 'Word analogy') && (
                             <div className="relative w-32">
                                 <select
                                     value={filterLanguage}
@@ -479,7 +480,15 @@ export function DraftsReviewShell<T extends BaseDraftItem>({
                             <Check className="size-3" />
                         </span>
                         <span className="text-emerald-800 dark:text-emerald-300">
-                            Approve / Unapprove Draft
+                            Approve / Unapprove
+                        </span>
+                    </div>
+                    <div className="dark:bg-slate-950/30 flex items-center gap-1.5 rounded-lg border border-slate-100 bg-slate-50 px-2 py-1 dark:border-slate-800 dark:bg-slate-900/50">
+                        <span className="border-slate-200 flex size-5.5 items-center justify-center rounded-md border bg-white text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400">
+                            <Eye className="size-3" />
+                        </span>
+                        <span className="text-slate-700 dark:text-slate-300">
+                            Quick Preview
                         </span>
                     </div>
                     <div className="dark:bg-blue-950/30/50 flex items-center gap-1.5 rounded-lg border border-blue-100 bg-blue-50 px-2 py-1 dark:border-blue-900/20 dark:bg-blue-950/10">

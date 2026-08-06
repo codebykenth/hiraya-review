@@ -27,7 +27,7 @@ export function useUserFilters({
             const matchesRole =
                 selectedRole === 'All Roles' ||
                 (selectedRole === 'Admins' && u.role === 'admin') ||
-                (selectedRole === 'Students' && (u.role === 'student' || u.role === 'user'));
+                (selectedRole === 'Students' && u.role === 'student');
 
             // Apply advanced filters
             let matchesAdvancedFilters = true;
@@ -56,7 +56,7 @@ export function useUserFilters({
                 matchesAdvancedFilters =
                     matchesAdvancedFilters &&
                     ((filters.role === 'admin' && u.role === 'admin') ||
-                        (filters.role === 'student' && (u.role === 'student' || u.role === 'user')));
+                        (filters.role === 'student' && u.role === 'student'));
             }
 
             if (filters.registrationDateFrom) {

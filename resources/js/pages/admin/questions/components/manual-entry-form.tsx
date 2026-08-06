@@ -252,7 +252,7 @@ export function ManualEntryForm({
                         </div>
 
                         {/* Language Select */}
-                        {data.category === 'Verbal Ability' && (
+                        {(data.category === 'Verbal Ability' || data.subcategory === 'Word analogy') && (
                             <SelectField
                                 label="Language"
                                 value={data.language}
