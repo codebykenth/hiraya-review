@@ -61,6 +61,7 @@ interface DraftsReviewShellProps<T extends BaseDraftItem> {
     emptyStateActionIcon?: React.ComponentType<any>;
     renderItem: (item: T) => React.ReactNode;
     renderTableView?: (items: T[]) => React.ReactNode;
+    customActions?: React.ReactNode;
 }
 
 export function DraftsReviewShell<T extends BaseDraftItem>({
@@ -83,6 +84,7 @@ export function DraftsReviewShell<T extends BaseDraftItem>({
     emptyStateActionIcon: EmptyStateActionIcon = ListChecks,
     renderItem,
     renderTableView,
+    customActions,
 }: DraftsReviewShellProps<T>) {
     // Build categories tree dynamically with robust static CSC fallback
     const cseCategoriesTree: Record<string, string[]> = {};
@@ -233,6 +235,7 @@ export function DraftsReviewShell<T extends BaseDraftItem>({
                                 ? 'Unapprove All'
                                 : 'Approve All'}
                         </Button>
+                        {customActions}
                         <Button
                             type="button"
                             variant="success"

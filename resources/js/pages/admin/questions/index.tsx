@@ -526,6 +526,17 @@ export default function QuestionsIndex({
                                     Set Inactive
                                 </Button>
                             )}
+                            <Link href={`/admin/questions/bulk-edit?ids=${Array.from(selectedIds).join(',')}`}>
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="sm"
+                                    icon={Edit2}
+                                    className="border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100 hover:text-blue-900 dark:border-blue-900/30 dark:bg-blue-950/30 dark:text-blue-400 dark:hover:bg-blue-950/40"
+                                >
+                                    Bulk Edit
+                                </Button>
+                            </Link>
                             <Button
                                 type="button"
                                 variant="destructive"

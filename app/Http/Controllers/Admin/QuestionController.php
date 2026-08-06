@@ -326,6 +326,109 @@ class QuestionController
     }
 
     /**
+     * Show the form for bulk editing questions.
+     */
+    public function bulkEdit(Request $request)
+    {
+        $ids = $request->query('ids', '');
+        $idArray = array_filter(explode(',', $ids));
+
+        if (empty($idArray)) {
+            return redirect()->route('questions.index')->with('error', 'No questions selected for bulk edit.');
+        }
+
+        $questions = Question::with(['subcategory.category'])
+            ->whereIn('id', $idArray)
+            ->get()
+            ->map(function ($question) {
+                return [
+                    'id' => $question->id,
+                    'stem' => $question->stem,
+                    'category' => $question->subcategory?->category?->name ?? 'Analytical Ability',
+                    'subcategory' => $question->subcategory?->name ?? 'Word analogy',
+                    'options' => $question->options,
+                    'correct_option' => (int) $question->correct_option,
+                    'explanation' => $question->explanation,
+                    'language' => $question->language ?? 'English',
+                    'status' => strtoupper($question->status),
+                ];
+            });
+
+        $categories = Cache::rememberForever('categories.tree', function () {
+            return Category::with(['subcategory' => function ($query) {
+                $query->orderBy('sort_order');
+            }])->orderBy('sort_order')->get()->toArray();
+        });
+
+        return Inertia::render('admin/questions/bulk-edit', [
+            'questions' => $questions,
+            'categories' => $categories,
+        ]);
+    }
+
+    /**
+     * Bulk update questions.
+     */
+    public function bulkUpdate(Request $request)
+    {
+        $validated = $request->validate([
+            'questions' => 'required|array',
+            'questions.*.id' => 'required|integer|exists:questions,id',
+            'questions.*.category' => 'required|string',
+            'questions.*.subcategory' => 'required|string',
+            'questions.*.language' => 'required|string',
+            'questions.*.stem' => 'required|string',
+            'questions.*.options' => 'required|array|min:2',
+            'questions.*.correct_option' => 'required|integer',
+            'questions.*.explanation' => 'nullable|string',
+            'questions.*.status' => 'required|string',
+        ]);
+
+        foreach ($validated['questions'] as $qData) {
+            $question = Question::find($qData['id']);
+            
+            $category = Category::firstOrCreate([
+                'name' => $qData['category'],
+            ], [
+                'slug' => Str::slug($qData['category']),
+                'sort_order' => 1,
+            ]);
+
+            $subcategoryName = $qData['subcategory'] ?? $qData['category'];
+
+            $subcategory = Subcategory::firstOrCreate([
+                'category_id' => $category->id,
+                'name' => $subcategoryName,
+            ], [
+                'slug' => Str::slug($subcategoryName),
+                'language' => $qData['language'],
+                'sort_order' => 1,
+            ]);
+
+            $question->update([
+                'subcategory_id' => $subcategory->id,
+                'language' => $qData['language'],
+                'stem' => $qData['stem'],
+                'options' => $qData['options'],
+                'correct_option' => (int) $qData['correct_option'],
+                'explanation' => $qData['explanation'] ?? '',
+                'status' => strtolower($qData['status']) === 'active' ? 'active' : 'draft',
+            ]);
+        }
+
+        $this->clearCache();
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Questions updated successfully!',
+            ]);
+        }
+
+        return redirect()->route('questions.index')->with('success', 'Selected questions updated successfully!');
+    }
+
+    /**
      * Update the specified resource in storage.
      */
     public function update(UpdateQuestionRequest $request, string $id)

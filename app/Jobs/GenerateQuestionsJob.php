@@ -191,6 +191,14 @@ class GenerateQuestionsJob implements ShouldQueue
         - ABSOLUTELY NO mention of real political figures, living or deceased politicians (e.g., presidents, senators, congressmen, mayors, or political candidates).
         - Keep all scenario texts strictly neutral, objective, professional, and focused purely on Civil Service syllabus content (e.g., administrative procedures, public ethics under R.A. 6713, constitutional laws, or standard office logic).
 
+        EXPLICIT QUESTION RULE (CRITICAL):
+        Every generated 'stem' MUST end with a clear, explicit question asking the user what they need to find or solve. Do NOT just provide a statement, sentence, passage, or data table. You MUST append an actual question with a question mark at the end of the stem.
+        Examples:
+        - Error Recognition: 'Alin sa mga sumusunod na bahagi ng pangungusap ang may kamalian sa gramatika?' or 'Which part of the sentence contains a grammatical error?'
+        - Word Meaning: 'What is the closest meaning of the capitalized word?'
+        - Reading Comprehension: 'Based on the passage, which of the following is the most logical conclusion?'
+        - Sentence Completion: 'Ano ang pinaka-angkop na salita na bubuo sa pangungusap?'
+
         Category Specific Rules:
         {$categorySpecificRules}
         {$languageRule}

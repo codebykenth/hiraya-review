@@ -12,9 +12,9 @@ interface CurationEditShellProps {
     backLabel: string;
     headerTitle: string;
     headerIcon: React.ComponentType<any>;
-    statusLabel: string;
-    statusValue: boolean;
-    onStatusToggle: () => void;
+    statusLabel?: string;
+    statusValue?: boolean;
+    onStatusToggle?: () => void;
     onSaveSubmit: (e: React.FormEvent) => void;
     isSaving: boolean;
     children: React.ReactNode;
@@ -62,22 +62,26 @@ export function CurationEditShell({
                             {headerTitle}
                         </span>
 
-                        <div className="flex items-center gap-2">
-                            <span className="text-[10px] font-extrabold tracking-wider text-muted-foreground uppercase">
-                                {statusLabel}:
-                            </span>
-                            <button
-                                type="button"
-                                onClick={onStatusToggle}
-                                className={`cursor-pointer rounded-lg border px-3 py-1.5 text-[10px] font-extrabold uppercase transition ${
-                                    statusValue
-                                        ? 'border-emerald-150 bg-emerald-50 text-emerald-700 dark:border-emerald-900/30 dark:bg-emerald-950/20 dark:bg-emerald-950/30 dark:text-emerald-400'
-                                        : 'border-border bg-muted text-muted-foreground'
-                                }`}
-                            >
-                                {statusValue ? 'Active' : 'Draft'}
-                            </button>
-                        </div>
+                        {onStatusToggle && (
+                            <div className="flex items-center gap-2">
+                                {statusLabel && (
+                                    <span className="text-[10px] font-extrabold tracking-wider text-muted-foreground uppercase">
+                                        {statusLabel}:
+                                    </span>
+                                )}
+                                <button
+                                    type="button"
+                                    onClick={onStatusToggle}
+                                    className={`cursor-pointer rounded-lg border px-3 py-1.5 text-[10px] font-extrabold uppercase transition ${
+                                        statusValue
+                                            ? 'border-emerald-150 bg-emerald-50 text-emerald-700 dark:border-emerald-900/30 dark:bg-emerald-950/20 dark:bg-emerald-950/30 dark:text-emerald-400'
+                                            : 'border-border bg-muted text-muted-foreground'
+                                    }`}
+                                >
+                                    {statusValue ? 'Active' : 'Draft'}
+                                </button>
+                            </div>
+                        )}
                     </div>
 
                     <div className="flex flex-col gap-5 text-xs font-bold text-foreground">

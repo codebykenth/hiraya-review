@@ -189,6 +189,7 @@ Route::middleware(['auth.or.fail', 'verified'])->group(function () {
             Route::get('admin/questions', 'index')->name('questions.index');
             Route::get('admin/questions/create', 'create')->name('questions.create');
             Route::get('admin/questions/drafts', 'drafts')->name('questions.drafts');
+            Route::get('admin/questions/bulk-edit', 'bulkEdit')->name('questions.bulkEdit');
             Route::get('admin/questions/{question}', 'show')->name('questions.show');
             Route::get('admin/questions/{question}/edit', 'edit')->name('questions.edit');
         });
@@ -263,6 +264,7 @@ Route::middleware(['auth.or.fail', 'verified'])->group(function () {
                 // Question Resource Mutations
                 Route::post('questions', 'store')->name('questions.store');
                 Route::post('questions/bulk-delete', 'bulkDestroy')->name('questions.bulkDestroy');
+                Route::put('questions/bulk-update', 'bulkUpdate')->name('questions.bulkUpdate');
                 Route::put('questions/{question}', 'update')->name('questions.update');
                 Route::delete('questions/{question}', 'destroy')->name('questions.destroy');
             });
