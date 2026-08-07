@@ -200,7 +200,7 @@ export function ScorecardView({
                         savedAttempt?.cat_scores?.metadata?.track === 'Subprofessional'
                     );
                     const formattedPercentage = (
-                        Math.trunc(exactPercentage * 100) / 100
+                        Math.round(exactPercentage * 100) / 100
                     ).toFixed(2);
                     const strokeDashoffsetExact =
                         circumference - (exactPercentage / 100) * circumference;
