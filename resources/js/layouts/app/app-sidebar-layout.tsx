@@ -73,17 +73,20 @@ export default function AppSidebarLayout({
         echo.channel('admin-notifications').listen(
             'NewFeedbackSubmitted',
             (e: any) => {
-                toast.success('New feedback submitted', {
-                    duration: 8000,
-                    description:
-                        'A user has reported content that needs review.',
-                    action: {
-                        label: 'View',
-                        onClick: () => {
-                            window.location.href = '/admin/feedbacks';
+                // Do not show the admin notification toast to the user who just submitted it
+                if (!e.feedback || e.feedback.user_id != auth.user.id) {
+                    toast.success('New feedback submitted', {
+                        duration: 8000,
+                        description:
+                            'A user has reported content that needs review.',
+                        action: {
+                            label: 'View',
+                            onClick: () => {
+                                window.location.href = '/admin/feedbacks';
+                            },
                         },
-                    },
-                });
+                    });
+                }
 
                 // Update feedback count
                 setFeedbackCount((prev: number) => prev + 1);
@@ -96,6 +99,7 @@ export default function AppSidebarLayout({
         );
 
         return () => {
+            echo.leaveChannel('admin-notifications');
             echo.disconnect();
         };
     }, [

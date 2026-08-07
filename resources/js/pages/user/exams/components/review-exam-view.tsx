@@ -151,8 +151,27 @@ export function ReviewExamView({
     const { user_reports_map = {} } = usePage<{
         user_reports_map?: Record<string, 'pending' | 'resolved' | 'dismissed'>;
     }>().props;
+    
+    const [localReportsMap, setLocalReportsMap] = useState<Record<string, 'pending' | 'resolved' | 'dismissed'>>(user_reports_map);
+
+    useEffect(() => {
+        const handleReportSubmitted = (e: CustomEvent<{ flaggable_id: number }>) => {
+            if (e.detail && e.detail.flaggable_id) {
+                setLocalReportsMap(prev => ({
+                    ...prev,
+                    [`App\\Models\\Question:${e.detail.flaggable_id}`]: 'pending'
+                }));
+            }
+        };
+
+        window.addEventListener('report-submitted', handleReportSubmitted as EventListener);
+        return () => {
+            window.removeEventListener('report-submitted', handleReportSubmitted as EventListener);
+        };
+    }, []);
+
     const reportStatus = currentQuestion
-        ? user_reports_map[`App\\Models\\Question:${currentQuestion.id}`]
+        ? localReportsMap[`App\\Models\\Question:${currentQuestion.id}`]
         : undefined;
 
     const getNextMatchingIndex = useCallback(

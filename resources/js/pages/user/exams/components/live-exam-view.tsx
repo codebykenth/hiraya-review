@@ -172,13 +172,32 @@ export function LiveExamView({
         });
     };
 
-    const { user_reported_ids = [] } = usePage<{
-        user_reported_ids?: number[];
+    const { user_reports_map = {} } = usePage<{
+        user_reports_map?: Record<string, 'pending' | 'resolved' | 'dismissed'>;
     }>().props;
-    const isReported = activeQuestion
-        ? user_reported_ids.includes(activeQuestion.id)
-        : false;
+    
+    const [localReportsMap, setLocalReportsMap] = useState<Record<string, 'pending' | 'resolved' | 'dismissed'>>(user_reports_map);
 
+    useEffect(() => {
+        const handleReportSubmitted = (e: CustomEvent<{ flaggable_id: number }>) => {
+            if (e.detail && e.detail.flaggable_id) {
+                setLocalReportsMap(prev => ({
+                    ...prev,
+                    [`App\\Models\\Question:${e.detail.flaggable_id}`]: 'pending'
+                }));
+            }
+        };
+
+        window.addEventListener('report-submitted', handleReportSubmitted as EventListener);
+        return () => {
+            window.removeEventListener('report-submitted', handleReportSubmitted as EventListener);
+        };
+    }, []);
+
+    const reportStatus = activeQuestion
+        ? localReportsMap[`App\\Models\\Question:${activeQuestion.id}`]
+        : undefined;
+    const isReported = reportStatus === 'pending';
 
 
     // Live statistics & pacing calculations

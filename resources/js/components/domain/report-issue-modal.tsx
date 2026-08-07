@@ -43,42 +43,69 @@ export function ReportIssueModal({
         });
 
     const [processing, setProcessing] = React.useState(false);
+    const isSubmitting = React.useRef(false);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        if (isSubmitting.current) return;
+        
+        isSubmitting.current = true;
         setProcessing(true);
+        clearErrors();
 
         try {
-            const match = document.cookie.match(new RegExp('(^| )XSRF-TOKEN=([^;]+)'));
+            const match = document.cookie.match(
+                new RegExp('(^| )XSRF-TOKEN=([^;]+)'),
+            );
             const xsrfToken = match ? decodeURIComponent(match[2]) : '';
 
             const response = await fetch('/feedbacks/submit', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Accept': 'application/json',
+                    Accept: 'application/json',
                     'X-XSRF-TOKEN': xsrfToken,
                 },
                 body: JSON.stringify(data),
             });
 
-            if (response.ok || response.type === 'opaqueredirect' || response.redirected) {
+            if (response.status === 422) {
+                const errorData = await response.json();
+                if (errorData.errors && errorData.errors.reason) {
+                    toast.error(errorData.errors.reason[0]);
+                } else {
+                    toast.error(
+                        'Failed to submit report. Please check the fields and try again.',
+                    );
+                }
+                return;
+            }
+
+            if (
+                response.ok ||
+                response.type === 'opaqueredirect' ||
+                response.redirected
+            ) {
                 toast.success(
                     'Report submitted successfully! Thank you for helping improve the platform.',
                 );
+                
+                // Dispatch event so parent views can instantly update their local state
+                window.dispatchEvent(new CustomEvent('report-submitted', { detail: { flaggable_id: flaggableId } }));
+                
                 reset();
-                clearErrors();
                 onClose();
             } else {
                 toast.error(
-                    'Failed to submit report. Please check the fields and try again.',
+                    'Failed to submit report. Please try again.',
                 );
             }
         } catch (error) {
             toast.error(
-                'Failed to submit report. Please check the fields and try again.',
+                'Failed to submit report. Please try again.',
             );
         } finally {
+            isSubmitting.current = false;
             setProcessing(false);
         }
     };

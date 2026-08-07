@@ -33,7 +33,26 @@ export default function LearnShow({ module, recommended }: LearnShowProps) {
         user_reports_map?: Record<string, 'pending' | 'resolved' | 'dismissed'>;
     }>().props;
     const isLoggedIn = !!auth.user;
-    const reportStatus = user_reports_map[`App\\Models\\LearnModule:${module.id}`];
+    
+    const [localReportsMap, setLocalReportsMap] = useState<Record<string, 'pending' | 'resolved' | 'dismissed'>>(user_reports_map);
+
+    React.useEffect(() => {
+        const handleReportSubmitted = (e: CustomEvent<{ flaggable_id: number }>) => {
+            if (e.detail && e.detail.flaggable_id) {
+                setLocalReportsMap(prev => ({
+                    ...prev,
+                    [`App\\Models\\LearnModule:${e.detail.flaggable_id}`]: 'pending'
+                }));
+            }
+        };
+
+        window.addEventListener('report-submitted', handleReportSubmitted as EventListener);
+        return () => {
+            window.removeEventListener('report-submitted', handleReportSubmitted as EventListener);
+        };
+    }, []);
+
+    const reportStatus = localReportsMap[`App\\Models\\LearnModule:${module.id}`];
     const [isReportModalOpen, setIsReportModalOpen] = useState(false);
 
     React.useEffect(() => {
