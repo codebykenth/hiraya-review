@@ -1,7 +1,7 @@
 import { Head, Link, usePage } from '@inertiajs/react';
 import { Award, BookOpen, ChevronLeft, LogIn, Trophy } from 'lucide-react';
 import { useState } from 'react';
-import { formatDuration } from '@/lib/exam-formatters';
+import { formatDuration, calculateWeightedPercentage } from '@/lib/exam-formatters';
 
 
 interface ScorecardViewProps {
@@ -195,10 +195,10 @@ export function ScorecardView({
 
             {results &&
                 (() => {
-                    const exactPercentage =
-                        results.total > 0
-                            ? (results.correctCount / results.total) * 100
-                            : 0;
+                    const exactPercentage = calculateWeightedPercentage(
+                        results,
+                        savedAttempt?.cat_scores?.metadata?.track === 'Subprofessional'
+                    );
                     const formattedPercentage = (
                         Math.trunc(exactPercentage * 100) / 100
                     ).toFixed(2);

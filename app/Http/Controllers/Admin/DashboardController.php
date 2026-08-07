@@ -12,8 +12,14 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
+use App\Services\ExamAttemptFormatter;
+
 class DashboardController
 {
+    public function __construct(
+        protected ExamAttemptFormatter $formatter
+    ) {}
+
     /**
      * Display the dynamic administrator stats overview panel.
      */
@@ -65,7 +71,8 @@ class DashboardController
                 // Get correct counts and totals from metadata or fallbacks
                 $correct = $meta['correct_count'] ?? 0;
                 $total = $meta['total_questions'] ?? count($attempt->question_ids ?? []);
-                $percentage = $total > 0 ? round(($correct / $total) * 100, 2) : 0;
+                
+                $percentage = round($this->formatter->calculateWeightedPercentage($attempt->cat_scores ?? []), 2);
 
                 // Build a descriptive track or category name
                 $trackName = $meta['track'] ?? null;

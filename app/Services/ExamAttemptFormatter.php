@@ -8,6 +8,59 @@ use App\Models\Question;
 class ExamAttemptFormatter
 {
     /**
+     * Calculate the weighted percentage based on category scores.
+     */
+    public function calculateWeightedPercentage(array $catScores): float|int
+    {
+        $scoreMap = $catScores['categoryScoreMap'] ?? $catScores ?? [];
+        
+        $hasWeights = false;
+        foreach (['Verbal Ability', 'Analytical Ability', 'Numerical Ability', 'Clerical Ability', 'General Information'] as $cat) {
+            if (isset($scoreMap[$cat])) {
+                $hasWeights = true;
+                break;
+            }
+        }
+
+        if ($hasWeights) {
+            $totalWeight = 0;
+            $weightedScore = 0;
+
+            foreach ($scoreMap as $catName => $val) {
+                if ($catName === 'metadata' || !is_array($val)) {
+                    continue;
+                }
+
+                $weight = match ($catName) {
+                    'Verbal Ability', 'Numerical Ability' => 0.30,
+                    'Analytical Ability', 'Clerical Ability' => 0.35,
+                    'General Information' => 0.05,
+                    default => 0,
+                };
+
+                if ($weight > 0) {
+                    $correct = (int) ($val['correct'] ?? 0);
+                    $total = (int) ($val['total'] ?? 0);
+                    $catScore = $total > 0 ? ($correct / $total) * 100 : 0;
+                    
+                    $weightedScore += $catScore * $weight;
+                    $totalWeight += $weight;
+                }
+            }
+
+            if ($totalWeight > 0) {
+                return $weightedScore / $totalWeight;
+            }
+        }
+
+        $meta = $catScores['metadata'] ?? [];
+        $correct = $meta['correct_count'] ?? 0;
+        $total = $meta['total_questions'] ?? 0;
+        
+        return $total > 0 ? ($correct / $total) * 100 : 0;
+    }
+
+    /**
      * Format duration from seconds to a readable string (e.g. 1h 20m or 45s).
      */
     public function formatDurationText(int $seconds): string

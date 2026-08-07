@@ -49,7 +49,7 @@ class ExamHistoryController
 
             $correct = $meta['correct_count'] ?? 0;
             $total = $meta['total_questions'] ?? count($attempt->question_ids);
-            $percentage = $total > 0 ? round(($correct / $total) * 100) : 0;
+            $percentage = round($this->formatter->calculateWeightedPercentage($attempt->cat_scores ?? []), 2);
             $durationSecs = (int) ($meta['duration_secs'] ?? 0);
             $durationText = $this->formatter->formatDurationText($durationSecs);
 

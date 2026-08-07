@@ -7,8 +7,14 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
+use App\Services\ExamAttemptFormatter;
+
 class AttemptController
 {
+    public function __construct(
+        protected ExamAttemptFormatter $formatter
+    ) {}
+
     /**
      * Display a paginated list of all exam attempts.
      */
@@ -22,7 +28,8 @@ class AttemptController
 
                 $correct = $meta['correct_count'] ?? 0;
                 $total = $meta['total_questions'] ?? count($attempt->question_ids ?? []);
-                $percentage = $total > 0 ? round(($correct / $total) * 100, 2) : 0;
+                
+                $percentage = round($this->formatter->calculateWeightedPercentage($attempt->cat_scores ?? []), 2);
 
                 $trackName = $meta['track'] ?? null;
                 $categoryName = 'Full Mock Exam';

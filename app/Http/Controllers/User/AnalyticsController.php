@@ -80,7 +80,7 @@ class AnalyticsController
                 $meta = $attempt->cat_scores['metadata'] ?? [];
                 $correct = $meta['correct_count'] ?? 0;
                 $total = $meta['total_questions'] ?? count($attempt->question_ids);
-                $percentage = $total > 0 ? round(($correct / $total) * 100) : 0;
+                $percentage = round($this->formatter->calculateWeightedPercentage($attempt->cat_scores ?? []), 2);
                 $totalScoreSum += $percentage;
 
                 $track = $meta['track'] ?? 'Drill';
@@ -167,7 +167,7 @@ class AnalyticsController
                 $meta = $attempt->cat_scores['metadata'] ?? [];
                 $correct = $meta['correct_count'] ?? 0;
                 $total = $meta['total_questions'] ?? count($attempt->question_ids);
-                $percentage = $total > 0 ? round(($correct / $total) * 100) : 0;
+                $percentage = round($this->formatter->calculateWeightedPercentage($attempt->cat_scores ?? []), 2);
                 $durationSecs = (int) ($meta['duration_secs'] ?? 0);
                 $avgTimePerQuestion = $total > 0 ? round($durationSecs / $total, 1) : 0;
 

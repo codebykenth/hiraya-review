@@ -34,7 +34,7 @@ export function ReportIssueModal({
     flaggableId,
     flaggableType,
 }: ReportIssueModalProps) {
-    const { data, setData, post, processing, reset, clearErrors, errors } =
+    const { data, setData, reset, clearErrors, errors } =
         useForm({
             flaggable_id: flaggableId,
             flaggable_type: flaggableType,
@@ -42,29 +42,45 @@ export function ReportIssueModal({
             details: '',
         });
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const [processing, setProcessing] = React.useState(false);
+
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        setProcessing(true);
 
-        // Use generic route instead of specific since user is submitting it.
-        // Wait, did we make a non-admin route for feedback submission?
-        // Let's check web.php... Wait, Phase 1 only added Admin routes!
-        // The user needs a way to submit feedback from their end.
+        try {
+            const match = document.cookie.match(new RegExp('(^| )XSRF-TOKEN=([^;]+)'));
+            const xsrfToken = match ? decodeURIComponent(match[2]) : '';
 
-        post('/feedbacks/submit', {
-            onSuccess: () => {
+            const response = await fetch('/feedbacks/submit', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-XSRF-TOKEN': xsrfToken,
+                },
+                body: JSON.stringify(data),
+            });
+
+            if (response.ok || response.type === 'opaqueredirect' || response.redirected) {
                 toast.success(
                     'Report submitted successfully! Thank you for helping improve the platform.',
                 );
                 reset();
                 clearErrors();
                 onClose();
-            },
-            onError: () => {
+            } else {
                 toast.error(
                     'Failed to submit report. Please check the fields and try again.',
                 );
-            },
-        });
+            }
+        } catch (error) {
+            toast.error(
+                'Failed to submit report. Please check the fields and try again.',
+            );
+        } finally {
+            setProcessing(false);
+        }
     };
 
     return (
