@@ -54,10 +54,8 @@ export function useQuestionCreateState({
         return tree;
     }, [categories]);
 
-    const defaultCategory =
-        Object.keys(cseCategoriesTree)[0] || 'Analytical Ability';
-    const defaultSubcategory =
-        cseCategoriesTree[defaultCategory]?.[0] || 'Word analogy';
+    const defaultCategory = 'Analytical Ability';
+    const defaultSubcategory = 'Word analogy';
 
     // AI Generator State
     const [aiCategory, setAiCategory] = useState<string>(defaultCategory);
@@ -70,6 +68,7 @@ export function useQuestionCreateState({
     const [aiPrompt, setAiPrompt] = useState<string>('');
     const [aiSymbolicVariety, setAiSymbolicVariety] = useState<string>('all');
     const [aiDataVariety, setAiDataVariety] = useState<string>('all');
+    const [aiAnalogyVariety, setAiAnalogyVariety] = useState<string>('all');
     const [isGenerating, setIsGenerating] = useState<boolean>(false);
     const [errorMsg, setErrorMsg] = useState<string | null>(null);
     const [successMsg, setSuccessMsg] = useState<string | null>(null);
@@ -197,6 +196,7 @@ export function useQuestionCreateState({
                     primary_model: aiPrimaryModel,
                     symbolic_variety: aiSymbolicVariety,
                     data_variety: aiDataVariety,
+                    analogy_variety: aiAnalogyVariety,
                 }),
             });
 
@@ -278,6 +278,8 @@ export function useQuestionCreateState({
         setAiSymbolicVariety,
         aiDataVariety,
         setAiDataVariety,
+        aiAnalogyVariety,
+        setAiAnalogyVariety,
         isGenerating,
         errorMsg,
         successMsg,

@@ -22,6 +22,7 @@ class GenerateQuestionsRequest extends FormRequest
             'primary_model' => ['nullable', 'string'],
             'symbolic_variety' => ['nullable', 'string'],
             'data_variety' => ['nullable', 'string'],
+            'analogy_variety' => ['nullable', 'string'],
         ];
     }
 }

@@ -40,6 +40,8 @@ interface AIGeneratorPanelProps {
     setAiSymbolicVariety: (val: string) => void;
     aiDataVariety: string;
     setAiDataVariety: (val: string) => void;
+    aiAnalogyVariety: string;
+    setAiAnalogyVariety: (val: string) => void;
     isGenerating: boolean;
     errorMsg: string | null;
     successMsg: string | null;
@@ -65,6 +67,8 @@ export function AIGeneratorPanel({
     setAiSymbolicVariety,
     aiDataVariety,
     setAiDataVariety,
+    aiAnalogyVariety,
+    setAiAnalogyVariety,
     isGenerating,
     errorMsg,
     successMsg,
@@ -98,55 +102,54 @@ export function AIGeneratorPanel({
                                 <DialogHeader>
                                     <DialogTitle className="inline-flex items-center gap-2">
                                         <Cpu className="size-5 text-blue-500" />
-                                        AI Question Synthesizer
+                                        AI Question Generator
                                     </DialogTitle>
-                                    <DialogDescription className="hidden">AI Question Synthesizer</DialogDescription>
+                                    <DialogDescription className="text-slate-600 dark:text-slate-400">
+                                        The AI generator uses advanced language models tailored specifically for the Philippine Civil Service Exam to create challenging and diverse questions.
+                                    </DialogDescription>
                                 </DialogHeader>
-                                <div className="mt-4 space-y-4 text-xs leading-relaxed font-semibold text-slate-600 dark:text-slate-300">
-                                    <div className="flex gap-3.5">
-                                        <BookOpen className="mt-0.5 size-4 shrink-0 text-emerald-500 dark:text-emerald-400" />
-                                        <div>
-                                            <h4 className="mb-1 font-bold text-slate-800 dark:text-slate-200">
-                                                Standardized Exam Blueprint
-                                            </h4>
-                                            <p className="text-slate-500 dark:text-slate-400">
-                                                Questions are synthesized directly against
-                                                civil service exam guidelines, mapping to
-                                                key cognitive difficulty standards (Recall,
-                                                Application, Analysis).
-                                            </p>
-                                        </div>
+                                
+                                <div className="space-y-4 py-2">
+                                    <div className="space-y-3 rounded-lg border border-slate-200 bg-white/50 p-3 shadow-xs dark:border-slate-800 dark:bg-slate-900/50">
+                                        <h4 className="flex items-center gap-1.5 text-xs font-bold text-slate-700 dark:text-slate-300">
+                                            <BookOpen className="size-3.5 text-indigo-500" />
+                                            Supported Models
+                                        </h4>
+                                        <ul className="space-y-2 text-[13px]">
+                                            <li className="flex items-start gap-2 text-slate-600 dark:text-slate-400">
+                                                <div className="mt-0.5 rounded bg-indigo-100 p-0.5 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400">
+                                                    <Sparkle className="size-3" />
+                                                </div>
+                                                <span className="leading-snug"><strong className="font-semibold text-slate-800 dark:text-slate-200">Gemini 1.5 Flash:</strong> Fast and efficient model, perfect for standard questions like vocabulary, math, and general information.</span>
+                                            </li>
+                                            <li className="flex items-start gap-2 text-slate-600 dark:text-slate-400">
+                                                <div className="mt-0.5 rounded bg-blue-100 p-0.5 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
+                                                    <Sparkle className="size-3" />
+                                                </div>
+                                                <span className="leading-snug"><strong className="font-semibold text-slate-800 dark:text-slate-200">Gemini 1.5 Pro:</strong> Advanced reasoning model. Recommended for complex logical puzzles, data interpretation, and reading comprehension.</span>
+                                            </li>
+                                        </ul>
                                     </div>
-            
-                                    <div className="flex gap-3.5">
-                                        <Sparkles className="mt-0.5 size-4 shrink-0 text-purple-500 dark:text-purple-400" />
-                                        <div>
-                                            <h4 className="mb-1 font-bold text-slate-800 dark:text-slate-200">
-                                                Contextual Prompting
-                                            </h4>
-                                            <p className="text-slate-500 dark:text-slate-400">
-                                                Use the Additional Context block to hone in
-                                                on specific review modules—e.g. Philippine
-                                                Constitutional amendments, fractions, or
-                                                paragraph ordering puzzles.
-                                            </p>
-                                        </div>
-                                    </div>
-            
-                                    <div className="flex gap-3.5">
-                                        <HelpCircle className="mt-0.5 size-4 shrink-0 text-blue-500 dark:text-blue-400" />
-                                        <div>
-                                            <h4 className="mb-1 font-bold text-slate-800 dark:text-slate-200">
-                                                Interactive Review Queue
-                                            </h4>
-                                            <p className="font-medium text-slate-500 dark:text-slate-400">
-                                                Once questions are generated, they flow
-                                                straight into the{' '}
-                                                <strong>Drafts Review Center</strong>,
-                                                allowing you to edit and batch-approve them
-                                                in a unified dashboard.
-                                            </p>
-                                        </div>
+                                    
+                                    <div className="space-y-3 rounded-lg border border-emerald-200 bg-emerald-50/50 p-3 shadow-xs dark:border-emerald-900/20 dark:bg-emerald-900/10">
+                                        <h4 className="flex items-center gap-1.5 text-xs font-bold text-emerald-700 dark:text-emerald-400">
+                                            <CheckCircle2 className="size-3.5" />
+                                            Best Practices
+                                        </h4>
+                                        <ul className="space-y-2 text-[13px] text-emerald-700/80 dark:text-emerald-400/80">
+                                            <li className="flex items-start gap-1.5">
+                                                <span className="mt-1 size-1 shrink-0 rounded-full bg-emerald-400" />
+                                                <span className="leading-tight">Generated questions are saved as drafts first. Review them carefully before publishing.</span>
+                                            </li>
+                                            <li className="flex items-start gap-1.5">
+                                                <span className="mt-1 size-1 shrink-0 rounded-full bg-emerald-400" />
+                                                <span className="leading-tight">Use the "Custom Prompt" field to steer the AI (e.g., "Make the word problems about agriculture").</span>
+                                            </li>
+                                            <li className="flex items-start gap-1.5">
+                                                <span className="mt-1 size-1 shrink-0 rounded-full bg-emerald-400" />
+                                                <span className="leading-tight">Batch generate up to 20 questions at a time for optimal quality and speed.</span>
+                                            </li>
+                                        </ul>
                                     </div>
                                 </div>
                             </DialogContent>
@@ -171,6 +174,46 @@ export function AIGeneratorPanel({
                             onValueChange={setAiSubcategory}
                             options={cseCategoriesTree[aiCategory] || []}
                         />
+
+                        {/* Word Analogy format select - dynamic */}
+                        {aiSubcategory === 'Word analogy' && (
+                            <SelectField
+                                label="Analogy Relationship Variety"
+                                value={aiAnalogyVariety}
+                                disabled={isGenerating}
+                                onValueChange={setAiAnalogyVariety}
+                                options={[
+                                    {
+                                        value: 'all',
+                                        label: 'Random / All Categories',
+                                    },
+                                    {
+                                        value: 'function',
+                                        label: 'Function (e.g., Tool : Action)',
+                                    },
+                                    {
+                                        value: 'degree',
+                                        label: 'Degree (e.g., Warm : Hot)',
+                                    },
+                                    {
+                                        value: 'characteristics',
+                                        label: 'Characteristics (e.g., Sugar : Sweet)',
+                                    },
+                                    {
+                                        value: 'part_whole',
+                                        label: 'Part of a Whole (e.g., Wheel : Car)',
+                                    },
+                                    {
+                                        value: 'synonyms_antonyms',
+                                        label: 'Synonyms / Antonyms',
+                                    },
+                                    {
+                                        value: 'classification',
+                                        label: 'Classification (e.g., Apple : Fruit)',
+                                    },
+                                ]}
+                            />
+                        )}
 
                         {/* Symbolic reasoning format select - dynamic */}
                         {aiSubcategory ===
@@ -216,6 +259,18 @@ export function AIGeneratorPanel({
                                     {
                                         value: 'format_h',
                                         label: 'Format H: Mirror/Water Reflections',
+                                    },
+                                    {
+                                        value: 'format_i',
+                                        label: 'Format I: Categorical Syllogism (Text)',
+                                    },
+                                    {
+                                        value: 'format_j',
+                                        label: 'Format J: Conditional Syllogism (Text)',
+                                    },
+                                    {
+                                        value: 'format_k',
+                                        label: 'Format K: Disjunctive Syllogism (Text)',
                                     },
                                 ]}
                             />

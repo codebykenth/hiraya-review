@@ -83,7 +83,26 @@ class GenerateQuestionsJob implements ShouldQueue
                     $categorySpecificRules = "* Sentence structure (Filipino/Tagalog): Focus on correct Filipino/Tagalog syntax, such as distinguishing between standard and inverted sentence orders (Karaniwan vs. Di-karaniwang ayos), proper placement of enclitics (mga ingklitik like 'ba', 'na', 'man', 'yata'), and correct verb focus (pokus ng pandiwa).";
                 }
             } elseif ($subcategory === 'Word analogy') {
-                $categorySpecificRules = '* Word analogy: Provide standard analytical analogies. You MUST format the stem strictly as the analogy equation (e.g., "ARCHIVE : STORE :: TICKET : _____"). Do NOT add any explanatory text or questions like "Which word best completes the analogy?". You MUST ensure a diverse variety of relationship categories, including but not limited to: function (e.g. tool:action), degree (e.g. warm:hot), characteristics, part of a whole, antonyms/synonyms, and classification analogies.';
+                $variety = $validated['analogy_variety'] ?? 'all';
+                $varietyInstruction = '';
+                
+                if ($variety === 'function') {
+                    $varietyInstruction = 'CRITICAL VARIETY RULE: You MUST ONLY generate "Function" analogies (e.g., Tool : Action, Object : Purpose).';
+                } elseif ($variety === 'degree') {
+                    $varietyInstruction = 'CRITICAL VARIETY RULE: You MUST ONLY generate "Degree" analogies (e.g., Warm : Hot, Cool : Freezing).';
+                } elseif ($variety === 'characteristics') {
+                    $varietyInstruction = 'CRITICAL VARIETY RULE: You MUST ONLY generate "Characteristics" analogies (e.g., Sugar : Sweet, Lemon : Sour).';
+                } elseif ($variety === 'part_whole') {
+                    $varietyInstruction = 'CRITICAL VARIETY RULE: You MUST ONLY generate "Part of a Whole" analogies (e.g., Wheel : Car, Page : Book).';
+                } elseif ($variety === 'synonyms_antonyms') {
+                    $varietyInstruction = 'CRITICAL VARIETY RULE: You MUST ONLY generate "Synonyms or Antonyms" analogies.';
+                } elseif ($variety === 'classification') {
+                    $varietyInstruction = 'CRITICAL VARIETY RULE: You MUST ONLY generate "Classification" analogies (e.g., Apple : Fruit, Dog : Mammal).';
+                } else {
+                    $varietyInstruction = 'You MUST ensure a diverse variety of relationship categories, including but not limited to: function (e.g. tool:action), degree (e.g. warm:hot), characteristics, part of a whole, antonyms/synonyms, and classification analogies.';
+                }
+
+                $categorySpecificRules = "* Word analogy: Provide standard analytical analogies. You MUST format the stem strictly as the analogy equation (e.g., \"ARCHIVE : STORE :: TICKET : _____\"). Do NOT add any explanatory text or questions like \"Which word best completes the analogy?\". {$varietyInstruction}";
                 if (in_array($validated['language'], ['Filipino/Tagalog', 'Tagalog'])) {
                     $categorySpecificRules .= "\n        * Word analogy (Tagalog): Use authentic Filipino/Tagalog word relationships and formal vocabulary rather than directly translating standard English analogies. Maintain the same variety of relationship categories (function, degree, characteristics, part of a whole, antonyms/synonyms, classifications). Ensure this strictly falls under the Analytical Ability category.";
                 }
@@ -106,6 +125,12 @@ class GenerateQuestionsJob implements ShouldQueue
                     $varietyInstruction = "CRITICAL VARIETY RULE: You MUST generate ONLY the following format. You are forbidden from generating any other format:\n        - Format G: Dot Placement / Intersection Logic. The stem shows a reference diagram where shapes (like a circle, triangle, and square) overlap, with a dot placed in a specific intersection region. The options show similar overlapping shapes, and the user must choose the only option where a dot can be placed in the identical intersection condition.";
                 } elseif ($variety === 'format_h') {
                     $varietyInstruction = "CRITICAL VARIETY RULE: You MUST generate ONLY the following format. You are forbidden from generating any other format:\n        - Format H: Mirror/Water Reflections. The stem shows a complex figure, and the options show reflections across a given axis (horizontal or vertical).";
+                } elseif ($variety === 'format_i') {
+                    $varietyInstruction = "CRITICAL VARIETY RULE: You MUST generate ONLY the following format. You are forbidden from generating any other format:\n        - Format I: Categorical Syllogism. The stem provides a text-based logical scenario involving categorical propositions (e.g., 'All A are B', 'Some C are A'). The options must be valid or invalid conclusions derived from the premises. NO SVGs ALLOWED.";
+                } elseif ($variety === 'format_j') {
+                    $varietyInstruction = "CRITICAL VARIETY RULE: You MUST generate ONLY the following format. You are forbidden from generating any other format:\n        - Format J: Conditional Syllogism. The stem provides a text-based logical scenario using 'If... then...' statements (modus ponens, modus tollens). The options must be logical deductions based on the premises. NO SVGs ALLOWED.";
+                } elseif ($variety === 'format_k') {
+                    $varietyInstruction = "CRITICAL VARIETY RULE: You MUST generate ONLY the following format. You are forbidden from generating any other format:\n        - Format K: Disjunctive Syllogism. The stem provides a text-based logical scenario using 'Either... or...' statements. The options must be logical deductions based on the premises. NO SVGs ALLOWED.";
                 } else {
                     $varietyInstruction = "CRITICAL VARIETY RULE: To prevent repetitive questions, randomly select one of the following abstract reasoning formats for each question:
         - Format A: Grid-based Logical Matrix. Generate a single SVG showing a grid of shapes (e.g. 2x2, 3x3, or 4x4 cells). The bottom-right cell MUST show a question mark '?' indicating the missing symbol. The other cells must follow a logical grid-based pattern (e.g. addition, subtraction, or overlap of lines/shapes in rows or columns).
@@ -115,15 +140,25 @@ class GenerateQuestionsJob implements ShouldQueue
         - Format E: Odd One Out / Classification. The stem asks to find the figure that does not belong. Options A to E show different SVG figures, where 4 of them share a common geometric or mathematical property (e.g., line count, symmetry, rotational similarity) and 1 is the 'odd one out'.
         - Format F: Cube Folding / 3D Net. The stem shows a 2D unfolded cube net (showing shapes on the faces). The options show folded 3D cube representations, and the user must identify the only correct folded version.
         - Format G: Dot Placement / Intersection Logic. The stem shows a reference diagram where shapes (like a circle, triangle, and square) overlap, with a dot placed in a specific intersection region. The options show similar overlapping shapes, and the user must choose the only option where a dot can be placed in the identical intersection condition.
-        - Format H: Mirror/Water Reflections. The stem shows a complex figure, and the options show reflections across a given axis (horizontal or vertical).";
+        - Format H: Mirror/Water Reflections. The stem shows a complex figure, and the options show reflections across a given axis (horizontal or vertical).
+        - Format I: Categorical Syllogism (Text-based). Provide a logical scenario involving categorical propositions ('All A are B'). NO SVGs ALLOWED.
+        - Format J: Conditional Syllogism (Text-based). Provide a logical scenario using 'If... then...' statements. NO SVGs ALLOWED.
+        - Format K: Disjunctive Syllogism (Text-based). Provide a logical scenario using 'Either... or...' statements. NO SVGs ALLOWED.";
                 }
 
-                $categorySpecificRules = "* Symbolic logic / abstract reasoning: You MUST generate visual-spatial geometric puzzles using raw, scalable SVG code. Output raw <svg viewBox=\"...\">...</svg> blocks directly inside the text. You MUST include SVG visuals not just in the question stem, but ALSO in every single option (Options A to E must be standalone SVGs showing the possible answers, do NOT use descriptive text for options). Keep SVGs clean with simple paths, <rect>, <circle>, or <polygon>.
-        CRITICAL STEM SVG RULE: The question 'stem' MUST contain at least one <svg> block representing the puzzle's reference diagram or sequence. You are forbidden from generating visual questions without including the reference SVG in the stem! (Except for Odd One Out Format E, where the puzzle is defined by the options).
-        CRITICAL TOKEN OPTIMIZATION RULE: To prevent generation cutoffs, you MUST heavily minify your SVG code. Do NOT use any HTML comments (<!-- -->) inside the SVGs. Remove all unnecessary whitespace, spaces, and line breaks within the SVG code. Keep the code as compact as possible.
+                if (in_array($variety, ['format_i', 'format_j', 'format_k'])) {
+                    $categorySpecificRules = "* Symbolic logic / abstract reasoning: You MUST generate text-based logical reasoning puzzles focusing on syllogisms.
+        {$varietyInstruction}
+        CRITICAL RULE: DO NOT USE SVGS. The question must be purely text-based. Provide clear and tricky distractors. The explanation must clearly map out the logical deduction step-by-step in plain, intuitive English. AVOID formal academic logic jargon (e.g., do NOT use terms like 'Major/Minor Terms', 'E-type proposition', 'Festino', or 'illicit minor'). Instead, explain using simple concepts like sets, overlapping groups, or real-world logic that an average test-taker can easily follow.";
+                } else {
+                    $categorySpecificRules = "* Symbolic logic / abstract reasoning: You MUST generate visual-spatial geometric puzzles using raw, scalable SVG code. Output raw <svg viewBox=\"...\">...</svg> blocks directly inside the text. You MUST include SVG visuals not just in the question stem, but ALSO in every single option (Options A to E must be standalone SVGs showing the possible answers, do NOT use descriptive text for options). Keep SVGs clean with simple paths, <rect>, <circle>, or <polygon>.
+        CRITICAL STEM SVG RULE: If the format requires a visual reference (Formats A-H), the 'stem' MUST contain at least one <svg> block representing the puzzle's reference diagram or sequence. (Except for Odd One Out Format E, where the puzzle is defined by the options).
+        CRITICAL TOKEN OPTIMIZATION RULE: To prevent generation cutoffs, you MUST heavily minify your SVG code. Do NOT use any HTML comments (<!-- -->) inside the SVGs. Remove all unnecessary whitespace, spaces, and line breaks ONLY within the SVG code. Do NOT remove spaces or line breaks in regular text!
         {$varietyInstruction}
         
+        CRITICAL HYBRID RULE: If generating Format I, J, or K (Text-based Syllogisms), completely ignore the SVG rules above and generate purely text-based questions without any SVG tags. You MUST use proper spacing, line breaks, and formatting for text (e.g., place each premise on a new line). For syllogism explanations, use plain, intuitive English and strictly AVOID academic logic jargon (no 'Major/Minor Terms', 'E-type', 'Festino', etc.). Explain using simple concepts like overlapping groups. For visual Formats A-H, follow the geometric coherence rule below:
         CRITICAL GEOMETRIC COHERENCE RULE: Ensure that all elements (e.g. dots, lines, shapes) inside the SVGs never unintentionally overlap or intersect, unless it is a deliberate part of the puzzle logic. For multiple-choice options (A to E), every option must be constructed with clean spatial layouts and correct coordinate separation so that the correct answer cannot be easily guessed by simply choosing the only option without overlapping elements.";
+                }
             } elseif ($subcategory === 'Data interpretation') {
                 $variety = $validated['data_variety'] ?? 'all';
                 $varietyInstruction = '';
@@ -152,7 +187,7 @@ class GenerateQuestionsJob implements ShouldQueue
         
         CRITICAL SVG RULES: Use a wide viewBox='0 0 800 500' for charts. You MUST leave ample margin inside the viewBox for all axes labels and titles so nothing is clipped. For example, start the chart's main axes at least at x=100 and y=80. Ensure the rotated Y-axis title and the main chart title have plenty of room within positive coordinates. Ensure all text labels use <text> elements with clear font sizes, stay well within the viewBox boundaries, and do not overlap with other visual elements. Keep any SVG code clean, well-structured, and minified without comments. The options should be plain text or numbers based on the data, and the explanation block must reference the specific data points.";
             } elseif ($subcategory === 'Identifying assumptions and drawing conclusions') {
-                $categorySpecificRules = '* Identifying assumptions and drawing conclusions: Provide realistic logical scenarios (e.g. government policies, office protocols, or formal arguments). Questions must test formal syllogistic deductions ("All A are B...", valid conclusions) or identifying unstated premises and assumptions necessary for an argument to hold true. You MUST generate diverse logic types including "categorical", "conditional", and "disjunctive" syllogisms. You must also include ordering logic puzzles (e.g., "Person A is older than Person B but younger than Person C... Who is the oldest?"), ensuring strict logical rigor and variety.';
+                $categorySpecificRules = '* Identifying assumptions and drawing conclusions: Provide realistic logical scenarios (e.g. government policies, office protocols, or formal arguments). Questions must test identifying unstated premises and assumptions necessary for an argument to hold true, or drawing logical conclusions from a set of facts. You must also include ordering logic puzzles (e.g., "Person A is older than Person B but younger than Person C... Who is the oldest?") and calendar/day sequence logic puzzles (e.g., "If yesterday was two days before Monday, what day is tomorrow?"), ensuring strict logical rigor and variety. DO NOT generate standard categorical/conditional syllogisms (e.g. All A are B), as those belong in Symbolic Logic.';
             } elseif ($subcategory === 'Filing') {
                 $categorySpecificRules = '* Filing: Test standard Philippine Civil Service alphabetical filing and indexing rules (e.g., Last Name, First Name, Middle Initial; handling of titles like Dr./Atty., government agency names, hyphenated surnames, and numerical prefixes). Provide 4 to 5 names or file titles and ask for the correct alphabetical sequence.';
             } elseif ($subcategory === 'Spelling') {

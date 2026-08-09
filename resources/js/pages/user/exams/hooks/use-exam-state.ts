@@ -848,7 +848,11 @@ export function useExamState({
                 pool: Question[],
                 count: number,
                 catName: string,
+                subName?: string,
             ): Question[] => {
+                const maxSvg = subName === 'Symbolic logic / abstract reasoning' ? 2 : Infinity;
+                let currentSvgCount = 0;
+
                 const wrongFromSeen = pool.filter((q) => wrongSet.has(q.id));
                 const unseen = pool.filter((q) => !seenSet.has(q.id));
                 const seenCorrect = pool.filter(
@@ -857,12 +861,28 @@ export function useExamState({
 
                 let picked: Question[] = [];
 
+                const pushWithLimit = (items: Question[], quota: number) => {
+                    let added = 0;
+                    for (const q of items) {
+                        if (added >= quota) break;
+                        if (picked.some(p => p.id === q.id)) continue;
+                        
+                        const isSvg = (typeof q.stem === 'string' && q.stem.includes('<svg')) ||
+                                      (Array.isArray(q.options) && q.options.some((o: any) => typeof o === 'string' && o.includes('<svg')));
+                        if (isSvg && currentSvgCount >= maxSvg) continue;
+                        
+                        picked.push(q);
+                        if (isSvg) currentSvgCount++;
+                        added++;
+                    }
+                };
+
                 // 1. Pick up to 30% from previously wrong
                 const wrongQuota = Math.ceil(count * 0.3);
                 let wrongPicked = [...wrongFromSeen].sort(
                     () => Math.random() - 0.5,
                 );
-                picked.push(...wrongPicked.slice(0, wrongQuota));
+                pushWithLimit(wrongPicked, wrongQuota);
 
                 // 2. Fill from unseen pool
                 let remaining = count - picked.length;
@@ -870,7 +890,7 @@ export function useExamState({
                     let unseenPicked = [...unseen].sort(
                         () => Math.random() - 0.5,
                     );
-                    picked.push(...unseenPicked.slice(0, remaining));
+                    pushWithLimit(unseenPicked, remaining);
                 }
 
                 // 3. Backfill if still short with seen correct
@@ -879,14 +899,14 @@ export function useExamState({
                     let seenCorrectPicked = [...seenCorrect].sort(
                         () => Math.random() - 0.5,
                     );
-                    picked.push(...seenCorrectPicked.slice(0, remaining));
+                    pushWithLimit(seenCorrectPicked, remaining);
                 }
 
                 // 4. Backfill from remaining wrong questions if we are still short
                 remaining = count - picked.length;
                 if (remaining > 0) {
-                    let extraWrong = wrongPicked.slice(wrongQuota).sort(() => Math.random() - 0.5);
-                    picked.push(...extraWrong.slice(0, remaining));
+                    let extraWrong = wrongPicked.sort(() => Math.random() - 0.5);
+                    pushWithLimit(extraWrong, remaining);
                 }
 
                 // 5. If STILL short, fallback questions
@@ -894,14 +914,19 @@ export function useExamState({
                     const fbPool = fallbackQuestions.filter(
                         (q) =>
                             q.category === catName &&
+                            (!subName || q.subcategory === subName) &&
                             !picked.some((p) => p.id === q.id),
                     );
-                    picked = [
-                        ...picked,
-                        ...[...fbPool]
-                            .sort(() => Math.random() - 0.5)
-                            .slice(0, count - picked.length),
-                    ];
+                    pushWithLimit([...fbPool].sort(() => Math.random() - 0.5), count - picked.length);
+                }
+
+                // 6. If STILL short and restricted by SVG, lift the SVG restriction and backfill
+                if (picked.length < count && maxSvg !== Infinity) {
+                    const remainingPool = [...pool].filter(q => !picked.some(p => p.id === q.id)).sort(() => Math.random() - 0.5);
+                    for (const q of remainingPool) {
+                        if (picked.length >= count) break;
+                        picked.push(q);
+                    }
                 }
 
                 while (picked.length < count && picked.length > 0) {
@@ -979,11 +1004,11 @@ export function useExamState({
                         const engQuota = quota - filQuota;
 
                         picked.push(
-                            ...pickFlat(engPool, engQuota, catName),
-                            ...pickFlat(filPool, filQuota, catName),
+                            ...pickFlat(engPool, engQuota, catName, subName),
+                            ...pickFlat(filPool, filQuota, catName, subName),
                         );
                     } else {
-                        picked.push(...pickFlat(subPool, quota, catName));
+                        picked.push(...pickFlat(subPool, quota, catName, subName));
                     }
                 }
 

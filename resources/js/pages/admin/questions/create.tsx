@@ -1,4 +1,4 @@
-﻿import { Head } from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
 import React from 'react';
 import { CurationCreateShell } from '@/components/domain/curation-create-shell';
 import { index as questionsIndex } from '@/routes/questions';
@@ -36,6 +36,8 @@ export default function CreateQuestion(props: CreateProps) {
         setAiSymbolicVariety,
         aiDataVariety,
         setAiDataVariety,
+        aiAnalogyVariety,
+        setAiAnalogyVariety,
         handleCancelAIGeneration,
     } = useQuestionCreateState(props);
 
@@ -57,6 +59,8 @@ export default function CreateQuestion(props: CreateProps) {
             setAiSymbolicVariety={setAiSymbolicVariety}
             aiDataVariety={aiDataVariety}
             setAiDataVariety={setAiDataVariety}
+            aiAnalogyVariety={aiAnalogyVariety}
+            setAiAnalogyVariety={setAiAnalogyVariety}
             isGenerating={isGenerating}
             errorMsg={errorMsg}
             successMsg={successMsg}
