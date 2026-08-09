@@ -1458,13 +1458,17 @@ export default function QuestionsIndex({
                                             <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
                                                 {previewQuestion.options.map(
                                                     (
-                                                        opt: QuestionOption,
+                                                        opt: any,
                                                         idx: number,
-                                                    ) => (
+                                                    ) => {
+                                                        const text = typeof opt === 'string' ? opt : opt.option_text;
+                                                        const isCorrect = typeof opt === 'object' ? opt.is_correct : previewQuestion.correct_option === idx;
+                                                        
+                                                        return (
                                                         <div
                                                             key={idx}
                                                             className={`flex items-start gap-2 rounded-lg border p-3 text-xs ${
-                                                                opt.is_correct
+                                                                isCorrect
                                                                     ? 'border-emerald-300 bg-emerald-50/50 text-emerald-900 dark:border-emerald-900/40 dark:bg-emerald-950/20 dark:text-emerald-300'
                                                                     : 'border-border bg-background text-foreground'
                                                             }`}
@@ -1475,15 +1479,15 @@ export default function QuestionsIndex({
                                                                 )}
                                                             </span>
                                                             <span className="font-medium">
-                                                                {opt.option_text}
+                                                                {renderFormattedText(text)}
                                                             </span>
-                                                            {opt.is_correct && (
+                                                            {isCorrect && (
                                                                 <span className="ml-auto rounded bg-emerald-600 px-1.5 py-0.5 text-[9px] font-black text-white">
                                                                     Correct
                                                                 </span>
                                                             )}
                                                         </div>
-                                                    ),
+                                                    )}
                                                 )}
                                             </div>
                                         </div>

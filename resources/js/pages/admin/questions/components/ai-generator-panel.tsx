@@ -219,58 +219,62 @@ export function AIGeneratorPanel({
                         {aiSubcategory ===
                             'Symbolic logic / abstract reasoning' && (
                             <SelectField
-                                label="Abstract Reasoning Variety"
+                                label="Abstract Reasoning Format"
                                 value={aiSymbolicVariety}
                                 disabled={isGenerating}
                                 onValueChange={setAiSymbolicVariety}
                                 options={[
                                     {
                                         value: 'all',
-                                        label: 'Random / All Formats',
+                                        label: 'Random / Mixed Formats',
                                     },
                                     {
                                         value: 'format_a',
-                                        label: 'Format A: Grid-based Logical Matrix',
+                                        label: 'Format A: Grid-based Logical Matrix (Visual)',
                                     },
                                     {
                                         value: 'format_b',
-                                        label: 'Format B: Sequence Puzzle',
+                                        label: 'Format B: Sequence Puzzle (Visual)',
                                     },
                                     {
                                         value: 'format_c',
-                                        label: 'Format C: Visual Analogy',
+                                        label: 'Format C: Visual Analogy (Visual)',
                                     },
                                     {
                                         value: 'format_d',
-                                        label: 'Format D: Rotation/Reflection Grid',
+                                        label: 'Format D: Rotation/Reflection Grid (Visual)',
                                     },
                                     {
                                         value: 'format_e',
-                                        label: 'Format E: Odd One Out / Classification',
+                                        label: 'Format E: Odd One Out / Classification (Visual)',
                                     },
                                     {
                                         value: 'format_f',
-                                        label: 'Format F: Cube Folding / 3D Net',
+                                        label: 'Format F: Cube Folding / 3D Net (Visual)',
                                     },
                                     {
                                         value: 'format_g',
-                                        label: 'Format G: Dot Placement / Intersection Logic',
+                                        label: 'Format G: Dot Placement / Intersection (Visual)',
                                     },
                                     {
                                         value: 'format_h',
-                                        label: 'Format H: Mirror/Water Reflections',
+                                        label: 'Format H: Mirror/Water Reflections (Visual)',
                                     },
                                     {
                                         value: 'format_i',
-                                        label: 'Format I: Categorical Syllogism (Text)',
+                                        label: 'Format I: Categorical Syllogism (Text-based)',
                                     },
                                     {
                                         value: 'format_j',
-                                        label: 'Format J: Conditional Syllogism (Text)',
+                                        label: 'Format J: Conditional Syllogism (Text-based)',
                                     },
                                     {
                                         value: 'format_k',
-                                        label: 'Format K: Disjunctive Syllogism (Text)',
+                                        label: 'Format K: Disjunctive Syllogism (Text-based)',
+                                    },
+                                    {
+                                        value: 'format_l',
+                                        label: 'Format L: Flowchart Logic (Visual SVG with Text Options)',
                                     },
                                 ]}
                             />
