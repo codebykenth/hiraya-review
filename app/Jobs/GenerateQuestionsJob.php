@@ -131,8 +131,6 @@ class GenerateQuestionsJob implements ShouldQueue
                     $varietyInstruction = "CRITICAL VARIETY RULE: You MUST generate ONLY the following format. You are forbidden from generating any other format:\n        - Format J: Conditional Syllogism. The stem provides a text-based logical scenario using 'If... then...' statements (modus ponens, modus tollens). The options must be logical deductions based on the premises. NO SVGs ALLOWED.";
                 } elseif ($variety === 'format_k') {
                     $varietyInstruction = "CRITICAL VARIETY RULE: You MUST generate ONLY the following format. You are forbidden from generating any other format:\n        - Format K: Disjunctive Syllogism. The stem provides a text-based logical scenario using 'Either... or...' statements. The options must be logical deductions based on the premises. NO SVGs ALLOWED.";
-                } elseif ($variety === 'format_l') {
-                    $varietyInstruction = "CRITICAL VARIETY RULE: You MUST generate ONLY the following format. You are forbidden from generating any other format:\n        - Format L: Flowchart Logic. Generate a raw SVG flowchart puzzle (e.g., inputting a number and passing it through decision boxes like 'is it odd?', 'is it prime?'). The question stem must contain the SVG flowchart and a specific input, and ask for the final output. The options must be text-based numbers or strings representing the possible outputs (do NOT use SVGs for the options in this format).";
                 } else {
                     $varietyInstruction = "CRITICAL VARIETY RULE: To prevent repetitive questions, randomly select one of the following abstract reasoning formats for each question:
         - Format A: Grid-based Logical Matrix. Generate a single SVG showing a grid of shapes (e.g. 2x2, 3x3, or 4x4 cells). The bottom-right cell MUST show a question mark '?' indicating the missing symbol. The other cells must follow a logical grid-based pattern (e.g. addition, subtraction, or overlap of lines/shapes in rows or columns).
@@ -145,8 +143,7 @@ class GenerateQuestionsJob implements ShouldQueue
         - Format H: Mirror/Water Reflections. The stem shows a complex figure, and the options show reflections across a given axis (horizontal or vertical).
         - Format I: Categorical Syllogism (Text-based). Provide a logical scenario involving categorical propositions ('All A are B'). NO SVGs ALLOWED.
         - Format J: Conditional Syllogism (Text-based). Provide a logical scenario using 'If... then...' statements. NO SVGs ALLOWED.
-        - Format K: Disjunctive Syllogism (Text-based). Provide a logical scenario using 'Either... or...' statements. NO SVGs ALLOWED.
-        - Format L: Flowchart Logic. Generate an SVG flowchart puzzle (e.g. processing a number or string through decision boxes). The question stem contains the SVG flowchart and a specific input. Options are the final output.";
+        - Format K: Disjunctive Syllogism (Text-based). Provide a logical scenario using 'Either... or...' statements. NO SVGs ALLOWED.";
                 }
 
                 if (in_array($variety, ['format_i', 'format_j', 'format_k'])) {

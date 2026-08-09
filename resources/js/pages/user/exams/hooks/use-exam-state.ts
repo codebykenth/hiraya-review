@@ -850,9 +850,6 @@ export function useExamState({
                 catName: string,
                 subName?: string,
             ): Question[] => {
-                const maxSvg = subName === 'Symbolic logic / abstract reasoning' ? 2 : Infinity;
-                let currentSvgCount = 0;
-
                 const wrongFromSeen = pool.filter((q) => wrongSet.has(q.id));
                 const unseen = pool.filter((q) => !seenSet.has(q.id));
                 const seenCorrect = pool.filter(
@@ -867,12 +864,7 @@ export function useExamState({
                         if (added >= quota) break;
                         if (picked.some(p => p.id === q.id)) continue;
                         
-                        const isSvg = (typeof q.stem === 'string' && q.stem.includes('<svg')) ||
-                                      (Array.isArray(q.options) && q.options.some((o: any) => typeof o === 'string' && o.includes('<svg')));
-                        if (isSvg && currentSvgCount >= maxSvg) continue;
-                        
                         picked.push(q);
-                        if (isSvg) currentSvgCount++;
                         added++;
                     }
                 };
@@ -920,14 +912,6 @@ export function useExamState({
                     pushWithLimit([...fbPool].sort(() => Math.random() - 0.5), count - picked.length);
                 }
 
-                // 6. If STILL short and restricted by SVG, lift the SVG restriction and backfill
-                if (picked.length < count && maxSvg !== Infinity) {
-                    const remainingPool = [...pool].filter(q => !picked.some(p => p.id === q.id)).sort(() => Math.random() - 0.5);
-                    for (const q of remainingPool) {
-                        if (picked.length >= count) break;
-                        picked.push(q);
-                    }
-                }
 
                 while (picked.length < count && picked.length > 0) {
                     picked.push(
@@ -978,7 +962,7 @@ export function useExamState({
 
                     const subPool = groups[subName];
 
-                    if (splitLanguage) {
+                    if (splitLanguage || subName === 'Word analogy') {
                         // Split ~50/50 English vs Filipino within this subcategory
                         const engPool = subPool.filter((q) => {
                             const lang = (q.language || '').toLowerCase();
@@ -1012,7 +996,8 @@ export function useExamState({
                     }
                 }
 
-                return picked.slice(0, targetCount);
+                // Shuffle the final picked array so subcategories are completely mixed together within the category
+                return picked.slice(0, targetCount).sort(() => Math.random() - 0.5);
             };
 
             const scoredPool: Question[] = [];

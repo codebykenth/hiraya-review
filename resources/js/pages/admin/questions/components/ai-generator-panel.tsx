@@ -272,10 +272,6 @@ export function AIGeneratorPanel({
                                         value: 'format_k',
                                         label: 'Format K: Disjunctive Syllogism (Text-based)',
                                     },
-                                    {
-                                        value: 'format_l',
-                                        label: 'Format L: Flowchart Logic (Visual SVG with Text Options)',
-                                    },
                                 ]}
                             />
                         )}
