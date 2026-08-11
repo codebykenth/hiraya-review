@@ -406,12 +406,23 @@ export function LessonMarkdown({ content = '' }: LessonMarkdownProps) {
                 continue;
             }
 
-            const nextDollar = normalized.indexOf('$', i);
-            const nextMathIdx =
-                nextDollar === -1 ? normalized.length : nextDollar;
+            let nextDollar = i;
+            while (true) {
+                nextDollar = normalized.indexOf('$', nextDollar);
+                if (nextDollar === -1) break;
+                if (nextDollar > 0 && normalized[nextDollar - 1] === '\\') {
+                    nextDollar++;
+                } else {
+                    break;
+                }
+            }
+
+            const nextMathIdx = nextDollar === -1 ? normalized.length : nextDollar;
+            const plainText = normalized.substring(i, nextMathIdx).replace(/\\\$/g, '$');
+            
             result.push(
                 ...parseFormatting(
-                    normalized.substring(i, nextMathIdx),
+                    plainText,
                     `plain-${i}`,
                 ),
             );

@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 
 /**
  * Find the index of the matching closing brace for the opening brace at startIndex.
@@ -289,10 +289,20 @@ export const parseLatexString = (
             continue;
         }
 
-        // Plain text until next $
-        const nextDollar = text.indexOf('$', i);
+        // Plain text until next unescaped $
+        let nextDollar = i;
+        while (true) {
+            nextDollar = text.indexOf('$', nextDollar);
+            if (nextDollar === -1) break;
+            if (nextDollar > 0 && text[nextDollar - 1] === '\\') {
+                nextDollar++;
+            } else {
+                break;
+            }
+        }
+
         const plainEnd = nextDollar === -1 ? text.length : nextDollar;
-        const plainText = text.substring(i, plainEnd);
+        const plainText = text.substring(i, plainEnd).replace(/\\\$/g, '$');
         result.push(
             plainTextProcessor ? plainTextProcessor(plainText) : plainText,
         );
