@@ -282,15 +282,11 @@ export function AIGeneratorPanel({
                                     },
                                     {
                                         value: 'format_l',
-                                        label: 'Format L: Letter/Alphanumeric Sequence (Text-based)',
+                                        label: 'Format L: Alphanumeric and Symbol Sequence (Text-based)',
                                     },
                                     {
                                         value: 'format_m',
-                                        label: 'Format M: Symbol Sequence (Text-based)',
-                                    },
-                                    {
-                                        value: 'format_n',
-                                        label: 'Format N: Coding and Decoding (Text-based)',
+                                        label: 'Format M: Coding and Decoding (Text-based)',
                                     },
                                 ]}
                             />
