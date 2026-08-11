@@ -23,6 +23,8 @@ class GenerateQuestionsRequest extends FormRequest
             'symbolic_variety' => ['nullable', 'string'],
             'data_variety' => ['nullable', 'string'],
             'analogy_variety' => ['nullable', 'string'],
+            'basic_operations_variety' => ['nullable', 'string'],
+            'word_problem_variety' => ['nullable', 'string'],
         ];
     }
 }

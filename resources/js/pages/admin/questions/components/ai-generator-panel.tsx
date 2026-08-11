@@ -42,6 +42,10 @@ interface AIGeneratorPanelProps {
     setAiDataVariety: (val: string) => void;
     aiAnalogyVariety: string;
     setAiAnalogyVariety: (val: string) => void;
+    aiBasicOperationsVariety: string;
+    setAiBasicOperationsVariety: (val: string) => void;
+    aiWordProblemVariety: string;
+    setAiWordProblemVariety: (val: string) => void;
     isGenerating: boolean;
     errorMsg: string | null;
     successMsg: string | null;
@@ -69,6 +73,10 @@ export function AIGeneratorPanel({
     setAiDataVariety,
     aiAnalogyVariety,
     setAiAnalogyVariety,
+    aiBasicOperationsVariety,
+    setAiBasicOperationsVariety,
+    aiWordProblemVariety,
+    setAiWordProblemVariety,
     isGenerating,
     errorMsg,
     successMsg,
@@ -272,6 +280,18 @@ export function AIGeneratorPanel({
                                         value: 'format_k',
                                         label: 'Format K: Disjunctive Syllogism (Text-based)',
                                     },
+                                    {
+                                        value: 'format_l',
+                                        label: 'Format L: Letter/Alphanumeric Sequence (Text-based)',
+                                    },
+                                    {
+                                        value: 'format_m',
+                                        label: 'Format M: Symbol Sequence (Text-based)',
+                                    },
+                                    {
+                                        value: 'format_n',
+                                        label: 'Format N: Coding and Decoding (Text-based)',
+                                    },
                                 ]}
                             />
                         )}
@@ -308,6 +328,42 @@ export function AIGeneratorPanel({
                                         value: 'format_e',
                                         label: 'Format E: Combined Table and Chart',
                                     },
+                                ]}
+                            />
+                        )}
+
+                        {/* Basic operations format select - dynamic */}
+                        {aiSubcategory === 'Basic operations' && (
+                            <SelectField
+                                label="Basic Operations Variety"
+                                value={aiBasicOperationsVariety}
+                                disabled={isGenerating}
+                                onValueChange={setAiBasicOperationsVariety}
+                                options={[
+                                    { value: 'all', label: 'Random / All Formats' },
+                                    { value: 'mdas', label: 'MDAS/PEMDAS' },
+                                    { value: 'fractions', label: 'Fractions' },
+                                    { value: 'decimals', label: 'Decimals' },
+                                    { value: 'percentages', label: 'Percentages' },
+                                ]}
+                            />
+                        )}
+
+                        {/* Word problems format select - dynamic */}
+                        {aiSubcategory === 'Word problems' && (
+                            <SelectField
+                                label="Word Problem Variety"
+                                value={aiWordProblemVariety}
+                                disabled={isGenerating}
+                                onValueChange={setAiWordProblemVariety}
+                                options={[
+                                    { value: 'all', label: 'Random / All Formats' },
+                                    { value: 'age', label: 'Age Problems' },
+                                    { value: 'work', label: 'Work/Time Problems' },
+                                    { value: 'motion', label: 'Motion Problems (Distance-Rate-Time)' },
+                                    { value: 'ratio', label: 'Ratio and Proportion' },
+                                    { value: 'mixture', label: 'Mixture Problems' },
+                                    { value: 'finance', label: 'Finance (Simple Interest, Discounts)' },
                                 ]}
                             />
                         )}

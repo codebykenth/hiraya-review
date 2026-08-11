@@ -38,6 +38,10 @@ export default function CreateQuestion(props: CreateProps) {
         setAiDataVariety,
         aiAnalogyVariety,
         setAiAnalogyVariety,
+        aiBasicOperationsVariety,
+        setAiBasicOperationsVariety,
+        aiWordProblemVariety,
+        setAiWordProblemVariety,
         handleCancelAIGeneration,
     } = useQuestionCreateState(props);
 
@@ -61,6 +65,10 @@ export default function CreateQuestion(props: CreateProps) {
             setAiDataVariety={setAiDataVariety}
             aiAnalogyVariety={aiAnalogyVariety}
             setAiAnalogyVariety={setAiAnalogyVariety}
+            aiBasicOperationsVariety={aiBasicOperationsVariety}
+            setAiBasicOperationsVariety={setAiBasicOperationsVariety}
+            aiWordProblemVariety={aiWordProblemVariety}
+            setAiWordProblemVariety={setAiWordProblemVariety}
             isGenerating={isGenerating}
             errorMsg={errorMsg}
             successMsg={successMsg}

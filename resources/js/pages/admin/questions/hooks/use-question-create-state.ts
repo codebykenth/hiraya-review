@@ -69,6 +69,8 @@ export function useQuestionCreateState({
     const [aiSymbolicVariety, setAiSymbolicVariety] = useState<string>('all');
     const [aiDataVariety, setAiDataVariety] = useState<string>('all');
     const [aiAnalogyVariety, setAiAnalogyVariety] = useState<string>('all');
+    const [aiBasicOperationsVariety, setAiBasicOperationsVariety] = useState<string>('all');
+    const [aiWordProblemVariety, setAiWordProblemVariety] = useState<string>('all');
     const [isGenerating, setIsGenerating] = useState<boolean>(false);
     const [errorMsg, setErrorMsg] = useState<string | null>(null);
     const [successMsg, setSuccessMsg] = useState<string | null>(null);
@@ -83,6 +85,11 @@ export function useQuestionCreateState({
             const timer = setTimeout(() => {
                 const newSub = validSubs[0] || '';
                 setAiSubcategory(newSub);
+                setAiSymbolicVariety('all');
+                setAiDataVariety('all');
+                setAiAnalogyVariety('all');
+                setAiBasicOperationsVariety('all');
+                setAiWordProblemVariety('all');
             }, 0);
 
             return () => clearTimeout(timer);
@@ -91,6 +98,11 @@ export function useQuestionCreateState({
 
     const handleSetAiSubcategory = (subcat: string) => {
         setAiSubcategory(subcat);
+        setAiSymbolicVariety('all');
+        setAiDataVariety('all');
+        setAiAnalogyVariety('all');
+        setAiBasicOperationsVariety('all');
+        setAiWordProblemVariety('all');
     };
 
     const manualForm = useForm({
@@ -197,6 +209,8 @@ export function useQuestionCreateState({
                     symbolic_variety: aiSymbolicVariety,
                     data_variety: aiDataVariety,
                     analogy_variety: aiAnalogyVariety,
+                    basic_operations_variety: aiBasicOperationsVariety,
+                    word_problem_variety: aiWordProblemVariety,
                 }),
             });
 
@@ -280,6 +294,10 @@ export function useQuestionCreateState({
         setAiDataVariety,
         aiAnalogyVariety,
         setAiAnalogyVariety,
+        aiBasicOperationsVariety,
+        setAiBasicOperationsVariety,
+        aiWordProblemVariety,
+        setAiWordProblemVariety,
         isGenerating,
         errorMsg,
         successMsg,
