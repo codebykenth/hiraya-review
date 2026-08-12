@@ -557,7 +557,8 @@ export function PrintableExam({
                     force('z-index', '0');
                     force('pointer-events', 'auto');
 
-                    // Prevent SVG border clipping in html2canvas capture
+                    // Prevent SVG border clipping in html2canvas capture by converting to images
+                    // and slightly expanding the viewBox to accommodate center-aligned strokes.
                     clonedDoc.querySelectorAll('svg').forEach((svg) => {
                         svg.style.setProperty(
                             'overflow',
@@ -569,7 +570,52 @@ export function PrintableExam({
                             'content-box',
                             'important',
                         );
-                        svg.style.setProperty('padding', '3px', 'important');
+                        svg.style.setProperty('padding', '4px', 'important');
+
+                        // Expand viewBox slightly to account for stroke widths
+                        const viewBox = svg.getAttribute('viewBox');
+                        if (viewBox) {
+                            const parts = viewBox.split(/[ ,]+/).map(Number);
+                            if (parts.length === 4 && !parts.some(isNaN)) {
+                                // parts: [min-x, min-y, width, height]
+                                parts[0] -= 2;
+                                parts[1] -= 2;
+                                parts[2] += 4;
+                                parts[3] += 4;
+                                svg.setAttribute('viewBox', parts.join(' '));
+                            }
+                        }
+
+                        try {
+                            const serializer = new XMLSerializer();
+                            let svgStr = serializer.serializeToString(svg);
+                            if (!svgStr.includes('xmlns=')) {
+                                svgStr = svgStr.replace(
+                                    '<svg ',
+                                    '<svg xmlns="http://www.w3.org/2000/svg" ',
+                                );
+                            }
+
+                            const img = clonedDoc.createElement('img');
+                            img.src =
+                                'data:image/svg+xml;base64,' +
+                                window.btoa(unescape(encodeURIComponent(svgStr)));
+
+                            // Copy all styles and classes
+                            img.style.cssText = svg.style.cssText;
+                            const cls = svg.getAttribute('class');
+                            if (cls) img.setAttribute('class', cls);
+
+                            // Retain explicit dimensions if any
+                            const w = svg.getAttribute('width');
+                            const h = svg.getAttribute('height');
+                            if (w) img.setAttribute('width', w);
+                            if (h) img.setAttribute('height', h);
+
+                            svg.parentNode?.replaceChild(img, svg);
+                        } catch (e) {
+                            console.error('SVG conversion failed', e);
+                        }
                     });
                 };
 
