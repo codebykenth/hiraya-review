@@ -449,7 +449,7 @@ export default function AdminLearnIndex({
                             <button
                                 type="button"
                                 onClick={() => setViewMode('table')}
-                                className={`flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-bold transition cursor-pointer ${
+                                className={`flex cursor-pointer items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-bold transition ${
                                     viewMode === 'table'
                                         ? 'bg-blue-600 text-white shadow-xs'
                                         : 'text-muted-foreground hover:text-foreground'
@@ -462,7 +462,7 @@ export default function AdminLearnIndex({
                             <button
                                 type="button"
                                 onClick={() => setViewMode('grid')}
-                                className={`flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-bold transition cursor-pointer ${
+                                className={`flex cursor-pointer items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-bold transition ${
                                     viewMode === 'grid'
                                         ? 'bg-blue-600 text-white shadow-xs'
                                         : 'text-muted-foreground hover:text-foreground'
@@ -789,132 +789,138 @@ export default function AdminLearnIndex({
                             </div>
                         ) : (
                             <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-                            {paginatedModules.map((mod) => (
-                                <div
-                                    key={mod.id}
-                                    className={`group relative rounded-2xl border border-border bg-card p-5 shadow-xs transition-all duration-300 hover:-translate-y-1 hover:shadow-md ${
-                                        selectedIds.has(mod.id)
-                                            ? 'ring-2 ring-blue-500 ring-offset-2'
-                                            : ''
-                                    }`}
-                                >
-                                    {/* Checkbox */}
-                                    <div className="absolute top-4 right-4 z-10">
-                                        <input
-                                            type="checkbox"
-                                            checked={selectedIds.has(mod.id)}
-                                            onChange={(e) =>
-                                                handleSelectOne(
+                                {paginatedModules.map((mod) => (
+                                    <div
+                                        key={mod.id}
+                                        className={`group relative rounded-2xl border border-border bg-card p-5 shadow-xs transition-all duration-300 hover:-translate-y-1 hover:shadow-md ${
+                                            selectedIds.has(mod.id)
+                                                ? 'ring-2 ring-blue-500 ring-offset-2'
+                                                : ''
+                                        }`}
+                                    >
+                                        {/* Checkbox */}
+                                        <div className="absolute top-4 right-4 z-10">
+                                            <input
+                                                type="checkbox"
+                                                checked={selectedIds.has(
                                                     mod.id,
-                                                    e.target.checked,
-                                                )
-                                            }
-                                            className="size-4 cursor-pointer accent-blue-600"
-                                        />
-                                    </div>
+                                                )}
+                                                onChange={(e) =>
+                                                    handleSelectOne(
+                                                        mod.id,
+                                                        e.target.checked,
+                                                    )
+                                                }
+                                                className="size-4 cursor-pointer accent-blue-600"
+                                            />
+                                        </div>
 
-                                    {/* Card Header */}
-                                    <div className="mb-4 flex items-start justify-between gap-2 pr-8">
-                                        <div className="flex flex-wrap items-center gap-1.5">
+                                        {/* Card Header */}
+                                        <div className="mb-4 flex items-start justify-between gap-2 pr-8">
+                                            <div className="flex flex-wrap items-center gap-1.5">
+                                                <span
+                                                    className={`inline-flex rounded-md border px-2 py-0.5 text-[9px] font-extrabold tracking-wide uppercase ${getCategoryStyles(mod.category)}`}
+                                                >
+                                                    {mod.category}
+                                                </span>
+                                                <span className="rounded-full border border-blue-100 bg-blue-50 px-2 py-0.5 text-[9px] font-semibold text-blue-700 dark:border-blue-900/30 dark:bg-blue-950/30 dark:bg-blue-950/40 dark:text-blue-300">
+                                                    {mod.subcategory}
+                                                </span>
+                                            </div>
                                             <span
-                                                className={`inline-flex rounded-md border px-2 py-0.5 text-[9px] font-extrabold tracking-wide uppercase ${getCategoryStyles(mod.category)}`}
+                                                className={`inline-flex items-center gap-1 rounded-md border px-2 py-0.5 text-[9px] font-extrabold uppercase ${
+                                                    mod.is_published
+                                                        ? 'border-emerald-100 bg-emerald-50 text-emerald-700 dark:border-emerald-900/30 dark:bg-emerald-950/20 dark:bg-emerald-950/30 dark:text-emerald-400'
+                                                        : 'border-blue-100 bg-blue-50 text-blue-700 dark:border-blue-900/30 dark:bg-blue-950/20 dark:bg-blue-950/30 dark:text-blue-400'
+                                                }`}
                                             >
-                                                {mod.category}
-                                            </span>
-                                            <span className="rounded-full border border-blue-100 bg-blue-50 px-2 py-0.5 text-[9px] font-semibold text-blue-700 dark:border-blue-900/30 dark:bg-blue-950/30 dark:bg-blue-950/40 dark:text-blue-300">
-                                                {mod.subcategory}
+                                                {mod.is_published
+                                                    ? 'Active'
+                                                    : 'Draft'}
                                             </span>
                                         </div>
-                                        <span
-                                            className={`inline-flex items-center gap-1 rounded-md border px-2 py-0.5 text-[9px] font-extrabold uppercase ${
-                                                mod.is_published
-                                                    ? 'border-emerald-100 bg-emerald-50 text-emerald-700 dark:border-emerald-900/30 dark:bg-emerald-950/20 dark:bg-emerald-950/30 dark:text-emerald-400'
-                                                    : 'border-blue-100 bg-blue-50 text-blue-700 dark:border-blue-900/30 dark:bg-blue-950/20 dark:bg-blue-950/30 dark:text-blue-400'
-                                            }`}
-                                        >
-                                            {mod.is_published
-                                                ? 'Active'
-                                                : 'Draft'}
-                                        </span>
-                                    </div>
 
-                                    {/* Module ID */}
-                                    <div className="mb-3">
-                                        <span className="text-xs font-bold text-muted-foreground">
-                                            #{mod.id}
-                                        </span>
-                                    </div>
-
-                                    {/* Module Title */}
-                                    <div className="mb-2 line-clamp-2 text-sm leading-relaxed font-bold text-foreground">
-                                        {mod.title}
-                                    </div>
-
-                                    {/* Module Summary */}
-                                    <div className="mb-4 line-clamp-3 text-xs leading-relaxed text-muted-foreground">
-                                        {mod.summary ||
-                                            'CSE Syllabus Study Module'}
-                                    </div>
-
-                                    {/* Estimated Time */}
-                                    {mod.estimated_minutes && (
-                                        <div className="mb-4 text-[10px] font-semibold text-muted-foreground">
-                                            {mod.estimated_minutes} min read
+                                        {/* Module ID */}
+                                        <div className="mb-3">
+                                            <span className="text-xs font-bold text-muted-foreground">
+                                                #{mod.id}
+                                            </span>
                                         </div>
-                                    )}
 
-                                    {/* Actions */}
-                                    <div className="flex items-center justify-end gap-1.5 border-t border-border pt-3">
-                                        <TooltipProvider delayDuration={150}>
-                                            <Tooltip>
-                                                <TooltipTrigger asChild>
-                                                    <Link
-                                                        href={`${learnShow(mod.slug).url}?page=${currentPage}`}
-                                                        className="group/btn cursor-pointer rounded-lg p-1.5 text-muted-foreground transition-all duration-300 hover:bg-muted hover:text-blue-600 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95 dark:text-blue-400"
-                                                    >
-                                                        <Eye className="size-4" />
-                                                    </Link>
-                                                </TooltipTrigger>
-                                                <TooltipContent>
-                                                    Student Preview
-                                                </TooltipContent>
-                                            </Tooltip>
+                                        {/* Module Title */}
+                                        <div className="mb-2 line-clamp-2 text-sm leading-relaxed font-bold text-foreground">
+                                            {mod.title}
+                                        </div>
 
-                                            <Tooltip>
-                                                <TooltipTrigger asChild>
-                                                    <Link
-                                                        href={`${adminLearnEdit(mod.id).url}?page=${currentPage}`}
-                                                        className="group/btn cursor-pointer rounded-lg p-1.5 text-muted-foreground transition-all duration-300 hover:bg-muted hover:text-blue-600 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95 dark:text-blue-400"
-                                                    >
-                                                        <Edit2 className="size-4" />
-                                                    </Link>
-                                                </TooltipTrigger>
-                                                <TooltipContent>
-                                                    Edit details
-                                                </TooltipContent>
-                                            </Tooltip>
+                                        {/* Module Summary */}
+                                        <div className="mb-4 line-clamp-3 text-xs leading-relaxed text-muted-foreground">
+                                            {mod.summary ||
+                                                'CSE Syllabus Study Module'}
+                                        </div>
 
-                                            <Tooltip>
-                                                <TooltipTrigger asChild>
-                                                    <button
-                                                        type="button"
-                                                        onClick={() =>
-                                                            promptDelete(mod.id)
-                                                        }
-                                                        className="cursor-pointer rounded-lg p-1.5 text-muted-foreground transition-all duration-300 hover:bg-muted hover:text-red-600 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95"
-                                                    >
-                                                        <Trash2 className="size-4" />
-                                                    </button>
-                                                </TooltipTrigger>
-                                                <TooltipContent>
-                                                    Delete module
-                                                </TooltipContent>
-                                            </Tooltip>
-                                        </TooltipProvider>
+                                        {/* Estimated Time */}
+                                        {mod.estimated_minutes && (
+                                            <div className="mb-4 text-[10px] font-semibold text-muted-foreground">
+                                                {mod.estimated_minutes} min read
+                                            </div>
+                                        )}
+
+                                        {/* Actions */}
+                                        <div className="flex items-center justify-end gap-1.5 border-t border-border pt-3">
+                                            <TooltipProvider
+                                                delayDuration={150}
+                                            >
+                                                <Tooltip>
+                                                    <TooltipTrigger asChild>
+                                                        <Link
+                                                            href={`${learnShow(mod.slug).url}?page=${currentPage}`}
+                                                            className="group/btn cursor-pointer rounded-lg p-1.5 text-muted-foreground transition-all duration-300 hover:bg-muted hover:text-blue-600 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95 dark:text-blue-400"
+                                                        >
+                                                            <Eye className="size-4" />
+                                                        </Link>
+                                                    </TooltipTrigger>
+                                                    <TooltipContent>
+                                                        Student Preview
+                                                    </TooltipContent>
+                                                </Tooltip>
+
+                                                <Tooltip>
+                                                    <TooltipTrigger asChild>
+                                                        <Link
+                                                            href={`${adminLearnEdit(mod.id).url}?page=${currentPage}`}
+                                                            className="group/btn cursor-pointer rounded-lg p-1.5 text-muted-foreground transition-all duration-300 hover:bg-muted hover:text-blue-600 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95 dark:text-blue-400"
+                                                        >
+                                                            <Edit2 className="size-4" />
+                                                        </Link>
+                                                    </TooltipTrigger>
+                                                    <TooltipContent>
+                                                        Edit details
+                                                    </TooltipContent>
+                                                </Tooltip>
+
+                                                <Tooltip>
+                                                    <TooltipTrigger asChild>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() =>
+                                                                promptDelete(
+                                                                    mod.id,
+                                                                )
+                                                            }
+                                                            className="cursor-pointer rounded-lg p-1.5 text-muted-foreground transition-all duration-300 hover:bg-muted hover:text-red-600 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95"
+                                                        >
+                                                            <Trash2 className="size-4" />
+                                                        </button>
+                                                    </TooltipTrigger>
+                                                    <TooltipContent>
+                                                        Delete module
+                                                    </TooltipContent>
+                                                </Tooltip>
+                                            </TooltipProvider>
+                                        </div>
                                     </div>
-                                </div>
-                            ))}
-                        </div>
+                                ))}
+                            </div>
                         )}
 
                         {/* Pagination */}

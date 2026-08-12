@@ -377,7 +377,7 @@ export default function DraftsLearnList({
                                             </div>
                                         </td>
                                         <td className="min-w-[320px] px-4 py-4 align-top">
-                                            <div className="line-clamp-2 font-medium text-xs text-muted-foreground">
+                                            <div className="line-clamp-2 text-xs font-medium text-muted-foreground">
                                                 {m.summary}
                                             </div>
                                         </td>
@@ -424,7 +424,7 @@ export default function DraftsLearnList({
                                                                 cancelEditDraft(
                                                                     m.id,
                                                                 )
-                                                                }
+                                                            }
                                                             title="Cancel Edits"
                                                             className="cursor-pointer rounded-lg border border-red-200 bg-red-50 p-1.5 text-red-700 transition hover:bg-red-100 dark:border-red-900/40 dark:bg-red-950/30 dark:text-red-400"
                                                         >

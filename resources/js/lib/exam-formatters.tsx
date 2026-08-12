@@ -156,12 +156,9 @@ export const formatDuration = (totalSecs: number, showLabel = true): string => {
     return `${m}m`;
 };
 
-export const calculateWeightedPercentage = (
-    results: any,
-    isSubprofessional: boolean = false,
-): number => {
+export const calculateWeightedPercentage = (results: any): number => {
     const catMap = results.categoryScoreMap || {};
-    
+
     // Check if we have multiple categories typical of a full mock exam
     const hasWeights = Object.keys(catMap).some((cat) =>
         [
@@ -175,15 +172,28 @@ export const calculateWeightedPercentage = (
 
     if (hasWeights) {
         const getWeight = (catName: string) => {
-            if (catName === 'Verbal Ability') return 0.30;
-            if (catName === 'Numerical Ability') return 0.30;
-            if (catName === 'General Information') return 0.05;
-            
+            if (catName === 'Verbal Ability') {
+                return 0.3;
+            }
+
+            if (catName === 'Numerical Ability') {
+                return 0.3;
+            }
+
+            if (catName === 'General Information') {
+                return 0.05;
+            }
+
             // Professional uses Analytical, Subprofessional uses Clerical
-            if (catName === 'Analytical Ability') return 0.35;
-            if (catName === 'Clerical Ability') return 0.35;
-            
-            return 0; 
+            if (catName === 'Analytical Ability') {
+                return 0.35;
+            }
+
+            if (catName === 'Clerical Ability') {
+                return 0.35;
+            }
+
+            return 0;
         };
 
         let totalWeight = 0;
@@ -191,6 +201,7 @@ export const calculateWeightedPercentage = (
 
         Object.entries(catMap).forEach(([cat, val]: [string, any]) => {
             const weight = getWeight(cat);
+
             if (weight > 0) {
                 const catScore =
                     val.total > 0 ? (val.correct / val.total) * 100 : 0;
@@ -206,9 +217,7 @@ export const calculateWeightedPercentage = (
     }
 
     // Fallback to standard unweighted average if not a full mock exam track or weights are missing
-    return results.total > 0
-        ? (results.correctCount / results.total) * 100
-        : 0;
+    return results.total > 0 ? (results.correctCount / results.total) * 100 : 0;
 };
 
 export const extractPropositions = (stem: string) => {
@@ -375,8 +384,8 @@ export const renderFormattedText = (
     }
 
     // Strip bracket numbers in Error Recognition stems (e.g. "[1] has went]" -> "[has went]")
-    // Restrict to digits 1-9 or letters A-D to prevent eating valid dates like "[2024] [across all]"
-    text = text.replace(/\[([1-9]|[A-D])\]\s*([^\]]+)\]/gi, '[$2]');
+    // Restrict to digits 1-9 or letters A-D and prevent matching across nested opening brackets
+    text = text.replace(/\[([1-9]|[A-D])\]\s*([^[\]]+)\]/gi, '[$2]');
 
     // Clean up literal escaped quotes that might leak from JSON/AI payloads,
     // which breaks the browser's HTML parser in dangerouslySetInnerHTML
@@ -848,7 +857,7 @@ export const renderFormattedText = (
                                 {row.map((cell, ci) => (
                                     <td
                                         key={ci}
-                                        className="dark:text-slate-300 px-4 py-3 leading-relaxed font-semibold text-slate-700"
+                                        className="px-4 py-3 leading-relaxed font-semibold text-slate-700 dark:text-slate-300"
                                     >
                                         {formatMathInline(cell)}
                                     </td>
@@ -1039,7 +1048,7 @@ export const renderFormattedText = (
                                                 </DialogTrigger>
                                                 <DialogContent className="max-w-5xl border-none bg-transparent p-0 shadow-none sm:max-w-[90vw] md:max-w-5xl lg:max-w-6xl">
                                                     <div
-                                                        className="flex w-full justify-start md:justify-center overflow-auto rounded-2xl bg-white p-6 sm:p-8 lg:p-10 dark:bg-slate-900"
+                                                        className="flex w-full justify-start overflow-auto rounded-2xl bg-white p-6 sm:p-8 md:justify-center lg:p-10 dark:bg-slate-900"
                                                         dangerouslySetInnerHTML={{
                                                             __html: sanitizeSvg(
                                                                 frame.svg.replace(
@@ -1092,7 +1101,7 @@ export const renderFormattedText = (
                                 </DialogTrigger>
                                 <DialogContent className="max-w-5xl border-none bg-transparent p-0 shadow-none sm:max-w-[90vw] md:max-w-5xl lg:max-w-6xl">
                                     <div
-                                        className="flex w-full justify-start md:justify-center overflow-auto rounded-2xl bg-white p-6 sm:p-8 lg:p-10 dark:bg-slate-900"
+                                        className="flex w-full justify-start overflow-auto rounded-2xl bg-white p-6 sm:p-8 md:justify-center lg:p-10 dark:bg-slate-900"
                                         dangerouslySetInnerHTML={{
                                             __html: sanitizeSvg(
                                                 block.content.replace(
@@ -1168,7 +1177,7 @@ export const renderFormattedText = (
                                 </DialogTrigger>
                                 <DialogContent className="max-w-5xl border-none bg-transparent p-0 shadow-none sm:max-w-[90vw] md:max-w-5xl lg:max-w-6xl">
                                     <div
-                                        className="flex w-full justify-start md:justify-center overflow-auto rounded-2xl bg-white p-6 sm:p-8 lg:p-10 dark:bg-slate-900"
+                                        className="flex w-full justify-start overflow-auto rounded-2xl bg-white p-6 sm:p-8 md:justify-center lg:p-10 dark:bg-slate-900"
                                         dangerouslySetInnerHTML={{
                                             __html: sanitizeSvg(
                                                 svgPart.replace(
@@ -1203,7 +1212,7 @@ export const renderFormattedText = (
                             </DialogTrigger>
                             <DialogContent className="max-w-5xl border-none bg-transparent p-0 shadow-none sm:max-w-[90vw] md:max-w-5xl lg:max-w-6xl">
                                 <div
-                                    className="flex w-full justify-start md:justify-center overflow-auto rounded-2xl bg-white p-6 sm:p-8 lg:p-10 dark:bg-slate-900"
+                                    className="flex w-full justify-start overflow-auto rounded-2xl bg-white p-6 sm:p-8 md:justify-center lg:p-10 dark:bg-slate-900"
                                     dangerouslySetInnerHTML={{
                                         __html: sanitizeSvg(
                                             svgPart.replace(

@@ -34,21 +34,23 @@ export function ReportIssueModal({
     flaggableId,
     flaggableType,
 }: ReportIssueModalProps) {
-    const { data, setData, reset, clearErrors, errors } =
-        useForm({
-            flaggable_id: flaggableId,
-            flaggable_type: flaggableType,
-            reason: '',
-            details: '',
-        });
+    const { data, setData, reset, clearErrors, errors } = useForm({
+        flaggable_id: flaggableId,
+        flaggable_type: flaggableType,
+        reason: '',
+        details: '',
+    });
 
     const [processing, setProcessing] = React.useState(false);
     const isSubmitting = React.useRef(false);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (isSubmitting.current) return;
-        
+
+        if (isSubmitting.current) {
+            return;
+        }
+
         isSubmitting.current = true;
         setProcessing(true);
         clearErrors();
@@ -71,6 +73,7 @@ export function ReportIssueModal({
 
             if (response.status === 422) {
                 const errorData = await response.json();
+
                 if (errorData.errors && errorData.errors.reason) {
                     toast.error(errorData.errors.reason[0]);
                 } else {
@@ -78,6 +81,7 @@ export function ReportIssueModal({
                         'Failed to submit report. Please check the fields and try again.',
                     );
                 }
+
                 return;
             }
 
@@ -89,21 +93,21 @@ export function ReportIssueModal({
                 toast.success(
                     'Report submitted successfully! Thank you for helping improve the platform.',
                 );
-                
+
                 // Dispatch event so parent views can instantly update their local state
-                window.dispatchEvent(new CustomEvent('report-submitted', { detail: { flaggable_id: flaggableId } }));
-                
+                window.dispatchEvent(
+                    new CustomEvent('report-submitted', {
+                        detail: { flaggable_id: flaggableId },
+                    }),
+                );
+
                 reset();
                 onClose();
             } else {
-                toast.error(
-                    'Failed to submit report. Please try again.',
-                );
+                toast.error('Failed to submit report. Please try again.');
             }
-        } catch (error) {
-            toast.error(
-                'Failed to submit report. Please try again.',
-            );
+        } catch {
+            toast.error('Failed to submit report. Please try again.');
         } finally {
             isSubmitting.current = false;
             setProcessing(false);

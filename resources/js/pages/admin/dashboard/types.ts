@@ -6,6 +6,8 @@ export interface Metrics {
     total_subcategories: number;
     total_examinees: number;
     total_attempts: number;
+    total_mock_exams?: number;
+    total_drills?: number;
     track_configs: number;
 }
 

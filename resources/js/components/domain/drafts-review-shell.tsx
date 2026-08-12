@@ -175,7 +175,11 @@ export function DraftsReviewShell<T extends BaseDraftItem>({
             item.subcategory === filterSubcategory;
 
         const matchesLanguage =
-            !(filterCategory === 'Verbal Ability' || filterSubcategory === 'Word analogy' || (item as any).subcategory === 'Word analogy') ||
+            !(
+                filterCategory === 'Verbal Ability' ||
+                filterSubcategory === 'Word analogy' ||
+                (item as any).subcategory === 'Word analogy'
+            ) ||
             filterLanguage === 'all' ||
             (item as any).language === filterLanguage;
 
@@ -312,14 +316,21 @@ export function DraftsReviewShell<T extends BaseDraftItem>({
                                 onChange={(e) => {
                                     const val = e.target.value;
                                     setFilterSubcategory(val);
+
                                     if (val !== 'all') {
-                                        const parentCat = Object.keys(cseCategoriesTree).find(cat => 
-                                            cseCategoriesTree[cat].includes(val)
+                                        const parentCat = Object.keys(
+                                            cseCategoriesTree,
+                                        ).find((cat) =>
+                                            cseCategoriesTree[cat].includes(
+                                                val,
+                                            ),
                                         );
+
                                         if (parentCat) {
                                             setFilterCategory(parentCat);
                                         }
                                     }
+
                                     setCurrentPage(1);
                                 }}
                                 className="w-full appearance-none rounded-lg border border-border bg-background py-1.5 pr-8 pl-2.5 text-xs font-bold text-foreground transition focus:border-blue-500 focus:outline-none"
@@ -391,7 +402,8 @@ export function DraftsReviewShell<T extends BaseDraftItem>({
                         </div>
 
                         {/* Language Filter (Only for Verbal Ability and Word Analogy) */}
-                        {(filterCategory === 'Verbal Ability' || filterSubcategory === 'Word analogy') && (
+                        {(filterCategory === 'Verbal Ability' ||
+                            filterSubcategory === 'Word analogy') && (
                             <div className="relative w-32">
                                 <select
                                     value={filterLanguage}
@@ -401,9 +413,24 @@ export function DraftsReviewShell<T extends BaseDraftItem>({
                                     }}
                                     className="w-full appearance-none rounded-lg border border-border bg-background py-1.5 pr-8 pl-2.5 text-xs font-bold text-foreground transition focus:border-blue-500 focus:outline-none"
                                 >
-                                    <option value="all" className="dark:bg-slate-950">All Languages</option>
-                                    <option value="English" className="dark:bg-slate-950">English</option>
-                                    <option value="Tagalog" className="dark:bg-slate-950">Tagalog</option>
+                                    <option
+                                        value="all"
+                                        className="dark:bg-slate-950"
+                                    >
+                                        All Languages
+                                    </option>
+                                    <option
+                                        value="English"
+                                        className="dark:bg-slate-950"
+                                    >
+                                        English
+                                    </option>
+                                    <option
+                                        value="Tagalog"
+                                        className="dark:bg-slate-950"
+                                    >
+                                        Tagalog
+                                    </option>
                                 </select>
                                 <ChevronDown className="text-slate-550 pointer-events-none absolute top-1/2 right-2.5 size-3.5 -translate-y-1/2" />
                             </div>
@@ -446,7 +473,9 @@ export function DraftsReviewShell<T extends BaseDraftItem>({
                                     }`}
                                 >
                                     <Table className="size-3.5" />
-                                    <span className="text-xs font-bold">Table</span>
+                                    <span className="text-xs font-bold">
+                                        Table
+                                    </span>
                                 </button>
                                 <button
                                     type="button"
@@ -459,7 +488,9 @@ export function DraftsReviewShell<T extends BaseDraftItem>({
                                     }`}
                                 >
                                     <LayoutGrid className="size-3.5" />
-                                    <span className="text-xs font-bold">Cards</span>
+                                    <span className="text-xs font-bold">
+                                        Cards
+                                    </span>
                                 </button>
                             </div>
                         )}
@@ -483,8 +514,8 @@ export function DraftsReviewShell<T extends BaseDraftItem>({
                             Approve / Unapprove
                         </span>
                     </div>
-                    <div className="dark:bg-slate-950/30 flex items-center gap-1.5 rounded-lg border border-slate-100 bg-slate-50 px-2 py-1 dark:border-slate-800 dark:bg-slate-900/50">
-                        <span className="border-slate-200 flex size-5.5 items-center justify-center rounded-md border bg-white text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400">
+                    <div className="flex items-center gap-1.5 rounded-lg border border-slate-100 bg-slate-50 px-2 py-1 dark:border-slate-800 dark:bg-slate-900/50 dark:bg-slate-950/30">
+                        <span className="flex size-5.5 items-center justify-center rounded-md border border-slate-200 bg-white text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400">
                             <Eye className="size-3" />
                         </span>
                         <span className="text-slate-700 dark:text-slate-300">
@@ -566,7 +597,9 @@ export function DraftsReviewShell<T extends BaseDraftItem>({
                     <div className="flex flex-col gap-3 sm:gap-6">
                         {viewMode === 'cards' || !renderTableView ? (
                             <div className="flex flex-col gap-3 sm:gap-6">
-                                {paginatedDrafts.map((item) => renderItem(item))}
+                                {paginatedDrafts.map((item) =>
+                                    renderItem(item),
+                                )}
                             </div>
                         ) : (
                             renderTableView(paginatedDrafts)

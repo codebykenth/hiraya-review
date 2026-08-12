@@ -8,7 +8,6 @@ use App\Models\ExamDate;
 use App\Models\UserAiAnalysis;
 use App\Services\DeterministicAnalysisService;
 use App\Services\ExamAttemptFormatter;
-use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Schema;
@@ -29,6 +28,7 @@ class DashboardController
 
         $examDate = null;
         $examDateRaw = null;
+        $examDescription = null;
         $daysUntilExam = null;
         if (Schema::hasTable('exam_dates')) {
             $examDateObj = ExamDate::where('is_active', true)
@@ -38,15 +38,9 @@ class DashboardController
             if ($examDateObj) {
                 $examDate = $examDateObj->date->format('F j, Y');
                 $examDateRaw = $examDateObj->date->toDateString();
+                $examDescription = $examDateObj->description;
                 $daysUntilExam = (int) ceil(now()->diffInDays($examDateObj->date, false));
             }
-        }
-
-        if (! $examDate) {
-            $defaultDate = Carbon::parse('2026-08-09');
-            $examDate = $defaultDate->format('F j, Y');
-            $examDateRaw = $defaultDate->toDateString();
-            $daysUntilExam = (int) ceil(now()->diffInDays($defaultDate, false));
         }
 
         // Fetch user attempts and determine AI Predictor stats
@@ -61,7 +55,9 @@ class DashboardController
         $userMode = Cache::get("user-analysis-mode-{$userId}", 'ai');
         $useAi = $userMode === 'ai' && config('services.ai.analysis_enabled') && $latestMockAttemptId;
 
-        if ($latestAttemptId) {
+        if (! $examDate) {
+            $analysisStatus = 'no_exam_date';
+        } elseif ($latestAttemptId) {
             $cacheKey = "ai-analysis-generating-{$userId}";
             $failKey = "ai-analysis-failed-{$userId}";
 
@@ -101,6 +97,7 @@ class DashboardController
                 'daysUntilExam' => $daysUntilExam,
                 'examDate' => $examDate,
                 'examDateRaw' => $examDateRaw,
+                'examDescription' => $examDescription,
             ],
             'aiAnalysis' => [
                 'status' => $analysisStatus,

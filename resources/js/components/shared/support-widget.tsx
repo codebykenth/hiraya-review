@@ -110,7 +110,10 @@ export function SupportWidget() {
 
         return () => {
             window.removeEventListener('live-exam-status', handleExamStatus);
-            window.removeEventListener('review-exam-status', handleReviewStatus);
+            window.removeEventListener(
+                'review-exam-status',
+                handleReviewStatus,
+            );
             removeListener();
             clearTimeout(timer);
 

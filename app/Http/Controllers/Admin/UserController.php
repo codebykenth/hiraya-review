@@ -33,6 +33,10 @@ class UserController
                     'terms_accepted_at' => $u->terms_accepted_at ? $u->terms_accepted_at->format('Y-m-d H:i') : null,
                     'deleted_at' => null, // Kept to avoid breaking TS interface
                     'attempts_count' => ExamAttempt::where('user_id', $u->id)->count(),
+                    'mock_exams_count' => ExamAttempt::where('user_id', $u->id)->whereNull('category_id')->count(),
+                    'drills_count' => ExamAttempt::where('user_id', $u->id)->whereNotNull('category_id')->count(),
+                    'pdf_downloads_count' => $u->pdf_downloads_count,
+                    'can_download_pdf' => (bool) $u->can_download_pdf,
                 ];
             });
 
@@ -44,6 +48,7 @@ class UserController
             'total_active' => User::where('is_active', true)->count(),
             'total_terms_accepted' => User::whereNotNull('terms_accepted_at')->count(),
             'total_attempts' => ExamAttempt::count(),
+            'total_pdf_downloads' => User::sum('pdf_downloads_count'),
         ];
 
         return Inertia::render('admin/users/index', [
@@ -77,6 +82,10 @@ class UserController
                 return back()->withErrors(['is_active' => 'You cannot deactivate your own account while logged in.']);
             }
             $user->is_active = $request->boolean('is_active');
+        }
+
+        if ($request->has('can_download_pdf')) {
+            $user->can_download_pdf = $request->boolean('can_download_pdf');
         }
 
         $user->save();

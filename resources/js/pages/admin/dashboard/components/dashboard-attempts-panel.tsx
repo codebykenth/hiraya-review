@@ -1,5 +1,5 @@
-import { Activity, Users, ChevronRight } from 'lucide-react';
 import { Link } from '@inertiajs/react';
+import { Activity, Users, ChevronRight } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import type { RecentAttempt } from '../types';
 
@@ -18,10 +18,11 @@ export function DashboardAttemptsPanel({
                         Recent Exam Attempts
                     </h2>
                     <p className="mt-0.5 text-sm leading-relaxed text-slate-500">
-                        Real-time grades & completion status for standard test takers.
+                        Real-time grades & completion status for standard test
+                        takers.
                     </p>
                 </div>
-                
+
                 <Link
                     href="/admin/attempts"
                     className="flex items-center gap-1 text-xs font-bold text-blue-600 transition hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
@@ -34,13 +35,13 @@ export function DashboardAttemptsPanel({
             <div className="flex-1">
                 {attempts.length === 0 ? (
                     <div className="flex h-full flex-col items-center justify-center py-12 text-center">
-                        <Activity className="mb-3 size-8 animate-pulse text-slate-350 dark:text-slate-750" />
+                        <Activity className="text-slate-350 dark:text-slate-750 mb-3 size-8 animate-pulse" />
                         <h3 className="text-xs font-bold">
                             No exam attempts logged yet
                         </h3>
                         <p className="mt-1 max-w-2xl text-[11px] leading-relaxed text-slate-500 dark:text-slate-400">
-                            Taker activity results will render dynamically here when
-                            examinees complete exams.
+                            Taker activity results will render dynamically here
+                            when examinees complete exams.
                         </p>
                     </div>
                 ) : (
@@ -66,7 +67,7 @@ export function DashboardAttemptsPanel({
                                 </div>
                                 <div className="flex shrink-0 items-center gap-3">
                                     <div className="hidden text-right sm:block">
-                                        <span className="block text-[10px] font-extrabold text-slate-500 max-w-[120px] truncate">
+                                        <span className="block max-w-[120px] truncate text-[10px] font-extrabold text-slate-500">
                                             {attempt.category}
                                         </span>
                                     </div>

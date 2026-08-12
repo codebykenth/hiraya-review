@@ -69,8 +69,10 @@ export function useQuestionCreateState({
     const [aiSymbolicVariety, setAiSymbolicVariety] = useState<string>('all');
     const [aiDataVariety, setAiDataVariety] = useState<string>('all');
     const [aiAnalogyVariety, setAiAnalogyVariety] = useState<string>('all');
-    const [aiBasicOperationsVariety, setAiBasicOperationsVariety] = useState<string>('all');
-    const [aiWordProblemVariety, setAiWordProblemVariety] = useState<string>('all');
+    const [aiBasicOperationsVariety, setAiBasicOperationsVariety] =
+        useState<string>('all');
+    const [aiWordProblemVariety, setAiWordProblemVariety] =
+        useState<string>('all');
     const [isGenerating, setIsGenerating] = useState<boolean>(false);
     const [errorMsg, setErrorMsg] = useState<string | null>(null);
     const [successMsg, setSuccessMsg] = useState<string | null>(null);

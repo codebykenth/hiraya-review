@@ -3,11 +3,11 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Models\ExamAttempt;
+use App\Models\User;
+use App\Services\ExamAttemptFormatter;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
-
-use App\Services\ExamAttemptFormatter;
 
 class AttemptController
 {
@@ -20,15 +20,28 @@ class AttemptController
      */
     public function index(Request $request): Response
     {
-        $attempts = ExamAttempt::with(['user', 'category'])
-            ->latest()
-            ->paginate(10)
+        $query = ExamAttempt::with(['user', 'category'])->latest();
+
+        if ($request->filled('user_id')) {
+            $query->where('user_id', $request->user_id);
+        }
+
+        if ($request->filled('type')) {
+            if ($request->type === 'mock') {
+                $query->whereNull('category_id');
+            } elseif ($request->type === 'drill') {
+                $query->whereNotNull('category_id');
+            }
+        }
+
+        $attempts = $query->paginate(10)
+            ->withQueryString()
             ->through(function ($attempt) {
                 $meta = $attempt->cat_scores['metadata'] ?? [];
 
                 $correct = $meta['correct_count'] ?? 0;
                 $total = $meta['total_questions'] ?? count($attempt->question_ids ?? []);
-                
+
                 $percentage = round($this->formatter->calculateWeightedPercentage($attempt->cat_scores ?? []), 2);
 
                 $trackName = $meta['track'] ?? null;
@@ -37,7 +50,7 @@ class AttemptController
                 if ($attempt->category) {
                     $categoryName = $attempt->category->name;
                 } elseif ($trackName) {
-                    $categoryName = $trackName . ' Level Reviewer';
+                    $categoryName = $trackName.' Level Reviewer';
                 } elseif (isset($meta['category_name'])) {
                     $categoryName = $meta['category_name'];
                 }
@@ -55,8 +68,12 @@ class AttemptController
                 ];
             });
 
+        $users = User::orderBy('name')->get(['id', 'name', 'email']);
+
         return Inertia::render('admin/attempts/index', [
             'attempts' => $attempts,
+            'filters' => $request->only(['user_id', 'type']),
+            'users' => $users,
         ]);
     }
 }

@@ -43,8 +43,7 @@ const modes = [
         title: 'AI-Powered Analysis',
         icon: Sparkles,
         color: 'indigo',
-        description:
-            'Get a richer, AI-written coaching report powered by AI.',
+        description: 'Get a richer, AI-written coaching report powered by AI.',
         features: [
             {
                 icon: Clock,

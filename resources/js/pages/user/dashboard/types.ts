@@ -36,6 +36,7 @@ export interface DashboardStats {
     daysUntilExam?: number | null;
     examDate?: string | null;
     examDateRaw?: string | null;
+    examDescription?: string | null;
     filters?: {
         track: string;
         runs: string;

@@ -340,7 +340,7 @@ export default function Welcome() {
                         <div className="flex flex-col items-center justify-evenly gap-5 sm:gap-10 md:flex-row md:gap-0">
                             <div className="flex flex-1 flex-col items-center">
                                 <p className="text-2xl font-black text-primary sm:text-4xl">
-                                    1000+
+                                    2000+
                                 </p>
                                 <p className="mt-1 text-sm leading-relaxed font-bold tracking-wider text-muted-foreground uppercase">
                                     Questions
@@ -630,7 +630,13 @@ export default function Welcome() {
                         </div>
 
                         <p className="mt-8 text-center text-xs leading-relaxed text-muted-foreground">
-                            <span className="font-semibold text-foreground">Disclaimer:</span> Hiraya Review is an independent learning platform. Test questions and study modules are AI-assisted practice items structured around official Civil Service Commission (CSC) syllabus guidelines.
+                            <span className="font-semibold text-foreground">
+                                Disclaimer:
+                            </span>{' '}
+                            Hiraya Review is an independent learning platform.
+                            Test questions and study modules are AI-assisted
+                            practice items structured around official Civil
+                            Service Commission (CSC) syllabus guidelines.
                         </p>
                     </Section>
                 </main>

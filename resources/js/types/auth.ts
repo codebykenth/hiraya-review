@@ -7,6 +7,8 @@ export type User = {
     two_factor_enabled?: boolean;
     analysis_mode?: 'ai' | 'instant';
     role: 'admin' | 'user';
+    pdf_downloads_count: number;
+    can_download_pdf: boolean;
     created_at: string;
     updated_at: string;
     [key: string]: unknown;

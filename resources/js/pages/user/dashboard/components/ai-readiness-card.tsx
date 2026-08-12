@@ -3,7 +3,6 @@ import Echo from 'laravel-echo';
 import {
     Brain,
     Sparkles,
-    Loader2,
     TrendingUp,
     TrendingDown,
     BookOpen,
@@ -23,7 +22,7 @@ import type { Auth } from '@/types';
 
 interface AiReadinessCardProps {
     aiAnalysis?: {
-        status: 'no_data' | 'generating' | 'ready' | 'failed';
+        status: 'no_data' | 'generating' | 'ready' | 'failed' | 'no_exam_date';
         data: {
             pass_probability: number;
             verdict: string;
@@ -47,7 +46,7 @@ export default function AiReadinessCard({
     const { auth, pusher } = usePage<{ auth: Auth; pusher?: any }>().props;
     const initialStatus = aiAnalysis?.status || 'no_data';
     const [localStatus, setLocalStatus] = useState<
-        'no_data' | 'generating' | 'ready' | 'failed'
+        'no_data' | 'generating' | 'ready' | 'failed' | 'no_exam_date'
     >(initialStatus);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const data = aiAnalysis?.data;
@@ -63,14 +62,20 @@ export default function AiReadinessCard({
 
     useEffect(() => {
         if (localStatus !== 'generating') {
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setProgress(15);
+
             return;
         }
 
         const interval = setInterval(() => {
             setProgress((prev) => {
-                if (prev >= 92) return 92;
+                if (prev >= 92) {
+                    return 92;
+                }
+
                 const step = Math.floor(Math.random() * 8) + 4;
+
                 return Math.min(prev + step, 92);
             });
         }, 400);
@@ -122,6 +127,36 @@ export default function AiReadinessCard({
     // Container style sharing across all states to guarantee consistent glassmorphism
     const containerClasses =
         'relative overflow-hidden rounded-2xl border border-slate-200/80 bg-gradient-to-br from-blue-50/70 via-indigo-50/40 to-slate-50 p-4 sm:p-6 text-slate-900 shadow-sm transition-all hover:shadow-xl hover:shadow-primary/5 hover:-translate-y-1 dark:border-slate-800 dark:from-slate-900 dark:via-slate-900/80 dark:to-indigo-950/20 dark:text-white dark:shadow-xl backdrop-blur-md';
+
+    if (localStatus === 'no_exam_date') {
+        return (
+            <div className={containerClasses}>
+                <div className="pointer-events-none absolute -top-24 -right-24 h-48 w-48 rounded-full bg-slate-500/5 blur-3xl dark:bg-slate-500/10" />
+
+                <div className="flex flex-col items-center justify-between gap-4 text-center md:flex-row md:text-left">
+                    <div className="flex flex-col items-center gap-4 md:flex-row">
+                        <div className="flex size-12 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 text-slate-600 dark:border-slate-500/20 dark:border-slate-900/50 dark:bg-slate-500/10 dark:bg-slate-950/30 dark:text-slate-400">
+                            <Brain className="size-6" />
+                        </div>
+                        <div>
+                            <h3 className="flex items-center justify-center gap-2 text-xl font-black tracking-tight text-slate-900 md:justify-start dark:text-white">
+                                {analysisMode === 'ai'
+                                    ? 'AI Readiness Report'
+                                    : 'Readiness Report'}
+                                <span className="inline-flex items-center rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-[10px] font-medium text-slate-700 dark:border-slate-500/20 dark:border-slate-900/50 dark:bg-slate-500/10 dark:bg-slate-950/30 dark:text-slate-400">
+                                    Archived
+                                </span>
+                            </h3>
+                            <p className="dark:text-slate-450 mt-1 text-base leading-relaxed font-medium text-slate-500 dark:text-slate-400">
+                                Waiting for the next scheduled exam cycle. Your
+                                previous performances are archived.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     if (localStatus === 'failed') {
         return (

@@ -16,6 +16,7 @@ class AdminUserUpdateRequest extends FormRequest
         return [
             'role' => ['sometimes', 'string', 'in:admin,user'],
             'is_active' => ['sometimes', 'boolean'],
+            'can_download_pdf' => ['sometimes', 'boolean'],
         ];
     }
 }

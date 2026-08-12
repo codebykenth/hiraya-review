@@ -98,10 +98,13 @@ export function AIGeneratorPanel({
                             <Sparkles className="size-4 animate-pulse text-blue-600 dark:text-blue-400" />
                             Configuration Options
                         </h2>
-                        
+
                         <Dialog>
                             <DialogTrigger asChild>
-                                <button type="button" className="inline-flex items-center gap-1.5 rounded-lg border border-blue-200 bg-blue-50 px-2 py-1 text-[10px] font-bold text-blue-700 transition-colors hover:bg-blue-100 dark:border-blue-900/40 dark:bg-blue-950/40 dark:text-blue-300 dark:hover:bg-blue-900/50">
+                                <button
+                                    type="button"
+                                    className="inline-flex items-center gap-1.5 rounded-lg border border-blue-200 bg-blue-50 px-2 py-1 text-[10px] font-bold text-blue-700 transition-colors hover:bg-blue-100 dark:border-blue-900/40 dark:bg-blue-950/40 dark:text-blue-300 dark:hover:bg-blue-900/50"
+                                >
                                     <HelpCircle className="size-3" />
                                     How it works
                                 </button>
@@ -113,10 +116,13 @@ export function AIGeneratorPanel({
                                         AI Question Generator
                                     </DialogTitle>
                                     <DialogDescription className="text-slate-600 dark:text-slate-400">
-                                        The AI generator uses advanced language models tailored specifically for the Philippine Civil Service Exam to create challenging and diverse questions.
+                                        The AI generator uses advanced language
+                                        models tailored specifically for the
+                                        Philippine Civil Service Exam to create
+                                        challenging and diverse questions.
                                     </DialogDescription>
                                 </DialogHeader>
-                                
+
                                 <div className="space-y-4 py-2">
                                     <div className="space-y-3 rounded-lg border border-slate-200 bg-white/50 p-3 shadow-xs dark:border-slate-800 dark:bg-slate-900/50">
                                         <h4 className="flex items-center gap-1.5 text-xs font-bold text-slate-700 dark:text-slate-300">
@@ -128,17 +134,35 @@ export function AIGeneratorPanel({
                                                 <div className="mt-0.5 rounded bg-indigo-100 p-0.5 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400">
                                                     <Sparkle className="size-3" />
                                                 </div>
-                                                <span className="leading-snug"><strong className="font-semibold text-slate-800 dark:text-slate-200">Gemini 1.5 Flash:</strong> Fast and efficient model, perfect for standard questions like vocabulary, math, and general information.</span>
+                                                <span className="leading-snug">
+                                                    <strong className="font-semibold text-slate-800 dark:text-slate-200">
+                                                        Gemini 1.5 Flash:
+                                                    </strong>{' '}
+                                                    Fast and efficient model,
+                                                    perfect for standard
+                                                    questions like vocabulary,
+                                                    math, and general
+                                                    information.
+                                                </span>
                                             </li>
                                             <li className="flex items-start gap-2 text-slate-600 dark:text-slate-400">
                                                 <div className="mt-0.5 rounded bg-blue-100 p-0.5 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
                                                     <Sparkle className="size-3" />
                                                 </div>
-                                                <span className="leading-snug"><strong className="font-semibold text-slate-800 dark:text-slate-200">Gemini 1.5 Pro:</strong> Advanced reasoning model. Recommended for complex logical puzzles, data interpretation, and reading comprehension.</span>
+                                                <span className="leading-snug">
+                                                    <strong className="font-semibold text-slate-800 dark:text-slate-200">
+                                                        Gemini 1.5 Pro:
+                                                    </strong>{' '}
+                                                    Advanced reasoning model.
+                                                    Recommended for complex
+                                                    logical puzzles, data
+                                                    interpretation, and reading
+                                                    comprehension.
+                                                </span>
                                             </li>
                                         </ul>
                                     </div>
-                                    
+
                                     <div className="space-y-3 rounded-lg border border-emerald-200 bg-emerald-50/50 p-3 shadow-xs dark:border-emerald-900/20 dark:bg-emerald-900/10">
                                         <h4 className="flex items-center gap-1.5 text-xs font-bold text-emerald-700 dark:text-emerald-400">
                                             <CheckCircle2 className="size-3.5" />
@@ -147,15 +171,29 @@ export function AIGeneratorPanel({
                                         <ul className="space-y-2 text-[13px] text-emerald-700/80 dark:text-emerald-400/80">
                                             <li className="flex items-start gap-1.5">
                                                 <span className="mt-1 size-1 shrink-0 rounded-full bg-emerald-400" />
-                                                <span className="leading-tight">Generated questions are saved as drafts first. Review them carefully before publishing.</span>
+                                                <span className="leading-tight">
+                                                    Generated questions are
+                                                    saved as drafts first.
+                                                    Review them carefully before
+                                                    publishing.
+                                                </span>
                                             </li>
                                             <li className="flex items-start gap-1.5">
                                                 <span className="mt-1 size-1 shrink-0 rounded-full bg-emerald-400" />
-                                                <span className="leading-tight">Use the "Custom Prompt" field to steer the AI (e.g., "Make the word problems about agriculture").</span>
+                                                <span className="leading-tight">
+                                                    Use the "Custom Prompt"
+                                                    field to steer the AI (e.g.,
+                                                    "Make the word problems
+                                                    about agriculture").
+                                                </span>
                                             </li>
                                             <li className="flex items-start gap-1.5">
                                                 <span className="mt-1 size-1 shrink-0 rounded-full bg-emerald-400" />
-                                                <span className="leading-tight">Batch generate up to 20 questions at a time for optimal quality and speed.</span>
+                                                <span className="leading-tight">
+                                                    Batch generate up to 20
+                                                    questions at a time for
+                                                    optimal quality and speed.
+                                                </span>
                                             </li>
                                         </ul>
                                     </div>
@@ -288,6 +326,10 @@ export function AIGeneratorPanel({
                                         value: 'format_m',
                                         label: 'Format M: Coding and Decoding (Text-based)',
                                     },
+                                    {
+                                        value: 'format_n',
+                                        label: 'Format N: Flowchart / Procedural Logic (Text-based)',
+                                    },
                                 ]}
                             />
                         )}
@@ -336,11 +378,17 @@ export function AIGeneratorPanel({
                                 disabled={isGenerating}
                                 onValueChange={setAiBasicOperationsVariety}
                                 options={[
-                                    { value: 'all', label: 'Random / All Formats' },
+                                    {
+                                        value: 'all',
+                                        label: 'Random / All Formats',
+                                    },
                                     { value: 'mdas', label: 'MDAS/PEMDAS' },
                                     { value: 'fractions', label: 'Fractions' },
                                     { value: 'decimals', label: 'Decimals' },
-                                    { value: 'percentages', label: 'Percentages' },
+                                    {
+                                        value: 'percentages',
+                                        label: 'Percentages',
+                                    },
                                 ]}
                             />
                         )}
@@ -353,20 +401,39 @@ export function AIGeneratorPanel({
                                 disabled={isGenerating}
                                 onValueChange={setAiWordProblemVariety}
                                 options={[
-                                    { value: 'all', label: 'Random / All Formats' },
+                                    {
+                                        value: 'all',
+                                        label: 'Random / All Formats',
+                                    },
                                     { value: 'age', label: 'Age Problems' },
-                                    { value: 'work', label: 'Work/Time Problems' },
-                                    { value: 'motion', label: 'Motion Problems (Distance-Rate-Time)' },
-                                    { value: 'ratio', label: 'Ratio and Proportion' },
-                                    { value: 'mixture', label: 'Mixture Problems' },
-                                    { value: 'finance', label: 'Finance (Simple Interest, Discounts)' },
+                                    {
+                                        value: 'work',
+                                        label: 'Work/Time Problems',
+                                    },
+                                    {
+                                        value: 'motion',
+                                        label: 'Motion Problems (Distance-Rate-Time)',
+                                    },
+                                    {
+                                        value: 'ratio',
+                                        label: 'Ratio and Proportion',
+                                    },
+                                    {
+                                        value: 'mixture',
+                                        label: 'Mixture Problems',
+                                    },
+                                    {
+                                        value: 'finance',
+                                        label: 'Finance (Simple Interest, Discounts)',
+                                    },
                                 ]}
                             />
                         )}
 
                         <div
                             className={
-                                aiCategory === 'Verbal Ability' || aiSubcategory === 'Word analogy'
+                                aiCategory === 'Verbal Ability' ||
+                                aiSubcategory === 'Word analogy'
                                     ? 'grid grid-cols-2 gap-4'
                                     : 'w-full'
                             }
@@ -389,7 +456,10 @@ export function AIGeneratorPanel({
                                         setAiCount(isNaN(val) ? 0 : val);
                                     }}
                                     onBlur={() => {
-                                        setTimeout(() => setShowCountDropdown(false), 200);
+                                        setTimeout(
+                                            () => setShowCountDropdown(false),
+                                            200,
+                                        );
                                         let val = aiCount;
 
                                         if (isNaN(val) || val < 1) {
@@ -425,9 +495,16 @@ export function AIGeneratorPanel({
                                                         : 'text-foreground'
                                                 }`}
                                             >
-                                                <span>{num} {num === 1 ? 'Question' : 'Questions'}</span>
+                                                <span>
+                                                    {num}{' '}
+                                                    {num === 1
+                                                        ? 'Question'
+                                                        : 'Questions'}
+                                                </span>
                                                 {aiCount === num && (
-                                                    <span className="text-[10px] font-black uppercase text-primary">Selected</span>
+                                                    <span className="text-[10px] font-black text-primary uppercase">
+                                                        Selected
+                                                    </span>
                                                 )}
                                             </button>
                                         ))}
@@ -436,7 +513,8 @@ export function AIGeneratorPanel({
                             </div>
 
                             {/* Language Select */}
-                            {(aiCategory === 'Verbal Ability' || aiSubcategory === 'Word analogy') && (
+                            {(aiCategory === 'Verbal Ability' ||
+                                aiSubcategory === 'Word analogy') && (
                                 <SelectField
                                     label="Language"
                                     value={aiLanguage}
@@ -944,9 +1022,7 @@ export function AIGeneratorPanel({
                             <textarea
                                 value={aiPrompt}
                                 disabled={isGenerating}
-                                onChange={(e) =>
-                                    setAiPrompt(e.target.value)
-                                }
+                                onChange={(e) => setAiPrompt(e.target.value)}
                                 placeholder="E.g., Focus on recent Republic Acts, make options highly tricky, or emphasize logical fallacies..."
                                 rows={4}
                                 className="w-full rounded-xl border border-border p-4 text-sm font-medium text-foreground transition duration-150 placeholder:text-muted-foreground focus:border-blue-500 focus:bg-background focus:outline-none disabled:opacity-55"

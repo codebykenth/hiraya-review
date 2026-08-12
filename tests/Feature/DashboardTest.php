@@ -2,6 +2,7 @@
 
 use App\Jobs\GenerateUserAnalysisJob;
 use App\Models\ExamAttempt;
+use App\Models\ExamDate;
 use App\Models\User;
 use App\Models\UserAiAnalysis;
 use Illuminate\Support\Facades\Bus;
@@ -21,8 +22,24 @@ test('authenticated users can visit the dashboard', function () {
     $response->assertStatus(200);
 });
 
+test('dashboard status is no_exam_date if there is no active exam date', function () {
+    $user = User::factory()->create();
+
+    $response = $this->actingAs($user)->get(route('dashboard.index'));
+    $response->assertOk();
+
+    $response->assertInertia(fn (Assert $page) => $page
+        ->component('user/dashboard/index')
+        ->has('aiAnalysis', fn (Assert $page) => $page
+            ->where('status', 'no_exam_date')
+            ->where('data', null)
+        )
+    );
+});
+
 test('dashboard status is no_data if user has no exam attempts', function () {
     $user = User::factory()->create();
+    ExamDate::create(['date' => now()->addDays(30), 'is_active' => true]);
 
     $response = $this->actingAs($user)->get(route('dashboard.index'));
     $response->assertOk();
@@ -41,6 +58,7 @@ test('dashboard dispatches GenerateUserAnalysisJob if user has exam attempts but
     Bus::fake();
 
     $user = User::factory()->create();
+    ExamDate::create(['date' => now()->addDays(30), 'is_active' => true]);
     Cache::put("user-analysis-mode-{$user->id}", 'ai');
     $this->actingAs($user);
 
@@ -80,6 +98,7 @@ test('dashboard dispatches GenerateUserAnalysisJob if user has exam attempts but
 test('dashboard serves cached analysis if generated today', function () {
     config(['services.ai.analysis_enabled' => true]);
     $user = User::factory()->create();
+    ExamDate::create(['date' => now()->addDays(30), 'is_active' => true]);
     Cache::put("user-analysis-mode-{$user->id}", 'ai');
     $this->actingAs($user);
 

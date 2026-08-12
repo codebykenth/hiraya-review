@@ -4,12 +4,14 @@ import React, { useState, useEffect } from 'react';
 interface ExamCountdownProps {
     examDate: string;
     examDateRaw: string;
+    examDescription?: string | null;
     motivationText?: string | null;
 }
 
 export function ExamCountdown({
     examDate,
     examDateRaw,
+    examDescription,
     motivationText,
 }: ExamCountdownProps) {
     const [timeLeft, setTimeLeft] = useState({
@@ -124,6 +126,11 @@ export function ExamCountdown({
                                 {examDate}
                             </span>
                         </h3>
+                        {examDescription && (
+                            <p className="mt-0.5 text-xs font-bold text-slate-500 dark:text-slate-400">
+                                {examDescription}
+                            </p>
+                        )}
                     </div>
                 </div>
 

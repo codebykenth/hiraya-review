@@ -1,8 +1,10 @@
 import { Head, Link, usePage } from '@inertiajs/react';
 import { Award, BookOpen, ChevronLeft, LogIn, Trophy } from 'lucide-react';
 import { useState } from 'react';
-import { formatDuration, calculateWeightedPercentage } from '@/lib/exam-formatters';
-
+import {
+    formatDuration,
+    calculateWeightedPercentage,
+} from '@/lib/exam-formatters';
 
 interface ScorecardViewProps {
     details: any;
@@ -28,7 +30,6 @@ export function ScorecardView({
     getActiveTimeLimitSecs,
     submittedByTimer,
     setReviewScreenActive,
-    aiAnalysis,
 }: ScorecardViewProps) {
     const { auth } = usePage<{ auth: any }>().props;
     const isGuest = !auth?.user;
@@ -179,7 +180,7 @@ export function ScorecardView({
                 <div className="flex items-center gap-3">
                     <button
                         onClick={() => setReviewScreenActive(true)}
-                        className="shadow-sm flex cursor-pointer items-center gap-1.5 rounded-lg bg-blue-600 px-5 py-2.5 text-xs font-bold text-white transition-all hover:bg-blue-700 active:scale-95 focus:outline-none dark:bg-blue-600 dark:hover:bg-blue-500"
+                        className="flex cursor-pointer items-center gap-1.5 rounded-lg bg-blue-600 px-5 py-2.5 text-xs font-bold text-white shadow-sm transition-all hover:bg-blue-700 focus:outline-none active:scale-95 dark:bg-blue-600 dark:hover:bg-blue-500"
                     >
                         <BookOpen className="size-3.5" /> View Review
                     </button>
@@ -195,10 +196,8 @@ export function ScorecardView({
 
             {results &&
                 (() => {
-                    const exactPercentage = calculateWeightedPercentage(
-                        results,
-                        savedAttempt?.cat_scores?.metadata?.track === 'Subprofessional'
-                    );
+                    const exactPercentage =
+                        calculateWeightedPercentage(results);
                     const formattedPercentage = (
                         Math.round(exactPercentage * 100) / 100
                     ).toFixed(2);
@@ -389,8 +388,6 @@ export function ScorecardView({
                                 </div>
                             </div>
 
-
-
                             {isGuest && (
                                 <div className="mt-6 overflow-hidden rounded-2xl border border-blue-100 bg-gradient-to-br from-blue-50/80 via-white to-blue-50/30 p-6 text-center shadow-lg dark:border-blue-950/40 dark:from-slate-900 dark:to-slate-950">
                                     <div className="mx-auto mb-4 flex size-12 items-center justify-center rounded-full bg-blue-600 text-white shadow-md shadow-blue-500/20 dark:bg-blue-500">
@@ -424,7 +421,7 @@ export function ScorecardView({
             {showGuestPrompt && (
                 <div className="fixed inset-0 z-[100] flex animate-in items-center justify-center bg-slate-900/60 p-4 backdrop-blur-xs duration-200 fade-in">
                     <div
-                        className="relative flex flex-col w-[calc(100vw-2rem)] sm:w-full max-w-2xl max-h-[85dvh] overflow-y-auto animate-in rounded-xl border border-slate-200 bg-white p-6 shadow-xl duration-200 zoom-in-95 dark:border-slate-800 dark:bg-slate-950"
+                        className="relative flex max-h-[85dvh] w-[calc(100vw-2rem)] max-w-2xl animate-in flex-col overflow-y-auto rounded-xl border border-slate-200 bg-white p-6 shadow-xl duration-200 zoom-in-95 sm:w-full dark:border-slate-800 dark:bg-slate-950"
                         onClick={(e) => e.stopPropagation()}
                     >
                         <div className="mb-4 flex flex-col items-center text-center">

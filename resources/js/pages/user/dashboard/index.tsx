@@ -67,6 +67,7 @@ export default function Dashboard({ stats, aiAnalysis }: DashboardProps) {
                 <ExamCountdown
                     examDate={stats.examDate}
                     examDateRaw={stats.examDateRaw}
+                    examDescription={stats.examDescription}
                     motivationText={aiAnalysis?.data?.encouragement}
                 />
             )}

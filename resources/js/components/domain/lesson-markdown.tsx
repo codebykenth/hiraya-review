@@ -407,9 +407,14 @@ export function LessonMarkdown({ content = '' }: LessonMarkdownProps) {
             }
 
             let nextDollar = i;
+
             while (true) {
                 nextDollar = normalized.indexOf('$', nextDollar);
-                if (nextDollar === -1) break;
+
+                if (nextDollar === -1) {
+                    break;
+                }
+
                 if (nextDollar > 0 && normalized[nextDollar - 1] === '\\') {
                     nextDollar++;
                 } else {
@@ -417,15 +422,13 @@ export function LessonMarkdown({ content = '' }: LessonMarkdownProps) {
                 }
             }
 
-            const nextMathIdx = nextDollar === -1 ? normalized.length : nextDollar;
-            const plainText = normalized.substring(i, nextMathIdx).replace(/\\\$/g, '$');
-            
-            result.push(
-                ...parseFormatting(
-                    plainText,
-                    `plain-${i}`,
-                ),
-            );
+            const nextMathIdx =
+                nextDollar === -1 ? normalized.length : nextDollar;
+            const plainText = normalized
+                .substring(i, nextMathIdx)
+                .replace(/\\\$/g, '$');
+
+            result.push(...parseFormatting(plainText, `plain-${i}`));
             i = nextMathIdx > i ? nextMathIdx : i + 1;
         }
 

@@ -114,6 +114,21 @@ class AppServiceProvider extends ServiceProvider
             });
         });
 
+        RateLimiter::for('pdf-export', function (Request $request) {
+            $user = $request->user();
+
+            if ($user?->isAdmin()) {
+                return Limit::none();
+            }
+
+            return Limit::perDay(1)->by($user?->id ?: $request->ip())->response(function (Request $request, array $headers) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'PDF export is limited to 1 download per day to prevent spam.',
+                ], 429, $headers);
+            });
+        });
+
         Gate::define('access-dev-docs', function (User $user) {
             return in_array($user->email, [
                 env('DEV_EMAIL'),

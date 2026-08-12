@@ -387,7 +387,7 @@ class QuestionController
 
         foreach ($validated['questions'] as $qData) {
             $question = Question::find($qData['id']);
-            
+
             $category = Category::firstOrCreate([
                 'name' => $qData['category'],
             ], [

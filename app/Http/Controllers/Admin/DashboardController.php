@@ -8,11 +8,10 @@ use App\Models\Question;
 use App\Models\Subcategory;
 use App\Models\TrackConfig;
 use App\Models\User;
+use App\Services\ExamAttemptFormatter;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
-
-use App\Services\ExamAttemptFormatter;
 
 class DashboardController
 {
@@ -41,6 +40,16 @@ class DashboardController
             })->count(),
             'guest_attempts' => ExamAttempt::whereNull('user_id')->count(),
             'track_configs' => TrackConfig::count(),
+            'total_mock_exams' => ExamAttempt::where(function ($query) {
+                $query->whereHas('user', function ($q) {
+                    $q->where('role', '!=', 'admin');
+                })->orWhereNull('user_id');
+            })->whereNull('category_id')->count(),
+            'total_drills' => ExamAttempt::where(function ($query) {
+                $query->whereHas('user', function ($q) {
+                    $q->where('role', '!=', 'admin');
+                })->orWhereNull('user_id');
+            })->whereNotNull('category_id')->count(),
         ];
 
         // 2. Real-time question distribution count across exam categories
@@ -71,7 +80,7 @@ class DashboardController
                 // Get correct counts and totals from metadata or fallbacks
                 $correct = $meta['correct_count'] ?? 0;
                 $total = $meta['total_questions'] ?? count($attempt->question_ids ?? []);
-                
+
                 $percentage = round($this->formatter->calculateWeightedPercentage($attempt->cat_scores ?? []), 2);
 
                 // Build a descriptive track or category name

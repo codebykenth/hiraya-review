@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/dialog';
 import { index as examsIndex } from '@/routes/exams';
 import { LiveExamView } from './components/live-exam-view';
+import { PrintableExam } from './components/printable-exam';
 import { ReviewExamView } from './components/review-exam-view';
 import { ScorecardView } from './components/scorecard-view';
 import { SetupExamView } from './components/setup-exam-view';
@@ -61,6 +62,10 @@ export default function ExamIndex(props: ExamIndexProps) {
         setConfirmModal,
         errorMessage,
         setErrorMessage,
+        printPool,
+        setPrintPool,
+        isPrinting,
+        setIsPrinting,
 
         // Handlers
         formatTime,
@@ -71,6 +76,7 @@ export default function ExamIndex(props: ExamIndexProps) {
         handleRegisterFromFreeExam,
         handleCancelFreeExam,
         handleBeginExam,
+        handlePrintExam,
         handleSubmitExam,
         handleExitExam,
         getActiveTimeLimitSecs,
@@ -194,8 +200,21 @@ export default function ExamIndex(props: ExamIndexProps) {
                 setSelectedExamId={setSelectedExamId}
                 details={details}
                 handleBeginExam={handleBeginExam}
+                handlePrintExam={handlePrintExam}
+                isPrinting={isPrinting}
                 customConfirmModal={customConfirmModal}
             />
+
+            {printPool && (
+                <PrintableExam
+                    questions={printPool}
+                    title={details.title}
+                    onComplete={() => {
+                        setPrintPool(null);
+                        setIsPrinting(false);
+                    }}
+                />
+            )}
 
             {/* Error Modal */}
             <Dialog

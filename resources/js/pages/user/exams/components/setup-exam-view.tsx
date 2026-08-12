@@ -1,4 +1,4 @@
-import { Head } from '@inertiajs/react';
+import { Head, usePage } from '@inertiajs/react';
 import {
     Award,
     ClipboardList,
@@ -9,11 +9,13 @@ import {
     ArrowRight,
     BarChart,
     Target,
+    Download,
 } from 'lucide-react';
 import React from 'react';
 import { PageContainer } from '@/components/layout/page-container';
 import { PageHeader } from '@/components/layout/page-header';
 import { HowItWorksModal } from '@/components/shared/how-it-works-modal';
+import type { Auth } from '@/types';
 
 interface SetupExamViewProps {
     selectedExamId: number | null;
@@ -27,6 +29,8 @@ interface SetupExamViewProps {
         targetPace: string;
     };
     handleBeginExam: () => void;
+    handlePrintExam: () => void;
+    isPrinting?: boolean;
     customConfirmModal: React.ReactNode;
 }
 
@@ -35,8 +39,16 @@ export function SetupExamView({
     setSelectedExamId,
     details,
     handleBeginExam,
+    handlePrintExam,
+    isPrinting = false,
     customConfirmModal,
 }: SetupExamViewProps) {
+    const { auth } = usePage<{ auth: Auth }>().props;
+
+    const onPrint = () => {
+        handlePrintExam();
+    };
+
     return (
         <>
             <Head title="Mock Exams" />
@@ -217,14 +229,40 @@ export function SetupExamView({
                                 will begin immediately upon confirmation.
                             </div>
 
-                            {/* Action CTA Button */}
-                            <button
-                                onClick={handleBeginExam}
-                                className="group flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 py-3 text-xs font-semibold text-white shadow-sm transition transition-all duration-150 duration-300 hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95"
-                            >
-                                Begin Exam
-                                <ArrowRight className="size-4" />
-                            </button>
+                            <div className="flex gap-3">
+                                {/* Action CTA Button */}
+                                <button
+                                    onClick={handleBeginExam}
+                                    className="group flex flex-1 items-center justify-center gap-2 rounded-lg bg-blue-600 py-3 text-xs font-semibold text-white shadow-sm transition transition-all duration-150 duration-300 hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95"
+                                >
+                                    Begin Exam
+                                    <ArrowRight className="size-4" />
+                                </button>
+                                {(auth.user.role === 'admin' ||
+                                    auth.user.can_download_pdf) && (
+                                    <button
+                                        onClick={onPrint}
+                                        disabled={isPrinting}
+                                        title="Download PDF Exam Booklet"
+                                        className="group flex items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-3 text-xs font-semibold text-slate-700 shadow-sm transition-all hover:border-blue-300 hover:bg-slate-50 hover:text-blue-600 disabled:opacity-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
+                                    >
+                                        {isPrinting ? (
+                                            <div className="size-5 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                                        ) : (
+                                            <Download className="size-5 text-slate-500 transition-colors group-hover:text-blue-600 dark:text-slate-400" />
+                                        )}
+                                    </button>
+                                )}
+                            </div>
+
+                            <p className="mt-2 text-center text-[11px] leading-relaxed text-slate-500 dark:text-slate-400">
+                                💡{' '}
+                                <span className="font-semibold text-slate-700 dark:text-slate-300">
+                                    PDF Booklet:
+                                </span>{' '}
+                                Automatically generates a high-resolution, A4
+                                PDF exam booklet with answer key.
+                            </p>
                         </div>
                     </div>
                 </div>

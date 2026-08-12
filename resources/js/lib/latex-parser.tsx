@@ -291,9 +291,14 @@ export const parseLatexString = (
 
         // Plain text until next unescaped $
         let nextDollar = i;
+
         while (true) {
             nextDollar = text.indexOf('$', nextDollar);
-            if (nextDollar === -1) break;
+
+            if (nextDollar === -1) {
+                break;
+            }
+
             if (nextDollar > 0 && text[nextDollar - 1] === '\\') {
                 nextDollar++;
             } else {

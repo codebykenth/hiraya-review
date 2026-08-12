@@ -203,10 +203,10 @@ export default function LearnIndex(props: LearnIndexProps) {
                                         const pct =
                                             stats.total > 0
                                                 ? Math.round(
-                                                    (stats.completed /
-                                                        stats.total) *
-                                                    100,
-                                                )
+                                                      (stats.completed /
+                                                          stats.total) *
+                                                          100,
+                                                  )
                                                 : 0;
                                         const barColor =
                                             progressBarColors[cat.name] ||

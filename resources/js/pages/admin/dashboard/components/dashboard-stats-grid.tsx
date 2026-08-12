@@ -1,4 +1,4 @@
-﻿import { Database, Activity, Users, Layers, TrendingUp } from 'lucide-react';
+import { Database, Activity, Users, Layers } from 'lucide-react';
 import type { Metrics } from '../types';
 import { StatsCard } from './stats-card';
 
@@ -37,10 +37,15 @@ export function DashboardStatsGrid({ metrics }: DashboardStatsGridProps) {
                 iconTextColor="text-emerald-600 dark:text-emerald-400 dark:text-emerald-400"
                 footer={{
                     highlight: (
-                        <div className="flex items-center gap-1">
-                            <TrendingUp className="size-3 text-emerald-600 dark:text-emerald-400" />
+                        <div className="flex items-center gap-1.5">
                             <span className="font-bold text-emerald-600 dark:text-emerald-400">
-                                Dynamic monitoring active
+                                {metrics.total_mock_exams ?? 0} Mocks
+                            </span>
+                            <span className="text-slate-300 dark:text-slate-600">
+                                •
+                            </span>
+                            <span className="font-bold text-indigo-500">
+                                {metrics.total_drills ?? 0} Drills
                             </span>
                         </div>
                     ) as any,

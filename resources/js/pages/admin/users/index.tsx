@@ -18,6 +18,7 @@ import { useBulkSelection } from '@/hooks/use-bulk-selection';
 import { useConfirmModal } from '@/hooks/use-confirm-modal';
 import type { UserItem, AdminUsersIndexProps } from '@/pages/admin/users/user';
 import { index as adminUsersIndex } from '@/routes/admin/users';
+import type { Auth } from '@/types';
 import type { FilterState } from './components/advanced-filters';
 import { AdvancedFilters } from './components/advanced-filters';
 import { UserDetailModal } from './components/user-detail-modal';
@@ -31,7 +32,7 @@ export default function AdminUsersIndex({
     users = [],
     stats,
 }: AdminUsersIndexProps) {
-    const { auth } = usePage().props;
+    const { auth } = usePage<{ auth: Auth }>().props;
     const currentUser = auth.user;
 
     const { modal, open, close, confirm } = useConfirmModal();
@@ -206,11 +207,31 @@ export default function AdminUsersIndex({
         );
     };
 
+    const handleTogglePdfAccess = (user: UserItem) => {
+        const newAccess = !user.can_download_pdf;
+        const action = newAccess ? 'grant' : 'revoke';
+
+        open(
+            `${newAccess ? 'Grant' : 'Revoke'} PDF Access?`,
+            `Are you sure you want to ${action} PDF download access for "${user.name}"?`,
+            `${newAccess ? 'Grant' : 'Revoke'} Access`,
+            () => {
+                router.put(
+                    `/admin/users/${user.id}`,
+                    { can_download_pdf: newAccess },
+                    { preserveScroll: true },
+                );
+            },
+            newAccess ? 'success' : 'danger',
+        );
+    };
+
     const columns = getUsersTableColumns({
         currentUserId: currentUser.id,
         onRoleChange: handleRoleChange,
         onStatusToggle: handleToggleStatus,
         onDelete: handleDeleteUser,
+        onPdfAccessToggle: handleTogglePdfAccess,
         onSelectUser: setSelectedUserModal,
         selectedUserIds: selectedIds,
         onToggleSelect: toggleSelect,
@@ -249,12 +270,22 @@ export default function AdminUsersIndex({
                                 onChange={(e) => {
                                     const val = e.target.value;
                                     setSelectedRole(val);
-                                    
-                                    let roleFilter: 'all' | 'admin' | 'student' = 'all';
-                                    if (val === 'Admins') roleFilter = 'admin';
-                                    else if (val === 'Students') roleFilter = 'student';
-                                    
-                                    setFilters((prev) => ({ ...prev, role: roleFilter }));
+
+                                    let roleFilter:
+                                        | 'all'
+                                        | 'admin'
+                                        | 'student' = 'all';
+
+                                    if (val === 'Admins') {
+                                        roleFilter = 'admin';
+                                    } else if (val === 'Students') {
+                                        roleFilter = 'student';
+                                    }
+
+                                    setFilters((prev) => ({
+                                        ...prev,
+                                        role: roleFilter,
+                                    }));
                                     setCurrentPage(1);
                                 }}
                                 className="w-full appearance-none rounded-lg border border-border bg-background py-1.5 pr-8 pl-2.5 text-xs font-bold text-foreground transition focus:border-blue-500 focus:outline-none"
@@ -369,6 +400,7 @@ export default function AdminUsersIndex({
                 onClose={() => setShowFiltersModal(false)}
                 onApply={(newFilters) => {
                     setFilters(newFilters);
+
                     if (newFilters.role === 'admin') {
                         setSelectedRole('Admins');
                     } else if (newFilters.role === 'student') {
@@ -376,6 +408,7 @@ export default function AdminUsersIndex({
                     } else {
                         setSelectedRole('All Roles');
                     }
+
                     setCurrentPage(1);
                 }}
                 currentFilters={filters}

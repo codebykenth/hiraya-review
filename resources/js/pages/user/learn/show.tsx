@@ -33,26 +33,40 @@ export default function LearnShow({ module, recommended }: LearnShowProps) {
         user_reports_map?: Record<string, 'pending' | 'resolved' | 'dismissed'>;
     }>().props;
     const isLoggedIn = !!auth.user;
-    
-    const [localReportsMap, setLocalReportsMap] = useState<Record<string, 'pending' | 'resolved' | 'dismissed'>>(user_reports_map);
+
+    const [localReportsMap, setLocalReportsMap] =
+        useState<Record<string, 'pending' | 'resolved' | 'dismissed'>>(
+            user_reports_map,
+        );
 
     React.useEffect(() => {
-        const handleReportSubmitted = (e: CustomEvent<{ flaggable_id: number }>) => {
+        const handleReportSubmitted = (
+            e: CustomEvent<{ flaggable_id: number }>,
+        ) => {
             if (e.detail && e.detail.flaggable_id) {
-                setLocalReportsMap(prev => ({
+                setLocalReportsMap((prev) => ({
                     ...prev,
-                    [`App\\Models\\LearnModule:${e.detail.flaggable_id}`]: 'pending'
+                    [`App\\Models\\LearnModule:${e.detail.flaggable_id}`]:
+                        'pending',
                 }));
             }
         };
 
-        window.addEventListener('report-submitted', handleReportSubmitted as EventListener);
+        window.addEventListener(
+            'report-submitted',
+            handleReportSubmitted as EventListener,
+        );
+
         return () => {
-            window.removeEventListener('report-submitted', handleReportSubmitted as EventListener);
+            window.removeEventListener(
+                'report-submitted',
+                handleReportSubmitted as EventListener,
+            );
         };
     }, []);
 
-    const reportStatus = localReportsMap[`App\\Models\\LearnModule:${module.id}`];
+    const reportStatus =
+        localReportsMap[`App\\Models\\LearnModule:${module.id}`];
     const [isReportModalOpen, setIsReportModalOpen] = useState(false);
 
     React.useEffect(() => {
@@ -189,7 +203,9 @@ export default function LearnShow({ module, recommended }: LearnShowProps) {
                                         />
                                         <div className="mt-8 flex items-center justify-between border-t border-border pt-6">
                                             {(() => {
-                                                if (reportStatus === 'pending') {
+                                                if (
+                                                    reportStatus === 'pending'
+                                                ) {
                                                     return (
                                                         <span className="inline-flex items-center gap-1.5 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-bold text-amber-700 dark:border-amber-900/40 dark:bg-amber-950/30 dark:text-amber-400">
                                                             <Clock className="size-4 text-amber-600 dark:text-amber-400" />
@@ -197,11 +213,16 @@ export default function LearnShow({ module, recommended }: LearnShowProps) {
                                                         </span>
                                                     );
                                                 }
+
                                                 return (
                                                     <Button
                                                         variant="destructive"
-                                                        onClick={() => setIsReportModalOpen(true)}
-                                                        className="bg-red-500 text-white hover:bg-red-600 font-bold"
+                                                        onClick={() =>
+                                                            setIsReportModalOpen(
+                                                                true,
+                                                            )
+                                                        }
+                                                        className="bg-red-500 font-bold text-white hover:bg-red-600"
                                                     >
                                                         <Flag className="mr-2 size-4" />
                                                         Report Issue

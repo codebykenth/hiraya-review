@@ -82,12 +82,12 @@ class GenerateQuestionsJob implements ShouldQueue
                 if (in_array($validated['language'], ['Filipino/Tagalog', 'Tagalog'])) {
                     $categorySpecificRules = "* Sentence structure (Filipino/Tagalog): Focus on correct Filipino/Tagalog syntax, such as distinguishing between standard and inverted sentence orders (Karaniwan vs. Di-karaniwang ayos), proper placement of enclitics (mga ingklitik like 'ba', 'na', 'man', 'yata'), and correct verb focus (pokus ng pandiwa).";
                 } else {
-                    $categorySpecificRules = "* Sentence structure: Test advanced English syntax rules. Focus on identifying structural errors related to Parallelism (parallel structure), Subject-Verb Agreement (especially with intervening phrases or collective nouns), Dangling or Misplaced Modifiers, and correct use of conjunctions/clauses. Provide a sentence and ask which structural rule is violated or how to best rewrite a structurally flawed sentence.";
+                    $categorySpecificRules = '* Sentence structure: Test advanced English syntax rules. Focus on identifying structural errors related to Parallelism (parallel structure), Subject-Verb Agreement (especially with intervening phrases or collective nouns), Dangling or Misplaced Modifiers, and correct use of conjunctions/clauses. Provide a sentence and ask which structural rule is violated or how to best rewrite a structurally flawed sentence.';
                 }
             } elseif ($subcategory === 'Word analogy') {
                 $variety = $validated['analogy_variety'] ?? 'all';
                 $varietyInstruction = '';
-                
+
                 if ($variety === 'function') {
                     $varietyInstruction = 'CRITICAL VARIETY RULE: You MUST ONLY generate "Function" analogies (e.g., Tool : Action, Object : Purpose).';
                 } elseif ($variety === 'degree') {
@@ -136,7 +136,9 @@ class GenerateQuestionsJob implements ShouldQueue
                 } elseif ($variety === 'format_l') {
                     $varietyInstruction = "CRITICAL VARIETY RULE: You MUST generate ONLY the following format. You are forbidden from generating any other format:\n        - Format L: Alphanumeric and Symbol Sequence. Provide a sequence of letters, numbers, and text-based symbols. Do NOT limit to just 2 characters per term; randomly vary the complexity (e.g., A1, C\\\$4, E%9, G^16, _ or !@, #\$, %^, _, _) and sequence length (4 to 7 terms) based on alphabetic/numeric/symbol patterns. Do NOT explicitly describe the sequence elements in the question (e.g., avoid 'symbol triplets' or 'alphanumeric pattern'). Just present the sequence and ask a general question like 'What comes next in the sequence?'. CRITICAL: If you use a dollar sign (\$) or a backtick (`), you MUST escape them with a backslash (e.g., \\\$ and \\\`) so they render as plain text. NO SVGs ALLOWED.";
                 } elseif ($variety === 'format_m') {
-                    $varietyInstruction = "CRITICAL VARIETY RULE: You MUST generate ONLY the following format. You are forbidden from generating any other format:\n        - Format M: Coding and Decoding. Provide a word and its coded equivalent based on a specific letter-shifting pattern. Use the real Unicode right-arrow symbol (→) instead of explicit words. DO NOT use '->' or phrases like 'If X is coded as Y'. To add variety, randomly generate questions with 2, 3, 4, or 5 pairs (e.g., 'APPLE → CRRNG ; BANANA → ?' or 'CAT → FDW ; DOG → GRJ ; BIRD → ?'). The options must be potential coded words. NO SVGs ALLOWED.";
+                    $varietyInstruction = "CRITICAL VARIETY RULE: You MUST generate ONLY the following format. You are forbidden from generating any other format:\n        - Format M: Coding and Decoding. Provide a word and its coded equivalent based on a specific letter-shifting pattern. Use the real Unicode right-arrow symbol (→) instead of '->'. To add variety, randomly generate questions with 2, 3, 4, or 5 pairs (e.g., 'APPLE → CRRNG ; BANANA → ?' or 'CAT → FDW ; DOG → GRJ ; BIRD → ?'). ADDITIONALLY, generate hard/advanced coding questions with complex patterns such as:\n          1) Asymmetric length coding and explicit question phrasing (e.g., 'If SUN is coded as TKAF, what is the code for MOON?');\n          2) Dual/Alternating rules (e.g., Vowels vs Consonants shifted differently, reverse-alphabet complement pairs A<->Z, or incremental positional shifts +1, +2, +3...);\n          3) Reversal + shift combinations.\n        The options must be potential coded words. NO SVGs ALLOWED.";
+                } elseif ($variety === 'format_n') {
+                    $varietyInstruction = "CRITICAL VARIETY RULE: You MUST generate ONLY the following format. You are forbidden from generating any other format:\n        - Format N: Flowchart / Procedural Logic. Provide a procedural logic puzzle based on administrative rules (e.g., tax computation, application routing). You MUST include a clean, scalable SVG diagram (e.g., a flowchart or decision tree) in the question stem to represent the rules. Give a specific scenario in the text and ask the user to trace it through the flowchart to find the final output. The options (A to E) MUST be purely text-based.";
                 } else {
                     $varietyInstruction = "CRITICAL VARIETY RULE: To prevent repetitive questions, randomly select one of the following abstract reasoning formats for each question:
         - Format A: Grid-based Logical Matrix. Generate a single SVG showing a grid of shapes (e.g. 2x2, 3x3, or 4x4 cells). The bottom-right cell MUST show a question mark '?' indicating the missing symbol. The other cells must follow a logical grid-based pattern (e.g. addition, subtraction, or overlap of lines/shapes in rows or columns).
@@ -151,20 +153,25 @@ class GenerateQuestionsJob implements ShouldQueue
         - Format J: Conditional Syllogism (Text-based). Provide a logical scenario using 'If... then...' statements. NO SVGs ALLOWED.
         - Format K: Disjunctive Syllogism (Text-based). Provide a logical scenario using 'Either... or...' statements. NO SVGs ALLOWED.
         - Format L: Alphanumeric and Symbol Sequence (Text-based). Provide a sequence of letters, numbers, and symbols. Randomly vary complexity (2 to 5 characters) and length (4 to 7 terms). Do NOT explicitly describe the sequence in the question; keep it general ('What comes next?'). CRITICAL: If using \$ or `, escape them (e.g., \\\$ and \\\`). NO SVGs ALLOWED.
-        - Format M: Coding and Decoding (Text-based). Provide a word and its coded equivalent based on a letter-shifting pattern using the real Unicode right-arrow symbol (→). Randomly vary the length to have 2, 3, 4, or 5 pairs (e.g., 'CAT → FDW ; DOG → GRJ ; BIRD → ?'). DO NOT use '->' or phrases like 'If X is coded as Y'. NO SVGs ALLOWED.";
+        - Format M: Coding and Decoding (Text-based). Provide a word and its coded equivalent based on a letter-shifting pattern using the real Unicode right-arrow symbol (→). Randomly vary the length to have 2, 3, 4, or 5 pairs (e.g., 'CAT → FDW ; DOG → GRJ ; BIRD → ?'). DO NOT use '->'. ADDITIONALLY, include hard questions with asymmetric length codes (e.g., 'If SUN is coded as TKAF, what is the code for MOON?'), vowel/consonant dual shifts, reverse-alphabet complements (A<->Z), or positional incremental shifts (+1, +2, +3...). NO SVGs ALLOWED.
+        - Format N: Flowchart / Procedural Logic. Provide an SVG flowchart in the question stem representing procedural rules. Give a specific scenario and ask the user to trace it to the final output. The options MUST be purely text-based.";
                 }
 
                 if (in_array($variety, ['format_i', 'format_j', 'format_k', 'format_l', 'format_m'])) {
                     $categorySpecificRules = "* Symbolic logic / abstract reasoning: You MUST generate text-based logical reasoning puzzles focusing on syllogisms, sequence logic, or coding/decoding.
         {$varietyInstruction}
         CRITICAL RULE: DO NOT USE SVGS. The question must be purely text-based. Provide clear and tricky distractors. The explanation must clearly map out the logical deduction step-by-step in plain, intuitive English. AVOID formal academic logic jargon. Explain using simple concepts that an average test-taker can easily follow.";
+                } elseif ($variety === 'format_n') {
+                    $categorySpecificRules = "* Symbolic logic / abstract reasoning: You MUST generate procedural reasoning puzzles focusing on flowcharts or decision trees.
+        {$varietyInstruction}
+        CRITICAL RULE: You MUST use an SVG for the flowchart diagram in the question stem. The options (A to E) MUST NOT be SVGs; they must be purely text-based outputs or decisions. Keep the SVG clean and readable. The explanation must map out the deduction step-by-step through the diagram.";
                 } else {
                     $categorySpecificRules = "* Symbolic logic / abstract reasoning: You MUST generate visual-spatial geometric puzzles using raw, scalable SVG code. Output raw <svg viewBox=\"...\">...</svg> blocks directly inside the text. You MUST include SVG visuals not just in the question stem, but ALSO in every single option (Options A to E must be standalone SVGs showing the possible answers, do NOT use descriptive text for options). Keep SVGs clean with simple paths, <rect>, <circle>, or <polygon>.
         CRITICAL STEM SVG RULE: If the format requires a visual reference (Formats A-H), the 'stem' MUST contain at least one <svg> block representing the puzzle's reference diagram or sequence. (Except for Odd One Out Format E, where the puzzle is defined by the options).
         CRITICAL TOKEN OPTIMIZATION RULE: To prevent generation cutoffs, you MUST heavily minify your SVG code. Do NOT use any HTML comments (<!-- -->) inside the SVGs. Remove all unnecessary whitespace, spaces, and line breaks ONLY within the SVG code. Do NOT remove spaces or line breaks in regular text!
         {$varietyInstruction}
         
-        CRITICAL HYBRID RULE: If generating Format I, J, K, L, M, or N (Text-based logic), completely ignore the SVG rules above and generate purely text-based questions without any SVG tags. You MUST use proper spacing, line breaks, and formatting for text. For explanations, use plain, intuitive English and strictly AVOID academic logic jargon. For visual Formats A-H, follow the geometric coherence rule below:
+        CRITICAL HYBRID RULE: If generating Format I, J, K, L, or M (Text-based logic), completely ignore the SVG rules above and generate purely text-based questions without any SVG tags. If generating Format N, use an SVG for the diagram in the stem, but keep options text-based. For visual Formats A-H, follow the geometric coherence rule below:
         CRITICAL GEOMETRIC COHERENCE RULE: Ensure that all elements (e.g. dots, lines, shapes) inside the SVGs never unintentionally overlap or intersect, unless it is a deliberate part of the puzzle logic. For multiple-choice options (A to E), every option must be constructed with clean spatial layouts and correct coordinate separation so that the correct answer cannot be easily guessed by simply choosing the only option without overlapping elements.";
                 }
             } elseif ($subcategory === 'Data interpretation') {
@@ -209,26 +216,39 @@ class GenerateQuestionsJob implements ShouldQueue
                 }
             } elseif ($subcategory === 'Basic operations') {
                 $variety = $validated['basic_operations_variety'] ?? 'all';
-                $varietyText = "You MUST randomly rotate between testing: 1) MDAS/PEMDAS order of operations (involving brackets, exponents, negative numbers); 2) Fractions (adding/multiplying mixed and dissimilar fractions); 3) Decimals (aligning decimals in multiplication/division); or 4) Percentages (finding the Base, Rate, or Percentage).";
-                
-                if ($variety === 'mdas') $varietyText = "You MUST ONLY test MDAS/PEMDAS order of operations (involving brackets, exponents, negative numbers).";
-                elseif ($variety === 'fractions') $varietyText = "You MUST ONLY test Fractions (adding, subtracting, multiplying, dividing mixed and dissimilar fractions).";
-                elseif ($variety === 'decimals') $varietyText = "You MUST ONLY test Decimals (aligning decimals in addition/subtraction, multiplication, or division).";
-                elseif ($variety === 'percentages') $varietyText = "You MUST ONLY test Percentages (finding the Base, Rate, or Percentage, e.g., 'What is 15% of 300?').";
-                
+                $varietyText = 'You MUST randomly rotate between testing: 1) MDAS/PEMDAS order of operations (involving brackets, exponents, negative numbers); 2) Fractions (adding/multiplying mixed and dissimilar fractions); 3) Decimals (aligning decimals in multiplication/division); or 4) Percentages (finding the Base, Rate, or Percentage).';
+
+                if ($variety === 'mdas') {
+                    $varietyText = 'You MUST ONLY test MDAS/PEMDAS order of operations (involving brackets, exponents, negative numbers).';
+                } elseif ($variety === 'fractions') {
+                    $varietyText = 'You MUST ONLY test Fractions (adding, subtracting, multiplying, dividing mixed and dissimilar fractions).';
+                } elseif ($variety === 'decimals') {
+                    $varietyText = 'You MUST ONLY test Decimals (aligning decimals in addition/subtraction, multiplication, or division).';
+                } elseif ($variety === 'percentages') {
+                    $varietyText = "You MUST ONLY test Percentages (finding the Base, Rate, or Percentage, e.g., 'What is 15% of 300?').";
+                }
+
                 $categorySpecificRules = "* Basic operations: Test fundamental math computation skills without a calculator. {$varietyText} Ensure distractors are common calculation errors.";
             } elseif ($subcategory === 'Word problems') {
                 $variety = $validated['word_problem_variety'] ?? 'all';
-                $varietyText = "You MUST randomly rotate among these classic types: 1) Age problems; 2) Work/Time problems; 3) Motion problems (Distance-Rate-Time); 4) Ratio and Proportion; 5) Mixture problems; 6) Business/Finance problems; or 7) Percentage word problems.";
-                
-                if ($variety === 'age') $varietyText = "You MUST ONLY generate Age problems (e.g., 'In 5 years, John will be twice as old as...').";
-                elseif ($variety === 'work') $varietyText = "You MUST ONLY generate Work/Time problems (e.g., 'If Pipe A fills the tank in 2 hours and Pipe B...').";
-                elseif ($variety === 'motion') $varietyText = "You MUST ONLY generate Motion problems / Distance-Rate-Time (e.g., 'A train travels at 60km/h...').";
-                elseif ($variety === 'ratio') $varietyText = "You MUST ONLY generate Ratio and Proportion problems.";
-                elseif ($variety === 'mixture') $varietyText = "You MUST ONLY generate Mixture problems (e.g., mixing solutions with different percentages).";
-                elseif ($variety === 'finance') $varietyText = "You MUST ONLY generate Business/Finance problems (Simple Interest, Discounts, Profit/Loss).";
-                elseif ($variety === 'percentages') $varietyText = "You MUST ONLY generate Percentage word problems (e.g., population growth, percentage increase/decrease).";
-                
+                $varietyText = 'You MUST randomly rotate among these classic types: 1) Age problems; 2) Work/Time problems; 3) Motion problems (Distance-Rate-Time); 4) Ratio and Proportion; 5) Mixture problems; 6) Business/Finance problems; or 7) Percentage word problems.';
+
+                if ($variety === 'age') {
+                    $varietyText = "You MUST ONLY generate Age problems (e.g., 'In 5 years, John will be twice as old as...').";
+                } elseif ($variety === 'work') {
+                    $varietyText = "You MUST ONLY generate Work/Time problems (e.g., 'If Pipe A fills the tank in 2 hours and Pipe B...').";
+                } elseif ($variety === 'motion') {
+                    $varietyText = "You MUST ONLY generate Motion problems / Distance-Rate-Time (e.g., 'A train travels at 60km/h...').";
+                } elseif ($variety === 'ratio') {
+                    $varietyText = 'You MUST ONLY generate Ratio and Proportion problems.';
+                } elseif ($variety === 'mixture') {
+                    $varietyText = 'You MUST ONLY generate Mixture problems (e.g., mixing solutions with different percentages).';
+                } elseif ($variety === 'finance') {
+                    $varietyText = 'You MUST ONLY generate Business/Finance problems (Simple Interest, Discounts, Profit/Loss).';
+                } elseif ($variety === 'percentages') {
+                    $varietyText = 'You MUST ONLY generate Percentage word problems (e.g., population growth, percentage increase/decrease).';
+                }
+
                 $categorySpecificRules = "* Word problems: Provide challenging, multi-step math word problems based on the Philippine Civil Service scope. {$varietyText} The question stem must be a real-world scenario (use Philippine context like Pesos or local cities).";
             } elseif ($subcategory === 'Philippine Constitution') {
                 $categorySpecificRules = '* Philippine Constitution: Test factual knowledge of the 1987 Philippine Constitution. Focus heavily on Article III (Bill of Rights), Article IV (Citizenship), Article V (Suffrage), and the powers/qualifications of the Three Branches of Government (Executive, Legislative, Judicial). Avoid controversial political opinions; stick to constitutional law and facts.';
@@ -276,6 +296,9 @@ class GenerateQuestionsJob implements ShouldQueue
         - Reading Comprehension: 'Based on the passage, which of the following is the most logical conclusion?'
         - Sentence Completion: 'Which word best completes the sentence?'
         (NOTE: If the question language is Tagalog, strictly translate these explicit questions into formal Tagalog).
+
+        LENGTH & COMPLEXITY RULE (SIMULATE EXAM FATIGUE):
+        The official Civil Service Exam is known for its long, complex, and verbose question structures designed to test reading comprehension, patience, and attention to detail under time pressure. You MUST simulate this difficulty. Do NOT arbitrarily shorten scenarios or word problems just for brevity. Where applicable (especially in word problems, logical reasoning, and reading comprehension), generate suitably long and detailed question stems so test-takers can practice parsing dense information.
 
         Category Specific Rules:
         {$categorySpecificRules}

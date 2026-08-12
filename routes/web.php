@@ -103,6 +103,14 @@ Route::middleware(['auth.or.fail', 'verified'])->group(function () {
     });
 
     // --- USER EXAMS & HISTORY ---
+    Route::post('exams/export-pdf-check', [ExamController::class, 'checkPdfExportLimit'])
+        ->name('exams.exportPdfCheck')
+        ->middleware('throttle:pdf-export');
+
+    Route::post('exams/track-pdf-download', [ExamController::class, 'trackPdfDownload'])
+        ->name('exams.trackPdfDownload')
+        ->middleware('throttle:global-mutations');
+
     Route::controller(ExamHistoryController::class)->group(function () {
         Route::get('history', 'index')->name('history.index')->middleware('throttle:global-views');
         Route::post('exams/attempts/bulk-delete', 'bulkDestroy')->name('exams.attempts.bulkDestroy')->middleware('throttle:global-mutations');

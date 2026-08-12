@@ -252,11 +252,14 @@ export function ManualEntryForm({
                         </div>
 
                         {/* Language Select */}
-                        {(data.category === 'Verbal Ability' || data.subcategory === 'Word analogy') && (
+                        {(data.category === 'Verbal Ability' ||
+                            data.subcategory === 'Word analogy') && (
                             <SelectField
                                 label="Language"
                                 value={data.language}
-                                onValueChange={(val) => setData('language', val)}
+                                onValueChange={(val) =>
+                                    setData('language', val)
+                                }
                                 options={['English', 'Tagalog']}
                             />
                         )}

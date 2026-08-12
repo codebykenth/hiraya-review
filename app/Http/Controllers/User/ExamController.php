@@ -11,6 +11,7 @@ use App\Services\DeterministicAnalysisService;
 use App\Services\ExamAttemptFormatter;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 
 class ExamController
@@ -207,5 +208,50 @@ class ExamController
             'success' => true,
             'attempt_id' => $attempt->id,
         ]);
+    }
+
+    /**
+     * Issue export authorization token for PDF examination booklet export.
+     * Rate limiting (1 per day for normal users, unlimited for admins) is handled via route middleware.
+     */
+    public function checkPdfExportLimit(Request $request)
+    {
+        $user = $request->user();
+
+        if (! $user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You must be logged in to download PDF examination booklets.',
+            ], 401);
+        }
+
+        if (! $user->can_download_pdf && $user->role !== 'admin') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Your account is not authorized to download PDF examination booklets.',
+            ], 403);
+        }
+
+        $token = Str::random(40);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'PDF export authorized.',
+            'export_token' => $token,
+        ]);
+    }
+
+    /**
+     * Track a successful PDF download.
+     */
+    public function trackPdfDownload(Request $request)
+    {
+        $user = $request->user();
+
+        if ($user) {
+            $user->increment('pdf_downloads_count');
+        }
+
+        return response()->json(['success' => true]);
     }
 }

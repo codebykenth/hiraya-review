@@ -13,7 +13,7 @@ class ExamAttemptFormatter
     public function calculateWeightedPercentage(array $catScores): float|int
     {
         $scoreMap = $catScores['categoryScoreMap'] ?? $catScores ?? [];
-        
+
         $hasWeights = false;
         foreach (['Verbal Ability', 'Analytical Ability', 'Numerical Ability', 'Clerical Ability', 'General Information'] as $cat) {
             if (isset($scoreMap[$cat])) {
@@ -27,7 +27,7 @@ class ExamAttemptFormatter
             $weightedScore = 0;
 
             foreach ($scoreMap as $catName => $val) {
-                if ($catName === 'metadata' || !is_array($val)) {
+                if ($catName === 'metadata' || ! is_array($val)) {
                     continue;
                 }
 
@@ -42,7 +42,7 @@ class ExamAttemptFormatter
                     $correct = (int) ($val['correct'] ?? 0);
                     $total = (int) ($val['total'] ?? 0);
                     $catScore = $total > 0 ? ($correct / $total) * 100 : 0;
-                    
+
                     $weightedScore += $catScore * $weight;
                     $totalWeight += $weight;
                 }
@@ -56,7 +56,7 @@ class ExamAttemptFormatter
         $meta = $catScores['metadata'] ?? [];
         $correct = $meta['correct_count'] ?? 0;
         $total = $meta['total_questions'] ?? 0;
-        
+
         return $total > 0 ? ($correct / $total) * 100 : 0;
     }
 

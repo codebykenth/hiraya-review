@@ -19,7 +19,7 @@ export default function AuthSplitLayout({
                     className="group relative z-20 flex items-center text-lg font-medium transition-all duration-300 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95"
                 >
                     <AppLogoIcon className="mr-2 size-8 fill-current text-white transition-transform group-hover:scale-110" />
-                    {name}
+                    {name as string}
                 </Link>
             </div>
             <div className="w-full lg:p-8">

@@ -8,7 +8,9 @@ export function CookieConsentBanner() {
 
     useEffect(() => {
         const consent = localStorage.getItem('hiraya_cookie_consent');
+
         if (!consent) {
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setIsVisible(true);
         }
     }, []);
@@ -18,10 +20,12 @@ export function CookieConsentBanner() {
         setIsVisible(false);
     };
 
-    if (!isVisible) return null;
+    if (!isVisible) {
+        return null;
+    }
 
     return (
-        <div className="fixed bottom-20 left-4 right-4 z-50 rounded-2xl border border-border/80 bg-card/95 p-4 shadow-xl backdrop-blur-md transition-all duration-300 sm:bottom-6 sm:left-auto sm:right-24 sm:max-w-2xl sm:p-5">
+        <div className="fixed right-4 bottom-20 left-4 z-50 rounded-2xl border border-border/80 bg-card/95 p-4 shadow-xl backdrop-blur-md transition-all duration-300 sm:right-24 sm:bottom-6 sm:left-auto sm:max-w-2xl sm:p-5">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div className="flex items-start gap-3">
                     <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
@@ -32,7 +36,9 @@ export function CookieConsentBanner() {
                             Cookie & Privacy Transparency
                         </p>
                         <p className="mt-0.5">
-                            We use strictly essential cookies to keep you logged in and save your theme preferences. We do not track or sell your data.{' '}
+                            We use strictly essential cookies to keep you logged
+                            in and save your theme preferences. We do not track
+                            or sell your data.{' '}
                             <Link
                                 href="/privacy"
                                 className="font-semibold text-primary underline underline-offset-2 hover:text-primary/90"

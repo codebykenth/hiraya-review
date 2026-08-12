@@ -118,7 +118,8 @@ export default function Privacy({ privacy }: PrivacyProps) {
                                             </li>
                                             <li>
                                                 <strong>
-                                                    Essential Cookies & Preferences:
+                                                    Essential Cookies &
+                                                    Preferences:
                                                 </strong>{' '}
                                                 Minimal technical cookies and
                                                 local storage tokens used to
@@ -159,10 +160,10 @@ export default function Privacy({ privacy }: PrivacyProps) {
                                                 across exam disciplines.
                                             </li>
                                             <li>
-                                                Generate targeted practice drills
-                                                and personalized study plans
-                                                focused on your identified weak
-                                                subtopics.
+                                                Generate targeted practice
+                                                drills and personalized study
+                                                plans focused on your identified
+                                                weak subtopics.
                                             </li>
                                             <li>
                                                 Maintain platform security,

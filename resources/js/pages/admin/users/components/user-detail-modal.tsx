@@ -23,6 +23,10 @@ interface User {
     last_login_at?: string | null;
     created_at: string;
     attempts_count: number;
+    mock_exams_count?: number;
+    drills_count?: number;
+    pdf_downloads_count?: number;
+    can_download_pdf?: boolean;
 }
 
 interface UserDetailModalProps {
@@ -372,14 +376,40 @@ export function UserDetailModal({
                                 </p>
                             </div>
 
-                            {/* Mock Attempts */}
+                            {/* Mock Exams */}
                             <div>
                                 <label className="text-[10px] font-bold text-slate-500 uppercase dark:text-slate-400">
-                                    Mock Attempts
+                                    Mock Exams
                                 </label>
                                 <p className="mt-1 text-base leading-relaxed font-bold text-slate-900 dark:text-white">
-                                    {user.attempts_count} exam
-                                    {user.attempts_count !== 1 ? 's' : ''}
+                                    {user.mock_exams_count ?? 0} exam
+                                    {(user.mock_exams_count ?? 0) !== 1
+                                        ? 's'
+                                        : ''}
+                                </p>
+                            </div>
+
+                            {/* Drills */}
+                            <div>
+                                <label className="text-[10px] font-bold text-slate-500 uppercase dark:text-slate-400">
+                                    Drills
+                                </label>
+                                <p className="mt-1 text-base leading-relaxed font-bold text-slate-900 dark:text-white">
+                                    {user.drills_count ?? 0} drill
+                                    {(user.drills_count ?? 0) !== 1 ? 's' : ''}
+                                </p>
+                            </div>
+
+                            {/* PDF Downloads */}
+                            <div>
+                                <label className="text-[10px] font-bold text-slate-500 uppercase dark:text-slate-400">
+                                    PDF Downloads
+                                </label>
+                                <p className="mt-1 text-base leading-relaxed font-bold text-slate-900 dark:text-white">
+                                    {user.pdf_downloads_count ?? 0} booklet
+                                    {(user.pdf_downloads_count ?? 0) !== 1
+                                        ? 's'
+                                        : ''}
                                 </p>
                             </div>
                         </div>

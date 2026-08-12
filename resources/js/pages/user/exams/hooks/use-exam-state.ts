@@ -1,5 +1,7 @@
 import { router, setLayoutProps, usePage } from '@inertiajs/react';
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { toast } from 'sonner';
+import { triggerPdfExport } from '@/components/shared/global-pdf-exporter';
 import { fallbackDemographicQuestions } from '@/data/fallback-demographics';
 import { formatDuration } from '@/lib/exam-formatters';
 import type { Auth } from '@/types';
@@ -71,37 +73,19 @@ export function useExamState({
         if (typeof window !== 'undefined') {
             localStorage.removeItem('active_exam_session');
         }
-        setMounted(true);
-    }, []);
 
-    const getRestoredQuestions = (sessionQuestionIds: number[]) => {
-        let loadedQuestions = [...questions];
+        const timer = setTimeout(() => {
+            setMounted(true);
+        }, 0);
 
-        if (questions.length === 0) {
-            loadedQuestions = [...fallbackQuestions];
-        }
-
-        return sessionQuestionIds
-            .map((id: number) => {
-                return (
-                    loadedQuestions.find((q) => q.id === id) ||
-                    demographicQuestions.find((q) => q.id === id) ||
-                    fallbackQuestions.find((q) => q.id === id)
-                );
-            })
-            .filter(Boolean) as Question[];
-    };
-
-    // Clear any legacy active exam session on mount
-    useEffect(() => {
-        if (typeof window !== 'undefined') {
-            localStorage.removeItem('active_exam_session');
-        }
+        return () => clearTimeout(timer);
     }, []);
 
     const [selectedExamId, setSelectedExamId] = useState<number | null>(1);
     const [drillCategoryId, setDrillCategoryId] = useState<number | null>(null);
-    const [drillCategoryName, setDrillCategoryName] = useState<string | null>(null);
+    const [drillCategoryName, setDrillCategoryName] = useState<string | null>(
+        null,
+    );
     const [drillSubcategories, setDrillSubcategories] = useState<string[]>([]);
     const [drillLanguage, setDrillLanguage] = useState<string>('English');
     const [drillQuestionCount, setDrillQuestionCount] = useState<
@@ -121,7 +105,7 @@ export function useExamState({
         message: '',
         confirmLabel: '',
         variant: 'success',
-        onConfirm: () => { },
+        onConfirm: () => {},
     });
 
     const [isExamActive, setIsExamActive] = useState(false);
@@ -144,6 +128,14 @@ export function useExamState({
     }, [isExamActive]);
 
     const [activeQuestions, setActiveQuestions] = useState<Question[]>([]);
+    const [printPool, setPrintPool] = useState<Question[] | null>(null);
+    const [isPrinting, setIsPrinting] = useState(() => {
+        if (typeof window !== 'undefined') {
+            return window.sessionStorage.getItem('isPdfExporting') === 'true';
+        }
+
+        return false;
+    });
     const [currentIdx, setCurrentIdx] = useState(0);
     const [answers, setAnswers] = useState<Record<number, number>>({});
     const [questionTimes, setQuestionTimes] = useState<Record<number, number>>(
@@ -151,6 +143,7 @@ export function useExamState({
             if (savedAttempt?.cat_scores?.metadata?.question_times) {
                 return savedAttempt.cat_scores.metadata.question_times;
             }
+
             return {};
         },
     );
@@ -159,6 +152,7 @@ export function useExamState({
             if (savedAttempt?.cat_scores?.metadata?.answer_changes) {
                 return savedAttempt.cat_scores.metadata.answer_changes;
             }
+
             return {};
         },
     );
@@ -192,12 +186,12 @@ export function useExamState({
             (q) =>
                 q.category !== 'Demographic Profile' &&
                 !q.category.toLowerCase().includes('demographic') &&
-                !q.isDemographic
+                !q.isDemographic,
         );
 
         if (reviewCategoryFilter !== 'All Categories') {
             filtered = filtered.filter(
-                (q) => q.category === reviewCategoryFilter
+                (q) => q.category === reviewCategoryFilter,
             );
         }
 
@@ -208,12 +202,12 @@ export function useExamState({
         return ['All Subcategories', ...subcats];
     }, [activeQuestions, reviewCategoryFilter]);
 
-    const [isRestored] = useState(true);
     const [selectedPaletteCategory, setSelectedPaletteCategory] =
         useState('All Categories');
 
     const [timeLeft, setTimeLeft] = useState<number>(11400);
-    const [sessionTimeLimitSecs, setSessionTimeLimitSecs] = useState<number>(11400);
+    const [sessionTimeLimitSecs, setSessionTimeLimitSecs] =
+        useState<number>(11400);
     const timeLeftRef = useRef(timeLeft);
     const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
     const [isTimed, setIsTimed] = useState<boolean>(true);
@@ -382,11 +376,16 @@ export function useExamState({
 
     // Per-question timer ticker effect during live active exam
     useEffect(() => {
-        if (!isExamActive || isExamSubmitted) return;
+        if (!isExamActive || isExamSubmitted) {
+            return;
+        }
 
         const isAlreadyAnswered =
             answers[currentIdx] !== undefined && answers[currentIdx] !== null;
-        if (isAlreadyAnswered) return;
+
+        if (isAlreadyAnswered) {
+            return;
+        }
 
         const timer = setInterval(() => {
             setQuestionTimes((prev) => ({
@@ -394,16 +393,21 @@ export function useExamState({
                 [currentIdx]: (prev[currentIdx] || 0) + 1,
             }));
         }, 1000);
+
         return () => clearInterval(timer);
     }, [isExamActive, isExamSubmitted, currentIdx, answers]);
 
     // Trigger browser warning dialog if user attempts to reload or leave during an active exam or drill
     useEffect(() => {
-        if (!isExamActive || isExamSubmitted) return;
+        if (!isExamActive || isExamSubmitted) {
+            return;
+        }
 
         const handleBeforeUnload = (e: BeforeUnloadEvent) => {
             e.preventDefault();
-            e.returnValue = 'You have an active exam session. Unsaved progress will be lost if you leave or reload this page.';
+            e.returnValue =
+                'You have an active exam session. Unsaved progress will be lost if you leave or reload this page.';
+
             return e.returnValue;
         };
 
@@ -455,7 +459,7 @@ export function useExamState({
             if (
                 reviewSubcategoryFilter !== 'All Subcategories' &&
                 (q.subcategory || 'General Concepts') !==
-                reviewSubcategoryFilter
+                    reviewSubcategoryFilter
             ) {
                 return false;
             }
@@ -794,7 +798,7 @@ export function useExamState({
             const track = getTrackNameForExam(examId);
             const fromServer =
                 seenQuestionIdsByTrack[
-                track as keyof typeof seenQuestionIdsByTrack
+                    track as keyof typeof seenQuestionIdsByTrack
                 ] ?? [];
             const fromCurrentSession =
                 selectedExamId === examId && activeQuestions.length > 0
@@ -811,7 +815,7 @@ export function useExamState({
             const track = getTrackNameForExam(examId);
             const fromServer =
                 wrongQuestionIdsByTrack[
-                track as keyof typeof wrongQuestionIdsByTrack
+                    track as keyof typeof wrongQuestionIdsByTrack
                 ] ?? [];
 
             return [...new Set(fromServer)];
@@ -856,14 +860,20 @@ export function useExamState({
                     (q) => seenSet.has(q.id) && !wrongSet.has(q.id),
                 );
 
-                let picked: Question[] = [];
+                const picked: Question[] = [];
 
                 const pushWithLimit = (items: Question[], quota: number) => {
                     let added = 0;
+
                     for (const q of items) {
-                        if (added >= quota) break;
-                        if (picked.some(p => p.id === q.id)) continue;
-                        
+                        if (added >= quota) {
+                            break;
+                        }
+
+                        if (picked.some((p) => p.id === q.id)) {
+                            continue;
+                        }
+
                         picked.push(q);
                         added++;
                     }
@@ -871,15 +881,16 @@ export function useExamState({
 
                 // 1. Pick up to 30% from previously wrong
                 const wrongQuota = Math.ceil(count * 0.3);
-                let wrongPicked = [...wrongFromSeen].sort(
+                const wrongPicked = [...wrongFromSeen].sort(
                     () => Math.random() - 0.5,
                 );
                 pushWithLimit(wrongPicked, wrongQuota);
 
                 // 2. Fill from unseen pool
                 let remaining = count - picked.length;
+
                 if (remaining > 0) {
-                    let unseenPicked = [...unseen].sort(
+                    const unseenPicked = [...unseen].sort(
                         () => Math.random() - 0.5,
                     );
                     pushWithLimit(unseenPicked, remaining);
@@ -887,8 +898,9 @@ export function useExamState({
 
                 // 3. Backfill if still short with seen correct
                 remaining = count - picked.length;
+
                 if (remaining > 0) {
-                    let seenCorrectPicked = [...seenCorrect].sort(
+                    const seenCorrectPicked = [...seenCorrect].sort(
                         () => Math.random() - 0.5,
                     );
                     pushWithLimit(seenCorrectPicked, remaining);
@@ -896,8 +908,11 @@ export function useExamState({
 
                 // 4. Backfill from remaining wrong questions if we are still short
                 remaining = count - picked.length;
+
                 if (remaining > 0) {
-                    let extraWrong = wrongPicked.sort(() => Math.random() - 0.5);
+                    const extraWrong = wrongPicked.sort(
+                        () => Math.random() - 0.5,
+                    );
                     pushWithLimit(extraWrong, remaining);
                 }
 
@@ -909,9 +924,11 @@ export function useExamState({
                             (!subName || q.subcategory === subName) &&
                             !picked.some((p) => p.id === q.id),
                     );
-                    pushWithLimit([...fbPool].sort(() => Math.random() - 0.5), count - picked.length);
+                    pushWithLimit(
+                        [...fbPool].sort(() => Math.random() - 0.5),
+                        count - picked.length,
+                    );
                 }
-
 
                 while (picked.length < count && picked.length > 0) {
                     picked.push(
@@ -981,9 +998,9 @@ export function useExamState({
                         const filQuota =
                             filPool.length > 0
                                 ? Math.min(
-                                    Math.floor(quota / 2),
-                                    filPool.length,
-                                )
+                                      Math.floor(quota / 2),
+                                      filPool.length,
+                                  )
                                 : 0;
                         const engQuota = quota - filQuota;
 
@@ -992,12 +1009,16 @@ export function useExamState({
                             ...pickFlat(filPool, filQuota, catName, subName),
                         );
                     } else {
-                        picked.push(...pickFlat(subPool, quota, catName, subName));
+                        picked.push(
+                            ...pickFlat(subPool, quota, catName, subName),
+                        );
                     }
                 }
 
                 // Shuffle the final picked array so subcategories are completely mixed together within the category
-                return picked.slice(0, targetCount).sort(() => Math.random() - 0.5);
+                return picked
+                    .slice(0, targetCount)
+                    .sort(() => Math.random() - 0.5);
             };
 
             const scoredPool: Question[] = [];
@@ -1056,7 +1077,13 @@ export function useExamState({
 
             return finalPool.map(shuffleOptionsForQuestion);
         },
-        [questions, fallbackQuestions, demographicQuestions, getSeenIdsForExam],
+        [
+            questions,
+            fallbackQuestions,
+            demographicQuestions,
+            getSeenIdsForExam,
+            getWrongIdsForExam,
+        ],
     );
 
     const beginExamSession = useCallback(
@@ -1092,6 +1119,114 @@ export function useExamState({
 
     const handleBeginExam = () => {
         beginExamSession(buildFreshExamPool(selectedExamId), selectedExamId);
+    };
+
+    useEffect(() => {
+        const handleDone = () => {
+            setIsPrinting(false);
+
+            if (typeof window !== 'undefined') {
+                window.sessionStorage.removeItem('isPdfExporting');
+
+                const csrfToken =
+                    (
+                        document.querySelector(
+                            'meta[name="csrf-token"]',
+                        ) as HTMLMetaElement
+                    )?.content || '';
+
+                fetch('/exams/track-pdf-download', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Accept: 'application/json',
+                        'X-CSRF-TOKEN': csrfToken,
+                    },
+                }).catch(() => {});
+            }
+        };
+        window.addEventListener('hiraya:export-pdf-done', handleDone);
+
+        return () =>
+            window.removeEventListener('hiraya:export-pdf-done', handleDone);
+    }, []);
+
+    const handlePrintExam = async () => {
+        const pool = buildFreshExamPool(selectedExamId);
+
+        if (!pool || pool.length === 0) {
+            toast.error(
+                'Unable to generate exam pool for export. Please try again.',
+            );
+            setIsPrinting(false);
+
+            if (typeof window !== 'undefined') {
+                window.sessionStorage.removeItem('isPdfExporting');
+            }
+
+            return;
+        }
+
+        toast.loading('Verifying export limits...', {
+            id: 'pdf-export-toast',
+        });
+        setIsPrinting(true);
+
+        if (typeof window !== 'undefined') {
+            window.sessionStorage.setItem('isPdfExporting', 'true');
+        }
+
+        try {
+            const csrfToken =
+                (
+                    document.querySelector(
+                        'meta[name="csrf-token"]',
+                    ) as HTMLMetaElement
+                )?.content || '';
+            const res = await fetch('/exams/export-pdf-check', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Accept: 'application/json',
+                    'X-CSRF-TOKEN': csrfToken,
+                },
+            });
+
+            const data = await res.json();
+
+            if (!res.ok || !data.success) {
+                toast.error(data.message || 'PDF export rate limit reached.', {
+                    id: 'pdf-export-toast',
+                    duration: 6000,
+                });
+                setIsPrinting(false);
+
+                if (typeof window !== 'undefined') {
+                    window.sessionStorage.removeItem('isPdfExporting');
+                }
+
+                return;
+            }
+
+            toast.loading('Preparing PDF Examination Booklet...', {
+                id: 'pdf-export-toast',
+            });
+
+            triggerPdfExport({
+                questions: pool,
+                title: details.title || 'Civil Service Examination',
+                exportToken: data.export_token,
+            });
+        } catch {
+            toast.error('Failed to verify export limits. Please try again.', {
+                id: 'pdf-export-toast',
+            });
+            setIsPrinting(false);
+
+            if (typeof window !== 'undefined') {
+                window.sessionStorage.removeItem('isPdfExporting');
+            }
+        }
     };
 
     // Auto-start exam session when passed from dashboard/drill deep links
@@ -1241,6 +1376,7 @@ export function useExamState({
         fallbackQuestions,
         beginExamSession,
         buildFreshExamPool,
+        isExamActive,
     ]);
 
     // Restore guest free exam session after registration
@@ -1314,7 +1450,7 @@ export function useExamState({
         isExamSubmitted,
     ]);
 
-    const handleSubmitExamRef = useRef<(auto?: boolean) => void>(() => { });
+    const handleSubmitExamRef = useRef<(auto?: boolean) => void>(() => {});
 
     // Live countdown timer
     useEffect(() => {
@@ -1380,6 +1516,7 @@ export function useExamState({
             if (previousAnswer === optionIndex) {
                 const nextAnswers = { ...prev };
                 delete nextAnswers[currentIdx];
+
                 return nextAnswers;
             }
 
@@ -1530,17 +1667,17 @@ export function useExamState({
         const trackName = isDrillSessionLocal
             ? 'Drill'
             : detailsTitleLocal.includes('Sub-Professional')
-                ? 'Subprofessional'
-                : 'Professional';
+              ? 'Subprofessional'
+              : 'Professional';
         const finalCategoryId = isDrillSessionLocal
             ? drillCategoryIdRef.current ||
-            savedAttemptRef.current?.category_id ||
-            null
+              savedAttemptRef.current?.category_id ||
+              null
             : null;
         const finalCategoryName = isDrillSessionLocal
             ? drillCategoryNameRef.current ||
-            savedAttemptRef.current?.cat_scores?.metadata?.category_name ||
-            'Practice Drill'
+              savedAttemptRef.current?.cat_scores?.metadata?.category_name ||
+              'Practice Drill'
             : detailsTitleLocal;
 
         const originalAnswers: Record<number, number> = {};
@@ -1785,7 +1922,10 @@ export function useExamState({
         setConfirmModal,
         errorMessage,
         setErrorMessage,
-        lastStoredAttemptId,
+        printPool,
+        setPrintPool,
+        isPrinting,
+        setIsPrinting,
 
         // Handlers
         formatTime,
@@ -1796,6 +1936,7 @@ export function useExamState({
         handleRegisterFromFreeExam,
         handleCancelFreeExam,
         handleBeginExam,
+        handlePrintExam,
         handleSubmitExam,
         handleExitExam,
         getActiveTimeLimitSecs,

@@ -1,4 +1,11 @@
-import { CheckCircle2, ChevronRight, X, PanelRightClose, PanelRightOpen, LayoutGrid } from 'lucide-react';
+import {
+    CheckCircle2,
+    ChevronRight,
+    X,
+    PanelRightClose,
+    PanelRightOpen,
+    LayoutGrid,
+} from 'lucide-react';
 import React, { useMemo } from 'react';
 
 export interface QuestionPalettePanelProps {
@@ -84,33 +91,6 @@ export default function QuestionPalettePanel({
                 q.isDemographic,
         );
     }, [questions]);
-
-    const stats = useMemo(() => {
-        let correct = 0;
-        let incorrect = 0;
-        let skipped = 0;
-        let flaggedCount = 0;
-
-        (questions || []).forEach((q, idx) => {
-            if (flagged && flagged[idx]) flaggedCount++;
-            const isDemographic =
-                q.category === 'Demographic Profile' ||
-                q.category?.toLowerCase().includes('demographic') ||
-                q.isDemographic;
-            if (isDemographic) return;
-
-            const chosen = answers ? answers[idx] : undefined;
-            if (chosen === undefined || chosen === null) {
-                skipped++;
-            } else if (Number(chosen) === Number(q.correct_option)) {
-                correct++;
-            } else {
-                incorrect++;
-            }
-        });
-
-        return { correct, incorrect, skipped, flagged: flaggedCount };
-    }, [questions, answers, flagged]);
 
     const content = (
         <>
@@ -211,7 +191,7 @@ export default function QuestionPalettePanel({
                                 type="button"
                                 onClick={() => onReviewStatusChange('all')}
                                 title="Show All"
-                                className={`rounded-lg px-0.5 py-1.5 text-[10px] font-bold tracking-tight transition sm:text-[11px] text-center ${
+                                className={`rounded-lg px-0.5 py-1.5 text-center text-[10px] font-bold tracking-tight transition sm:text-[11px] ${
                                     reviewStatusFilter === 'all'
                                         ? 'bg-background text-foreground shadow-2xs'
                                         : 'text-muted-foreground hover:text-foreground'
@@ -223,7 +203,7 @@ export default function QuestionPalettePanel({
                                 type="button"
                                 onClick={() => onReviewStatusChange('correct')}
                                 title="Show Correct"
-                                className={`rounded-lg px-0.5 py-1.5 text-[10px] font-bold tracking-tight transition sm:text-[11px] text-center ${
+                                className={`rounded-lg px-0.5 py-1.5 text-center text-[10px] font-bold tracking-tight transition sm:text-[11px] ${
                                     reviewStatusFilter === 'correct'
                                         ? 'bg-background text-emerald-600 shadow-2xs dark:text-emerald-400'
                                         : 'text-muted-foreground hover:text-foreground'
@@ -237,7 +217,7 @@ export default function QuestionPalettePanel({
                                     onReviewStatusChange('incorrect')
                                 }
                                 title="Show Incorrect"
-                                className={`rounded-lg px-0.5 py-1.5 text-[10px] font-bold tracking-tight transition sm:text-[11px] text-center ${
+                                className={`rounded-lg px-0.5 py-1.5 text-center text-[10px] font-bold tracking-tight transition sm:text-[11px] ${
                                     reviewStatusFilter === 'incorrect'
                                         ? 'bg-background text-rose-600 shadow-2xs dark:text-rose-400'
                                         : 'text-muted-foreground hover:text-foreground'
@@ -249,7 +229,7 @@ export default function QuestionPalettePanel({
                                 type="button"
                                 onClick={() => onReviewStatusChange('flagged')}
                                 title="Show Flagged"
-                                className={`rounded-lg px-0.5 py-1.5 text-[10px] font-bold tracking-tight transition sm:text-[11px] text-center ${
+                                className={`rounded-lg px-0.5 py-1.5 text-center text-[10px] font-bold tracking-tight transition sm:text-[11px] ${
                                     reviewStatusFilter === 'flagged'
                                         ? 'bg-background text-amber-600 shadow-2xs dark:text-amber-400'
                                         : 'text-muted-foreground hover:text-foreground'
@@ -271,7 +251,7 @@ export default function QuestionPalettePanel({
                                 type="button"
                                 onClick={() => onLiveStatusChange('all')}
                                 title="Show All"
-                                className={`rounded-lg px-0.5 py-1.5 text-[10px] font-bold tracking-tight transition sm:text-[11px] text-center ${
+                                className={`rounded-lg px-0.5 py-1.5 text-center text-[10px] font-bold tracking-tight transition sm:text-[11px] ${
                                     liveStatusFilter === 'all'
                                         ? 'bg-background text-foreground shadow-2xs'
                                         : 'text-muted-foreground hover:text-foreground'
@@ -283,7 +263,7 @@ export default function QuestionPalettePanel({
                                 type="button"
                                 onClick={() => onLiveStatusChange('unanswered')}
                                 title="Show Unanswered"
-                                className={`rounded-lg px-0.5 py-1.5 text-[10px] font-bold tracking-tight transition sm:text-[11px] text-center ${
+                                className={`rounded-lg px-0.5 py-1.5 text-center text-[10px] font-bold tracking-tight transition sm:text-[11px] ${
                                     liveStatusFilter === 'unanswered'
                                         ? 'bg-background text-amber-600 shadow-2xs dark:text-amber-400'
                                         : 'text-muted-foreground hover:text-foreground'
@@ -295,7 +275,7 @@ export default function QuestionPalettePanel({
                                 type="button"
                                 onClick={() => onLiveStatusChange('answered')}
                                 title="Show Answered"
-                                className={`rounded-lg px-0.5 py-1.5 text-[10px] font-bold tracking-tight transition sm:text-[11px] text-center ${
+                                className={`rounded-lg px-0.5 py-1.5 text-center text-[10px] font-bold tracking-tight transition sm:text-[11px] ${
                                     liveStatusFilter === 'answered'
                                         ? 'bg-background text-blue-600 shadow-2xs dark:text-blue-400'
                                         : 'text-muted-foreground hover:text-foreground'
@@ -307,7 +287,7 @@ export default function QuestionPalettePanel({
                                 type="button"
                                 onClick={() => onLiveStatusChange('flagged')}
                                 title="Show Flagged"
-                                className={`rounded-lg px-0.5 py-1.5 text-[10px] font-bold tracking-tight transition sm:text-[11px] text-center ${
+                                className={`rounded-lg px-0.5 py-1.5 text-center text-[10px] font-bold tracking-tight transition sm:text-[11px] ${
                                     liveStatusFilter === 'flagged'
                                         ? 'bg-background text-rose-600 shadow-2xs dark:text-rose-400'
                                         : 'text-muted-foreground hover:text-foreground'
@@ -384,7 +364,10 @@ export default function QuestionPalettePanel({
                                 answers[idx] !== null;
                             const isFlagged = flagged[idx] === true;
 
-                            if (liveStatusFilter === 'unanswered' && isAnswered) {
+                            if (
+                                liveStatusFilter === 'unanswered' &&
+                                isAnswered
+                            ) {
                                 isFilteredOut = true;
                             } else if (
                                 liveStatusFilter === 'answered' &&
@@ -568,7 +551,7 @@ export default function QuestionPalettePanel({
 
                 <div className="flex flex-col items-center gap-3">
                     <LayoutGrid className="size-4 text-blue-600 dark:text-blue-400" />
-                    <span className="text-[10px] font-extrabold tracking-widest text-muted-foreground uppercase [writing-mode:vertical-lr] rotate-180">
+                    <span className="rotate-180 text-[10px] font-extrabold tracking-widest text-muted-foreground uppercase [writing-mode:vertical-lr]">
                         Question Palette
                     </span>
                 </div>

@@ -64,13 +64,13 @@ class GenerateUserAnalysisJob implements ShouldQueue
         3. Every subject name in `subject_mastery`, `strengths`, and `critical_weaknesses` must strictly use the exact spelling of the 5 standard categories: 'Verbal Ability', 'Clerical Ability', 'General Information', 'Numerical Ability', and 'Analytical Ability'.
         4. You must respond ONLY with a valid JSON object matching the provided schema.";
 
-        $userPrompt = 'Here is the computed deterministic analysis data for the student:
+            $userPrompt = 'Here is the computed deterministic analysis data for the student:
         '.json_encode($deterministicData).'
         
         Please rewrite the verbal fields to make them sound like a highly supportive, professional, and personalized Philippines CSE coach. Make sure all numerical facts and structure are strictly preserved.';
 
-        $resultText = null;
-        $errorMsg = null;
+            $resultText = null;
+            $errorMsg = null;
 
             $attemptGemini = function ($model = 'gemini-3.5-flash') use ($geminiKey, $systemPrompt, $userPrompt, &$resultText, &$errorMsg) {
                 if (! $geminiKey) {

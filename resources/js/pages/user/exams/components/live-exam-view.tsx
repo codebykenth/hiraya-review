@@ -1,8 +1,5 @@
 import { Head, usePage } from '@inertiajs/react';
 import {
-    Award,
-    BookOpen,
-    X,
     LayoutGrid,
     Clock,
     Timer,
@@ -20,6 +17,7 @@ import {
     Minimize2,
     Edit3,
     EyeOff,
+    BookOpen,
 } from 'lucide-react';
 import { useState, useMemo, useEffect } from 'react';
 import { toast } from 'sonner';
@@ -33,6 +31,7 @@ import {
 } from '@/components/ui/dialog';
 
 import { renderFormattedText } from '@/lib/exam-formatters';
+import { useContentShield } from '../hooks/use-content-shield';
 import QuestionPalettePanel from './question-palette-panel';
 
 interface Question {
@@ -125,6 +124,18 @@ export function LiveExamView({
     const [isFullscreen, setIsFullscreen] = useState(false);
     const [isPaletteCollapsed, setIsPaletteCollapsed] = useState(false);
 
+    const {
+        isShielded,
+        isResumeLocked,
+        dismissShield,
+        styleBlock,
+        contentRef,
+        wrapperProps,
+    } = useContentShield({
+        contentLabel: 'Exam',
+        onCopyAttempt: (msg) => toast.error(msg),
+    });
+
     // Auto-save scratchpad notes
     const handleScratchpadChange = (val: string) => {
         setScratchpadNotes(val);
@@ -140,6 +151,7 @@ export function LiveExamView({
             if (document.exitFullscreen) {
                 document.exitFullscreen().catch(() => {});
             }
+
             setIsFullscreen(false);
         }
     };
@@ -149,6 +161,7 @@ export function LiveExamView({
             setIsFullscreen(!!document.fullscreenElement);
         };
         document.addEventListener('fullscreenchange', handleFsChange);
+
         return () =>
             document.removeEventListener('fullscreenchange', handleFsChange);
     }, []);
@@ -162,6 +175,7 @@ export function LiveExamView({
         e.stopPropagation();
         setEliminatedOptions((prev) => {
             const qElim = prev[questionIdx] || {};
+
             return {
                 ...prev,
                 [questionIdx]: {
@@ -175,22 +189,35 @@ export function LiveExamView({
     const { user_reports_map = {} } = usePage<{
         user_reports_map?: Record<string, 'pending' | 'resolved' | 'dismissed'>;
     }>().props;
-    
-    const [localReportsMap, setLocalReportsMap] = useState<Record<string, 'pending' | 'resolved' | 'dismissed'>>(user_reports_map);
+
+    const [localReportsMap, setLocalReportsMap] =
+        useState<Record<string, 'pending' | 'resolved' | 'dismissed'>>(
+            user_reports_map,
+        );
 
     useEffect(() => {
-        const handleReportSubmitted = (e: CustomEvent<{ flaggable_id: number }>) => {
+        const handleReportSubmitted = (
+            e: CustomEvent<{ flaggable_id: number }>,
+        ) => {
             if (e.detail && e.detail.flaggable_id) {
-                setLocalReportsMap(prev => ({
+                setLocalReportsMap((prev) => ({
                     ...prev,
-                    [`App\\Models\\Question:${e.detail.flaggable_id}`]: 'pending'
+                    [`App\\Models\\Question:${e.detail.flaggable_id}`]:
+                        'pending',
                 }));
             }
         };
 
-        window.addEventListener('report-submitted', handleReportSubmitted as EventListener);
+        window.addEventListener(
+            'report-submitted',
+            handleReportSubmitted as EventListener,
+        );
+
         return () => {
-            window.removeEventListener('report-submitted', handleReportSubmitted as EventListener);
+            window.removeEventListener(
+                'report-submitted',
+                handleReportSubmitted as EventListener,
+            );
         };
     }, []);
 
@@ -199,7 +226,6 @@ export function LiveExamView({
         : undefined;
     const isReported = reportStatus === 'pending';
 
-
     // Live statistics & pacing calculations
     const stats = useMemo(() => {
         let answered = 0;
@@ -207,14 +233,21 @@ export function LiveExamView({
         let flaggedCount = 0;
 
         (activeQuestions || []).forEach((q, idx) => {
-            if (flagged && flagged[idx]) flaggedCount++;
+            if (flagged && flagged[idx]) {
+                flaggedCount++;
+            }
+
             const isDemographic =
                 q.category === 'Demographic Profile' ||
                 q.category?.toLowerCase().includes('demographic') ||
                 q.isDemographic;
-            if (isDemographic) return;
+
+            if (isDemographic) {
+                return;
+            }
 
             const chosen = answers ? answers[idx] : undefined;
+
             if (chosen !== undefined && chosen !== null) {
                 answered++;
             } else {
@@ -231,8 +264,12 @@ export function LiveExamView({
             unanswered > 0 ? Math.round(timeLeft / unanswered) : 0;
 
         let paceStatus: 'good' | 'warn' | 'behind' = 'good';
-        if (targetPace < 20) paceStatus = 'behind';
-        else if (targetPace < 40) paceStatus = 'warn';
+
+        if (targetPace < 20) {
+            paceStatus = 'behind';
+        } else if (targetPace < 40) {
+            paceStatus = 'warn';
+        }
 
         return {
             answered,
@@ -249,6 +286,7 @@ export function LiveExamView({
     const formatQuestionTime = (secs: number) => {
         const m = Math.floor(secs / 60);
         const s = secs % 60;
+
         return `${m}:${s < 10 ? '0' : ''}${s}`;
     };
 
@@ -267,12 +305,9 @@ export function LiveExamView({
         }
     };
 
-    // Global Keyboard Shortcuts Listener
+    // Navigation-only Keyboard Listener (security keys handled by useContentShield)
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
-            // Skip when modifier keys are held (Ctrl+A, Cmd+B, Alt+C, etc.)
-            if (e.ctrlKey || e.metaKey || e.altKey) return;
-
             if (
                 ['INPUT', 'TEXTAREA', 'SELECT'].includes(
                     (e.target as HTMLElement)?.tagName,
@@ -285,7 +320,11 @@ export function LiveExamView({
                 if (currentIdx < activeQuestions.length - 1) {
                     handleQuestionNavigate(currentIdx + 1);
                 }
-            } else if (e.key === 'ArrowLeft' || e.key === '[' || e.key === 'p') {
+            } else if (
+                e.key === 'ArrowLeft' ||
+                e.key === '[' ||
+                e.key === 'p'
+            ) {
                 if (currentIdx > 0) {
                     handleQuestionNavigate(currentIdx - 1);
                 }
@@ -331,17 +370,22 @@ export function LiveExamView({
                     E: 4,
                 };
                 const optIdx = optionMap[e.key];
+
                 if (
                     optIdx !== undefined &&
                     activeQuestion?.options?.[optIdx] !== undefined
                 ) {
-                    onOptionClick(optIdx);
+                    handleSelectOption(optIdx);
                 }
             }
         };
 
-        window.addEventListener('keydown', handleKeyDown);
-        return () => window.removeEventListener('keydown', handleKeyDown);
+        window.addEventListener('keydown', handleKeyDown, { capture: true });
+
+        return () =>
+            window.removeEventListener('keydown', handleKeyDown, {
+                capture: true,
+            });
     }, [
         currentIdx,
         activeQuestions,
@@ -355,7 +399,55 @@ export function LiveExamView({
     return (
         <>
             <Head title={`Live Simulation: ${details.title}`} />
-            <div className="fixed inset-0 z-50 flex animate-in flex-col bg-background duration-200 fade-in">
+            <style>{styleBlock}</style>
+            {isShielded && (
+                <div className="fixed inset-0 z-[99999] flex flex-col items-center justify-center bg-card p-6 text-center opacity-100 select-none">
+                    <div className="mx-auto flex max-w-2xl flex-col items-center gap-4 rounded-2xl border border-border/80 bg-background p-8 shadow-2xl">
+                        <div className="flex size-14 items-center justify-center rounded-full bg-amber-500/10 text-amber-600 dark:bg-amber-500/20 dark:text-amber-400">
+                            <Lock className="size-7" />
+                        </div>
+                        <div className="space-y-2">
+                            <h3 className="font-heading text-lg font-bold text-foreground">
+                                Content Shield Active
+                            </h3>
+                            <p className="text-xs leading-relaxed font-semibold text-muted-foreground">
+                                Exam content was hidden because window focus was
+                                lost or external screen tools were detected.
+                            </p>
+                            {isResumeLocked && (
+                                <p className="text-[11px] font-bold text-amber-600 dark:text-amber-400">
+                                    Content stays locked while the exam window
+                                    is not focused. Click back into this window,
+                                    then resume.
+                                </p>
+                            )}
+                        </div>
+                        <button
+                            type="button"
+                            onClick={dismissShield}
+                            disabled={isResumeLocked}
+                            className={`mt-2 inline-flex items-center gap-2 rounded-xl px-6 py-2.5 text-xs font-bold text-white shadow-md transition focus:outline-none ${
+                                isResumeLocked
+                                    ? 'cursor-not-allowed bg-slate-400 opacity-60'
+                                    : 'bg-blue-600 hover:bg-blue-700'
+                            }`}
+                        >
+                            {isResumeLocked
+                                ? 'Window Not Focused — Click to Focus'
+                                : 'Resume Examination'}
+                        </button>
+                    </div>
+                </div>
+            )}
+            <div
+                ref={contentRef}
+                {...wrapperProps}
+                className={`fixed inset-0 z-50 flex flex-col bg-background transition-none select-none ${
+                    isShielded
+                        ? 'pointer-events-none invisible opacity-0'
+                        : 'opacity-100'
+                }`}
+            >
                 {/* TOP NAVBAR HEADER: RESPONSIVE MULTI-ROW MICRO-LAYOUT */}
                 <div className="shadow-3xs flex w-full flex-col justify-center gap-2 border-b border-border bg-card px-3 py-3 sm:px-5 lg:h-[84px]">
                     {/* ROW 1: Exit, Title, Tools & Timer */}
@@ -377,7 +469,9 @@ export function LiveExamView({
 
                             <span className="shrink-0 rounded-md bg-blue-50 px-2 py-0.5 text-[10px] font-extrabold tracking-wider text-blue-600 uppercase dark:bg-blue-950/30 dark:text-blue-400">
                                 <span className="md:hidden">Live</span>
-                                <span className="hidden md:inline">Live Simulation</span>
+                                <span className="hidden md:inline">
+                                    Live Simulation
+                                </span>
                             </span>
 
                             <span className="truncate font-heading text-sm font-bold text-foreground">
@@ -392,11 +486,9 @@ export function LiveExamView({
                                 <div
                                     title={`Target pace: ~${stats.targetPace}s per question`}
                                     className={`inline-flex h-8 items-center gap-1 rounded-md border px-2 font-bold ${
-                                        stats.paceStatus ===
-                                        'behind'
+                                        stats.paceStatus === 'behind'
                                             ? 'animate-pulse border-rose-300 bg-rose-50 text-rose-700 dark:border-rose-900/50 dark:bg-rose-950/30 dark:text-rose-400'
-                                            : stats.paceStatus ===
-                                                'warn'
+                                            : stats.paceStatus === 'warn'
                                               ? 'border-amber-300 bg-amber-50 text-amber-700 dark:border-amber-900/50 dark:bg-amber-950/30 dark:text-amber-400'
                                               : 'border-emerald-300 bg-emerald-50 text-emerald-700 dark:border-emerald-900/50 dark:bg-emerald-950/30 dark:text-emerald-400'
                                     }`}
@@ -420,6 +512,7 @@ export function LiveExamView({
                                 onClick={() => {
                                     const nextState = !autoAdvance;
                                     setAutoAdvance(nextState);
+
                                     if (nextState) {
                                         toast.success('Auto-Next Enabled', {
                                             description:
@@ -449,13 +542,10 @@ export function LiveExamView({
 
                             {/* Scratchpad Notes */}
                             <button
-                                onClick={() =>
-                                    setIsScratchpadOpen(true)
-                                }
+                                onClick={() => setIsScratchpadOpen(true)}
                                 title="Scratchpad / Notes"
-                                className={`flex h-8 size-8 items-center justify-center rounded-md border transition ${
-                                    scratchpadNotes.trim().length >
-                                    0
+                                className={`flex size-8 h-8 items-center justify-center rounded-md border transition ${
+                                    scratchpadNotes.trim().length > 0
                                         ? 'border-amber-300 bg-amber-50 text-amber-700 dark:border-amber-900/50 dark:bg-amber-950/40 dark:text-amber-400'
                                         : 'border-border bg-background text-muted-foreground hover:bg-accent hover:text-foreground'
                                 }`}
@@ -465,11 +555,9 @@ export function LiveExamView({
 
                             {/* Keyboard Shortcuts — hidden on mobile */}
                             <button
-                                onClick={() =>
-                                    setShowKeyboardModal(true)
-                                }
+                                onClick={() => setShowKeyboardModal(true)}
                                 title="Keyboard Shortcuts (?)"
-                                className="hidden h-8 size-8 items-center justify-center rounded-md border border-border bg-background text-muted-foreground transition hover:bg-accent hover:text-foreground sm:flex"
+                                className="hidden size-8 h-8 items-center justify-center rounded-md border border-border bg-background text-muted-foreground transition hover:bg-accent hover:text-foreground sm:flex"
                             >
                                 <Keyboard className="size-4 shrink-0" />
                             </button>
@@ -477,8 +565,12 @@ export function LiveExamView({
                             {/* Fullscreen Toggle — hidden on mobile */}
                             <button
                                 onClick={toggleFullscreen}
-                                title={isFullscreen ? 'Exit Fullscreen' : 'Focus Mode (Fullscreen)'}
-                                className="hidden h-8 size-8 items-center justify-center rounded-md border border-border bg-background text-muted-foreground transition hover:bg-accent hover:text-foreground sm:flex"
+                                title={
+                                    isFullscreen
+                                        ? 'Exit Fullscreen'
+                                        : 'Focus Mode (Fullscreen)'
+                                }
+                                className="hidden size-8 h-8 items-center justify-center rounded-md border border-border bg-background text-muted-foreground transition hover:bg-accent hover:text-foreground sm:flex"
                             >
                                 {isFullscreen ? (
                                     <Minimize2 className="size-4 shrink-0" />
@@ -506,8 +598,8 @@ export function LiveExamView({
                                 </div>
                             ) : (
                                 <div className="shadow-3xs flex h-8 items-center gap-1.5 rounded-md border border-border bg-background px-2.5 font-black text-foreground">
-                                    <Timer className="size-4 text-emerald-500 shrink-0" />
-                                    <span className="text-muted-foreground whitespace-nowrap">
+                                    <Timer className="size-4 shrink-0 text-emerald-500" />
+                                    <span className="whitespace-nowrap text-muted-foreground">
                                         Untimed
                                     </span>
                                 </div>
@@ -534,7 +626,7 @@ export function LiveExamView({
                             >
                                 <LayoutGrid className="size-4 shrink-0" />
                                 {isPaletteCollapsed && (
-                                    <span className="hidden whitespace-nowrap text-xs font-bold lg:inline ml-1.5">
+                                    <span className="ml-1.5 hidden text-xs font-bold whitespace-nowrap lg:inline">
                                         Show Palette
                                     </span>
                                 )}
@@ -567,11 +659,15 @@ export function LiveExamView({
                             </div>
 
                             <span className="shrink-0 whitespace-nowrap text-muted-foreground">
-                                <span className="hidden sm:inline">Answered </span>
+                                <span className="hidden sm:inline">
+                                    Answered{' '}
+                                </span>
                                 <strong className="font-extrabold text-foreground">
                                     {stats.answered}/{stats.totalGraded}
                                 </strong>{' '}
-                                <span className="hidden xs:inline">({stats.progressPct}%)</span>
+                                <span className="xs:inline hidden">
+                                    ({stats.progressPct}%)
+                                </span>
                             </span>
                         </div>
                     )}
@@ -604,7 +700,10 @@ export function LiveExamView({
                                                     Multiple Choice
                                                 </span>
                                                 <span className="rounded-full border border-border bg-muted/60 px-2 py-0.5 text-[10px] font-bold text-muted-foreground">
-                                                    Time on question: {formatQuestionTime(timeOnQuestion)}
+                                                    Time on question:{' '}
+                                                    {formatQuestionTime(
+                                                        timeOnQuestion,
+                                                    )}
                                                 </span>
                                             </div>
                                             <div className="flex items-center gap-2">
@@ -951,7 +1050,8 @@ export function LiveExamView({
                                 Exam Scratchpad & Rough Notes
                             </DialogTitle>
                             <DialogDescription>
-                                Write down formulas, rough calculations, or reasoning notes. Your notes auto-save locally.
+                                Write down formulas, rough calculations, or
+                                reasoning notes. Your notes auto-save locally.
                             </DialogDescription>
                         </DialogHeader>
 
@@ -963,7 +1063,7 @@ export function LiveExamView({
                                 }
                                 placeholder="Type your rough calculations or notes here..."
                                 rows={8}
-                                className="w-full resize-y rounded-xl border border-border bg-muted/30 p-3 font-mono text-xs font-medium text-foreground transition focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
+                                className="w-full resize-y rounded-xl border border-border bg-muted/30 p-3 font-mono text-xs font-medium text-foreground transition focus:border-amber-500 focus:ring-1 focus:ring-amber-500 focus:outline-none"
                             />
                             <div className="flex items-center justify-between text-xs text-muted-foreground">
                                 <span>{scratchpadNotes.length} characters</span>
@@ -986,7 +1086,7 @@ export function LiveExamView({
                         onClick={() => setShowLockedModal(false)}
                     >
                         <div
-                            className="relative flex flex-col w-[calc(100vw-2rem)] sm:w-full max-w-2xl max-h-[85dvh] overflow-y-auto animate-in rounded-xl border border-slate-200 bg-white p-4 shadow-xl duration-200 zoom-in-95 sm:p-6 dark:border-slate-800 dark:bg-slate-950"
+                            className="relative flex max-h-[85dvh] w-[calc(100vw-2rem)] max-w-2xl animate-in flex-col overflow-y-auto rounded-xl border border-slate-200 bg-white p-4 shadow-xl duration-200 zoom-in-95 sm:w-full sm:p-6 dark:border-slate-800 dark:bg-slate-950"
                             onClick={(e) => e.stopPropagation()}
                         >
                             <div className="mb-1 flex items-center gap-2">
@@ -1027,7 +1127,7 @@ export function LiveExamView({
                         onClick={() => setShowRegisterModal(false)}
                     >
                         <div
-                            className="relative flex flex-col w-[calc(100vw-2rem)] sm:w-full max-w-2xl max-h-[85dvh] overflow-y-auto animate-in rounded-xl border border-slate-200 bg-white p-4 shadow-xl duration-200 zoom-in-95 sm:p-6 dark:border-slate-800 dark:bg-slate-950"
+                            className="relative flex max-h-[85dvh] w-[calc(100vw-2rem)] max-w-2xl animate-in flex-col overflow-y-auto rounded-xl border border-slate-200 bg-white p-4 shadow-xl duration-200 zoom-in-95 sm:w-full sm:p-6 dark:border-slate-800 dark:bg-slate-950"
                             onClick={(e) => e.stopPropagation()}
                         >
                             <div className="mb-1 flex items-center gap-2">

@@ -26,11 +26,11 @@ class FeedbackController extends Controller
         $counts = Feedback::selectRaw('flaggable_type, flaggable_id, count(*) as aggregate_count')
             ->groupBy('flaggable_type', 'flaggable_id')
             ->get()
-            ->keyBy(fn ($item) => $item->flaggable_type . '_' . $item->flaggable_id);
+            ->keyBy(fn ($item) => $item->flaggable_type.'_'.$item->flaggable_id);
 
         // Add the correct field names and total report count to the flaggable data
         $feedbacks->getCollection()->transform(function ($feedback) use ($counts) {
-            $groupKey = $feedback->flaggable_type . '_' . $feedback->flaggable_id;
+            $groupKey = $feedback->flaggable_type.'_'.$feedback->flaggable_id;
             $feedback->total_reports_count = $counts[$groupKey]->aggregate_count ?? 1;
 
             if ($feedback->flaggable_type === 'App\Models\Question' && $feedback->flaggable) {

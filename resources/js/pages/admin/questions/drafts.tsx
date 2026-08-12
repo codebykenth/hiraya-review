@@ -1,5 +1,13 @@
 import { Head, router, Link } from '@inertiajs/react';
-import { Check, X, Edit3, ListChecks, Save, Eye, FileImage, Sparkles } from 'lucide-react';
+import {
+    Check,
+    X,
+    Edit3,
+    ListChecks,
+    Save,
+    Eye,
+    FileImage,
+} from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { DraftsReviewShell } from '@/components/domain/drafts-review-shell';
 import type { CategoryItem } from '@/components/domain/drafts-review-shell';
@@ -67,10 +75,14 @@ export default function DraftsQuestionList({
         useState<DraftQuestion | null>(null);
 
     const getCleanStemText = (stem: string) => {
-        if (!stem) return '';
+        if (!stem) {
+            return '';
+        }
+
         let text = stem.replace(/<svg[\s\S]*?<\/svg>/gi, '').trim();
         text = text.replace(/<[^>]+>/g, '').trim();
         text = text.replace(/#+\s*/g, '').replace(/\s+/g, ' ');
+
         return text || 'Visual Question (Chart/Diagram)';
     };
 
@@ -340,7 +352,9 @@ export default function DraftsQuestionList({
             .filter((q) => q.approved)
             .map((q) => q.id);
 
-        if (approvedIds.length === 0) return;
+        if (approvedIds.length === 0) {
+            return;
+        }
 
         router.get(questionsBulkEdit().url, {
             ids: approvedIds.join(','),
@@ -361,11 +375,15 @@ export default function DraftsQuestionList({
                         type="button"
                         variant="outline"
                         size="sm"
-                        disabled={draftQuestions.filter((q) => q.approved).length === 0}
+                        disabled={
+                            draftQuestions.filter((q) => q.approved).length ===
+                            0
+                        }
                         icon={Edit3}
                         onClick={handleBulkEdit}
                     >
-                        Bulk Edit Selected ({draftQuestions.filter((q) => q.approved).length})
+                        Bulk Edit Selected (
+                        {draftQuestions.filter((q) => q.approved).length})
                     </Button>
                 }
                 items={draftQuestions}
@@ -387,11 +405,16 @@ export default function DraftsQuestionList({
                 emptyStateActionIcon={ListChecks}
                 renderTableView={(items) => {
                     const handleTogglePageDrafts = () => {
-                        const pageIds = items.map(q => q.id);
-                        const allPageApproved = items.length > 0 && items.every(q => q.approved);
-                        setDraftQuestions(prev => prev.map(q => 
-                            pageIds.includes(q.id) ? { ...q, approved: !allPageApproved } : q
-                        ));
+                        const pageIds = items.map((q) => q.id);
+                        const allPageApproved =
+                            items.length > 0 && items.every((q) => q.approved);
+                        setDraftQuestions((prev) =>
+                            prev.map((q) =>
+                                pageIds.includes(q.id)
+                                    ? { ...q, approved: !allPageApproved }
+                                    : q,
+                            ),
+                        );
                     };
 
                     return (
@@ -402,8 +425,15 @@ export default function DraftsQuestionList({
                                         <th className="w-12 px-4 py-3 text-center">
                                             <input
                                                 type="checkbox"
-                                                checked={items.length > 0 && items.every((q) => q.approved)}
-                                                onChange={handleTogglePageDrafts}
+                                                checked={
+                                                    items.length > 0 &&
+                                                    items.every(
+                                                        (q) => q.approved,
+                                                    )
+                                                }
+                                                onChange={
+                                                    handleTogglePageDrafts
+                                                }
                                                 className="size-4 cursor-pointer accent-blue-600"
                                                 title="Select all on this page"
                                             />
@@ -414,225 +444,281 @@ export default function DraftsQuestionList({
                                         <th className="min-w-[400px] px-4 py-3.5">
                                             Question Stem
                                         </th>
-                                    <th className="w-48 px-4 py-3.5">
-                                        Correct Option
-                                    </th>
-                                    <th className="w-44 px-4 py-3.5">
-                                        Category & Subcategory
-                                    </th>
-                                    <th className="w-28 px-4 py-3.5 text-center">
-                                        Status
-                                    </th>
-                                    <th className="w-32 py-3.5 pr-4 pl-3 text-right">
-                                        Actions
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-border">
-                                {items.map((q) => {
-                                    const correctOptIndex = q.correct_option;
-                                    const correctOptText =
-                                        q.options[correctOptIndex] || 'None';
-                                    return (
-                                        <tr
-                                            key={q.id}
-                                            className={`transition hover:bg-muted/30 ${
-                                                q.approved
-                                                    ? 'bg-emerald-500/5 dark:bg-emerald-950/10'
-                                                    : ''
-                                            }`}
-                                        >
-                                            <td className="w-12 px-4 py-4 text-center align-top">
-                                                <input
-                                                    type="checkbox"
-                                                    checked={q.approved}
-                                                    onChange={() => toggleApproveDraft(q.id)}
-                                                    className="size-4 mt-1 cursor-pointer accent-blue-600"
-                                                />
-                                            </td>
-                                            <td className="w-20 px-4 py-4 font-mono text-xs text-muted-foreground align-top">
-                                                #{q.id}
-                                            </td>
-                                            <td className="min-w-[400px] px-4 py-4 align-top">
-                                                {q.isEditing ? (
-                                                    <div className="flex flex-col gap-1">
-                                                        <textarea
-                                                            value={q.stem}
-                                                            onChange={(e) =>
-                                                                handleUpdateDraftStem(
-                                                                    q.id,
-                                                                    e.target.value,
-                                                                )
-                                                            }
-                                                            className="w-full rounded-md border border-border bg-background p-2 text-xs font-medium text-foreground focus:border-blue-500 focus:outline-none"
-                                                            rows={3}
-                                                        />
-                                                    </div>
-                                                ) : (
-                                                    <div className="flex flex-col">
-                                                        <div className="flex flex-wrap items-center gap-2">
-                                                            <div className="line-clamp-2 font-semibold text-foreground">
-                                                                {getCleanStemText(q.stem)}
+                                        <th className="w-48 px-4 py-3.5">
+                                            Correct Option
+                                        </th>
+                                        <th className="w-44 px-4 py-3.5">
+                                            Category & Subcategory
+                                        </th>
+                                        <th className="w-28 px-4 py-3.5 text-center">
+                                            Status
+                                        </th>
+                                        <th className="w-32 py-3.5 pr-4 pl-3 text-right">
+                                            Actions
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-border">
+                                    {items.map((q) => {
+                                        const correctOptIndex =
+                                            q.correct_option;
+                                        const correctOptText =
+                                            q.options[correctOptIndex] ||
+                                            'None';
+
+                                        return (
+                                            <tr
+                                                key={q.id}
+                                                className={`transition hover:bg-muted/30 ${
+                                                    q.approved
+                                                        ? 'bg-emerald-500/5 dark:bg-emerald-950/10'
+                                                        : ''
+                                                }`}
+                                            >
+                                                <td className="w-12 px-4 py-4 text-center align-top">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={q.approved}
+                                                        onChange={() =>
+                                                            toggleApproveDraft(
+                                                                q.id,
+                                                            )
+                                                        }
+                                                        className="mt-1 size-4 cursor-pointer accent-blue-600"
+                                                    />
+                                                </td>
+                                                <td className="w-20 px-4 py-4 align-top font-mono text-xs text-muted-foreground">
+                                                    #{q.id}
+                                                </td>
+                                                <td className="min-w-[400px] px-4 py-4 align-top">
+                                                    {q.isEditing ? (
+                                                        <div className="flex flex-col gap-1">
+                                                            <textarea
+                                                                value={q.stem}
+                                                                onChange={(e) =>
+                                                                    handleUpdateDraftStem(
+                                                                        q.id,
+                                                                        e.target
+                                                                            .value,
+                                                                    )
+                                                                }
+                                                                className="w-full rounded-md border border-border bg-background p-2 text-xs font-medium text-foreground focus:border-blue-500 focus:outline-none"
+                                                                rows={3}
+                                                            />
+                                                        </div>
+                                                    ) : (
+                                                        <div className="flex flex-col">
+                                                            <div className="flex flex-wrap items-center gap-2">
+                                                                <div className="line-clamp-2 font-semibold text-foreground">
+                                                                    {getCleanStemText(
+                                                                        q.stem,
+                                                                    )}
+                                                                </div>
+                                                                {hasSvgContent(
+                                                                    q.stem,
+                                                                ) && (
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={() =>
+                                                                            setPreviewQuestion(
+                                                                                q,
+                                                                            )
+                                                                        }
+                                                                        className="inline-flex shrink-0 cursor-pointer items-center gap-1 rounded border border-blue-200 bg-blue-50 px-1.5 py-0.5 text-[9px] font-extrabold text-blue-700 transition hover:bg-blue-100 dark:border-blue-900/40 dark:bg-blue-950/40 dark:text-blue-300 dark:hover:bg-blue-900/50"
+                                                                        title="Quick preview diagram"
+                                                                    >
+                                                                        <FileImage className="size-3" />
+                                                                        <span>
+                                                                            Diagram
+                                                                        </span>
+                                                                    </button>
+                                                                )}
                                                             </div>
-                                                            {hasSvgContent(q.stem) && (
+                                                            <div className="mt-1 line-clamp-1 text-[11px] text-muted-foreground">
+                                                                {q.options &&
+                                                                q.options
+                                                                    .length >
+                                                                    0 ? (
+                                                                    (() => {
+                                                                        const choicesStr =
+                                                                            q.options
+                                                                                .map(
+                                                                                    (
+                                                                                        opt,
+                                                                                        i,
+                                                                                    ) => {
+                                                                                        const cleanText =
+                                                                                            opt
+                                                                                                ? String(
+                                                                                                      opt,
+                                                                                                  )
+                                                                                                      .replace(
+                                                                                                          /<[^>]+>/g,
+                                                                                                          '',
+                                                                                                      )
+                                                                                                      .trim()
+                                                                                                : '';
+
+                                                                                        return `${String.fromCharCode(65 + i)}) ${cleanText}`;
+                                                                                    },
+                                                                                )
+                                                                                .join(
+                                                                                    ' • ',
+                                                                                );
+
+                                                                        return choicesStr;
+                                                                    })()
+                                                                ) : (
+                                                                    <span className="text-red-400 italic">
+                                                                        No
+                                                                        options
+                                                                        found
+                                                                        for this
+                                                                        question
+                                                                        (Possible
+                                                                        cache
+                                                                        issue)
+                                                                    </span>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                </td>
+                                                <td className="w-48 px-4 py-4 align-top">
+                                                    <span className="inline-flex items-center gap-1.5 rounded-lg border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-800 dark:border-emerald-900/40 dark:bg-emerald-950/30 dark:text-emerald-300">
+                                                        <span className="flex size-4 items-center justify-center rounded-md bg-emerald-600 text-[10px] font-black text-white dark:bg-emerald-400">
+                                                            {String.fromCharCode(
+                                                                65 +
+                                                                    correctOptIndex,
+                                                            )}
+                                                        </span>
+                                                        <span className="max-w-[150px] truncate">
+                                                            {renderFormattedText(
+                                                                correctOptText,
+                                                                false,
+                                                                undefined,
+                                                                true,
+                                                            )}
+                                                        </span>
+                                                    </span>
+                                                </td>
+                                                <td className="w-44 px-4 py-4 align-top">
+                                                    <div className="flex flex-col gap-1">
+                                                        <span className="w-fit max-w-[150px] truncate rounded-full border border-border bg-muted px-2 py-0.5 text-[10px] font-bold text-foreground">
+                                                            {q.category}
+                                                        </span>
+                                                        <span className="w-fit max-w-[150px] truncate rounded-full border border-blue-100 bg-blue-50 px-2 py-0.5 text-[10px] font-bold text-blue-700 dark:border-blue-900/30 dark:bg-blue-950/30 dark:text-blue-400">
+                                                            {q.subcategory}
+                                                        </span>
+                                                    </div>
+                                                </td>
+                                                <td className="px-4 py-4 text-center align-top">
+                                                    {q.approved ? (
+                                                        <span className="inline-block rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-0.5 text-[10px] font-bold text-emerald-700 dark:border-emerald-900/40 dark:bg-emerald-950/30 dark:text-emerald-400">
+                                                            Approved
+                                                        </span>
+                                                    ) : (
+                                                        <span className="inline-block rounded-full border border-amber-200 bg-amber-50 px-2.5 py-0.5 text-[10px] font-bold text-amber-700 dark:border-amber-900/40 dark:bg-amber-950/30 dark:text-amber-400">
+                                                            Pending
+                                                        </span>
+                                                    )}
+                                                </td>
+                                                <td className="py-4 pr-4 pl-3 text-right align-top">
+                                                    <div className="flex items-center justify-end gap-1">
+                                                        {q.isEditing ? (
+                                                            <>
                                                                 <button
                                                                     type="button"
-                                                                    onClick={() => setPreviewQuestion(q)}
-                                                                    className="inline-flex shrink-0 cursor-pointer items-center gap-1 rounded border border-blue-200 bg-blue-50 px-1.5 py-0.5 text-[9px] font-extrabold text-blue-700 transition hover:bg-blue-100 dark:border-blue-900/40 dark:bg-blue-950/40 dark:text-blue-300 dark:hover:bg-blue-900/50"
-                                                                    title="Quick preview diagram"
+                                                                    onClick={() =>
+                                                                        toggleEditDraft(
+                                                                            q.id,
+                                                                        )
+                                                                    }
+                                                                    title="Save Edits"
+                                                                    className="cursor-pointer rounded-lg border border-emerald-200 bg-emerald-50 p-1.5 text-emerald-700 transition hover:bg-emerald-100 dark:border-emerald-900/40 dark:bg-emerald-950/30 dark:text-emerald-400"
                                                                 >
-                                                                    <FileImage className="size-3" />
-                                                                    <span>Diagram</span>
+                                                                    <Save className="size-4" />
                                                                 </button>
-                                                            )}
-                                                        </div>
-                                                        <div className="mt-1 line-clamp-1 text-[11px] text-muted-foreground">
-                                                        {q.options && q.options.length > 0 ? (
-                                                            (() => {
-                                                                const choicesStr = q.options.map((opt, i) => {
-                                                                    const cleanText = opt ? String(opt).replace(/<[^>]+>/g, '').trim() : '';
-                                                                    return `${String.fromCharCode(65 + i)}) ${cleanText}`;
-                                                                }).join(' • ');
-                                                                return choicesStr;
-                                                            })()
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() =>
+                                                                        cancelEditDraft(
+                                                                            q.id,
+                                                                        )
+                                                                    }
+                                                                    title="Cancel Edits"
+                                                                    className="cursor-pointer rounded-lg border border-red-200 bg-red-50 p-1.5 text-red-700 transition hover:bg-red-100 dark:border-red-900/40 dark:bg-red-950/30 dark:text-red-400"
+                                                                >
+                                                                    <X className="size-4" />
+                                                                </button>
+                                                            </>
                                                         ) : (
-                                                            <span className="text-red-400 italic">No options found for this question (Possible cache issue)</span>
+                                                            <>
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() =>
+                                                                        setPreviewQuestion(
+                                                                            q,
+                                                                        )
+                                                                    }
+                                                                    title="Quick Preview"
+                                                                    className="cursor-pointer rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted hover:text-blue-600 dark:text-blue-400"
+                                                                >
+                                                                    <FileImage className="size-4" />
+                                                                </button>
+                                                                <Link
+                                                                    href={
+                                                                        questionsShow(
+                                                                            q.id,
+                                                                        ).url
+                                                                    }
+                                                                    title="Full Details"
+                                                                    className="cursor-pointer rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted hover:text-blue-600 dark:text-blue-400"
+                                                                >
+                                                                    <Eye className="size-4" />
+                                                                </Link>
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() =>
+                                                                        toggleEditDraft(
+                                                                            q.id,
+                                                                        )
+                                                                    }
+                                                                    title="Edit Inline"
+                                                                    className="cursor-pointer rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted hover:text-blue-600 dark:text-blue-400"
+                                                                >
+                                                                    <Edit3 className="size-4" />
+                                                                </button>
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() =>
+                                                                        promptDeleteDraft(
+                                                                            q.id,
+                                                                        )
+                                                                    }
+                                                                    title="Delete Draft"
+                                                                    className="cursor-pointer rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted hover:text-red-600"
+                                                                >
+                                                                    <X className="size-4" />
+                                                                </button>
+                                                            </>
                                                         )}
                                                     </div>
-                                                </div>
-                                                )}
-                                            </td>
-                                            <td className="w-48 px-4 py-4 align-top">
-                                                <span className="inline-flex items-center gap-1.5 rounded-lg border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-800 dark:border-emerald-900/40 dark:bg-emerald-950/30 dark:text-emerald-300">
-                                                    <span className="flex size-4 items-center justify-center rounded-md bg-emerald-600 text-[10px] font-black text-white dark:bg-emerald-400">
-                                                        {String.fromCharCode(
-                                                            65 +
-                                                                correctOptIndex,
-                                                        )}
-                                                    </span>
-                                                    <span className="max-w-[150px] truncate">
-                                                        {renderFormattedText(
-                                                            correctOptText,
-                                                            false,
-                                                            undefined,
-                                                            true,
-                                                        )}
-                                                    </span>
-                                                </span>
-                                            </td>
-                                            <td className="w-44 px-4 py-4 align-top">
-                                                <div className="flex flex-col gap-1">
-                                                    <span className="w-fit max-w-[150px] truncate rounded-full border border-border bg-muted px-2 py-0.5 text-[10px] font-bold text-foreground">
-                                                        {q.category}
-                                                    </span>
-                                                    <span className="w-fit max-w-[150px] truncate rounded-full border border-blue-100 bg-blue-50 px-2 py-0.5 text-[10px] font-bold text-blue-700 dark:border-blue-900/30 dark:bg-blue-950/30 dark:text-blue-400">
-                                                        {q.subcategory}
-                                                    </span>
-                                                </div>
-                                            </td>
-                                            <td className="px-4 py-4 text-center align-top">
-                                                {q.approved ? (
-                                                    <span className="inline-block rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-0.5 text-[10px] font-bold text-emerald-700 dark:border-emerald-900/40 dark:bg-emerald-950/30 dark:text-emerald-400">
-                                                        Approved
-                                                    </span>
-                                                ) : (
-                                                    <span className="inline-block rounded-full border border-amber-200 bg-amber-50 px-2.5 py-0.5 text-[10px] font-bold text-amber-700 dark:border-amber-900/40 dark:bg-amber-950/30 dark:text-amber-400">
-                                                        Pending
-                                                    </span>
-                                                )}
-                                            </td>
-                                            <td className="py-4 pr-4 pl-3 text-right align-top">
-                                                <div className="flex items-center justify-end gap-1">
-                                                    {q.isEditing ? (
-                                                        <>
-                                                            <button
-                                                                type="button"
-                                                                onClick={() =>
-                                                                    toggleEditDraft(
-                                                                        q.id,
-                                                                    )
-                                                                }
-                                                                title="Save Edits"
-                                                                className="cursor-pointer rounded-lg border border-emerald-200 bg-emerald-50 p-1.5 text-emerald-700 transition hover:bg-emerald-100 dark:border-emerald-900/40 dark:bg-emerald-950/30 dark:text-emerald-400"
-                                                            >
-                                                                <Save className="size-4" />
-                                                            </button>
-                                                            <button
-                                                                type="button"
-                                                                onClick={() =>
-                                                                    cancelEditDraft(
-                                                                        q.id,
-                                                                    )
-                                                                }
-                                                                title="Cancel Edits"
-                                                                className="cursor-pointer rounded-lg border border-red-200 bg-red-50 p-1.5 text-red-700 transition hover:bg-red-100 dark:border-red-900/40 dark:bg-red-950/30 dark:text-red-400"
-                                                            >
-                                                                <X className="size-4" />
-                                                            </button>
-                                                        </>
-                                                    ) : (
-                                                        <>
-                                                            <button
-                                                                type="button"
-                                                                onClick={() =>
-                                                                    setPreviewQuestion(
-                                                                        q,
-                                                                    )
-                                                                }
-                                                                title="Quick Preview"
-                                                                className="cursor-pointer rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted hover:text-blue-600 dark:text-blue-400"
-                                                            >
-                                                                <FileImage className="size-4" />
-                                                            </button>
-                                                            <Link
-                                                                href={questionsShow(q.id).url}
-                                                                title="Full Details"
-                                                                className="cursor-pointer rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted hover:text-blue-600 dark:text-blue-400"
-                                                            >
-                                                                <Eye className="size-4" />
-                                                            </Link>
-                                                            <button
-                                                                type="button"
-                                                                onClick={() =>
-                                                                    toggleEditDraft(
-                                                                        q.id,
-                                                                    )
-                                                                }
-                                                                title="Edit Inline"
-                                                                className="cursor-pointer rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted hover:text-blue-600 dark:text-blue-400"
-                                                            >
-                                                                <Edit3 className="size-4" />
-                                                            </button>
-                                                            <button
-                                                                type="button"
-                                                                onClick={() =>
-                                                                    promptDeleteDraft(
-                                                                        q.id,
-                                                                    )
-                                                                }
-                                                                title="Delete Draft"
-                                                                className="cursor-pointer rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted hover:text-red-600"
-                                                            >
-                                                                <X className="size-4" />
-                                                            </button>
-                                                        </>
-                                                    )}
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    );
-                                })}
-                            </tbody>
-                        </table>
-                    </div>
-                );
+                                                </td>
+                                            </tr>
+                                        );
+                                    })}
+                                </tbody>
+                            </table>
+                        </div>
+                    );
                 }}
                 renderItem={(q) => (
                     <div
                         key={q.id}
                         className={`group relative rounded-2xl border bg-card p-4 shadow-xs transition-all duration-300 hover:-translate-y-1 hover:shadow-md sm:p-6 ${
                             q.approved
-                                ? 'border-emerald-250 ring-2 ring-emerald-500 shadow-emerald-50/10 dark:border-emerald-800'
+                                ? 'border-emerald-250 ring-2 shadow-emerald-50/10 ring-emerald-500 dark:border-emerald-800'
                                 : 'border-border dark:hover:border-slate-700'
                         }`}
                     >
@@ -648,12 +734,12 @@ export default function DraftsQuestionList({
                         </div>
 
                         {/* Card Header metadata */}
-                        <div className="mb-4 flex items-center justify-between border-b border-border pb-3 pr-8">
+                        <div className="mb-4 flex items-center justify-between border-b border-border pr-8 pb-3">
                             <div className="flex flex-wrap items-center gap-2">
                                 <span className="font-mono text-[11px] font-black tracking-widest text-muted-foreground uppercase">
                                     #{q.id}
                                 </span>
-                                <span className="rounded-full border border-border bg-muted px-3 py-0.5 text-[10px] font-extrabold uppercase text-foreground">
+                                <span className="rounded-full border border-border bg-muted px-3 py-0.5 text-[10px] font-extrabold text-foreground uppercase">
                                     {q.category}
                                 </span>
                                 <span className="rounded-full border border-blue-100 bg-blue-50 px-3 py-0.5 text-[10px] font-bold text-blue-700 dark:border-blue-900/30 dark:bg-blue-950/30 dark:bg-blue-950/40 dark:text-blue-300">
@@ -737,7 +823,10 @@ export default function DraftsQuestionList({
                                             <Tooltip>
                                                 <TooltipTrigger asChild>
                                                     <Link
-                                                        href={questionsShow(q.id).url}
+                                                        href={
+                                                            questionsShow(q.id)
+                                                                .url
+                                                        }
                                                         className="cursor-pointer rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted hover:text-blue-600 dark:text-blue-400"
                                                     >
                                                         <Eye className="size-4" />
@@ -957,7 +1046,7 @@ export default function DraftsQuestionList({
                 open={!!previewQuestion}
                 onOpenChange={(open) => !open && setPreviewQuestion(null)}
             >
-                <DialogContent className="max-w-3xl overflow-y-auto max-h-[85vh]">
+                <DialogContent className="max-h-[85vh] max-w-3xl overflow-y-auto">
                     {previewQuestion && (
                         <>
                             <DialogHeader>
@@ -976,7 +1065,7 @@ export default function DraftsQuestionList({
 
                             <div className="flex flex-col gap-4 py-2">
                                 <div className="rounded-xl border border-border bg-card p-4">
-                                    <div className="text-sm font-medium leading-relaxed text-foreground">
+                                    <div className="text-sm leading-relaxed font-medium text-foreground">
                                         {renderFormattedText(
                                             previewQuestion.stem,
                                         )}
@@ -986,7 +1075,7 @@ export default function DraftsQuestionList({
                                 {previewQuestion.options &&
                                     previewQuestion.options.length > 0 && (
                                         <div className="flex flex-col gap-2">
-                                            <span className="text-xs font-bold uppercase text-muted-foreground">
+                                            <span className="text-xs font-bold text-muted-foreground uppercase">
                                                 Answer Options
                                             </span>
                                             <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
@@ -998,6 +1087,7 @@ export default function DraftsQuestionList({
                                                         const isCorrect =
                                                             previewQuestion.correct_option ===
                                                             idx;
+
                                                         return (
                                                             <div
                                                                 key={idx}
@@ -1009,7 +1099,8 @@ export default function DraftsQuestionList({
                                                             >
                                                                 <span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-muted text-[10px] font-black">
                                                                     {String.fromCharCode(
-                                                                        65 + idx,
+                                                                        65 +
+                                                                            idx,
                                                                     )}
                                                                 </span>
                                                                 <span className="font-medium">
@@ -1035,7 +1126,7 @@ export default function DraftsQuestionList({
 
                                 {previewQuestion.explanation && (
                                     <div className="rounded-xl border border-blue-200 bg-blue-50/60 p-4 dark:border-blue-900/30 dark:bg-blue-950/30">
-                                        <span className="text-xs font-bold uppercase text-blue-800 dark:text-blue-300">
+                                        <span className="text-xs font-bold text-blue-800 uppercase dark:text-blue-300">
                                             Explanation
                                         </span>
                                         <div className="mt-1 text-xs leading-relaxed text-blue-950 dark:text-blue-200">
