@@ -24,7 +24,7 @@ class UpdateQuestionRequest extends FormRequest
             'stem' => ['required', 'string'],
             'options' => $isDemographic ? ['required', 'array', 'min:2'] : ['required', 'array', 'min:4', 'max:5'],
             'correct_option' => $isDemographic ? ['nullable', 'integer'] : ['required', 'integer'],
-            'explanation' => $isDemographic ? ['nullable', 'string'] : ['required', 'string'],
+            'explanation' => ['nullable', 'string'],
             'status' => ['required', 'string', 'in:active,draft'],
         ];
     }

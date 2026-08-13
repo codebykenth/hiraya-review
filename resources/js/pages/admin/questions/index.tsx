@@ -13,6 +13,7 @@ import {
     ListChecks,
     Save,
     Edit3,
+    HelpCircle,
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { getCategoryStyles } from '@/components/domain/curation-index-shell';
@@ -31,7 +32,7 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from '@/components/ui/tooltip';
-import { renderFormattedText } from '@/lib/exam-formatters';
+import { renderFormattedText, extractPropositions } from '@/lib/exam-formatters';
 import {
     index as questionsIndex,
     create as questionsCreate,
@@ -40,6 +41,7 @@ import {
     destroy as questionsDestroy,
     show as questionsShow,
 } from '@/routes/questions';
+import { QuickEditModal } from '@/components/questions/quick-edit-modal';
 import type { QuestionItem, QuestionsIndexProps } from './types';
 
 export default function QuestionsIndex({
@@ -75,63 +77,7 @@ export default function QuestionsIndex({
     const [previewQuestion, setPreviewQuestion] = useState<QuestionItem | null>(
         null,
     );
-    const [inlineEdits, setInlineEdits] = useState<Record<number, string>>({});
-    const [savingEdits, setSavingEdits] = useState<Record<number, boolean>>({});
-
-    const pageSize = 10;
-
-    const toggleInlineEdit = (q: QuestionItem) => {
-        if (inlineEdits[q.id] !== undefined) {
-            const newEdits = { ...inlineEdits };
-            delete newEdits[q.id];
-            setInlineEdits(newEdits);
-        } else {
-            setInlineEdits({ ...inlineEdits, [q.id]: q.stem });
-        }
-    };
-
-    const handleInlineEditChange = (id: number, value: string) => {
-        setInlineEdits((prev) => ({ ...prev, [id]: value }));
-    };
-
-    const saveInlineEdit = (q: QuestionItem) => {
-        const newStem = inlineEdits[q.id];
-
-        if (!newStem || newStem === q.stem) {
-            toggleInlineEdit(q);
-
-            return;
-        }
-
-        setSavingEdits((prev) => ({ ...prev, [q.id]: true }));
-
-        router.put(
-            questionsUpdate(q.id).url,
-            {
-                category: q.category,
-                subcategory: q.subcategory,
-                language: (q as any).language || 'English',
-                stem: newStem,
-                options: q.options as any,
-                correct_option: q.correct_option,
-                explanation: q.explanation,
-                status: q.status,
-            },
-            {
-                preserveScroll: true,
-                onSuccess: () => {
-                    const newEdits = { ...inlineEdits };
-                    delete newEdits[q.id];
-                    setInlineEdits(newEdits);
-                },
-                onFinish: () => {
-                    const newSaving = { ...savingEdits };
-                    delete newSaving[q.id];
-                    setSavingEdits(newSaving);
-                },
-            },
-        );
-    };
+    const [editModalQuestion, setEditModalQuestion] = useState<QuestionItem | null>(null);
 
     const getCleanStemText = (stem: string) => {
         if (!stem) {
@@ -262,6 +208,7 @@ export default function QuestionsIndex({
             return timeB - timeA;
         });
 
+    const pageSize = 10;
     const totalPages = Math.ceil(filteredQuestions.length / pageSize);
     const paginatedQuestions = filteredQuestions.slice(
         (currentPage - 1) * pageSize,
@@ -895,61 +842,34 @@ export default function QuestionsIndex({
                                                     #{q.id}
                                                 </td>
                                                 <td className="min-w-[400px] px-4 py-4 align-top">
-                                                    {inlineEdits[q.id] !==
-                                                    undefined ? (
-                                                        <div className="flex flex-col gap-1">
-                                                            <textarea
-                                                                value={
-                                                                    inlineEdits[
-                                                                        q.id
-                                                                    ]
-                                                                }
-                                                                onChange={(e) =>
-                                                                    handleInlineEditChange(
-                                                                        q.id,
-                                                                        e.target
-                                                                            .value,
-                                                                    )
-                                                                }
-                                                                className="w-full rounded-md border border-border bg-background p-2 text-xs font-medium text-foreground focus:border-blue-500 focus:outline-none"
-                                                                rows={3}
-                                                                disabled={
-                                                                    savingEdits[
-                                                                        q.id
-                                                                    ]
-                                                                }
-                                                            />
-                                                        </div>
-                                                    ) : (
-                                                        <div className="flex flex-col">
-                                                            <div className="flex flex-wrap items-center gap-2">
-                                                                <div className="line-clamp-2 font-semibold text-foreground">
-                                                                    {getCleanStemText(
-                                                                        q.stem,
-                                                                    )}
-                                                                </div>
-                                                                {hasSvgContent(
+                                                    <div className="flex flex-col">
+                                                        <div className="flex flex-wrap items-center gap-2">
+                                                            <div className="line-clamp-2 font-semibold text-foreground">
+                                                                {getCleanStemText(
                                                                     q.stem,
-                                                                ) && (
-                                                                    <button
-                                                                        type="button"
-                                                                        onClick={() =>
-                                                                            setPreviewQuestion(
-                                                                                q,
-                                                                            )
-                                                                        }
-                                                                        className="inline-flex shrink-0 cursor-pointer items-center gap-1 rounded border border-blue-200 bg-blue-50 px-1.5 py-0.5 text-[9px] font-extrabold text-blue-700 transition hover:bg-blue-100 dark:border-blue-900/40 dark:bg-blue-950/40 dark:text-blue-300 dark:hover:bg-blue-900/50"
-                                                                        title="Quick preview diagram"
-                                                                    >
-                                                                        <FileImage className="size-3" />
-                                                                        <span>
-                                                                            Diagram
-                                                                        </span>
-                                                                    </button>
                                                                 )}
                                                             </div>
+                                                            {hasSvgContent(
+                                                                q.stem,
+                                                            ) && (
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() =>
+                                                                        setPreviewQuestion(
+                                                                            q,
+                                                                        )
+                                                                    }
+                                                                    className="inline-flex shrink-0 cursor-pointer items-center gap-1 rounded border border-blue-200 bg-blue-50 px-1.5 py-0.5 text-[9px] font-extrabold text-blue-700 transition hover:bg-blue-100 dark:border-blue-900/40 dark:bg-blue-950/40 dark:text-blue-300 dark:hover:bg-blue-900/50"
+                                                                    title="Quick preview diagram"
+                                                                >
+                                                                    <FileImage className="size-3" />
+                                                                    <span>
+                                                                        Diagram
+                                                                    </span>
+                                                                </button>
+                                                            )}
                                                         </div>
-                                                    )}
+                                                    </div>
                                                     {/* Sub-line under main question stem (Options & Answer) */}
                                                     <div className="mt-0.5 line-clamp-1 text-[11px] text-muted-foreground">
                                                         {q.options &&
@@ -1031,165 +951,43 @@ export default function QuestionsIndex({
                                                         <TooltipProvider
                                                             delayDuration={150}
                                                         >
-                                                            {inlineEdits[
-                                                                q.id
-                                                            ] !== undefined ? (
-                                                                <>
-                                                                    <Tooltip>
-                                                                        <TooltipTrigger
-                                                                            asChild
-                                                                        >
-                                                                            <button
-                                                                                type="button"
-                                                                                onClick={() =>
-                                                                                    saveInlineEdit(
-                                                                                        q,
-                                                                                    )
-                                                                                }
-                                                                                disabled={
-                                                                                    savingEdits[
-                                                                                        q
-                                                                                            .id
-                                                                                    ]
-                                                                                }
-                                                                                className="cursor-pointer rounded-lg p-1.5 text-emerald-600 transition hover:bg-muted dark:text-emerald-400"
-                                                                            >
-                                                                                <Save className="size-4" />
-                                                                            </button>
-                                                                        </TooltipTrigger>
-                                                                        <TooltipContent>
-                                                                            Save
-                                                                            Edits
-                                                                        </TooltipContent>
-                                                                    </Tooltip>
-                                                                    <Tooltip>
-                                                                        <TooltipTrigger
-                                                                            asChild
-                                                                        >
-                                                                            <button
-                                                                                type="button"
-                                                                                onClick={() =>
-                                                                                    toggleInlineEdit(
-                                                                                        q,
-                                                                                    )
-                                                                                }
-                                                                                disabled={
-                                                                                    savingEdits[
-                                                                                        q
-                                                                                            .id
-                                                                                    ]
-                                                                                }
-                                                                                className="cursor-pointer rounded-lg p-1.5 text-red-600 transition hover:bg-muted dark:text-red-400"
-                                                                            >
-                                                                                <X className="size-4" />
-                                                                            </button>
-                                                                        </TooltipTrigger>
-                                                                        <TooltipContent>
-                                                                            Cancel
-                                                                            Edits
-                                                                        </TooltipContent>
-                                                                    </Tooltip>
-                                                                </>
-                                                            ) : (
-                                                                <>
-                                                                    <Tooltip>
-                                                                        <TooltipTrigger
-                                                                            asChild
-                                                                        >
-                                                                            <button
-                                                                                type="button"
-                                                                                onClick={() =>
-                                                                                    setPreviewQuestion(
-                                                                                        q,
-                                                                                    )
-                                                                                }
-                                                                                className="cursor-pointer rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted hover:text-blue-600 dark:text-blue-400"
-                                                                            >
-                                                                                <FileImage className="size-4" />
-                                                                            </button>
-                                                                        </TooltipTrigger>
-                                                                        <TooltipContent>
-                                                                            Quick
-                                                                            preview
-                                                                        </TooltipContent>
-                                                                    </Tooltip>
-                                                                    <Tooltip>
-                                                                        <TooltipTrigger
-                                                                            asChild
-                                                                        >
-                                                                            <Link
-                                                                                href={`${questionsShow(q.id).url}?page=${currentPage}`}
-                                                                                className="cursor-pointer rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted hover:text-blue-600 dark:text-blue-400"
-                                                                            >
-                                                                                <Eye className="size-4" />
-                                                                            </Link>
-                                                                        </TooltipTrigger>
-                                                                        <TooltipContent>
-                                                                            Full
-                                                                            details
-                                                                        </TooltipContent>
-                                                                    </Tooltip>
-                                                                    <Tooltip>
-                                                                        <TooltipTrigger
-                                                                            asChild
-                                                                        >
-                                                                            <button
-                                                                                type="button"
-                                                                                onClick={() =>
-                                                                                    toggleInlineEdit(
-                                                                                        q,
-                                                                                    )
-                                                                                }
-                                                                                className="cursor-pointer rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted hover:text-blue-600 dark:text-blue-400"
-                                                                            >
-                                                                                <Edit3 className="size-4" />
-                                                                            </button>
-                                                                        </TooltipTrigger>
-                                                                        <TooltipContent>
-                                                                            Edit
-                                                                            inline
-                                                                        </TooltipContent>
-                                                                    </Tooltip>
-                                                                    <Tooltip>
-                                                                        <TooltipTrigger
-                                                                            asChild
-                                                                        >
-                                                                            <Link
-                                                                                href={`${questionsEdit(q.id).url}?page=${currentPage}`}
-                                                                                className="cursor-pointer rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted hover:text-blue-600 dark:text-blue-400"
-                                                                            >
-                                                                                <Edit2 className="size-4" />
-                                                                            </Link>
-                                                                        </TooltipTrigger>
-                                                                        <TooltipContent>
-                                                                            Edit
-                                                                            Full
-                                                                            Details
-                                                                        </TooltipContent>
-                                                                    </Tooltip>
-                                                                    <Tooltip>
-                                                                        <TooltipTrigger
-                                                                            asChild
-                                                                        >
-                                                                            <button
-                                                                                type="button"
-                                                                                onClick={() =>
-                                                                                    promptDelete(
-                                                                                        q.id,
-                                                                                    )
-                                                                                }
-                                                                                className="cursor-pointer rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted hover:text-red-600"
-                                                                            >
-                                                                                <Trash2 className="size-4" />
-                                                                            </button>
-                                                                        </TooltipTrigger>
-                                                                        <TooltipContent>
-                                                                            Delete
-                                                                            question
-                                                                        </TooltipContent>
-                                                                    </Tooltip>
-                                                                </>
-                                                            )}
+                                                            <Tooltip>
+                                                                <TooltipTrigger asChild>
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={() => setPreviewQuestion(q)}
+                                                                        className="cursor-pointer rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted hover:text-blue-600 dark:text-blue-400"
+                                                                    >
+                                                                        <FileImage className="size-4" />
+                                                                    </button>
+                                                                </TooltipTrigger>
+                                                                <TooltipContent>Quick preview</TooltipContent>
+                                                            </Tooltip>
+                                                            <Tooltip>
+                                                                <TooltipTrigger asChild>
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={() => setEditModalQuestion(q)}
+                                                                        className="cursor-pointer rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted hover:text-blue-600 dark:text-blue-400"
+                                                                    >
+                                                                        <Edit3 className="size-4" />
+                                                                    </button>
+                                                                </TooltipTrigger>
+                                                                <TooltipContent>Edit</TooltipContent>
+                                                            </Tooltip>
+
+                                                            <Tooltip>
+                                                                <TooltipTrigger asChild>
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={() => promptDelete(q.id)}
+                                                                        className="cursor-pointer rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted hover:text-red-600"
+                                                                    >
+                                                                        <Trash2 className="size-4" />
+                                                                    </button>
+                                                                </TooltipTrigger>
+                                                                <TooltipContent>Delete question</TooltipContent>
+                                                            </Tooltip>
                                                         </TooltipProvider>
                                                     </div>
                                                 </td>
@@ -1256,9 +1054,8 @@ export default function QuestionsIndex({
                                             </span>
                                         </div>
 
-                                        {/* Question Stem */}
-                                        <div className="mb-4 line-clamp-3 text-sm leading-relaxed font-medium text-foreground">
-                                            {renderFormattedText(q.stem)}
+                                        <div className="mb-4 text-sm leading-relaxed font-semibold text-foreground">
+                                            {renderFormattedText(q.stem, true)}
                                         </div>
 
                                         {/* Options Preview */}
@@ -1332,138 +1129,31 @@ export default function QuestionsIndex({
                                             <TooltipProvider
                                                 delayDuration={150}
                                             >
-                                                {inlineEdits[q.id] !==
-                                                undefined ? (
-                                                    <>
                                                         <Tooltip>
-                                                            <TooltipTrigger
-                                                                asChild
-                                                            >
+                                                            <TooltipTrigger asChild>
                                                                 <button
                                                                     type="button"
-                                                                    onClick={() =>
-                                                                        saveInlineEdit(
-                                                                            q,
-                                                                        )
-                                                                    }
-                                                                    disabled={
-                                                                        savingEdits[
-                                                                            q.id
-                                                                        ]
-                                                                    }
-                                                                    className="cursor-pointer rounded-lg p-1.5 text-emerald-600 transition hover:bg-muted dark:text-emerald-400"
-                                                                >
-                                                                    <Save className="size-4" />
-                                                                </button>
-                                                            </TooltipTrigger>
-                                                            <TooltipContent>
-                                                                Save Edits
-                                                            </TooltipContent>
-                                                        </Tooltip>
-                                                        <Tooltip>
-                                                            <TooltipTrigger
-                                                                asChild
-                                                            >
-                                                                <button
-                                                                    type="button"
-                                                                    onClick={() =>
-                                                                        toggleInlineEdit(
-                                                                            q,
-                                                                        )
-                                                                    }
-                                                                    disabled={
-                                                                        savingEdits[
-                                                                            q.id
-                                                                        ]
-                                                                    }
-                                                                    className="cursor-pointer rounded-lg p-1.5 text-red-600 transition hover:bg-muted dark:text-red-400"
-                                                                >
-                                                                    <X className="size-4" />
-                                                                </button>
-                                                            </TooltipTrigger>
-                                                            <TooltipContent>
-                                                                Cancel Edits
-                                                            </TooltipContent>
-                                                        </Tooltip>
-                                                    </>
-                                                ) : (
-                                                    <>
-                                                        <Tooltip>
-                                                            <TooltipTrigger
-                                                                asChild
-                                                            >
-                                                                <Link
-                                                                    href={`${questionsShow(q.id).url}?page=${currentPage}`}
-                                                                    className="group/btn cursor-pointer rounded-lg p-1.5 text-muted-foreground transition-all duration-300 hover:bg-muted hover:text-blue-600 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95 dark:text-blue-400"
-                                                                >
-                                                                    <Eye className="size-4" />
-                                                                </Link>
-                                                            </TooltipTrigger>
-                                                            <TooltipContent>
-                                                                View details
-                                                            </TooltipContent>
-                                                        </Tooltip>
-
-                                                        <Tooltip>
-                                                            <TooltipTrigger
-                                                                asChild
-                                                            >
-                                                                <button
-                                                                    type="button"
-                                                                    onClick={() =>
-                                                                        toggleInlineEdit(
-                                                                            q,
-                                                                        )
-                                                                    }
+                                                                    onClick={() => setEditModalQuestion(q)}
                                                                     className="group/btn cursor-pointer rounded-lg p-1.5 text-muted-foreground transition-all duration-300 hover:bg-muted hover:text-blue-600 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95 dark:text-blue-400"
                                                                 >
                                                                     <Edit3 className="size-4" />
                                                                 </button>
                                                             </TooltipTrigger>
-                                                            <TooltipContent>
-                                                                Edit inline
-                                                            </TooltipContent>
+                                                            <TooltipContent>Edit</TooltipContent>
                                                         </Tooltip>
 
                                                         <Tooltip>
-                                                            <TooltipTrigger
-                                                                asChild
-                                                            >
-                                                                <Link
-                                                                    href={`${questionsEdit(q.id).url}?page=${currentPage}`}
-                                                                    className="group/btn cursor-pointer rounded-lg p-1.5 text-muted-foreground transition-all duration-300 hover:bg-muted hover:text-blue-600 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95 dark:text-blue-400"
-                                                                >
-                                                                    <Edit2 className="size-4" />
-                                                                </Link>
-                                                            </TooltipTrigger>
-                                                            <TooltipContent>
-                                                                Edit Full
-                                                                Details
-                                                            </TooltipContent>
-                                                        </Tooltip>
-
-                                                        <Tooltip>
-                                                            <TooltipTrigger
-                                                                asChild
-                                                            >
+                                                            <TooltipTrigger asChild>
                                                                 <button
                                                                     type="button"
-                                                                    onClick={() =>
-                                                                        promptDelete(
-                                                                            q.id,
-                                                                        )
-                                                                    }
+                                                                    onClick={() => promptDelete(q.id)}
                                                                     className="cursor-pointer rounded-lg p-1.5 text-muted-foreground transition-all duration-300 hover:bg-muted hover:text-red-600 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95"
                                                                 >
                                                                     <Trash2 className="size-4" />
                                                                 </button>
                                                             </TooltipTrigger>
-                                                            <TooltipContent>
-                                                                Delete question
-                                                            </TooltipContent>
+                                                            <TooltipContent>Delete question</TooltipContent>
                                                         </Tooltip>
-                                                    </>
-                                                )}
                                             </TooltipProvider>
                                         </div>
                                     </div>
@@ -1645,10 +1335,11 @@ export default function QuestionsIndex({
                             </DialogHeader>
 
                             <div className="flex flex-col gap-4 py-2">
-                                <div className="rounded-xl border border-border bg-card p-4">
-                                    <div className="text-sm leading-relaxed font-medium text-foreground">
+                                <div className="mb-4">
+                                    <div className="text-sm leading-relaxed font-semibold text-foreground">
                                         {renderFormattedText(
                                             previewQuestion.stem,
+                                            true,
                                         )}
                                     </div>
                                 </div>
@@ -1659,7 +1350,7 @@ export default function QuestionsIndex({
                                             <span className="text-xs font-bold text-muted-foreground uppercase">
                                                 Answer Options
                                             </span>
-                                            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                                            <div className="flex flex-col gap-3.5">
                                                 {previewQuestion.options.map(
                                                     (opt: any, idx: number) => {
                                                         const text =
@@ -1673,27 +1364,42 @@ export default function QuestionsIndex({
                                                                 ? opt.is_correct
                                                                 : previewQuestion.correct_option ===
                                                                   idx;
+                                                        const label = String.fromCharCode(65 + idx);
 
                                                         return (
                                                             <div
                                                                 key={idx}
-                                                                className={`flex items-start gap-2 rounded-lg border p-3 text-xs ${
+                                                                className={`shadow-3xs relative flex items-center justify-between gap-4 rounded-xl border p-4 transition-all ${
                                                                     isCorrect
-                                                                        ? 'border-emerald-300 bg-emerald-50/50 text-emerald-900 dark:border-emerald-900/40 dark:bg-emerald-950/20 dark:text-emerald-300'
-                                                                        : 'border-border bg-background text-foreground'
+                                                                        ? 'border-emerald-600 bg-emerald-50 dark:border-emerald-500 dark:bg-emerald-950/30'
+                                                                        : 'border-border bg-card'
                                                                 }`}
                                                             >
-                                                                <span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-muted text-[10px] font-black">
-                                                                    {String.fromCharCode(
-                                                                        65 +
-                                                                            idx,
-                                                                    )}
-                                                                </span>
-                                                                <span className="font-medium">
-                                                                    {renderFormattedText(
-                                                                        text,
-                                                                    )}
-                                                                </span>
+                                                                <div className="flex items-center gap-4">
+                                                                    <span
+                                                                        className={`flex size-8 shrink-0 items-center justify-center rounded-full border text-xs font-black transition ${
+                                                                            isCorrect
+                                                                                ? 'border-emerald-600 bg-emerald-600 text-white'
+                                                                                : 'border-border bg-background text-muted-foreground'
+                                                                        }`}
+                                                                    >
+                                                                        {label}
+                                                                    </span>
+                                                                    <p
+                                                                        className={`text-sm font-bold transition md:text-base ${
+                                                                            isCorrect
+                                                                                ? 'text-emerald-900 dark:text-emerald-200'
+                                                                                : 'text-foreground'
+                                                                        }`}
+                                                                    >
+                                                                        {renderFormattedText(
+                                                                            text,
+                                                                            false,
+                                                                            undefined,
+                                                                            true
+                                                                        )}
+                                                                    </p>
+                                                                </div>
                                                                 {isCorrect && (
                                                                     <span className="ml-auto rounded bg-emerald-600 px-1.5 py-0.5 text-[9px] font-black text-white">
                                                                         Correct
@@ -1708,11 +1414,44 @@ export default function QuestionsIndex({
                                     )}
 
                                 {previewQuestion.explanation && (
-                                    <div className="rounded-lg border border-amber-200 bg-amber-50/50 p-3 text-xs text-amber-900 dark:border-amber-900/30 dark:bg-amber-950/20 dark:text-amber-300">
-                                        <span className="font-bold">
-                                            Explanation:{' '}
-                                        </span>
-                                        {previewQuestion.explanation}
+                                    <div className="shadow-3xs mt-2 overflow-hidden rounded-2xl border border-border bg-card text-sm leading-relaxed text-muted-foreground transition-all">
+                                        <div className="flex w-full items-center gap-2 p-4 font-bold text-foreground sm:p-5">
+                                            <HelpCircle className="size-4 text-blue-600 dark:text-blue-400" />
+                                            <span>Explanation &amp; Rationale</span>
+                                        </div>
+                                        <div className="border-t border-border/60 bg-muted/30 p-5">
+                                            {(() => {
+                                                const propositions = extractPropositions(previewQuestion.stem);
+                                                const letterMap: Record<string, string> = {};
+                                                propositions.forEach((prop, idx) => {
+                                                    letterMap[prop.letter] = String.fromCharCode(65 + idx);
+                                                });
+                                                return (
+                                                    <>
+                                                        {propositions.length > 0 && (
+                                                            <div className="shadow-3xs mb-4 rounded-xl border border-border bg-background p-4">
+                                                                <span className="mb-2 block font-heading text-[10px] font-black tracking-wider text-muted-foreground uppercase">
+                                                                    Proposition Key:
+                                                                </span>
+                                                                <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                                                                    {propositions.map((prop, idx) => (
+                                                                        <div key={idx} className="flex items-center gap-2 text-xs">
+                                                                            <span className="inline-flex size-5 items-center justify-center rounded border border-blue-100/60 bg-blue-50 font-mono text-[10px] font-black text-blue-700 dark:border-blue-900/40 dark:bg-blue-950/40 dark:text-blue-400">
+                                                                                {String.fromCharCode(65 + idx)}
+                                                                            </span>
+                                                                            <span className="font-medium text-foreground">
+                                                                                {prop.phrase}
+                                                                            </span>
+                                                                        </div>
+                                                                    ))}
+                                                                </div>
+                                                            </div>
+                                                        )}
+                                                        {renderFormattedText(previewQuestion.explanation, false, letterMap)}
+                                                    </>
+                                                );
+                                            })()}
+                                        </div>
                                     </div>
                                 )}
                             </div>
@@ -1738,6 +1477,16 @@ export default function QuestionsIndex({
                     )}
                 </DialogContent>
             </Dialog>
+
+            <QuickEditModal
+                isOpen={!!editModalQuestion}
+                question={editModalQuestion}
+                categories={categories}
+                onClose={() => setEditModalQuestion(null)}
+                onSaveSuccess={() => {
+                    setEditModalQuestion(null);
+                }}
+            />
         </>
     );
 }

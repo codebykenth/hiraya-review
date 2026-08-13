@@ -33,13 +33,15 @@ const aiModelOptions = [
         label: 'Google Gemini 3.5 Flash (Best for CSE & SVGs)',
     },
     {
-        value: 'llama-3.3-70b-versatile',
-        label: 'Groq LLaMA 3.3 70B (High Reasoning)',
+        value: 'gemini-1.5-pro',
+        label: 'Google Gemini 1.5 Pro (High Reasoning)',
     },
-    { value: 'gemini-2.5-flash', label: 'Google Gemini 2.5 Flash' },
-    { value: 'mixtral-8x7b-32768', label: 'Groq Mixtral 8x7B' },
-    { value: 'gemma2-9b-it', label: 'Groq Gemma 2 9B' },
-    { value: 'llama-3.1-8b-instant', label: 'Groq LLaMA 3.1 8B (Fast)' },
+    {
+        value: 'gemini-2.5-flash',
+        label: 'Google Gemini 2.5 Flash',
+    },
+    { value: 'gemini-1.5-flash', label: 'Google Gemini 1.5 Flash (Fast)' },
+    { value: 'gemini-1.5-flash-8b', label: 'Google Gemini 1.5 Flash-8B' },
 ];
 
 interface LearnAIGeneratorPanelProps {

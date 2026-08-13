@@ -45,7 +45,7 @@ class QuestionController
         $this->ensureCategoriesSeeded();
 
         $questions = Cache::rememberForever('questions.all', function () {
-            return Question::with(['subcategory.category'])->get()->map(function ($q) {
+            return Question::with(['subcategory.category'])->orderBy('id', 'desc')->get()->map(function ($q) {
                 return [
                     'id' => $q->id,
                     'stem' => $q->stem,
@@ -83,7 +83,7 @@ class QuestionController
         $drafts = Question::with(['subcategory.category'])
             ->where('status', 'draft')
             ->where('created_by', auth()->id() ?: (User::first()?->id ?: 1))
-            ->latest()
+            ->orderBy('id', 'desc')
             ->get()
             ->map(function ($q) {
                 return [

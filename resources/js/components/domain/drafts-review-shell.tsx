@@ -13,6 +13,7 @@ import {
     Table,
     RotateCcw,
     Eye,
+    Trash2,
 } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
 import { PageContainer } from '@/components/layout/page-container';
@@ -532,7 +533,7 @@ export function DraftsReviewShell<T extends BaseDraftItem>({
                     </div>
                     <div className="dark:bg-rose-950/30/50 flex items-center gap-1.5 rounded-lg border border-rose-100 bg-rose-50 px-2 py-1 dark:border-rose-900/20 dark:bg-rose-950/10">
                         <span className="border-rose-250 flex size-5.5 items-center justify-center rounded-md border bg-rose-100 text-rose-700 dark:border-rose-900/30 dark:bg-rose-950/20 dark:text-rose-400">
-                            <X className="size-3" />
+                            <Trash2 className="size-3" />
                         </span>
                         <span className="text-rose-800 dark:text-rose-300">
                             Delete Draft

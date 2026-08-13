@@ -23,7 +23,7 @@ class StoreQuestionRequest extends FormRequest
                 'questions.*.stem' => ['required', 'string'],
                 'questions.*.options' => ['required', 'array'],
                 'questions.*.correct_option' => ['required', 'integer'],
-                'questions.*.explanation' => ['required', 'string'],
+                'questions.*.explanation' => ['nullable', 'string'],
             ];
         }
 
@@ -35,9 +35,9 @@ class StoreQuestionRequest extends FormRequest
             'category' => ['required', 'string'],
             'subcategory' => $isDemographic ? ['nullable', 'string'] : ['required', 'string'],
             'language' => ['required', 'string'],
-            'options' => $isDemographic ? ['required', 'array', 'min:2'] : ['required', 'array', 'min:5', 'max:5'],
+            'options' => $isDemographic ? ['required', 'array', 'min:2'] : ['required', 'array', 'min:4', 'max:5'],
             'correct_option' => $isDemographic ? ['nullable', 'integer'] : ['required', 'integer', 'min:0', 'max:4'],
-            'explanation' => $isDemographic ? ['nullable', 'string'] : ['required', 'string'],
+            'explanation' => ['nullable', 'string'],
             'status' => ['required', 'in:active,draft'],
         ];
     }
