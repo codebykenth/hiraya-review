@@ -22,8 +22,11 @@ class PreferencesController extends Controller
     public function edit(Request $request): Response
     {
         $userId = $request->user()->id;
-        $analysisMode = Cache::get("user-analysis-mode-{$userId}", 'ai');
         $aiAvailable = (bool) config('services.ai.analysis_enabled');
+        $analysisMode = Cache::get("user-analysis-mode-{$userId}", 'ai');
+        if (! $aiAvailable && $analysisMode === 'ai') {
+            $analysisMode = 'instant';
+        }
 
         return Inertia::render('settings/preferences', [
             'analysisMode' => $analysisMode,

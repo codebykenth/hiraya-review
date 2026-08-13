@@ -205,63 +205,11 @@ Topic: {$validated['topic']}
                         return false;
                     }
                 };
-
-                $attemptGroq = function ($model) use ($systemPrompt, $userPrompt, &$resultText, &$errorMsg) {
-                    $groqKey = config('services.groq.key') ?: env('GROQ_API_KEY');
-                    if (! $groqKey) {
-                        $errorMsg = 'GROQ_API_KEY is missing.';
-
-                        return false;
-                    }
-
-                    try {
-                        $groqResponse = Http::withToken($groqKey)
-                            ->timeout(300)
-                            ->post('https://api.groq.com/openai/v1/chat/completions', [
-                                'model' => $model,
-                                'messages' => [
-                                    ['role' => 'system', 'content' => $systemPrompt],
-                                    ['role' => 'user', 'content' => $userPrompt],
-                                ],
-                                'temperature' => 0.7,
-                                'response_format' => ['type' => 'json_object'],
-                            ]);
-
-                        if ($groqResponse->successful()) {
-                            $result = $groqResponse->json();
-                            $resultText = $result['choices'][0]['message']['content'] ?? '';
-
-                            return true;
-                        } else {
-                            $body = $groqResponse->json();
-                            $errorMsg = $body['error']['message'] ?? $groqResponse->body();
-
-                            return false;
-                        }
-                    } catch (\Exception $e) {
-                        $errorMsg = 'Groq Exception: '.$e->getMessage();
-
-                        return false;
-                    }
-                };
-
-                $success = false;
-                $primaryIsGemini = str_starts_with($this->primaryModel, 'gemini');
-
-                if ($primaryIsGemini) {
-                    Log::info('GenerateLearnModuleJob: Attempting Gemini model: '.$this->primaryModel);
-                    if ($attemptGemini($this->primaryModel)) {
-                        $success = true;
-                    } else {
-                        Log::warning('GenerateLearnModuleJob: Gemini model '.$this->primaryModel.' failed: '.$errorMsg);
-                    }
+                Log::info('GenerateLearnModuleJob: Attempting Gemini model: '.$this->primaryModel);
+                if (! $attemptGemini($this->primaryModel)) {
+                    $success = false;
                 } else {
-                    Log::info('GenerateLearnModuleJob: Attempting Groq model: '.$this->primaryModel);
-                    if ($attemptGroq($this->primaryModel)) {
-                        $success = true;
-                    } else {
-                        Log::warning('GenerateLearnModuleJob: Groq model '.$this->primaryModel.' failed: '.$errorMsg);
-                    }
+                    $success = true;
                 }
 
                 if (! $success) {

@@ -204,53 +204,9 @@ class GenerateUserAnalysisJob implements ShouldQueue
                 }
             };
 
-            $attemptGroq = function ($model) use ($groqKey, $systemPrompt, $userPrompt, &$resultText, &$errorMsg) {
-                if (! $groqKey) {
-                    $errorMsg = 'GROQ_API_KEY is missing.';
-
-                    return false;
-                }
-                try {
-                    $groqResponse = Http::withToken($groqKey)
-                        ->timeout(300)
-                        ->post('https://api.groq.com/openai/v1/chat/completions', [
-                            'model' => $model,
-                            'messages' => [
-                                ['role' => 'system', 'content' => $systemPrompt],
-                                ['role' => 'user', 'content' => $userPrompt],
-                            ],
-                            'temperature' => 0.7,
-                            'response_format' => ['type' => 'json_object'],
-                        ]);
-
-                    if ($groqResponse->successful()) {
-                        $result = $groqResponse->json();
-                        $resultText = $result['choices'][0]['message']['content'] ?? '';
-
-                        return true;
-                    } else {
-                        $errorMsg = 'Groq API failed with status '.$groqResponse->status().': '.$groqResponse->body();
-
-                        return false;
-                    }
-                } catch (\Exception $e) {
-                    $errorMsg = 'Groq Exception: '.$e->getMessage();
-
-                    return false;
-                }
-            };
-
-            $isGemini = str_starts_with($this->primaryModel, 'gemini-');
-
-            if ($isGemini) {
-                Log::info("GenerateUserAnalysisJob: Calling Gemini API with model: {$this->primaryModel}");
-                $success = $attemptGemini($this->primaryModel);
-                Log::info('GenerateUserAnalysisJob: Gemini API responded. Success: '.($success ? 'true' : 'false'));
-            } else {
-                Log::info("GenerateUserAnalysisJob: Calling Groq API with model: {$this->primaryModel}");
-                $success = $attemptGroq($this->primaryModel);
-                Log::info('GenerateUserAnalysisJob: Groq API responded. Success: '.($success ? 'true' : 'false'));
-            }
+            Log::info("GenerateUserAnalysisJob: Calling Gemini API with model: {$this->primaryModel}");
+            $success = $attemptGemini($this->primaryModel);
+            Log::info('GenerateUserAnalysisJob: Gemini API responded. Success: '.($success ? 'true' : 'false'));
 
             if (! $success) {
                 Log::warning('GenerateUserAnalysisJob: AI generation model failed, falling back to deterministic data: '.$errorMsg);

@@ -138,7 +138,7 @@ class GenerateQuestionsJob implements ShouldQueue
                 } elseif ($variety === 'format_m') {
                     $varietyInstruction = "CRITICAL VARIETY RULE: You MUST generate ONLY the following format. You are forbidden from generating any other format:\n        - Format M: Coding and Decoding. Provide a word and its coded equivalent based on a specific letter-shifting pattern. Use the real Unicode right-arrow symbol (→) instead of '->'. To add variety, randomly generate questions with 2, 3, 4, or 5 pairs (e.g., 'APPLE → CRRNG ; BANANA → ?' or 'CAT → FDW ; DOG → GRJ ; BIRD → ?'). ADDITIONALLY, generate hard/advanced coding questions with complex patterns such as:\n          1) Asymmetric length coding and explicit question phrasing (e.g., 'If SUN is coded as TKAF, what is the code for MOON?');\n          2) Dual/Alternating rules (e.g., Vowels vs Consonants shifted differently, reverse-alphabet complement pairs A<->Z, or incremental positional shifts +1, +2, +3...);\n          3) Reversal + shift combinations.\n        The options must be potential coded words. NO SVGs ALLOWED.";
                 } elseif ($variety === 'format_n') {
-                    $varietyInstruction = "CRITICAL VARIETY RULE: You MUST generate ONLY the following format. You are forbidden from generating any other format:\n        - Format N: Flowchart / Procedural Logic. Provide a procedural logic puzzle based on administrative rules (e.g., tax computation, application routing). You MUST include a clean, scalable SVG diagram (e.g., a flowchart or decision tree) in the question stem to represent the rules. Ensure flowchart connecting lines DO NOT OVERLAP or cross each other to maintain readability. The flowchart MUST contain 7 to 10 nodes (boxes/diamonds) and branching paths, keeping the layout strictly linear or tree-like to prevent confusing line intersections. CRITICAL SVG TOKEN RULE: You MUST aggressively minify the flowchart SVG (remove line breaks, spaces, unnecessary tags, use short IDs, and round coordinates to integers) to avoid hitting token output limits! Keep text labels inside shapes extremely brief. Give a specific scenario in the text. You MUST end the text stem with a clear, direct question (e.g., 'Based on the flowchart, what is the final decision for this applicant?'). The options (A to E) MUST be purely text-based.";
+                    $varietyInstruction = "CRITICAL VARIETY RULE: You MUST generate ONLY the following format. You are forbidden from generating any other format:\n        - Format N: Flowchart / Procedural Logic. Provide a procedural logic puzzle based on administrative rules (e.g., tax computation, application routing). You MUST include a clean, scalable SVG diagram (e.g., a flowchart or decision tree) in the question stem to represent the rules. Ensure flowchart connecting lines DO NOT OVERLAP or cross each other to maintain readability. The flowchart MUST contain 7 to 10 nodes (boxes/diamonds) and branching paths, keeping the layout strictly linear or tree-like to prevent confusing line intersections. CRITICAL SVG TOKEN RULE: You MUST aggressively minify the flowchart SVG (remove line breaks, spaces, unnecessary tags, use short IDs, and round coordinates to integers) to avoid hitting token output limits! Give a specific scenario in the text. You MUST end the text stem with a clear, direct question (e.g., 'Based on the flowchart, what is the final decision for this applicant?'). The options (A to E) MUST be purely text-based.";
                 } else {
                     $varietyInstruction = "CRITICAL VARIETY RULE: To prevent repetitive questions, randomly select one of the following abstract reasoning formats for each question:
         - Format A: Grid-based Logical Matrix. Generate a single SVG showing a grid of shapes (e.g. 2x2, 3x3, or 4x4 cells). The bottom-right cell MUST show a question mark '?' indicating the missing symbol. The other cells must follow a logical grid-based pattern (e.g. addition, subtraction, or overlap of lines/shapes in rows or columns).
@@ -164,8 +164,8 @@ class GenerateQuestionsJob implements ShouldQueue
                 } elseif ($variety === 'format_n') {
                     $categorySpecificRules = "* Symbolic logic / abstract reasoning: You MUST generate procedural reasoning puzzles focusing on flowcharts or decision trees.
         {$varietyInstruction}
-        CRITICAL RULE: You MUST use an SVG for the flowchart diagram in the question stem. You MUST ensure that the connecting lines between flowchart nodes DO NOT OVERLAP or intersect. The flowchart MUST contain 7 to 10 nodes (boxes/diamonds) and branching decision paths. You MUST aggressively minify the SVG code (use short text labels, remove line breaks, round coordinates) to prevent token limit cutoffs. Keep the layout linear or use a simple well-spaced tree structure to prevent visual confusion.
-        CRITICAL SVG STYLING: DO NOT generate solid black shapes that hide text! All shapes (<rect>, <polygon>, etc.) MUST use fill=\"none\" or fill=\"#ffffff\" with stroke=\"#000000\" (or pastel colors). The <text> elements MUST be placed AFTER the shapes in the SVG code so they render on top. Use text-anchor=\"middle\" and dominant-baseline=\"middle\" to center text inside shapes. Ensure font sizes are readable.
+        CRITICAL RULE: You MUST use an SVG for the flowchart diagram in the question stem. You MUST ensure that the connecting lines between flowchart nodes DO NOT OVERLAP or intersect. The flowchart MUST contain 7 to 10 nodes (boxes/diamonds) and branching decision paths. You MUST aggressively minify the SVG code (use short text labels, remove line breaks, round coordinates) to prevent token limit cutoffs. Keep the layout linear or use a simple well-spaced tree structure to prevent visual confusion. PATH CONNECTION RULE: Ensure all paths connect cleanly without gaps. If two horizontal branches merge, you MUST explicitly draw a vertical line dropping down into the top point of the next node.
+        CRITICAL SVG STYLING: DO NOT generate solid black shapes that hide text! All shapes (<rect>, <polygon>, etc.) MUST use fill=\"none\" or fill=\"#ffffff\" with stroke=\"#000000\" (or pastel colors). The <text> elements MUST be placed AFTER the shapes in the SVG code so they render on top. ABSOLUTELY DO NOT USE <style> TAGS (they will get stripped by the system). You MUST place styling (font-weight, text-anchor=\"middle\", dominant-baseline=\"middle\") directly as inline attributes on the <text> elements or inside a <g> wrapper. CRITICAL SHAPE SIZE RULE: You MUST draw all nodes using explicit, very large dimensions to prevent text overflow. Use <rect width=\"200\" height=\"40\"> and ensure diamonds (<polygon>) are equally wide (e.g., spanning 200px horizontally). Adjust your 'x' and 'y' coordinates to properly center these large shapes within your SVG layout!
         The options (A to E) MUST NOT be SVGs; they must be purely text-based outputs or decisions. Keep the SVG clean and readable. The explanation must map out the deduction step-by-step through the diagram.";
                 } else {
                     $categorySpecificRules = "* Symbolic logic / abstract reasoning: You MUST generate visual-spatial geometric puzzles using raw, scalable SVG code. Output raw <svg viewBox=\"...\">...</svg> blocks directly inside the text. You MUST include SVG visuals not just in the question stem, but ALSO in every single option (Options A to E must be standalone SVGs showing the possible answers, do NOT use descriptive text for options). Keep SVGs clean with simple paths, <rect>, <circle>, or <polygon>.
@@ -430,62 +430,11 @@ class GenerateQuestionsJob implements ShouldQueue
                     }
                 };
 
-                $attemptGroq = function ($model) use ($systemPrompt, $userPrompt, &$resultText, &$errorMsg) {
-                    $groqKey = config('services.groq.key') ?: env('GROQ_API_KEY');
-                    if (! $groqKey) {
-                        $errorMsg = 'GROQ_API_KEY is missing.';
-
-                        return false;
-                    }
-
-                    try {
-                        $groqResponse = Http::withToken($groqKey)
-                            ->timeout(300)
-                            ->post('https://api.groq.com/openai/v1/chat/completions', [
-                                'model' => $model,
-                                'messages' => [
-                                    ['role' => 'system', 'content' => $systemPrompt],
-                                    ['role' => 'user', 'content' => $userPrompt],
-                                ],
-                                'temperature' => 0.7,
-                                'max_tokens' => 8192,
-                            ]);
-
-                        if ($groqResponse->successful()) {
-                            $result = $groqResponse->json();
-                            $resultText = $result['choices'][0]['message']['content'] ?? '';
-
-                            return true;
-                        } else {
-                            $body = $groqResponse->json();
-                            $errorMsg = $body['error']['message'] ?? $groqResponse->body();
-
-                            return false;
-                        }
-                    } catch (\Exception $e) {
-                        $errorMsg = 'Groq Exception: '.$e->getMessage();
-
-                        return false;
-                    }
-                };
-
-                $success = false;
-                $primaryIsGemini = str_starts_with($this->primaryModel, 'gemini');
-
-                if ($primaryIsGemini) {
-                    Log::info('GenerateQuestionsJob: Attempting Gemini model: '.$this->primaryModel);
-                    if ($attemptGemini($this->primaryModel)) {
-                        $success = true;
-                    } else {
-                        Log::warning('GenerateQuestionsJob: Gemini model '.$this->primaryModel.' failed: '.$errorMsg);
-                    }
+                Log::info('GenerateQuestionsJob: Attempting Gemini model: '.$this->primaryModel);
+                if (! $attemptGemini($this->primaryModel)) {
+                    $success = false;
                 } else {
-                    Log::info('GenerateQuestionsJob: Attempting Groq model: '.$this->primaryModel);
-                    if ($attemptGroq($this->primaryModel)) {
-                        $success = true;
-                    } else {
-                        Log::warning('GenerateQuestionsJob: Groq model '.$this->primaryModel.' failed: '.$errorMsg);
-                    }
+                    $success = true;
                 }
 
                 if (! $success) {
