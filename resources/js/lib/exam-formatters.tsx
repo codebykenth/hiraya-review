@@ -269,29 +269,31 @@ export const formatMarkdownInline = (text: string): React.ReactNode[] => {
     return parts.map((part, idx) => {
         if (idx % 2 === 1) {
             if (part.startsWith('**') && part.endsWith('**')) {
+                const inner = part.slice(2, -2).trim();
                 return (
                     <strong
                         key={idx}
                         className="font-extrabold text-slate-950 dark:text-white"
                     >
-                        {part.slice(2, -2)}
+                        {formatMathInlineBase(inner)}
                     </strong>
                 );
             }
 
             if (part.startsWith('*') && part.endsWith('*')) {
+                const inner = part.slice(1, -1).trim();
                 return (
                     <em
                         key={idx}
                         className="text-slate-900 italic dark:text-slate-100"
                     >
-                        {part.slice(1, -1)}
+                        {formatMathInlineBase(inner)}
                     </em>
                 );
             }
         }
 
-        return part;
+        return formatMathInlineBase(part);
     });
 };
 
@@ -843,7 +845,7 @@ export const renderFormattedText = (
                                     key={i}
                                     className="px-4 py-3 font-extrabold tracking-wider text-slate-500 uppercase dark:text-slate-400"
                                 >
-                                    {h}
+                                    {formatMarkdownInline(h)}
                                 </th>
                             ))}
                         </tr>
@@ -859,7 +861,7 @@ export const renderFormattedText = (
                                         key={ci}
                                         className="px-4 py-3 leading-relaxed font-semibold text-slate-700 dark:text-slate-300"
                                     >
-                                        {formatMathInline(cell)}
+                                        {formatMarkdownInline(cell)}
                                     </td>
                                 ))}
                             </tr>
