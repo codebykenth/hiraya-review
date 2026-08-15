@@ -217,10 +217,13 @@ export function useExamSubmission({
                 if (isDemographicQuestion(q)) {
                     return;
                 }
+
                 scoredTotal++;
+
                 if (answers[idx] !== undefined && answers[idx] !== null) {
                     answeredCount++;
                 }
+
                 if (flagged[idx]) {
                     flaggedCount++;
                 }
@@ -231,12 +234,15 @@ export function useExamSubmission({
             const title = unansweredCount > 0 ? 'Submit Exam with Unanswered Questions?' : 'Submit Examination?';
             
             let message = `You have answered ${answeredCount} of ${scoredTotal} graded questions.`;
+
             if (unansweredCount > 0) {
                 message += ` ⚠️ ${unansweredCount} question${unansweredCount > 1 ? 's are' : ' is'} left unanswered.`;
             }
+
             if (flaggedCount > 0) {
                 message += ` You also have ${flaggedCount} item${flaggedCount > 1 ? 's' : ''} flagged for review.`;
             }
+
             message += ' Once submitted, your exam will be finalized and graded immediately.';
 
             setConfirmModal({

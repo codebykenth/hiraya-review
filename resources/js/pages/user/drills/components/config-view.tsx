@@ -250,6 +250,7 @@ export function ConfigView({
                                     placeholder={`1-${filteredQCount}`}
                                     onFocus={() => {
                                         setIsCustomMode(true);
+
                                         if (typeof questionCount === 'number' && questionCount > 0) {
                                             setCustomInput(String(questionCount));
                                         }
@@ -258,10 +259,12 @@ export function ConfigView({
                                         const raw = e.target.value;
                                         setIsCustomMode(true);
                                         setCustomInput(raw);
+
                                         if (raw === '') {
                                             setQuestionCount('all');
                                         } else {
                                             const parsed = parseInt(raw, 10);
+
                                             if (!isNaN(parsed) && parsed > 0) {
                                                 const clamped = Math.min(filteredQCount, parsed);
                                                 setQuestionCount(clamped);

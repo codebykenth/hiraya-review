@@ -7,6 +7,15 @@ export interface StudySchedule {
     description?: string;
     subcategory_id?: number;
     is_done?: boolean;
+    subcategory?: {
+        id: number;
+        name: string;
+        category_id: number;
+        category?: {
+            id: number;
+            name: string;
+        };
+    };
     created_at: string;
     updated_at: string;
 }

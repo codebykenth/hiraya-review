@@ -15,6 +15,7 @@ export default function Dashboard({
     aiAnalysis,
     dailyGoal,
     todayTasks = [],
+    overdueTasksCount = 0,
     recentAttempts = [],
     nextModule,
 }: DashboardProps) {
@@ -63,6 +64,7 @@ export default function Dashboard({
                 {/* Card 4: Today's Tasks & Recent Exam Runs */}
                 <StudyScheduleActivityCard
                     todayTasks={todayTasks}
+                    overdueTasksCount={overdueTasksCount}
                     recentAttempts={recentAttempts}
                 />
             </div>

@@ -81,11 +81,16 @@ export function ScorecardView({
     const isActuallyTimed = isTimed && (savedAttempt ? savedAttempt.cat_scores?.metadata?.is_timed !== false : true);
 
     const activeTimeLimitSecs = useMemo(() => {
-        if (!isActuallyTimed) return 0;
+        if (!isActuallyTimed) {
+return 0;
+}
+
         if (isDrill) {
             const qCount = results?.total || activeQuestions?.length || 10;
+
             return qCount * 60;
         }
+
         return getActiveTimeLimitSecs();
     }, [isActuallyTimed, isDrill, results?.total, activeQuestions?.length, getActiveTimeLimitSecs]);
 
@@ -108,15 +113,18 @@ export function ScorecardView({
         if (setReviewStatusFilter) {
             setReviewStatusFilter('all');
         }
+
         if (setReviewCategoryFilter) {
             setReviewCategoryFilter('All Categories');
         }
+
         if (setCurrentIdx && activeQuestions && activeQuestions.length > 0) {
             const firstScoredIdx = activeQuestions.findIndex(
                 (q) => !q.isDemographic && q.category !== 'Demographic Profile',
             );
             setCurrentIdx(firstScoredIdx !== -1 ? firstScoredIdx : 0);
         }
+
         setReviewScreenActive(true);
     };
 
@@ -124,25 +132,34 @@ export function ScorecardView({
         if (setReviewStatusFilter) {
             setReviewStatusFilter('incorrect');
         }
+
         if (setReviewCategoryFilter) {
             setReviewCategoryFilter('All Categories');
         }
+
         if (setCurrentIdx && activeQuestions && answers) {
             const firstMistakeIdx = activeQuestions.findIndex((q, idx) => {
                 const isDemographic =
                     q.category === 'Demographic Profile' || q.isDemographic;
-                if (isDemographic) return false;
+
+                if (isDemographic) {
+return false;
+}
+
                 const chosen = answers[idx];
+
                 return (
                     chosen !== undefined &&
                     chosen !== null &&
                     Number(chosen) !== Number(q.correct_option)
                 );
             });
+
             if (firstMistakeIdx !== -1) {
                 setCurrentIdx(firstMistakeIdx);
             }
         }
+
         setReviewScreenActive(true);
     };
 
@@ -150,17 +167,21 @@ export function ScorecardView({
         if (setReviewCategoryFilter) {
             setReviewCategoryFilter(catName);
         }
+
         if (setReviewStatusFilter) {
             setReviewStatusFilter('all');
         }
+
         if (setCurrentIdx && activeQuestions && activeQuestions.length > 0) {
             const firstCatIdx = activeQuestions.findIndex(
                 (q) => q.category === catName,
             );
+
             if (firstCatIdx !== -1) {
                 setCurrentIdx(firstCatIdx);
             }
         }
+
         setReviewScreenActive(true);
     };
 
@@ -175,11 +196,18 @@ export function ScorecardView({
         .filter((c) => c.percentage < 80);
 
     const wrongQuestionIds = useMemo(() => {
-        if (!activeQuestions || !answers) return [];
+        if (!activeQuestions || !answers) {
+return [];
+}
+
         return activeQuestions
             .filter((q, idx) => {
-                if (q.category === 'Demographic Profile' || q.isDemographic) return false;
+                if (q.category === 'Demographic Profile' || q.isDemographic) {
+return false;
+}
+
                 const chosen = answers[idx];
+
                 return (
                     chosen !== undefined &&
                     chosen !== null &&
@@ -198,6 +226,7 @@ export function ScorecardView({
             params.set('is_timed', 'true');
             params.set('question_count', 'all');
             router.visit(`/exams?${params.toString()}`);
+
             return;
         }
 
@@ -209,6 +238,7 @@ export function ScorecardView({
             params.set('is_timed', 'true');
             params.set('question_count', '15');
             router.visit(`/exams?${params.toString()}`);
+
             return;
         }
 

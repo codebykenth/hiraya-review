@@ -36,6 +36,14 @@ export const mainCategories = [
 
 export function useCalendarState(initialProps: CalendarPageProps) {
     const [currentDate, setCurrentDate] = useState(new Date());
+    const [selectedWeekDate, setSelectedWeekDate] = useState(new Date());
+    const [activeView, setActiveView] = useState<'month' | 'week' | 'agenda'>(
+        'month',
+    );
+    const [selectedCategory, setSelectedCategory] = useState<'all' | number>(
+        'all',
+    );
+
     const initialSchedulesMap = useMemo(() => {
         const map = new Map<string, StudySchedule[]>();
 
@@ -97,6 +105,24 @@ export function useCalendarState(initialProps: CalendarPageProps) {
     const monthCacheRef = useRef<Map<string, any>>(new Map());
     const isInitialMount = useRef(true);
 
+    const isSnoozed = useCallback(() => {
+        if (typeof window === 'undefined') {
+return false;
+}
+
+        try {
+            const snoozedUntil = localStorage.getItem('study_plan_reminder_snoozed_until');
+
+            if (snoozedUntil && new Date(snoozedUntil).getTime() > Date.now()) {
+                return true;
+            }
+        } catch {
+            return false;
+        }
+
+        return false;
+    }, []);
+
     const [nextExam, setNextExam] = useState<{
         date: string;
         description: string;
@@ -106,10 +132,10 @@ export function useCalendarState(initialProps: CalendarPageProps) {
         initialProps.pastPending ?? [],
     );
     const [isReminderOpen, setIsReminderOpen] = useState(
-        (initialProps.pastPending ?? []).length > 0,
+        (initialProps.pastPending ?? []).length > 0 && !isSnoozed(),
     );
     const [hasShownReminder, setHasShownReminder] = useState(
-        (initialProps.pastPending ?? []).length > 0,
+        (initialProps.pastPending ?? []).length > 0 && !isSnoozed(),
     );
 
     const today = new Date();
@@ -165,7 +191,7 @@ export function useCalendarState(initialProps: CalendarPageProps) {
                 if (data.pastPending && data.pastPending.length > 0) {
                     setPastPending(data.pastPending);
 
-                    if (!hasShownReminder) {
+                    if (!hasShownReminder && !isSnoozed()) {
                         setIsReminderOpen(true);
                         setHasShownReminder(true);
                     }
@@ -176,7 +202,7 @@ export function useCalendarState(initialProps: CalendarPageProps) {
                 );
             }
         },
-        [currentDate, hasShownReminder],
+        [currentDate, hasShownReminder, isSnoozed],
     );
 
     useEffect(() => {
@@ -203,6 +229,87 @@ export function useCalendarState(initialProps: CalendarPageProps) {
             })();
         }
     }, [currentDate, fetchSchedules, subcategories.length]);
+
+    const getScheduleCategoryId = useCallback(
+        (schedule: StudySchedule): number | null => {
+            if (schedule.subcategory_id && subcategories.length > 0) {
+                const sub = subcategories.find(
+                    (s) => s.id === schedule.subcategory_id,
+                );
+
+                if (sub) {
+                    return sub.category_id;
+                }
+            }
+
+            const titleLower = schedule.title.toLowerCase();
+
+            if (
+                titleLower.includes('numerical') ||
+                titleLower.includes('math') ||
+                titleLower.includes('fraction') ||
+                titleLower.includes('pemdas') ||
+                titleLower.includes('operation')
+            ) {
+                return 4;
+            }
+
+            if (
+                titleLower.includes('verbal') ||
+                titleLower.includes('grammar') ||
+                titleLower.includes('vocabulary') ||
+                titleLower.includes('reading') ||
+                titleLower.includes('comprehension')
+            ) {
+                return 2;
+            }
+
+            if (
+                titleLower.includes('analytical') ||
+                titleLower.includes('logic') ||
+                titleLower.includes('abstract') ||
+                titleLower.includes('reasoning')
+            ) {
+                return 3;
+            }
+
+            if (
+                titleLower.includes('clerical') ||
+                titleLower.includes('filing') ||
+                titleLower.includes('alphabetizing') ||
+                titleLower.includes('spelling')
+            ) {
+                return 5;
+            }
+
+            if (
+                titleLower.includes('constitution') ||
+                titleLower.includes('general info') ||
+                titleLower.includes('philippine') ||
+                titleLower.includes('ra 6713') ||
+                titleLower.includes('conduct') ||
+                titleLower.includes('environment')
+            ) {
+                return 1;
+            }
+
+            return null;
+        },
+        [subcategories],
+    );
+
+    const filterScheduleByCategory = useCallback(
+        (schedule: StudySchedule): boolean => {
+            if (selectedCategory === 'all') {
+                return true;
+            }
+
+            const catId = getScheduleCategoryId(schedule);
+
+            return catId === selectedCategory;
+        },
+        [selectedCategory, getScheduleCategoryId],
+    );
 
     const daysInMonth = (date: Date) => {
         return new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
@@ -276,6 +383,90 @@ export function useCalendarState(initialProps: CalendarPageProps) {
 
         return result;
     }, [calendarDays]);
+
+    // Calculate the 7 days of the selected week for WeekView
+    const currentWeekDays = useMemo((): CalendarDay[] => {
+        const curr = new Date(selectedWeekDate);
+        const dayOfWeek = curr.getDay(); // 0 is Sunday
+        const sunday = new Date(curr);
+        sunday.setDate(curr.getDate() - dayOfWeek);
+
+        const days: CalendarDay[] = [];
+
+        for (let i = 0; i < 7; i++) {
+            const d = new Date(sunday);
+            d.setDate(sunday.getDate() + i);
+
+            const year = d.getFullYear();
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const dayNum = String(d.getDate()).padStart(2, '0');
+            const dateStr = `${year}-${month}-${dayNum}`;
+
+            const daySchedules = (schedules.get(dateStr) || []).filter(
+                filterScheduleByCategory,
+            );
+
+            days.push({
+                day: d.getDate(),
+                isCurrentMonth: d.getMonth() === currentDate.getMonth(),
+                date: dateStr,
+                schedules: daySchedules,
+            });
+        }
+
+        return days;
+    }, [
+        selectedWeekDate,
+        schedules,
+        filterScheduleByCategory,
+        currentDate,
+    ]);
+
+    const weekRangeLabel = useMemo(() => {
+        if (currentWeekDays.length < 7) {
+            return '';
+        }
+
+        const start = new Date(currentWeekDays[0].date + 'T00:00:00');
+        const end = new Date(currentWeekDays[6].date + 'T00:00:00');
+
+        const startMonth = start.toLocaleDateString('en-US', { month: 'short' });
+        const endMonth = end.toLocaleDateString('en-US', { month: 'short' });
+
+        if (startMonth === endMonth) {
+            return `${startMonth} ${start.getDate()} – ${end.getDate()}, ${start.getFullYear()}`;
+        }
+
+        return `${startMonth} ${start.getDate()} – ${endMonth} ${end.getDate()}, ${start.getFullYear()}`;
+    }, [currentWeekDays]);
+
+    const previousWeek = () => {
+        const prev = new Date(selectedWeekDate);
+        prev.setDate(prev.getDate() - 7);
+        setSelectedWeekDate(prev);
+
+        // Keep currentDate month in sync if week crosses into another month
+        if (prev.getMonth() !== currentDate.getMonth()) {
+            setCurrentDate(new Date(prev.getFullYear(), prev.getMonth(), 1));
+        }
+    };
+
+    const nextWeek = () => {
+        const next = new Date(selectedWeekDate);
+        next.setDate(next.getDate() + 7);
+        setSelectedWeekDate(next);
+
+        // Keep currentDate month in sync if week crosses into another month
+        if (next.getMonth() !== currentDate.getMonth()) {
+            setCurrentDate(new Date(next.getFullYear(), next.getMonth(), 1));
+        }
+    };
+
+    const jumpToTodayWeek = () => {
+        const now = new Date();
+        setSelectedWeekDate(now);
+        setCurrentDate(now);
+    };
 
     const previousMonth = () => {
         setCurrentDate(
@@ -728,9 +919,138 @@ export function useCalendarState(initialProps: CalendarPageProps) {
         });
     };
 
+    const handleDismissReminderWithSnooze = (snooze24h: boolean) => {
+        if (snooze24h && typeof window !== 'undefined') {
+            try {
+                const snoozedUntil = new Date(
+                    Date.now() + 24 * 60 * 60 * 1000,
+                ).toISOString();
+                localStorage.setItem(
+                    'study_plan_reminder_snoozed_until',
+                    snoozedUntil,
+                );
+            } catch (e) {
+                console.error('Failed to save snooze preference:', e);
+            }
+        }
+
+        setIsReminderOpen(false);
+    };
+
+    const handleBulkRescheduleAllToToday = async (ids?: number[]) => {
+        setIsLoading(true);
+
+        try {
+            const response = await fetch(
+                '/study-schedules/bulk-reschedule-today',
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN':
+                            document
+                                .querySelector('meta[name="csrf-token"]')
+                                ?.getAttribute('content') || '',
+                    },
+                    body: JSON.stringify({ ids: ids || [] }),
+                },
+            );
+
+            if (response.ok) {
+                monthCacheRef.current.clear();
+                await fetchSchedules(true);
+                setPastPending([]);
+                setIsReminderOpen(false);
+            } else {
+                const data = await response.json();
+                setErrorMessage(
+                    data.message || 'Failed to reschedule overdue tasks.',
+                );
+            }
+        } catch {
+            setErrorMessage(
+                'An error occurred while rescheduling overdue tasks.',
+            );
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const handleBulkMarkAllDone = async (ids?: number[]) => {
+        setIsLoading(true);
+
+        try {
+            const response = await fetch('/study-schedules/bulk-mark-done', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN':
+                        document
+                            .querySelector('meta[name="csrf-token"]')
+                            ?.getAttribute('content') || '',
+                },
+                body: JSON.stringify({ ids: ids || [] }),
+            });
+
+            if (response.ok) {
+                monthCacheRef.current.clear();
+                await fetchSchedules(true);
+                setPastPending([]);
+                setIsReminderOpen(false);
+            } else {
+                const data = await response.json();
+                setErrorMessage(
+                    data.message || 'Failed to mark tasks as completed.',
+                );
+            }
+        } catch {
+            setErrorMessage(
+                'An error occurred while marking tasks as completed.',
+            );
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const filteredWeeks = useMemo(() => {
+        if (selectedCategory === 'all') {
+            return weeks;
+        }
+
+        return weeks.map((week) =>
+            week.map((day) => ({
+                ...day,
+                schedules: day.schedules.filter(filterScheduleByCategory),
+            })),
+        );
+    }, [weeks, selectedCategory, filterScheduleByCategory]);
+
+    const filteredWeekDays = useMemo(() => {
+        if (selectedCategory === 'all') {
+            return currentWeekDays;
+        }
+
+        return currentWeekDays.map((day) => ({
+            ...day,
+            schedules: day.schedules.filter(filterScheduleByCategory),
+        }));
+    }, [currentWeekDays, selectedCategory, filterScheduleByCategory]);
+
+    const filteredPastPending = useMemo(() => {
+        if (selectedCategory === 'all') {
+            return pastPending;
+        }
+
+        return pastPending.filter(filterScheduleByCategory);
+    }, [pastPending, selectedCategory, filterScheduleByCategory]);
+
     return {
         currentDate,
         setCurrentDate,
+        activeView,
+        setActiveView,
+        selectedCategory,
+        setSelectedCategory,
         schedules,
         examDates,
         subcategories,
@@ -759,12 +1079,21 @@ export function useCalendarState(initialProps: CalendarPageProps) {
         bulkFormData,
         setBulkFormData,
         nextExam,
-        pastPending,
+        pastPending: filteredPastPending,
+        rawPastPending: pastPending,
         setPastPending,
         isReminderOpen,
         setIsReminderOpen,
         todayStr,
-        weeks,
+        weeks: filteredWeeks,
+        rawWeeks: weeks,
+        currentWeekDays: filteredWeekDays,
+        weekRangeLabel,
+        selectedWeekDate,
+        setSelectedWeekDate,
+        previousWeek,
+        nextWeek,
+        jumpToTodayWeek,
         previousMonth,
         nextMonth,
         openModal,
@@ -777,5 +1106,10 @@ export function useCalendarState(initialProps: CalendarPageProps) {
         handleRescheduleToToday,
         handleResetAll,
         handleDragSchedule,
+        handleDismissReminderWithSnooze,
+        handleBulkRescheduleAllToToday,
+        handleBulkMarkAllDone,
+        getScheduleCategoryId,
+        filterScheduleByCategory,
     };
 }

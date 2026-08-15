@@ -68,6 +68,32 @@ export function useExamState(props: ExamIndexProps) {
     const isDrillSession = selectedExamId === null || selectedExamId > 2;
 
     const details: SimulationDetails = useMemo(() => {
+        if (isDrillSession) {
+            const topic = drillCategoryName || 'Practice Drill';
+            const subcatText =
+                drillSubcategories.length === 1
+                    ? ` - ${drillSubcategories[0]}`
+                    : '';
+            const drillTitle = `${topic}${subcatText}`;
+
+            return {
+                title: drillTitle,
+                totalItems: activeQuestions.length || 30,
+                scoredItems: activeQuestions.length || 30,
+                timeLimit: isTimed ? `${Math.round((activeQuestions.length || 30))} Mins` : 'Untimed',
+                timeLimitSecs: isTimed ? (activeQuestions.length || 30) * 60 : 0,
+                targetPace: '60 sec / item',
+                allowedCategories: [
+                    'Demographic Profile',
+                    'Verbal Ability',
+                    'Analytical Ability',
+                    'Numerical Ability',
+                    'Clerical Ability',
+                    'General Information',
+                ],
+            };
+        }
+
         if (selectedExamId === 2) {
             return {
                 title: 'Subprofessional Level (CSC-PPT)',
@@ -101,7 +127,14 @@ export function useExamState(props: ExamIndexProps) {
                 'General Information',
             ],
         };
-    }, [selectedExamId]);
+    }, [
+        isDrillSession,
+        drillCategoryName,
+        drillSubcategories,
+        activeQuestions.length,
+        isTimed,
+        selectedExamId,
+    ]);
 
     // Sub-hook 1: Pool Builder
     const { buildFreshExamPool } = useExamPoolBuilder({
@@ -479,12 +512,15 @@ return [];
         if (!isTimed) {
             return 0;
         }
+
         if (sessionTimeLimitSecs > 0) {
             return sessionTimeLimitSecs;
         }
+
         if (drillCategoryId !== null || drillCategoryName !== null) {
             return (activeQuestions.length || 10) * 60;
         }
+
         return details.timeLimitSecs;
     }, [
         isTimed,

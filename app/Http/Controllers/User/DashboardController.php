@@ -187,6 +187,12 @@ class DashboardController
             'estimated_minutes' => $nextModuleModel->estimated_minutes,
         ] : null;
 
+        // --- OVERDUE TASKS COUNT ---
+        $overdueTasksCount = StudySchedule::where('user_id', $userId)
+            ->where('study_date', '<', Carbon::today())
+            ->where('is_done', false)
+            ->count();
+
         return Inertia::render('user/dashboard/index', [
             'stats' => [
                 'daysUntilExam' => $daysUntilExam,
@@ -204,6 +210,7 @@ class DashboardController
                 'goalTarget' => 20,
             ],
             'todayTasks' => $todayTasks,
+            'overdueTasksCount' => $overdueTasksCount,
             'recentAttempts' => $recentAttempts,
             'nextModule' => $nextModule,
         ]);

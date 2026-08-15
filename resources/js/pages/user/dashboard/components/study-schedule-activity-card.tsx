@@ -17,11 +17,13 @@ import type { TodayTaskItem, RecentAttemptItem } from '../types';
 
 interface StudyScheduleActivityCardProps {
     todayTasks?: TodayTaskItem[];
+    overdueTasksCount?: number;
     recentAttempts?: RecentAttemptItem[];
 }
 
 export function StudyScheduleActivityCard({
     todayTasks = [],
+    overdueTasksCount = 0,
     recentAttempts = [],
 }: StudyScheduleActivityCardProps) {
     const [tasks, setTasks] = useState(todayTasks);
@@ -83,6 +85,24 @@ export function StudyScheduleActivityCard({
 
             {/* Split Body */}
             <div className="my-4 space-y-4">
+                {/* Overdue Alert Banner if any */}
+                {overdueTasksCount > 0 && (
+                    <div className="flex items-center justify-between rounded-xl border border-amber-200/80 bg-amber-50/70 px-3 py-2 text-xs dark:border-amber-900/40 dark:bg-amber-950/20">
+                        <div className="flex items-center gap-2">
+                            <span className="size-2 rounded-full bg-amber-500 animate-pulse" />
+                            <span className="font-bold text-amber-900 dark:text-amber-300">
+                                {overdueTasksCount} overdue {overdueTasksCount === 1 ? 'task' : 'tasks'}
+                            </span>
+                        </div>
+                        <Link
+                            href={calendarIndex()}
+                            className="font-extrabold text-blue-600 hover:text-blue-700 dark:text-blue-400"
+                        >
+                            Resolve &rarr;
+                        </Link>
+                    </div>
+                )}
+
                 {/* Top Section: Today's Tasks */}
                 <div>
                     <div className="mb-2 flex items-center justify-between">

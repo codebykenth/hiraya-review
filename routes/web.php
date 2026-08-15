@@ -146,6 +146,8 @@ Route::middleware(['auth.or.fail', 'verified'])->group(function () {
         });
         Route::middleware('throttle:global-mutations')->group(function () {
             Route::post('/', 'store')->name('store');
+            Route::post('bulk-reschedule-today', 'bulkRescheduleToday')->name('bulkRescheduleToday');
+            Route::post('bulk-mark-done', 'bulkMarkDone')->name('bulkMarkDone');
             Route::delete('reset', 'destroyAll')->name('destroyAll');
             Route::put('bulk-time', 'bulkUpdateTime')->name('bulkUpdateTime');
             Route::put('{studySchedule}', 'update')->name('update');

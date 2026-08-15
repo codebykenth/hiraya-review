@@ -14,10 +14,10 @@ import {
     SlidersHorizontal,
 } from 'lucide-react';
 import React, { useState } from 'react';
-import { Card } from '@/components/ui/card';
 import { ConfirmModal } from '@/components/shared/confirm-modal';
-import { EditSavedSetDialog } from './edit-saved-set-dialog';
+import { Card } from '@/components/ui/card';
 import type { SavedDrillSet, Question, Category } from '../types';
+import { EditSavedSetDialog } from './edit-saved-set-dialog';
 
 interface SavedSetsViewProps {
     savedDrillSets: SavedDrillSet[];
@@ -45,9 +45,13 @@ export function SavedSetsView({
 
     const handleCreateSet = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!setName.trim()) return;
+
+        if (!setName.trim()) {
+return;
+}
 
         setIsSubmitting(true);
+
         try {
             const csrfToken =
                 (document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement)?.content || '';
@@ -80,9 +84,12 @@ export function SavedSetsView({
     };
 
     const handleConfirmDelete = async () => {
-        if (!setToDelete) return;
+        if (!setToDelete) {
+return;
+}
 
         setIsDeleting(true);
+
         try {
             const csrfToken =
                 (document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement)?.content || '';

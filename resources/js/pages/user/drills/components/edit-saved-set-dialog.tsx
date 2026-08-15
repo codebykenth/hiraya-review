@@ -68,10 +68,12 @@ export function EditSavedSetDialog({
 
     const fetchSetQuestions = async (setId: number) => {
         setIsLoadingQuestions(true);
+
         try {
             const res = await fetch(`/drills/saved-sets/${setId}/questions`, {
                 headers: { Accept: 'application/json' },
             });
+
             if (res.ok) {
                 const data = await res.json();
                 setSetQuestions(data.questions || []);
@@ -85,9 +87,13 @@ export function EditSavedSetDialog({
 
     const handleSaveDetails = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!drillSet || !name.trim()) return;
+
+        if (!drillSet || !name.trim()) {
+return;
+}
 
         setIsSavingDetails(true);
+
         try {
             const csrfToken =
                 (document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement)?.content || '';
@@ -121,9 +127,12 @@ export function EditSavedSetDialog({
     };
 
     const handleRemoveQuestion = async (questionId: number) => {
-        if (!drillSet) return;
+        if (!drillSet) {
+return;
+}
 
         setRemovingQuestionId(questionId);
+
         try {
             const csrfToken =
                 (document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement)?.content || '';
@@ -152,9 +161,12 @@ export function EditSavedSetDialog({
     };
 
     const handleAddQuestion = async (questionId: number) => {
-        if (!drillSet) return;
+        if (!drillSet) {
+return;
+}
 
         setAddingQuestionId(questionId);
+
         try {
             const csrfToken =
                 (document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement)?.content || '';
@@ -174,9 +186,11 @@ export function EditSavedSetDialog({
 
             if (res.ok) {
                 const addedQ = allQuestions.find((q) => q.id === questionId);
+
                 if (addedQ) {
                     setSetQuestions((prev) => [...prev, addedQ]);
                 }
+
                 toast.success('Question added to set.');
                 router.reload();
                 onUpdated?.();
@@ -197,19 +211,25 @@ export function EditSavedSetDialog({
         const query = searchQuery.toLowerCase().trim();
 
         return allQuestions.filter((q) => {
-            if (currentQuestionIds.has(q.id)) return false;
+            if (currentQuestionIds.has(q.id)) {
+return false;
+}
 
             if (selectedCategory !== 'all') {
                 const matches =
                     q.category.toLowerCase().includes(selectedCategory.toLowerCase()) ||
                     selectedCategory.toLowerCase().includes(q.category.toLowerCase());
-                if (!matches) return false;
+
+                if (!matches) {
+return false;
+}
             }
 
             if (query) {
                 const stemMatch = q.stem.toLowerCase().includes(query);
                 const subcatMatch = (q.subcategory || '').toLowerCase().includes(query);
                 const catMatch = (q.category || '').toLowerCase().includes(query);
+
                 return stemMatch || subcatMatch || catMatch;
             }
 
@@ -217,7 +237,9 @@ export function EditSavedSetDialog({
         });
     }, [allQuestions, currentQuestionIds, selectedCategory, searchQuery]);
 
-    if (!drillSet) return null;
+    if (!drillSet) {
+return null;
+}
 
     return (
         <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>

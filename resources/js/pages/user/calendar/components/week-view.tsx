@@ -18,11 +18,14 @@ import {
     Clock,
     CheckCircle2,
     Circle,
+    ChevronLeft,
+    ChevronRight,
     Dumbbell,
     BookOpen,
 } from 'lucide-react';
 import React from 'react';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import {
     Tooltip,
     TooltipContent,
@@ -30,26 +33,50 @@ import {
     TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { categoryNames } from '../hooks/use-calendar-state';
-import type { StudySchedule, CalendarDay, LearnModule } from '../types';
+import type { StudySchedule, CalendarDay } from '../types';
 
-function DroppableDay({ id, children, className, onClick }: any) {
+function DroppableWeekDay({
+    id,
+    children,
+    className,
+    onClick,
+}: {
+    id: string;
+    children: React.ReactNode;
+    className: string;
+    onClick?: () => void;
+}) {
     const { setNodeRef, isOver } = useDroppable({ id });
 
     return (
         <div
             ref={setNodeRef}
             onClick={onClick}
-            className={`${className} ${isOver ? 'bg-blue-50/50 ring-2 ring-blue-400 ring-inset dark:bg-blue-900/20 dark:ring-blue-500' : ''}`}
+            className={`${className} ${
+                isOver
+                    ? 'bg-blue-50/70 ring-2 ring-blue-500 ring-inset dark:bg-blue-900/30 dark:ring-blue-400'
+                    : ''
+            }`}
         >
             {children}
         </div>
     );
 }
 
-function DraggableSchedule({ schedule, children, className, onClick }: any) {
+function DraggableWeekSchedule({
+    schedule,
+    children,
+    className,
+    onClick,
+}: {
+    schedule: StudySchedule;
+    children: React.ReactNode;
+    className: string;
+    onClick?: (e: React.MouseEvent) => void;
+}) {
     const { attributes, listeners, setNodeRef, transform, isDragging } =
         useDraggable({
-            id: `schedule-${schedule.id}`,
+            id: `week-schedule-${schedule.id}`,
             data: { schedule },
         });
 
@@ -67,19 +94,22 @@ function DraggableSchedule({ schedule, children, className, onClick }: any) {
             {...attributes}
             {...listeners}
             onClick={onClick}
-            className={`${className} ${isDragging ? 'opacity-50 shadow-lg' : ''}`}
+            className={`${className} ${isDragging ? 'opacity-50 shadow-xl ring-2 ring-blue-500' : ''}`}
         >
             {children}
         </div>
     );
 }
 
-interface CalendarGridProps {
-    weeks: CalendarDay[][];
+interface WeekViewProps {
+    days: CalendarDay[];
     todayStr: string;
     examDates: string[];
     subcategories: Array<{ id: number; name: string; category_id: number }>;
-    learnModules: LearnModule[];
+    weekRangeLabel: string;
+    previousWeek: () => void;
+    nextWeek: () => void;
+    jumpToTodayWeek: () => void;
     openModal: (date: string) => void;
     openEditModal: (schedule: StudySchedule, date: string) => void;
     toggleScheduleDone: (
@@ -95,19 +125,22 @@ interface CalendarGridProps {
     ) => Promise<void>;
 }
 
-export function CalendarGrid({
-    weeks,
+export function WeekView({
+    days,
     todayStr,
     examDates,
     subcategories,
-    learnModules,
+    weekRangeLabel,
+    previousWeek,
+    nextWeek,
+    jumpToTodayWeek,
     openModal,
     openEditModal,
     toggleScheduleDone,
     handleDeleteSchedule,
     handleRescheduleToToday,
     handleDragSchedule,
-}: CalendarGridProps) {
+}: WeekViewProps) {
     const sensors = useSensors(
         useSensor(PointerSensor, {
             activationConstraint: {
@@ -115,6 +148,22 @@ export function CalendarGrid({
             },
         }),
     );
+
+    const customCollisionDetection: CollisionDetection = (args) => {
+        const pointerCollisions = pointerWithin(args);
+
+        if (pointerCollisions.length > 0) {
+            return pointerCollisions;
+        }
+
+        const rectCollisions = rectIntersection(args);
+
+        if (rectCollisions.length > 0) {
+            return rectCollisions;
+        }
+
+        return closestCenter(args);
+    };
 
     const handleDragEnd = (event: DragEndEvent) => {
         const { active, over } = event;
@@ -127,7 +176,6 @@ export function CalendarGrid({
         const sourceDate = schedule.study_date || schedule.date;
         const targetDate = over.id as string;
 
-        // Verify dates are different (ignore drops on the same day)
         if (sourceDate !== targetDate) {
             handleDragSchedule(schedule, sourceDate, targetDate);
         }
@@ -257,149 +305,157 @@ export function CalendarGrid({
         return { catName, catId, colorClasses, buildDrillUrl };
     };
 
-    // Collision detection prioritizing the exact pointer location over the center of the card
-    const customCollisionDetection: CollisionDetection = (args) => {
-        // 1. First priority: day cell directly under the cursor/pointer
-        const pointerCollisions = pointerWithin(args);
-
-        if (pointerCollisions.length > 0) {
-            return pointerCollisions;
+    const extractLinks = (description?: string) => {
+        if (!description) {
+            return [];
         }
 
-        // 2. Second priority: any intersecting day cell
-        const rectCollisions = rectIntersection(args);
+        const linkRegex = /\[(.*?)\]\((.*?)\)/g;
+        const links: Array<{ title: string; url: string }> = [];
+        let match;
 
-        if (rectCollisions.length > 0) {
-            return rectCollisions;
+        while ((match = linkRegex.exec(description)) !== null) {
+            links.push({ title: match[1], url: match[2] });
         }
 
-        // 3. Fallback: closest center
-        return closestCenter(args);
+        return links;
     };
 
+    const weekdayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
     return (
-        <div className="overflow-x-auto pb-4 [scrollbar-width:thin]">
-            <div className="min-w-[1400px] 2xl:min-w-full">
-                {/* Sticky Day headers */}
-                <div className="sticky top-0 z-20 mb-2 grid grid-cols-7 gap-2 rounded-lg bg-slate-50/95 py-2 backdrop-blur-sm dark:bg-slate-900/95">
-                    {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(
-                        (day) => (
-                            <div
-                                key={day}
-                                className="flex items-center justify-center font-bold text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400"
-                            >
-                                {day}
-                            </div>
-                        ),
-                    )}
+        <div className="space-y-4">
+            {/* Week Navigation Toolbar */}
+            <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-200/80 bg-slate-50/70 px-4 py-2.5 dark:border-slate-800 dark:bg-slate-900/60">
+                <div className="flex items-center gap-2">
+                    <Button
+                        variant="outline"
+                        size="icon"
+                        className="h-8 w-8"
+                        onClick={previousWeek}
+                        title="Previous Week"
+                    >
+                        <ChevronLeft className="size-4" />
+                    </Button>
+                    <Button
+                        variant="outline"
+                        size="icon"
+                        className="h-8 w-8"
+                        onClick={nextWeek}
+                        title="Next Week"
+                    >
+                        <ChevronRight className="size-4" />
+                    </Button>
+                    <span className="ml-2 text-sm font-black text-slate-800 dark:text-slate-200">
+                        {weekRangeLabel}
+                    </span>
                 </div>
 
-                {/* Calendar grid */}
-                <DndContext
-                    sensors={sensors}
-                    collisionDetection={customCollisionDetection}
-                    onDragEnd={handleDragEnd}
-                >
-                    <div className="space-y-2">
-                        {weeks.map((week, weekIndex) => (
-                            <div
-                                key={weekIndex}
-                                className="grid grid-cols-7 gap-2"
-                            >
-                                {week.map((calendarDay) => (
-                                    <DroppableDay
+                <div className="flex items-center gap-2">
+                    <Button
+                        size="sm"
+                        variant="outline"
+                        className="h-8 text-xs font-bold"
+                        onClick={jumpToTodayWeek}
+                    >
+                        This Week (Today)
+                    </Button>
+                </div>
+            </div>
+
+            {/* 7-Column Week Planner Grid */}
+            <div className="overflow-x-auto pb-2 [scrollbar-width:thin]">
+                <div className="min-w-[1400px] 2xl:min-w-full">
+                    <DndContext
+                        sensors={sensors}
+                        collisionDetection={customCollisionDetection}
+                        onDragEnd={handleDragEnd}
+                    >
+                        <div className="grid grid-cols-7 gap-3">
+                            {days.map((calendarDay, idx) => {
+                                const isCurrentDayToday = isToday(
+                                    calendarDay.date,
+                                );
+                                const isExamDay = examDates.includes(
+                                    calendarDay.date,
+                                );
+                                const dayDateObj = new Date(
+                                    calendarDay.date + 'T00:00:00',
+                                );
+
+                                return (
+                                    <DroppableWeekDay
                                         key={calendarDay.date}
                                         id={calendarDay.date}
                                         onClick={() => {
-                                            if (
-                                                calendarDay.isCurrentMonth &&
-                                                calendarDay.date >= todayStr
-                                            ) {
+                                            if (calendarDay.date >= todayStr) {
                                                 openModal(calendarDay.date);
                                             }
                                         }}
-                                        className={`group relative flex h-52 min-w-[190px] flex-col rounded-xl border p-2.5 transition-all ${
-                                            calendarDay.isCurrentMonth &&
-                                            calendarDay.date >= todayStr
-                                                ? 'cursor-pointer hover:border-blue-300 hover:shadow-sm'
-                                                : ''
-                                        } ${
-                                            examDates.includes(calendarDay.date)
-                                                ? 'border-red-400 bg-red-50 dark:border-red-900/50 dark:bg-red-950/20'
-                                                : isToday(calendarDay.date)
-                                                  ? 'border-blue-400 bg-blue-50 dark:border-blue-800 dark:bg-blue-900/20 dark:bg-blue-950/30'
-                                                  : calendarDay.isCurrentMonth
-                                                    ? 'border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-800/40'
-                                                    : 'border-slate-100 bg-slate-50 opacity-60 dark:border-slate-800/50 dark:bg-slate-900/20'
+                                        className={`group relative flex h-[520px] min-w-[200px] flex-col rounded-2xl border p-3 transition-all ${
+                                            isExamDay
+                                                ? 'border-red-300 bg-red-50/50 dark:border-red-900/50 dark:bg-red-950/20'
+                                                : isCurrentDayToday
+                                                  ? 'border-blue-400/80 bg-blue-50/40 shadow-sm ring-1 ring-blue-400/50 dark:border-blue-800 dark:bg-blue-950/20'
+                                                  : 'border-slate-200/80 bg-slate-50/40 dark:border-slate-800 dark:bg-slate-900/40'
                                         }`}
                                     >
-                                        <div className="flex shrink-0 items-center justify-between">
-                                            <span
-                                                className={`text-sm font-semibold ${
-                                                    examDates.includes(
-                                                        calendarDay.date,
-                                                    )
-                                                        ? 'text-red-900 dark:text-red-400'
-                                                        : isToday(
-                                                                calendarDay.date,
-                                                            )
-                                                          ? 'text-blue-900 dark:text-blue-400'
-                                                          : calendarDay.isCurrentMonth
-                                                            ? 'text-slate-900 dark:text-slate-100'
-                                                            : 'text-slate-400 dark:text-slate-500'
-                                                }`}
-                                            >
-                                                {examDates.includes(
-                                                    calendarDay.date,
-                                                ) && (
-                                                    <span className="mr-1 inline-block rounded-full bg-red-600 px-1.5 py-0.5 text-xs font-bold text-white">
-                                                        Exam Date
+                                        {/* Column Day Header */}
+                                        <div className="flex shrink-0 items-center justify-between border-b border-slate-200/60 pb-2 dark:border-slate-800">
+                                            <div className="flex items-center gap-1.5">
+                                                <span className="text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                                                    {weekdayNames[idx]}
+                                                </span>
+                                                <span
+                                                    className={`flex size-6 items-center justify-center rounded-md font-black text-xs ${
+                                                        isCurrentDayToday
+                                                            ? 'bg-blue-600 text-white shadow-sm'
+                                                            : 'text-slate-800 dark:text-slate-200'
+                                                    }`}
+                                                >
+                                                    {dayDateObj.getDate()}
+                                                </span>
+                                            </div>
+
+                                            <div className="flex items-center gap-1">
+                                                {isCurrentDayToday && (
+                                                    <span className="rounded bg-blue-100 px-1 py-0.2 text-[9px] font-black text-blue-700 dark:bg-blue-950 dark:text-blue-300">
+                                                        Today
                                                     </span>
                                                 )}
-                                                {isToday(calendarDay.date) &&
-                                                    !examDates.includes(
-                                                        calendarDay.date,
-                                                    ) && (
-                                                        <span className="mr-1 inline-block rounded-full bg-blue-600 px-1.5 py-0.5 text-xs font-bold text-white">
-                                                            Today
-                                                        </span>
-                                                    )}
-                                                {calendarDay.day}
-                                            </span>
-                                            {calendarDay.isCurrentMonth &&
-                                                calendarDay.date >=
-                                                    todayStr && (
-                                                    <TooltipProvider
-                                                        delayDuration={150}
-                                                    >
-                                                        <Tooltip>
-                                                            <TooltipTrigger
-                                                                asChild
-                                                            >
-                                                                <button
-                                                                    onClick={(
-                                                                        e,
-                                                                    ) => {
-                                                                        e.stopPropagation();
-                                                                        openModal(
-                                                                            calendarDay.date,
-                                                                        );
-                                                                    }}
-                                                                    className="rounded p-1 opacity-100 transition-opacity hover:bg-blue-100 lg:opacity-0 lg:group-hover:opacity-100 dark:hover:bg-blue-900/30"
-                                                                >
-                                                                    <Plus className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-                                                                </button>
-                                                            </TooltipTrigger>
-                                                            <TooltipContent>
-                                                                Add study item
-                                                            </TooltipContent>
-                                                        </Tooltip>
-                                                    </TooltipProvider>
+                                                {isExamDay && (
+                                                    <span className="rounded bg-red-600 px-1 py-0.2 text-[9px] font-black text-white">
+                                                        Exam
+                                                    </span>
                                                 )}
+                                                <TooltipProvider
+                                                    delayDuration={150}
+                                                >
+                                                    <Tooltip>
+                                                        <TooltipTrigger asChild>
+                                                            <button
+                                                                type="button"
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    openModal(
+                                                                        calendarDay.date,
+                                                                    );
+                                                                }}
+                                                                className="rounded-lg p-1 text-slate-400 transition hover:bg-slate-200 hover:text-slate-700 dark:hover:bg-slate-800 dark:hover:text-slate-200"
+                                                            >
+                                                                <Plus className="size-3.5" />
+                                                            </button>
+                                                        </TooltipTrigger>
+                                                        <TooltipContent>
+                                                            Add study session
+                                                        </TooltipContent>
+                                                    </Tooltip>
+                                                </TooltipProvider>
+                                            </div>
                                         </div>
 
-                                        {/* Study items for this day with smooth scrollbar */}
-                                        <div className="mt-1.5 min-h-0 flex-1 space-y-1 overflow-y-auto pr-0.5 [scrollbar-width:thin]">
+                                        {/* Task Cards in this Day Column with dedicated vertical scroll */}
+                                        <div className="mt-2.5 min-h-0 flex-1 space-y-2 overflow-y-auto pr-1 [scrollbar-width:thin]">
                                             {calendarDay.schedules.map(
                                                 (schedule) => {
                                                     const isOverdue =
@@ -414,7 +470,9 @@ export function CalendarGrid({
                                                         schedule.title,
                                                         schedule.subcategory_id,
                                                     );
-
+                                                    const links = extractLinks(
+                                                        schedule.description,
+                                                    );
                                                     const cleanDesc = (
                                                         schedule.description ||
                                                         ''
@@ -433,33 +491,11 @@ export function CalendarGrid({
                                                         )
                                                         .trim();
 
-                                                    const linkRegex =
-                                                        /\[(.*?)\]\((.*?)\)/g;
-                                                    const rawLinks: Array<{
-                                                        title: string;
-                                                        url: string;
-                                                    }> = [];
-                                                    let match;
-                                                    while (
-                                                        (match =
-                                                            linkRegex.exec(
-                                                                schedule.description ||
-                                                                    '',
-                                                            )) !== null
-                                                    ) {
-                                                        rawLinks.push({
-                                                            title: match[1],
-                                                            url: match[2],
-                                                        });
-                                                    }
-
                                                     return (
-                                                        <DraggableSchedule
+                                                        <DraggableWeekSchedule
                                                             key={schedule.id}
                                                             schedule={schedule}
-                                                            onClick={(
-                                                                e: React.MouseEvent,
-                                                            ) => {
+                                                            onClick={(e) => {
                                                                 e.stopPropagation();
                                                                 openEditModal(
                                                                     schedule,
@@ -474,7 +510,7 @@ export function CalendarGrid({
                                                                       : `${colorClasses.border} ${colorClasses.bg}`
                                                             }`}
                                                         >
-                                                            {/* Top Line: Checkbox, Title, Action Buttons */}
+                                                            {/* Top Line: Checkbox, Title, Badges */}
                                                             <div className="flex items-start gap-2">
                                                                 <button
                                                                     type="button"
@@ -607,7 +643,7 @@ export function CalendarGrid({
                                                                         Drill
                                                                     </span>
                                                                 </Link>
-                                                                {rawLinks.map(
+                                                                {links.map(
                                                                     (
                                                                         link,
                                                                         i,
@@ -636,17 +672,26 @@ export function CalendarGrid({
                                                                     ),
                                                                 )}
                                                             </div>
-                                                        </DraggableSchedule>
+                                                        </DraggableWeekSchedule>
                                                     );
                                                 },
                                             )}
+
+                                            {calendarDay.schedules.length ===
+                                                0 && (
+                                                <div className="flex h-32 flex-col items-center justify-center rounded-xl border border-dashed border-slate-200 p-2 text-center text-slate-400 dark:border-slate-800 dark:text-slate-500">
+                                                    <span className="text-[11px]">
+                                                        No tasks
+                                                    </span>
+                                                </div>
+                                            )}
                                         </div>
-                                    </DroppableDay>
-                                ))}
-                            </div>
-                        ))}
-                    </div>
-                </DndContext>
+                                    </DroppableWeekDay>
+                                );
+                            })}
+                        </div>
+                    </DndContext>
+                </div>
             </div>
         </div>
     );

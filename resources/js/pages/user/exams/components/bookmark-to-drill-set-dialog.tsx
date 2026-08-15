@@ -44,7 +44,9 @@ export function BookmarkToDrillSetDialog({
     question,
     onSaved,
 }: BookmarkToDrillSetDialogProps) {
-    if (!question) return null;
+    if (!question) {
+return null;
+}
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
@@ -86,9 +88,11 @@ function BookmarkForm({
                 if (isMounted) {
                     const fetchedSets = data.sets || [];
                     setSets(fetchedSets);
+
                     if (fetchedSets.length > 0) {
                         setSelectedSetId(fetchedSets[0].id);
                     }
+
                     setIsLoadingSets(false);
                 }
             })

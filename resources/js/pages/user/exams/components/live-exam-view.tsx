@@ -41,6 +41,7 @@ import QuestionPalettePanel from './question-palette-panel';
 
 interface LiveExamViewProps {
     details: SimulationDetails;
+    isDrillSession?: boolean;
     activeQuestions: Question[];
     currentIdx: number;
     isTimed: boolean;
@@ -70,6 +71,7 @@ interface LiveExamViewProps {
 
 export function LiveExamView({
     details,
+    isDrillSession = false,
     activeQuestions,
     currentIdx,
     isTimed,
@@ -476,21 +478,31 @@ export function LiveExamView({
                         <div className="flex min-w-0 items-center gap-1.5">
                             <button
                                 onClick={handleExitExam}
-                                title="Exit Exam"
+                                title={isDrillSession ? 'Exit Drill' : 'Exit Exam'}
                                 className="group flex h-8 shrink-0 items-center gap-1 rounded-md px-2 text-xs font-bold text-muted-foreground transition hover:bg-accent hover:text-foreground focus-visible:outline-none"
                             >
                                 <ChevronLeft className="size-4" />
                                 <span className="hidden sm:inline">
-                                    Exit Exam
+                                    {isDrillSession ? 'Exit Drill' : 'Exit Exam'}
                                 </span>
                             </button>
 
                             <div className="h-4 w-px shrink-0 bg-border" />
 
-                            <span className="shrink-0 rounded-md bg-blue-50 px-2 py-0.5 text-[10px] font-extrabold tracking-wider text-blue-600 uppercase dark:bg-blue-950/30 dark:text-blue-400">
-                                <span className="md:hidden">Live</span>
+                            <span
+                                className={`shrink-0 rounded-md px-2 py-0.5 text-[10px] font-extrabold tracking-wider uppercase ${
+                                    isDrillSession
+                                        ? 'bg-purple-50 text-purple-700 dark:bg-purple-950/40 dark:text-purple-300'
+                                        : 'bg-blue-50 text-blue-600 dark:bg-blue-950/30 dark:text-blue-400'
+                                }`}
+                            >
+                                <span className="md:hidden">
+                                    {isDrillSession ? 'Drill' : 'Live'}
+                                </span>
                                 <span className="hidden md:inline">
-                                    Live Simulation
+                                    {isDrillSession
+                                        ? 'Practice Drill'
+                                        : 'Live Simulation'}
                                 </span>
                             </span>
 

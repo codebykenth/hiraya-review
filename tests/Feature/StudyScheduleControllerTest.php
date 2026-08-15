@@ -197,3 +197,70 @@ test('index returns past uncompleted study schedules', function () {
     $response->assertJsonCount(1, 'pastPending');
     $this->assertEquals('Yesterday Uncompleted Task', $response->json('pastPending.0.title'));
 });
+
+test('user can bulk reschedule overdue tasks to today', function () {
+    $user = User::factory()->create();
+    $pastDate = now()->subDays(2)->format('Y-m-d');
+    $today = now()->format('Y-m-d');
+
+    $s1 = StudySchedule::create([
+        'user_id' => $user->id,
+        'study_date' => $pastDate,
+        'title' => 'Past Task 1',
+        'is_done' => false,
+    ]);
+
+    $s2 = StudySchedule::create([
+        'user_id' => $user->id,
+        'study_date' => $pastDate,
+        'title' => 'Past Task 2',
+        'is_done' => false,
+    ]);
+
+    $response = $this->actingAs($user)->postJson('/study-schedules/bulk-reschedule-today');
+
+    $response->assertStatus(200);
+    $response->assertJsonPath('count', 2);
+
+    $this->assertDatabaseHas('study_schedules', [
+        'id' => $s1->id,
+        'study_date' => $today,
+    ]);
+    $this->assertDatabaseHas('study_schedules', [
+        'id' => $s2->id,
+        'study_date' => $today,
+    ]);
+});
+
+test('user can bulk mark overdue tasks as completed', function () {
+    $user = User::factory()->create();
+    $pastDate = now()->subDays(3)->format('Y-m-d');
+
+    $s1 = StudySchedule::create([
+        'user_id' => $user->id,
+        'study_date' => $pastDate,
+        'title' => 'Past Task 1',
+        'is_done' => false,
+    ]);
+
+    $s2 = StudySchedule::create([
+        'user_id' => $user->id,
+        'study_date' => $pastDate,
+        'title' => 'Past Task 2',
+        'is_done' => false,
+    ]);
+
+    $response = $this->actingAs($user)->postJson('/study-schedules/bulk-mark-done');
+
+    $response->assertStatus(200);
+    $response->assertJsonPath('count', 2);
+
+    $this->assertDatabaseHas('study_schedules', [
+        'id' => $s1->id,
+        'is_done' => true,
+    ]);
+    $this->assertDatabaseHas('study_schedules', [
+        'id' => $s2->id,
+        'is_done' => true,
+    ]);
+});

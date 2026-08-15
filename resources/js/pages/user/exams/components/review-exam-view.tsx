@@ -37,8 +37,8 @@ import type {
     ExamResults,
     ReviewStatusFilter,
 } from '../types';
-import QuestionPalettePanel from './question-palette-panel';
 import { BookmarkToDrillSetDialog } from './bookmark-to-drill-set-dialog';
+import QuestionPalettePanel from './question-palette-panel';
 
 interface ReviewExamViewProps {
     details: SimulationDetails;
@@ -220,8 +220,12 @@ export function ReviewExamView({
     const wrongQuestionIds = useMemo(() => {
         return activeQuestions
             .filter((q, idx) => {
-                if (q.category === 'Demographic Profile' || q.isDemographic) return false;
+                if (q.category === 'Demographic Profile' || q.isDemographic) {
+return false;
+}
+
                 const chosen = answers[idx];
+
                 return (
                     chosen !== undefined &&
                     chosen !== null &&
@@ -232,20 +236,28 @@ export function ReviewExamView({
     }, [activeQuestions, answers]);
 
     const handleDrillCurrentTopic = (q: Question | undefined) => {
-        if (!q) return;
+        if (!q) {
+return;
+}
+
         const params = new URLSearchParams();
         params.set('drill', 'true');
         params.set('category_name', q.category);
+
         if (q.subcategory) {
             params.set('subcategories', JSON.stringify([q.subcategory]));
         }
+
         params.set('is_timed', 'true');
         params.set('question_count', '10');
         router.visit(`/exams?${params.toString()}`);
     };
 
     const handleDrillAllMistakes = () => {
-        if (wrongQuestionIds.length === 0) return;
+        if (wrongQuestionIds.length === 0) {
+return;
+}
+
         const params = new URLSearchParams();
         params.set('drill', 'true');
         params.set('category_name', 'Mistakes Review Drill');
@@ -487,12 +499,14 @@ export function ReviewExamView({
                 if (category !== 'All Categories' && q.category !== category) {
                     return false;
                 }
+
                 if (
                     subcategory !== 'All Subcategories' &&
                     (q.subcategory || 'General Concepts') !== subcategory
                 ) {
                     return false;
                 }
+
                 const chosen = answers[idx];
                 const isCorrect =
                     chosen !== undefined &&
@@ -504,12 +518,15 @@ export function ReviewExamView({
                 if (status === 'correct' && (isDemographic || !isCorrect)) {
                     return false;
                 }
+
                 if (status === 'incorrect' && (isDemographic || isCorrect)) {
                     return false;
                 }
+
                 if (status === 'flagged' && !flagged[idx]) {
                     return false;
                 }
+
                 return true;
             });
         },
@@ -525,6 +542,7 @@ export function ReviewExamView({
                 'All Subcategories',
                 reviewStatusFilter,
             );
+
             if (firstMatch !== -1) {
                 setCurrentIdx(firstMatch);
             }
@@ -546,6 +564,7 @@ export function ReviewExamView({
                 subcat,
                 reviewStatusFilter,
             );
+
             if (firstMatch !== -1) {
                 setCurrentIdx(firstMatch);
             }
@@ -567,6 +586,7 @@ export function ReviewExamView({
                 reviewSubcategoryFilter,
                 status,
             );
+
             if (firstMatch !== -1) {
                 setCurrentIdx(firstMatch);
             }
@@ -583,12 +603,14 @@ export function ReviewExamView({
     // Safeguard: Automatically jump to 1st matching question if currentIdx is out of bounds or doesn't match active filters
     useEffect(() => {
         const currentQ = activeQuestions[currentIdx];
+
         if (!currentQ || !isCurrentMatch(currentQ, currentIdx)) {
             const firstMatch = findFirstMatchingIndex(
                 reviewCategoryFilter,
                 reviewSubcategoryFilter,
                 reviewStatusFilter,
             );
+
             if (firstMatch !== -1) {
                 setCurrentIdx(firstMatch);
             }

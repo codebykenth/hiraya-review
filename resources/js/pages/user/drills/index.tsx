@@ -26,6 +26,7 @@ export default function Drills(props: DrillsProps) {
         if (typeof window !== 'undefined') {
             const params = new URLSearchParams(window.location.search);
             const tabParam = params.get('tab');
+
             if (tabParam === 'custom' || tabParam === 'saved' || tabParam === 'categories') {
                 setActiveTab(tabParam);
             }
@@ -82,7 +83,9 @@ export default function Drills(props: DrillsProps) {
             const data = await res.json();
             const setQuestions = data.questions || [];
 
-            if (setQuestions.length === 0) return;
+            if (setQuestions.length === 0) {
+return;
+}
 
             if (typeof window !== 'undefined') {
                 localStorage.removeItem('active_exam_session');

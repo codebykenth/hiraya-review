@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\User;
 
+use App\Http\Requests\BulkMarkDoneRequest;
+use App\Http\Requests\BulkRescheduleTodayRequest;
 use App\Http\Requests\BulkUpdateStudyTimeRequest;
 use App\Http\Requests\StoreStudyScheduleRequest;
 use App\Http\Requests\UpdateStudyScheduleRequest;
@@ -42,6 +44,7 @@ class StudyScheduleController
         $endDate = $startDate->copy()->endOfMonth();
 
         $schedules = StudySchedule::where('user_id', Auth::id())
+            ->with(['subcategory.category'])
             ->whereBetween('study_date', [$startDate, $endDate])
             ->get()
             ->groupBy(function ($schedule) {
@@ -70,6 +73,7 @@ class StudyScheduleController
 
         // Fetch past pending uncompleted tasks
         $pastPending = StudySchedule::where('user_id', Auth::id())
+            ->with(['subcategory.category'])
             ->where('study_date', '<', Carbon::today())
             ->where('is_done', false)
             ->orderBy('study_date', 'asc')
@@ -109,6 +113,7 @@ class StudyScheduleController
         $endDate = $startDate->copy()->endOfMonth();
 
         $schedules = StudySchedule::where('user_id', Auth::id())
+            ->with(['subcategory.category'])
             ->whereBetween('study_date', [$startDate, $endDate])
             ->get()
             ->groupBy(function ($schedule) {
@@ -132,6 +137,7 @@ class StudyScheduleController
         }
 
         $pastPending = StudySchedule::where('user_id', Auth::id())
+            ->with(['subcategory.category'])
             ->where('study_date', '<', Carbon::today())
             ->where('is_done', false)
             ->orderBy('study_date', 'asc')
@@ -244,6 +250,50 @@ class StudyScheduleController
         ]);
 
         return response()->json(['message' => 'Study times updated successfully.']);
+    }
+
+    public function bulkRescheduleToday(BulkRescheduleTodayRequest $request)
+    {
+        $validated = $request->validated();
+        $query = StudySchedule::where('user_id', Auth::id())
+            ->where('is_done', false);
+
+        if (! empty($validated['ids'])) {
+            $query->whereIn('id', $validated['ids']);
+        } else {
+            $query->where('study_date', '<', Carbon::today());
+        }
+
+        $count = $query->update([
+            'study_date' => Carbon::today()->toDateString(),
+        ]);
+
+        return response()->json([
+            'message' => "Successfully rescheduled {$count} study sessions to today.",
+            'count' => $count,
+        ]);
+    }
+
+    public function bulkMarkDone(BulkMarkDoneRequest $request)
+    {
+        $validated = $request->validated();
+        $query = StudySchedule::where('user_id', Auth::id());
+
+        if (! empty($validated['ids'])) {
+            $query->whereIn('id', $validated['ids']);
+        } else {
+            $query->where('study_date', '<', Carbon::today())
+                ->where('is_done', false);
+        }
+
+        $count = $query->update([
+            'is_done' => true,
+        ]);
+
+        return response()->json([
+            'message' => "Successfully marked {$count} study sessions as completed.",
+            'count' => $count,
+        ]);
     }
 
     public function destroyAll()

@@ -88,9 +88,13 @@ export function CustomBuilderView({
     const toggleCategory = (catName: string) => {
         setSelectedCategories((prev) => {
             if (prev.includes(catName)) {
-                if (prev.length === 1) return prev; // Keep at least one
+                if (prev.length === 1) {
+return prev;
+} // Keep at least one
+
                 return prev.filter((c) => c !== catName);
             }
+
             return [...prev, catName];
         });
     };
@@ -115,17 +119,27 @@ export function CustomBuilderView({
                     q.category.toLowerCase().includes(c.toLowerCase()) ||
                     c.toLowerCase().includes(q.category.toLowerCase()),
             );
-            if (!matchesCat) return false;
+
+            if (!matchesCat) {
+return false;
+}
 
             // Language match
             const qLang = (q.language || '').toLowerCase();
-            if (language === 'English' && qLang.includes('filipino')) return false;
-            if (language === 'Filipino' && !qLang.includes('filipino') && !qLang.includes('tagalog')) return false;
+
+            if (language === 'English' && qLang.includes('filipino')) {
+return false;
+}
+
+            if (language === 'Filipino' && !qLang.includes('filipino') && !qLang.includes('tagalog')) {
+return false;
+}
 
             // Pool Filter match
             if (poolFilter === 'mistakes') {
                 return wrongSet.has(q.id);
             }
+
             if (poolFilter === 'unseen') {
                 return !seenSet.has(q.id);
             }
@@ -138,8 +152,12 @@ export function CustomBuilderView({
 
     // Filtered matching questions in Manual Mode with Search Query
     const displayedManualQuestions = useMemo(() => {
-        if (!manualSearchQuery.trim()) return matchingQuestions;
+        if (!manualSearchQuery.trim()) {
+return matchingQuestions;
+}
+
         const query = manualSearchQuery.toLowerCase().trim();
+
         return matchingQuestions.filter(
             (q) =>
                 q.stem.toLowerCase().includes(query) ||
@@ -150,32 +168,54 @@ export function CustomBuilderView({
 
     // Dynamic question count choices for Auto Mode
     const dynamicCountOptions = useMemo(() => {
-        if (poolSize === 0) return [];
+        if (poolSize === 0) {
+return [];
+}
+
         const options: (number | 'all')[] = [];
 
         if (poolSize <= 8) {
-            if (poolSize > 3) options.push(3);
+            if (poolSize > 3) {
+options.push(3);
+}
         } else if (poolSize <= 15) {
             options.push(5);
-            if (poolSize > 10) options.push(10);
+
+            if (poolSize > 10) {
+options.push(10);
+}
         } else if (poolSize <= 30) {
             options.push(10);
-            if (poolSize > 20) options.push(20);
+
+            if (poolSize > 20) {
+options.push(20);
+}
         } else {
             options.push(10, 15, 20, 30);
         }
 
         options.push('all');
+
         return options;
     }, [poolSize]);
 
     const effectiveAutoCount = useMemo(() => {
-        if (poolSize === 0) return 0;
-        if (questionCount === 'all') return poolSize;
+        if (poolSize === 0) {
+return 0;
+}
+
+        if (questionCount === 'all') {
+return poolSize;
+}
+
         if (typeof questionCount === 'number') {
-            if (questionCount <= 0) return Math.min(10, poolSize);
+            if (questionCount <= 0) {
+return Math.min(10, poolSize);
+}
+
             return Math.min(questionCount, poolSize);
         }
+
         return Math.min(10, poolSize);
     }, [questionCount, poolSize]);
 
@@ -183,11 +223,13 @@ export function CustomBuilderView({
     const activeSelectedQuestions = useMemo(() => {
         if (builderMode === 'manual') {
             const manualSet = new Set(selectedManualIds);
+
             return matchingQuestions.filter((q) => manualSet.has(q.id));
         }
 
         // Auto mode
         const shuffled = [...matchingQuestions].sort(() => 0.5 - Math.random());
+
         return shuffled.slice(0, effectiveAutoCount);
     }, [builderMode, selectedManualIds, matchingQuestions, effectiveAutoCount]);
 
@@ -211,9 +253,12 @@ export function CustomBuilderView({
 
     // Start Drill
     const handleStart = () => {
-        if (activeSelectedQuestions.length === 0) return;
+        if (activeSelectedQuestions.length === 0) {
+return;
+}
 
         let title = 'Custom Multi-Topic Drill';
+
         if (builderMode === 'manual') {
             title = 'Curated Practice Drill';
         } else if (poolFilter === 'mistakes') {
@@ -229,6 +274,7 @@ export function CustomBuilderView({
     const handleOpenSaveModal = () => {
         if (totalSelectedCount === 0) {
             toast.error('Select at least one question to save a practice set.');
+
             return;
         }
 
@@ -240,9 +286,13 @@ export function CustomBuilderView({
 
     const handleSavePracticeSet = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!savedSetName.trim()) return;
+
+        if (!savedSetName.trim()) {
+return;
+}
 
         setIsSavingSet(true);
+
         try {
             const csrfToken =
                 (document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement)?.content || '';
@@ -672,6 +722,7 @@ export function CustomBuilderView({
                                                         placeholder={`1 - ${poolSize}`}
                                                         onFocus={() => {
                                                             setIsCustomCount(true);
+
                                                             if (typeof questionCount === 'number' && questionCount > 0) {
                                                                 setCustomCountInput(String(questionCount));
                                                             }
@@ -680,10 +731,12 @@ export function CustomBuilderView({
                                                             const raw = e.target.value;
                                                             setIsCustomCount(true);
                                                             setCustomCountInput(raw);
+
                                                             if (raw === '') {
                                                                 setQuestionCount(0);
                                                             } else {
                                                                 const parsed = parseInt(raw, 10);
+
                                                                 if (!isNaN(parsed) && parsed > 0) {
                                                                     const clamped = Math.min(poolSize, parsed);
                                                                     setQuestionCount(clamped);

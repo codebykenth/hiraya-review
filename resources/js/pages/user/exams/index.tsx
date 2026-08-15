@@ -135,6 +135,7 @@ export default function ExamIndex(props: ExamIndexProps) {
             >
                 <LiveExamView
                     details={details}
+                    isDrillSession={isDrillSession}
                     activeQuestions={activeQuestions}
                     currentIdx={currentIdx}
                     isTimed={isTimed}

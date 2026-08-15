@@ -111,6 +111,7 @@ export interface DashboardProps {
     };
     dailyGoal?: DailyGoalStats;
     todayTasks?: TodayTaskItem[];
+    overdueTasksCount?: number;
     recentAttempts?: RecentAttemptItem[];
     nextModule?: NextModuleItem | null;
 }
