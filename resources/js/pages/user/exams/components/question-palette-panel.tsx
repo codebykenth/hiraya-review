@@ -7,12 +7,14 @@ import {
     LayoutGrid,
 } from 'lucide-react';
 import React, { useMemo } from 'react';
+import type { Question, ReviewStatusFilter, LiveStatusFilter } from '../types';
+import { isDemographicQuestion } from '../utils/exam-utils';
 
 export interface QuestionPalettePanelProps {
     mode: 'exam' | 'review';
-    questions: any[];
+    questions: Question[];
     currentIdx: number;
-    answers: Record<number, any>;
+    answers: Record<number, number>;
     flagged: Record<number, boolean>;
     onNavigate: (idx: number) => void;
 
@@ -23,18 +25,14 @@ export interface QuestionPalettePanelProps {
     isFreeAttempt?: boolean;
     onSubmitExam?: () => void;
 
-    reviewStatusFilter?: 'all' | 'correct' | 'incorrect' | 'flagged';
+    reviewStatusFilter?: ReviewStatusFilter;
     reviewSubcategoryFilter?: string;
-    onReviewStatusChange?: (
-        status: 'all' | 'correct' | 'incorrect' | 'flagged',
-    ) => void;
+    onReviewStatusChange?: (status: ReviewStatusFilter) => void;
     onReviewSubcategoryChange?: (subcat: string) => void;
     reviewSubcategories?: string[];
 
-    liveStatusFilter?: 'all' | 'unanswered' | 'answered' | 'flagged';
-    onLiveStatusChange?: (
-        status: 'all' | 'unanswered' | 'answered' | 'flagged',
-    ) => void;
+    liveStatusFilter?: LiveStatusFilter;
+    onLiveStatusChange?: (status: LiveStatusFilter) => void;
 
     isMobile?: boolean;
     onCloseMobile?: () => void;
@@ -73,24 +71,15 @@ export default function QuestionPalettePanel({
     onToggleCollapse,
 }: QuestionPalettePanelProps) {
     const demographicCategoryName = useMemo(() => {
-        const cat = questions.find(
-            (q) =>
-                q.category === 'Demographic Profile' ||
-                q.category.toLowerCase().includes('demographic') ||
-                q.isDemographic,
-        );
+        const cat = questions.find((q) => isDemographicQuestion(q));
 
         return cat ? cat.category : 'Demographic Profile';
     }, [questions]);
 
     const hasDemographics = useMemo(() => {
-        return questions.some(
-            (q) =>
-                q.category === 'Demographic Profile' ||
-                q.category.toLowerCase().includes('demographic') ||
-                q.isDemographic,
-        );
+        return questions.some((q) => isDemographicQuestion(q));
     }, [questions]);
+
 
     const content = (
         <>
@@ -341,10 +330,7 @@ export default function QuestionPalettePanel({
             <div className="flex-1 overflow-y-auto bg-card p-4">
                 <div className="grid grid-cols-5 gap-2">
                     {questions.map((q, idx) => {
-                        const isDemographic =
-                            q.category === 'Demographic Profile' ||
-                            q.category.toLowerCase().includes('demographic') ||
-                            q.isDemographic;
+                        const isDemographic = isDemographicQuestion(q);
 
                         let isFilteredOut = false;
 

@@ -14,8 +14,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->integer('pdf_downloads_count')->default(0);
-            $table->boolean('can_download_pdf')->default(true);
+            if (! Schema::hasColumn('users', 'pdf_downloads_count')) {
+                $table->integer('pdf_downloads_count')->default(0);
+            }
+            if (! Schema::hasColumn('users', 'can_download_pdf')) {
+                $table->boolean('can_download_pdf')->default(true);
+            }
         });
     }
 

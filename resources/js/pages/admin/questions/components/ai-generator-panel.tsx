@@ -109,7 +109,7 @@ export function AIGeneratorPanel({
                                     How it works
                                 </button>
                             </DialogTrigger>
-                            <DialogContent className="max-w-md border-blue-200 bg-gradient-to-br from-blue-50 to-slate-50 dark:border-blue-900/40 dark:from-slate-950 dark:to-slate-900">
+                            <DialogContent className="max-w-2xl border-blue-200 bg-gradient-to-br from-blue-50 to-slate-50 dark:border-blue-900/40 dark:from-slate-950 dark:to-slate-900">
                                 <DialogHeader>
                                     <DialogTitle className="inline-flex items-center gap-2">
                                         <Cpu className="size-5 text-blue-500" />
@@ -588,18 +588,14 @@ export function AIGeneratorPanel({
                                                             </td>
                                                             <td className="p-3 font-bold text-blue-600 dark:text-blue-400">
                                                                 Google Gemini
-                                                                3.5 Flash
+                                                                3.7 Flash / 3.7 Pro
                                                             </td>
                                                             <td className="p-3 text-muted-foreground">
-                                                                Mandates raw,
-                                                                visual-spatial
-                                                                SVG rendering.
-                                                                Groq models lack
-                                                                vision
-                                                                coordinate
-                                                                mapping and will
-                                                                output broken
-                                                                shapes.
+                                                                Unmatched spatial-visual
+                                                                awareness for generating
+                                                                precise, error-free raw SVG
+                                                                coordinates and complex
+                                                                geometric rotation patterns.
                                                             </td>
                                                         </tr>
                                                         <tr className="bg-blue-500/5">
@@ -609,15 +605,15 @@ export function AIGeneratorPanel({
                                                             </td>
                                                             <td className="p-3 font-bold text-blue-600 dark:text-blue-400">
                                                                 Google Gemini
-                                                                3.5 Flash
+                                                                3.7 Flash / 3.7 Pro
                                                             </td>
                                                             <td className="p-3 text-muted-foreground">
-                                                                Requires
-                                                                rendering
+                                                                Renders clean,
+                                                                proportional
                                                                 coordinate axes,
-                                                                lines, pie
-                                                                slices, or bar
-                                                                charts via SVG
+                                                                labels, tables, bar
+                                                                charts, and pie
+                                                                charts via accurate SVG
                                                                 code.
                                                             </td>
                                                         </tr>
@@ -627,14 +623,14 @@ export function AIGeneratorPanel({
                                                             </td>
                                                             <td className="p-3 font-bold text-blue-600 dark:text-blue-400">
                                                                 Google Gemini
-                                                                1.5 Pro
+                                                                3.7 Flash / 3.7 Pro
                                                             </td>
                                                             <td className="p-3 text-muted-foreground">
                                                                 Superb semantic
                                                                 understanding of
-                                                                word
-                                                                relationship
-                                                                pairs.
+                                                                word relationship
+                                                                pairs, nuances, and
+                                                                distractor choices.
                                                             </td>
                                                         </tr>
                                                         <tr className="bg-blue-500/5">
@@ -645,14 +641,13 @@ export function AIGeneratorPanel({
                                                             </td>
                                                             <td className="p-3 font-bold text-blue-600 dark:text-blue-400">
                                                                 Google Gemini
-                                                                1.5 Pro
+                                                                3.7 Pro / 3.7 Flash
                                                             </td>
                                                             <td className="p-3 text-muted-foreground">
-                                                                Excellent
-                                                                deductive logic
-                                                                capabilities for
-                                                                detecting
-                                                                unstated
+                                                                Superior
+                                                                deductive and
+                                                                syllogistic logic for
+                                                                detecting unstated
                                                                 premises and
                                                                 drawing valid
                                                                 inferences.
@@ -670,9 +665,9 @@ export function AIGeneratorPanel({
                                                             <td className="p-3 font-bold">
                                                                 Basic operations
                                                             </td>
-                                                            <td className="p-3 font-bold text-purple-600 dark:text-purple-400">
-                                                                Groq LLaMA 3.3
-                                                                70B
+                                                            <td className="p-3 font-bold text-amber-600 dark:text-amber-400">
+                                                                Google Gemini
+                                                                3.7 Flash
                                                             </td>
                                                             <td className="p-3 text-muted-foreground">
                                                                 Best at
@@ -687,16 +682,17 @@ export function AIGeneratorPanel({
                                                             <td className="p-3 font-bold">
                                                                 Number sequence
                                                             </td>
-                                                            <td className="p-3 font-bold text-purple-600 dark:text-purple-400">
-                                                                Groq LLaMA 3.3
-                                                                70B
+                                                            <td className="p-3 font-bold text-amber-600 dark:text-amber-400">
+                                                                Google Gemini
+                                                                3.7 Flash
                                                             </td>
                                                             <td className="p-3 text-muted-foreground">
                                                                 Accurately
                                                                 identifies
                                                                 mathematical
                                                                 patterns (+3,
-                                                                x2, fibonacci)
+                                                                x2, fibonacci,
+                                                                alternating series)
                                                                 and explains
                                                                 them clearly.
                                                             </td>
@@ -705,20 +701,18 @@ export function AIGeneratorPanel({
                                                             <td className="p-3 font-bold">
                                                                 Word problems
                                                             </td>
-                                                            <td className="p-3 font-bold text-purple-600 dark:text-purple-400">
-                                                                Groq LLaMA 3.3
-                                                                70B
+                                                            <td className="p-3 font-bold text-amber-600 dark:text-amber-400">
+                                                                Google Gemini
+                                                                3.7 Pro / 3.7 Flash
                                                             </td>
                                                             <td className="p-3 text-muted-foreground">
                                                                 Superb at
                                                                 interpreting
-                                                                word-based math
-                                                                scenarios (work
+                                                                multi-variable
+                                                                word scenarios (work
                                                                 rates, age
-                                                                problems) and
-                                                                generating
-                                                                logical
-                                                                equations.
+                                                                problems, mixtures)
+                                                                into clear equations.
                                                             </td>
                                                         </tr>
                                                         {/* General Information */}
@@ -734,9 +728,9 @@ export function AIGeneratorPanel({
                                                                 Philippine
                                                                 Constitution
                                                             </td>
-                                                            <td className="p-3 font-bold text-purple-600 dark:text-purple-400">
-                                                                Groq LLaMA 3.3
-                                                                70B
+                                                            <td className="p-3 font-bold text-emerald-600 dark:text-emerald-400">
+                                                                Google Gemini
+                                                                3.7 Flash
                                                             </td>
                                                             <td className="p-3 text-muted-foreground">
                                                                 Outstanding
@@ -754,9 +748,9 @@ export function AIGeneratorPanel({
                                                                 Code of Conduct
                                                                 (R.A. 6713)
                                                             </td>
-                                                            <td className="p-3 font-bold text-purple-600 dark:text-purple-400">
-                                                                Groq LLaMA 3.3
-                                                                70B
+                                                            <td className="p-3 font-bold text-emerald-600 dark:text-emerald-400">
+                                                                Google Gemini
+                                                                3.7 Flash
                                                             </td>
                                                             <td className="p-3 text-muted-foreground">
                                                                 Accurately
@@ -774,9 +768,9 @@ export function AIGeneratorPanel({
                                                                 Peace and Human
                                                                 Rights
                                                             </td>
-                                                            <td className="p-3 font-bold text-purple-600 dark:text-purple-400">
-                                                                Groq LLaMA 3.3
-                                                                70B
+                                                            <td className="p-3 font-bold text-emerald-600 dark:text-emerald-400">
+                                                                Google Gemini
+                                                                3.7 Flash
                                                             </td>
                                                             <td className="p-3 text-muted-foreground">
                                                                 Strong
@@ -793,19 +787,17 @@ export function AIGeneratorPanel({
                                                                 Environment
                                                                 Management
                                                             </td>
-                                                            <td className="p-3 font-bold text-purple-600 dark:text-purple-400">
-                                                                Groq LLaMA 3.3
-                                                                70B
+                                                            <td className="p-3 font-bold text-emerald-600 dark:text-emerald-400">
+                                                                Google Gemini
+                                                                3.7 Flash
                                                             </td>
                                                             <td className="p-3 text-muted-foreground">
                                                                 High recall of
-                                                                global
-                                                                environment
-                                                                protection
-                                                                agreements and
-                                                                national
+                                                                Philippine
                                                                 environmental
-                                                                acts.
+                                                                acts (Clean Air,
+                                                                Solid Waste) and
+                                                                global treaties.
                                                             </td>
                                                         </tr>
                                                         {/* Verbal Ability */}
@@ -820,8 +812,8 @@ export function AIGeneratorPanel({
                                                                 Word meaning
                                                             </td>
                                                             <td className="p-3 font-bold text-purple-600 dark:text-purple-400">
-                                                                Groq LLaMA 3.3
-                                                                70B
+                                                                Google Gemini
+                                                                3.7 Flash
                                                             </td>
                                                             <td className="p-3 text-muted-foreground">
                                                                 Exceptional
@@ -839,8 +831,8 @@ export function AIGeneratorPanel({
                                                                 completion
                                                             </td>
                                                             <td className="p-3 font-bold text-purple-600 dark:text-purple-400">
-                                                                Groq LLaMA 3.3
-                                                                70B
+                                                                Google Gemini
+                                                                3.7 Flash
                                                             </td>
                                                             <td className="p-3 text-muted-foreground">
                                                                 Excellent
@@ -856,8 +848,8 @@ export function AIGeneratorPanel({
                                                                 recognition
                                                             </td>
                                                             <td className="p-3 font-bold text-purple-600 dark:text-purple-400">
-                                                                Groq LLaMA 3.3
-                                                                70B
+                                                                Google Gemini
+                                                                3.7 Flash
                                                             </td>
                                                             <td className="p-3 text-muted-foreground">
                                                                 Strong grammar
@@ -875,8 +867,8 @@ export function AIGeneratorPanel({
                                                                 structure
                                                             </td>
                                                             <td className="p-3 font-bold text-purple-600 dark:text-purple-400">
-                                                                Groq LLaMA 3.3
-                                                                70B
+                                                                Google Gemini
+                                                                3.7 Flash
                                                             </td>
                                                             <td className="p-3 text-muted-foreground">
                                                                 Deep syntactic
@@ -894,8 +886,8 @@ export function AIGeneratorPanel({
                                                                 organization
                                                             </td>
                                                             <td className="p-3 font-bold text-purple-600 dark:text-purple-400">
-                                                                Groq LLaMA 3.3
-                                                                70B
+                                                                Google Gemini
+                                                                3.7 Flash
                                                             </td>
                                                             <td className="p-3 text-muted-foreground">
                                                                 Highly skilled
@@ -913,8 +905,8 @@ export function AIGeneratorPanel({
                                                                 comprehension
                                                             </td>
                                                             <td className="p-3 font-bold text-purple-600 dark:text-purple-400">
-                                                                Groq LLaMA 3.3
-                                                                70B
+                                                                Google Gemini
+                                                                3.7 Pro / 3.7 Flash
                                                             </td>
                                                             <td className="p-3 text-muted-foreground">
                                                                 Can synthesize
@@ -937,9 +929,9 @@ export function AIGeneratorPanel({
                                                             <td className="p-3 font-bold">
                                                                 Filing
                                                             </td>
-                                                            <td className="p-3 font-bold text-purple-600 dark:text-purple-400">
-                                                                Groq LLaMA 3.3
-                                                                70B
+                                                            <td className="p-3 font-bold text-rose-600 dark:text-rose-400">
+                                                                Google Gemini
+                                                                3.7 Flash
                                                             </td>
                                                             <td className="p-3 text-muted-foreground">
                                                                 Excellent
@@ -954,9 +946,9 @@ export function AIGeneratorPanel({
                                                             <td className="p-3 font-bold">
                                                                 Spelling
                                                             </td>
-                                                            <td className="p-3 font-bold text-purple-600 dark:text-purple-400">
-                                                                Groq LLaMA 3.3
-                                                                70B
+                                                            <td className="p-3 font-bold text-rose-600 dark:text-rose-400">
+                                                                Google Gemini
+                                                                3.7 Flash
                                                             </td>
                                                             <td className="p-3 text-muted-foreground">
                                                                 Best at
@@ -981,20 +973,28 @@ export function AIGeneratorPanel({
                                 onValueChange={setAiPrimaryModel}
                                 options={[
                                     {
+                                        value: 'gemini-3.7-flash',
+                                        label: 'Google Gemini 3.7 Flash (Recommended — Best for CSE & SVGs)',
+                                    },
+                                    {
+                                        value: 'gemini-3.7-pro',
+                                        label: 'Google Gemini 3.7 Pro (Advanced Reasoning & Multi-step Problems)',
+                                    },
+                                    {
                                         value: 'gemini-3.6-flash',
-                                        label: 'Google Gemini 3.6 Flash (Latest)',
+                                        label: 'Google Gemini 3.6 Flash (Stable High Performance)',
                                     },
                                     {
                                         value: 'gemini-3.5-flash',
-                                        label: 'Google Gemini 3.5 Flash (Best for CSE & SVGs)',
-                                    },
-                                    {
-                                        value: 'gemini-1.5-pro',
-                                        label: 'Google Gemini 1.5 Pro (High Reasoning)',
+                                        label: 'Google Gemini 3.5 Flash (Standard Fast)',
                                     },
                                     {
                                         value: 'gemini-2.5-flash',
                                         label: 'Google Gemini 2.5 Flash',
+                                    },
+                                    {
+                                        value: 'gemini-1.5-pro',
+                                        label: 'Google Gemini 1.5 Pro (High Reasoning)',
                                     },
                                     {
                                         value: 'gemini-1.5-flash',

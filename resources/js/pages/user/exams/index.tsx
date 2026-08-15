@@ -14,6 +14,7 @@ import { PrintableExam } from './components/printable-exam';
 import { ReviewExamView } from './components/review-exam-view';
 import { ScorecardView } from './components/scorecard-view';
 import { SetupExamView } from './components/setup-exam-view';
+import { ExamSessionProvider } from './context/exam-context';
 import { useExamState } from './hooks/use-exam-state';
 import type { ExamIndexProps } from './types';
 
@@ -36,6 +37,8 @@ export default function ExamIndex(props: ExamIndexProps) {
         answerChanges,
         flagged,
         setFlagged,
+        scratchpads,
+        setScratchpads,
         isMobilePaletteOpen,
         setIsMobilePaletteOpen,
         isFreeAttempt,
@@ -113,34 +116,52 @@ export default function ExamIndex(props: ExamIndexProps) {
     // Render the Live active exam simulator view
     if (isExamActive) {
         return (
-            <LiveExamView
-                details={details}
-                activeQuestions={activeQuestions}
-                currentIdx={currentIdx}
-                isTimed={isTimed}
-                timeLeft={timeLeft}
-                formatTime={formatTime}
-                handleExitExam={handleExitExam}
-                setIsMobilePaletteOpen={setIsMobilePaletteOpen}
-                toggleFlag={toggleFlag}
-                flagged={flagged}
-                answers={answers}
-                questionTimes={questionTimes}
-                handleSelectOption={handleSelectOption}
-                handleQuestionNavigate={handleQuestionNavigate}
-                isFreeAttempt={isFreeAttempt}
-                setShowRegisterModal={setShowRegisterModal}
-                handleSubmitExam={handleSubmitExam}
-                selectedPaletteCategory={selectedPaletteCategory}
-                handleCategoryChange={handleCategoryChange}
-                isMobilePaletteOpen={isMobilePaletteOpen}
-                showLockedModal={showLockedModal}
-                setShowLockedModal={setShowLockedModal}
-                handleRegisterFromFreeExam={handleRegisterFromFreeExam}
-                showRegisterModal={showRegisterModal}
-                handleCancelFreeExam={handleCancelFreeExam}
-                customConfirmModal={customConfirmModal}
-            />
+            <ExamSessionProvider
+                value={{
+                    activeQuestions,
+                    currentIdx,
+                    answers,
+                    flagged,
+                    scratchpads,
+                    isTimed,
+                    timeLeft,
+                    details,
+                    formatTime,
+                    setCurrentIdx,
+                    toggleFlag,
+                    handleSelectOption,
+                    setScratchpads,
+                }}
+            >
+                <LiveExamView
+                    details={details}
+                    activeQuestions={activeQuestions}
+                    currentIdx={currentIdx}
+                    isTimed={isTimed}
+                    timeLeft={timeLeft}
+                    formatTime={formatTime}
+                    handleExitExam={handleExitExam}
+                    setIsMobilePaletteOpen={setIsMobilePaletteOpen}
+                    toggleFlag={toggleFlag}
+                    flagged={flagged}
+                    answers={answers}
+                    questionTimes={questionTimes}
+                    handleSelectOption={handleSelectOption}
+                    handleQuestionNavigate={handleQuestionNavigate}
+                    isFreeAttempt={isFreeAttempt}
+                    setShowRegisterModal={setShowRegisterModal}
+                    handleSubmitExam={handleSubmitExam}
+                    selectedPaletteCategory={selectedPaletteCategory}
+                    handleCategoryChange={handleCategoryChange}
+                    isMobilePaletteOpen={isMobilePaletteOpen}
+                    showLockedModal={showLockedModal}
+                    setShowLockedModal={setShowLockedModal}
+                    handleRegisterFromFreeExam={handleRegisterFromFreeExam}
+                    showRegisterModal={showRegisterModal}
+                    handleCancelFreeExam={handleCancelFreeExam}
+                    customConfirmModal={customConfirmModal}
+                />
+            </ExamSessionProvider>
         );
     }
 
@@ -179,7 +200,7 @@ export default function ExamIndex(props: ExamIndexProps) {
                     details={details}
                     isDrillSession={isDrillSession}
                     drillCategoryName={drillCategoryName}
-                    savedAttempt={savedAttempt}
+                    savedAttempt={savedAttempt ?? null}
                     results={results}
                     isTimed={isTimed}
                     getActiveTimeLimitSecs={getActiveTimeLimitSecs}

@@ -574,8 +574,10 @@ export function PrintableExam({
 
                         // Expand viewBox slightly to account for stroke widths
                         const viewBox = svg.getAttribute('viewBox');
+
                         if (viewBox) {
                             const parts = viewBox.split(/[ ,]+/).map(Number);
+
                             if (parts.length === 4 && !parts.some(isNaN)) {
                                 // parts: [min-x, min-y, width, height]
                                 parts[0] -= 2;
@@ -589,6 +591,7 @@ export function PrintableExam({
                         try {
                             const serializer = new XMLSerializer();
                             let svgStr = serializer.serializeToString(svg);
+
                             if (!svgStr.includes('xmlns=')) {
                                 svgStr = svgStr.replace(
                                     '<svg ',
@@ -604,13 +607,22 @@ export function PrintableExam({
                             // Copy all styles and classes
                             img.style.cssText = svg.style.cssText;
                             const cls = svg.getAttribute('class');
-                            if (cls) img.setAttribute('class', cls);
+
+                            if (cls) {
+img.setAttribute('class', cls);
+}
 
                             // Retain explicit dimensions if any
                             const w = svg.getAttribute('width');
                             const h = svg.getAttribute('height');
-                            if (w) img.setAttribute('width', w);
-                            if (h) img.setAttribute('height', h);
+
+                            if (w) {
+img.setAttribute('width', w);
+}
+
+                            if (h) {
+img.setAttribute('height', h);
+}
 
                             svg.parentNode?.replaceChild(img, svg);
                         } catch (e) {

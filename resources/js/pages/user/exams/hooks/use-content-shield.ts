@@ -232,12 +232,19 @@ export function useContentShield(
             }
         };
 
-        // 2. Window blur — NO DEBOUNCE. Security > convenience.
-        //    Snipping Tool / Win+Shift+S causes blur BEFORE the screenshot
-        //    capture. By blurring content synchronously in this handler,
-        //    the compositor renders the blurred version for the capture.
+        // 2. Window blur — 500ms debounced to prevent false positives when clicking
+        //    notifications or multi-monitor dragging, while visibilitychange remains instant.
+        let blurTimeout: ReturnType<typeof setTimeout> | null = null;
         const handleBlur = () => {
-            activateShield();
+            if (blurTimeout) {
+clearTimeout(blurTimeout);
+}
+
+            blurTimeout = setTimeout(() => {
+                if (!document.hasFocus() || document.hidden) {
+                    activateShield();
+                }
+            }, 500);
         };
 
         // 3. When focus returns, refresh lock state so the user can resume
@@ -405,7 +412,10 @@ export function useContentShield(
                 origGetDisplayMediaRef.current = null;
             }
 
-            // Remove listeners
+            if (blurTimeout) {
+clearTimeout(blurTimeout);
+}
+
             document.removeEventListener('visibilitychange', handleVisibility);
             window.removeEventListener('blur', handleBlur);
             window.removeEventListener('focus', handleFocus);

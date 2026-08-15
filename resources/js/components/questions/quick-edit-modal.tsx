@@ -1,9 +1,9 @@
-import { useState, useEffect } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import InputError from '@/components/shared/input-error';
-import { QuestionItem } from '@/pages/admin/questions/types';
 import { router } from '@inertiajs/react';
+import { useState, useEffect } from 'react';
+import InputError from '@/components/shared/input-error';
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import type { QuestionItem } from '@/pages/admin/questions/types';
 
 interface QuickEditModalProps {
     isOpen: boolean;
@@ -40,13 +40,19 @@ export function QuickEditModal({ isOpen, question, categories, onClose, onSaveSu
                 });
                 
                 // Ensure at least 4 options, up to 5
-                while (normalizedOptions.length < 4) normalizedOptions.push('');
-                if (normalizedOptions.length > 5) normalizedOptions.length = 5;
+                while (normalizedOptions.length < 4) {
+normalizedOptions.push('');
+}
+
+                if (normalizedOptions.length > 5) {
+normalizedOptions.length = 5;
+}
                 
                 setOptions(normalizedOptions);
             } else {
                 setOptions(['', '', '', '', '']);
             }
+
             setErrors({});
         }
     }, [question, isOpen]);
@@ -58,7 +64,9 @@ export function QuickEditModal({ isOpen, question, categories, onClose, onSaveSu
     };
 
     const handleSave = () => {
-        if (!question) return;
+        if (!question) {
+return;
+}
 
         setIsSaving(true);
         setErrors({});
@@ -91,12 +99,15 @@ export function QuickEditModal({ isOpen, question, categories, onClose, onSaveSu
         );
     };
 
-    if (!question) return null;
+    if (!question) {
+return null;
+}
 
     const isDemographic = category === 'Demographic Profile';
 
     // Build categories tree dynamically with robust static CSC fallback
     const cseCategoriesTree: Record<string, string[]> = {};
+
     if (categories && categories.length > 0) {
         categories.forEach((cat) => {
             cseCategoriesTree[cat.name] = (cat.subcategory || []).map(

@@ -64,7 +64,7 @@ export function useQuestionCreateState({
     const [aiCount, setAiCount] = useState<number>(10);
     const [aiLanguage, setAiLanguage] = useState<string>('English');
     const [aiPrimaryModel, setAiPrimaryModel] =
-        useState<string>('gemini-3.6-flash');
+        useState<string>('gemini-3.7-flash');
     const [aiPrompt, setAiPrompt] = useState<string>('');
     const [aiSymbolicVariety, setAiSymbolicVariety] = useState<string>('all');
     const [aiDataVariety, setAiDataVariety] = useState<string>('all');

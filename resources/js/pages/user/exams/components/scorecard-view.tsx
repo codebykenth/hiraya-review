@@ -6,18 +6,25 @@ import {
     calculateWeightedPercentage,
 } from '@/lib/exam-formatters';
 
+import type {
+    SimulationDetails,
+    SavedAttempt,
+    ExamResults,
+    AiAnalysisResult,
+} from '../types';
+
 interface ScorecardViewProps {
-    details: any;
+    details: SimulationDetails;
     isDrillSession: boolean;
     drillCategoryName: string | null;
-    savedAttempt: any;
-    results: any;
+    savedAttempt?: SavedAttempt | null;
+    results: ExamResults | null;
     isTimed: boolean;
     getActiveTimeLimitSecs: () => number;
     submittedByTimer: boolean;
     setReviewScreenActive: (val: boolean) => void;
     handleBeginExam: () => void;
-    aiAnalysis?: any;
+    aiAnalysis?: AiAnalysisResult;
 }
 
 export function ScorecardView({

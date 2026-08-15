@@ -13,6 +13,7 @@ import {
 import { useState, useEffect } from 'react';
 import { DraftsReviewShell } from '@/components/domain/drafts-review-shell';
 import type { CategoryItem } from '@/components/domain/drafts-review-shell';
+import { QuickEditModal } from '@/components/questions/quick-edit-modal';
 import { ConfirmModal } from '@/components/shared/confirm-modal';
 import { Button } from '@/components/ui/button';
 import {
@@ -40,7 +41,6 @@ import {
     bulkEdit as questionsBulkEdit,
     update as questionsUpdate,
 } from '@/routes/questions';
-import { QuickEditModal } from '@/components/questions/quick-edit-modal';
 
 interface DraftQuestion {
     id: number;
@@ -785,6 +785,7 @@ export default function DraftsQuestionList({
                                                 propositions.forEach((prop, idx) => {
                                                     letterMap[prop.letter] = String.fromCharCode(65 + idx);
                                                 });
+
                                                 return (
                                                     <>
                                                         {propositions.length > 0 && (

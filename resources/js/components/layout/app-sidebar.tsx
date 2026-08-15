@@ -19,6 +19,7 @@ import {
     Eye,
     Megaphone,
     MessageSquareWarning,
+    Brain,
 } from 'lucide-react';
 import React from 'react';
 import AppLogo from '@/components/layout/app-logo';
@@ -75,6 +76,11 @@ const generalNavItems: NavItem[] = [
         title: 'Learn',
         href: learnIndex(),
         icon: BookOpen,
+    },
+    {
+        title: 'Flashcards',
+        href: '/flashcards',
+        icon: Brain,
     },
     {
         title: 'Practice Drills',
@@ -190,6 +196,7 @@ const viewMap: Record<string, string> = {
     'Reviewer Guide': 'reviewer-guide',
     'Study Plan': 'study-plan',
     Learn: 'learn',
+    Flashcards: 'flashcards',
     'Practice Drills': 'practice-drills',
     'Mock Exams': 'mock-exams',
     History: 'history',

@@ -664,23 +664,30 @@ export default function AiAnalysisReport({
                                         <div className="flex gap-2">
                                             <button
                                                 onClick={() => {
-                                                    if (
-                                                        confirm(
-                                                            'Delete existing analysis and generate a new one from scratch?',
-                                                        )
-                                                    ) {
-                                                        setLocalStatus(
-                                                            'generating',
-                                                        );
-                                                        setErrorMessage(null);
-                                                        router.visit(
-                                                            '/analytics/ai-analysis?delete=1',
-                                                            {
-                                                                replace: true,
-                                                                preserveScroll: true,
-                                                            },
-                                                        );
-                                                    }
+                                                    setConfirmModal({
+                                                        isOpen: true,
+                                                        title: 'Delete Analysis?',
+                                                        message:
+                                                            'Are you sure you want to delete the existing analysis and generate a new one from scratch?',
+                                                        confirmLabel:
+                                                            'Delete & Regenerate',
+                                                        variant: 'danger',
+                                                        onConfirm: () => {
+                                                            setLocalStatus(
+                                                                'generating',
+                                                            );
+                                                            setErrorMessage(
+                                                                null,
+                                                            );
+                                                            router.visit(
+                                                                '/analytics/ai-analysis?delete=1',
+                                                                {
+                                                                    replace: true,
+                                                                    preserveScroll: true,
+                                                                },
+                                                            );
+                                                        },
+                                                    });
                                                 }}
                                                 className="text-rose-650 dark:bg-rose-550/10 inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-rose-500/20 bg-rose-600/10 px-2.5 py-1 text-[10px] font-black uppercase transition hover:bg-rose-600/20 dark:text-rose-400"
                                             >

@@ -416,6 +416,42 @@ class AnalyticsController
             $daysUntilExam = (int) ceil(now()->diffInDays($defaultDate, false));
         }
 
+        // Calculate CSE Passing Probability Index and Subtest Cutoffs
+        $subtestThresholds = [];
+        $hasSubtestRisk = false;
+        foreach ($categoryTotals as $catName => $totals) {
+            if ($totals['total'] > 0) {
+                $pct = round(($totals['correct'] / $totals['total']) * 100);
+                $subtestThresholds[] = [
+                    'category' => $catName,
+                    'score' => $pct,
+                    'passed' => $pct >= 70,
+                ];
+                if ($pct < 70) {
+                    $hasSubtestRisk = true;
+                }
+            }
+        }
+
+        // Weighted CSE Index: Avg Score capped at 100, penalized if subtest risk exists
+        $cseReadinessIndex = $avgScore;
+        if ($hasSubtestRisk && $cseReadinessIndex > 75) {
+            $cseReadinessIndex = 75; // Cap readiness index at 75% if any core subject is under 70%
+        }
+
+        // Compute global percentile rank against all system attempts
+        $totalSystemAttempts = ExamAttempt::count();
+        $percentileRank = 50; // default baseline
+        if ($totalSystemAttempts > 5 && $avgScore > 0) {
+            $lowerCount = ExamAttempt::all()->filter(function ($att) use ($avgScore) {
+                $pct = $this->formatter->calculateWeightedPercentage($att->cat_scores ?? []);
+
+                return $pct < $avgScore;
+            })->count();
+
+            $percentileRank = (int) round(($lowerCount / $totalSystemAttempts) * 100);
+        }
+
         return Inertia::render('user/analytics/index', [
             'stats' => [
                 'filters' => [
@@ -437,6 +473,10 @@ class AnalyticsController
                 'examDateRaw' => $examDateRaw,
                 'pacingTrend' => $pacingTrend,
                 'attemptBreakdowns' => $attemptBreakdowns,
+                'cseReadinessIndex' => $cseReadinessIndex,
+                'subtestThresholds' => $subtestThresholds,
+                'hasSubtestRisk' => $hasSubtestRisk,
+                'percentileRank' => $percentileRank,
             ],
             'aiAnalysis' => [
                 'status' => $analysisStatus, // 'no_data' | 'generating' | 'ready' | 'failed'

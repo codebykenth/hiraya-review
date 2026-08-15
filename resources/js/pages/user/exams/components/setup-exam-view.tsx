@@ -16,18 +16,12 @@ import { PageContainer } from '@/components/layout/page-container';
 import { PageHeader } from '@/components/layout/page-header';
 import { HowItWorksModal } from '@/components/shared/how-it-works-modal';
 import type { Auth } from '@/types';
+import type { SimulationDetails } from '../types';
 
 interface SetupExamViewProps {
     selectedExamId: number | null;
     setSelectedExamId: (id: number) => void;
-    details: {
-        title: string;
-        timeLimitSecs: number;
-        totalItems: number;
-        scoredItems: number;
-        timeLimit: string;
-        targetPace: string;
-    };
+    details: SimulationDetails;
     handleBeginExam: () => void;
     handlePrintExam: () => void;
     isPrinting?: boolean;

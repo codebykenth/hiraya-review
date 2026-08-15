@@ -18,6 +18,7 @@ import {
 import { useState, useEffect } from 'react';
 import { getCategoryStyles } from '@/components/domain/curation-index-shell';
 import { PageContainer } from '@/components/layout/page-container';
+import { QuickEditModal } from '@/components/questions/quick-edit-modal';
 import { ConfirmModal } from '@/components/shared/confirm-modal';
 import { Button } from '@/components/ui/button';
 import {
@@ -41,7 +42,6 @@ import {
     destroy as questionsDestroy,
     show as questionsShow,
 } from '@/routes/questions';
-import { QuickEditModal } from '@/components/questions/quick-edit-modal';
 import type { QuestionItem, QuestionsIndexProps } from './types';
 
 export default function QuestionsIndex({
@@ -1426,6 +1426,7 @@ export default function QuestionsIndex({
                                                 propositions.forEach((prop, idx) => {
                                                     letterMap[prop.letter] = String.fromCharCode(65 + idx);
                                                 });
+
                                                 return (
                                                     <>
                                                         {propositions.length > 0 && (

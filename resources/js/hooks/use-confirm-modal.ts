@@ -1,20 +1,28 @@
+import type React from 'react';
 import { useState } from 'react';
 
 export interface ConfirmModalState {
     isOpen: boolean;
     title: string;
-    message: string;
+    message: string | React.ReactNode;
     confirmLabel: string;
-    variant: 'danger' | 'success' | 'info';
-    onConfirm: () => void;
+    cancelLabel?: string;
+    variant: 'danger' | 'warning' | 'success' | 'info';
+    verificationText?: string;
+    isLoading?: boolean;
+    hideCancel?: boolean;
+    onConfirm: () => void | Promise<void>;
 }
 
 const defaultState: ConfirmModalState = {
     isOpen: false,
     title: '',
     message: '',
-    confirmLabel: '',
+    confirmLabel: 'Confirm',
+    cancelLabel: 'Cancel',
     variant: 'success',
+    isLoading: false,
+    hideCancel: false,
     onConfirm: () => {},
 };
 
@@ -23,17 +31,26 @@ export function useConfirmModal() {
 
     const open = (
         title: string,
-        message: string,
-        confirmLabel: string,
-        onConfirm: () => void,
-        variant: 'danger' | 'success' | 'info' = 'success',
+        message: string | React.ReactNode,
+        confirmLabel = 'Confirm',
+        onConfirm: () => void | Promise<void> = () => {},
+        variant: 'danger' | 'warning' | 'success' | 'info' = 'success',
+        options?: {
+            cancelLabel?: string;
+            verificationText?: string;
+            hideCancel?: boolean;
+        }
     ) => {
         setModal({
             isOpen: true,
             title,
             message,
             confirmLabel,
+            cancelLabel: options?.cancelLabel ?? 'Cancel',
             variant,
+            verificationText: options?.verificationText,
+            hideCancel: options?.hideCancel ?? false,
+            isLoading: false,
             onConfirm,
         });
     };
@@ -43,8 +60,13 @@ export function useConfirmModal() {
     };
 
     const confirm = async () => {
-        await modal.onConfirm();
-        close();
+        setModal((prev) => ({ ...prev, isLoading: true }));
+
+        try {
+            await modal.onConfirm();
+        } finally {
+            close();
+        }
     };
 
     return {
@@ -52,5 +74,6 @@ export function useConfirmModal() {
         open,
         close,
         confirm,
+        setModal,
     };
 }

@@ -22,6 +22,7 @@ use App\Http\Controllers\User\DashboardController as UserDashboardController;
 use App\Http\Controllers\User\DrillController;
 use App\Http\Controllers\User\ExamController;
 use App\Http\Controllers\User\ExamHistoryController;
+use App\Http\Controllers\User\FlashcardController;
 use App\Http\Controllers\User\LearnController as UserLearnController;
 use App\Http\Controllers\User\StudyScheduleController;
 use App\Http\Controllers\User\StudySuggestionController;
@@ -95,6 +96,23 @@ Route::middleware(['auth.or.fail', 'verified'])->group(function () {
     Route::middleware('throttle:global-views')->group(function () {
         Route::get('dashboard', [UserDashboardController::class, 'index'])->name('dashboard.index');
         Route::get('drills', [DrillController::class, 'index'])->name('drills.index');
+        Route::get('drills/smart-weakness', [DrillController::class, 'smartWeakness'])->name('drills.smartWeakness');
+
+        Route::controller(FlashcardController::class)->prefix('flashcards')->name('flashcards.')->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::get('list', 'listUserDecks')->name('list');
+            Route::get('decks/{deck}', 'showDeck')->name('showDeck');
+            Route::post('decks', 'storeDeck')->name('storeDeck');
+            Route::put('decks/{deck}', 'updateDeck')->name('updateDeck');
+            Route::delete('decks/{deck}', 'destroyDeck')->name('destroyDeck');
+            Route::post('decks/{deck}/clone', 'cloneDeck')->name('cloneDeck');
+            Route::post('decks/{deck}/reset-progress', 'resetProgress')->name('resetProgress');
+            Route::post('decks/{deck}/cards', 'storeCard')->name('storeCard');
+            Route::put('cards/{card}', 'updateCard')->name('updateCard');
+            Route::delete('cards/{card}', 'destroyCard')->name('destroyCard');
+            Route::post('cards/{card}/rate', 'submitRating')->name('submitRating');
+            Route::post('convert-question', 'convertFromQuestion')->name('convertFromQuestion');
+        });
 
         Route::controller(AnalyticsController::class)->prefix('analytics')->name('analytics.')->group(function () {
             Route::get('/', 'index')->name('index');

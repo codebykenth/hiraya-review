@@ -32,23 +32,13 @@ import {
 
 import { renderFormattedText } from '@/lib/exam-formatters';
 import { useContentShield } from '../hooks/use-content-shield';
+import type { Question, SimulationDetails, LiveStatusFilter } from '../types';
+import { isDemographicQuestion } from '../utils/exam-utils';
+import { ExamTimerDisplay } from './exam-timer-display';
 import QuestionPalettePanel from './question-palette-panel';
 
-interface Question {
-    id: number;
-    stem: string;
-    options: string[];
-    correct_option: number;
-    explanation: string;
-    category: string;
-    subcategory: string;
-    originalOptionIndices?: number[];
-    isDemographic?: boolean;
-    language?: string;
-}
-
 interface LiveExamViewProps {
-    details: any;
+    details: SimulationDetails;
     activeQuestions: Question[];
     currentIdx: number;
     isTimed: boolean;
@@ -173,6 +163,15 @@ export function LiveExamView({
         optionIdx: number,
     ) => {
         e.stopPropagation();
+        const isCurrentlyEliminated =
+            eliminatedOptions[questionIdx]?.[optionIdx];
+        const willBeEliminated = !isCurrentlyEliminated;
+
+        // If eliminating an option that is currently selected as answer, deselect it first
+        if (willBeEliminated && answers[questionIdx] === optionIdx) {
+            handleSelectOption(optionIdx);
+        }
+
         setEliminatedOptions((prev) => {
             const qElim = prev[questionIdx] || {};
 
@@ -180,7 +179,7 @@ export function LiveExamView({
                 ...prev,
                 [questionIdx]: {
                     ...qElim,
-                    [optionIdx]: !qElim[optionIdx],
+                    [optionIdx]: willBeEliminated,
                 },
             };
         });
@@ -375,7 +374,25 @@ export function LiveExamView({
                     optIdx !== undefined &&
                     activeQuestion?.options?.[optIdx] !== undefined
                 ) {
-                    handleSelectOption(optIdx);
+                    if (e.altKey) {
+                        e.preventDefault();
+                        const isCurrentlyEliminated = eliminatedOptions[currentIdx]?.[optIdx];
+                        const willBeEliminated = !isCurrentlyEliminated;
+
+                        if (willBeEliminated && answers[currentIdx] === optIdx) {
+                            handleSelectOption(optIdx);
+                        }
+
+                        setEliminatedOptions((prev) => ({
+                            ...prev,
+                            [currentIdx]: {
+                                ...(prev[currentIdx] || {}),
+                                [optIdx]: willBeEliminated,
+                            },
+                        }));
+                    } else if (!eliminatedOptions[currentIdx]?.[optIdx]) {
+                        handleSelectOption(optIdx);
+                    }
                 }
             }
         };
@@ -391,6 +408,7 @@ export function LiveExamView({
         activeQuestions,
         activeQuestion,
         autoAdvance,
+        eliminatedOptions,
         handleQuestionNavigate,
         handleSelectOption,
         toggleFlag,
@@ -583,27 +601,11 @@ export function LiveExamView({
                             <div className="mx-0.5 h-4 w-px shrink-0 bg-border/60" />
 
                             {/* Timer */}
-                            {isTimed ? (
-                                <div
-                                    className={`shadow-3xs flex h-8 items-center gap-1.5 rounded-md border px-2.5 font-black ${
-                                        timeLeft < 600
-                                            ? 'animate-pulse border-rose-200 bg-rose-50 text-rose-700 dark:border-rose-900/50 dark:bg-rose-950/30 dark:text-rose-400'
-                                            : 'border-border bg-background text-foreground'
-                                    }`}
-                                >
-                                    <Clock className="size-4 shrink-0" />
-                                    <span className="whitespace-nowrap">
-                                        {formatTime(timeLeft)}
-                                    </span>
-                                </div>
-                            ) : (
-                                <div className="shadow-3xs flex h-8 items-center gap-1.5 rounded-md border border-border bg-background px-2.5 font-black text-foreground">
-                                    <Timer className="size-4 shrink-0 text-emerald-500" />
-                                    <span className="whitespace-nowrap text-muted-foreground">
-                                        Untimed
-                                    </span>
-                                </div>
-                            )}
+                            <ExamTimerDisplay
+                                isTimed={isTimed}
+                                timeLeft={timeLeft}
+                                formatTime={formatTime}
+                            />
 
                             <button
                                 onClick={() => {

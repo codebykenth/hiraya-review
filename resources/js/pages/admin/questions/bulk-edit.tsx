@@ -8,6 +8,7 @@ import {
     ChevronUp,
 } from 'lucide-react';
 import React, { useState, useEffect, useRef } from 'react';
+import { toast } from 'sonner';
 import { CurationEditShell } from '@/components/domain/curation-edit-shell';
 import { SelectField } from '@/components/ui/select';
 import { index as questionsIndex } from '@/routes/questions';
@@ -161,7 +162,7 @@ export default function BulkEditQuestions({
                 regex = new RegExp(escapedFind, matchCase ? 'g' : 'gi');
             }
         } catch {
-            alert('Invalid regular expression');
+            toast.error('Invalid regular expression');
 
             return;
         }

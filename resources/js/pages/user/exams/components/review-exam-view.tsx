@@ -13,6 +13,8 @@ import {
     RotateCcw,
     CheckCircle2,
     Lock,
+    Brain,
+    Check,
 } from 'lucide-react';
 import React, {
     useState,
@@ -22,45 +24,34 @@ import React, {
     useRef,
 } from 'react';
 import { ReportIssueModal } from '@/components/domain/report-issue-modal';
-import {
-    renderFormattedText,
-    extractPropositions,
-} from '@/lib/exam-formatters';
+import { renderFormattedText, extractPropositions } from '@/lib/exam-formatters';
 import { useContentShield } from '../hooks/use-content-shield';
+import type {
+    Question,
+    SimulationDetails,
+    ExamResults,
+    ReviewStatusFilter,
+} from '../types';
 import QuestionPalettePanel from './question-palette-panel';
-
-interface Question {
-    id: number;
-    stem: string;
-    options: string[];
-    correct_option: number;
-    explanation: string;
-    category: string;
-    subcategory: string;
-    originalOptionIndices?: number[];
-    isDemographic?: boolean;
-    language?: string;
-}
+import { SaveToFlashcardDialog } from './save-to-flashcard-dialog';
 
 interface ReviewExamViewProps {
-    details: any;
+    details: SimulationDetails;
     activeQuestions: Question[];
     currentIdx: number;
     setCurrentIdx: (idx: number) => void;
     answers: Record<number, number>;
     questionTimes?: Record<number, number>;
     answerChanges?: Record<number, number>;
-    results?: any;
+    results?: ExamResults | null;
     flagged: Record<number, boolean>;
     setFlagged: React.Dispatch<React.SetStateAction<Record<number, boolean>>>;
     reviewCategoryFilter: string;
     setReviewCategoryFilter: (cat: string) => void;
     reviewSubcategoryFilter: string;
     setReviewSubcategoryFilter: (subcat: string) => void;
-    reviewStatusFilter: 'all' | 'correct' | 'incorrect' | 'flagged';
-    setReviewStatusFilter: (
-        status: 'all' | 'correct' | 'incorrect' | 'flagged',
-    ) => void;
+    reviewStatusFilter: ReviewStatusFilter;
+    setReviewStatusFilter: (status: ReviewStatusFilter) => void;
     reviewSubcategories: string[];
     isMobilePaletteOpen: boolean;
     setIsMobilePaletteOpen: (val: boolean) => void;
@@ -68,7 +59,7 @@ interface ReviewExamViewProps {
 }
 
 export function ReviewExamView({
-    details = {},
+    details,
     activeQuestions = [],
     currentIdx = 0,
     setCurrentIdx,
@@ -217,6 +208,9 @@ export function ReviewExamView({
             );
         };
     }, []);
+
+    const [savedFlashcards, setSavedFlashcards] = useState<Record<number, boolean>>({});
+    const [isFlashcardDialogOpen, setIsFlashcardDialogOpen] = useState(false);
 
     const reportStatus = currentQuestion
         ? localReportsMap[`App\\Models\\Question:${currentQuestion.id}`]
@@ -1023,17 +1017,35 @@ export function ReviewExamView({
                                                         }
 
                                                         return (
-                                                            <button
-                                                                onClick={() =>
-                                                                    setIsReportModalOpen(
-                                                                        true,
-                                                                    )
-                                                                }
-                                                                className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[11px] font-bold text-amber-600 transition hover:bg-amber-50 focus:outline-none dark:text-amber-500 dark:hover:bg-amber-950/20"
-                                                            >
-                                                                <Flag className="size-3.5" />
-                                                                Report Issue
-                                                            </button>
+                                                            <div className="flex items-center gap-2">
+                                                                <button
+                                                                    onClick={() => setIsFlashcardDialogOpen(true)}
+                                                                    className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[11px] font-bold text-indigo-600 transition hover:bg-indigo-50 focus:outline-none dark:text-indigo-400 dark:hover:bg-indigo-950/20"
+                                                                >
+                                                                    {savedFlashcards[currentQuestion.id] ? (
+                                                                        <>
+                                                                            <Check className="size-3.5 text-emerald-600" />
+                                                                            Saved to Deck
+                                                                        </>
+                                                                    ) : (
+                                                                        <>
+                                                                            <Brain className="size-3.5" />
+                                                                            Save to Flashcards
+                                                                        </>
+                                                                    )}
+                                                                </button>
+                                                                <button
+                                                                    onClick={() =>
+                                                                        setIsReportModalOpen(
+                                                                            true,
+                                                                        )
+                                                                    }
+                                                                    className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[11px] font-bold text-amber-600 transition hover:bg-amber-50 focus:outline-none dark:text-amber-500 dark:hover:bg-amber-950/20"
+                                                                >
+                                                                    <Flag className="size-3.5" />
+                                                                    Report Issue
+                                                                </button>
+                                                            </div>
                                                         );
                                                     })()}
                                                 </div>
@@ -1381,6 +1393,15 @@ export function ReviewExamView({
                         flaggableType="App\Models\Question"
                     />
                 )}
+
+                <SaveToFlashcardDialog
+                    open={isFlashcardDialogOpen}
+                    onOpenChange={setIsFlashcardDialogOpen}
+                    question={currentQuestion ?? null}
+                    onSaved={(questionId) => {
+                        setSavedFlashcards((prev) => ({ ...prev, [questionId]: true }));
+                    }}
+                />
             </div>
         </>
     );

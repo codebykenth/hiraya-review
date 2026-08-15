@@ -270,6 +270,7 @@ export const formatMarkdownInline = (text: string): React.ReactNode[] => {
         if (idx % 2 === 1) {
             if (part.startsWith('**') && part.endsWith('**')) {
                 const inner = part.slice(2, -2).trim();
+
                 return (
                     <strong
                         key={idx}
@@ -282,6 +283,7 @@ export const formatMarkdownInline = (text: string): React.ReactNode[] => {
 
             if (part.startsWith('*') && part.endsWith('*')) {
                 const inner = part.slice(1, -1).trim();
+
                 return (
                     <em
                         key={idx}
