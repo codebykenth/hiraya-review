@@ -17,6 +17,8 @@ import {
     Minimize2,
     Edit3,
     EyeOff,
+    Strikethrough,
+    MinusCircle,
     BookOpen,
 } from 'lucide-react';
 import { useState, useMemo, useEffect } from 'react';
@@ -544,14 +546,14 @@ export function LiveExamView({
                                     }
                                 }}
                                 title={`Auto-Advance after answering (${autoAdvance ? 'ON' : 'OFF'})`}
-                                className={`flex h-8 items-center justify-center gap-1 rounded-md border px-2 font-bold transition ${
+                                className={`flex h-8 items-center justify-center gap-1.5 rounded-lg border px-2.5 text-xs font-bold transition ${
                                     autoAdvance
                                         ? 'border-blue-300 bg-blue-50 text-blue-700 dark:border-blue-900/50 dark:bg-blue-950/40 dark:text-blue-400'
                                         : 'border-border bg-background text-muted-foreground hover:bg-accent hover:text-foreground'
                                 }`}
                             >
                                 <Zap
-                                    className={`size-4 shrink-0 ${autoAdvance ? 'fill-blue-600 text-blue-600 dark:text-blue-400' : ''}`}
+                                    className={`size-3.5 shrink-0 ${autoAdvance ? 'fill-blue-600 text-blue-600 dark:text-blue-400' : ''}`}
                                 />
                                 <span className="hidden whitespace-nowrap sm:inline">
                                     Auto-Next
@@ -562,20 +564,26 @@ export function LiveExamView({
                             <button
                                 onClick={() => setIsScratchpadOpen(true)}
                                 title="Scratchpad / Notes"
-                                className={`flex size-8 h-8 items-center justify-center rounded-md border transition ${
+                                className={`relative flex h-8 items-center justify-center gap-1.5 rounded-lg border px-2.5 text-xs font-bold transition ${
                                     scratchpadNotes.trim().length > 0
                                         ? 'border-amber-300 bg-amber-50 text-amber-700 dark:border-amber-900/50 dark:bg-amber-950/40 dark:text-amber-400'
                                         : 'border-border bg-background text-muted-foreground hover:bg-accent hover:text-foreground'
                                 }`}
                             >
-                                <Edit3 className="size-4 shrink-0" />
+                                <Edit3 className="size-3.5 shrink-0" />
+                                <span className="hidden whitespace-nowrap md:inline">
+                                    Notes
+                                </span>
+                                {scratchpadNotes.trim().length > 0 && (
+                                    <span className="absolute -top-1 -right-1 size-2 rounded-full bg-amber-500 ring-2 ring-background" />
+                                )}
                             </button>
 
                             {/* Keyboard Shortcuts — hidden on mobile */}
                             <button
                                 onClick={() => setShowKeyboardModal(true)}
                                 title="Keyboard Shortcuts (?)"
-                                className="hidden size-8 h-8 items-center justify-center rounded-md border border-border bg-background text-muted-foreground transition hover:bg-accent hover:text-foreground sm:flex"
+                                className="hidden size-8 h-8 items-center justify-center rounded-lg border border-border bg-background text-muted-foreground transition hover:bg-accent hover:text-foreground sm:flex"
                             >
                                 <Keyboard className="size-4 shrink-0" />
                             </button>
@@ -588,7 +596,7 @@ export function LiveExamView({
                                         ? 'Exit Fullscreen'
                                         : 'Focus Mode (Fullscreen)'
                                 }
-                                className="hidden size-8 h-8 items-center justify-center rounded-md border border-border bg-background text-muted-foreground transition hover:bg-accent hover:text-foreground sm:flex"
+                                className="hidden size-8 h-8 items-center justify-center rounded-lg border border-border bg-background text-muted-foreground transition hover:bg-accent hover:text-foreground sm:flex"
                             >
                                 {isFullscreen ? (
                                     <Minimize2 className="size-4 shrink-0" />
@@ -620,18 +628,16 @@ export function LiveExamView({
                                         ? 'Expand Question Palette'
                                         : 'Question Palette'
                                 }
-                                className={`shadow-3xs flex h-8 cursor-pointer items-center justify-center rounded-md transition focus:outline-none ${
+                                className={`shadow-3xs flex h-8 cursor-pointer items-center justify-center rounded-lg px-2.5 transition focus:outline-none ${
                                     isPaletteCollapsed
-                                        ? 'border border-blue-300 bg-blue-50 px-2.5 text-blue-700 hover:bg-blue-100 dark:border-blue-900/50 dark:bg-blue-950/40 dark:text-blue-400'
-                                        : 'size-8 bg-blue-600 text-white hover:bg-blue-700'
+                                        ? 'border border-blue-300 bg-blue-50 text-blue-700 hover:bg-blue-100 dark:border-blue-900/50 dark:bg-blue-950/40 dark:text-blue-400'
+                                        : 'bg-blue-600 text-white hover:bg-blue-700'
                                 }`}
                             >
                                 <LayoutGrid className="size-4 shrink-0" />
-                                {isPaletteCollapsed && (
-                                    <span className="ml-1.5 hidden text-xs font-bold whitespace-nowrap lg:inline">
-                                        Show Palette
-                                    </span>
-                                )}
+                                <span className="ml-1.5 hidden text-xs font-bold whitespace-nowrap sm:inline">
+                                    Palette
+                                </span>
                             </button>
                         </div>
                     </div>
@@ -792,22 +798,22 @@ export function LiveExamView({
                                                             !isEliminated &&
                                                             onOptionClick(idx)
                                                         }
-                                                        className={`shadow-3xs relative flex cursor-pointer items-center justify-between gap-4 rounded-xl border p-4 transition-all ${
+                                                        className={`shadow-3xs group relative flex cursor-pointer items-center justify-between gap-4 rounded-xl border p-4 transition-all duration-200 ${
                                                             isEliminated
-                                                                ? 'border-border/60 bg-muted/40 opacity-45'
+                                                                ? 'border-dashed border-border/70 bg-muted/25 opacity-45'
                                                                 : isSelected
-                                                                  ? 'border-blue-600 bg-blue-50 dark:border-blue-500 dark:bg-blue-950/30'
-                                                                  : 'border-border bg-card hover:bg-muted'
+                                                                  ? 'border-blue-600 bg-blue-50/90 shadow-sm dark:border-blue-500 dark:bg-blue-950/40'
+                                                                  : 'border-border bg-card hover:border-blue-500/40 hover:bg-accent/40'
                                                         }`}
                                                     >
-                                                        <div className="flex items-center gap-4">
+                                                        <div className="flex min-w-0 flex-1 items-center gap-4">
                                                             <span
                                                                 className={`flex size-8 shrink-0 items-center justify-center rounded-full border text-xs font-black transition ${
                                                                     isEliminated
-                                                                        ? 'border-border bg-muted text-muted-foreground line-through'
+                                                                        ? 'border-border bg-muted/60 text-muted-foreground line-through'
                                                                         : isSelected
-                                                                          ? 'border-blue-600 bg-blue-600 text-white'
-                                                                          : 'border-border bg-background text-muted-foreground'
+                                                                          ? 'border-blue-600 bg-blue-600 text-white shadow-xs'
+                                                                          : 'border-border bg-background text-muted-foreground group-hover:border-border/80 group-hover:text-foreground'
                                                                 }`}
                                                             >
                                                                 {label}
@@ -830,7 +836,7 @@ export function LiveExamView({
                                                             </p>
                                                         </div>
 
-                                                        {/* Option Elimination Strike Toggle */}
+                                                        {/* Option Strikethrough Elimination Toggle */}
                                                         <button
                                                             type="button"
                                                             onClick={(e) =>
@@ -838,20 +844,25 @@ export function LiveExamView({
                                                                     e,
                                                                     currentIdx,
                                                                     idx,
-                                                                )
+                                                                    )
                                                             }
                                                             title={
                                                                 isEliminated
-                                                                    ? 'Restore option'
-                                                                    : 'Eliminate / strike-through option'
+                                                                    ? 'Restore choice'
+                                                                    : 'Strike out choice (Eliminate)'
                                                             }
-                                                            className={`rounded-lg p-1.5 transition ${
+                                                            className={`inline-flex shrink-0 items-center gap-1 rounded-lg p-2 text-xs font-bold transition ${
                                                                 isEliminated
-                                                                    ? 'bg-rose-100 text-rose-700 hover:bg-rose-200 dark:bg-rose-950/40 dark:text-rose-400'
-                                                                    : 'text-muted-foreground opacity-40 hover:bg-muted hover:opacity-100'
+                                                                    ? 'bg-rose-100/80 text-rose-700 hover:bg-rose-200 dark:bg-rose-950/60 dark:text-rose-400'
+                                                                    : 'text-muted-foreground opacity-30 hover:bg-muted hover:text-foreground hover:opacity-100'
                                                             }`}
                                                         >
-                                                            <EyeOff className="size-4" />
+                                                            <Strikethrough className="size-4" />
+                                                            {isEliminated && (
+                                                                <span className="hidden text-[10px] sm:inline">
+                                                                    Struck
+                                                                </span>
+                                                            )}
                                                         </button>
                                                     </div>
                                                 );

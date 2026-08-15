@@ -149,6 +149,7 @@ export function useExamState(props: ExamIndexProps) {
     } = useExamSubmission({
         activeQuestions,
         answers,
+        flagged,
         questionTimes,
         answerChanges,
         selectedExamId,
@@ -474,10 +475,25 @@ return [];
         }
     }, [buildFreshExamPool, details.title, selectedExamId]);
 
-    const getActiveTimeLimitSecs = useCallback(
-        () => (isTimed ? sessionTimeLimitSecs || details.timeLimitSecs : 0),
-        [isTimed, sessionTimeLimitSecs, details.timeLimitSecs],
-    );
+    const getActiveTimeLimitSecs = useCallback(() => {
+        if (!isTimed) {
+            return 0;
+        }
+        if (sessionTimeLimitSecs > 0) {
+            return sessionTimeLimitSecs;
+        }
+        if (drillCategoryId !== null || drillCategoryName !== null) {
+            return (activeQuestions.length || 10) * 60;
+        }
+        return details.timeLimitSecs;
+    }, [
+        isTimed,
+        sessionTimeLimitSecs,
+        drillCategoryId,
+        drillCategoryName,
+        activeQuestions.length,
+        details.timeLimitSecs,
+    ]);
 
     return {
         mounted,

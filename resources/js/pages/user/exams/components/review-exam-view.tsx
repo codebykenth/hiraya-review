@@ -1,4 +1,4 @@
-import { Head, usePage } from '@inertiajs/react';
+import { Head, Link, usePage, router } from '@inertiajs/react';
 import {
     ChevronLeft,
     ChevronRight,
@@ -15,6 +15,11 @@ import {
     Lock,
     Brain,
     Check,
+    Target,
+    Lightbulb,
+    Sparkles,
+    ArrowRight,
+    Bookmark,
 } from 'lucide-react';
 import React, {
     useState,
@@ -33,7 +38,7 @@ import type {
     ReviewStatusFilter,
 } from '../types';
 import QuestionPalettePanel from './question-palette-panel';
-import { SaveToFlashcardDialog } from './save-to-flashcard-dialog';
+import { BookmarkToDrillSetDialog } from './bookmark-to-drill-set-dialog';
 
 interface ReviewExamViewProps {
     details: SimulationDetails;
@@ -209,8 +214,46 @@ export function ReviewExamView({
         };
     }, []);
 
-    const [savedFlashcards, setSavedFlashcards] = useState<Record<number, boolean>>({});
-    const [isFlashcardDialogOpen, setIsFlashcardDialogOpen] = useState(false);
+    const [savedBookmarks, setSavedBookmarks] = useState<Record<number, boolean>>({});
+    const [isBookmarkDialogOpen, setIsBookmarkDialogOpen] = useState(false);
+
+    const wrongQuestionIds = useMemo(() => {
+        return activeQuestions
+            .filter((q, idx) => {
+                if (q.category === 'Demographic Profile' || q.isDemographic) return false;
+                const chosen = answers[idx];
+                return (
+                    chosen !== undefined &&
+                    chosen !== null &&
+                    Number(chosen) !== Number(q.correct_option)
+                );
+            })
+            .map((q) => q.id);
+    }, [activeQuestions, answers]);
+
+    const handleDrillCurrentTopic = (q: Question | undefined) => {
+        if (!q) return;
+        const params = new URLSearchParams();
+        params.set('drill', 'true');
+        params.set('category_name', q.category);
+        if (q.subcategory) {
+            params.set('subcategories', JSON.stringify([q.subcategory]));
+        }
+        params.set('is_timed', 'true');
+        params.set('question_count', '10');
+        router.visit(`/exams?${params.toString()}`);
+    };
+
+    const handleDrillAllMistakes = () => {
+        if (wrongQuestionIds.length === 0) return;
+        const params = new URLSearchParams();
+        params.set('drill', 'true');
+        params.set('category_name', 'Mistakes Review Drill');
+        params.set('custom_question_ids', JSON.stringify(wrongQuestionIds));
+        params.set('is_timed', 'false');
+        params.set('question_count', 'all');
+        router.visit(`/exams?${params.toString()}`);
+    };
 
     const reportStatus = currentQuestion
         ? localReportsMap[`App\\Models\\Question:${currentQuestion.id}`]
@@ -434,15 +477,140 @@ export function ReviewExamView({
         };
     }, []);
 
+    const findFirstMatchingIndex = useCallback(
+        (
+            category: string,
+            subcategory: string,
+            status: ReviewStatusFilter,
+        ) => {
+            return activeQuestions.findIndex((q, idx) => {
+                if (category !== 'All Categories' && q.category !== category) {
+                    return false;
+                }
+                if (
+                    subcategory !== 'All Subcategories' &&
+                    (q.subcategory || 'General Concepts') !== subcategory
+                ) {
+                    return false;
+                }
+                const chosen = answers[idx];
+                const isCorrect =
+                    chosen !== undefined &&
+                    chosen !== null &&
+                    Number(chosen) === Number(q.correct_option);
+                const isDemographic =
+                    q.category === 'Demographic Profile' || q.isDemographic;
+
+                if (status === 'correct' && (isDemographic || !isCorrect)) {
+                    return false;
+                }
+                if (status === 'incorrect' && (isDemographic || isCorrect)) {
+                    return false;
+                }
+                if (status === 'flagged' && !flagged[idx]) {
+                    return false;
+                }
+                return true;
+            });
+        },
+        [activeQuestions, answers, flagged],
+    );
+
+    const handleCategoryFilterChange = useCallback(
+        (cat: string) => {
+            setReviewCategoryFilter(cat);
+            setReviewSubcategoryFilter('All Subcategories');
+            const firstMatch = findFirstMatchingIndex(
+                cat,
+                'All Subcategories',
+                reviewStatusFilter,
+            );
+            if (firstMatch !== -1) {
+                setCurrentIdx(firstMatch);
+            }
+        },
+        [
+            findFirstMatchingIndex,
+            reviewStatusFilter,
+            setReviewCategoryFilter,
+            setReviewSubcategoryFilter,
+            setCurrentIdx,
+        ],
+    );
+
+    const handleSubcategoryFilterChange = useCallback(
+        (subcat: string) => {
+            setReviewSubcategoryFilter(subcat);
+            const firstMatch = findFirstMatchingIndex(
+                reviewCategoryFilter,
+                subcat,
+                reviewStatusFilter,
+            );
+            if (firstMatch !== -1) {
+                setCurrentIdx(firstMatch);
+            }
+        },
+        [
+            findFirstMatchingIndex,
+            reviewCategoryFilter,
+            reviewStatusFilter,
+            setReviewSubcategoryFilter,
+            setCurrentIdx,
+        ],
+    );
+
+    const handleStatusFilterChange = useCallback(
+        (status: ReviewStatusFilter) => {
+            setReviewStatusFilter(status);
+            const firstMatch = findFirstMatchingIndex(
+                reviewCategoryFilter,
+                reviewSubcategoryFilter,
+                status,
+            );
+            if (firstMatch !== -1) {
+                setCurrentIdx(firstMatch);
+            }
+        },
+        [
+            findFirstMatchingIndex,
+            reviewCategoryFilter,
+            reviewSubcategoryFilter,
+            setReviewStatusFilter,
+            setCurrentIdx,
+        ],
+    );
+
+    // Safeguard: Automatically jump to 1st matching question if currentIdx is out of bounds or doesn't match active filters
+    useEffect(() => {
+        const currentQ = activeQuestions[currentIdx];
+        if (!currentQ || !isCurrentMatch(currentQ, currentIdx)) {
+            const firstMatch = findFirstMatchingIndex(
+                reviewCategoryFilter,
+                reviewSubcategoryFilter,
+                reviewStatusFilter,
+            );
+            if (firstMatch !== -1) {
+                setCurrentIdx(firstMatch);
+            }
+        }
+    }, [
+        reviewCategoryFilter,
+        reviewSubcategoryFilter,
+        reviewStatusFilter,
+        findFirstMatchingIndex,
+        activeQuestions,
+        currentIdx,
+        setCurrentIdx,
+    ]);
+
     const handleTopicClick = (topicName: string) => {
         if (reviewSubcategories && reviewSubcategories.includes(topicName)) {
-            setReviewSubcategoryFilter(topicName);
+            handleSubcategoryFilterChange(topicName);
         } else if (
             details.allowedCategories &&
             details.allowedCategories.includes(topicName)
         ) {
-            setReviewCategoryFilter(topicName);
-            setReviewSubcategoryFilter('All Subcategories');
+            handleCategoryFilterChange(topicName);
         }
     };
 
@@ -670,6 +838,19 @@ export function ReviewExamView({
 
                             {/* Score Pills (Large Screens) */}
                             <div className="hidden lg:flex">{scorePills}</div>
+
+                            {/* Drill All Mistakes CTA */}
+                            {wrongQuestionIds.length > 0 && (
+                                <button
+                                    type="button"
+                                    onClick={handleDrillAllMistakes}
+                                    title={`Start an instant practice session targeting the ${wrongQuestionIds.length} questions you missed`}
+                                    className="hidden sm:inline-flex cursor-pointer items-center gap-1.5 rounded-lg bg-rose-600 px-3 py-1.5 text-xs font-bold text-white shadow-xs transition hover:bg-rose-700 active:scale-95"
+                                >
+                                    <RotateCcw className="size-3.5" />
+                                    <span>Drill Mistakes ({wrongQuestionIds.length})</span>
+                                </button>
+                            )}
 
                             {/* Question Palette Toggle Button */}
                             <button
@@ -1010,29 +1191,37 @@ export function ReviewExamView({
                                                                     title="Report is currently under admin review"
                                                                 >
                                                                     <Clock className="size-3.5 text-amber-600 dark:text-amber-400" />
-                                                                    Report
-                                                                    Pending
+                                                                    Report Pending
                                                                 </span>
                                                             );
                                                         }
 
                                                         return (
-                                                            <div className="flex items-center gap-2">
+                                                            <div className="flex flex-wrap items-center gap-1.5">
                                                                 <button
-                                                                    onClick={() => setIsFlashcardDialogOpen(true)}
-                                                                    className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[11px] font-bold text-indigo-600 transition hover:bg-indigo-50 focus:outline-none dark:text-indigo-400 dark:hover:bg-indigo-950/20"
+                                                                    onClick={() => setIsBookmarkDialogOpen(true)}
+                                                                    className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-border bg-background px-2.5 py-1.5 text-[11px] font-bold text-blue-600 transition hover:bg-blue-50 hover:border-blue-200 focus:outline-none dark:text-blue-400 dark:hover:bg-blue-950/20 dark:hover:border-blue-900/50"
                                                                 >
-                                                                    {savedFlashcards[currentQuestion.id] ? (
+                                                                    {savedBookmarks[currentQuestion.id] ? (
                                                                         <>
                                                                             <Check className="size-3.5 text-emerald-600" />
-                                                                            Saved to Deck
+                                                                            <span>Bookmarked</span>
                                                                         </>
                                                                     ) : (
                                                                         <>
-                                                                            <Brain className="size-3.5" />
-                                                                            Save to Flashcards
+                                                                            <Bookmark className="size-3.5" />
+                                                                            <span>Bookmark</span>
                                                                         </>
                                                                     )}
+                                                                </button>
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => handleDrillCurrentTopic(currentQuestion)}
+                                                                    className="hidden sm:inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-amber-200 bg-amber-50/60 px-2.5 py-1.5 text-[11px] font-bold text-amber-800 transition hover:bg-amber-100 hover:border-amber-300 focus:outline-none dark:border-amber-900/50 dark:bg-amber-950/30 dark:text-amber-300 dark:hover:bg-amber-950/60"
+                                                                    title={`Launch 10-question practice drill on ${currentQuestion.subcategory || currentQuestion.category}`}
+                                                                >
+                                                                    <Target className="size-3.5 text-amber-600 dark:text-amber-400" />
+                                                                    <span>Drill Topic</span>
                                                                 </button>
                                                                 <button
                                                                     onClick={() =>
@@ -1040,10 +1229,10 @@ export function ReviewExamView({
                                                                             true,
                                                                         )
                                                                     }
-                                                                    className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[11px] font-bold text-amber-600 transition hover:bg-amber-50 focus:outline-none dark:text-amber-500 dark:hover:bg-amber-950/20"
+                                                                    className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg px-2 py-1.5 text-[11px] font-bold text-muted-foreground transition hover:bg-muted hover:text-amber-600 focus:outline-none dark:hover:text-amber-400"
                                                                 >
                                                                     <Flag className="size-3.5" />
-                                                                    Report Issue
+                                                                    <span className="hidden sm:inline">Report</span>
                                                                 </button>
                                                             </div>
                                                         );
@@ -1059,7 +1248,7 @@ export function ReviewExamView({
                                         </div>
                                     </div>
 
-                                    {/* Options Grid */}
+                                    {/* Options Grid with High-Contrast Feedback */}
                                     <div className="flex flex-col gap-3.5">
                                         {currentQuestion.options.map(
                                             (opt, idx) => {
@@ -1089,39 +1278,39 @@ export function ReviewExamView({
                                                 if (isDemographic) {
                                                     if (isChosen) {
                                                         optionStyle =
-                                                            'bg-blue-50/15 border-blue-600 text-blue-950 font-bold dark:bg-blue-950/20 dark:border-blue-500 dark:text-blue-200';
+                                                            'bg-blue-50/20 border-blue-600 text-blue-950 font-bold dark:bg-blue-950/30 dark:border-blue-500 dark:text-blue-200 shadow-xs';
                                                         badgeStyle =
                                                             'border-blue-600 bg-blue-600 text-white';
                                                     }
                                                 } else if (isCorrectOption) {
                                                     optionStyle =
-                                                        'bg-emerald-50/20 border-emerald-500 text-emerald-950 font-bold dark:bg-emerald-950/20 dark:border-emerald-500 dark:text-emerald-300';
+                                                        'bg-emerald-50/40 border-emerald-500 text-emerald-950 font-bold dark:bg-emerald-950/30 dark:border-emerald-500 dark:text-emerald-200 shadow-xs';
                                                     badgeStyle =
                                                         'border-emerald-600 bg-emerald-600 text-white';
                                                 } else if (isChosen) {
                                                     optionStyle =
-                                                        'bg-rose-50/20 border-rose-500 text-rose-950 font-bold dark:bg-rose-950/20 dark:border-rose-500 dark:text-rose-300';
+                                                        'bg-rose-50/40 border-rose-500 text-rose-950 font-bold dark:bg-rose-950/30 dark:border-rose-500 dark:text-rose-200 shadow-xs';
                                                     badgeStyle =
                                                         'border-rose-600 bg-rose-600 text-white';
                                                 } else {
                                                     optionStyle =
-                                                        'border-border bg-card hover:bg-muted text-foreground/60 opacity-80';
+                                                        'border-border bg-card text-foreground/70 opacity-75';
                                                     badgeStyle =
-                                                        'border-border bg-background text-muted-foreground/60';
+                                                        'border-border bg-muted/40 text-muted-foreground';
                                                 }
 
                                                 return (
                                                     <div
                                                         key={idx}
-                                                        className={`shadow-3xs flex items-center gap-4 rounded-xl border p-4 transition-all ${optionStyle}`}
+                                                        className={`shadow-3xs flex items-center gap-4 rounded-xl border p-4 transition-all duration-200 ${optionStyle}`}
                                                     >
                                                         <span
                                                             className={`flex size-8 shrink-0 items-center justify-center rounded-full border text-xs font-black transition ${badgeStyle}`}
                                                         >
                                                             {letter}
                                                         </span>
-                                                        <div className="flex flex-1 items-center justify-between">
-                                                            <p className="text-base leading-relaxed font-bold transition md:text-base">
+                                                        <div className="flex flex-1 items-center justify-between gap-3">
+                                                            <p className="text-sm sm:text-base leading-relaxed font-bold transition">
                                                                 {renderFormattedText(
                                                                     opt,
                                                                     false,
@@ -1131,25 +1320,27 @@ export function ReviewExamView({
                                                             </p>
                                                             {!isDemographic &&
                                                                 isCorrectOption && (
-                                                                    <div className="flex shrink-0 items-center gap-1.5 pl-3">
-                                                                        {isChosen && (
-                                                                            <span className="hidden text-[9px] font-black tracking-wider text-emerald-700 uppercase sm:inline-block dark:text-emerald-400">
-                                                                                Your
-                                                                                Answer
+                                                                    <div className="flex shrink-0 items-center gap-1.5 pl-2">
+                                                                        {isChosen ? (
+                                                                            <span className="hidden rounded-full bg-emerald-100 px-2 py-0.5 text-[9px] font-black tracking-wider text-emerald-800 uppercase sm:inline-block dark:bg-emerald-950 dark:text-emerald-300">
+                                                                                Your Answer (Correct)
+                                                                            </span>
+                                                                        ) : (
+                                                                            <span className="hidden rounded-full bg-emerald-100 px-2 py-0.5 text-[9px] font-black tracking-wider text-emerald-800 uppercase sm:inline-block dark:bg-emerald-950 dark:text-emerald-300">
+                                                                                Correct Answer
                                                                             </span>
                                                                         )}
-                                                                        <CheckCircle2 className="dark:text-emerald-450 size-5 text-emerald-600 dark:text-emerald-400" />
+                                                                        <CheckCircle2 className="size-5 text-emerald-600 dark:text-emerald-400" />
                                                                     </div>
                                                                 )}
                                                             {!isDemographic &&
                                                                 isChosen &&
                                                                 !isCorrectOption && (
-                                                                    <div className="flex shrink-0 items-center gap-1.5 pl-3">
-                                                                        <span className="hidden text-[9px] font-black tracking-wider text-rose-700 uppercase sm:inline-block dark:text-rose-400">
-                                                                            Your
-                                                                            Answer
+                                                                    <div className="flex shrink-0 items-center gap-1.5 pl-2">
+                                                                        <span className="hidden rounded-full bg-rose-100 px-2 py-0.5 text-[9px] font-black tracking-wider text-rose-800 uppercase sm:inline-block dark:bg-rose-950 dark:text-rose-300">
+                                                                            Your Answer (Incorrect)
                                                                         </span>
-                                                                        <X className="text-rose-650 dark:text-rose-450 size-5" />
+                                                                        <X className="size-5 text-rose-600 dark:text-rose-400" />
                                                                     </div>
                                                                 )}
                                                         </div>
@@ -1190,11 +1381,9 @@ export function ReviewExamView({
                                                             className="flex w-full items-center justify-between p-4 font-bold text-foreground transition hover:bg-muted/50 sm:p-5"
                                                         >
                                                             <div className="flex items-center gap-2">
-                                                                <HelpCircle className="size-4 text-blue-600 dark:text-blue-400" />
-                                                                <span>
-                                                                    Explanation
-                                                                    &amp;
-                                                                    Rationale
+                                                                <Lightbulb className="size-4 text-amber-500" />
+                                                                <span className="font-heading text-sm font-bold">
+                                                                    Explanation &amp; Concept Rationale
                                                                 </span>
                                                             </div>
                                                             <div className="flex items-center gap-2">
@@ -1212,13 +1401,12 @@ export function ReviewExamView({
                                                         </button>
 
                                                         {isExplanationOpen && (
-                                                            <div className="border-t border-border/60 bg-muted/30 p-5">
+                                                            <div className="border-t border-border/60 bg-muted/20 p-5">
                                                                 {propositions.length >
                                                                     0 && (
                                                                     <div className="shadow-3xs mb-4 rounded-xl border border-border bg-background p-4">
                                                                         <span className="mb-2 block font-heading text-[10px] font-black tracking-wider text-muted-foreground uppercase">
-                                                                            Proposition
-                                                                            Key:
+                                                                            Proposition Key:
                                                                         </span>
                                                                         <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
                                                                             {propositions.map(
@@ -1257,11 +1445,13 @@ export function ReviewExamView({
                                                                     </div>
                                                                 )}
 
-                                                                {renderFormattedText(
-                                                                    currentQuestion.explanation,
-                                                                    false,
-                                                                    letterMap,
-                                                                )}
+                                                                <div className="text-foreground leading-relaxed">
+                                                                    {renderFormattedText(
+                                                                        currentQuestion.explanation,
+                                                                        false,
+                                                                        letterMap,
+                                                                    )}
+                                                                </div>
                                                             </div>
                                                         )}
                                                     </div>
@@ -1277,8 +1467,7 @@ export function ReviewExamView({
                                         No questions match filters
                                     </h3>
                                     <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
-                                        Try switching to a different category or
-                                        status pill.
+                                        Try switching to a different category or status filter.
                                     </p>
                                 </div>
                             )}
@@ -1305,7 +1494,7 @@ export function ReviewExamView({
                                     onClick={handleJumpToNextIncorrect}
                                     className="flex cursor-pointer items-center gap-2 rounded-xl border border-rose-200 bg-rose-50 px-4 py-2.5 text-xs font-extrabold text-rose-700 shadow-2xs transition hover:bg-rose-100 hover:shadow-xs dark:border-rose-900/40 dark:bg-rose-950/30 dark:text-rose-400 dark:hover:bg-rose-950/50"
                                 >
-                                    <span>Next Incorrect</span>
+                                    <span>Next Mistake</span>
                                     <ChevronRight className="size-4 text-rose-600 dark:text-rose-400" />
                                 </button>
                             )}
@@ -1334,19 +1523,12 @@ export function ReviewExamView({
                         flagged={flagged}
                         onNavigate={setCurrentIdx}
                         selectedCategory={reviewCategoryFilter}
-                        onCategoryChange={(cat) => {
-                            setReviewCategoryFilter(cat);
-                            setReviewSubcategoryFilter('All Subcategories');
-                        }}
+                        onCategoryChange={handleCategoryFilterChange}
                         allowedCategories={details.allowedCategories}
                         reviewStatusFilter={reviewStatusFilter}
                         reviewSubcategoryFilter={reviewSubcategoryFilter}
-                        onReviewStatusChange={(status) =>
-                            setReviewStatusFilter(status)
-                        }
-                        onReviewSubcategoryChange={(subcat) =>
-                            setReviewSubcategoryFilter(subcat)
-                        }
+                        onReviewStatusChange={handleStatusFilterChange}
+                        onReviewSubcategoryChange={handleSubcategoryFilterChange}
                         reviewSubcategories={reviewSubcategories}
                         isMobile={false}
                         isCollapsed={isPaletteCollapsed}
@@ -1366,19 +1548,12 @@ export function ReviewExamView({
                         flagged={flagged}
                         onNavigate={setCurrentIdx}
                         selectedCategory={reviewCategoryFilter}
-                        onCategoryChange={(cat) => {
-                            setReviewCategoryFilter(cat);
-                            setReviewSubcategoryFilter('All Subcategories');
-                        }}
+                        onCategoryChange={handleCategoryFilterChange}
                         allowedCategories={details.allowedCategories}
                         reviewStatusFilter={reviewStatusFilter}
                         reviewSubcategoryFilter={reviewSubcategoryFilter}
-                        onReviewStatusChange={(status) =>
-                            setReviewStatusFilter(status)
-                        }
-                        onReviewSubcategoryChange={(subcat) =>
-                            setReviewSubcategoryFilter(subcat)
-                        }
+                        onReviewStatusChange={handleStatusFilterChange}
+                        onReviewSubcategoryChange={handleSubcategoryFilterChange}
                         reviewSubcategories={reviewSubcategories}
                         isMobile={true}
                         onCloseMobile={() => setIsMobilePaletteOpen(false)}
@@ -1394,12 +1569,12 @@ export function ReviewExamView({
                     />
                 )}
 
-                <SaveToFlashcardDialog
-                    open={isFlashcardDialogOpen}
-                    onOpenChange={setIsFlashcardDialogOpen}
+                <BookmarkToDrillSetDialog
+                    open={isBookmarkDialogOpen}
+                    onOpenChange={setIsBookmarkDialogOpen}
                     question={currentQuestion ?? null}
                     onSaved={(questionId) => {
-                        setSavedFlashcards((prev) => ({ ...prev, [questionId]: true }));
+                        setSavedBookmarks((prev) => ({ ...prev, [questionId]: true }));
                     }}
                 />
             </div>

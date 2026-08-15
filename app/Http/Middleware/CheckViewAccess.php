@@ -18,7 +18,6 @@ class CheckViewAccess
         'guide' => 'reviewer-guide',
         'study-schedules.*' => 'study-plan',
         'learn.*' => 'learn',
-        'flashcards.*' => 'flashcards',
         'drills.*' => 'practice-drills',
         'exams.*' => 'mock-exams',
         'history.*' => 'history',

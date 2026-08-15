@@ -3,6 +3,7 @@
 use App\Jobs\GenerateUserAnalysisJob;
 use App\Models\ExamAttempt;
 use App\Models\ExamDate;
+use App\Models\StudySchedule;
 use App\Models\User;
 use App\Models\UserAiAnalysis;
 use Illuminate\Support\Facades\Bus;
@@ -147,5 +148,50 @@ test('dashboard serves cached analysis if generated today', function () {
             ->where('status', 'ready')
             ->where('data', $analysisData)
         )
+        ->has('dailyGoal')
+        ->has('todayTasks')
+        ->has('recentAttempts')
+    );
+});
+
+test('dashboard returns streak, today tasks, and recent attempts', function () {
+    $user = User::factory()->create();
+    ExamDate::create(['date' => now()->addDays(30), 'is_active' => true]);
+
+    StudySchedule::create([
+        'user_id' => $user->id,
+        'study_date' => now()->toDateString(),
+        'title' => 'Review Vocabulary',
+        'is_done' => false,
+    ]);
+
+    ExamAttempt::create([
+        'user_id' => $user->id,
+        'category_id' => null,
+        'question_ids' => [1, 2],
+        'answers' => [1 => 0, 2 => 1],
+        'cat_scores' => [
+            'categoryScoreMap' => [],
+            'metadata' => [
+                'track' => 'Drill',
+                'category_name' => 'Verbal Ability',
+                'correct_count' => 2,
+                'total_questions' => 2,
+                'skipped_count' => 0,
+                'duration_secs' => 60,
+                'is_timed' => false,
+            ],
+        ],
+    ]);
+
+    $response = $this->actingAs($user)->get(route('dashboard.index'));
+    $response->assertOk();
+
+    $response->assertInertia(fn (Assert $page) => $page
+        ->component('user/dashboard/index')
+        ->where('dailyGoal.streak', 1)
+        ->where('dailyGoal.questionsToday', 2)
+        ->has('todayTasks', 1)
+        ->has('recentAttempts', 1)
     );
 });

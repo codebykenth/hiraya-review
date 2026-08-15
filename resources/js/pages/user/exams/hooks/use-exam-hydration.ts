@@ -214,28 +214,43 @@ return;
             window.history.replaceState({}, '', url.toString());
 
             const sourcePool = questions.length > 0 ? questions : fallbackQuestions;
-            let pool = sourcePool.filter((q) => {
-                const catMatch =
-                    q.category.toLowerCase().includes(catName.toLowerCase()) ||
-                    catName.toLowerCase().includes(q.category.toLowerCase());
-                const subcatMatch =
-                    subcats.length === 0 ||
-                    subcats.some(
-                        (subName) =>
-                            q.subcategory.toLowerCase().includes(subName.toLowerCase()) ||
-                            subName.toLowerCase().includes(q.subcategory.toLowerCase()),
-                    );
+            const customIdsParam = params.get('custom_question_ids');
+            let pool: Question[] = [];
 
-                let langMatch = true;
-
-                if (lang === 'English') {
-                    langMatch = q.language === 'English' || !q.language;
-                } else if (lang === 'Filipino') {
-                    langMatch = q.language === 'Filipino';
+            if (customIdsParam) {
+                try {
+                    const parsedIds: number[] = JSON.parse(customIdsParam);
+                    const idSet = new Set(parsedIds);
+                    pool = sourcePool.filter((q) => idSet.has(q.id));
+                } catch {
+                    /* ignore */
                 }
+            }
 
-                return catMatch && subcatMatch && langMatch;
-            });
+            if (pool.length === 0) {
+                pool = sourcePool.filter((q) => {
+                    const catMatch =
+                        q.category.toLowerCase().includes(catName.toLowerCase()) ||
+                        catName.toLowerCase().includes(q.category.toLowerCase());
+                    const subcatMatch =
+                        subcats.length === 0 ||
+                        subcats.some(
+                            (subName) =>
+                                q.subcategory.toLowerCase().includes(subName.toLowerCase()) ||
+                                subName.toLowerCase().includes(q.subcategory.toLowerCase()),
+                        );
+
+                    let langMatch = true;
+
+                    if (lang === 'English') {
+                        langMatch = q.language === 'English' || !q.language;
+                    } else if (lang === 'Filipino') {
+                        langMatch = q.language === 'Filipino';
+                    }
+
+                    return catMatch && subcatMatch && langMatch;
+                });
+            }
 
             if (pool.length === 0) {
                 pool = sourcePool.slice(0, 30);
@@ -246,7 +261,7 @@ return;
             const limitSecs = isTimedParam ? finalPool.length * 60 : 0;
 
             setDrillCategoryId(catId);
-            setDrillCategoryName(`${catName} Practice`);
+            setDrillCategoryName(catName.endsWith('Practice') || catName.endsWith('Drill') ? catName : `${catName} Practice`);
             setDrillSubcategories(subcats);
             setDrillLanguage(lang);
             setDrillQuestionCount(qCountParam === 'all' ? 'all' : Number(qCountParam));

@@ -18,7 +18,6 @@ class ViewManagementController extends Controller
             'reviewer-guide' => 'Reviewer Guide',
             'study-plan' => 'Study Plan',
             'learn' => 'Learn Modules',
-            'flashcards' => 'Flashcards',
             'practice-drills' => 'Practice Drills',
             'mock-exams' => 'Mock Exams',
             'history' => 'History & Results',

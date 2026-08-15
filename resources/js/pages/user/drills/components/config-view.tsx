@@ -11,7 +11,7 @@ import {
     Globe,
     RefreshCcw,
 } from 'lucide-react';
-import React from 'react';
+import React, { useState } from 'react';
 import { PageHeader } from '@/components/layout/page-header';
 import { Card } from '@/components/ui/card';
 import {
@@ -55,6 +55,9 @@ export function ConfigView({
     setIsTimed,
     startDrill,
 }: ConfigViewProps) {
+    const [customInput, setCustomInput] = useState<string>('');
+    const [isCustomMode, setIsCustomMode] = useState<boolean>(false);
+
     const meta = categoryMeta[selectedCategory.name] || {
         icon: Brain,
         bgColor: 'bg-slate-600',
@@ -174,15 +177,17 @@ export function ConfigView({
                                             key={count}
                                             type="button"
                                             disabled={isRetakeConfig}
-                                            onClick={() =>
-                                                setQuestionCount(count)
-                                            }
+                                            onClick={() => {
+                                                setIsCustomMode(false);
+                                                setCustomInput('');
+                                                setQuestionCount(count);
+                                            }}
                                             className={`cursor-pointer rounded-lg border px-4 py-2 text-xs font-bold transition focus:outline-none ${
                                                 isRetakeConfig
                                                     ? 'pointer-events-none opacity-60 select-none'
                                                     : ''
                                             } ${
-                                                isSelected
+                                                !isCustomMode && isSelected
                                                     ? 'border-blue-600 bg-blue-600 text-white shadow-xs'
                                                     : 'border-border bg-slate-50/50 text-muted-foreground hover:bg-slate-100 dark:bg-slate-900 dark:hover:bg-slate-800'
                                             }`}
@@ -196,13 +201,17 @@ export function ConfigView({
                             <button
                                 type="button"
                                 disabled={isRetakeConfig}
-                                onClick={() => setQuestionCount('all')}
+                                onClick={() => {
+                                    setIsCustomMode(false);
+                                    setCustomInput('');
+                                    setQuestionCount('all');
+                                }}
                                 className={`cursor-pointer rounded-lg border px-4 py-2 text-xs font-bold transition focus:outline-none ${
                                     isRetakeConfig
                                         ? 'pointer-events-none opacity-60 select-none'
                                         : ''
                                 } ${
-                                    questionCount === 'all'
+                                    !isCustomMode && questionCount === 'all'
                                         ? 'border-blue-600 bg-blue-600 text-white shadow-xs'
                                         : 'border-border bg-slate-50/50 text-muted-foreground hover:bg-slate-100 dark:bg-slate-900 dark:hover:bg-slate-800'
                                 }`}
@@ -212,10 +221,14 @@ export function ConfigView({
 
                             {/* Custom number input */}
                             <div
-                                className={`flex items-center gap-2 rounded-lg border border-border bg-slate-50/20 px-3 py-1 text-xs transition focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500 dark:bg-slate-900/30 ${
+                                className={`flex items-center gap-2 rounded-lg border px-3 py-1 text-xs transition ${
                                     isRetakeConfig
                                         ? 'pointer-events-none opacity-60 select-none'
                                         : ''
+                                } ${
+                                    isCustomMode
+                                        ? 'border-blue-500 bg-blue-50/20 ring-1 ring-blue-500/30 dark:bg-blue-950/20'
+                                        : 'border-border bg-slate-50/20 dark:bg-slate-900/30'
                                 }`}
                             >
                                 <span className="shrink-0 font-bold text-muted-foreground">
@@ -227,34 +240,44 @@ export function ConfigView({
                                     disabled={isRetakeConfig}
                                     max={filteredQCount}
                                     value={
-                                        typeof questionCount === 'number' &&
-                                        !generateQuestionOptions(
-                                            filteredQCount,
-                                        ).includes(questionCount)
-                                            ? questionCount
+                                        isCustomMode
+                                            ? customInput
+                                            : typeof questionCount === 'number' &&
+                                              !generateQuestionOptions(filteredQCount).includes(questionCount)
+                                            ? String(questionCount)
                                             : ''
                                     }
                                     placeholder={`1-${filteredQCount}`}
+                                    onFocus={() => {
+                                        setIsCustomMode(true);
+                                        if (typeof questionCount === 'number' && questionCount > 0) {
+                                            setCustomInput(String(questionCount));
+                                        }
+                                    }}
                                     onChange={(e) => {
-                                        const val =
-                                            e.target.value === ''
-                                                ? ''
-                                                : Math.min(
-                                                      filteredQCount,
-                                                      Math.max(
-                                                          1,
-                                                          parseInt(
-                                                              e.target.value,
-                                                              10,
-                                                          ),
-                                                      ),
-                                                  );
-
-                                        if (
-                                            typeof val === 'number' &&
-                                            !isNaN(val)
-                                        ) {
-                                            setQuestionCount(val);
+                                        const raw = e.target.value;
+                                        setIsCustomMode(true);
+                                        setCustomInput(raw);
+                                        if (raw === '') {
+                                            setQuestionCount('all');
+                                        } else {
+                                            const parsed = parseInt(raw, 10);
+                                            if (!isNaN(parsed) && parsed > 0) {
+                                                const clamped = Math.min(filteredQCount, parsed);
+                                                setQuestionCount(clamped);
+                                            }
+                                        }
+                                    }}
+                                    onBlur={() => {
+                                        if (isCustomMode) {
+                                            if (customInput === '' || Number(customInput) <= 0) {
+                                                const fallback = Math.min(10, filteredQCount);
+                                                setQuestionCount(fallback);
+                                                setCustomInput(String(fallback));
+                                            } else if (Number(customInput) > filteredQCount) {
+                                                setQuestionCount(filteredQCount);
+                                                setCustomInput(String(filteredQCount));
+                                            }
                                         }
                                     }}
                                     className="w-14 [appearance:textfield] bg-transparent font-bold text-foreground focus:outline-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
@@ -263,51 +286,47 @@ export function ConfigView({
                         </div>
                     </Card>
 
-                    {/* 3. Language Selector */}
-                    <Card className="p-5 shadow-2xs">
-                        <div className="mb-3.5 flex items-center gap-1.5 text-[10px] font-extrabold tracking-wider text-muted-foreground uppercase">
-                            <Globe className="size-3" />
-                            <span>Language</span>
-                        </div>
-                        <div className="flex flex-wrap gap-3 sm:gap-6">
-                            {(hasFilipinoQuestions
-                                ? ['English', 'Filipino', 'Both']
-                                : ['English']
-                            ).map((lang) => {
-                                const isSelected = language === lang;
+                    {/* 3. Language Selector (Only shown if current selection contains Filipino/Tagalog questions) */}
+                    {hasFilipinoQuestions && (
+                        <Card className="p-5 shadow-2xs">
+                            <div className="mb-3.5 flex items-center gap-1.5 text-[10px] font-extrabold tracking-wider text-muted-foreground uppercase">
+                                <Globe className="size-3" />
+                                <span>Language</span>
+                            </div>
+                            <div className="flex flex-wrap gap-3 sm:gap-6">
+                                {(['English', 'Filipino', 'Both'] as const).map(
+                                    (lang) => {
+                                        const isSelected = language === lang;
 
-                                return (
-                                    <label
-                                        key={lang}
-                                        className={`flex cursor-pointer items-center gap-2 text-xs font-bold text-foreground ${
-                                            isRetakeConfig
-                                                ? 'pointer-events-none opacity-60 select-none'
-                                                : ''
-                                        }`}
-                                    >
-                                        <input
-                                            type="radio"
-                                            name="drill-lang"
-                                            disabled={isRetakeConfig}
-                                            checked={isSelected}
-                                            onChange={() =>
-                                                setLanguage(
-                                                    lang as
-                                                        | 'English'
-                                                        | 'Filipino'
-                                                        | 'Both',
-                                                )
-                                            }
-                                            className="size-4 border-border text-blue-600 focus:ring-blue-500 dark:border-slate-800 dark:bg-slate-900 dark:text-blue-400"
-                                        />
-                                        {lang === 'Both'
-                                            ? 'Both (Mixed)'
-                                            : lang}
-                                    </label>
-                                );
-                            })}
-                        </div>
-                    </Card>
+                                        return (
+                                            <label
+                                                key={lang}
+                                                className={`flex cursor-pointer items-center gap-2 text-xs font-bold text-foreground ${
+                                                    isRetakeConfig
+                                                        ? 'pointer-events-none opacity-60 select-none'
+                                                        : ''
+                                                }`}
+                                            >
+                                                <input
+                                                    type="radio"
+                                                    name="drill-lang"
+                                                    disabled={isRetakeConfig}
+                                                    checked={isSelected}
+                                                    onChange={() =>
+                                                        setLanguage(lang)
+                                                    }
+                                                    className="size-4 border-border text-blue-600 focus:ring-blue-500 dark:border-slate-800 dark:bg-slate-900 dark:text-blue-400"
+                                                />
+                                                {lang === 'Both'
+                                                    ? 'Both (Mixed)'
+                                                    : lang}
+                                            </label>
+                                        );
+                                    },
+                                )}
+                            </div>
+                        </Card>
+                    )}
 
                     {/* 4. Practice Mode Selector */}
                     <Card className="p-5 shadow-2xs">
@@ -411,14 +430,16 @@ export function ConfigView({
                                             : questionCount}
                                     </span>
                                 </div>
-                                <div className="flex items-center justify-between">
-                                    <span className="text-muted-foreground">
-                                        Language:
-                                    </span>
-                                    <span className="font-bold text-foreground">
-                                        {language}
-                                    </span>
-                                </div>
+                                {hasFilipinoQuestions && (
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-muted-foreground">
+                                            Language:
+                                        </span>
+                                        <span className="font-bold text-foreground">
+                                            {language}
+                                        </span>
+                                    </div>
+                                )}
                                 <div className="flex items-center justify-between">
                                     <span className="text-muted-foreground">
                                         Format:

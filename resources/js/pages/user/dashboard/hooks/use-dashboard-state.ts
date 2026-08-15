@@ -1,4 +1,4 @@
-﻿import { router, usePage } from '@inertiajs/react';
+import { router, usePage } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
 import { index as dashboardIndex } from '@/routes/dashboard';
 import type { Auth } from '@/types';
@@ -142,7 +142,7 @@ export function useDashboardState({ stats }: DashboardProps) {
     const activeStats = stats || defaultStats;
     const isDemoMode = !stats || stats.totalExams === 0;
     const filteredChartData = [
-        ...(activeStats.chartData || defaultStats.chartData),
+        ...(activeStats.chartData || defaultStats.chartData || []),
     ];
 
     const chartWidth = 800;

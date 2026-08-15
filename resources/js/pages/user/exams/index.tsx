@@ -198,6 +198,9 @@ export default function ExamIndex(props: ExamIndexProps) {
             <PageContainer>
                 <ScorecardView
                     details={details}
+                    activeQuestions={activeQuestions}
+                    setCurrentIdx={setCurrentIdx}
+                    answers={answers}
                     isDrillSession={isDrillSession}
                     drillCategoryName={drillCategoryName}
                     savedAttempt={savedAttempt ?? null}
@@ -206,6 +209,8 @@ export default function ExamIndex(props: ExamIndexProps) {
                     getActiveTimeLimitSecs={getActiveTimeLimitSecs}
                     submittedByTimer={submittedByTimer}
                     setReviewScreenActive={setReviewScreenActive}
+                    setReviewCategoryFilter={setReviewCategoryFilter}
+                    setReviewStatusFilter={setReviewStatusFilter}
                     handleBeginExam={handleBeginExam}
                     aiAnalysis={props.aiAnalysis}
                 />

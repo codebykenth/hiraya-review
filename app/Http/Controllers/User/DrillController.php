@@ -5,6 +5,7 @@ namespace App\Http\Controllers\User;
 use App\Models\Category;
 use App\Models\ExamAttempt;
 use App\Models\Question;
+use App\Models\SavedDrillSet;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Inertia\Inertia;
@@ -41,9 +42,66 @@ class DrillController
             }])->orderBy('sort_order')->get()->toArray();
         });
 
+        $userId = auth()->id();
+        $savedDrillSets = [];
+        $wrongQuestionIds = [];
+        $seenQuestionIds = [];
+
+        if ($userId) {
+            $savedDrillSets = SavedDrillSet::where('user_id', $userId)
+                ->withCount('questions')
+                ->with(['questions.subcategory.category'])
+                ->orderBy('id', 'desc')
+                ->get()
+                ->map(function ($set) {
+                    return [
+                        'id' => $set->id,
+                        'name' => $set->name,
+                        'description' => $set->description,
+                        'color' => $set->color,
+                        'questions_count' => $set->questions_count,
+                        'sample_categories' => $set->questions->map(fn ($q) => $q->subcategory?->category?->name)->filter()->unique()->values()->all(),
+                        'created_at' => $set->created_at?->toIso8601String(),
+                    ];
+                })
+                ->toArray();
+
+            $attempts = ExamAttempt::where('user_id', $userId)->get();
+            $questionsKeyed = collect($questions)->keyBy('id');
+
+            foreach ($attempts as $attempt) {
+                $qIds = $attempt->question_ids ?? [];
+                $seenQuestionIds = array_merge($seenQuestionIds, $qIds);
+
+                $wrongIds = $attempt->cat_scores['metadata']['wrong_question_ids'] ?? [];
+
+                // Fallback: if metadata didn't record wrong_question_ids directly, compute from answers
+                if (empty($wrongIds) && ! empty($attempt->answers) && ! empty($attempt->question_ids)) {
+                    foreach ($attempt->question_ids as $idx => $qId) {
+                        $qData = $questionsKeyed->get($qId);
+                        if (! $qData) {
+                            continue;
+                        }
+                        $chosen = $attempt->answers[$idx] ?? null;
+                        if ($chosen !== null && (int) $chosen !== (int) $qData['correct_option']) {
+                            $wrongIds[] = $qId;
+                        }
+                    }
+                }
+
+                $wrongQuestionIds = array_merge($wrongQuestionIds, $wrongIds);
+            }
+
+            $seenQuestionIds = array_values(array_unique($seenQuestionIds));
+            $wrongQuestionIds = array_values(array_unique($wrongQuestionIds));
+        }
+
         return Inertia::render('user/drills/index', [
             'questions' => $questions,
             'categories' => $categories,
+            'savedDrillSets' => $savedDrillSets,
+            'wrongQuestionIds' => $wrongQuestionIds,
+            'seenQuestionIds' => $seenQuestionIds,
         ]);
     }
 

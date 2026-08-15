@@ -748,7 +748,7 @@ class DeterministicAnalysisService
             'coaching_medium' => [
                 'Review the study guides and summary sheet for {subtopic} before drilling.',
                 'Complete 5 easy-level {subtopic} drills to rebuild confidence, then move to medium.',
-                'Create flashcards for key {subtopic} rules and review them daily.',
+                'Bookmark key {subtopic} questions into a saved drill set and practice them regularly.',
                 'Do a quick {subtopic} refresher, then test yourself with a timed drill.',
             ],
 

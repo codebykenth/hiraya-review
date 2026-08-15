@@ -6,6 +6,7 @@ import { isDemographicQuestion, apiPost } from '../utils/exam-utils';
 interface UseExamSubmissionProps {
     activeQuestions: Question[];
     answers: Record<number, number>;
+    flagged?: Record<number, boolean>;
     questionTimes: Record<number, number>;
     answerChanges: Record<number, number>;
     selectedExamId: number | null;
@@ -28,6 +29,7 @@ interface UseExamSubmissionProps {
 export function useExamSubmission({
     activeQuestions,
     answers,
+    flagged = {},
     questionTimes,
     answerChanges,
     selectedExamId,
@@ -77,12 +79,13 @@ export function useExamSubmission({
             let skippedCount = 0;
             const catMap: Record<string, CategoryScore> = {};
 
+            const wrongQuestionIds: number[] = [];
             activeQuestions.forEach((q, idx) => {
                 const isDemographic = isDemographicQuestion(q);
 
                 if (isDemographic) {
-return;
-}
+                    return;
+                }
 
                 const catName = q.category || 'General Information';
                 const subcatName = q.subcategory || 'General Concepts';
@@ -108,6 +111,7 @@ return;
                     catMap[catName].subcats[subcatName].correct += 1;
                 } else {
                     wrongCount += 1;
+                    wrongQuestionIds.push(q.id);
                 }
             });
 
@@ -137,25 +141,31 @@ return;
                 localStorage.removeItem('active_exam_session');
             }
 
-            // Post attempt payload via Inertia v3 http module
+            // Post attempt payload with full cat_scores structure
             const payload = {
                 category_id: drillCategoryId ?? selectedExamId,
-                score: scorePercentage,
-                total_questions: totalScoredQuestions,
-                correct_count: correctCount,
-                skipped_count: skippedCount,
-                duration_secs: elapsedSecs,
-                answers,
                 question_ids: activeQuestions.map((q) => q.id),
-                is_timed: isTimed,
-                track: selectedExamId === 1 ? 'Professional' : selectedExamId === 2 ? 'Subprofessional' : 'Drill',
-                category_name: drillCategoryName || 'Civil Service Examination',
-                categoryScoreMap: catMap,
-                question_times: questionTimes,
-                answer_changes: answerChanges,
-                selected_subcategories: drillSubcategories,
-                language: drillLanguage,
-                question_count: drillQuestionCount,
+                answers,
+                cat_scores: {
+                    categoryScoreMap: catMap,
+                    metadata: {
+                        track: selectedExamId === 1 ? 'Professional' : selectedExamId === 2 ? 'Subprofessional' : 'Drill',
+                        category_name: drillCategoryName || 'Civil Service Examination',
+                        score: scorePercentage,
+                        total_questions: totalScoredQuestions,
+                        correct_count: correctCount,
+                        wrong_count: wrongCount,
+                        skipped_count: skippedCount,
+                        wrong_question_ids: wrongQuestionIds,
+                        duration_secs: elapsedSecs,
+                        is_timed: isTimed,
+                        question_times: questionTimes,
+                        answer_changes: answerChanges,
+                        selected_subcategories: drillSubcategories,
+                        language: drillLanguage,
+                        question_count: drillQuestionCount,
+                    },
+                },
             };
 
             apiPost('/exams/attempts', payload)
@@ -199,26 +209,46 @@ return;
                 return;
             }
 
-            const scoredQs = activeQuestions.filter((q) => !isDemographicQuestion(q));
-            const answeredCount = Object.keys(answers).length;
-            const unansweredCount = scoredQs.length - answeredCount;
+            let scoredTotal = 0;
+            let answeredCount = 0;
+            let flaggedCount = 0;
+
+            activeQuestions.forEach((q, idx) => {
+                if (isDemographicQuestion(q)) {
+                    return;
+                }
+                scoredTotal++;
+                if (answers[idx] !== undefined && answers[idx] !== null) {
+                    answeredCount++;
+                }
+                if (flagged[idx]) {
+                    flaggedCount++;
+                }
+            });
+
+            const unansweredCount = Math.max(0, scoredTotal - answeredCount);
 
             const title = unansweredCount > 0 ? 'Submit Exam with Unanswered Questions?' : 'Submit Examination?';
-            const message =
-                unansweredCount > 0
-                    ? `You have ${unansweredCount} unanswered questions remaining out of ${scoredQs.length}. Are you sure you want to finish now?`
-                    : 'Are you sure you want to submit your exam and view your scorecard?';
+            
+            let message = `You have answered ${answeredCount} of ${scoredTotal} graded questions.`;
+            if (unansweredCount > 0) {
+                message += ` ⚠️ ${unansweredCount} question${unansweredCount > 1 ? 's are' : ' is'} left unanswered.`;
+            }
+            if (flaggedCount > 0) {
+                message += ` You also have ${flaggedCount} item${flaggedCount > 1 ? 's' : ''} flagged for review.`;
+            }
+            message += ' Once submitted, your exam will be finalized and graded immediately.';
 
             setConfirmModal({
                 isOpen: true,
                 title,
                 message,
-                confirmLabel: 'Submit Exam',
+                confirmLabel: unansweredCount > 0 ? 'Submit Anyway' : 'Submit Exam',
                 variant: unansweredCount > 0 ? 'danger' : 'success',
                 onConfirm: () => executeSubmit(false),
             });
         },
-        [activeQuestions, answers, executeSubmit],
+        [activeQuestions, answers, flagged, executeSubmit],
     );
 
     return {

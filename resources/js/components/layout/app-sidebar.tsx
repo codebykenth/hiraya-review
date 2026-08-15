@@ -73,14 +73,9 @@ const generalNavItems: NavItem[] = [
         icon: CalendarIcon,
     },
     {
-        title: 'Learn',
+        title: 'Study Hub',
         href: learnIndex(),
         icon: BookOpen,
-    },
-    {
-        title: 'Flashcards',
-        href: '/flashcards',
-        icon: Brain,
     },
     {
         title: 'Practice Drills',
@@ -195,8 +190,8 @@ const viewMap: Record<string, string> = {
     Dashboard: 'dashboard',
     'Reviewer Guide': 'reviewer-guide',
     'Study Plan': 'study-plan',
+    'Study Hub': 'learn',
     Learn: 'learn',
-    Flashcards: 'flashcards',
     'Practice Drills': 'practice-drills',
     'Mock Exams': 'mock-exams',
     History: 'history',

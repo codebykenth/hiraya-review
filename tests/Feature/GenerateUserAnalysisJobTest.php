@@ -72,57 +72,61 @@ test('GenerateUserAnalysisJob calculates subtopic stats and maps subcategory IDs
         ],
     ]);
 
-    // 4. Mock AI Response
+    // 4. Mock AI Response (Gemini API)
     Http::fake([
-        'https://api.groq.com/openai/v1/chat/completions' => Http::response([
-            'choices' => [
+        'https://generativelanguage.googleapis.com/*' => Http::response([
+            'candidates' => [
                 [
-                    'message' => [
-                        'content' => json_encode([
-                            'pass_probability' => 75,
-                            'verdict' => 'Great performance on fractions, needs improvement in decimals!',
-                            'trend' => 'stable',
-                            'strengths' => ['Numerical Ability'],
-                            'critical_weaknesses' => ['Decimals'],
-                            'priority_action' => 'Review decimal addition.',
-                            'recommended_modules' => ['Decimals'],
-                            'encouragement' => 'Keep pushing forward!',
-                            'predictive_metrics' => [
-                                'estimated_exam_score' => '70% - 80%',
-                                'days_to_readiness' => '10 days',
-                                'completion_pace' => 'Steady pace.',
-                                'mock_pass_confidence' => 'moderate',
+                    'content' => [
+                        'parts' => [
+                            [
+                                'text' => json_encode([
+                                    'pass_probability' => 75,
+                                    'verdict' => 'Great performance on fractions, needs improvement in decimals!',
+                                    'trend' => 'stable',
+                                    'strengths' => ['Numerical Ability'],
+                                    'critical_weaknesses' => ['Decimals'],
+                                    'priority_action' => 'Review decimal addition.',
+                                    'recommended_modules' => ['Decimals'],
+                                    'encouragement' => 'Keep pushing forward!',
+                                    'predictive_metrics' => [
+                                        'estimated_exam_score' => '70% - 80%',
+                                        'days_to_readiness' => '10 days',
+                                        'completion_pace' => 'Steady pace.',
+                                        'mock_pass_confidence' => 'moderate',
+                                    ],
+                                    'subject_mastery' => [
+                                        [
+                                            'subject' => 'Numerical Ability',
+                                            'rating' => 'Satisfactory',
+                                            'color' => 'amber',
+                                            'insight' => 'Scored 50% on decimal and fraction drills.',
+                                        ],
+                                    ],
+                                    'timeline_prediction' => [
+                                        'current_stage' => 'Practice Stage',
+                                        'milestone_prediction' => 'Master decimals in 7 days.',
+                                        'potential_score_improvement' => '+15%',
+                                    ],
+                                    'remediation_matrix' => [
+                                        [
+                                            'subtopic' => 'Decimals',
+                                            'difficulty_level' => 'Medium',
+                                            'reason_for_struggle' => 'Incorrect option chosen.',
+                                            'coaching_tip' => 'Draw visual decimal grids.',
+                                        ],
+                                    ],
+                                    'personalized_7_day_plan' => [
+                                        [
+                                            'day' => 'Day 1',
+                                            'focus_topic' => 'Decimals',
+                                            'activity' => 'Review decimal addition',
+                                            'subcategory_id' => $subcategory2->id,
+                                        ],
+                                    ],
+                                ]),
                             ],
-                            'subject_mastery' => [
-                                [
-                                    'subject' => 'Numerical Ability',
-                                    'rating' => 'Satisfactory',
-                                    'color' => 'amber',
-                                    'insight' => 'Scored 50% on decimal and fraction drills.',
-                                ],
-                            ],
-                            'timeline_prediction' => [
-                                'current_stage' => 'Practice Stage',
-                                'milestone_prediction' => 'Master decimals in 7 days.',
-                                'potential_score_improvement' => '+15%',
-                            ],
-                            'remediation_matrix' => [
-                                [
-                                    'subtopic' => 'Decimals',
-                                    'difficulty_level' => 'Medium',
-                                    'reason_for_struggle' => 'Incorrect option chosen.',
-                                    'coaching_tip' => 'Draw visual decimal grids.',
-                                ],
-                            ],
-                            'personalized_7_day_plan' => [
-                                [
-                                    'day' => 'Day 1',
-                                    'focus_topic' => 'Decimals',
-                                    'activity' => 'Review decimal addition',
-                                    'subcategory_id' => $subcategory2->id,
-                                ],
-                            ],
-                        ]),
+                        ],
                     ],
                 ],
             ],
@@ -131,7 +135,7 @@ test('GenerateUserAnalysisJob calculates subtopic stats and maps subcategory IDs
 
     // Set temporary environment keys so model attempts do not skip
     config([
-        'services.groq.key' => 'fake-groq-key',
+        'services.gemini.key' => 'fake-gemini-key',
         'services.ai.analysis_enabled' => true,
     ]);
 

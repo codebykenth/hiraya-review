@@ -185,14 +185,27 @@ export function useDrillsState({
                     .toLowerCase()
                     .includes(q.category.toLowerCase());
 
+            const subcatMatch =
+                selectedSubcats.length === 0 ||
+                selectedSubcats.some(
+                    (subName) =>
+                        q.subcategory
+                            .toLowerCase()
+                            .includes(subName.toLowerCase()) ||
+                        subName
+                            .toLowerCase()
+                            .includes(q.subcategory.toLowerCase()),
+                );
+
             const qLang = (q.language || '').toLowerCase();
 
             return (
                 catMatch &&
+                subcatMatch &&
                 (qLang.includes('filipino') || qLang.includes('tagalog'))
             );
         });
-    }, [questions, selectedCategory]);
+    }, [questions, selectedCategory, selectedSubcats]);
 
     const effectiveLanguage =
         hasFilipinoQuestions || language === 'English' ? language : 'English';
