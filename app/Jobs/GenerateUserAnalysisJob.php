@@ -59,10 +59,11 @@ class GenerateUserAnalysisJob implements ShouldQueue
         Your task is to rewrite the verbal commentary fields to make them highly personalized, coaching-oriented, professional, and natural.
         
         CRITICAL RULES:
-        1. Rewrite only the following text fields: `verdict`, `encouragement`, the `insight` and `recommended_action` in `subject_mastery`, and the `reason_for_struggle` and `coaching_tip` in `remediation_matrix`.
-        2. Keep the mathematical values, percentages, category/subject names, and study plan structure EXACTLY as provided. Do not invent new subjects or category names.
-        3. Every subject name in `subject_mastery`, `strengths`, and `critical_weaknesses` must strictly use the exact spelling of the 5 standard categories: 'Verbal Ability', 'Clerical Ability', 'General Information', 'Numerical Ability', and 'Analytical Ability'.
-        4. You must respond ONLY with a valid JSON object matching the provided schema.";
+        1. Rewrite only the following text fields: `verdict`, `encouragement`, `priority_action`, the `insight` and `recommended_action` in `subject_mastery`, and the `reason_for_struggle` and `coaching_tip` in `remediation_matrix`.
+        2. STRICT THEMATIC CONSISTENCY: Your `priority_action` and `encouragement` MUST strictly align with the student's top weakness in `critical_weaknesses[0]` and top remediation topic in `recommended_modules[0]`. If `critical_weaknesses[0]` is 'General Information', your advice must strictly refer to 'General Information' (or its subtopics like Philippine Constitution, RA 6713, etc.). NEVER recommend a drill or topic from an unrelated category (e.g., do NOT recommend Word Meaning if the weakness is General Information).
+        3. Keep the mathematical values, percentages, category/subject names, and study plan structure EXACTLY as provided. Do not invent new subjects or category names.
+        4. Every subject name in `subject_mastery`, `strengths`, and `critical_weaknesses` must strictly use the exact spelling of the 5 standard categories: 'Verbal Ability', 'Clerical Ability', 'General Information', 'Numerical Ability', and 'Analytical Ability'.
+        5. You must respond ONLY with a valid JSON object matching the provided schema.";
 
             $userPrompt = 'Here is the computed deterministic analysis data for the student:
         '.json_encode($deterministicData).'

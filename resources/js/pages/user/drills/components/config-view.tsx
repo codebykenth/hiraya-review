@@ -14,6 +14,8 @@ import {
 import React, { useState } from 'react';
 import { PageHeader } from '@/components/layout/page-header';
 import { Card } from '@/components/ui/card';
+import { makeBackOnClick } from '@/lib/smart-back';
+import { router } from '@inertiajs/react';
 import {
     categoryMeta,
     generateQuestionOptions,
@@ -29,6 +31,7 @@ interface ConfigViewProps {
     isRetakeConfig: boolean;
     filteredQCount: number;
     hasFilipinoQuestions: boolean;
+    originInfo?: { href: string; title: string } | null;
     setViewState: (view: 'hub' | 'config') => void;
     setIsRetakeConfig: (val: boolean) => void;
     toggleSubcat: (name: string) => void;
@@ -47,6 +50,7 @@ export function ConfigView({
     isRetakeConfig,
     filteredQCount,
     hasFilipinoQuestions,
+    originInfo,
     setViewState,
     setIsRetakeConfig,
     toggleSubcat,
@@ -57,6 +61,18 @@ export function ConfigView({
 }: ConfigViewProps) {
     const [customInput, setCustomInput] = useState<string>('');
     const [isCustomMode, setIsCustomMode] = useState<boolean>(false);
+
+    const isExternalOrigin = originInfo && originInfo.href !== '/drills';
+    const backLabel = isExternalOrigin ? `Back to ${originInfo.title}` : 'Back to Drill Hub';
+
+    const handleBack = () => {
+        if (isExternalOrigin) {
+            router.visit(originInfo.href);
+        } else {
+            setViewState('hub');
+            setIsRetakeConfig(false);
+        }
+    };
 
     const meta = categoryMeta[selectedCategory.name] || {
         icon: Brain,
@@ -69,14 +85,13 @@ export function ConfigView({
         <div className="flex flex-col gap-3 sm:gap-6">
             {/* Back Link */}
             <button
-                onClick={() => {
-                    setViewState('hub');
-                    setIsRetakeConfig(false);
-                }}
+                onClick={makeBackOnClick({
+                    onFallback: handleBack,
+                })}
                 className="flex w-fit cursor-pointer items-center gap-1 text-xs font-black text-foreground transition hover:text-blue-600 focus:outline-none dark:text-blue-400 dark:hover:text-blue-400"
             >
                 <ChevronLeft className="size-4" />
-                Back to Drill Hub
+                {backLabel}
             </button>
 
             {/* Retake Mode Status Banner */}

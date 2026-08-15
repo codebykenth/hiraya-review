@@ -46,6 +46,7 @@ export default function Drills(props: DrillsProps) {
         setIsTimed,
         isRetakeConfig,
         setIsRetakeConfig,
+        originInfo,
         filteredQCount,
         hasFilipinoQuestions,
         handleCategoryClick,
@@ -71,6 +72,10 @@ export default function Drills(props: DrillsProps) {
             custom_question_ids: JSON.stringify(customQuestions.map((q) => q.id)),
         });
 
+        if (originInfo) {
+            queryParams.append('from', originInfo.href);
+        }
+
         router.visit(`/exams?${queryParams.toString()}`);
     };
 
@@ -84,8 +89,8 @@ export default function Drills(props: DrillsProps) {
             const setQuestions = data.questions || [];
 
             if (setQuestions.length === 0) {
-return;
-}
+                return;
+            }
 
             if (typeof window !== 'undefined') {
                 localStorage.removeItem('active_exam_session');
@@ -98,6 +103,10 @@ return;
                 timed: 'false',
                 custom_question_ids: JSON.stringify(setQuestions.map((q: Question) => q.id)),
             });
+
+            if (originInfo) {
+                queryParams.append('from', originInfo.href);
+            }
 
             router.visit(`/exams?${queryParams.toString()}`);
         } catch {
@@ -199,6 +208,7 @@ return;
                         isRetakeConfig={isRetakeConfig}
                         filteredQCount={filteredQCount}
                         hasFilipinoQuestions={hasFilipinoQuestions}
+                        originInfo={originInfo}
                         setViewState={setViewState}
                         setIsRetakeConfig={setIsRetakeConfig}
                         toggleSubcat={toggleSubcat}

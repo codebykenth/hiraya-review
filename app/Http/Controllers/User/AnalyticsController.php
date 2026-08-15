@@ -6,6 +6,7 @@ use App\Jobs\GenerateUserAnalysisJob;
 use App\Models\ExamAttempt;
 use App\Models\ExamDate;
 use App\Models\StudySchedule;
+use App\Models\Subcategory;
 use App\Models\UserAiAnalysis;
 use App\Services\DeterministicAnalysisService;
 use App\Services\ExamAttemptFormatter;
@@ -58,6 +59,7 @@ class AnalyticsController
         $strongestArea = 'Not Started';
         $weakestArea = 'Not Started';
         $passingRate = 0;
+        $mockExamCount = 0;
         $totalQuestionsSolved = 0;
         $totalDurationSecs = 0;
         $avgDurationText = '0 mins';
@@ -74,7 +76,6 @@ class AnalyticsController
         if ($totalExams > 0) {
             $totalScoreSum = 0;
             $passCount = 0;
-            $mockExamCount = 0;
 
             foreach ($attempts as $attempt) {
                 $meta = $attempt->cat_scores['metadata'] ?? [];
@@ -210,6 +211,7 @@ class AnalyticsController
             }
 
             // Calculate category breakdown
+            $subcategoriesMap = Subcategory::all()->keyBy('name');
             $formattedCategories = [];
             foreach ($categoryTotals as $catName => $totals) {
                 $correct = $totals['correct'];
@@ -223,7 +225,9 @@ class AnalyticsController
                         $subCorrect = $subTotals['correct'];
                         $subTotal = $subTotals['total'];
                         if ($subTotal > 0) {
+                            $subModel = $subcategoriesMap->get($subName);
                             $subcatsData[] = [
+                                'id' => $subModel?->id,
                                 'name' => $subName,
                                 'correct' => (int) $subCorrect,
                                 'total' => (int) $subTotal,
@@ -419,8 +423,10 @@ class AnalyticsController
         // Calculate CSE Passing Probability Index and Subtest Cutoffs
         $subtestThresholds = [];
         $hasSubtestRisk = false;
+        $coveredCategoriesCount = 0;
         foreach ($categoryTotals as $catName => $totals) {
             if ($totals['total'] > 0) {
+                $coveredCategoriesCount++;
                 $pct = round(($totals['correct'] / $totals['total']) * 100);
                 $subtestThresholds[] = [
                     'category' => $catName,
@@ -433,9 +439,13 @@ class AnalyticsController
             }
         }
 
-        // Weighted CSE Index: Avg Score capped at 100, penalized if subtest risk exists
+        $isIncompleteSyllabus = ($mockExamCount === 0 && $coveredCategoriesCount < 3);
+
+        // Weighted CSE Index: Avg Score capped at 100, penalized if subtest risk exists or syllabus is incomplete
         $cseReadinessIndex = $avgScore;
-        if ($hasSubtestRisk && $cseReadinessIndex > 75) {
+        if ($isIncompleteSyllabus && $cseReadinessIndex > 65) {
+            $cseReadinessIndex = 65; // Cap drill-only readiness index if syllabus coverage is partial
+        } elseif ($hasSubtestRisk && $cseReadinessIndex > 75) {
             $cseReadinessIndex = 75; // Cap readiness index at 75% if any core subject is under 70%
         }
 
@@ -477,6 +487,9 @@ class AnalyticsController
                 'subtestThresholds' => $subtestThresholds,
                 'hasSubtestRisk' => $hasSubtestRisk,
                 'percentileRank' => $percentileRank,
+                'isIncompleteSyllabus' => $isIncompleteSyllabus,
+                'coveredCategoriesCount' => $coveredCategoriesCount,
+                'mockExamCount' => $mockExamCount,
             ],
             'aiAnalysis' => [
                 'status' => $analysisStatus, // 'no_data' | 'generating' | 'ready' | 'failed'
@@ -617,11 +630,14 @@ class AnalyticsController
                 'subcategory_id' => $s->subcategory_id,
             ]);
 
+        $lastUpdated = $analysis?->updated_at ? $analysis->updated_at->diffForHumans() : null;
+
         return Inertia::render('user/dashboard/ai-analysis', [
             'status' => $status,
             'data' => $data,
             'isLocal' => app()->environment('local'),
             'existingSchedules' => $existingSchedules,
+            'lastUpdated' => $lastUpdated,
         ]);
     }
 }

@@ -105,8 +105,17 @@ export function AiReadinessBentoCard({
 
     const prob = Math.round(data?.pass_probability ?? 0);
     const primaryWeakness = data?.critical_weaknesses?.[0];
+    const isDrillOnly = prob === 0;
 
-    const getScoreColor = (score: number) => {
+    const getScoreColor = (score: number, isDrill: boolean) => {
+        if (isDrill) {
+            return {
+                text: 'text-indigo-600 dark:text-indigo-400',
+                stroke: 'stroke-indigo-500',
+                badge: 'bg-indigo-50 text-indigo-700 border-indigo-200 dark:bg-indigo-950/40 dark:text-indigo-300 dark:border-indigo-900/60',
+            };
+        }
+
         if (score >= 80) {
             return {
                 text: 'text-emerald-600 dark:text-emerald-400',
@@ -130,53 +139,42 @@ export function AiReadinessBentoCard({
         };
     };
 
-    const colors = getScoreColor(prob);
+    const colors = getScoreColor(prob, isDrillOnly);
 
     // SVG Circular Gauge calculation
     const radius = 38;
     const circumference = 2 * Math.PI * radius;
-    const strokeDashoffset = circumference - (prob / 100) * circumference;
+    const strokeDashoffset = isDrillOnly
+        ? circumference * (1 - 0.35)
+        : circumference - (prob / 100) * circumference;
 
     return (
-        <Card className="relative flex h-full flex-col justify-between overflow-hidden border border-slate-200/80 bg-white/90 p-5 shadow-sm backdrop-blur-xl transition-all duration-300 hover:border-slate-300 hover:shadow-md dark:border-slate-800/80 dark:bg-slate-900/70 dark:hover:border-slate-700 sm:p-6">
+        <Card className="relative flex flex-col justify-between overflow-hidden border border-slate-200/80 bg-gradient-to-br from-white via-indigo-50/20 to-blue-50/30 p-5 shadow-2xs dark:border-slate-800 dark:from-slate-900 dark:via-indigo-950/20 dark:to-slate-900/90 sm:p-6">
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2.5">
-                    <div className="flex size-9 items-center justify-center rounded-xl bg-indigo-500/10 text-indigo-600 dark:bg-indigo-400/10 dark:text-indigo-400">
-                        <Brain className="size-4.5" />
+                    <div className="flex size-8 items-center justify-center rounded-lg bg-indigo-500/10 text-indigo-600 dark:bg-indigo-400/10 dark:text-indigo-400">
+                        <Brain className="size-4" />
                     </div>
                     <div>
-                        <h2 className="text-sm font-bold text-slate-900 dark:text-white">
+                        <h3 className="text-sm font-bold text-slate-900 dark:text-white">
                             AI Readiness Predictor
-                        </h2>
-                        <p className="text-xs font-medium text-slate-500 dark:text-slate-400">
-                            Based on real CSE exam weighted algorithm
+                        </h3>
+                        <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                            Based on your latest practice attempts
                         </p>
                     </div>
                 </div>
 
-                {localStatus === 'ready' && data?.trend && (
-                    <div className="flex items-center gap-1 text-[11px] font-semibold text-slate-500 dark:text-slate-400">
-                        {data.trend === 'improving' && (
-                            <span className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400">
-                                <TrendingUp className="size-3.5" /> Improving
-                            </span>
-                        )}
-                        {data.trend === 'declining' && (
-                            <span className="flex items-center gap-1 text-rose-600 dark:text-rose-400">
-                                <TrendingDown className="size-3.5" /> Declining
-                            </span>
-                        )}
-                        {data.trend === 'stable' && (
-                            <span className="flex items-center gap-1 text-slate-600 dark:text-slate-400">
-                                <Minus className="size-3.5" /> Stable
-                            </span>
-                        )}
-                    </div>
+                {localStatus === 'ready' && data && (
+                    <span className="inline-flex items-center gap-1 rounded-full border border-indigo-200 bg-indigo-50 px-2.5 py-0.5 text-[11px] font-bold text-indigo-700 dark:border-indigo-800 dark:bg-indigo-950/40 dark:text-indigo-300">
+                        <Sparkles className="size-3 fill-current" />
+                        AI Synced
+                    </span>
                 )}
             </div>
 
-            {/* Body */}
+            {/* Content Body */}
             <div className="my-4">
                 {localStatus === 'ready' && data && (
                     <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -209,12 +207,14 @@ export function AiReadinessBentoCard({
                                 </svg>
                                 <div className="absolute flex flex-col items-center justify-center text-center">
                                     <span
-                                        className={`text-2xl font-black tracking-tight ${colors.text}`}
+                                        className={`font-black tracking-tight ${colors.text} ${
+                                            isDrillOnly ? 'text-lg' : 'text-2xl'
+                                        }`}
                                     >
-                                        {prob}%
+                                        {isDrillOnly ? 'Drill' : `${prob}%`}
                                     </span>
                                     <span className="text-[9px] font-bold uppercase tracking-wider text-slate-400">
-                                        Pass Chance
+                                        {isDrillOnly ? 'Mock Needed' : 'Pass Chance'}
                                     </span>
                                 </div>
                             </div>
@@ -223,17 +223,21 @@ export function AiReadinessBentoCard({
                                 <span
                                     className={`inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-extrabold ${colors.badge}`}
                                 >
-                                    {data.verdict || 'Ready for Testing'}
+                                    {isDrillOnly
+                                        ? 'Drill Diagnostics Active'
+                                        : data.verdict || 'Ready for Testing'}
                                 </span>
                                 <p className="text-xs font-medium leading-relaxed text-slate-600 dark:text-slate-300">
-                                    {data.priority_action ||
-                                        'Focus on targeted practice drills to raise your score.'}
+                                    {isDrillOnly
+                                        ? 'Complete a Full Mock Exam to calculate your official CSE passing probability.'
+                                        : data.priority_action ||
+                                          'Focus on targeted practice drills to raise your score.'}
                                 </p>
                             </div>
                         </div>
 
                         {/* Top Weakness / Quick Fix Pill */}
-                        {primaryWeakness && (
+                        {primaryWeakness && !isDrillOnly && (
                             <div className="flex flex-col gap-1.5 rounded-xl border border-rose-200/80 bg-rose-50/50 p-3 sm:max-w-[200px] dark:border-rose-900/40 dark:bg-rose-950/20">
                                 <div className="flex items-center gap-1.5 text-[11px] font-bold text-rose-700 dark:text-rose-300">
                                     <Target className="size-3.5 shrink-0" />
@@ -243,7 +247,7 @@ export function AiReadinessBentoCard({
                                     {primaryWeakness}
                                 </p>
                                 <Link
-                                    href="/drills/smart-weakness"
+                                    href={`/drills?category=${encodeURIComponent(primaryWeakness)}&from=/dashboard`}
                                     className="mt-1 inline-flex items-center gap-1 text-[11px] font-bold text-rose-600 transition-colors hover:text-rose-700 dark:text-rose-400 dark:hover:text-rose-300"
                                 >
                                     <Zap className="size-3 fill-current" />
@@ -290,7 +294,10 @@ export function AiReadinessBentoCard({
                             <Link
                                 href={
                                     examsIndex({
-                                        query: { start: 'professional' },
+                                        query: {
+                                            start: 'professional',
+                                            from: '/dashboard',
+                                        },
                                     }).url
                                 }
                             >
@@ -333,14 +340,14 @@ export function AiReadinessBentoCard({
             {/* Footer */}
             <div className="flex items-center justify-between border-t border-slate-100 pt-3 dark:border-slate-800/80">
                 <Link
-                    href="/analytics/ai-analysis"
+                    href="/analytics/ai-analysis?from=/dashboard"
                     className="inline-flex items-center gap-1 text-xs font-bold text-indigo-600 transition-colors hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300"
                 >
                     <span>View In-Depth AI Analysis</span>
                     <ChevronRight className="size-3.5" />
                 </Link>
                 <span className="text-[10px] font-semibold text-slate-400 dark:text-slate-500">
-                    Updated live
+                    Updates per exam run
                 </span>
             </div>
         </Card>

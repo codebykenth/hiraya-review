@@ -1,5 +1,11 @@
 import { setLayoutProps } from '@inertiajs/react';
 import { useEffect } from 'react';
+import {
+    resolveOriginFromUrl,
+    setSessionOrigin,
+    getSessionOrigin,
+    getOriginTitle,
+} from '@/lib/smart-back';
 import type { Question, SavedAttempt, ExamResults, CategoryScore, AttemptMetadata } from '../types';
 import { isDemographicQuestion, EXAM_CONSTANTS } from '../utils/exam-utils';
 import { shuffleOptionsForQuestion } from './use-exam-pool-builder';
@@ -163,9 +169,15 @@ return;
             ? `Drill: ${meta.category_name || 'Practice Drill'}`
             : `Exam Attempt #${savedAttempt.id}`;
 
+        const origin = resolveOriginFromUrl(
+            typeof window !== 'undefined' ? window.location.href : undefined,
+        );
+        const originTitle = origin ? origin.title : 'History';
+        const originHref = origin ? origin.href : '/history';
+
         setLayoutProps({
             breadcrumbs: [
-                { title: 'History', href: '/history' },
+                { title: originTitle, href: originHref },
                 { title: attemptTitle, href: '#' },
             ],
         });
@@ -176,6 +188,11 @@ return;
         const params = new URLSearchParams(window.location.search);
         const startType = params.get('start');
         const isDrillStart = params.get('drill') === 'true';
+        const fromParam = params.get('from') || params.get('return_to');
+
+        if (fromParam) {
+            setSessionOrigin(fromParam);
+        }
 
         if (startType && !savedAttempt) {
             const examId = startType === 'subprofessional' ? 2 : 1;
@@ -282,9 +299,13 @@ return;
             setResults(null);
             setSubmittedByTimer(false);
 
+            const sessionOrigin = getSessionOrigin() || fromParam;
+            const originTitle = sessionOrigin ? getOriginTitle(sessionOrigin) : 'Practice';
+            const originHref = sessionOrigin ? (sessionOrigin.startsWith('/') ? sessionOrigin : `/${sessionOrigin}`) : '/drills';
+
             setLayoutProps({
                 breadcrumbs: [
-                    { title: 'Practice', href: '/drills' },
+                    { title: originTitle, href: originHref },
                     { title: `${catName} Active Practice`, href: '#' },
                 ],
             });

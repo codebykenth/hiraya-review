@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import type React from 'react';
 import { useState, useEffect, useCallback, useMemo } from 'react';
+import { resolveOriginFromUrl, setSessionOrigin, setBackAnchor } from '@/lib/smart-back';
 import type { Category, DrillsProps } from '../types';
 
 export const categoryMeta: Record<
@@ -80,14 +81,29 @@ export function useDrillsState({
     );
     const [isTimed, setIsTimed] = useState<boolean>(true);
     const [isRetakeConfig, setIsRetakeConfig] = useState<boolean>(false);
+    const [originInfo, setOriginInfo] = useState<{ href: string; title: string } | null>(() =>
+        resolveOriginFromUrl(url),
+    );
+
+    // Keep origin resolved if URL changes or on mount
+    useEffect(() => {
+        const resolved = resolveOriginFromUrl(url);
+        if (resolved) {
+            setOriginInfo(resolved);
+            setSessionOrigin(resolved.href);
+        }
+    }, [url]);
 
     // Dynamically update layout breadcrumbs at the top header
     useEffect(() => {
         if (viewState === 'config') {
+            const originHref = originInfo ? originInfo.href : '/drills';
+            const originTitle = originInfo ? originInfo.title : 'Drills';
+
             setTimeout(() => {
                 setLayoutProps({
                     breadcrumbs: [
-                        { title: 'Drills', href: '/drills' },
+                        { title: originTitle, href: originHref },
                         {
                             title: `${selectedCategory?.name || 'Category'} Setup`,
                             href: '#',
@@ -102,7 +118,7 @@ export function useDrillsState({
                 });
             }, 0);
         }
-    }, [viewState, selectedCategory]);
+    }, [viewState, selectedCategory, originInfo]);
 
     const handleCategoryClick = useCallback(
         (
@@ -166,6 +182,7 @@ export function useDrillsState({
             setLanguage(targetLanguage);
             setIsTimed(targetTimed);
             setViewState('config');
+            setBackAnchor('/drills');
         },
         [categories],
     );
@@ -271,49 +288,67 @@ export function useDrillsState({
         filteredQCount,
     ]);
 
-    // Pre-select category, subcategories, language, and question count on retake
+    // Pre-select category, subcategories, language, and question count on deep link or retake
     useEffect(() => {
         if (categories && categories.length > 0) {
-            const params = new URLSearchParams(
-                url.includes('?') ? url.split('?')[1] : '',
-            );
-            const catParam = params.get('category');
-            const totalParam = params.get('total');
-            const langParam = params.get('language');
+            const searchStr = url.includes('?') ? url.split('?')[1] : (typeof window !== 'undefined' ? window.location.search.replace(/^\?/, '') : '');
+            const params = new URLSearchParams(searchStr);
+            let catParam = params.get('category') || params.get('cat');
+            const totalParam = params.get('total') || params.get('count');
+            const langParam = params.get('language') || params.get('lang');
             const subcatsParam = params.get('subcategories');
+            const singleSubcatParam = params.get('subcategory') || params.get('subcat') || params.get('search');
             const timedParam = params.get('timed');
 
-            if (catParam) {
-                const newUrl = window.location.pathname;
-                window.history.replaceState({}, document.title, newUrl);
+            let parsedSubcats: string[] | null = null;
 
-                let parsedSubcats: string[] | null = null;
-
-                if (subcatsParam) {
-                    try {
-                        parsedSubcats = JSON.parse(
-                            decodeURIComponent(subcatsParam),
-                        );
-                    } catch {
-                        // ignore malformed strings
+            if (subcatsParam) {
+                try {
+                    const parsed = JSON.parse(decodeURIComponent(subcatsParam));
+                    if (Array.isArray(parsed)) {
+                        parsedSubcats = parsed;
                     }
+                } catch {
+                    parsedSubcats = subcatsParam.split(',').map((s) => s.trim());
                 }
+            } else if (singleSubcatParam) {
+                parsedSubcats = [singleSubcatParam.trim()];
+            }
+
+            // If category is not explicitly passed but subcategory is, find the parent category
+            if (!catParam && parsedSubcats && parsedSubcats.length > 0) {
+                const targetSub = parsedSubcats[0].toLowerCase();
+                const matchedCat = categories.find((c: Category) =>
+                    c.subcategory?.some((s) =>
+                        s.name.toLowerCase().includes(targetSub) ||
+                        targetSub.includes(s.name.toLowerCase()),
+                    ),
+                );
+                if (matchedCat) {
+                    catParam = matchedCat.name;
+                }
+            }
+
+            if (catParam) {
+                if (typeof window !== 'undefined') {
+                    const newUrl = window.location.pathname;
+                    window.history.replaceState({}, document.title, newUrl);
+                }
+
+                // Came from another page via a deep link (e.g. Analytics): back
+                // should return to the source, not to the drill hub.
+                setBackAnchor(null);
 
                 const timer = setTimeout(() => {
                     handleCategoryClick(
-                        catParam,
+                        catParam!,
                         totalParam,
                         langParam,
                         parsedSubcats,
                         timedParam,
                     );
-                    const hasRetakeParams = !!(
-                        totalParam ||
-                        langParam ||
-                        subcatsParam ||
-                        timedParam
-                    );
-                    setIsRetakeConfig(hasRetakeParams);
+                    const isExplicitRetake = params.get('retake') === 'true';
+                    setIsRetakeConfig(isExplicitRetake);
                 }, 0);
 
                 return () => clearTimeout(timer);
@@ -354,6 +389,10 @@ export function useDrillsState({
             );
         }
 
+        if (originInfo) {
+            queryParams.append('from', originInfo.href);
+        }
+
         // Clear any existing exam session before starting a fresh drill
         if (typeof window !== 'undefined') {
             localStorage.removeItem('active_exam_session');
@@ -377,6 +416,7 @@ export function useDrillsState({
         setIsTimed,
         isRetakeConfig,
         setIsRetakeConfig,
+        originInfo,
         filteredQCount,
         hasFilipinoQuestions,
         handleCategoryClick,

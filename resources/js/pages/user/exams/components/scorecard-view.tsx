@@ -20,6 +20,7 @@ import {
     formatDuration,
     calculateWeightedPercentage,
 } from '@/lib/exam-formatters';
+import { makeBackOnClick, resolveOriginFromUrl } from '@/lib/smart-back';
 import type {
     SimulationDetails,
     SavedAttempt,
@@ -256,18 +257,22 @@ return false;
             />
 
             {(() => {
-                const params = new URLSearchParams(
-                    typeof window !== 'undefined' ? window.location.search : '',
+                const origin = resolveOriginFromUrl(
+                    typeof window !== 'undefined' ? window.location.href : undefined,
                 );
-                const fromHistory = params.get('from') === 'history';
+                const originTitle = origin ? origin.title : (savedAttempt ? 'History' : null);
+                const originHref = origin ? origin.href : '/history';
 
-                if (savedAttempt && fromHistory) {
+                if (originTitle) {
                     return (
                         <Link
-                            href="/history"
+                            href={originHref}
+                            onClick={makeBackOnClick({
+                                onFallback: () => router.visit(originHref),
+                            })}
                             className="group mb-4 flex w-fit cursor-pointer items-center gap-1.5 text-xs font-bold text-muted-foreground transition hover:text-foreground focus:outline-none"
                         >
-                            <ChevronLeft className="size-4" /> Back to History
+                            <ChevronLeft className="size-4" /> Back to {originTitle}
                         </Link>
                     );
                 }

@@ -352,6 +352,7 @@ class DeterministicAnalysisService
         asort($worstSubtopics);
 
         // Match with database subcategories
+        $primaryWeakSubject = $criticalWeaknesses[0] ?? null;
         $remediationMatrix = [];
         $recommendedSubcatIds = [];
         $recommendedModules = [];
@@ -361,26 +362,51 @@ class DeterministicAnalysisService
             $availableSubcatMap[$sub->name] = $sub;
         }
 
-        $cnt = 0;
-        foreach (array_keys($worstSubtopics) as $worstName) {
-            if ($cnt >= 3) {
-                break;
-            }
-            if (isset($availableSubcatMap[$worstName])) {
-                $sub = $availableSubcatMap[$worstName];
-                $remediationMatrix[] = [
-                    'subtopic' => $sub->name,
-                    'difficulty_level' => 'Hard',
-                    'reason_for_struggle' => $this->pickTemplate('struggle_reason_hard', ['subtopic' => $sub->name]),
-                    'coaching_tip' => $this->pickTemplate('coaching_hard', ['subtopic' => $sub->name]),
-                ];
-                $recommendedSubcatIds[] = $sub->id;
-                $recommendedModules[] = $sub->name;
-                $cnt++;
+        // 1. Prioritize worst subtopics belonging to the primary critical weakness subject
+        if ($primaryWeakSubject) {
+            foreach (array_keys($worstSubtopics) as $worstName) {
+                if (isset($availableSubcatMap[$worstName])) {
+                    $sub = $availableSubcatMap[$worstName];
+                    if ($sub->category?->name === $primaryWeakSubject && ! in_array($sub->name, $recommendedModules)) {
+                        $remediationMatrix[] = [
+                            'subtopic' => $sub->name,
+                            'difficulty_level' => 'Hard',
+                            'reason_for_struggle' => $this->pickTemplate('struggle_reason_hard', ['subtopic' => $sub->name]),
+                            'coaching_tip' => $this->pickTemplate('coaching_hard', ['subtopic' => $sub->name]),
+                        ];
+                        $recommendedSubcatIds[] = $sub->id;
+                        $recommendedModules[] = $sub->name;
+                        if (count($recommendedModules) >= 3) {
+                            break;
+                        }
+                    }
+                }
             }
         }
 
-        // If not enough worst subtopics, fill with subtopics from critical weaknesses
+        // 2. If still need modules, add other worst subtopics
+        if (count($recommendedModules) < 3) {
+            foreach (array_keys($worstSubtopics) as $worstName) {
+                if (isset($availableSubcatMap[$worstName])) {
+                    $sub = $availableSubcatMap[$worstName];
+                    if (! in_array($sub->name, $recommendedModules)) {
+                        $remediationMatrix[] = [
+                            'subtopic' => $sub->name,
+                            'difficulty_level' => 'Hard',
+                            'reason_for_struggle' => $this->pickTemplate('struggle_reason_hard', ['subtopic' => $sub->name]),
+                            'coaching_tip' => $this->pickTemplate('coaching_hard', ['subtopic' => $sub->name]),
+                        ];
+                        $recommendedSubcatIds[] = $sub->id;
+                        $recommendedModules[] = $sub->name;
+                        if (count($recommendedModules) >= 3) {
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        // 3. If still need modules, fill from critical weaknesses categories
         if (count($recommendedModules) < 3) {
             foreach ($criticalWeaknesses as $weakSubject) {
                 foreach ($subcategories as $sub) {

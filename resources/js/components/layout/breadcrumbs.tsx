@@ -8,6 +8,8 @@ import {
     BreadcrumbPage,
     BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
+import { makeBackOnClick } from '@/lib/smart-back';
+
 import type { BreadcrumbItem as BreadcrumbItemType } from '@/types';
 
 export function Breadcrumbs({
@@ -32,7 +34,10 @@ export function Breadcrumbs({
                                             </BreadcrumbPage>
                                         ) : (
                                             <BreadcrumbLink asChild>
-                                                <Link href={item.href}>
+                                                <Link
+                                                    href={item.href}
+                                                    onClick={makeBackOnClick()}
+                                                >
                                                     {item.title}
                                                 </Link>
                                             </BreadcrumbLink>

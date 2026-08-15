@@ -14,7 +14,14 @@ export interface ChartDataPoint {
     categoryScores?: CategoryScore[];
 }
 
+export interface SubtestThreshold {
+    category: string;
+    score: number;
+    passed: boolean;
+}
+
 export interface SubcategoryAnalytics {
+    id?: number;
     name: string;
     percentage: number;
     correct: number;
@@ -61,6 +68,13 @@ export interface AnalyticsStats {
     daysUntilExam?: number | null;
     examDate?: string | null;
     examDateRaw?: string | null;
+    cseReadinessIndex?: number;
+    subtestThresholds?: SubtestThreshold[];
+    hasSubtestRisk?: boolean;
+    percentileRank?: number;
+    isIncompleteSyllabus?: boolean;
+    coveredCategoriesCount?: number;
+    mockExamCount?: number;
     filters?: {
         track: string;
         runs: string;
@@ -72,7 +86,8 @@ export interface AnalyticsStats {
 export interface AnalyticsProps {
     stats?: AnalyticsStats | null;
     aiAnalysis?: {
-        status: 'no_data' | 'generating' | 'ready' | 'failed';
+        status: 'no_data' | 'generating' | 'ready' | 'failed' | 'no_exam_date';
         data: any | null;
     };
 }
+

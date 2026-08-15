@@ -30,6 +30,7 @@ import React, {
 } from 'react';
 import { ReportIssueModal } from '@/components/domain/report-issue-modal';
 import { renderFormattedText, extractPropositions } from '@/lib/exam-formatters';
+import { makeBackOnClick } from '@/lib/smart-back';
 import { useContentShield } from '../hooks/use-content-shield';
 import type {
     Question,
@@ -793,7 +794,10 @@ return;
                         {/* Left: Back & Exam Title */}
                         <div className="flex min-w-0 items-center gap-1.5">
                             <button
-                                onClick={() => setReviewScreenActive(false)}
+                                onClick={makeBackOnClick({
+                                    onFallback: () =>
+                                        setReviewScreenActive(false),
+                                })}
                                 title="Back to Scorecard"
                                 className="group flex h-8 shrink-0 items-center gap-1 rounded-md px-2 text-xs font-bold text-muted-foreground transition hover:bg-accent hover:text-foreground focus-visible:outline-none"
                             >

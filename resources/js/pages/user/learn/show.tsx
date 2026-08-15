@@ -18,6 +18,7 @@ import { ReportIssueModal } from '@/components/domain/report-issue-modal';
 import { PageContainer } from '@/components/layout/page-container';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { makeBackOnClick } from '@/lib/smart-back';
 import { useScrollProgress } from './hooks/use-scroll-progress';
 import type { LearnShowProps } from './types';
 
@@ -144,6 +145,7 @@ export default function LearnShow({ module, recommended }: LearnShowProps) {
                     return (
                         <Link
                             href={backUrl}
+                            onClick={makeBackOnClick()}
                             className="group flex w-fit items-center gap-1 text-sm font-black text-foreground transition transition-all duration-300 hover:text-blue-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95 dark:text-blue-400 dark:hover:text-blue-400"
                         >
                             <ChevronLeft className="size-4" />

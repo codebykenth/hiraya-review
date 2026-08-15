@@ -9,6 +9,7 @@ import { initializeTheme } from '@/hooks/use-appearance';
 import AppLayout from '@/layouts/app-layout';
 import AuthLayout from '@/layouts/auth-layout';
 import SettingsLayout from '@/layouts/settings/layout';
+import { initSmartBackTracking, getOriginTitle } from '@/lib/smart-back';
 import type { Auth } from './types/auth';
 // Echo initialization moved to specific components to save connections
 
@@ -73,9 +74,12 @@ const PageLayoutWrapper = ({
         return b;
     });
 
-    const hasAttemptId =
-        typeof window !== 'undefined' &&
-        new URLSearchParams(window.location.search).has('attempt_id');
+    const urlParams =
+        typeof window !== 'undefined'
+            ? new URLSearchParams(window.location.search)
+            : null;
+    const hasAttemptId = urlParams?.has('attempt_id');
+    const fromParam = urlParams?.get('from') || urlParams?.get('return_to');
 
     if (
         name === 'user/dashboard/ai-analysis' &&
@@ -83,6 +87,10 @@ const PageLayoutWrapper = ({
         pageBreadcrumbs.length > 0
     ) {
         pageBreadcrumbs[0] = { title: 'History', href: '/history' };
+    } else if (fromParam && pageBreadcrumbs.length > 1) {
+        const originTitle = getOriginTitle(fromParam);
+        const originHref = fromParam.startsWith('/') ? fromParam : `/${fromParam}`;
+        pageBreadcrumbs[0] = { title: originTitle, href: originHref };
     }
 
     return <AppLayout breadcrumbs={pageBreadcrumbs}>{page}</AppLayout>;
@@ -186,6 +194,8 @@ createInertiaApp({
 });
 // This will set light / dark mode on load...
 initializeTheme();
+// Track previous in-app location so "back" returns to where the user came from
+initSmartBackTracking();
 
 // Register PWA Service Worker
 if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {

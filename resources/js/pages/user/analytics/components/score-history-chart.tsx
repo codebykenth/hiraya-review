@@ -33,7 +33,7 @@ export function ScoreHistoryChart({
     };
 
     return (
-        <Card className="relative mb-6 w-full overflow-hidden border border-slate-200/80 bg-slate-50/50 p-5 dark:border-slate-800 dark:bg-slate-950/40">
+        <Card className="relative w-full overflow-hidden border border-slate-200/80 bg-slate-50/50 p-5 dark:border-slate-800 dark:bg-slate-950/40">
             {isDemoMode && (
                 <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/60 backdrop-blur-[2px] dark:bg-slate-950/60">
                     <div className="rounded-2xl border border-slate-200 bg-white/90 px-4 py-4 text-center shadow-lg sm:px-6 dark:border-slate-700 dark:bg-slate-800/90">

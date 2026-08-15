@@ -14,6 +14,7 @@ type PageProps = {
 export default function Guide() {
     const { auth } = usePage<PageProps>().props;
     const isLoggedIn = !!auth.user;
+
     const content = (
         <>
             <div className="mb-8 flex items-start gap-3">
@@ -29,7 +30,7 @@ export default function Guide() {
 
     if (isLoggedIn) {
         return (
-            <AppLayout>
+            <AppLayout breadcrumbs={Guide.layout.breadcrumbs}>
                 <Head>
                     <title>
                         Ultimate CSE Preparation Guide | Hiraya Review

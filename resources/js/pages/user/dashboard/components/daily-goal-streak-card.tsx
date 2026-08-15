@@ -133,7 +133,7 @@ export function DailyGoalStreakCard({ dailyGoal }: DailyGoalStreakCardProps) {
             {/* Footer */}
             <div className="flex items-center justify-between border-t border-slate-100 pt-3 dark:border-slate-800/80">
                 <Link
-                    href={drillsIndex()}
+                    href={drillsIndex({ query: { from: '/dashboard' } })}
                     className="inline-flex items-center gap-1 text-xs font-bold text-blue-600 transition-colors hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
                 >
                     <span>Practice Quick Drill</span>

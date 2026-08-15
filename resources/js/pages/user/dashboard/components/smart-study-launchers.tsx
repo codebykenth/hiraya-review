@@ -26,9 +26,9 @@ export function SmartStudyLaunchers({
     primaryWeakness,
 }: SmartStudyLaunchersProps) {
     return (
-        <Card className="relative flex h-full flex-col justify-between overflow-hidden border border-slate-200/80 bg-white/90 p-5 shadow-sm backdrop-blur-xl transition-all duration-300 hover:border-slate-300 hover:shadow-md dark:border-slate-800/80 dark:bg-slate-900/70 dark:hover:border-slate-700 sm:p-6">
+        <Card className="relative flex min-h-[460px] h-full flex-col justify-between overflow-hidden border border-slate-200/80 bg-white/90 p-5 shadow-sm backdrop-blur-xl transition-all duration-300 hover:border-slate-300 hover:shadow-md dark:border-slate-800/80 dark:bg-slate-900/70 dark:hover:border-slate-700 sm:p-6">
             {/* Header */}
-            <div className="flex items-center justify-between">
+            <div className="flex shrink-0 items-center justify-between">
                 <div className="flex items-center gap-2.5">
                     <div className="flex size-9 items-center justify-center rounded-xl bg-blue-500/10 text-blue-600 dark:bg-blue-400/10 dark:text-blue-400">
                         <Sparkles className="size-5 text-blue-600 dark:text-blue-400" />
@@ -45,13 +45,13 @@ export function SmartStudyLaunchers({
             </div>
 
             {/* 4 Contextual Tiles Grid */}
-            <div className="my-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <div className="my-auto py-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
                 {/* Tile 1: Practice Drills */}
                 <Link
                     href={
                         primaryWeakness
-                            ? '/drills/smart-weakness'
-                            : drillsIndex()
+                            ? '/drills/smart-weakness?from=/dashboard'
+                            : drillsIndex({ query: { from: '/dashboard' } })
                     }
                     className="group relative flex flex-col justify-between rounded-xl border border-indigo-100 bg-gradient-to-br from-indigo-50/60 to-white p-3.5 transition-all duration-300 hover:-translate-y-0.5 hover:border-indigo-300 hover:shadow-md dark:border-indigo-950/60 dark:from-indigo-950/30 dark:to-slate-900/60 dark:hover:border-indigo-800"
                 >
@@ -82,7 +82,7 @@ export function SmartStudyLaunchers({
 
                 {/* Tile 2: Custom Drill Builder */}
                 <Link
-                    href="/drills?tab=custom"
+                    href="/drills?tab=custom&from=/dashboard"
                     className="group relative flex flex-col justify-between rounded-xl border border-violet-100 bg-gradient-to-br from-violet-50/60 to-white p-3.5 transition-all duration-300 hover:-translate-y-0.5 hover:border-violet-300 hover:shadow-md dark:border-violet-950/60 dark:from-violet-950/30 dark:to-slate-900/60 dark:hover:border-violet-800"
                 >
                     <div>
@@ -141,7 +141,7 @@ export function SmartStudyLaunchers({
 
                 {/* Tile 4: Mock Exams */}
                 <Link
-                    href={examsIndex()}
+                    href={examsIndex({ query: { from: '/dashboard' } })}
                     className="group relative flex flex-col justify-between rounded-xl border border-emerald-100 bg-gradient-to-br from-emerald-50/60 to-white p-3.5 transition-all duration-300 hover:-translate-y-0.5 hover:border-emerald-300 hover:shadow-md dark:border-emerald-950/60 dark:from-emerald-950/30 dark:to-slate-900/60 dark:hover:border-emerald-800"
                 >
                     <div>
@@ -168,7 +168,7 @@ export function SmartStudyLaunchers({
             </div>
 
             {/* Footer */}
-            <div className="flex items-center justify-between border-t border-slate-100 pt-3 dark:border-slate-800/80">
+            <div className="flex shrink-0 items-center justify-between border-t border-slate-100 pt-3 dark:border-slate-800/80">
                 <Link
                     href="/guide"
                     className="inline-flex items-center gap-1 text-xs font-bold text-slate-600 transition-colors hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"

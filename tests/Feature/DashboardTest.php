@@ -23,7 +23,7 @@ test('authenticated users can visit the dashboard', function () {
     $response->assertStatus(200);
 });
 
-test('dashboard status is no_exam_date if there is no active exam date', function () {
+test('dashboard status is no_data if user has no exam attempts even without active exam date', function () {
     $user = User::factory()->create();
 
     $response = $this->actingAs($user)->get(route('dashboard.index'));
@@ -32,13 +32,13 @@ test('dashboard status is no_exam_date if there is no active exam date', functio
     $response->assertInertia(fn (Assert $page) => $page
         ->component('user/dashboard/index')
         ->has('aiAnalysis', fn (Assert $page) => $page
-            ->where('status', 'no_exam_date')
+            ->where('status', 'no_data')
             ->where('data', null)
         )
     );
 });
 
-test('dashboard status is no_data if user has no exam attempts', function () {
+test('dashboard status is no_data if user has no exam attempts with active exam date', function () {
     $user = User::factory()->create();
     ExamDate::create(['date' => now()->addDays(30), 'is_active' => true]);
 

@@ -25,6 +25,7 @@ import { useEffect, useState } from 'react';
 import { PageContainer } from '@/components/layout/page-container';
 import { ConfirmModal } from '@/components/shared/confirm-modal';
 import { Card } from '@/components/ui/card';
+import { makeBackOnClick, resolveOriginFromUrl } from '@/lib/smart-back';
 import type { Auth } from '@/types';
 
 interface SubjectMasteryItem {
@@ -149,6 +150,7 @@ interface AiAnalysisProps {
         }>;
     } | null;
     attempt_id?: number | null;
+    lastUpdated?: string | null;
 }
 
 export default function AiAnalysisReport({
@@ -157,6 +159,7 @@ export default function AiAnalysisReport({
     isLocal,
     existingSchedules = [],
     attempt_id,
+    lastUpdated,
 }: AiAnalysisProps) {
     const { auth, pusher } = usePage<{ auth: Auth; pusher?: any }>().props;
     const isAiMode = auth?.user?.analysis_mode === 'ai';
@@ -508,15 +511,38 @@ export default function AiAnalysisReport({
 
             <PageContainer>
                 {/* Back Link */}
-                <div className="mb-6">
-                    <Link
-                        href={attempt_id ? '/history' : '/dashboard'}
-                        className="group inline-flex items-center gap-2 text-sm font-semibold text-slate-500 transition transition-all duration-300 hover:text-slate-800 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95 dark:text-slate-400 dark:hover:text-slate-200"
-                    >
-                        <ArrowLeft className="size-4" />
-                        {attempt_id ? 'Back to History' : 'Back to Dashboard'}
-                    </Link>
-                </div>
+                {(() => {
+                    const origin = resolveOriginFromUrl(
+                        typeof window !== 'undefined'
+                            ? window.location.href
+                            : undefined,
+                    );
+                    const originTitle = origin
+                        ? origin.title
+                        : attempt_id
+                          ? 'History'
+                          : 'Dashboard';
+                    const originHref = origin
+                        ? origin.href
+                        : attempt_id
+                          ? '/history'
+                          : '/dashboard';
+
+                    return (
+                        <div className="mb-6">
+                            <Link
+                                href={originHref}
+                                onClick={makeBackOnClick({
+                                    onFallback: () => router.visit(originHref),
+                                })}
+                                className="group inline-flex items-center gap-2 text-sm font-semibold text-slate-500 transition transition-all duration-300 hover:text-slate-800 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95 dark:text-slate-400 dark:hover:text-slate-200"
+                            >
+                                <ArrowLeft className="size-4" />
+                                Back to {originTitle}
+                            </Link>
+                        </div>
+                    );
+                })()}
 
                 {/* Main Content States */}
                 {localStatus === 'no_data' && (
@@ -658,7 +684,9 @@ export default function AiAnalysisReport({
 
                                 <div className="flex shrink-0 flex-col items-end gap-2">
                                     <span className="text-xs text-slate-400 dark:text-slate-500">
-                                        Last Updated Today
+                                        {lastUpdated
+                                            ? `Updated ${lastUpdated}`
+                                            : 'Updates after each exam run'}
                                     </span>
                                     {isLocal && (
                                         <div className="flex gap-2">

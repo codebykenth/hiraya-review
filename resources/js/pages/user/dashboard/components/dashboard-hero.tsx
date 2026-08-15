@@ -132,6 +132,7 @@ export function DashboardHero({
                                             examsIndex({
                                                 query: {
                                                     start: 'professional',
+                                                    from: '/dashboard',
                                                 },
                                             }).url
                                         }
@@ -152,6 +153,7 @@ export function DashboardHero({
                                             examsIndex({
                                                 query: {
                                                     start: 'subprofessional',
+                                                    from: '/dashboard',
                                                 },
                                             }).url
                                         }

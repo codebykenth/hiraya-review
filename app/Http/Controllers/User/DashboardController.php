@@ -58,9 +58,7 @@ class DashboardController
         $userMode = Cache::get("user-analysis-mode-{$userId}", 'ai');
         $useAi = $userMode === 'ai' && config('services.ai.analysis_enabled') && $latestMockAttemptId;
 
-        if (! $examDate) {
-            $analysisStatus = 'no_exam_date';
-        } elseif ($latestAttemptId) {
+        if ($latestAttemptId) {
             $cacheKey = "ai-analysis-generating-{$userId}";
             $failKey = "ai-analysis-failed-{$userId}";
 

@@ -2,6 +2,7 @@ import { router, setLayoutProps, usePage } from '@inertiajs/react';
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { toast } from 'sonner';
 import { triggerPdfExport } from '@/components/shared/global-pdf-exporter';
+import { getSessionOrigin, clearSessionOrigin } from '@/lib/smart-back';
 import type { Auth } from '@/types';
 import type { Question, ExamResults, ExamIndexProps, SimulationDetails } from '../types';
 import { isDemographicQuestion, EXAM_CONSTANTS, apiPost } from '../utils/exam-utils';
@@ -432,7 +433,7 @@ return [];
     const handleExitExam = useCallback(() => {
         setConfirmModal({
             isOpen: true,
-            title: 'Exit Exam Session?',
+            title: isDrillSession ? 'Exit Practice Drill?' : 'Exit Exam Session?',
             message: 'Are you sure you want to exit? Your current progress will be lost.',
             confirmLabel: 'Exit Session',
             variant: 'danger',
@@ -445,7 +446,13 @@ return [];
                     localStorage.removeItem('active_exam_session_v1');
                 }
 
-                if (isDrillSession) {
+                const origin = getSessionOrigin();
+                clearSessionOrigin();
+
+                if (origin && origin !== window.location.pathname) {
+                    const dest = origin.startsWith('/') ? origin : `/${origin}`;
+                    router.visit(dest);
+                } else if (isDrillSession) {
                     router.visit('/drills');
                 } else {
                     router.visit('/exams');

@@ -65,9 +65,9 @@ export function StudyScheduleActivityCard({
     };
 
     return (
-        <Card className="relative flex h-full flex-col justify-between overflow-hidden border border-slate-200/80 bg-white/90 p-5 shadow-sm backdrop-blur-xl transition-all duration-300 hover:border-slate-300 hover:shadow-md dark:border-slate-800/80 dark:bg-slate-900/70 dark:hover:border-slate-700 sm:p-6">
+        <Card className="relative flex min-h-[460px] h-full flex-col justify-between overflow-hidden border border-slate-200/80 bg-white/90 p-5 shadow-sm backdrop-blur-xl transition-all duration-300 hover:border-slate-300 hover:shadow-md dark:border-slate-800/80 dark:bg-slate-900/70 dark:hover:border-slate-700 sm:p-6">
             {/* Header */}
-            <div className="flex items-center justify-between">
+            <div className="flex shrink-0 items-center justify-between">
                 <div className="flex items-center gap-2.5">
                     <div className="flex size-9 items-center justify-center rounded-xl bg-purple-500/10 text-purple-600 dark:bg-purple-400/10 dark:text-purple-400">
                         <CalendarDays className="size-5 text-purple-600 dark:text-purple-400" />
@@ -83,8 +83,8 @@ export function StudyScheduleActivityCard({
                 </div>
             </div>
 
-            {/* Split Body */}
-            <div className="my-4 space-y-4">
+            {/* Split Body (Scrollable) */}
+            <div className="my-3.5 flex-1 min-h-0 space-y-4 overflow-y-auto pr-1.5">
                 {/* Overdue Alert Banner if any */}
                 {overdueTasksCount > 0 && (
                     <div className="flex items-center justify-between rounded-xl border border-amber-200/80 bg-amber-50/70 px-3 py-2 text-xs dark:border-amber-900/40 dark:bg-amber-950/20">
@@ -262,7 +262,7 @@ export function StudyScheduleActivityCard({
             </div>
 
             {/* Footer */}
-            <div className="flex items-center justify-between border-t border-slate-100 pt-3 dark:border-slate-800/80">
+            <div className="flex shrink-0 items-center justify-between border-t border-slate-100 pt-3 dark:border-slate-800/80">
                 <Link
                     href={historyIndex()}
                     className="inline-flex items-center gap-1 text-xs font-bold text-purple-600 transition-colors hover:text-purple-700 dark:text-purple-400 dark:hover:text-purple-300"
