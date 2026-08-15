@@ -46,24 +46,18 @@ import type { QuestionItem, QuestionsIndexProps } from './types';
 
 export default function QuestionsIndex({
     questions = [],
+    pagination = { current_page: 1, per_page: 10, total: 0, last_page: 1 },
+    filters = {},
     categories = [],
 }: QuestionsIndexProps) {
-    const [filterSearch, setFilterSearch] = useState('');
-    const [debouncedFilterSearch, setDebouncedFilterSearch] = useState('');
-    const [filterStatus, setFilterStatus] = useState<
-        'all' | 'ACTIVE' | 'DRAFT'
-    >('all');
-    const [filterCategory, setFilterCategory] = useState<string>('all');
-    const [filterSubcategory, setFilterSubcategory] = useState<string>('all');
-    const [filterLanguage, setFilterLanguage] = useState<string>('all');
-    const [currentPage, setCurrentPage] = useState(() => {
-        const params = new URLSearchParams(
-            typeof window !== 'undefined' ? window.location.search : '',
-        );
-        const p = params.get('page');
-
-        return p ? Number(p) : 1;
-    });
+    const [filterSearch, setFilterSearch] = useState(filters.search || '');
+    const [filterStatus, setFilterStatus] = useState<string>(filters.status || 'all');
+    const [filterCategory, setFilterCategory] = useState<string>(filters.category || 'all');
+    const [filterSubcategory, setFilterSubcategory] = useState<string>(filters.subcategory || 'all');
+    const [filterLanguage, setFilterLanguage] = useState<string>(filters.language || 'all');
+    const [perPage, setPerPage] = useState<number>(filters.per_page || 10);
+    const currentPage = pagination.current_page;
+    const totalPages = pagination.last_page;
     const [deleteModal, setDeleteModal] = useState<{
         isOpen: boolean;
         id: number | null;
@@ -134,94 +128,42 @@ export default function QuestionsIndex({
         cseCategoriesTree['Clerical Ability'] = ['Filing', 'Spelling'];
     }
 
-    useEffect(() => {
-        const handler = setTimeout(() => {
-            setDebouncedFilterSearch(filterSearch);
-        }, 300);
+    const updateFilters = (params: {
+        search?: string;
+        status?: string;
+        category?: string;
+        subcategory?: string;
+        language?: string;
+        page?: number;
+        per_page?: number;
+    }) => {
+        router.get(
+            questionsIndex().url,
+            {
+                search: params.search !== undefined ? params.search : filterSearch,
+                status: params.status !== undefined ? params.status : filterStatus,
+                category: params.category !== undefined ? params.category : filterCategory,
+                subcategory: params.subcategory !== undefined ? params.subcategory : filterSubcategory,
+                language: params.language !== undefined ? params.language : filterLanguage,
+                per_page: params.per_page !== undefined ? params.per_page : perPage,
+                page: params.page !== undefined ? params.page : 1,
+            },
+            {
+                preserveState: true,
+                replace: true,
+                onSuccess: () => setSelectedIds(new Set()),
+            },
+        );
+    };
 
-        return () => clearTimeout(handler);
-    }, [filterSearch]);
-
-    const filteredQuestions = questions
-        .filter((q) => {
-            const matchesSearch =
-                q.stem
-                    .toLowerCase()
-                    .includes(debouncedFilterSearch.toLowerCase()) ||
-                q.category
-                    .toLowerCase()
-                    .includes(debouncedFilterSearch.toLowerCase()) ||
-                q.subcategory
-                    .toLowerCase()
-                    .includes(debouncedFilterSearch.toLowerCase()) ||
-                String(q.id).includes(debouncedFilterSearch);
-
-            const matchesStatus =
-                filterStatus === 'all' ||
-                (filterStatus === 'ACTIVE' && q.status === 'ACTIVE') ||
-                (filterStatus === 'DRAFT' && q.status === 'DRAFT');
-
-            const matchesCategory =
-                filterCategory === 'all' || q.category === filterCategory;
-
-            const matchesSubcategory =
-                filterSubcategory === 'all' ||
-                q.subcategory === filterSubcategory;
-
-            const matchesLanguage =
-                !(
-                    filterCategory === 'Verbal Ability' ||
-                    filterSubcategory === 'Word analogy' ||
-                    (q as any).subcategory === 'Word analogy'
-                ) ||
-                filterLanguage === 'all' ||
-                (q as any).language === filterLanguage;
-
-            return (
-                matchesSearch &&
-                matchesStatus &&
-                matchesCategory &&
-                matchesSubcategory &&
-                matchesLanguage
-            );
-        })
-        .sort((a, b) => {
-            // Sort by Category
-            if (a.category !== b.category) {
-                return a.category.localeCompare(b.category);
-            }
-
-            // Then by Subcategory
-            if (a.subcategory !== b.subcategory) {
-                return a.subcategory.localeCompare(b.subcategory);
-            }
-
-            // Then by Status (Active first)
-            if (a.status !== b.status) {
-                return a.status === 'ACTIVE' ? -1 : 1;
-            }
-
-            // Then by updated_at timestamp (latest to oldest)
-            const timeB = b.updated_at ? new Date(b.updated_at).getTime() : 0;
-            const timeA = a.updated_at ? new Date(a.updated_at).getTime() : 0;
-
-            return timeB - timeA;
-        });
-
-    const pageSize = 10;
-    const totalPages = Math.ceil(filteredQuestions.length / pageSize);
-    const paginatedQuestions = filteredQuestions.slice(
-        (currentPage - 1) * pageSize,
-        currentPage * pageSize,
-    );
+    const handleSearchSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        updateFilters({ search: filterSearch, page: 1 });
+    };
 
     const handlePageChange = (page: number) => {
-        setCurrentPage(page);
+        updateFilters({ page });
         window.scrollTo({ top: 0, behavior: 'smooth' });
-
-        const url = new URL(window.location.href);
-        url.searchParams.set('page', String(page));
-        window.history.replaceState({}, '', url.toString());
     };
 
     const promptDelete = (id: number) => {
@@ -241,9 +183,9 @@ export default function QuestionsIndex({
         const newSelected = new Set(selectedIds);
 
         if (checked) {
-            paginatedQuestions.forEach((q) => newSelected.add(q.id));
+            questions.forEach((q) => newSelected.add(q.id));
         } else {
-            paginatedQuestions.forEach((q) => newSelected.delete(q.id));
+            questions.forEach((q) => newSelected.delete(q.id));
         }
 
         setSelectedIds(newSelected);
@@ -349,18 +291,16 @@ export default function QuestionsIndex({
 
                 {/* Search & Filters */}
                 <div className="mb-6 flex flex-wrap items-center justify-between gap-4 rounded-xl border border-border bg-card p-4 shadow-xs">
-                    <div className="flex min-w-[260px] flex-1 items-center gap-2">
+                    <form onSubmit={handleSearchSubmit} className="flex min-w-[260px] flex-1 items-center gap-2">
                         <input
                             type="text"
                             value={filterSearch}
-                            onChange={(e) => {
-                                setFilterSearch(e.target.value);
-                                setCurrentPage(1);
-                            }}
+                            onChange={(e) => setFilterSearch(e.target.value)}
+                            onBlur={() => updateFilters({ search: filterSearch, page: 1 })}
                             placeholder="Search questions (stem, ID, topic)..."
                             className="w-full rounded-lg border border-border bg-muted px-3 py-1.5 text-xs font-semibold text-foreground transition placeholder:text-muted-foreground focus:border-blue-500 focus:outline-none"
                         />
-                    </div>
+                    </form>
 
                     <div className="flex flex-wrap items-center gap-2">
                         {/* Category Filter */}
@@ -368,9 +308,10 @@ export default function QuestionsIndex({
                             <select
                                 value={filterCategory}
                                 onChange={(e) => {
-                                    setFilterCategory(e.target.value);
+                                    const val = e.target.value;
+                                    setFilterCategory(val);
                                     setFilterSubcategory('all');
-                                    setCurrentPage(1);
+                                    updateFilters({ category: val, subcategory: 'all', page: 1 });
                                 }}
                                 className="w-full appearance-none rounded-lg border border-border bg-background py-1.5 pr-8 pl-2.5 text-xs font-bold text-foreground transition focus:border-blue-500 focus:outline-none"
                             >
@@ -400,6 +341,7 @@ export default function QuestionsIndex({
                                 onChange={(e) => {
                                     const val = e.target.value;
                                     setFilterSubcategory(val);
+                                    let newCat = filterCategory;
 
                                     if (val !== 'all') {
                                         const parentCat = Object.keys(
@@ -411,11 +353,12 @@ export default function QuestionsIndex({
                                         );
 
                                         if (parentCat) {
+                                            newCat = parentCat;
                                             setFilterCategory(parentCat);
                                         }
                                     }
 
-                                    setCurrentPage(1);
+                                    updateFilters({ subcategory: val, category: newCat, page: 1 });
                                 }}
                                 className="w-full appearance-none rounded-lg border border-border bg-background py-1.5 pr-8 pl-2.5 text-xs font-bold text-foreground transition focus:border-blue-500 focus:outline-none"
                             >
@@ -458,8 +401,9 @@ export default function QuestionsIndex({
                             <select
                                 value={filterStatus}
                                 onChange={(e) => {
-                                    setFilterStatus(e.target.value as any);
-                                    setCurrentPage(1);
+                                    const val = e.target.value;
+                                    setFilterStatus(val);
+                                    updateFilters({ status: val, page: 1 });
                                 }}
                                 className="w-full appearance-none rounded-lg border border-border bg-background py-1.5 pr-8 pl-2.5 text-xs font-bold text-foreground transition focus:border-blue-500 focus:outline-none"
                             >
@@ -485,6 +429,29 @@ export default function QuestionsIndex({
                             <ChevronRight className="pointer-events-none absolute top-1/2 right-2.5 size-3.5 -translate-y-1/2 -rotate-90 text-muted-foreground" />
                         </div>
 
+                        {/* Per-Page Selector */}
+                        <div className="relative w-20">
+                            <select
+                                value={perPage}
+                                onChange={(e) => {
+                                    const val = Number(e.target.value);
+                                    setPerPage(val);
+                                    updateFilters({ per_page: val, page: 1 });
+                                }}
+                                className="w-full appearance-none rounded-lg border border-border bg-background py-1.5 pr-6 pl-2 text-xs font-bold text-foreground transition focus:border-blue-500 focus:outline-none"
+                            >
+                                <option value={10}>10 / pg</option>
+                                <option value={15}>15 / pg</option>
+                                <option value={25}>25 / pg</option>
+                                <option value={50}>50 / pg</option>
+                            </select>
+                            <ChevronRight className="pointer-events-none absolute top-1/2 right-2 size-3 -translate-y-1/2 -rotate-90 text-muted-foreground" />
+                        </div>
+
+                        <span className="shrink-0 pl-1 text-xs font-bold text-muted-foreground">
+                            {pagination.total} found
+                        </span>
+
                         {/* Language Filter (Only for Verbal Ability and Word Analogy) */}
                         {(filterCategory === 'Verbal Ability' ||
                             filterSubcategory === 'Word analogy') && (
@@ -492,8 +459,9 @@ export default function QuestionsIndex({
                                 <select
                                     value={filterLanguage}
                                     onChange={(e) => {
-                                        setFilterLanguage(e.target.value);
-                                        setCurrentPage(1);
+                                        const val = e.target.value;
+                                        setFilterLanguage(val);
+                                        updateFilters({ language: val, page: 1 });
                                     }}
                                     className="w-full appearance-none rounded-lg border border-border bg-background py-1.5 pr-8 pl-2.5 text-xs font-bold text-foreground transition focus:border-blue-500 focus:outline-none"
                                 >
@@ -520,42 +488,7 @@ export default function QuestionsIndex({
                             </div>
                         )}
 
-                        <span className="shrink-0 pl-1 text-xs font-bold text-muted-foreground">
-                            {filteredQuestions.length} found
-                        </span>
-
                         <div className="ml-auto flex items-center gap-2">
-                            {filteredQuestions.length > 0 && (
-                                <button
-                                    type="button"
-                                    onClick={() => {
-                                        if (
-                                            selectedIds.size ===
-                                            filteredQuestions.length
-                                        ) {
-                                            setSelectedIds(new Set());
-                                        } else {
-                                            setSelectedIds(
-                                                new Set(
-                                                    filteredQuestions.map(
-                                                        (q) => q.id,
-                                                    ),
-                                                ),
-                                            );
-                                        }
-                                    }}
-                                    className="flex items-center gap-1.5 rounded-lg border border-border bg-background px-2.5 py-1.5 text-xs font-bold text-muted-foreground transition hover:border-blue-200 hover:text-blue-600 dark:hover:border-blue-900/50 dark:hover:text-blue-400"
-                                >
-                                    <ListChecks className="size-3.5" />
-                                    <span className="hidden sm:inline">
-                                        {selectedIds.size ===
-                                        filteredQuestions.length
-                                            ? 'Deselect All Pages'
-                                            : 'Select All Pages'}
-                                    </span>
-                                </button>
-                            )}
-
                             {/* View Mode Toggle */}
                             <div className="flex items-center rounded-lg border border-border bg-background p-1">
                                 <button
@@ -665,7 +598,7 @@ export default function QuestionsIndex({
                 )}
 
                 {/* 2.5 ACTIONS LEGEND */}
-                {filteredQuestions.length > 0 && (
+                {questions.length > 0 && (
                     <div className="mb-4 flex flex-wrap items-center justify-end gap-3 rounded-xl border border-border bg-card p-3 text-[10px] font-extrabold tracking-wider uppercase">
                         <span className="text-muted-foreground">Legend:</span>
                         <div className="flex items-center gap-1.5 rounded-lg border border-slate-100 bg-slate-50 px-2 py-1 dark:border-slate-800 dark:bg-slate-900/50 dark:bg-slate-950/30">
@@ -697,46 +630,33 @@ export default function QuestionsIndex({
 
                 {/* Question Cards Grid */}
                 {questions.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-border bg-card p-16 text-center">
-                        <div className="mx-auto mb-4 flex size-16 items-center justify-center rounded-2xl bg-muted text-muted-foreground">
-                            <FileQuestion className="size-8" />
-                        </div>
-                        <h3 className="text-xl font-black tracking-tight text-foreground">
-                            No Questions Found
-                        </h3>
-                        <p className="mt-1.5 max-w-2xl text-base leading-relaxed text-muted-foreground">
-                            We couldn't find any questions in the database.
-                            Start by creating your first question using the AI
-                            Generator or Manual Entry.
-                        </p>
-                        <Link
-                            href={questionsCreate().url}
-                            className="group mt-6 inline-flex cursor-pointer items-center gap-1.5 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-bold text-white shadow-md transition transition-all duration-300 hover:bg-blue-700 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95"
-                        >
-                            <ChevronRight className="size-4 transition-transform group-hover:scale-110" />
-                            Create Question
-                        </Link>
-                    </div>
-                ) : filteredQuestions.length === 0 ? (
                     <div className="flex flex-col items-center justify-center rounded-2xl border border-border bg-card p-12 text-center">
                         <div className="mx-auto mb-4 flex size-14 items-center justify-center rounded-2xl bg-muted text-muted-foreground">
                             <FileQuestion className="size-6" />
                         </div>
                         <h3 className="font-bold text-foreground">
-                            No Matching Questions
+                            No Questions Found
                         </h3>
                         <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
-                            No questions match your active filters.
+                            No questions match your search or filter parameters.
                         </p>
                         <Button
                             type="button"
                             variant="default"
                             size="sm"
+                            className="mt-4"
                             onClick={() => {
                                 setFilterSearch('');
                                 setFilterStatus('all');
                                 setFilterCategory('all');
                                 setFilterSubcategory('all');
+                                updateFilters({
+                                    search: '',
+                                    status: 'all',
+                                    category: 'all',
+                                    subcategory: 'all',
+                                    page: 1,
+                                });
                             }}
                         >
                             Reset Filters
@@ -750,8 +670,8 @@ export default function QuestionsIndex({
                                 <input
                                     type="checkbox"
                                     checked={
-                                        paginatedQuestions.length > 0 &&
-                                        paginatedQuestions.every((q) =>
+                                        questions.length > 0 &&
+                                        questions.every((q) =>
                                             selectedIds.has(q.id),
                                         )
                                     }
@@ -775,13 +695,11 @@ export default function QuestionsIndex({
                                                 <input
                                                     type="checkbox"
                                                     checked={
-                                                        paginatedQuestions.length >
-                                                            0 &&
-                                                        paginatedQuestions.every(
-                                                            (q) =>
-                                                                selectedIds.has(
-                                                                    q.id,
-                                                                ),
+                                                        questions.length > 0 &&
+                                                        questions.every((q) =>
+                                                            selectedIds.has(
+                                                                q.id,
+                                                            ),
                                                         )
                                                     }
                                                     onChange={(e) =>
@@ -796,7 +714,7 @@ export default function QuestionsIndex({
                                                 ID
                                             </th>
                                             <th className="min-w-[400px] px-4 py-3 font-bold">
-                                                Question Stem
+                                                Question Stem & Answer Choices
                                             </th>
                                             <th className="w-36 px-4 py-3 font-bold">
                                                 Category
@@ -804,7 +722,10 @@ export default function QuestionsIndex({
                                             <th className="w-40 px-4 py-3 font-bold">
                                                 Subcategory
                                             </th>
-                                            <th className="w-28 px-4 py-3 font-bold">
+                                            <th className="w-20 px-4 py-3 font-bold">
+                                                Language
+                                            </th>
+                                            <th className="w-24 px-4 py-3 font-bold">
                                                 Status
                                             </th>
                                             <th className="w-32 px-4 py-3 text-right font-bold">
@@ -813,7 +734,7 @@ export default function QuestionsIndex({
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-border">
-                                        {paginatedQuestions.map((q) => (
+                                        {questions.map((q) => (
                                             <tr
                                                 key={q.id}
                                                 className={`transition hover:bg-muted/40 ${
@@ -822,7 +743,7 @@ export default function QuestionsIndex({
                                                         : ''
                                                 }`}
                                             >
-                                                <td className="w-12 px-4 py-4 text-center align-top">
+                                                <td className="w-12 px-4 py-3 text-center">
                                                     <input
                                                         type="checkbox"
                                                         checked={selectedIds.has(
@@ -835,43 +756,40 @@ export default function QuestionsIndex({
                                                                     .checked,
                                                             )
                                                         }
-                                                        className="mt-1 size-4 cursor-pointer accent-blue-600"
+                                                        className="size-4 cursor-pointer accent-blue-600"
                                                     />
                                                 </td>
-                                                <td className="w-20 px-4 py-4 align-top font-mono text-xs text-muted-foreground">
+                                                <td className="w-16 px-4 py-3 font-bold text-muted-foreground">
                                                     #{q.id}
                                                 </td>
-                                                <td className="min-w-[400px] px-4 py-4 align-top">
-                                                    <div className="flex flex-col">
-                                                        <div className="flex flex-wrap items-center gap-2">
-                                                            <div className="line-clamp-2 font-semibold text-foreground">
-                                                                {getCleanStemText(
-                                                                    q.stem,
-                                                                )}
-                                                            </div>
-                                                            {hasSvgContent(
+                                                <td className="min-w-[400px] px-4 py-3">
+                                                    <div className="flex flex-wrap items-center gap-2">
+                                                        <div className="line-clamp-2 font-bold text-foreground">
+                                                            {getCleanStemText(
                                                                 q.stem,
-                                                            ) && (
-                                                                <button
-                                                                    type="button"
-                                                                    onClick={() =>
-                                                                        setPreviewQuestion(
-                                                                            q,
-                                                                        )
-                                                                    }
-                                                                    className="inline-flex shrink-0 cursor-pointer items-center gap-1 rounded border border-blue-200 bg-blue-50 px-1.5 py-0.5 text-[9px] font-extrabold text-blue-700 transition hover:bg-blue-100 dark:border-blue-900/40 dark:bg-blue-950/40 dark:text-blue-300 dark:hover:bg-blue-900/50"
-                                                                    title="Quick preview diagram"
-                                                                >
-                                                                    <FileImage className="size-3" />
-                                                                    <span>
-                                                                        Diagram
-                                                                    </span>
-                                                                </button>
                                                             )}
                                                         </div>
+                                                        {hasSvgContent(
+                                                            q.stem,
+                                                        ) && (
+                                                            <button
+                                                                type="button"
+                                                                onClick={() =>
+                                                                    setPreviewQuestion(
+                                                                        q,
+                                                                    )
+                                                                }
+                                                                className="inline-flex shrink-0 cursor-pointer items-center gap-1 rounded border border-blue-200 bg-blue-50 px-1.5 py-0.5 text-[9px] font-extrabold text-blue-700 transition hover:bg-blue-100 dark:border-blue-900/40 dark:bg-blue-950/40 dark:text-blue-300 dark:hover:bg-blue-900/50"
+                                                                title="Quick preview diagram"
+                                                            >
+                                                                <FileImage className="size-3" />
+                                                                <span>
+                                                                    Diagram
+                                                                </span>
+                                                            </button>
+                                                        )}
                                                     </div>
-                                                    {/* Sub-line under main question stem (Options & Answer) */}
-                                                    <div className="mt-0.5 line-clamp-1 text-[11px] text-muted-foreground">
+                                                    <div className="mt-1 line-clamp-1 text-[11px] text-muted-foreground">
                                                         {q.options &&
                                                         q.options.length > 0 ? (
                                                             (() => {
@@ -882,17 +800,9 @@ export default function QuestionsIndex({
                                                                                 opt,
                                                                                 i,
                                                                             ) => {
-                                                                                const rawText =
-                                                                                    typeof opt ===
-                                                                                    'string'
-                                                                                        ? opt
-                                                                                        : opt.option_text ||
-                                                                                          '';
                                                                                 const cleanText =
-                                                                                    rawText
-                                                                                        ? String(
-                                                                                              rawText,
-                                                                                          )
+                                                                                    opt.option_text
+                                                                                        ? opt.option_text
                                                                                               .replace(
                                                                                                   /<[^>]+>/g,
                                                                                                   '',
@@ -907,15 +817,18 @@ export default function QuestionsIndex({
                                                                             ' • ',
                                                                         );
 
-                                                                return choicesStr;
+                                                                return choicesStr.length >
+                                                                    90
+                                                                    ? choicesStr.slice(
+                                                                          0,
+                                                                          90,
+                                                                      ) + '...'
+                                                                    : choicesStr;
                                                             })()
                                                         ) : (
-                                                            <span className="text-red-400 italic">
-                                                                No options found
-                                                                for this
-                                                                question
-                                                                (Possible cache
-                                                                issue)
+                                                            <span className="italic text-muted-foreground">
+                                                                No choices
+                                                                defined
                                                             </span>
                                                         )}
                                                     </div>
@@ -932,6 +845,12 @@ export default function QuestionsIndex({
                                                         {q.subcategory}
                                                     </span>
                                                 </td>
+                                                <td className="w-20 px-4 py-3">
+                                                    <span className="inline-block rounded border border-border bg-muted px-1.5 py-0.5 text-[9px] font-semibold text-foreground">
+                                                        {(q as any).language ||
+                                                            'English'}
+                                                    </span>
+                                                </td>
                                                 <td className="px-4 py-3">
                                                     <span
                                                         className={`inline-flex items-center gap-1 rounded-md border px-2 py-0.5 text-[9px] font-extrabold uppercase ${
@@ -941,9 +860,7 @@ export default function QuestionsIndex({
                                                                 : 'border-blue-100 bg-blue-50 text-blue-700 dark:border-blue-900/30 dark:bg-blue-950/30 dark:text-blue-400'
                                                         }`}
                                                     >
-                                                        {q.status === 'ACTIVE'
-                                                            ? 'Active'
-                                                            : 'Draft'}
+                                                        {q.status}
                                                     </span>
                                                 </td>
                                                 <td className="px-4 py-3 text-right">
@@ -952,41 +869,76 @@ export default function QuestionsIndex({
                                                             delayDuration={150}
                                                         >
                                                             <Tooltip>
-                                                                <TooltipTrigger asChild>
-                                                                    <button
-                                                                        type="button"
-                                                                        onClick={() => setPreviewQuestion(q)}
+                                                                <TooltipTrigger
+                                                                    asChild
+                                                                >
+                                                                    <Link
+                                                                        href={`${questionsShow(q.id).url}?page=${currentPage}`}
                                                                         className="cursor-pointer rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted hover:text-blue-600 dark:text-blue-400"
                                                                     >
-                                                                        <FileImage className="size-4" />
-                                                                    </button>
+                                                                        <Eye className="size-4" />
+                                                                    </Link>
                                                                 </TooltipTrigger>
-                                                                <TooltipContent>Quick preview</TooltipContent>
+                                                                <TooltipContent>
+                                                                    Full details
+                                                                </TooltipContent>
                                                             </Tooltip>
                                                             <Tooltip>
-                                                                <TooltipTrigger asChild>
+                                                                <TooltipTrigger
+                                                                    asChild
+                                                                >
                                                                     <button
                                                                         type="button"
-                                                                        onClick={() => setEditModalQuestion(q)}
-                                                                        className="cursor-pointer rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted hover:text-blue-600 dark:text-blue-400"
+                                                                        onClick={() =>
+                                                                            setEditModalQuestion(
+                                                                                q,
+                                                                            )
+                                                                        }
+                                                                        className="cursor-pointer rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted hover:text-amber-600 dark:hover:text-amber-400"
                                                                     >
                                                                         <Edit3 className="size-4" />
                                                                     </button>
                                                                 </TooltipTrigger>
-                                                                <TooltipContent>Edit</TooltipContent>
+                                                                <TooltipContent>
+                                                                    Quick Edit
+                                                                </TooltipContent>
                                                             </Tooltip>
-
                                                             <Tooltip>
-                                                                <TooltipTrigger asChild>
+                                                                <TooltipTrigger
+                                                                    asChild
+                                                                >
+                                                                    <Link
+                                                                        href={`${questionsEdit(q.id).url}?page=${currentPage}`}
+                                                                        className="cursor-pointer rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted hover:text-blue-600 dark:text-blue-400"
+                                                                    >
+                                                                        <Edit2 className="size-4" />
+                                                                    </Link>
+                                                                </TooltipTrigger>
+                                                                <TooltipContent>
+                                                                    Edit
+                                                                    question
+                                                                </TooltipContent>
+                                                            </Tooltip>
+                                                            <Tooltip>
+                                                                <TooltipTrigger
+                                                                    asChild
+                                                                >
                                                                     <button
                                                                         type="button"
-                                                                        onClick={() => promptDelete(q.id)}
+                                                                        onClick={() =>
+                                                                            promptDelete(
+                                                                                q.id,
+                                                                            )
+                                                                        }
                                                                         className="cursor-pointer rounded-lg p-1.5 text-muted-foreground transition hover:bg-muted hover:text-red-600"
                                                                     >
                                                                         <Trash2 className="size-4" />
                                                                     </button>
                                                                 </TooltipTrigger>
-                                                                <TooltipContent>Delete question</TooltipContent>
+                                                                <TooltipContent>
+                                                                    Delete
+                                                                    question
+                                                                </TooltipContent>
                                                             </Tooltip>
                                                         </TooltipProvider>
                                                     </div>
@@ -998,7 +950,7 @@ export default function QuestionsIndex({
                             </div>
                         ) : (
                             <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-                                {paginatedQuestions.map((q) => (
+                                {questions.map((q) => (
                                     <div
                                         key={q.id}
                                         className={`group relative rounded-2xl border border-border bg-card p-5 shadow-xs transition-all duration-300 hover:-translate-y-1 hover:shadow-md ${
@@ -1041,119 +993,121 @@ export default function QuestionsIndex({
                                                         : 'border-blue-100 bg-blue-50 text-blue-700 dark:border-blue-900/30 dark:bg-blue-950/20 dark:bg-blue-950/30 dark:text-blue-400'
                                                 }`}
                                             >
-                                                {q.status === 'ACTIVE'
-                                                    ? 'Active'
-                                                    : 'Draft'}
+                                                {q.status}
                                             </span>
                                         </div>
 
-                                        {/* Question ID */}
-                                        <div className="mb-3">
+                                        {/* Question ID & Language */}
+                                        <div className="mb-3 flex items-center gap-2">
                                             <span className="text-xs font-bold text-muted-foreground">
                                                 #{q.id}
                                             </span>
+                                            <span className="rounded border border-border bg-muted px-1.5 py-0.5 text-[9px] font-semibold text-foreground">
+                                                {(q as any).language ||
+                                                    'English'}
+                                            </span>
                                         </div>
 
-                                        <div className="mb-4 text-sm leading-relaxed font-semibold text-foreground">
-                                            {renderFormattedText(q.stem, true)}
-                                        </div>
-
-                                        {/* Options Preview */}
-                                        {q.options && q.options.length > 0 && (
-                                            <div className="mb-4 space-y-1.5">
-                                                <div className="text-[10px] font-bold tracking-wider text-muted-foreground uppercase">
-                                                    Options
+                                        {/* Question Stem */}
+                                        <div className="mb-4">
+                                            <div className="flex flex-wrap items-center gap-2">
+                                                <div className="line-clamp-3 text-sm leading-relaxed font-bold text-foreground">
+                                                    {getCleanStemText(q.stem)}
                                                 </div>
-                                                <div className="space-y-1">
-                                                    {q.options
-                                                        .slice(0, 2)
-                                                        .map((opt, idx) => {
-                                                            const rawText =
-                                                                typeof opt ===
-                                                                'string'
-                                                                    ? opt
-                                                                    : opt.option_text;
-                                                            const text = rawText
-                                                                ? String(
-                                                                      rawText,
-                                                                  )
-                                                                      .replace(
-                                                                          /<[^>]+>/g,
-                                                                          '',
-                                                                      )
-                                                                      .trim()
-                                                                : '';
-                                                            const isCorrect =
-                                                                typeof opt ===
-                                                                'object'
-                                                                    ? opt.is_correct
-                                                                    : q.correct_option ===
-                                                                      idx;
-
-                                                            return (
-                                                                <div
-                                                                    key={idx}
-                                                                    className={`flex items-center gap-1.5 rounded-lg px-2 py-1 text-[10px] leading-tight ${
-                                                                        isCorrect
-                                                                            ? 'bg-emerald-50 font-semibold text-emerald-900 dark:bg-emerald-950/30 dark:text-emerald-300'
-                                                                            : 'bg-muted text-muted-foreground'
-                                                                    }`}
-                                                                >
-                                                                    <span className="font-bold">
-                                                                        {String.fromCharCode(
-                                                                            65 +
-                                                                                idx,
-                                                                        )}
-                                                                        .
-                                                                    </span>
-                                                                    <span className="line-clamp-1">
-                                                                        {text}
-                                                                    </span>
-                                                                </div>
-                                                            );
-                                                        })}
-                                                    {q.options.length > 2 && (
-                                                        <div className="text-[10px] text-muted-foreground">
-                                                            +
-                                                            {q.options.length -
-                                                                2}{' '}
-                                                            more options
-                                                        </div>
-                                                    )}
-                                                </div>
+                                                {hasSvgContent(q.stem) && (
+                                                    <button
+                                                        type="button"
+                                                        onClick={() =>
+                                                            setPreviewQuestion(
+                                                                q,
+                                                            )
+                                                        }
+                                                        className="inline-flex shrink-0 cursor-pointer items-center gap-1 rounded border border-blue-200 bg-blue-50 px-1.5 py-0.5 text-[9px] font-extrabold text-blue-700 transition hover:bg-blue-100 dark:border-blue-900/40 dark:bg-blue-950/40 dark:text-blue-300 dark:hover:bg-blue-900/50"
+                                                        title="Quick preview diagram"
+                                                    >
+                                                        <FileImage className="size-3" />
+                                                        <span>Diagram</span>
+                                                    </button>
+                                                )}
                                             </div>
-                                        )}
+                                        </div>
+
+                                        {/* Choices count */}
+                                        <div className="mb-4 text-xs font-semibold text-muted-foreground">
+                                            {q.options?.length || 0} answer
+                                            choices
+                                        </div>
 
                                         {/* Actions */}
                                         <div className="flex items-center justify-end gap-1.5 border-t border-border pt-3">
                                             <TooltipProvider
                                                 delayDuration={150}
                                             >
-                                                        <Tooltip>
-                                                            <TooltipTrigger asChild>
-                                                                <button
-                                                                    type="button"
-                                                                    onClick={() => setEditModalQuestion(q)}
-                                                                    className="group/btn cursor-pointer rounded-lg p-1.5 text-muted-foreground transition-all duration-300 hover:bg-muted hover:text-blue-600 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95 dark:text-blue-400"
-                                                                >
-                                                                    <Edit3 className="size-4" />
-                                                                </button>
-                                                            </TooltipTrigger>
-                                                            <TooltipContent>Edit</TooltipContent>
-                                                        </Tooltip>
+                                                <Tooltip>
+                                                    <TooltipTrigger asChild>
+                                                        <Link
+                                                            href={`${questionsShow(q.id).url}?page=${currentPage}`}
+                                                            className="group/btn cursor-pointer rounded-lg p-1.5 text-muted-foreground transition-all duration-300 hover:bg-muted hover:text-blue-600 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95 dark:text-blue-400"
+                                                        >
+                                                            <Eye className="size-4" />
+                                                        </Link>
+                                                    </TooltipTrigger>
+                                                    <TooltipContent>
+                                                        Full details
+                                                    </TooltipContent>
+                                                </Tooltip>
 
-                                                        <Tooltip>
-                                                            <TooltipTrigger asChild>
-                                                                <button
-                                                                    type="button"
-                                                                    onClick={() => promptDelete(q.id)}
-                                                                    className="cursor-pointer rounded-lg p-1.5 text-muted-foreground transition-all duration-300 hover:bg-muted hover:text-red-600 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95"
-                                                                >
-                                                                    <Trash2 className="size-4" />
-                                                                </button>
-                                                            </TooltipTrigger>
-                                                            <TooltipContent>Delete question</TooltipContent>
-                                                        </Tooltip>
+                                                <Tooltip>
+                                                    <TooltipTrigger asChild>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() =>
+                                                                setEditModalQuestion(
+                                                                    q,
+                                                                )
+                                                            }
+                                                            className="group/btn cursor-pointer rounded-lg p-1.5 text-muted-foreground transition-all duration-300 hover:bg-muted hover:text-amber-600 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95 dark:hover:text-amber-400"
+                                                        >
+                                                            <Edit3 className="size-4" />
+                                                        </button>
+                                                    </TooltipTrigger>
+                                                    <TooltipContent>
+                                                        Quick Edit
+                                                    </TooltipContent>
+                                                </Tooltip>
+
+                                                <Tooltip>
+                                                    <TooltipTrigger asChild>
+                                                        <Link
+                                                            href={`${questionsEdit(q.id).url}?page=${currentPage}`}
+                                                            className="group/btn cursor-pointer rounded-lg p-1.5 text-muted-foreground transition-all duration-300 hover:bg-muted hover:text-blue-600 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95 dark:text-blue-400"
+                                                        >
+                                                            <Edit2 className="size-4" />
+                                                        </Link>
+                                                    </TooltipTrigger>
+                                                    <TooltipContent>
+                                                        Edit question
+                                                    </TooltipContent>
+                                                </Tooltip>
+
+                                                <Tooltip>
+                                                    <TooltipTrigger asChild>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() =>
+                                                                promptDelete(
+                                                                    q.id,
+                                                                )
+                                                            }
+                                                            className="cursor-pointer rounded-lg p-1.5 text-muted-foreground transition-all duration-300 hover:bg-muted hover:text-red-600 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95"
+                                                        >
+                                                            <Trash2 className="size-4" />
+                                                        </button>
+                                                    </TooltipTrigger>
+                                                    <TooltipContent>
+                                                        Delete question
+                                                    </TooltipContent>
+                                                </Tooltip>
                                             </TooltipProvider>
                                         </div>
                                     </div>
@@ -1162,23 +1116,23 @@ export default function QuestionsIndex({
                         )}
 
                         {/* Pagination */}
-                        {filteredQuestions.length > pageSize && (
+                        {pagination.total > 0 && (
                             <div className="flex flex-col items-center justify-between gap-3 rounded-b-xl border-t border-border bg-muted px-4 py-4 sm:flex-row sm:px-6">
                                 <span className="text-xs font-bold text-muted-foreground">
                                     Showing{' '}
                                     <strong className="text-foreground">
-                                        {(currentPage - 1) * pageSize + 1}
+                                        {(pagination.current_page - 1) * pagination.per_page + 1}
                                     </strong>{' '}
                                     to{' '}
                                     <strong className="text-foreground">
                                         {Math.min(
-                                            currentPage * pageSize,
-                                            filteredQuestions.length,
+                                            pagination.current_page * pagination.per_page,
+                                            pagination.total,
                                         )}
                                     </strong>{' '}
                                     of{' '}
                                     <strong className="text-foreground">
-                                        {filteredQuestions.length}
+                                        {pagination.total}
                                     </strong>{' '}
                                     results
                                 </span>
@@ -1186,10 +1140,10 @@ export default function QuestionsIndex({
                                 <div className="flex items-center gap-1.5">
                                     <button
                                         type="button"
-                                        disabled={currentPage === 1}
+                                        disabled={pagination.current_page === 1}
                                         onClick={() =>
                                             handlePageChange(
-                                                Math.max(1, currentPage - 1),
+                                                Math.max(1, pagination.current_page - 1),
                                             )
                                         }
                                         className="cursor-pointer rounded-lg border border-border bg-card px-3 py-1.5 text-xs font-bold text-foreground transition hover:bg-muted focus:outline-none disabled:cursor-not-allowed disabled:opacity-40"
@@ -1198,19 +1152,19 @@ export default function QuestionsIndex({
                                     </button>
 
                                     {Array.from(
-                                        { length: totalPages },
+                                        { length: pagination.last_page },
                                         (_, i) => i + 1,
                                     ).map((pageNum) => {
                                         if (
-                                            totalPages > 7 &&
-                                            Math.abs(pageNum - currentPage) >
+                                            pagination.last_page > 7 &&
+                                            Math.abs(pageNum - pagination.current_page) >
                                                 2 &&
                                             pageNum !== 1 &&
-                                            pageNum !== totalPages
+                                            pageNum !== pagination.last_page
                                         ) {
                                             if (
-                                                pageNum === currentPage - 3 ||
-                                                pageNum === currentPage + 3
+                                                pageNum === pagination.current_page - 3 ||
+                                                pageNum === pagination.current_page + 3
                                             ) {
                                                 return (
                                                     <span
@@ -1226,7 +1180,7 @@ export default function QuestionsIndex({
                                         }
 
                                         const isActive =
-                                            pageNum === currentPage;
+                                            pageNum === pagination.current_page;
 
                                         return (
                                             <button
@@ -1248,12 +1202,12 @@ export default function QuestionsIndex({
 
                                     <button
                                         type="button"
-                                        disabled={currentPage === totalPages}
+                                        disabled={pagination.current_page === pagination.last_page}
                                         onClick={() =>
                                             handlePageChange(
                                                 Math.min(
-                                                    totalPages,
-                                                    currentPage + 1,
+                                                    pagination.last_page,
+                                                    pagination.current_page + 1,
                                                 ),
                                             )
                                         }

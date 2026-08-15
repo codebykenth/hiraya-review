@@ -18,12 +18,12 @@ class SubcategoryFactory extends Factory
      */
     public function definition(): array
     {
-        $name = fake()->word();
+        $name = fake()->unique()->word();
 
         return [
             'category_id' => Category::factory(),
             'name' => ucfirst($name),
-            'slug' => str()->slug($name),
+            'slug' => str()->slug($name).'-'.fake()->unique()->randomNumber(5),
             'language' => 'en',
             'sort_order' => fake()->numberBetween(0, 100),
         ];

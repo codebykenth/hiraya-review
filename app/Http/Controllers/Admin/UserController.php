@@ -17,9 +17,17 @@ class UserController
      */
     public function index(Request $request): Response
     {
-
-        // Retrieve ALL active users and fetch their exam attempts count
-        $users = User::latest()
+        // Eager load attempts_count, mock_exams_count, and drills_count using withCount to eliminate N+1 queries
+        $users = User::withCount([
+            'examAttempts as attempts_count',
+            'examAttempts as mock_exams_count' => function ($query) {
+                $query->whereNull('category_id');
+            },
+            'examAttempts as drills_count' => function ($query) {
+                $query->whereNotNull('category_id');
+            },
+        ])
+            ->latest()
             ->get()
             ->map(function ($u) {
                 return [
@@ -31,11 +39,11 @@ class UserController
                     'last_login_at' => $u->last_login_at ? $u->last_login_at->format('Y-m-d H:i') : 'Never',
                     'is_active' => (bool) $u->is_active,
                     'terms_accepted_at' => $u->terms_accepted_at ? $u->terms_accepted_at->format('Y-m-d H:i') : null,
-                    'deleted_at' => null, // Kept to avoid breaking TS interface
-                    'attempts_count' => ExamAttempt::where('user_id', $u->id)->count(),
-                    'mock_exams_count' => ExamAttempt::where('user_id', $u->id)->whereNull('category_id')->count(),
-                    'drills_count' => ExamAttempt::where('user_id', $u->id)->whereNotNull('category_id')->count(),
-                    'pdf_downloads_count' => $u->pdf_downloads_count,
+                    'deleted_at' => null,
+                    'attempts_count' => (int) $u->attempts_count,
+                    'mock_exams_count' => (int) $u->mock_exams_count,
+                    'drills_count' => (int) $u->drills_count,
+                    'pdf_downloads_count' => (int) $u->pdf_downloads_count,
                     'can_download_pdf' => (bool) $u->can_download_pdf,
                 ];
             });
@@ -48,7 +56,7 @@ class UserController
             'total_active' => User::where('is_active', true)->count(),
             'total_terms_accepted' => User::whereNotNull('terms_accepted_at')->count(),
             'total_attempts' => ExamAttempt::count(),
-            'total_pdf_downloads' => User::sum('pdf_downloads_count'),
+            'total_pdf_downloads' => (int) User::sum('pdf_downloads_count'),
         ];
 
         return Inertia::render('admin/users/index', [

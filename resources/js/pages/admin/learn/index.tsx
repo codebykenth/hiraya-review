@@ -49,23 +49,31 @@ interface AdminLearnIndexProps {
 
 export default function AdminLearnIndex({
     modules = [],
+    pagination = { current_page: 1, per_page: 10, total: 0, last_page: 1 },
+    filters = {},
     categories = [],
-}: AdminLearnIndexProps) {
-    const [filterSearch, setFilterSearch] = useState('');
-    const [debouncedFilterSearch, setDebouncedFilterSearch] = useState('');
-    const [filterStatus, setFilterStatus] = useState<
-        'all' | 'ACTIVE' | 'DRAFT'
-    >('all');
-    const [filterCategory, setFilterCategory] = useState<string>('all');
-    const [filterSubcategory, setFilterSubcategory] = useState<string>('all');
-    const [currentPage, setCurrentPage] = useState(() => {
-        const params = new URLSearchParams(
-            typeof window !== 'undefined' ? window.location.search : '',
-        );
-        const p = params.get('page');
-
-        return p ? Number(p) : 1;
-    });
+}: AdminLearnIndexProps & {
+    pagination?: {
+        current_page: number;
+        per_page: number;
+        total: number;
+        last_page: number;
+    };
+    filters?: {
+        search?: string;
+        status?: string;
+        category?: string;
+        subcategory?: string;
+        per_page?: number;
+    };
+}) {
+    const [filterSearch, setFilterSearch] = useState(filters.search || '');
+    const [filterStatus, setFilterStatus] = useState<string>(filters.status || 'all');
+    const [filterCategory, setFilterCategory] = useState<string>(filters.category || 'all');
+    const [filterSubcategory, setFilterSubcategory] = useState<string>(filters.subcategory || 'all');
+    const [perPage, setPerPage] = useState<number>(filters.per_page || 10);
+    const currentPage = pagination.current_page;
+    const totalPages = pagination.last_page;
     const [deleteModal, setDeleteModal] = useState<{
         isOpen: boolean;
         id: number | null;
@@ -76,7 +84,6 @@ export default function AdminLearnIndex({
         action: 'setActive' | 'setInactive' | 'delete' | null;
     }>({ isOpen: false, action: null });
     const [viewMode, setViewMode] = useState<'grid' | 'table'>('table');
-    const pageSize = 10;
 
     // Build categories tree
     const cseCategoriesTree: Record<string, string[]> = {};
@@ -117,86 +124,40 @@ export default function AdminLearnIndex({
         cseCategoriesTree['Clerical Ability'] = ['Filing', 'Spelling'];
     }
 
-    useEffect(() => {
-        const handler = setTimeout(() => {
-            setDebouncedFilterSearch(filterSearch);
-        }, 300);
+    const updateFilters = (params: {
+        search?: string;
+        status?: string;
+        category?: string;
+        subcategory?: string;
+        page?: number;
+        per_page?: number;
+    }) => {
+        router.get(
+            adminLearnIndex().url,
+            {
+                search: params.search !== undefined ? params.search : filterSearch,
+                status: params.status !== undefined ? params.status : filterStatus,
+                category: params.category !== undefined ? params.category : filterCategory,
+                subcategory: params.subcategory !== undefined ? params.subcategory : filterSubcategory,
+                per_page: params.per_page !== undefined ? params.per_page : perPage,
+                page: params.page !== undefined ? params.page : 1,
+            },
+            {
+                preserveState: true,
+                replace: true,
+                onSuccess: () => setSelectedIds(new Set()),
+            },
+        );
+    };
 
-        return () => clearTimeout(handler);
-    }, [filterSearch]);
-
-    const filteredModules = modules
-        .filter((mod) => {
-            const matchesSearch =
-                mod.title
-                    .toLowerCase()
-                    .includes(debouncedFilterSearch.toLowerCase()) ||
-                mod.topic
-                    .toLowerCase()
-                    .includes(debouncedFilterSearch.toLowerCase()) ||
-                mod.category
-                    .toLowerCase()
-                    .includes(debouncedFilterSearch.toLowerCase()) ||
-                mod.subcategory
-                    .toLowerCase()
-                    .includes(debouncedFilterSearch.toLowerCase()) ||
-                String(mod.id).includes(debouncedFilterSearch);
-
-            const matchesStatus =
-                filterStatus === 'all' ||
-                (filterStatus === 'ACTIVE' && mod.is_published) ||
-                (filterStatus === 'DRAFT' && !mod.is_published);
-
-            const matchesCategory =
-                filterCategory === 'all' || mod.category === filterCategory;
-
-            const matchesSubcategory =
-                filterSubcategory === 'all' ||
-                mod.subcategory === filterSubcategory;
-
-            return (
-                matchesSearch &&
-                matchesStatus &&
-                matchesCategory &&
-                matchesSubcategory
-            );
-        })
-        .sort((a, b) => {
-            // Sort by Category
-            if (a.category !== b.category) {
-                return a.category.localeCompare(b.category);
-            }
-
-            // Then by Subcategory
-            if (a.subcategory !== b.subcategory) {
-                return a.subcategory.localeCompare(b.subcategory);
-            }
-
-            // Then by Status (Active first)
-            if (a.is_published !== b.is_published) {
-                return a.is_published ? -1 : 1;
-            }
-
-            // Then by updated_at timestamp (latest to oldest)
-            return (
-                new Date(b.updated_at).getTime() -
-                new Date(a.updated_at).getTime()
-            );
-        });
-
-    const totalPages = Math.ceil(filteredModules.length / pageSize);
-    const paginatedModules = filteredModules.slice(
-        (currentPage - 1) * pageSize,
-        currentPage * pageSize,
-    );
+    const handleSearchSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        updateFilters({ search: filterSearch, page: 1 });
+    };
 
     const handlePageChange = (page: number) => {
-        setCurrentPage(page);
+        updateFilters({ page });
         window.scrollTo({ top: 0, behavior: 'smooth' });
-
-        const url = new URL(window.location.href);
-        url.searchParams.set('page', String(page));
-        window.history.replaceState({}, '', url.toString());
     };
 
     const promptDelete = (id: number) => {
@@ -216,9 +177,9 @@ export default function AdminLearnIndex({
         const newSelected = new Set(selectedIds);
 
         if (checked) {
-            paginatedModules.forEach((mod) => newSelected.add(mod.id));
+            modules.forEach((mod) => newSelected.add(mod.id));
         } else {
-            paginatedModules.forEach((mod) => newSelected.delete(mod.id));
+            modules.forEach((mod) => newSelected.delete(mod.id));
         }
 
         setSelectedIds(newSelected);
@@ -320,18 +281,16 @@ export default function AdminLearnIndex({
 
                 {/* Search & Filters */}
                 <div className="mb-6 flex flex-wrap items-center justify-between gap-4 rounded-xl border border-border bg-card p-4 shadow-xs">
-                    <div className="flex min-w-[260px] flex-1 items-center gap-2">
+                    <form onSubmit={handleSearchSubmit} className="flex min-w-[260px] flex-1 items-center gap-2">
                         <input
                             type="text"
                             value={filterSearch}
-                            onChange={(e) => {
-                                setFilterSearch(e.target.value);
-                                setCurrentPage(1);
-                            }}
+                            onChange={(e) => setFilterSearch(e.target.value)}
+                            onBlur={() => updateFilters({ search: filterSearch, page: 1 })}
                             placeholder="Search modules (title, summary, topic)..."
                             className="w-full rounded-lg border border-border bg-muted px-3 py-1.5 text-xs font-semibold text-foreground transition placeholder:text-muted-foreground focus:border-blue-500 focus:outline-none"
                         />
-                    </div>
+                    </form>
 
                     <div className="flex flex-wrap items-center gap-2">
                         {/* Category Filter */}
@@ -339,9 +298,10 @@ export default function AdminLearnIndex({
                             <select
                                 value={filterCategory}
                                 onChange={(e) => {
-                                    setFilterCategory(e.target.value);
+                                    const val = e.target.value;
+                                    setFilterCategory(val);
                                     setFilterSubcategory('all');
-                                    setCurrentPage(1);
+                                    updateFilters({ category: val, subcategory: 'all', page: 1 });
                                 }}
                                 className="w-full appearance-none rounded-lg border border-border bg-background py-1.5 pr-8 pl-2.5 text-xs font-bold text-foreground transition focus:border-blue-500 focus:outline-none"
                             >
@@ -369,8 +329,26 @@ export default function AdminLearnIndex({
                             <select
                                 value={filterSubcategory}
                                 onChange={(e) => {
-                                    setFilterSubcategory(e.target.value);
-                                    setCurrentPage(1);
+                                    const val = e.target.value;
+                                    setFilterSubcategory(val);
+                                    let newCat = filterCategory;
+
+                                    if (val !== 'all') {
+                                        const parentCat = Object.keys(
+                                            cseCategoriesTree,
+                                        ).find((cat) =>
+                                            cseCategoriesTree[cat].includes(
+                                                val,
+                                            ),
+                                        );
+
+                                        if (parentCat) {
+                                            newCat = parentCat;
+                                            setFilterCategory(parentCat);
+                                        }
+                                    }
+
+                                    updateFilters({ subcategory: val, category: newCat, page: 1 });
                                 }}
                                 className="w-full appearance-none rounded-lg border border-border bg-background py-1.5 pr-8 pl-2.5 text-xs font-bold text-foreground transition focus:border-blue-500 focus:outline-none"
                             >
@@ -413,8 +391,9 @@ export default function AdminLearnIndex({
                             <select
                                 value={filterStatus}
                                 onChange={(e) => {
-                                    setFilterStatus(e.target.value as any);
-                                    setCurrentPage(1);
+                                    const val = e.target.value;
+                                    setFilterStatus(val);
+                                    updateFilters({ status: val, page: 1 });
                                 }}
                                 className="w-full appearance-none rounded-lg border border-border bg-background py-1.5 pr-8 pl-2.5 text-xs font-bold text-foreground transition focus:border-blue-500 focus:outline-none"
                             >
@@ -440,8 +419,27 @@ export default function AdminLearnIndex({
                             <ChevronRight className="pointer-events-none absolute top-1/2 right-2.5 size-3.5 -translate-y-1/2 -rotate-90 text-muted-foreground" />
                         </div>
 
+                        {/* Per-Page Selector */}
+                        <div className="relative w-20">
+                            <select
+                                value={perPage}
+                                onChange={(e) => {
+                                    const val = Number(e.target.value);
+                                    setPerPage(val);
+                                    updateFilters({ per_page: val, page: 1 });
+                                }}
+                                className="w-full appearance-none rounded-lg border border-border bg-background py-1.5 pr-6 pl-2 text-xs font-bold text-foreground transition focus:border-blue-500 focus:outline-none"
+                            >
+                                <option value={10}>10 / pg</option>
+                                <option value={15}>15 / pg</option>
+                                <option value={25}>25 / pg</option>
+                                <option value={50}>50 / pg</option>
+                            </select>
+                            <ChevronRight className="pointer-events-none absolute top-1/2 right-2 size-3 -translate-y-1/2 -rotate-90 text-muted-foreground" />
+                        </div>
+
                         <span className="shrink-0 pl-1 text-xs font-bold text-muted-foreground">
-                            {filteredModules.length} found
+                            {pagination.total} found
                         </span>
 
                         {/* View Mode Toggle */}
@@ -536,46 +534,33 @@ export default function AdminLearnIndex({
 
                 {/* Module Cards Grid */}
                 {modules.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-border bg-card p-16 text-center">
-                        <div className="mx-auto mb-4 flex size-16 items-center justify-center rounded-2xl bg-muted text-muted-foreground">
-                            <FileText className="size-8" />
-                        </div>
-                        <h3 className="text-xl font-black tracking-tight text-foreground">
-                            No Modules Found
-                        </h3>
-                        <p className="mt-1.5 max-w-2xl text-base leading-relaxed text-muted-foreground">
-                            We couldn't find any learning modules in the
-                            database. Start by creating your first module using
-                            the AI Generator or Manual Entry.
-                        </p>
-                        <Link
-                            href={adminLearnCreate().url}
-                            className="group mt-6 inline-flex cursor-pointer items-center gap-1.5 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-bold text-white shadow-md transition transition-all duration-300 hover:bg-blue-700 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95"
-                        >
-                            <ChevronRight className="size-4 transition-transform group-hover:scale-110" />
-                            Create Module
-                        </Link>
-                    </div>
-                ) : filteredModules.length === 0 ? (
                     <div className="flex flex-col items-center justify-center rounded-2xl border border-border bg-card p-12 text-center">
                         <div className="mx-auto mb-4 flex size-14 items-center justify-center rounded-2xl bg-muted text-muted-foreground">
                             <FileText className="size-6" />
                         </div>
                         <h3 className="font-bold text-foreground">
-                            No Matching Modules
+                            No Modules Found
                         </h3>
                         <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
-                            No modules match your active filters.
+                            No modules match your search or filter parameters.
                         </p>
                         <Button
                             type="button"
                             variant="default"
                             size="sm"
+                            className="mt-4"
                             onClick={() => {
                                 setFilterSearch('');
                                 setFilterStatus('all');
                                 setFilterCategory('all');
                                 setFilterSubcategory('all');
+                                updateFilters({
+                                    search: '',
+                                    status: 'all',
+                                    category: 'all',
+                                    subcategory: 'all',
+                                    page: 1,
+                                });
                             }}
                         >
                             Reset Filters
@@ -589,8 +574,8 @@ export default function AdminLearnIndex({
                                 <input
                                     type="checkbox"
                                     checked={
-                                        paginatedModules.length > 0 &&
-                                        paginatedModules.every((mod) =>
+                                        modules.length > 0 &&
+                                        modules.every((mod) =>
                                             selectedIds.has(mod.id),
                                         )
                                     }
@@ -614,13 +599,11 @@ export default function AdminLearnIndex({
                                                 <input
                                                     type="checkbox"
                                                     checked={
-                                                        paginatedModules.length >
-                                                            0 &&
-                                                        paginatedModules.every(
-                                                            (mod) =>
-                                                                selectedIds.has(
-                                                                    mod.id,
-                                                                ),
+                                                        modules.length > 0 &&
+                                                        modules.every((mod) =>
+                                                            selectedIds.has(
+                                                                mod.id,
+                                                            ),
                                                         )
                                                     }
                                                     onChange={(e) =>
@@ -655,7 +638,7 @@ export default function AdminLearnIndex({
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-border">
-                                        {paginatedModules.map((mod) => (
+                                        {modules.map((mod) => (
                                             <tr
                                                 key={mod.id}
                                                 className={`transition hover:bg-muted/40 ${
@@ -789,7 +772,7 @@ export default function AdminLearnIndex({
                             </div>
                         ) : (
                             <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-                                {paginatedModules.map((mod) => (
+                                {modules.map((mod) => (
                                     <div
                                         key={mod.id}
                                         className={`group relative rounded-2xl border border-border bg-card p-5 shadow-xs transition-all duration-300 hover:-translate-y-1 hover:shadow-md ${
@@ -924,23 +907,23 @@ export default function AdminLearnIndex({
                         )}
 
                         {/* Pagination */}
-                        {filteredModules.length > pageSize && (
+                        {pagination.total > 0 && (
                             <div className="flex flex-col items-center justify-between gap-3 rounded-b-xl border-t border-border bg-muted px-4 py-4 sm:flex-row sm:px-6">
                                 <span className="text-xs font-bold text-muted-foreground">
                                     Showing{' '}
                                     <strong className="text-foreground">
-                                        {(currentPage - 1) * pageSize + 1}
+                                        {(pagination.current_page - 1) * pagination.per_page + 1}
                                     </strong>{' '}
                                     to{' '}
                                     <strong className="text-foreground">
                                         {Math.min(
-                                            currentPage * pageSize,
-                                            filteredModules.length,
+                                            pagination.current_page * pagination.per_page,
+                                            pagination.total,
                                         )}
                                     </strong>{' '}
                                     of{' '}
                                     <strong className="text-foreground">
-                                        {filteredModules.length}
+                                        {pagination.total}
                                     </strong>{' '}
                                     results
                                 </span>
@@ -948,10 +931,10 @@ export default function AdminLearnIndex({
                                 <div className="flex items-center gap-1.5">
                                     <button
                                         type="button"
-                                        disabled={currentPage === 1}
+                                        disabled={pagination.current_page === 1}
                                         onClick={() =>
                                             handlePageChange(
-                                                Math.max(1, currentPage - 1),
+                                                Math.max(1, pagination.current_page - 1),
                                             )
                                         }
                                         className="cursor-pointer rounded-lg border border-border bg-card px-3 py-1.5 text-xs font-bold text-foreground transition hover:bg-muted focus:outline-none disabled:cursor-not-allowed disabled:opacity-40"
@@ -960,19 +943,19 @@ export default function AdminLearnIndex({
                                     </button>
 
                                     {Array.from(
-                                        { length: totalPages },
+                                        { length: pagination.last_page },
                                         (_, i) => i + 1,
                                     ).map((pageNum) => {
                                         if (
-                                            totalPages > 7 &&
-                                            Math.abs(pageNum - currentPage) >
+                                            pagination.last_page > 7 &&
+                                            Math.abs(pageNum - pagination.current_page) >
                                                 2 &&
                                             pageNum !== 1 &&
-                                            pageNum !== totalPages
+                                            pageNum !== pagination.last_page
                                         ) {
                                             if (
-                                                pageNum === currentPage - 3 ||
-                                                pageNum === currentPage + 3
+                                                pageNum === pagination.current_page - 3 ||
+                                                pageNum === pagination.current_page + 3
                                             ) {
                                                 return (
                                                     <span
@@ -988,7 +971,7 @@ export default function AdminLearnIndex({
                                         }
 
                                         const isActive =
-                                            pageNum === currentPage;
+                                            pageNum === pagination.current_page;
 
                                         return (
                                             <button
@@ -1010,12 +993,12 @@ export default function AdminLearnIndex({
 
                                     <button
                                         type="button"
-                                        disabled={currentPage === totalPages}
+                                        disabled={pagination.current_page === pagination.last_page}
                                         onClick={() =>
                                             handlePageChange(
                                                 Math.min(
-                                                    totalPages,
-                                                    currentPage + 1,
+                                                    pagination.last_page,
+                                                    pagination.current_page + 1,
                                                 ),
                                             )
                                         }

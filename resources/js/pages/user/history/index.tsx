@@ -9,20 +9,24 @@ import { TooltipProvider } from '@/components/ui/tooltip';
 import type { Auth } from '@/types';
 import { AttemptsTable } from './components/attempts-table';
 import { FiltersCard } from './components/filters-card';
+import { HistoryKpiCards } from './components/history-kpi-cards';
 import { useHistoryState } from './hooks/use-history-state';
 import type { HistoryPageProps } from './types';
 
 export default function HistoryPage(props: HistoryPageProps) {
     const { auth } = usePage<{ auth: Auth }>().props;
     const isAiMode = auth?.user?.analysis_mode === 'ai';
-    const { attempts = [], pagination } = props;
+    const { attempts = [], stats, pagination } = props;
 
     const {
         searchVal,
         setSearchVal,
         selectedTrack,
         selectedDate,
+        perPage,
         selectedIds,
+        expandedIds,
+        toggleExpandRow,
         confirmModal,
         setConfirmModal,
         handleDeleteAttempt,
@@ -31,6 +35,7 @@ export default function HistoryPage(props: HistoryPageProps) {
         handleBulkDelete,
         handleTrackChange,
         handleDateChange,
+        handlePerPageChange,
         handleSearchSubmit,
     } = useHistoryState(props);
 
@@ -40,11 +45,11 @@ export default function HistoryPage(props: HistoryPageProps) {
 
             <PageContainer>
                 {/* 1. HEADER SECTION */}
-                <div className="mb-8 flex items-start gap-3">
+                <div className="mb-6 flex items-start gap-3">
                     <PageHeader
-                        title="History"
-                        description="Review your past performance, analyze detailed score breakdowns, and identify specific areas for improvement across all your exam tracks."
-                        tooltip="A log of all your previous exam attempts, subcategory performance reports, and historical stats."
+                        title="History & Results"
+                        description="Review past performance, inspect section score breakdowns, and retake drills or mock tests to improve your readiness."
+                        tooltip="A log of all your previous exam attempts, section performance reports, and historical stats."
                     />
                     <div className="mt-1">
                         <HowItWorksModal
@@ -53,39 +58,50 @@ export default function HistoryPage(props: HistoryPageProps) {
                                 {
                                     icon: <Search className="size-4" />,
                                     title: 'Detailed Breakdowns',
-                                    text: 'Click on any past attempt to see a comprehensive breakdown of your score across different subject categories.',
+                                    text: 'Expand any attempt record to see a section-by-section percentage breakdown, timing metrics, and subcategories.',
                                 },
                                 {
                                     icon: <Calendar className="size-4" />,
-                                    title: 'Filter by Date & Track',
-                                    text: 'Use the filters to quickly find specific exam runs or see how you performed during a specific time period.',
+                                    title: 'Filter by Date, Track & Limit',
+                                    text: 'Use the top filter bar to drill down into specific exam runs or customize how many records appear per page.',
                                 },
                                 {
                                     icon: <Trash2 className="size-4" />,
                                     title: 'Manage Records',
-                                    text: `You can delete old or irrelevant attempt records to keep your ${isAiMode ? 'AI Readiness Score' : 'Readiness Score'} focused on your most recent performance.`,
+                                    text: `Delete obsolete attempt records anytime to keep your ${isAiMode ? 'AI Readiness Score' : 'Readiness Score'} accurate and up-to-date.`,
                                 },
                             ]}
                         />
                     </div>
                 </div>
 
-                {/* 2. FILTERS CONTAINER */}
-                <FiltersCard
-                    searchVal={searchVal}
-                    setSearchVal={setSearchVal}
-                    selectedTrack={selectedTrack}
-                    selectedDate={selectedDate}
-                    handleTrackChange={handleTrackChange}
-                    handleDateChange={handleDateChange}
-                    handleSearchSubmit={handleSearchSubmit}
-                />
+                {/* 2. KPI SUMMARY BENTO CARDS */}
+                <div className="mb-6">
+                    <HistoryKpiCards stats={stats} />
+                </div>
 
-                {/* 3. ATTEMPTS TABLE */}
+                {/* 3. FILTERS CONTAINER */}
+                <div className="mb-6">
+                    <FiltersCard
+                        searchVal={searchVal}
+                        setSearchVal={setSearchVal}
+                        selectedTrack={selectedTrack}
+                        selectedDate={selectedDate}
+                        perPage={perPage}
+                        handleTrackChange={handleTrackChange}
+                        handleDateChange={handleDateChange}
+                        handlePerPageChange={handlePerPageChange}
+                        handleSearchSubmit={handleSearchSubmit}
+                    />
+                </div>
+
+                {/* 4. ATTEMPTS TABLE */}
                 <AttemptsTable
                     attempts={attempts}
                     pagination={pagination}
                     selectedIds={selectedIds}
+                    expandedIds={expandedIds}
+                    toggleExpandRow={toggleExpandRow}
                     handleSelectAll={handleSelectAll}
                     handleSelectOne={handleSelectOne}
                     handleBulkDelete={handleBulkDelete}
@@ -96,7 +112,7 @@ export default function HistoryPage(props: HistoryPageProps) {
                 />
             </PageContainer>
 
-            {/* Unified confirmation modal component */}
+            {/* Unified confirmation modal */}
             <ConfirmModal
                 isOpen={confirmModal.isOpen}
                 title={confirmModal.title}

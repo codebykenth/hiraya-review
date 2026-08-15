@@ -16,6 +16,7 @@ import type { CategoryItem } from '@/components/domain/drafts-review-shell';
 import { QuickEditModal } from '@/components/questions/quick-edit-modal';
 import { ConfirmModal } from '@/components/shared/confirm-modal';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
     Dialog,
     DialogContent,
@@ -326,15 +327,14 @@ export default function DraftsQuestionList({
                                                 }`}
                                             >
                                                 <td className="w-12 px-4 py-4 text-center align-top">
-                                                    <input
-                                                        type="checkbox"
+                                                    <Checkbox
                                                         checked={q.approved}
-                                                        onChange={() =>
+                                                        onCheckedChange={() =>
                                                             toggleApproveDraft(
                                                                 q.id,
                                                             )
                                                         }
-                                                        className="mt-1 size-4 cursor-pointer accent-blue-600"
+                                                        aria-label={`Approve question #${q.id}`}
                                                     />
                                                 </td>
                                                 <td className="w-20 px-4 py-4 align-top font-mono text-xs text-muted-foreground">

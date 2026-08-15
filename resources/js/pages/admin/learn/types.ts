@@ -34,6 +34,28 @@ export interface AdminLearnEditProps {
     categories: Category[];
 }
 
+export interface Pagination {
+    current_page: number;
+    per_page: number;
+    total: number;
+    last_page: number;
+}
+
+export interface LearnModuleFilters {
+    search?: string;
+    status?: string;
+    category?: string;
+    subcategory?: string;
+    per_page?: number;
+}
+
+export interface AdminLearnIndexProps {
+    modules: LearnModule[];
+    pagination?: Pagination;
+    filters?: LearnModuleFilters;
+    categories: Category[];
+}
+
 export interface LearnModuleFormData {
     category_id: number | string;
     subcategory_id: number | string;

@@ -39,7 +39,25 @@ export interface QuestionItem {
     options?: QuestionOption[];
 }
 
+export interface Pagination {
+    current_page: number;
+    per_page: number;
+    total: number;
+    last_page: number;
+}
+
+export interface QuestionFilters {
+    search?: string;
+    status?: string;
+    category?: string;
+    subcategory?: string;
+    language?: string;
+    per_page?: number;
+}
+
 export interface QuestionsIndexProps {
     questions?: QuestionItem[];
+    pagination?: Pagination;
+    filters?: QuestionFilters;
     categories?: CategoryItem[];
 }

@@ -6,6 +6,7 @@ import type { CategoryItem } from '@/components/domain/drafts-review-shell';
 import { LessonMarkdown } from '@/components/domain/lesson-markdown';
 import { ConfirmModal } from '@/components/shared/confirm-modal';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
     Dialog,
     DialogContent,
@@ -323,8 +324,11 @@ export default function DraftsLearnList({
                         <table className="w-full text-left text-xs">
                             <thead>
                                 <tr className="border-b border-border bg-muted/60 text-[11px] font-black tracking-wider text-muted-foreground uppercase">
-                                    <th className="w-16 py-3.5 pr-3 pl-4 text-center">
+                                    <th className="w-12 py-3.5 pr-3 pl-4 text-center">
                                         Approve
+                                    </th>
+                                    <th className="w-16 px-4 py-3.5 font-bold">
+                                        ID
                                     </th>
                                     <th className="min-w-[280px] px-4 py-3.5">
                                         Module Title & Topic
@@ -353,20 +357,17 @@ export default function DraftsLearnList({
                                                 : ''
                                         }`}
                                     >
-                                        <td className="w-16 py-4 pr-3 pl-4 text-center">
-                                            <button
-                                                type="button"
-                                                onClick={() =>
+                                        <td className="w-12 px-4 py-4 text-center align-top sm:px-5">
+                                            <Checkbox
+                                                checked={m.approved}
+                                                onCheckedChange={() =>
                                                     toggleApproveDraft(m.id)
                                                 }
-                                                className={`inline-flex size-6 cursor-pointer items-center justify-center rounded-lg border transition ${
-                                                    m.approved
-                                                        ? 'border-emerald-500 bg-emerald-600 text-white dark:bg-emerald-500'
-                                                        : 'border-border bg-card text-muted-foreground hover:text-foreground'
-                                                }`}
-                                            >
-                                                <Check className="size-3.5" />
-                                            </button>
+                                                aria-label={`Approve draft ${m.title}`}
+                                            />
+                                        </td>
+                                        <td className="w-16 px-4 py-4 align-top font-mono text-xs font-bold text-muted-foreground">
+                                            #{m.id}
                                         </td>
                                         <td className="min-w-[280px] px-4 py-4 align-top">
                                             <div className="font-bold text-foreground">
@@ -479,6 +480,9 @@ export default function DraftsLearnList({
                         {/* Card Header metadata */}
                         <div className="mb-4 flex items-center justify-between border-b border-border pb-3">
                             <div className="flex flex-wrap items-center gap-2">
+                                <span className="font-mono text-xs font-bold text-muted-foreground">
+                                    #{m.id}
+                                </span>
                                 <span className="rounded-full border border-border bg-muted px-3 py-0.5 text-xs font-semibold text-foreground">
                                     {m.category}
                                 </span>

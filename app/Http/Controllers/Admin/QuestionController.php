@@ -40,25 +40,62 @@ class QuestionController
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         $this->ensureCategoriesSeeded();
 
-        $questions = Cache::rememberForever('questions.all', function () {
-            return Question::with(['subcategory.category'])->orderBy('id', 'desc')->get()->map(function ($q) {
-                return [
-                    'id' => $q->id,
-                    'stem' => $q->stem,
-                    'category' => $q->subcategory?->category?->name ?? 'Analytical Ability',
-                    'subcategory' => $q->subcategory?->name ?? 'Word analogy',
-                    'options' => $q->options,
-                    'correct_option' => (int) $q->correct_option,
-                    'explanation' => $q->explanation,
-                    'language' => $q->language ?? 'English',
-                    'status' => strtoupper($q->status),
-                    'updated_at' => $q->updated_at->format('Y-m-d H:i:s'),
-                ];
-            })->toArray();
+        $search = $request->input('search');
+        $status = $request->input('status', 'all');
+        $category = $request->input('category', 'all');
+        $subcategory = $request->input('subcategory', 'all');
+        $language = $request->input('language', 'all');
+        $perPage = min(50, max(5, (int) $request->input('per_page', 10)));
+
+        $query = Question::with(['subcategory.category'])->orderBy('id', 'desc');
+
+        if ($status && $status !== 'all' && $status !== 'All Statuses') {
+            $query->where('status', strtolower($status));
+        }
+
+        if ($category && $category !== 'all' && $category !== 'All Categories') {
+            $query->whereHas('subcategory.category', function ($q) use ($category) {
+                $q->where('name', $category);
+            });
+        }
+
+        if ($subcategory && $subcategory !== 'all' && $subcategory !== 'All Subcategories') {
+            $query->whereHas('subcategory', function ($q) use ($subcategory) {
+                $q->where('name', $subcategory);
+            });
+        }
+
+        if ($language && $language !== 'all' && $language !== 'All Languages') {
+            $query->where('language', $language);
+        }
+
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('stem', 'like', "%{$search}%")
+                    ->orWhere('explanation', 'like', "%{$search}%")
+                    ->orWhere('id', $search);
+            });
+        }
+
+        $paginator = $query->paginate($perPage)->withQueryString();
+
+        $paginator->getCollection()->transform(function ($q) {
+            return [
+                'id' => $q->id,
+                'stem' => $q->stem,
+                'category' => $q->subcategory?->category?->name ?? 'Analytical Ability',
+                'subcategory' => $q->subcategory?->name ?? 'Word analogy',
+                'options' => $q->options,
+                'correct_option' => (int) $q->correct_option,
+                'explanation' => $q->explanation,
+                'language' => $q->language ?? 'English',
+                'status' => strtoupper($q->status),
+                'updated_at' => $q->updated_at->format('Y-m-d H:i:s'),
+            ];
         });
 
         $categories = Cache::rememberForever('categories.tree', function () {
@@ -68,7 +105,21 @@ class QuestionController
         });
 
         return Inertia::render('admin/questions/index', [
-            'questions' => $questions,
+            'questions' => $paginator->items(),
+            'pagination' => [
+                'current_page' => $paginator->currentPage(),
+                'per_page' => $paginator->perPage(),
+                'total' => $paginator->total(),
+                'last_page' => $paginator->lastPage(),
+            ],
+            'filters' => [
+                'search' => $search ?? '',
+                'status' => $status,
+                'category' => $category,
+                'subcategory' => $subcategory,
+                'language' => $language,
+                'per_page' => $perPage,
+            ],
             'categories' => $categories,
         ]);
     }
@@ -80,24 +131,56 @@ class QuestionController
     {
         $this->ensureCategoriesSeeded();
 
-        $drafts = Question::with(['subcategory.category'])
+        $search = $request->input('search');
+        $category = $request->input('category', 'all');
+        $subcategory = $request->input('subcategory', 'all');
+        $language = $request->input('language', 'all');
+        $perPage = min(50, max(5, (int) $request->input('per_page', 10)));
+
+        $query = Question::with(['subcategory.category'])
             ->where('status', 'draft')
             ->where('created_by', auth()->id() ?: (User::first()?->id ?: 1))
-            ->orderBy('id', 'desc')
-            ->get()
-            ->map(function ($q) {
-                return [
-                    'id' => $q->id,
-                    'stem' => $q->stem,
-                    'category' => $q->subcategory->category->name ?? 'Analytical Ability',
-                    'subcategory' => $q->subcategory->name ?? 'Word analogy',
-                    'options' => $q->options,
-                    'correct_option' => $q->correct_option,
-                    'explanation' => $q->explanation,
-                    'language' => $q->language ?? 'English',
-                    'approved' => true, // Start approved so user can commit in 1 click!
-                ];
+            ->orderBy('id', 'desc');
+
+        if ($category && $category !== 'all' && $category !== 'All Categories') {
+            $query->whereHas('subcategory.category', function ($q) use ($category) {
+                $q->where('name', $category);
             });
+        }
+
+        if ($subcategory && $subcategory !== 'all' && $subcategory !== 'All Subcategories') {
+            $query->whereHas('subcategory', function ($q) use ($subcategory) {
+                $q->where('name', $subcategory);
+            });
+        }
+
+        if ($language && $language !== 'all' && $language !== 'All Languages') {
+            $query->where('language', $language);
+        }
+
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('stem', 'like', "%{$search}%")
+                    ->orWhere('explanation', 'like', "%{$search}%")
+                    ->orWhere('id', $search);
+            });
+        }
+
+        $paginator = $query->paginate($perPage)->withQueryString();
+
+        $paginator->getCollection()->transform(function ($q) {
+            return [
+                'id' => $q->id,
+                'stem' => $q->stem,
+                'category' => $q->subcategory->category->name ?? 'Analytical Ability',
+                'subcategory' => $q->subcategory->name ?? 'Word analogy',
+                'options' => $q->options,
+                'correct_option' => $q->correct_option,
+                'explanation' => $q->explanation,
+                'language' => $q->language ?? 'English',
+                'approved' => true,
+            ];
+        });
 
         $categories = Cache::rememberForever('categories.tree', function () {
             return Category::with(['subcategory' => function ($query) {
@@ -106,7 +189,20 @@ class QuestionController
         });
 
         return Inertia::render('admin/questions/drafts', [
-            'initialDrafts' => $drafts,
+            'initialDrafts' => $paginator->items(),
+            'pagination' => [
+                'current_page' => $paginator->currentPage(),
+                'per_page' => $paginator->perPage(),
+                'total' => $paginator->total(),
+                'last_page' => $paginator->lastPage(),
+            ],
+            'filters' => [
+                'search' => $search ?? '',
+                'category' => $category,
+                'subcategory' => $subcategory,
+                'language' => $language,
+                'per_page' => $perPage,
+            ],
             'categories' => $categories,
         ]);
     }

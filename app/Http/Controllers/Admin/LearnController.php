@@ -38,29 +38,76 @@ class LearnController
      */
     public function index(Request $request): Response
     {
+        $search = $request->input('search');
+        $status = $request->input('status', 'all');
+        $category = $request->input('category', 'all');
+        $subcategory = $request->input('subcategory', 'all');
+        $perPage = min(50, max(5, (int) $request->input('per_page', 10)));
 
-        $modules = LearnModule::with(['category', 'subcategory'])
-            ->latest()
-            ->get()
-            ->map(function ($mod) {
-                return [
-                    'id' => $mod->id,
-                    'title' => $mod->title,
-                    'slug' => $mod->slug,
-                    'topic' => $mod->topic,
-                    'summary' => $mod->summary,
-                    'estimated_minutes' => $mod->estimated_minutes,
-                    'is_published' => (bool) $mod->is_published,
-                    'category' => $mod->category?->name ?? 'General Info',
-                    'subcategory' => $mod->subcategory?->name ?? 'Core Concepts',
-                    'updated_at' => $mod->updated_at->format('Y-m-d H:i'),
-                ];
+        $query = LearnModule::with(['category', 'subcategory'])->latest();
+
+        if ($status && $status !== 'all' && $status !== 'All Statuses') {
+            if ($status === 'ACTIVE' || $status === 'published') {
+                $query->where('is_published', true);
+            } elseif ($status === 'DRAFT' || $status === 'draft') {
+                $query->where('is_published', false);
+            }
+        }
+
+        if ($category && $category !== 'all' && $category !== 'All Categories') {
+            $query->whereHas('category', function ($q) use ($category) {
+                $q->where('name', $category);
             });
+        }
+
+        if ($subcategory && $subcategory !== 'all' && $subcategory !== 'All Subcategories') {
+            $query->whereHas('subcategory', function ($q) use ($subcategory) {
+                $q->where('name', $subcategory);
+            });
+        }
+
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                    ->orWhere('topic', 'like', "%{$search}%")
+                    ->orWhere('summary', 'like', "%{$search}%");
+            });
+        }
+
+        $paginator = $query->paginate($perPage)->withQueryString();
+
+        $paginator->getCollection()->transform(function ($mod) {
+            return [
+                'id' => $mod->id,
+                'title' => $mod->title,
+                'slug' => $mod->slug,
+                'topic' => $mod->topic,
+                'summary' => $mod->summary,
+                'estimated_minutes' => $mod->estimated_minutes,
+                'is_published' => (bool) $mod->is_published,
+                'category' => $mod->category?->name ?? 'General Info',
+                'subcategory' => $mod->subcategory?->name ?? 'Core Concepts',
+                'updated_at' => $mod->updated_at->format('Y-m-d H:i'),
+            ];
+        });
 
         $categories = Category::with('subcategory')->orderBy('sort_order')->get();
 
         return Inertia::render('admin/learn/index', [
-            'modules' => $modules,
+            'modules' => $paginator->items(),
+            'pagination' => [
+                'current_page' => $paginator->currentPage(),
+                'per_page' => $paginator->perPage(),
+                'total' => $paginator->total(),
+                'last_page' => $paginator->lastPage(),
+            ],
+            'filters' => [
+                'search' => $search ?? '',
+                'status' => $status,
+                'category' => $category,
+                'subcategory' => $subcategory,
+                'per_page' => $perPage,
+            ],
             'categories' => $categories,
         ]);
     }
@@ -340,33 +387,71 @@ class LearnController
      */
     public function drafts(Request $request): Response
     {
+        $search = $request->input('search');
+        $category = $request->input('category', 'all');
+        $subcategory = $request->input('subcategory', 'all');
+        $perPage = min(50, max(5, (int) $request->input('per_page', 10)));
 
-        $drafts = LearnModule::with(['category', 'subcategory'])
+        $query = LearnModule::with(['category', 'subcategory'])
             ->where('is_published', false)
-            ->latest()
-            ->get()
-            ->map(function ($mod) {
-                return [
-                    'id' => $mod->id,
-                    'title' => $mod->title,
-                    'slug' => $mod->slug,
-                    'topic' => $mod->topic,
-                    'summary' => $mod->summary,
-                    'content' => $mod->content,
-                    'estimated_minutes' => $mod->estimated_minutes,
-                    'category_id' => $mod->category_id,
-                    'subcategory_id' => $mod->subcategory_id,
-                    'category' => $mod->category?->name ?? 'General Info',
-                    'subcategory' => $mod->subcategory?->name ?? 'Core Concepts',
-                    'updated_at' => $mod->updated_at->format('Y-m-d H:i'),
-                    'approved' => true,
-                ];
+            ->latest();
+
+        if ($category && $category !== 'all' && $category !== 'All Categories') {
+            $query->whereHas('category', function ($q) use ($category) {
+                $q->where('name', $category);
             });
+        }
+
+        if ($subcategory && $subcategory !== 'all' && $subcategory !== 'All Subcategories') {
+            $query->whereHas('subcategory', function ($q) use ($subcategory) {
+                $q->where('name', $subcategory);
+            });
+        }
+
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                    ->orWhere('topic', 'like', "%{$search}%")
+                    ->orWhere('summary', 'like', "%{$search}%");
+            });
+        }
+
+        $paginator = $query->paginate($perPage)->withQueryString();
+
+        $paginator->getCollection()->transform(function ($mod) {
+            return [
+                'id' => $mod->id,
+                'title' => $mod->title,
+                'slug' => $mod->slug,
+                'topic' => $mod->topic,
+                'summary' => $mod->summary,
+                'content' => $mod->content,
+                'estimated_minutes' => $mod->estimated_minutes,
+                'category_id' => $mod->category_id,
+                'subcategory_id' => $mod->subcategory_id,
+                'category' => $mod->category?->name ?? 'General Info',
+                'subcategory' => $mod->subcategory?->name ?? 'Core Concepts',
+                'updated_at' => $mod->updated_at->format('Y-m-d H:i'),
+                'approved' => true,
+            ];
+        });
 
         $categories = Category::with('subcategory')->orderBy('sort_order')->get();
 
         return Inertia::render('admin/learn/drafts', [
-            'initialDrafts' => $drafts,
+            'initialDrafts' => $paginator->items(),
+            'pagination' => [
+                'current_page' => $paginator->currentPage(),
+                'per_page' => $paginator->perPage(),
+                'total' => $paginator->total(),
+                'last_page' => $paginator->lastPage(),
+            ],
+            'filters' => [
+                'search' => $search ?? '',
+                'category' => $category,
+                'subcategory' => $subcategory,
+                'per_page' => $perPage,
+            ],
             'categories' => $categories,
         ]);
     }

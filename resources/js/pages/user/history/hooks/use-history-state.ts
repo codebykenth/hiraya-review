@@ -10,7 +10,9 @@ export function useHistoryState({ attempts = [], filters }: HistoryPageProps) {
         filters.track || 'All Tracks',
     );
     const [selectedDate, setSelectedDate] = useState(filters.date || 'all');
+    const [perPage, setPerPage] = useState<number>(filters.per_page || 10);
     const [selectedIds, setSelectedIds] = useState<number[]>([]);
+    const [expandedIds, setExpandedIds] = useState<number[]>([]);
 
     const [confirmModal, setConfirmModal] = useState<{
         isOpen: boolean;
@@ -28,6 +30,12 @@ export function useHistoryState({ attempts = [], filters }: HistoryPageProps) {
         onConfirm: () => {},
     });
 
+    const toggleExpandRow = (id: number) => {
+        setExpandedIds((prev) =>
+            prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id],
+        );
+    };
+
     const handleDeleteAttempt = (id: number) => {
         setConfirmModal({
             isOpen: true,
@@ -39,6 +47,10 @@ export function useHistoryState({ attempts = [], filters }: HistoryPageProps) {
             onConfirm: () => {
                 router.delete(`/exams/attempts/${id}`, {
                     preserveScroll: true,
+                    onSuccess: () => {
+                        setSelectedIds((prev) => prev.filter((i) => i !== id));
+                        setExpandedIds((prev) => prev.filter((i) => i !== id));
+                    },
                 });
             },
         });
@@ -77,7 +89,10 @@ export function useHistoryState({ attempts = [], filters }: HistoryPageProps) {
                     { ids: selectedIds },
                     {
                         preserveScroll: true,
-                        onSuccess: () => setSelectedIds([]),
+                        onSuccess: () => {
+                            setSelectedIds([]);
+                            setExpandedIds([]);
+                        },
                     },
                 );
             },
@@ -88,6 +103,7 @@ export function useHistoryState({ attempts = [], filters }: HistoryPageProps) {
         newSearch: string,
         newTrack: string,
         newDate: string,
+        newPerPage: number,
     ) => {
         router.get(
             historyIndex().url,
@@ -95,6 +111,7 @@ export function useHistoryState({ attempts = [], filters }: HistoryPageProps) {
                 search: newSearch,
                 track: newTrack,
                 date: newDate,
+                per_page: newPerPage,
                 page: 1,
             },
             {
@@ -108,18 +125,24 @@ export function useHistoryState({ attempts = [], filters }: HistoryPageProps) {
     const handleTrackChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         const val = e.target.value;
         setSelectedTrack(val);
-        updateFilters(searchVal, val, selectedDate);
+        updateFilters(searchVal, val, selectedDate, perPage);
     };
 
     const handleDateChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         const val = e.target.value;
         setSelectedDate(val);
-        updateFilters(searchVal, selectedTrack, val);
+        updateFilters(searchVal, selectedTrack, val, perPage);
+    };
+
+    const handlePerPageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        const val = parseInt(e.target.value, 10);
+        setPerPage(val);
+        updateFilters(searchVal, selectedTrack, selectedDate, val);
     };
 
     const handleSearchSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        updateFilters(searchVal, selectedTrack, selectedDate);
+        updateFilters(searchVal, selectedTrack, selectedDate, perPage);
     };
 
     return {
@@ -129,8 +152,12 @@ export function useHistoryState({ attempts = [], filters }: HistoryPageProps) {
         setSelectedTrack,
         selectedDate,
         setSelectedDate,
+        perPage,
+        setPerPage,
         selectedIds,
         setSelectedIds,
+        expandedIds,
+        toggleExpandRow,
         confirmModal,
         setConfirmModal,
         handleDeleteAttempt,
@@ -139,6 +166,7 @@ export function useHistoryState({ attempts = [], filters }: HistoryPageProps) {
         handleBulkDelete,
         handleTrackChange,
         handleDateChange,
+        handlePerPageChange,
         handleSearchSubmit,
     };
 }
