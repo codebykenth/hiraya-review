@@ -1,5 +1,5 @@
 import { Head, router } from '@inertiajs/react';
-import { Target, SlidersHorizontal, Bookmark, Zap } from 'lucide-react';
+import { Target, SlidersHorizontal, Bookmark } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
 import { PageContainer } from '@/components/layout/page-container';
 import { index as drillsIndex } from '@/routes/drills';
@@ -19,19 +19,64 @@ export default function Drills(props: DrillsProps) {
         seenQuestionIds = [],
     } = props;
 
-    const [activeTab, setActiveTab] = useState<'categories' | 'custom' | 'saved'>('categories');
-
-    // Parse ?tab= URL param if provided (e.g. from dashboard or deep links)
-    useEffect(() => {
+    const getInitialTab = (): 'categories' | 'custom' | 'saved' => {
         if (typeof window !== 'undefined') {
             const params = new URLSearchParams(window.location.search);
             const tabParam = params.get('tab');
 
             if (tabParam === 'custom' || tabParam === 'saved' || tabParam === 'categories') {
-                setActiveTab(tabParam);
+                return tabParam;
+            }
+
+            const storedTab = localStorage.getItem('hiraya_drills_active_tab');
+
+            if (storedTab === 'custom' || storedTab === 'saved' || storedTab === 'categories') {
+                return storedTab;
             }
         }
-    }, []);
+
+        return 'categories';
+    };
+
+    const [activeTab, setActiveTabState] = useState<'categories' | 'custom' | 'saved'>(getInitialTab);
+
+    const setActiveTab = (tab: 'categories' | 'custom' | 'saved') => {
+        setActiveTabState(tab);
+
+        if (typeof window !== 'undefined') {
+            localStorage.setItem('hiraya_drills_active_tab', tab);
+            const url = new URL(window.location.href);
+            url.searchParams.set('tab', tab);
+            window.history.replaceState({}, '', url.toString());
+        }
+    };
+
+    // Keep URL synchronized with active tab on mount & popstate
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            const url = new URL(window.location.href);
+
+            if (url.searchParams.get('tab') !== activeTab) {
+                url.searchParams.set('tab', activeTab);
+                window.history.replaceState({}, '', url.toString());
+            }
+
+            localStorage.setItem('hiraya_drills_active_tab', activeTab);
+
+            const handlePopState = () => {
+                const params = new URLSearchParams(window.location.search);
+                const tabParam = params.get('tab');
+
+                if (tabParam === 'custom' || tabParam === 'saved' || tabParam === 'categories') {
+                    setActiveTabState(tabParam);
+                }
+            };
+
+            window.addEventListener('popstate', handlePopState);
+
+            return () => window.removeEventListener('popstate', handlePopState);
+        }
+    }, [activeTab]);
 
     const {
         viewState,
@@ -70,11 +115,8 @@ export default function Drills(props: DrillsProps) {
             question_count: String(customQuestions.length),
             timed: String(timed),
             custom_question_ids: JSON.stringify(customQuestions.map((q) => q.id)),
+            from: originInfo ? originInfo.href : '/drills?tab=custom',
         });
-
-        if (originInfo) {
-            queryParams.append('from', originInfo.href);
-        }
 
         router.visit(`/exams?${queryParams.toString()}`);
     };
@@ -102,11 +144,8 @@ export default function Drills(props: DrillsProps) {
                 question_count: String(setQuestions.length),
                 timed: 'false',
                 custom_question_ids: JSON.stringify(setQuestions.map((q: Question) => q.id)),
+                from: originInfo ? originInfo.href : '/drills?tab=saved',
             });
-
-            if (originInfo) {
-                queryParams.append('from', originInfo.href);
-            }
 
             router.visit(`/exams?${queryParams.toString()}`);
         } catch {
@@ -145,9 +184,6 @@ export default function Drills(props: DrillsProps) {
                         >
                             <SlidersHorizontal className="size-4" />
                             <span>Custom Builder</span>
-                            <span className="rounded-full bg-violet-100 px-1.5 py-0.5 text-[9px] font-black text-violet-700 dark:bg-violet-950 dark:text-violet-300">
-                                New
-                            </span>
                         </button>
 
                         <button

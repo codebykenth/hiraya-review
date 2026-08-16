@@ -30,7 +30,7 @@ import { flushSync } from 'react-dom';
 interface UseContentShieldOptions {
     onCopyAttempt?: (msg: string) => void;
     onShieldActivate?: () => void;
-    contentLabel?: 'Exam' | 'Review';
+    contentLabel?: 'Exam' | 'Review' | 'Drill' | 'Custom Drill' | string;
 }
 
 interface UseContentShieldReturn {
@@ -108,7 +108,6 @@ export function useContentShield(
 
     // Keep latest callbacks in refs so listener effects never re-run on every
     // parent render (the exam view re-renders every second for the timer).
-    // Ref updates happen in an effect (never during render — lint rule).
     const onCopyAttemptRef = useRef(onCopyAttempt);
     const onShieldActivateRef = useRef(onShieldActivate);
     const contentLabelRef = useRef(contentLabel);
@@ -129,16 +128,11 @@ export function useContentShield(
         | ((constraints?: DisplayMediaStreamOptions) => Promise<MediaStream>)
         | null
     >(null);
-    // Cooldown lock: after a shield activation the user must wait this long
-    // before the Resume button unlocks, so a capture tool can't be beaten by
-    // instantly clicking Resume while the window is still momentarily focused.
+
+    // Cooldown lock: after a shield activation the user must wait before the Resume button unlocks
     const lockUntilRef = useRef(0);
 
     // ── INSTANT DOM blur — runs synchronously, bypasses React render cycle ──
-    // This is the critical function. When blur/visibilitychange fires,
-    // the browser hasn't painted yet. By setting filter+opacity in the SAME
-    // synchronous handler, the compositor will use these values for any
-    // pending screenshot capture.
     const instantBlurContent = useCallback(() => {
         const el = contentRef.current;
 
@@ -189,10 +183,9 @@ export function useContentShield(
             setIsShielded(true);
         }
 
-        // 4. Cooldown lock — always start locked so the Resume button cannot be
-        //    pressed in the brief moment a capture tool still holds the screen.
+        // 4. Cooldown lock
         const now = Date.now();
-        lockUntilRef.current = Math.max(lockUntilRef.current, now + 3000);
+        lockUntilRef.current = Math.max(lockUntilRef.current, now + 1500);
         const lockStillActive = now < lockUntilRef.current;
         setIsResumeLocked(
             lockStillActive || !document.hasFocus() || document.hidden,
@@ -202,10 +195,7 @@ export function useContentShield(
     }, [instantBlurContent, wipeClipboard]);
 
     const dismissShield = useCallback(() => {
-        // STICKY SHIELD: refuse to uncover content during the cooldown lock,
-        // or unless the window genuinely has focus AND is visible. Clicking
-        // "Resume" while a recorder / Snipping Tool / second monitor still
-        // captures the screen must NOT re-expose it.
+        // Refuse to uncover content during the cooldown lock or if window is not focused
         if (
             Date.now() < lockUntilRef.current ||
             !document.hasFocus() ||
@@ -228,27 +218,18 @@ export function useContentShield(
         // 1. Visibility API (tab switch, minimize, snipping tool)
         const handleVisibility = () => {
             if (document.hidden) {
+                instantBlurContent();
                 activateShield();
             }
         };
 
-        // 2. Window blur — 500ms debounced to prevent false positives when clicking
-        //    notifications or multi-monitor dragging, while visibilitychange remains instant.
-        let blurTimeout: ReturnType<typeof setTimeout> | null = null;
+        // 2. Window blur — Instant blur immediately, activate shield synchronously
         const handleBlur = () => {
-            if (blurTimeout) {
-clearTimeout(blurTimeout);
-}
-
-            blurTimeout = setTimeout(() => {
-                if (!document.hasFocus() || document.hidden) {
-                    activateShield();
-                }
-            }, 500);
+            instantBlurContent();
+            activateShield();
         };
 
-        // 3. When focus returns, refresh lock state so the user can resume
-        //    only once the window is genuinely focused AND visible.
+        // 3. Focus return
         const handleFocus = () => {
             const now = Date.now();
             setIsResumeLocked(
@@ -258,7 +239,7 @@ clearTimeout(blurTimeout);
             );
         };
 
-        // 3. Selection prevention
+        // 4. Selection prevention
         const handleSelectStart = (e: Event) => {
             if (!isInputElement(e.target)) {
                 e.preventDefault();
@@ -277,7 +258,7 @@ clearTimeout(blurTimeout);
             }
         };
 
-        // 4. Clipboard interception (capture phase — runs before React handlers)
+        // 5. Clipboard interception
         const handleCopy = (e: ClipboardEvent) => {
             if (!isInputElement(e.target)) {
                 e.preventDefault();
@@ -293,7 +274,7 @@ clearTimeout(blurTimeout);
             }
         };
 
-        // 5. Context menu
+        // 6. Context menu
         const handleContextMenu = (e: MouseEvent) => {
             if (!isInputElement(e.target)) {
                 e.preventDefault();
@@ -301,14 +282,13 @@ clearTimeout(blurTimeout);
             }
         };
 
-        // 6. Print blocking
+        // 7. Print blocking
         const handleBeforePrint = () => {
+            instantBlurContent();
             activateShield();
         };
 
         // ── API overrides ────────────────────────────────────────
-
-        // Override clipboard.writeText
         if (navigator.clipboard?.writeText) {
             origWriteTextRef.current = navigator.clipboard.writeText.bind(
                 navigator.clipboard,
@@ -322,7 +302,6 @@ clearTimeout(blurTimeout);
             };
         }
 
-        // Override clipboard.write (blocks image/rich clipboard writes too)
         const origClipboardWrite = navigator.clipboard?.write?.bind(
             navigator.clipboard,
         );
@@ -333,13 +312,13 @@ clearTimeout(blurTimeout);
             };
         }
 
-        // Override getDisplayMedia (screen capture API)
         if (navigator.mediaDevices?.getDisplayMedia) {
             origGetDisplayMediaRef.current =
                 navigator.mediaDevices.getDisplayMedia.bind(
                     navigator.mediaDevices,
                 );
             navigator.mediaDevices.getDisplayMedia = async () => {
+                instantBlurContent();
                 activateShield();
 
                 return Promise.reject(
@@ -366,16 +345,10 @@ clearTimeout(blurTimeout);
         window.addEventListener('beforeprint', handleBeforePrint);
 
         // ── Shield watchdog ───────────────────────────────────────
-        // Every 350ms, while the window is NOT genuinely focused+visible,
-        // re-apply the synchronous blur and force the shield back on. This
-        // defeats "click Resume, then keep recording": any second when the
-        // exam window isn't the focused/visible window re-seals the content,
-        // so a running recorder only captures the blurred/sealed frame.
         const watchdogId = window.setInterval(() => {
             const compromised = document.hidden || !document.hasFocus();
 
             if (!compromised) {
-                // Only clear the lock once the cooldown has elapsed too.
                 setIsResumeLocked(Date.now() < lockUntilRef.current);
 
                 return;
@@ -391,12 +364,11 @@ clearTimeout(blurTimeout);
             } catch {
                 setIsShielded(true);
             }
-        }, 350);
+        }, 250);
 
         return () => {
             window.clearInterval(watchdogId);
 
-            // Restore API overrides
             if (origWriteTextRef.current && navigator.clipboard) {
                 navigator.clipboard.writeText = origWriteTextRef.current;
                 origWriteTextRef.current = null;
@@ -411,10 +383,6 @@ clearTimeout(blurTimeout);
                     origGetDisplayMediaRef.current;
                 origGetDisplayMediaRef.current = null;
             }
-
-            if (blurTimeout) {
-clearTimeout(blurTimeout);
-}
 
             document.removeEventListener('visibilitychange', handleVisibility);
             window.removeEventListener('blur', handleBlur);
@@ -442,14 +410,29 @@ clearTimeout(blurTimeout);
                 isInputElement(e.target) ||
                 (e.target as HTMLElement)?.isContentEditable;
 
-            // ── PRE-EMPTIVE: seal the instant the Win/Cmd key is pressed ──
-            // Win+Shift+S / Win+Shift+T / Win+Alt+R are OS-level hotkeys the
-            // browser CANNOT preventDefault — the OS fires them before the
-            // browser's keydown for the final key, and often never delivers
-            // it at all. The only way to beat the capture is to blur content
-            // at the EARLIEST key: the Meta (Win/Cmd) press itself, which
-            // always arrives before the full combo completes. By the time
-            // Shift+S is pressed the content is already sealed.
+            // Check PrintScreen (PrtScn) key across all browser/OS variants
+            const isPrintScreen =
+                e.key === 'PrintScreen' ||
+                e.code === 'PrintScreen' ||
+                e.key === 'Snapshot' ||
+                e.code === 'Snapshot' ||
+                e.key === 'Print' ||
+                e.keyCode === 44 ||
+                e.which === 44;
+
+            if (isPrintScreen) {
+                e.preventDefault();
+                e.stopPropagation();
+                e.stopImmediatePropagation?.();
+                instantBlurContent();
+                wipeClipboard();
+                activateShield();
+                onCopyAttemptRef.current?.('Screenshot capture is blocked. Practice content is protected.');
+
+                return;
+            }
+
+            // Seal on Win/Meta key press
             if (
                 e.key === 'Meta' ||
                 e.code === 'MetaLeft' ||
@@ -458,12 +441,13 @@ clearTimeout(blurTimeout);
                 e.preventDefault();
                 e.stopPropagation();
                 e.stopImmediatePropagation?.();
+                instantBlurContent();
                 activateShield();
 
                 return;
             }
 
-            // Block Win+Shift+T (PowerToys Text Extractor / OCR) and standalone Shift+T
+            // Block Win+Shift+T (PowerToys Text Extractor / OCR)
             if (
                 (e.metaKey && e.shiftKey && e.code === 'KeyT') ||
                 (!isInput && e.shiftKey && e.code === 'KeyT')
@@ -471,17 +455,14 @@ clearTimeout(blurTimeout);
                 e.preventDefault();
                 e.stopPropagation();
                 e.stopImmediatePropagation?.();
+                instantBlurContent();
                 activateShield();
 
                 return;
             }
 
-            // Block PrintScreen / Alt+PrintScreen, Win+Shift+S (Snipping tool),
-            // Xbox Game Bar record (Win+Alt+R), macOS Cmd+Shift+3/4/5, and
-            // standalone Shift+S outside inputs
+            // Block Win+Shift+S (Snipping tool), Xbox Game Bar record (Win+Alt+R), macOS Cmd+Shift+3/4/5
             if (
-                e.key === 'PrintScreen' ||
-                e.code === 'PrintScreen' ||
                 (e.metaKey && e.shiftKey && e.code === 'KeyS') ||
                 (e.metaKey && e.altKey && e.code === 'KeyR') ||
                 (!isInput && e.shiftKey && e.code === 'KeyS') ||
@@ -490,6 +471,7 @@ clearTimeout(blurTimeout);
                 e.preventDefault();
                 e.stopPropagation();
                 e.stopImmediatePropagation?.();
+                instantBlurContent();
                 activateShield();
 
                 return;
@@ -516,28 +498,42 @@ clearTimeout(blurTimeout);
             }
         };
 
-        // Some keyboards/OS setups fire the PrintScreen capture on KEYUP or
-        // deliver a late keydown. Re-seal on keyup so a screenshot triggered
-        // on release still captures the blurred/sealed frame.
         const handleKeyUp = (e: KeyboardEvent) => {
-            if (e.key === 'PrintScreen' || e.code === 'PrintScreen') {
+            const isPrintScreen =
+                e.key === 'PrintScreen' ||
+                e.code === 'PrintScreen' ||
+                e.key === 'Snapshot' ||
+                e.code === 'Snapshot' ||
+                e.key === 'Print' ||
+                e.keyCode === 44 ||
+                e.which === 44;
+
+            if (isPrintScreen) {
                 e.preventDefault();
                 e.stopPropagation();
                 e.stopImmediatePropagation?.();
+                instantBlurContent();
+                wipeClipboard();
                 activateShield();
             }
         };
 
         window.addEventListener('keydown', handleKeyDown, { capture: true });
         window.addEventListener('keyup', handleKeyUp, { capture: true });
+        document.addEventListener('keydown', handleKeyDown, { capture: true });
+        document.addEventListener('keyup', handleKeyUp, { capture: true });
 
         return () => {
             window.removeEventListener('keydown', handleKeyDown, {
                 capture: true,
             });
             window.removeEventListener('keyup', handleKeyUp, { capture: true });
+            document.removeEventListener('keydown', handleKeyDown, {
+                capture: true,
+            });
+            document.removeEventListener('keyup', handleKeyUp, { capture: true });
         };
-    }, [activateShield]);
+    }, [activateShield, instantBlurContent, wipeClipboard]);
 
     // ── Wrapper props ────────────────────────────────────────────
     const wrapperProps = {

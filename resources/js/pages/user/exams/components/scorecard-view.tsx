@@ -8,12 +8,7 @@ import {
     RotateCcw,
     Zap,
     Target,
-    CheckCircle2,
-    XCircle,
-    HelpCircle,
-    Clock,
     ArrowRight,
-    Sparkles,
 } from 'lucide-react';
 import { useState, useMemo } from 'react';
 import {
@@ -260,24 +255,42 @@ return false;
                 const origin = resolveOriginFromUrl(
                     typeof window !== 'undefined' ? window.location.href : undefined,
                 );
-                const originTitle = origin ? origin.title : (savedAttempt ? 'History' : null);
-                const originHref = origin ? origin.href : '/history';
+                const activeDrillTab =
+                    typeof window !== 'undefined'
+                        ? localStorage.getItem('hiraya_drills_active_tab')
+                        : null;
+                const defaultDrillHref = activeDrillTab
+                    ? `/drills?tab=${activeDrillTab}`
+                    : '/drills';
 
-                if (originTitle) {
-                    return (
-                        <Link
-                            href={originHref}
-                            onClick={makeBackOnClick({
-                                onFallback: () => router.visit(originHref),
-                            })}
-                            className="group mb-4 flex w-fit cursor-pointer items-center gap-1.5 text-xs font-bold text-muted-foreground transition hover:text-foreground focus:outline-none"
-                        >
-                            <ChevronLeft className="size-4" /> Back to {originTitle}
-                        </Link>
-                    );
-                }
+                const originTitle = origin
+                    ? origin.title
+                    : isDrill
+                    ? 'Practice Drills'
+                    : savedAttempt
+                    ? 'History'
+                    : 'Mock Exams';
 
-                return null;
+                const originHref = origin
+                    ? origin.href
+                    : isDrill
+                    ? defaultDrillHref
+                    : savedAttempt
+                    ? '/history'
+                    : '/exams';
+
+                return (
+                    <Link
+                        href={originHref}
+                        onClick={makeBackOnClick({
+                            onFallback: () => router.visit(originHref),
+                        })}
+                        className="group mb-4 flex w-fit cursor-pointer items-center gap-1.5 text-xs font-bold text-muted-foreground transition hover:text-foreground focus:outline-none"
+                    >
+                        <ChevronLeft className="size-4 transition-transform group-hover:-translate-x-0.5" />{' '}
+                        Back to {originTitle}
+                    </Link>
+                );
             })()}
 
             {(() => {

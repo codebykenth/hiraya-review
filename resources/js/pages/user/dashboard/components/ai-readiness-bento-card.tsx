@@ -3,9 +3,6 @@ import Echo from 'laravel-echo';
 import {
     Brain,
     Sparkles,
-    TrendingUp,
-    TrendingDown,
-    Minus,
     Zap,
     ChevronRight,
     Loader2,
@@ -141,8 +138,8 @@ export function AiReadinessBentoCard({
 
     const colors = getScoreColor(prob, isDrillOnly);
 
-    // SVG Circular Gauge calculation
-    const radius = 38;
+    // SVG Circular Gauge calculation with ample inner breathing space
+    const radius = 46;
     const circumference = 2 * Math.PI * radius;
     const strokeDashoffset = isDrillOnly
         ? circumference * (1 - 0.35)
@@ -177,85 +174,93 @@ export function AiReadinessBentoCard({
             {/* Content Body */}
             <div className="my-4">
                 {localStatus === 'ready' && data && (
-                    <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                        {/* Circular Progress Gauge */}
-                        <div className="flex items-center gap-4">
-                            <div className="relative flex size-24 shrink-0 items-center justify-center">
-                                <svg
-                                    className="size-full -rotate-90"
-                                    viewBox="0 0 96 96"
-                                >
-                                    <circle
-                                        cx="48"
-                                        cy="48"
-                                        r={radius}
-                                        className="stroke-slate-100 dark:stroke-slate-800"
-                                        strokeWidth="8"
-                                        fill="transparent"
-                                    />
-                                    <circle
-                                        cx="48"
-                                        cy="48"
-                                        r={radius}
-                                        className={`${colors.stroke} transition-all duration-1000 ease-out`}
-                                        strokeWidth="8"
-                                        strokeDasharray={circumference}
-                                        strokeDashoffset={strokeDashoffset}
-                                        strokeLinecap="round"
-                                        fill="transparent"
-                                    />
-                                </svg>
-                                <div className="absolute flex flex-col items-center justify-center text-center">
-                                    <span
-                                        className={`font-black tracking-tight ${colors.text} ${
-                                            isDrillOnly ? 'text-lg' : 'text-2xl'
-                                        }`}
-                                    >
-                                        {isDrillOnly ? 'Drill' : `${prob}%`}
-                                    </span>
-                                    <span className="text-[9px] font-bold uppercase tracking-wider text-slate-400">
-                                        {isDrillOnly ? 'Mock Needed' : 'Pass Chance'}
-                                    </span>
-                                </div>
-                            </div>
-
-                            <div className="space-y-1.5">
+                    <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
+                        {/* Circular Progress Gauge with Generous Inner Spacing */}
+                        <div className="relative flex size-28 sm:size-32 shrink-0 items-center justify-center p-1 self-start">
+                            <svg
+                                className="size-full -rotate-90"
+                                viewBox="0 0 112 112"
+                            >
+                                <circle
+                                    cx="56"
+                                    cy="56"
+                                    r={radius}
+                                    className="stroke-slate-100 dark:stroke-slate-800"
+                                    strokeWidth="7"
+                                    fill="transparent"
+                                />
+                                <circle
+                                    cx="56"
+                                    cy="56"
+                                    r={radius}
+                                    className={`${colors.stroke} transition-all duration-1000 ease-out`}
+                                    strokeWidth="7"
+                                    strokeDasharray={circumference}
+                                    strokeDashoffset={strokeDashoffset}
+                                    strokeLinecap="round"
+                                    fill="transparent"
+                                />
+                            </svg>
+                            <div className="absolute inset-0 flex flex-col items-center justify-center p-3 text-center">
                                 <span
-                                    className={`inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-extrabold ${colors.badge}`}
+                                    className={`font-black tracking-tight ${colors.text} ${
+                                        isDrillOnly ? 'text-lg sm:text-xl' : 'text-2xl sm:text-3xl'
+                                    }`}
+                                >
+                                    {isDrillOnly ? 'Drill' : `${prob}%`}
+                                </span>
+                                <span className="mt-0.5 text-[9px] sm:text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 whitespace-nowrap leading-none">
+                                    {isDrillOnly ? 'Mock Needed' : 'Pass Chance'}
+                                </span>
+                            </div>
+                        </div>
+
+                        {/* Verdict & Recommendation with Priority Focus underneath */}
+                        <div className="flex-1 space-y-2.5 min-w-0">
+                            <div>
+                                <span
+                                    className={`inline-block rounded-xl border px-3 py-2 text-xs font-bold leading-relaxed sm:text-sm ${colors.badge}`}
                                 >
                                     {isDrillOnly
                                         ? 'Drill Diagnostics Active'
                                         : data.verdict || 'Ready for Testing'}
                                 </span>
-                                <p className="text-xs font-medium leading-relaxed text-slate-600 dark:text-slate-300">
-                                    {isDrillOnly
-                                        ? 'Complete a Full Mock Exam to calculate your official CSE passing probability.'
-                                        : data.priority_action ||
-                                          'Focus on targeted practice drills to raise your score.'}
-                                </p>
                             </div>
-                        </div>
 
-                        {/* Top Weakness / Quick Fix Pill */}
-                        {primaryWeakness && !isDrillOnly && (
-                            <div className="flex flex-col gap-1.5 rounded-xl border border-rose-200/80 bg-rose-50/50 p-3 sm:max-w-[200px] dark:border-rose-900/40 dark:bg-rose-950/20">
-                                <div className="flex items-center gap-1.5 text-[11px] font-bold text-rose-700 dark:text-rose-300">
-                                    <Target className="size-3.5 shrink-0" />
-                                    <span>Priority Focus</span>
+                            <p className="text-xs font-medium leading-relaxed text-slate-600 dark:text-slate-300 sm:text-sm">
+                                {isDrillOnly
+                                    ? 'Complete a Full Mock Exam to calculate your official CSE passing probability.'
+                                    : data.priority_action ||
+                                      'Focus on targeted practice drills to raise your score.'}
+                            </p>
+
+                            {/* Top Weakness / Quick Fix Pill placed underneath */}
+                            {primaryWeakness && !isDrillOnly && (
+                                <div className="mt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 rounded-xl border border-rose-200/80 bg-rose-50/60 p-2.5 sm:px-3 sm:py-2 dark:border-rose-900/40 dark:bg-rose-950/30">
+                                    <div className="flex items-center gap-2 min-w-0">
+                                        <div className="flex size-6 shrink-0 items-center justify-center rounded-md bg-rose-500/10 text-rose-600 dark:text-rose-400">
+                                            <Target className="size-3.5" />
+                                        </div>
+                                        <div className="min-w-0 flex items-center gap-1.5 flex-wrap">
+                                            <span className="text-[11px] font-black uppercase tracking-wide text-rose-700 dark:text-rose-300 shrink-0">
+                                                Priority Focus:
+                                            </span>
+                                            <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
+                                                {primaryWeakness}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <Link
+                                        href={`/drills?category=${encodeURIComponent(primaryWeakness)}&from=/dashboard`}
+                                        className="inline-flex items-center justify-center gap-1.5 rounded-lg bg-rose-600 px-3 py-1.5 text-xs font-bold text-white shadow-2xs transition hover:bg-rose-700 active:scale-95 shrink-0 self-start sm:self-auto"
+                                    >
+                                        <Zap className="size-3 fill-current" />
+                                        <span>Fix in Drill</span>
+                                        <ChevronRight className="size-3.5" />
+                                    </Link>
                                 </div>
-                                <p className="line-clamp-2 text-xs font-semibold text-slate-800 dark:text-slate-200">
-                                    {primaryWeakness}
-                                </p>
-                                <Link
-                                    href={`/drills?category=${encodeURIComponent(primaryWeakness)}&from=/dashboard`}
-                                    className="mt-1 inline-flex items-center gap-1 text-[11px] font-bold text-rose-600 transition-colors hover:text-rose-700 dark:text-rose-400 dark:hover:text-rose-300"
-                                >
-                                    <Zap className="size-3 fill-current" />
-                                    <span>Fix in Drill</span>
-                                    <ChevronRight className="size-3" />
-                                </Link>
-                            </div>
-                        )}
+                            )}
+                        </div>
                     </div>
                 )}
 

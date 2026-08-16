@@ -1,4 +1,4 @@
-import { Link, router } from '@inertiajs/react';
+import { router } from '@inertiajs/react';
 import {
     FolderPlus,
     Bookmark,
@@ -7,14 +7,12 @@ import {
     Plus,
     X,
     Folder,
-    Sparkles,
-    FileText,
-    Check,
     Pencil,
     SlidersHorizontal,
 } from 'lucide-react';
 import React, { useState } from 'react';
 import { ConfirmModal } from '@/components/shared/confirm-modal';
+import { HowItWorksModal } from '@/components/shared/how-it-works-modal';
 import { Card } from '@/components/ui/card';
 import type { SavedDrillSet, Question, Category } from '../types';
 import { EditSavedSetDialog } from './edit-saved-set-dialog';
@@ -37,7 +35,7 @@ export function SavedSetsView({
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [setName, setSetName] = useState('');
     const [setDescription, setSetDescription] = useState('');
-    const [setColor, setSetColor] = useState('blue');
+    const [setColor] = useState('blue');
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [setToDelete, setSetToDelete] = useState<SavedDrillSet | null>(null);
     const [setForEdit, setSetForEdit] = useState<SavedDrillSet | null>(null);
@@ -131,14 +129,42 @@ return;
                     </div>
                 </div>
 
-                <button
-                    type="button"
-                    onClick={() => setIsCreateModalOpen(true)}
-                    className="flex cursor-pointer items-center gap-1.5 rounded-xl bg-blue-600 px-4 py-2.5 text-xs font-bold text-white shadow-xs transition hover:bg-blue-700 active:scale-95 self-start sm:self-auto"
-                >
-                    <Plus className="size-4" />
-                    <span>New Practice Set</span>
-                </button>
+                <div className="flex items-center gap-2 self-start sm:self-auto">
+                    <HowItWorksModal
+                        title="How Saved Practice Sets Work"
+                        description="Organize and master your personalized question collections:"
+                        tips={[
+                            {
+                                icon: <Bookmark className="size-4" />,
+                                title: 'Personalized Study Playlists',
+                                text: 'Group high-yield problems, challenging formulas, or tricky subcategories into dedicated study sets.',
+                            },
+                            {
+                                icon: <Plus className="size-4" />,
+                                title: 'Bookmark During Reviews & Builder',
+                                text: 'Save questions while reviewing past exam attempts or directly from the Custom Drill Builder.',
+                            },
+                            {
+                                icon: <Pencil className="size-4" />,
+                                title: 'Manage & Curate Sets',
+                                text: 'Click the pencil icon on any set to add new questions from the question bank, remove mastered items, or update set descriptions.',
+                            },
+                            {
+                                icon: <Play className="size-4" />,
+                                title: 'Launch Focused Drills',
+                                text: 'Click Start Practice Drill on any set to immediately simulate an exam session containing only the questions in that set.',
+                            },
+                        ]}
+                    />
+                    <button
+                        type="button"
+                        onClick={() => setIsCreateModalOpen(true)}
+                        className="flex cursor-pointer items-center gap-1.5 rounded-xl bg-blue-600 px-4 py-2.5 text-xs font-bold text-white shadow-xs transition hover:bg-blue-700 active:scale-95"
+                    >
+                        <Plus className="size-4" />
+                        <span>New Practice Set</span>
+                    </button>
+                </div>
             </div>
 
             {/* Sets Grid */}

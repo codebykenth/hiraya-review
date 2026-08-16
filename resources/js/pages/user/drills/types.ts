@@ -9,6 +9,7 @@ export interface Question {
     language: string;
     originalOptionIndices?: number[];
     isDemographic?: boolean;
+    isCustom?: boolean;
 }
 
 export interface Subcategory {

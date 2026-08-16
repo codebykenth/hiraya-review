@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\User;
 
+use App\Http\Requests\User\StoreCustomDrillQuestionRequest;
 use App\Models\Category;
 use App\Models\ExamAttempt;
 use App\Models\Question;
@@ -165,5 +166,44 @@ class DrillController
             'weak_subcategories' => $weakSubcatNames,
             'questions' => $questions,
         ]);
+    }
+
+    /**
+     * Store a custom user-created question for practice drills.
+     */
+    public function storeCustomQuestion(StoreCustomDrillQuestionRequest $request)
+    {
+        $validated = $request->validated();
+
+        $question = Question::create([
+            'subcategory_id' => $validated['subcategory_id'],
+            'language' => $validated['language'] ?? 'English',
+            'stem' => $validated['stem'],
+            'options' => $validated['options'],
+            'correct_option' => (int) $validated['correct_option'],
+            'explanation' => $validated['explanation'] ?? '',
+            'created_by' => auth()->id(),
+            'status' => 'active',
+        ]);
+
+        Cache::forget('questions.active');
+
+        $question->load('subcategory.category');
+
+        return response()->json([
+            'message' => 'Question created successfully.',
+            'question' => [
+                'id' => $question->id,
+                'stem' => $question->stem,
+                'options' => $question->options ?? [],
+                'correct_option' => $question->correct_option,
+                'explanation' => $question->explanation ?? '',
+                'category' => $question->subcategory?->category?->name ?? 'General Information',
+                'subcategory' => $question->subcategory?->name ?? '',
+                'language' => (str_contains(strtolower($question->language ?? ''), 'tagalog') || str_contains(strtolower($question->language ?? ''), 'filipino')) ? 'Filipino' : 'English',
+                'isDemographic' => $question->subcategory?->category?->is_demographic ?? false,
+                'isCustom' => true,
+            ],
+        ], 201);
     }
 }

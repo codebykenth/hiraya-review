@@ -97,6 +97,7 @@ Route::middleware(['auth.or.fail', 'verified'])->group(function () {
         Route::get('dashboard', [UserDashboardController::class, 'index'])->name('dashboard.index');
         Route::get('drills', [DrillController::class, 'index'])->name('drills.index');
         Route::get('drills/smart-weakness', [DrillController::class, 'smartWeakness'])->name('drills.smartWeakness');
+        Route::post('drills/custom-questions', [DrillController::class, 'storeCustomQuestion'])->name('drills.custom-questions.store')->middleware('throttle:global-mutations');
 
         Route::controller(SavedDrillSetController::class)->prefix('drills/saved-sets')->name('drills.saved-sets.')->group(function () {
             Route::get('/', 'index')->name('index');

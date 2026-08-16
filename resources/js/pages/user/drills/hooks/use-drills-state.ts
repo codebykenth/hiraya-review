@@ -81,18 +81,14 @@ export function useDrillsState({
     );
     const [isTimed, setIsTimed] = useState<boolean>(true);
     const [isRetakeConfig, setIsRetakeConfig] = useState<boolean>(false);
-    const [originInfo, setOriginInfo] = useState<{ href: string; title: string } | null>(() =>
-        resolveOriginFromUrl(url),
-    );
+    const originInfo = useMemo(() => resolveOriginFromUrl(url), [url]);
 
-    // Keep origin resolved if URL changes or on mount
+    // Keep session origin synced
     useEffect(() => {
-        const resolved = resolveOriginFromUrl(url);
-        if (resolved) {
-            setOriginInfo(resolved);
-            setSessionOrigin(resolved.href);
+        if (originInfo) {
+            setSessionOrigin(originInfo.href);
         }
-    }, [url]);
+    }, [originInfo]);
 
     // Dynamically update layout breadcrumbs at the top header
     useEffect(() => {
@@ -305,6 +301,7 @@ export function useDrillsState({
             if (subcatsParam) {
                 try {
                     const parsed = JSON.parse(decodeURIComponent(subcatsParam));
+
                     if (Array.isArray(parsed)) {
                         parsedSubcats = parsed;
                     }
@@ -324,6 +321,7 @@ export function useDrillsState({
                         targetSub.includes(s.name.toLowerCase()),
                     ),
                 );
+
                 if (matchedCat) {
                     catParam = matchedCat.name;
                 }
@@ -389,9 +387,10 @@ export function useDrillsState({
             );
         }
 
-        if (originInfo) {
-            queryParams.append('from', originInfo.href);
-        }
+        queryParams.set(
+            'from',
+            originInfo ? originInfo.href : '/drills?tab=categories',
+        );
 
         // Clear any existing exam session before starting a fresh drill
         if (typeof window !== 'undefined') {
