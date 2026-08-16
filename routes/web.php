@@ -149,6 +149,8 @@ Route::middleware(['auth.or.fail', 'verified'])->group(function () {
             Route::post('/', 'store')->name('store');
             Route::post('bulk-reschedule-today', 'bulkRescheduleToday')->name('bulkRescheduleToday');
             Route::post('bulk-mark-done', 'bulkMarkDone')->name('bulkMarkDone');
+            Route::post('bulk-delete', 'bulkDelete')->name('bulkDelete');
+            Route::post('shift', 'shiftSchedule')->name('shift');
             Route::delete('reset', 'destroyAll')->name('destroyAll');
             Route::put('bulk-time', 'bulkUpdateTime')->name('bulkUpdateTime');
             Route::put('{studySchedule}', 'update')->name('update');
@@ -156,9 +158,11 @@ Route::middleware(['auth.or.fail', 'verified'])->group(function () {
         });
     });
 
-    // --- STUDY SUGGESTIONS ---
+    // --- STUDY SUGGESTIONS & TEMPLATES ---
     Route::controller(StudySuggestionController::class)->prefix('study-suggestions')->name('study-suggestions.')->group(function () {
         Route::get('/', 'getSuggestions')->name('get')->middleware('throttle:global-views');
+        Route::get('templates', 'getTemplates')->name('templates')->middleware('throttle:global-views');
+        Route::post('templates/apply', 'applyTemplate')->name('templates.apply')->middleware('throttle:global-mutations');
         Route::post('apply', 'applySuggestions')->name('apply')->middleware('throttle:global-mutations');
     });
 

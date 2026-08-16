@@ -96,6 +96,18 @@ export function useCalendarState(initialProps: CalendarPageProps) {
     const [isSubjectDropdownOpen, setIsSubjectDropdownOpen] = useState(false);
     const [subjectSearch, setSubjectSearch] = useState('');
     const [isBulkModalOpen, setIsBulkModalOpen] = useState(false);
+    const [isTemplatesModalOpen, setIsTemplatesModalOpen] = useState(false);
+    const [isShiftModalOpen, setIsShiftModalOpen] = useState(false);
+    const [selectedStudyTask, setSelectedStudyTask] = useState<{
+        task: StudySchedule;
+        dateStr: string;
+    } | null>(null);
+    const [isStudyDrawerOpen, setIsStudyDrawerOpen] = useState(false);
+    const [selectedDayDetails, setSelectedDayDetails] = useState<{
+        dateStr: string;
+        schedules: StudySchedule[];
+    } | null>(null);
+    const [isDaySheetOpen, setIsDaySheetOpen] = useState(false);
     const [bulkFormData, setBulkFormData] = useState({
         category_id: '',
         study_time: '',
@@ -710,6 +722,9 @@ return false;
                             dateSchedules.filter((s) => s.id !== scheduleId),
                         );
                         setSchedules(updated);
+                        setPastPending((prev) =>
+                            prev.filter((s) => s.id !== scheduleId),
+                        );
                     }
                 } catch {
                     setErrorMessage(
@@ -726,6 +741,7 @@ return false;
     ) => {
         try {
             const newDoneState = !schedule.is_done;
+            const targetDate = date || schedule.study_date || todayStr;
             const response = await fetch(`/study-schedules/${schedule.id}`, {
                 method: 'PUT',
                 headers: {
@@ -736,7 +752,7 @@ return false;
                             ?.getAttribute('content') || '',
                 },
                 body: JSON.stringify({
-                    study_date: date,
+                    study_date: targetDate,
                     study_time: schedule.study_time
                         ? schedule.study_time.substring(0, 5)
                         : null,
@@ -750,9 +766,9 @@ return false;
             if (response.ok) {
                 monthCacheRef.current.clear();
                 const updated = new Map(schedules);
-                const dateSchedules = updated.get(date) || [];
+                const dateSchedules = updated.get(targetDate) || [];
                 updated.set(
-                    date,
+                    targetDate,
                     dateSchedules.map((s) =>
                         s.id === schedule.id
                             ? { ...s, is_done: newDoneState }
@@ -760,6 +776,22 @@ return false;
                     ),
                 );
                 setSchedules(updated);
+
+                // Update pastPending state so overdue list reflects change immediately
+                setPastPending((prev) =>
+                    newDoneState
+                        ? prev.filter((s) => s.id !== schedule.id)
+                        : prev.map((s) =>
+                              s.id === schedule.id
+                                  ? { ...s, is_done: newDoneState }
+                                  : s,
+                          ),
+                );
+            } else {
+                const data = await response.json().catch(() => ({}));
+                setErrorMessage(
+                    data.message || 'Failed to update study item. Please try again.',
+                );
             }
         } catch {
             setErrorMessage('Failed to update study item. Please try again.');
@@ -791,7 +823,10 @@ return false;
 
             if (response.ok) {
                 monthCacheRef.current.clear();
-                fetchSchedules(true);
+                await fetchSchedules(true);
+                setPastPending((prev) =>
+                    prev.filter((s) => s.id !== schedule.id),
+                );
             }
         } catch {
             setErrorMessage(
@@ -919,6 +954,106 @@ return false;
         });
     };
 
+    const [selectedScheduleIds, setSelectedScheduleIds] = useState<number[]>(
+        [],
+    );
+
+    const toggleSelectSchedule = useCallback((id: number) => {
+        setSelectedScheduleIds((prev) =>
+            prev.includes(id) ? prev.filter((itemId) => itemId !== id) : [...prev, id],
+        );
+    }, []);
+
+    const selectAllSchedules = useCallback((ids: number[]) => {
+        setSelectedScheduleIds(ids);
+    }, []);
+
+    const deselectAllSchedules = useCallback(() => {
+        setSelectedScheduleIds([]);
+    }, []);
+
+    const handleBulkDelete = useCallback(
+        async ({
+            ids,
+            scope,
+            date,
+            title = 'Delete Study Sessions',
+        }: {
+            ids?: number[];
+            scope?: 'overdue' | 'completed' | 'date';
+            date?: string;
+            title?: string;
+        }) => {
+            const count = ids ? ids.length : scope === 'overdue' ? pastPending.length : 0;
+            const countText =
+                count > 0
+                    ? `${count} study session${count > 1 ? 's' : ''}`
+                    : 'these study sessions';
+
+            setConfirmModal({
+                isOpen: true,
+                title,
+                message: `Are you sure you want to permanently delete ${countText}? This action cannot be undone.`,
+                confirmLabel: `Delete ${count > 0 ? count : ''} Session${count === 1 ? '' : 's'}`,
+                variant: 'danger',
+                onConfirm: async () => {
+                    setIsLoading(true);
+
+                    try {
+                        const response = await fetch(
+                            '/study-schedules/bulk-delete',
+                            {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRF-TOKEN':
+                                        document
+                                            .querySelector(
+                                                'meta[name="csrf-token"]',
+                                            )
+                                            ?.getAttribute('content') || '',
+                                },
+                                body: JSON.stringify({
+                                    ids: ids || [],
+                                    scope,
+                                    date,
+                                }),
+                            },
+                        );
+
+                        if (response.ok) {
+                            monthCacheRef.current.clear();
+                            await fetchSchedules(true);
+
+                            if (ids && ids.length > 0) {
+                                setPastPending((prev) =>
+                                    prev.filter((s) => !ids.includes(s.id)),
+                                );
+                            } else if (scope === 'overdue') {
+                                setPastPending([]);
+                            }
+
+                            setSelectedScheduleIds([]);
+                        } else {
+                            const data = await response.json();
+                            setErrorMessage(
+                                data.message ||
+                                    'Failed to delete study sessions.',
+                            );
+                        }
+                    } catch {
+                        setErrorMessage(
+                            'An error occurred while deleting study sessions.',
+                        );
+                    } finally {
+                        setIsLoading(false);
+                    }
+                },
+            });
+        },
+        [fetchSchedules, pastPending.length, setConfirmModal],
+    );
+
     const handleDismissReminderWithSnooze = (snooze24h: boolean) => {
         if (snooze24h && typeof window !== 'undefined') {
             try {
@@ -1044,6 +1179,42 @@ return false;
         return pastPending.filter(filterScheduleByCategory);
     }, [pastPending, selectedCategory, filterScheduleByCategory]);
 
+    const handleTemplateApplied = useCallback(async () => {
+        monthCacheRef.current.clear();
+        await fetchSchedules(true);
+    }, [fetchSchedules]);
+
+    const handleShiftApplied = useCallback(async () => {
+        monthCacheRef.current.clear();
+        await fetchSchedules(true);
+    }, [fetchSchedules]);
+
+    const openStudyDrawer = useCallback(
+        (task: StudySchedule, dateStr: string) => {
+            setSelectedStudyTask({ task, dateStr });
+            setIsStudyDrawerOpen(true);
+        },
+        [],
+    );
+
+    const closeStudyDrawer = useCallback(() => {
+        setIsStudyDrawerOpen(false);
+        setSelectedStudyTask(null);
+    }, []);
+
+    const openDaySheet = useCallback(
+        (dateStr: string, daySchedules: StudySchedule[]) => {
+            setSelectedDayDetails({ dateStr, schedules: daySchedules });
+            setIsDaySheetOpen(true);
+        },
+        [],
+    );
+
+    const closeDaySheet = useCallback(() => {
+        setIsDaySheetOpen(false);
+        setSelectedDayDetails(null);
+    }, []);
+
     return {
         currentDate,
         setCurrentDate,
@@ -1057,6 +1228,20 @@ return false;
         learnModules,
         isModalOpen,
         setIsModalOpen,
+        isTemplatesModalOpen,
+        setIsTemplatesModalOpen,
+        isShiftModalOpen,
+        setIsShiftModalOpen,
+        selectedStudyTask,
+        isStudyDrawerOpen,
+        setIsStudyDrawerOpen,
+        openStudyDrawer,
+        closeStudyDrawer,
+        selectedDayDetails,
+        isDaySheetOpen,
+        setIsDaySheetOpen,
+        openDaySheet,
+        closeDaySheet,
         errorMessage,
         setErrorMessage,
         confirmModal,
@@ -1100,6 +1285,8 @@ return false;
         openEditModal,
         closeModal,
         handleBulkUpdateTime,
+        handleTemplateApplied,
+        handleShiftApplied,
         handleAddStudy,
         handleDeleteSchedule,
         toggleScheduleDone,
@@ -1109,6 +1296,11 @@ return false;
         handleDismissReminderWithSnooze,
         handleBulkRescheduleAllToToday,
         handleBulkMarkAllDone,
+        handleBulkDelete,
+        selectedScheduleIds,
+        toggleSelectSchedule,
+        selectAllSchedules,
+        deselectAllSchedules,
         getScheduleCategoryId,
         filterScheduleByCategory,
     };

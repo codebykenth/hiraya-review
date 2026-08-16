@@ -37,6 +37,15 @@ interface AgendaViewProps {
     handleRescheduleToToday: (schedule: StudySchedule) => Promise<void>;
     handleBulkRescheduleAllToToday: (ids?: number[]) => Promise<void>;
     handleBulkMarkAllDone: (ids?: number[]) => Promise<void>;
+    handleBulkDelete?: (params: {
+        ids?: number[];
+        scope?: 'overdue' | 'completed' | 'date';
+        date?: string;
+        title?: string;
+    }) => Promise<void>;
+    selectedScheduleIds?: number[];
+    toggleSelectSchedule?: (id: number) => void;
+    onOpenStudyDrawer?: (schedule: StudySchedule, dateStr: string) => void;
     filterScheduleByCategory: (schedule: StudySchedule) => boolean;
 }
 
@@ -52,6 +61,10 @@ export function AgendaView({
     handleRescheduleToToday,
     handleBulkRescheduleAllToToday,
     handleBulkMarkAllDone,
+    handleBulkDelete,
+    selectedScheduleIds = [],
+    toggleSelectSchedule,
+    onOpenStudyDrawer,
     filterScheduleByCategory,
 }: AgendaViewProps) {
     const [isCompletedOpen, setIsCompletedOpen] = useState(false);
@@ -213,6 +226,7 @@ export function AgendaView({
             const foundSub = potentialSubs.find((s) =>
                 title.toLowerCase().includes(s.name.toLowerCase()),
             );
+
             if (foundSub) {
                 matchedSubcategoryName = foundSub.name;
             }
@@ -262,6 +276,7 @@ export function AgendaView({
         dateStr: string,
         isOverdue = false,
     ) => {
+        const isSelected = selectedScheduleIds.includes(task.id);
         const { catName, colorClasses, buildDrillUrl } = getCategoryDetails(
             task.title,
             task.subcategory_id,
@@ -277,15 +292,27 @@ export function AgendaView({
             <div
                 key={task.id}
                 className={`group relative flex flex-col gap-3 rounded-2xl border p-4 transition-all duration-200 hover:shadow-md sm:flex-row sm:items-center sm:justify-between ${
-                    task.is_done
-                        ? 'border-emerald-200/70 bg-emerald-50/40 dark:border-emerald-900/30 dark:bg-emerald-950/20'
-                        : isOverdue
-                          ? 'border-rose-200/80 bg-rose-50/40 hover:border-rose-300 dark:border-rose-900/40 dark:bg-rose-950/15'
-                          : `${colorClasses.border} ${colorClasses.bg}`
+                    isSelected
+                        ? 'border-blue-400 bg-blue-50/60 ring-2 ring-blue-400/40 dark:border-blue-600 dark:bg-blue-950/40 dark:ring-blue-500/30'
+                        : task.is_done
+                          ? 'border-emerald-200/70 bg-emerald-50/40 dark:border-emerald-900/30 dark:bg-emerald-950/20'
+                          : isOverdue
+                            ? 'border-rose-200/80 bg-rose-50/40 hover:border-rose-300 dark:border-rose-900/40 dark:bg-rose-950/15'
+                            : `${colorClasses.border} ${colorClasses.bg}`
                 }`}
             >
-                {/* Left: Completion Toggle & Title */}
-                <div className="flex flex-1 items-start gap-3.5">
+                {/* Left: Checkbox + Completion Toggle & Title */}
+                <div className="flex flex-1 items-start gap-3">
+                    {toggleSelectSchedule && (
+                        <input
+                            type="checkbox"
+                            checked={isSelected}
+                            onChange={() => toggleSelectSchedule(task.id)}
+                            className="mt-1 size-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-800 shrink-0 cursor-pointer"
+                            aria-label={`Select ${task.title}`}
+                        />
+                    )}
+
                     <button
                         type="button"
                         onClick={() => toggleScheduleDone(task, dateStr)}
@@ -373,6 +400,17 @@ export function AgendaView({
 
                 {/* Right: Quick Action Buttons */}
                 <div className="flex items-center gap-1.5 self-end sm:self-center">
+                    {onOpenStudyDrawer && (
+                        <Button
+                            size="sm"
+                            variant="outline"
+                            className="h-7 gap-1 px-2 text-[11px] font-bold border-indigo-200 text-indigo-700 bg-indigo-50/50 hover:bg-indigo-100 dark:border-indigo-900/40 dark:text-indigo-300 dark:bg-indigo-950/30"
+                            onClick={() => onOpenStudyDrawer(task, dateStr)}
+                        >
+                            <Sparkles className="size-3" />
+                            <span>Study</span>
+                        </Button>
+                    )}
                     {isOverdue && !task.is_done && (
                         <Button
                             size="sm"
@@ -387,6 +425,7 @@ export function AgendaView({
                         variant="ghost"
                         className="h-7 w-7 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
                         onClick={() => openEditModal(task, dateStr)}
+                        title="Edit"
                     >
                         <Edit2 className="size-3.5" />
                     </Button>
@@ -395,6 +434,7 @@ export function AgendaView({
                         variant="ghost"
                         className="h-7 w-7 text-slate-400 hover:text-rose-600 dark:hover:text-rose-400"
                         onClick={() => handleDeleteSchedule(task.id, dateStr)}
+                        title="Delete"
                     >
                         <Trash2 className="size-3.5" />
                     </Button>
@@ -461,6 +501,23 @@ export function AgendaView({
                                 <CheckCheck className="mr-1.5 size-3.5" />
                                 Mark All Done
                             </Button>
+                            {handleBulkDelete && (
+                                <Button
+                                    size="sm"
+                                    variant="outline"
+                                    disabled={isBulkLoading}
+                                    className="h-8 border-rose-300 bg-white font-bold text-rose-700 hover:bg-rose-50 dark:border-rose-800 dark:bg-slate-900 dark:text-rose-300"
+                                    onClick={() =>
+                                        handleBulkDelete({
+                                            scope: 'overdue',
+                                            title: 'Delete All Overdue Tasks',
+                                        })
+                                    }
+                                >
+                                    <Trash2 className="mr-1.5 size-3.5" />
+                                    Delete All
+                                </Button>
+                            )}
                         </div>
                     </div>
 
@@ -621,24 +678,42 @@ export function AgendaView({
             {/* COMPLETED HISTORY ACCORDION */}
             {completedList.length > 0 && (
                 <div className="border-t border-slate-200/80 pt-4 dark:border-slate-800/80">
-                    <button
-                        type="button"
-                        onClick={() => setIsCompletedOpen((prev) => !prev)}
-                        className="flex w-full items-center justify-between rounded-xl border border-slate-200 bg-slate-50/70 p-3.5 text-left font-bold text-slate-700 transition hover:bg-slate-100 dark:border-slate-800 dark:bg-slate-900/60 dark:text-slate-300 dark:hover:bg-slate-800/60"
-                    >
-                        <div className="flex items-center gap-2">
-                            <CheckCircle2 className="size-4.5 text-emerald-600 dark:text-emerald-400" />
-                            <span>
-                                Completed Study Sessions ({completedList.length}
-                                )
-                            </span>
-                        </div>
-                        {isCompletedOpen ? (
-                            <ChevronUp className="size-4 text-slate-400" />
-                        ) : (
-                            <ChevronDown className="size-4 text-slate-400" />
+                    <div className="flex items-center justify-between gap-2">
+                        <button
+                            type="button"
+                            onClick={() => setIsCompletedOpen((prev) => !prev)}
+                            className="flex flex-1 items-center justify-between rounded-xl border border-slate-200 bg-slate-50/70 p-3.5 text-left font-bold text-slate-700 transition hover:bg-slate-100 dark:border-slate-800 dark:bg-slate-900/60 dark:text-slate-300 dark:hover:bg-slate-800/60"
+                        >
+                            <div className="flex items-center gap-2">
+                                <CheckCircle2 className="size-4.5 text-emerald-600 dark:text-emerald-400" />
+                                <span>
+                                    Completed Study Sessions ({completedList.length})
+                                </span>
+                            </div>
+                            {isCompletedOpen ? (
+                                <ChevronUp className="size-4 text-slate-400" />
+                            ) : (
+                                <ChevronDown className="size-4 text-slate-400" />
+                            )}
+                        </button>
+
+                        {handleBulkDelete && (
+                            <Button
+                                size="sm"
+                                variant="outline"
+                                className="h-12 border-rose-200 text-rose-600 hover:bg-rose-50 hover:text-rose-700 dark:border-rose-900/40 dark:text-rose-400 dark:hover:bg-rose-950/30 px-3 font-bold text-xs shrink-0"
+                                onClick={() =>
+                                    handleBulkDelete({
+                                        scope: 'completed',
+                                        title: 'Clear Completed Tasks',
+                                    })
+                                }
+                            >
+                                <Trash2 className="mr-1.5 size-3.5" />
+                                Clear Completed
+                            </Button>
                         )}
-                    </button>
+                    </div>
 
                     {isCompletedOpen && (
                         <div className="mt-3 space-y-2">

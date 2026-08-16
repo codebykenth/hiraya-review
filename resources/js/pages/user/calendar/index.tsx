@@ -1,18 +1,10 @@
-import { Head, Link, usePage } from '@inertiajs/react';
+import { Head, usePage } from '@inertiajs/react';
 import {
-    ChevronLeft,
-    ChevronRight,
-    Plus,
-    Trash2,
-    Clock,
     MousePointerClick,
     Move,
     CheckCircle2,
     ArrowLeft,
     ArrowRight,
-    Calendar as CalendarGridIcon,
-    CalendarRange,
-    List,
     Sparkles,
 } from 'lucide-react';
 import React from 'react';
@@ -31,12 +23,19 @@ import {
 } from '@/components/ui/dialog';
 import { AgendaView } from './components/agenda-view';
 import { BulkUpdateModal } from './components/bulk-update-modal';
+import { CalendarBulkActionsBar } from './components/calendar-bulk-actions-bar';
 import { CalendarGrid } from './components/calendar-grid';
+import { CalendarStatsBanner } from './components/calendar-stats-banner';
+import { CalendarToolbar } from './components/calendar-toolbar';
+import { DayDetailsSheet } from './components/day-details-sheet';
 import { ExamCountdown } from './components/exam-countdown';
 import { PastPendingReminder } from './components/past-pending-reminder';
 import { ScheduleModal } from './components/schedule-modal';
+import { ShiftScheduleModal } from './components/shift-schedule-modal';
+import { StudyPlanTemplatesModal } from './components/study-plan-templates-modal';
+import { StudyTaskDrawer } from './components/study-task-drawer';
 import { WeekView } from './components/week-view';
-import { mainCategories, useCalendarState } from './hooks/use-calendar-state';
+import { useCalendarState } from './hooks/use-calendar-state';
 import type { CalendarPageProps } from './hooks/use-calendar-state';
 
 export default function Calendar() {
@@ -57,6 +56,18 @@ export default function Calendar() {
         learnModules,
         isModalOpen,
         setIsModalOpen,
+        isTemplatesModalOpen,
+        setIsTemplatesModalOpen,
+        isShiftModalOpen,
+        setIsShiftModalOpen,
+        selectedStudyTask,
+        isStudyDrawerOpen,
+        setIsStudyDrawerOpen,
+        openStudyDrawer,
+        selectedDayDetails,
+        isDaySheetOpen,
+        setIsDaySheetOpen,
+        openDaySheet,
         errorMessage,
         setErrorMessage,
         confirmModal,
@@ -84,6 +95,7 @@ export default function Calendar() {
         setIsReminderOpen,
         todayStr,
         weeks,
+        rawWeeks,
         currentWeekDays,
         weekRangeLabel,
         previousWeek,
@@ -94,6 +106,8 @@ export default function Calendar() {
         openModal,
         openEditModal,
         handleBulkUpdateTime,
+        handleTemplateApplied,
+        handleShiftApplied,
         handleAddStudy,
         handleDeleteSchedule,
         toggleScheduleDone,
@@ -103,20 +117,26 @@ export default function Calendar() {
         handleDismissReminderWithSnooze,
         handleBulkRescheduleAllToToday,
         handleBulkMarkAllDone,
+        handleBulkDelete,
+        selectedScheduleIds,
+        toggleSelectSchedule,
+        deselectAllSchedules,
         filterScheduleByCategory,
     } = useCalendarState({ schedules, examDates, pastPending, nextExam });
+
+    const totalScheduleCount = schedulesMap.size + rawPastPending.length;
 
     return (
         <>
             <Head title="Study Plan" />
             <PageContainer>
                 {/* Top Page Header */}
-                <div className="mb-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+                <div className="mb-4 flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
                     <div className="flex items-start gap-3">
                         <PageHeader
                             title="Study Plan"
                             description="Plan your daily study sessions, track progress, and conquer your exam"
-                            tooltip="Your personalized calendar, weekly planner, and agenda where you can create, reschedule, drag-and-drop, and track daily study tasks."
+                            tooltip="Your personalized calendar and study planner where you can apply pre-built templates, drag-and-drop sessions, and track daily goals."
                         />
                         <div className="mt-1">
                             <HowItWorksModal
@@ -124,11 +144,16 @@ export default function Calendar() {
                                 description="Master your study schedule with these quick tips:"
                                 tips={[
                                     {
+                                        icon: <Sparkles className="size-4" />,
+                                        title: 'Study Plan Templates',
+                                        text: 'Click "Study Templates" to generate a full 60-Day, 30-Day, or subject-specific schedule in 1 click.',
+                                    },
+                                    {
                                         icon: (
                                             <MousePointerClick className="size-4" />
                                         ),
-                                        title: 'Click to Add or Edit',
-                                        text: "Click any day in Month/Week view or '+ Add Task' in Agenda view to create a study session.",
+                                        title: 'Click to Inspect or Add',
+                                        text: 'Click any month date cell to inspect tasks for that day, or click any task to open the Study Drawer & Practice Drill.',
                                     },
                                     {
                                         icon: <Move className="size-4" />,
@@ -136,242 +161,87 @@ export default function Calendar() {
                                         text: "Simply drag and drop any session into another day's block on the calendar to instantly reschedule it.",
                                     },
                                     {
-                                        icon: <Sparkles className="size-4" />,
-                                        title: 'AI Diagnostic Sync',
-                                        text: 'Click "AI Readiness Plan" to populate your study calendar directly from your mock exam weaknesses.',
-                                    },
-                                    {
                                         icon: (
                                             <CheckCircle2 className="size-4" />
                                         ),
-                                        title: 'Overdue Tracking',
-                                        text: 'Incomplete past tasks alert you with 1-click batch actions to reschedule or mark them done.',
+                                        title: 'Auto Catch-Up',
+                                        text: 'Use "Shift / Auto Catch-Up" in the Actions menu to automatically rebalance missed days forward.',
                                     },
                                 ]}
                             />
                         </div>
                     </div>
-                    <div className="flex flex-wrap items-center gap-3">
-                        <Link
-                            href="/analytics/ai-analysis"
-                            className="group inline-flex items-center gap-1.5 rounded-xl border border-indigo-200 bg-gradient-to-r from-indigo-50 to-blue-50 px-3.5 py-2 text-xs font-bold text-indigo-700 shadow-sm transition-all hover:border-indigo-300 hover:shadow-md dark:border-indigo-900/50 dark:from-indigo-950/40 dark:to-blue-950/40 dark:text-indigo-300 dark:hover:border-indigo-700"
-                        >
-                            <Sparkles className="size-3.5 text-indigo-600 transition-transform group-hover:scale-110 dark:text-indigo-400" />
-                            <span>AI Readiness Plan</span>
-                        </Link>
+
+                    <div className="flex items-center gap-3">
                         <ExamCountdown nextExam={calendarNextExam} />
                     </div>
                 </div>
 
-                {/* Controls Bar: 3-View Mode Switcher & Category Filter */}
-                <div className="mb-4 flex flex-col justify-between gap-3 md:flex-row md:items-center">
-                    {/* View Switcher Tabs: Month | Week | Agenda */}
-                    <div className="flex items-center rounded-xl border border-slate-200 bg-slate-100/80 p-1 dark:border-slate-800 dark:bg-slate-900/80">
-                        <button
-                            type="button"
-                            onClick={() => setActiveView('month')}
-                            className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 font-bold text-xs transition-all ${
-                                activeView === 'month'
-                                    ? 'bg-white text-blue-600 shadow-sm dark:bg-slate-800 dark:text-blue-400'
-                                    : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white'
-                            }`}
-                        >
-                            <CalendarGridIcon className="size-3.5" />
-                            <span>Month Grid</span>
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => setActiveView('week')}
-                            className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 font-bold text-xs transition-all ${
-                                activeView === 'week'
-                                    ? 'bg-white text-blue-600 shadow-sm dark:bg-slate-800 dark:text-blue-400'
-                                    : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white'
-                            }`}
-                        >
-                            <CalendarRange className="size-3.5" />
-                            <span>Week Planner</span>
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => setActiveView('agenda')}
-                            className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 font-bold text-xs transition-all ${
-                                activeView === 'agenda'
-                                    ? 'bg-white text-blue-600 shadow-sm dark:bg-slate-800 dark:text-blue-400'
-                                    : 'text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white'
-                            }`}
-                        >
-                            <List className="size-3.5" />
-                            <span>Agenda List</span>
-                            {rawPastPending.length > 0 && (
-                                <span className="rounded-full bg-rose-500 px-1.5 py-0.2 text-[10px] font-black text-white">
-                                    {rawPastPending.length}
-                                </span>
-                            )}
-                        </button>
+                {/* Top Mini-Stats & Habit Momentum Banner */}
+                {totalScheduleCount > 0 && (
+                    <div className="mb-4">
+                        <CalendarStatsBanner
+                            weeks={rawWeeks}
+                            pastPending={rawPastPending}
+                            todayStr={todayStr}
+                            nextExam={calendarNextExam}
+                        />
                     </div>
+                )}
 
-                    {/* Category Filter Chips */}
-                    <div className="flex flex-wrap items-center gap-1.5 overflow-x-auto pb-1 text-xs">
-                        <button
-                            type="button"
-                            onClick={() => setSelectedCategory('all')}
-                            className={`rounded-lg px-2.5 py-1 text-xs font-bold transition-colors ${
-                                selectedCategory === 'all'
-                                    ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900'
-                                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700'
-                            }`}
-                        >
-                            All Subjects
-                        </button>
-                        {mainCategories.map((cat) => (
-                            <button
-                                key={cat.id}
-                                type="button"
-                                onClick={() => setSelectedCategory(cat.id)}
-                                className={`rounded-lg px-2.5 py-1 text-xs font-bold transition-colors ${
-                                    selectedCategory === cat.id
-                                        ? 'bg-blue-600 text-white dark:bg-blue-600 dark:text-white'
-                                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700'
-                                }`}
+                {/* Empty State Template Starter Banner (shown when no study sessions exist) */}
+                {totalScheduleCount === 0 && (
+                    <div className="mb-4 rounded-2xl border border-indigo-200/80 bg-gradient-to-r from-indigo-50/80 via-blue-50/50 to-indigo-50/80 p-4 sm:p-5 dark:border-indigo-900/40 dark:from-indigo-950/30 dark:via-blue-950/20 dark:to-indigo-950/30">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                            <div className="flex items-start gap-3">
+                                <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-indigo-600 text-white shadow-2xs">
+                                    <Sparkles className="size-4.5" />
+                                </div>
+                                <div>
+                                    <h3 className="text-sm font-bold text-slate-900 dark:text-white">
+                                        Start with a Ready-Made Study Plan
+                                    </h3>
+                                    <p className="text-xs text-slate-600 dark:text-slate-400">
+                                        No need to schedule manually. Choose from our 60-Day, 30-Day Sprint, or Subject Booster tracks to populate your calendar instantly.
+                                    </p>
+                                </div>
+                            </div>
+                            <Button
+                                onClick={() => setIsTemplatesModalOpen(true)}
+                                className="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shrink-0 self-start sm:self-auto shadow-2xs gap-1.5"
                             >
-                                {cat.name}
-                            </button>
-                        ))}
+                                <Sparkles className="size-3.5" />
+                                <span>Explore Templates</span>
+                            </Button>
+                        </div>
                     </div>
+                )}
+
+                {/* Unified Calendar Control Toolbar */}
+                <div className="mb-4">
+                    <CalendarToolbar
+                        activeView={activeView}
+                        setActiveView={setActiveView}
+                        selectedCategory={selectedCategory}
+                        setSelectedCategory={setSelectedCategory}
+                        currentDate={currentDate}
+                        setCurrentDate={setCurrentDate}
+                        previousMonth={previousMonth}
+                        nextMonth={nextMonth}
+                        previousWeek={previousWeek}
+                        nextWeek={nextWeek}
+                        jumpToTodayWeek={jumpToTodayWeek}
+                        weekRangeLabel={weekRangeLabel}
+                        onOpenAddModal={() => openModal(todayStr)}
+                        onOpenTemplatesModal={() => setIsTemplatesModalOpen(true)}
+                        onOpenBulkTimeModal={() => setIsBulkModalOpen(true)}
+                        onOpenShiftModal={() => setIsShiftModalOpen(true)}
+                        onResetAll={handleResetAll}
+                    />
                 </div>
 
-                <Card className="border-border bg-white p-4 shadow-sm sm:p-6 dark:bg-slate-900">
-                    {/* Header with navigation (shown for month and agenda views) */}
-                    <div className="mb-6 flex flex-col justify-between gap-4 md:flex-row md:items-center">
-                        <div className="flex items-center gap-4">
-                            <select
-                                value={currentDate.getMonth()}
-                                onChange={(e) => {
-                                    setCurrentDate(
-                                        new Date(
-                                            currentDate.getFullYear(),
-                                            parseInt(e.target.value),
-                                            1,
-                                        ),
-                                    );
-                                }}
-                                className="cursor-pointer appearance-none rounded border-none bg-transparent py-1 pr-6 pl-2 text-xl font-semibold text-slate-900 outline-none hover:bg-slate-50 focus:ring-2 focus:ring-blue-500 dark:text-slate-100 dark:hover:bg-slate-900"
-                                style={{
-                                    backgroundImage:
-                                        'url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%231e293b%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E")',
-                                    backgroundRepeat: 'no-repeat',
-                                    backgroundPosition: 'right 0.5rem top 55%',
-                                    backgroundSize: '0.65rem auto',
-                                }}
-                            >
-                                {[
-                                    'January',
-                                    'February',
-                                    'March',
-                                    'April',
-                                    'May',
-                                    'June',
-                                    'July',
-                                    'August',
-                                    'September',
-                                    'October',
-                                    'November',
-                                    'December',
-                                ].map((m, i) => (
-                                    <option key={m} value={i}>
-                                        {m}
-                                    </option>
-                                ))}
-                            </select>
-                            <select
-                                value={currentDate.getFullYear()}
-                                onChange={(e) => {
-                                    setCurrentDate(
-                                        new Date(
-                                            parseInt(e.target.value),
-                                            currentDate.getMonth(),
-                                            1,
-                                        ),
-                                    );
-                                }}
-                                className="cursor-pointer appearance-none rounded border-none bg-transparent py-1 pr-6 pl-2 text-xl font-semibold text-slate-900 outline-none hover:bg-slate-50 focus:ring-2 focus:ring-blue-500 dark:text-slate-100 dark:hover:bg-slate-900"
-                                style={{
-                                    backgroundImage:
-                                        'url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%231e293b%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E")',
-                                    backgroundRepeat: 'no-repeat',
-                                    backgroundPosition: 'right 0.5rem top 55%',
-                                    backgroundSize: '0.65rem auto',
-                                }}
-                            >
-                                {Array.from(
-                                    { length: 11 },
-                                    (_, i) => new Date().getFullYear() - 3 + i,
-                                ).map((year) => (
-                                    <option key={year} value={year}>
-                                        {year}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-                        <div className="flex w-full flex-wrap items-center gap-2 md:w-auto">
-                            <Button
-                                onClick={() => openModal(todayStr)}
-                                className="flex-1 bg-blue-600 text-white hover:bg-blue-700 md:flex-initial"
-                            >
-                                <Plus className="mr-2 h-4 w-4" />
-                                <span className="hidden sm:inline">
-                                    Add Session
-                                </span>
-                                <span className="sm:hidden">Add</span>
-                            </Button>
-                            <Button
-                                onClick={() => setIsBulkModalOpen(true)}
-                                variant="outline"
-                                className="flex-1 border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100 md:flex-initial dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800"
-                            >
-                                <Clock className="mr-2 h-4 w-4 text-slate-500" />
-                                <span className="hidden sm:inline">
-                                    Bulk Update Time
-                                </span>
-                                <span className="sm:hidden">
-                                    Bulk Update Time
-                                </span>
-                            </Button>
-                            <Button
-                                variant="outline"
-                                onClick={handleResetAll}
-                                className="flex-1 border-red-200 bg-red-50 text-red-600 hover:bg-red-100 md:flex-initial dark:border-red-900/30 dark:bg-red-950/20 dark:text-red-400 dark:hover:bg-red-900/30 dark:hover:text-red-300"
-                            >
-                                <Trash2 className="mr-2 h-4 w-4" />
-                                <span className="hidden sm:inline">
-                                    Reset Calendar
-                                </span>
-                                <span className="sm:hidden">Reset</span>
-                            </Button>
-                            <div className="ml-auto flex items-center gap-1 md:ml-0">
-                                <Button
-                                    variant="outline"
-                                    size="icon"
-                                    onClick={previousMonth}
-                                    className="h-9 w-9"
-                                    title="Previous Month"
-                                >
-                                    <ChevronLeft className="h-4 w-4" />
-                                </Button>
-                                <Button
-                                    variant="outline"
-                                    size="icon"
-                                    onClick={nextMonth}
-                                    className="h-9 w-9"
-                                    title="Next Month"
-                                >
-                                    <ChevronRight className="h-4 w-4" />
-                                </Button>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* View mode render */}
+                {/* Main Calendar Views */}
+                <Card className="border-slate-200/80 bg-white/90 p-4 sm:p-6 shadow-2xs backdrop-blur-xl dark:border-slate-800/80 dark:bg-slate-900/70">
                     {activeView === 'month' ? (
                         <>
                             {/* Calendar grid swipe tip on mobile */}
@@ -390,9 +260,10 @@ export default function Calendar() {
                                 todayStr={todayStr}
                                 examDates={calendarExamDates}
                                 subcategories={subcategories}
-                                learnModules={learnModules}
                                 openModal={openModal}
                                 openEditModal={openEditModal}
+                                onOpenDayDetails={openDaySheet}
+                                onOpenStudyDrawer={openStudyDrawer}
                                 toggleScheduleDone={toggleScheduleDone}
                                 handleDeleteSchedule={handleDeleteSchedule}
                                 handleRescheduleToToday={
@@ -426,6 +297,7 @@ export default function Calendar() {
                             subcategories={subcategories}
                             openModal={openModal}
                             openEditModal={openEditModal}
+                            onOpenStudyDrawer={openStudyDrawer}
                             toggleScheduleDone={toggleScheduleDone}
                             handleDeleteSchedule={handleDeleteSchedule}
                             handleRescheduleToToday={handleRescheduleToToday}
@@ -433,10 +305,60 @@ export default function Calendar() {
                                 handleBulkRescheduleAllToToday
                             }
                             handleBulkMarkAllDone={handleBulkMarkAllDone}
+                            handleBulkDelete={handleBulkDelete}
+                            selectedScheduleIds={selectedScheduleIds}
+                            toggleSelectSchedule={toggleSelectSchedule}
                             filterScheduleByCategory={filterScheduleByCategory}
                         />
                     )}
                 </Card>
+
+                {/* Side-by-Side Study Task Drawer */}
+                <StudyTaskDrawer
+                    isOpen={isStudyDrawerOpen}
+                    onOpenChange={setIsStudyDrawerOpen}
+                    task={selectedStudyTask?.task || null}
+                    dateStr={selectedStudyTask?.dateStr || todayStr}
+                    subcategories={subcategories}
+                    learnModules={learnModules}
+                    onToggleDone={toggleScheduleDone}
+                    onEdit={openEditModal}
+                    onDelete={handleDeleteSchedule}
+                />
+
+                {/* Day Inspector Slide-Over Sheet */}
+                <DayDetailsSheet
+                    isOpen={isDaySheetOpen}
+                    onOpenChange={setIsDaySheetOpen}
+                    dateStr={selectedDayDetails?.dateStr || todayStr}
+                    schedules={selectedDayDetails?.schedules || []}
+                    subcategories={subcategories}
+                    onAddNew={(d) => openModal(d)}
+                    onToggleDone={toggleScheduleDone}
+                    onSelectTask={(t) =>
+                        openStudyDrawer(
+                            t,
+                            selectedDayDetails?.dateStr || todayStr,
+                        )
+                    }
+                    onEditTask={openEditModal}
+                    onDeleteTask={handleDeleteSchedule}
+                />
+
+                {/* Smart Schedule Shift & Catch-Up Modal */}
+                <ShiftScheduleModal
+                    isOpen={isShiftModalOpen}
+                    onOpenChange={setIsShiftModalOpen}
+                    onShiftApplied={handleShiftApplied}
+                />
+
+                {/* Study Plan Templates Modal */}
+                <StudyPlanTemplatesModal
+                    isOpen={isTemplatesModalOpen}
+                    onOpenChange={setIsTemplatesModalOpen}
+                    todayStr={todayStr}
+                    onTemplateApplied={handleTemplateApplied}
+                />
 
                 {/* Add/Edit Study Modal */}
                 <ScheduleModal
@@ -522,6 +444,23 @@ export default function Calendar() {
                         handleDismissReminderWithSnooze
                     }
                     setPastPending={setPastPending}
+                />
+
+                {/* Floating Multi-Select Bulk Actions Bar */}
+                <CalendarBulkActionsBar
+                    selectedCount={selectedScheduleIds.length}
+                    isLoading={isLoading}
+                    onMarkDone={() => handleBulkMarkAllDone(selectedScheduleIds)}
+                    onRescheduleToday={() =>
+                        handleBulkRescheduleAllToToday(selectedScheduleIds)
+                    }
+                    onDelete={() =>
+                        handleBulkDelete({
+                            ids: selectedScheduleIds,
+                            title: 'Delete Selected Study Sessions',
+                        })
+                    }
+                    onClearSelection={deselectAllSchedules}
                 />
             </PageContainer>
         </>

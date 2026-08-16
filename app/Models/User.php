@@ -49,4 +49,24 @@ class User extends Authenticatable implements MustVerifyEmail, PasskeyUser
     {
         return $this->hasMany(Feedback::class);
     }
+
+    public function examAttempts(): HasMany
+    {
+        return $this->hasMany(ExamAttempt::class);
+    }
+
+    public function savedDrillSets(): HasMany
+    {
+        return $this->hasMany(SavedDrillSet::class);
+    }
+
+    public function studySchedules(): HasMany
+    {
+        return $this->hasMany(StudySchedule::class);
+    }
+
+    public function aiAnalyses(): HasMany
+    {
+        return $this->hasMany(UserAiAnalysis::class);
+    }
 }

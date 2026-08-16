@@ -18,12 +18,12 @@ class UpdateStudyScheduleRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'study_date' => ['required', 'date'],
+            'study_date' => ['sometimes', 'required', 'date'],
             'study_time' => ['nullable', 'date_format:H:i:s,H:i'],
-            'title' => ['required', 'string', 'max:255', new NoEmojis, new NoHtml, new NoUrls, new NoProfanity],
+            'title' => ['sometimes', 'required', 'string', 'max:255', new NoEmojis, new NoHtml, new NoUrls, new NoProfanity],
             'description' => ['nullable', 'string', new NoEmojis, new NoHtml, new NoProfanity],
             'subcategory_id' => ['nullable', 'exists:subcategories,id'],
-            'is_done' => ['nullable', 'boolean'],
+            'is_done' => ['sometimes', 'boolean'],
         ];
     }
 }

@@ -3,14 +3,42 @@
 namespace App\Http\Controllers\User;
 
 use App\Http\Requests\ApplySuggestionsRequest;
+use App\Http\Requests\ApplyTemplateRequest;
 use App\Models\StudySchedule;
 use App\Services\StudyPlanAnalyzer;
+use App\Services\StudyPlanTemplateService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class StudySuggestionController
 {
-    public function __construct(private StudyPlanAnalyzer $analyzer) {}
+    public function __construct(
+        private StudyPlanAnalyzer $analyzer,
+        private StudyPlanTemplateService $templateService
+    ) {}
+
+    public function getTemplates()
+    {
+        return response()->json([
+            'templates' => array_values($this->templateService->getTemplates()),
+        ]);
+    }
+
+    public function applyTemplate(ApplyTemplateRequest $request)
+    {
+        $validated = $request->validated();
+        $count = $this->templateService->applyTemplate(
+            $validated['template_id'],
+            $validated['start_date'],
+            $validated['preferred_time'] ?? '19:00',
+            $request->boolean('replace_existing', false)
+        );
+
+        return response()->json([
+            'message' => "Successfully applied study template! Created {$count} daily study sessions.",
+            'count' => $count,
+        ], 201);
+    }
 
     public function getSuggestions(Request $request)
     {

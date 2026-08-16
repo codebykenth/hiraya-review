@@ -20,6 +20,7 @@ import {
     Circle,
     Dumbbell,
     BookOpen,
+    Sparkles,
 } from 'lucide-react';
 import React from 'react';
 import { Badge } from '@/components/ui/badge';
@@ -30,7 +31,7 @@ import {
     TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { categoryNames } from '../hooks/use-calendar-state';
-import type { StudySchedule, CalendarDay, LearnModule } from '../types';
+import type { StudySchedule, CalendarDay } from '../types';
 
 function DroppableDay({ id, children, className, onClick }: any) {
     const { setNodeRef, isOver } = useDroppable({ id });
@@ -79,9 +80,10 @@ interface CalendarGridProps {
     todayStr: string;
     examDates: string[];
     subcategories: Array<{ id: number; name: string; category_id: number }>;
-    learnModules: LearnModule[];
     openModal: (date: string) => void;
     openEditModal: (schedule: StudySchedule, date: string) => void;
+    onOpenDayDetails?: (dateStr: string, schedules: StudySchedule[]) => void;
+    onOpenStudyDrawer?: (schedule: StudySchedule, dateStr: string) => void;
     toggleScheduleDone: (
         schedule: StudySchedule,
         date: string,
@@ -100,9 +102,10 @@ export function CalendarGrid({
     todayStr,
     examDates,
     subcategories,
-    learnModules,
     openModal,
     openEditModal,
+    onOpenDayDetails,
+    onOpenStudyDrawer,
     toggleScheduleDone,
     handleDeleteSchedule,
     handleRescheduleToToday,
@@ -229,6 +232,7 @@ export function CalendarGrid({
             const foundSub = potentialSubs.find((s) =>
                 title.toLowerCase().includes(s.name.toLowerCase()),
             );
+
             if (foundSub) {
                 matchedSubcategoryName = foundSub.name;
             }
@@ -311,7 +315,12 @@ export function CalendarGrid({
                                         key={calendarDay.date}
                                         id={calendarDay.date}
                                         onClick={() => {
-                                            if (
+                                            if (onOpenDayDetails) {
+                                                onOpenDayDetails(
+                                                    calendarDay.date,
+                                                    calendarDay.schedules,
+                                                );
+                                            } else if (
                                                 calendarDay.isCurrentMonth &&
                                                 calendarDay.date >= todayStr
                                             ) {
@@ -440,6 +449,7 @@ export function CalendarGrid({
                                                         url: string;
                                                     }> = [];
                                                     let match;
+
                                                     while (
                                                         (match =
                                                             linkRegex.exec(
@@ -461,10 +471,18 @@ export function CalendarGrid({
                                                                 e: React.MouseEvent,
                                                             ) => {
                                                                 e.stopPropagation();
-                                                                openEditModal(
-                                                                    schedule,
-                                                                    calendarDay.date,
-                                                                );
+
+                                                                if (onOpenStudyDrawer) {
+                                                                    onOpenStudyDrawer(
+                                                                        schedule,
+                                                                        calendarDay.date,
+                                                                    );
+                                                                } else {
+                                                                    openEditModal(
+                                                                        schedule,
+                                                                        calendarDay.date,
+                                                                    );
+                                                                }
                                                             }}
                                                             className={`group relative cursor-pointer rounded-xl border p-2.5 shadow-sm transition-all duration-200 hover:shadow-md ${
                                                                 schedule.is_done
@@ -517,6 +535,22 @@ export function CalendarGrid({
 
                                                                 {/* Action Buttons (visible on mobile / hover on desktop) */}
                                                                 <div className="flex shrink-0 items-center gap-0.5 opacity-80 transition-opacity lg:opacity-0 lg:group-hover:opacity-100">
+                                                                    {onOpenStudyDrawer && (
+                                                                        <button
+                                                                            type="button"
+                                                                            onClick={(e) => {
+                                                                                e.stopPropagation();
+                                                                                onOpenStudyDrawer(
+                                                                                    schedule,
+                                                                                    calendarDay.date,
+                                                                                );
+                                                                            }}
+                                                                            className="rounded p-1 text-indigo-600 hover:bg-indigo-100 dark:text-indigo-400 dark:hover:bg-indigo-900/40"
+                                                                            title="Study & Drill"
+                                                                        >
+                                                                            <Sparkles className="size-3.5" />
+                                                                        </button>
+                                                                    )}
                                                                     {isOverdue &&
                                                                         handleRescheduleToToday && (
                                                                             <button

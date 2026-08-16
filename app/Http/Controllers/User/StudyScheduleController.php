@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers\User;
 
+use App\Http\Requests\BulkDeleteStudyScheduleRequest;
 use App\Http\Requests\BulkMarkDoneRequest;
 use App\Http\Requests\BulkRescheduleTodayRequest;
 use App\Http\Requests\BulkUpdateStudyTimeRequest;
+use App\Http\Requests\ShiftStudyScheduleRequest;
 use App\Http\Requests\StoreStudyScheduleRequest;
 use App\Http\Requests\UpdateStudyScheduleRequest;
 use App\Models\ExamDate;
@@ -296,11 +298,93 @@ class StudyScheduleController
         ]);
     }
 
+    public function bulkDelete(BulkDeleteStudyScheduleRequest $request)
+    {
+        $validated = $request->validated();
+        $query = StudySchedule::where('user_id', Auth::id());
+
+        if (! empty($validated['ids'])) {
+            $query->whereIn('id', $validated['ids']);
+        } elseif (! empty($validated['scope'])) {
+            if ($validated['scope'] === 'overdue') {
+                $query->where('study_date', '<', Carbon::today())->where('is_done', false);
+            } elseif ($validated['scope'] === 'completed') {
+                $query->where('is_done', true);
+            } elseif ($validated['scope'] === 'date' && ! empty($validated['date'])) {
+                $query->whereDate('study_date', $validated['date']);
+            }
+        }
+
+        $count = $query->delete();
+
+        return response()->json([
+            'message' => "Successfully deleted {$count} study sessions.",
+            'count' => $count,
+        ]);
+    }
+
     public function destroyAll()
     {
         StudySchedule::where('user_id', Auth::id())->delete();
 
         return response()->json(null, 204);
+    }
+
+    public function shiftSchedule(ShiftStudyScheduleRequest $request)
+    {
+        $validated = $request->validated();
+        $mode = $validated['mode'];
+        $userId = Auth::id();
+
+        $incompleteSchedules = StudySchedule::where('user_id', $userId)
+            ->where('is_done', false)
+            ->orderBy('study_date', 'asc')
+            ->orderBy('id', 'asc')
+            ->get();
+
+        if ($incompleteSchedules->isEmpty()) {
+            return response()->json([
+                'message' => 'No incomplete study sessions to shift.',
+                'count' => 0,
+            ]);
+        }
+
+        $count = 0;
+        $today = Carbon::today();
+
+        if ($mode === 'start_today') {
+            $earliest = Carbon::parse($incompleteSchedules->first()->study_date)->startOfDay();
+            $dayDifference = $earliest->diffInDays($today, false);
+
+            if ($dayDifference > 0) {
+                foreach ($incompleteSchedules as $schedule) {
+                    $originalDate = Carbon::parse($schedule->study_date);
+                    $newDate = $originalDate->copy()->addDays($dayDifference);
+                    $schedule->update(['study_date' => $newDate->toDateString()]);
+                    $count++;
+                }
+            }
+        } elseif ($mode === 'shift_by_days') {
+            $days = (int) ($validated['days'] ?? 1);
+            $fromDate = ! empty($validated['from_date']) ? Carbon::parse($validated['from_date'])->startOfDay() : null;
+
+            foreach ($incompleteSchedules as $schedule) {
+                $schedDate = Carbon::parse($schedule->study_date)->startOfDay();
+
+                if ($fromDate && $schedDate->lt($fromDate)) {
+                    continue;
+                }
+
+                $newDate = $schedDate->copy()->addDays($days);
+                $schedule->update(['study_date' => $newDate->toDateString()]);
+                $count++;
+            }
+        }
+
+        return response()->json([
+            'message' => "Successfully shifted {$count} study sessions.",
+            'count' => $count,
+        ]);
     }
 
     public function destroy(StudySchedule $studySchedule)
