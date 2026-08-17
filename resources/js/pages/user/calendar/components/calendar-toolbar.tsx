@@ -116,9 +116,9 @@ export function CalendarToolbar({
 
     return (
         <div className="flex flex-col gap-3 rounded-2xl border border-slate-200/80 bg-white/90 p-3 shadow-2xs backdrop-blur-xl dark:border-slate-800/80 dark:bg-slate-900/80 sm:p-4">
-            <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3">
+            <div className="flex flex-col xl:flex-row items-stretch xl:items-center justify-between gap-4">
                 {/* Left: View Switcher & Category Filter */}
-                <div className="flex flex-wrap items-center gap-2">
+                <div className="flex flex-wrap items-center justify-between sm:justify-start gap-2">
                     {/* View Switcher Tabs */}
                     <div className="flex items-center rounded-xl bg-slate-100 p-1 dark:bg-slate-800/70 border border-slate-200/60 dark:border-slate-700/60">
                         <button
@@ -204,7 +204,7 @@ export function CalendarToolbar({
                 </div>
 
                 {/* Center: Date Navigation */}
-                <div className="flex items-center justify-between sm:justify-center gap-2 self-center sm:self-auto w-full sm:w-auto">
+                <div className="flex items-center justify-center gap-2 self-center sm:self-auto w-full sm:w-auto">
                     <Button
                         variant="outline"
                         size="icon"
@@ -245,7 +245,7 @@ export function CalendarToolbar({
                 </div>
 
                 {/* Right: Primary Actions & Clean Dropdown */}
-                <div className="flex items-center gap-2 justify-end">
+                <div className="flex flex-wrap items-center gap-2 justify-end">
                     {/* Ready-Made Study Templates Button */}
                     <Button
                         size="sm"

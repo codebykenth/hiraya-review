@@ -283,7 +283,7 @@ export function CalendarGrid({
 
     return (
         <div className="overflow-x-auto pb-4 [scrollbar-width:thin]">
-            <div className="min-w-[1400px] 2xl:min-w-full">
+            <div className="min-w-[720px] md:min-w-full">
                 {/* Sticky Day headers */}
                 <div className="sticky top-0 z-20 mb-2 grid grid-cols-7 gap-2 rounded-lg bg-slate-50/95 py-2 backdrop-blur-sm dark:bg-slate-900/95">
                     {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(
@@ -327,7 +327,7 @@ export function CalendarGrid({
                                                 openModal(calendarDay.date);
                                             }
                                         }}
-                                        className={`group relative flex h-52 min-w-[190px] flex-col rounded-xl border p-2.5 transition-all ${
+                                        className={`group relative flex h-44 sm:h-52 min-w-0 flex-col rounded-xl border p-2 sm:p-2.5 transition-all ${
                                             calendarDay.isCurrentMonth &&
                                             calendarDay.date >= todayStr
                                                 ? 'cursor-pointer hover:border-blue-300 hover:shadow-sm'

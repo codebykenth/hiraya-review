@@ -178,7 +178,7 @@ export function CalendarStatsBanner({
                         <p className="mt-1 text-[10px] text-slate-500 dark:text-slate-400">
                             {streakDays > 0
                                 ? 'Great consistency! Keep the daily rhythm going.'
-                                : 'Complete today&apos;s session to build momentum.'}
+                                : "Complete today's session to build momentum."}
                         </p>
                     </div>
 

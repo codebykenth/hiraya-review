@@ -365,7 +365,7 @@ export function WeekView({
 
             {/* 7-Column Week Planner Grid */}
             <div className="overflow-x-auto pb-2 [scrollbar-width:thin]">
-                <div className="min-w-[1400px] 2xl:min-w-full">
+                <div className="min-w-[720px] md:min-w-full">
                     <DndContext
                         sensors={sensors}
                         collisionDetection={customCollisionDetection}
