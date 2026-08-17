@@ -67,7 +67,7 @@ export function ShiftScheduleModal({
 
     return (
         <Dialog open={isOpen} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-lg">
+            <DialogContent className="max-w-2xl">
                 <DialogHeader>
                     <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400">
                         <CalendarDays className="size-5" />
