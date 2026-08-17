@@ -189,10 +189,9 @@ export function CseReadinessCard({ stats, isDemoMode }: CseReadinessCardProps) {
                                     </button>
                                 </TooltipTrigger>
                                 <TooltipContent className="max-w-2xl text-xs">
-                                    Official Civil Service Commission rule: A
-                                    candidate must obtain a general rating of at
-                                    least 80.00% AND no subtest score below
-                                    70.00%.
+                                    Benchmark criteria: A candidate must obtain
+                                    a general rating of at least 80.00% AND no
+                                    subtest score below 70.00%.
                                 </TooltipContent>
                             </Tooltip>
                         </TooltipProvider>

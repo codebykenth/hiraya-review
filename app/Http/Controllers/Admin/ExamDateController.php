@@ -6,6 +6,7 @@ use App\Http\Requests\StoreExamDateRequest;
 use App\Http\Requests\UpdateExamDateRequest;
 use App\Models\ExamDate;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 
 class ExamDateController
@@ -21,6 +22,8 @@ class ExamDateController
 
     public function store(StoreExamDateRequest $request)
     {
+        Gate::authorize('create', ExamDate::class);
+
         $validated = $request->validated();
 
         ExamDate::create([
@@ -36,6 +39,8 @@ class ExamDateController
 
     public function update(UpdateExamDateRequest $request, ExamDate $examDate)
     {
+        Gate::authorize('update', $examDate);
+
         $validated = $request->validated();
 
         $examDate->update([
@@ -51,6 +56,8 @@ class ExamDateController
 
     public function destroy(ExamDate $examDate)
     {
+        Gate::authorize('delete', $examDate);
+
         $examDate->delete();
         Cache::forget('exam_dates.active');
 

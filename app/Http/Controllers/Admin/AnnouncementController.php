@@ -7,6 +7,7 @@ use App\Http\Requests\Admin\StoreAnnouncementRequest;
 use App\Models\Announcement;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -23,6 +24,8 @@ class AnnouncementController extends Controller
 
     public function store(StoreAnnouncementRequest $request): RedirectResponse
     {
+        Gate::authorize('create', Announcement::class);
+
         Announcement::create($request->validated());
         Cache::forget('active_announcements');
 
@@ -31,6 +34,8 @@ class AnnouncementController extends Controller
 
     public function update(StoreAnnouncementRequest $request, Announcement $announcement): RedirectResponse
     {
+        Gate::authorize('update', $announcement);
+
         $announcement->update($request->validated());
         Cache::forget('active_announcements');
 
@@ -39,6 +44,8 @@ class AnnouncementController extends Controller
 
     public function destroy(Announcement $announcement): RedirectResponse
     {
+        Gate::authorize('delete', $announcement);
+
         $announcement->delete();
         Cache::forget('active_announcements');
 

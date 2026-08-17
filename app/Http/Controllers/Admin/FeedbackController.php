@@ -11,6 +11,7 @@ use App\Http\Requests\Admin\UpdateFeedbackStatusRequest;
 use App\Models\Feedback;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -63,6 +64,8 @@ class FeedbackController extends Controller
 
     public function updateStatus(UpdateFeedbackStatusRequest $request, Feedback $feedback): RedirectResponse
     {
+        Gate::authorize('update', $feedback);
+
         $newStatus = $request->validated('status');
         $feedback->update(['status' => $newStatus]);
 
@@ -79,6 +82,8 @@ class FeedbackController extends Controller
 
     public function destroy(Feedback $feedback): RedirectResponse
     {
+        Gate::authorize('delete', $feedback);
+
         $feedback->delete();
         Cache::forget('pending_feedback_count');
 
@@ -87,6 +92,8 @@ class FeedbackController extends Controller
 
     public function bulkUpdate(BulkUpdateFeedbackRequest $request): RedirectResponse
     {
+        Gate::authorize('manageAny', Feedback::class);
+
         $ids = $request->validated('ids');
         $newStatus = $request->validated('status');
 
@@ -109,6 +116,8 @@ class FeedbackController extends Controller
 
     public function bulkDestroy(BulkDestroyFeedbackRequest $request): RedirectResponse
     {
+        Gate::authorize('manageAny', Feedback::class);
+
         Feedback::whereIn('id', $request->validated('ids'))->delete();
         Cache::forget('pending_feedback_count');
 

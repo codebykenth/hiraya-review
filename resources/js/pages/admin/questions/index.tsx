@@ -15,12 +15,17 @@ import {
     Edit3,
     HelpCircle,
 } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, lazy, Suspense } from 'react';
 import { getCategoryStyles } from '@/components/domain/curation-index-shell';
 import { PageContainer } from '@/components/layout/page-container';
-import { QuickEditModal } from '@/components/questions/quick-edit-modal';
 import { ConfirmModal } from '@/components/shared/confirm-modal';
 import { Button } from '@/components/ui/button';
+
+const QuickEditModal = lazy(() =>
+    import('./components/quick-edit-modal').then((module) => ({
+        default: module.QuickEditModal,
+    }))
+);
 import {
     Dialog,
     DialogContent,
@@ -1433,15 +1438,19 @@ export default function QuestionsIndex({
                 </DialogContent>
             </Dialog>
 
-            <QuickEditModal
-                isOpen={!!editModalQuestion}
-                question={editModalQuestion}
-                categories={categories}
-                onClose={() => setEditModalQuestion(null)}
-                onSaveSuccess={() => {
-                    setEditModalQuestion(null);
-                }}
-            />
+            <Suspense fallback={null}>
+                {editModalQuestion && (
+                    <QuickEditModal
+                        isOpen={!!editModalQuestion}
+                        question={editModalQuestion}
+                        categories={categories}
+                        onClose={() => setEditModalQuestion(null)}
+                        onSaveSuccess={() => {
+                            setEditModalQuestion(null);
+                        }}
+                    />
+                )}
+            </Suspense>
         </>
     );
 }

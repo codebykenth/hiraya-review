@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Requests\Admin\BulkUpdateQuestionsRequest;
+use App\Http\Requests\Admin\BulkUpdateQuestionStatusRequest;
 use App\Http\Requests\BulkDestroyQuestionsRequest;
 use App\Http\Requests\GenerateQuestionsRequest;
 use App\Http\Requests\StoreCategoryRequest;
@@ -18,6 +20,7 @@ use App\Models\User;
 use Database\Seeders\DatabaseSeeder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 
@@ -139,7 +142,6 @@ class QuestionController
 
         $query = Question::with(['subcategory.category'])
             ->where('status', 'draft')
-            ->where('created_by', auth()->id() ?: (User::first()?->id ?: 1))
             ->orderBy('id', 'desc');
 
         if ($category && $category !== 'all' && $category !== 'All Categories') {
@@ -466,20 +468,9 @@ class QuestionController
     /**
      * Bulk update questions.
      */
-    public function bulkUpdate(Request $request)
+    public function bulkUpdate(BulkUpdateQuestionsRequest $request)
     {
-        $validated = $request->validate([
-            'questions' => 'required|array',
-            'questions.*.id' => 'required|integer|exists:questions,id',
-            'questions.*.category' => 'required|string',
-            'questions.*.subcategory' => 'required|string',
-            'questions.*.language' => 'required|string',
-            'questions.*.stem' => 'required|string',
-            'questions.*.options' => 'required|array|min:2',
-            'questions.*.correct_option' => 'required|integer',
-            'questions.*.explanation' => 'nullable|string',
-            'questions.*.status' => 'required|string',
-        ]);
+        $validated = $request->validated();
 
         foreach ($validated['questions'] as $qData) {
             $question = Question::find($qData['id']);
@@ -499,30 +490,24 @@ class QuestionController
             ], [
                 'slug' => Str::slug($subcategoryName),
                 'language' => $qData['language'],
-                'sort_order' => 1,
             ]);
 
-            $question->update([
-                'subcategory_id' => $subcategory->id,
-                'language' => $qData['language'],
-                'stem' => $qData['stem'],
-                'options' => $qData['options'],
-                'correct_option' => (int) $qData['correct_option'],
-                'explanation' => $qData['explanation'] ?? '',
-                'status' => strtolower($qData['status']) === 'active' ? 'active' : 'draft',
-            ]);
+            if ($question) {
+                $question->update([
+                    'subcategory_id' => $subcategory->id,
+                    'language' => $qData['language'],
+                    'stem' => $qData['stem'],
+                    'options' => $qData['options'],
+                    'correct_option' => (int) $qData['correct_option'],
+                    'explanation' => $qData['explanation'] ?? '',
+                    'status' => $qData['status'],
+                ]);
+            }
         }
 
         $this->clearCache();
 
-        if ($request->wantsJson()) {
-            return response()->json([
-                'success' => true,
-                'message' => 'Questions updated successfully!',
-            ]);
-        }
-
-        return redirect()->route('questions.index')->with('success', 'Selected questions updated successfully!');
+        return response()->json(['success' => true]);
     }
 
     /**
@@ -532,9 +517,10 @@ class QuestionController
     {
         $question = Question::findOrFail($id);
 
+        Gate::authorize('update', $question);
+
         $validated = $request->validated();
 
-        // Find or create category/subcategory structure dynamically matching creation logic
         $category = Category::firstOrCreate([
             'name' => $validated['category'],
         ], [
@@ -542,15 +528,12 @@ class QuestionController
             'sort_order' => 1,
         ]);
 
-        $subcategoryName = $validated['subcategory'] ?? $validated['category'];
-
         $subcategory = Subcategory::firstOrCreate([
             'category_id' => $category->id,
-            'name' => $subcategoryName,
+            'name' => $validated['subcategory'],
         ], [
-            'slug' => Str::slug($subcategoryName),
+            'slug' => Str::slug($validated['subcategory']),
             'language' => $validated['language'],
-            'sort_order' => 1,
         ]);
 
         $question->update([
@@ -583,6 +566,7 @@ class QuestionController
     {
         $question = Question::find($id);
         if ($question) {
+            Gate::authorize('delete', $question);
             $question->delete();
         }
         $this->clearCache();
@@ -599,6 +583,8 @@ class QuestionController
      */
     public function bulkDestroy(BulkDestroyQuestionsRequest $request)
     {
+        Gate::authorize('manageAny', Question::class);
+
         $validated = $request->validated();
 
         Question::whereIn('id', $validated['ids'])->delete();
@@ -615,13 +601,9 @@ class QuestionController
     /**
      * Bulk update question status.
      */
-    public function bulkUpdateStatus(Request $request)
+    public function bulkUpdateStatus(BulkUpdateQuestionStatusRequest $request)
     {
-        $validated = $request->validate([
-            'ids' => 'required|array',
-            'ids.*' => 'integer',
-            'status' => 'required|in:active,draft',
-        ]);
+        $validated = $request->validated();
 
         Question::whereIn('id', $validated['ids'])->update([
             'status' => $validated['status'],

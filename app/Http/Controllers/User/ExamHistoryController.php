@@ -254,7 +254,7 @@ class ExamHistoryController
      */
     public function destroy(ExamAttempt $attempt)
     {
-        Gate::allowIf(fn ($user) => $user->id === $attempt->user_id);
+        Gate::authorize('delete', $attempt);
 
         $attempt->delete();
 

@@ -11,6 +11,7 @@ use App\Services\DeterministicAnalysisService;
 use App\Services\ExamAttemptFormatter;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 
@@ -191,23 +192,42 @@ class ExamController
             }
         }
 
-        $attempt = ExamAttempt::create([
-            'user_id' => auth()->id(),
-            'category_id' => $validated['category_id'] ?? null,
-            'question_ids' => $validated['question_ids'],
-            'answers' => $validated['answers'],
-            'cat_scores' => $validated['cat_scores'],
-        ]);
+        $userId = auth()->id();
+        $lockKey = $userId ? "user-exam-attempt-submission-{$userId}" : "guest-exam-attempt-submission-{$request->ip()}";
+        $lock = Cache::lock($lockKey, 5);
 
-        if (! auth()->check()) {
-            session(['pending_guest_attempt_id' => $attempt->id]);
-            session()->forget('is_free_attempt_active');
+        if (! $lock->get()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Attempt submission already in progress. Please wait.',
+            ], 429);
         }
 
-        return response()->json([
-            'success' => true,
-            'attempt_id' => $attempt->id,
-        ]);
+        try {
+            $attempt = DB::transaction(function () use ($validated, $userId) {
+                $attempt = ExamAttempt::create([
+                    'user_id' => $userId,
+                    'category_id' => $validated['category_id'] ?? null,
+                    'question_ids' => $validated['question_ids'],
+                    'answers' => $validated['answers'],
+                    'cat_scores' => $validated['cat_scores'],
+                ]);
+
+                if (! auth()->check()) {
+                    session(['pending_guest_attempt_id' => $attempt->id]);
+                    session()->forget('is_free_attempt_active');
+                }
+
+                return $attempt;
+            });
+
+            return response()->json([
+                'success' => true,
+                'attempt_id' => $attempt->id,
+            ]);
+        } finally {
+            $lock->release();
+        }
     }
 
     /**

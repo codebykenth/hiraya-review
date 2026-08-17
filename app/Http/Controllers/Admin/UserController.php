@@ -7,6 +7,7 @@ use App\Models\ExamAttempt;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -70,10 +71,11 @@ class UserController
      */
     public function update(AdminUserUpdateRequest $request, int $id): RedirectResponse
     {
+        $user = User::findOrFail($id);
+
+        Gate::authorize('update', $user);
 
         $validated = $request->validated();
-
-        $user = User::findOrFail($id);
 
         // Security safeguard: Prevent logged in admin from demoting themselves
         if ($user->id === auth()->user()->id && $request->has('role') && $request->input('role') !== 'admin') {
@@ -106,8 +108,9 @@ class UserController
      */
     public function destroy(int $id): RedirectResponse
     {
-
         $user = User::findOrFail($id);
+
+        Gate::authorize('delete', $user);
 
         // Security safeguard: Prevent deleting your own account
         if ($user->id === auth()->user()->id) {

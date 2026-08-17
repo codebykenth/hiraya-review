@@ -17,6 +17,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Schema;
 use Inertia\Inertia;
@@ -196,6 +197,8 @@ class StudyScheduleController
 
     public function update(UpdateStudyScheduleRequest $request, StudySchedule $studySchedule)
     {
+        Gate::authorize('update', $studySchedule);
+
         $validated = $request->validated();
 
         // Fix time format validation edge cases depending on H:i:s or H:i input
@@ -349,37 +352,42 @@ class StudyScheduleController
             ]);
         }
 
-        $count = 0;
         $today = Carbon::today();
 
-        if ($mode === 'start_today') {
-            $earliest = Carbon::parse($incompleteSchedules->first()->study_date)->startOfDay();
-            $dayDifference = $earliest->diffInDays($today, false);
+        $count = DB::transaction(function () use ($mode, $incompleteSchedules, $today, $validated) {
+            $count = 0;
 
-            if ($dayDifference > 0) {
+            if ($mode === 'start_today') {
+                $earliest = Carbon::parse($incompleteSchedules->first()->study_date)->startOfDay();
+                $dayDifference = $earliest->diffInDays($today, false);
+
+                if ($dayDifference > 0) {
+                    foreach ($incompleteSchedules as $schedule) {
+                        $originalDate = Carbon::parse($schedule->study_date);
+                        $newDate = $originalDate->copy()->addDays($dayDifference);
+                        $schedule->update(['study_date' => $newDate->toDateString()]);
+                        $count++;
+                    }
+                }
+            } elseif ($mode === 'shift_by_days') {
+                $days = (int) ($validated['days'] ?? 1);
+                $fromDate = ! empty($validated['from_date']) ? Carbon::parse($validated['from_date'])->startOfDay() : null;
+
                 foreach ($incompleteSchedules as $schedule) {
-                    $originalDate = Carbon::parse($schedule->study_date);
-                    $newDate = $originalDate->copy()->addDays($dayDifference);
+                    $schedDate = Carbon::parse($schedule->study_date)->startOfDay();
+
+                    if ($fromDate && $schedDate->lt($fromDate)) {
+                        continue;
+                    }
+
+                    $newDate = $schedDate->copy()->addDays($days);
                     $schedule->update(['study_date' => $newDate->toDateString()]);
                     $count++;
                 }
             }
-        } elseif ($mode === 'shift_by_days') {
-            $days = (int) ($validated['days'] ?? 1);
-            $fromDate = ! empty($validated['from_date']) ? Carbon::parse($validated['from_date'])->startOfDay() : null;
 
-            foreach ($incompleteSchedules as $schedule) {
-                $schedDate = Carbon::parse($schedule->study_date)->startOfDay();
-
-                if ($fromDate && $schedDate->lt($fromDate)) {
-                    continue;
-                }
-
-                $newDate = $schedDate->copy()->addDays($days);
-                $schedule->update(['study_date' => $newDate->toDateString()]);
-                $count++;
-            }
-        }
+            return $count;
+        });
 
         return response()->json([
             'message' => "Successfully shifted {$count} study sessions.",
@@ -389,7 +397,7 @@ class StudyScheduleController
 
     public function destroy(StudySchedule $studySchedule)
     {
-        Gate::allowIf(fn ($user) => $user->id === $studySchedule->user_id);
+        Gate::authorize('delete', $studySchedule);
 
         $studySchedule->delete();
 

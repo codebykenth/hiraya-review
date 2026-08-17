@@ -10,6 +10,8 @@ use App\Models\SavedDrillSet;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 
 class SavedDrillSetController
 {
@@ -47,16 +49,20 @@ class SavedDrillSetController
     {
         $validated = $request->validated();
 
-        $set = SavedDrillSet::create([
-            'user_id' => auth()->id(),
-            'name' => trim($validated['name']),
-            'description' => $validated['description'] ?? null,
-            'color' => $validated['color'] ?? 'blue',
-        ]);
+        $set = DB::transaction(function () use ($validated) {
+            $set = SavedDrillSet::create([
+                'user_id' => auth()->id(),
+                'name' => trim($validated['name']),
+                'description' => $validated['description'] ?? null,
+                'color' => $validated['color'] ?? 'blue',
+            ]);
 
-        if (! empty($validated['question_ids'])) {
-            $set->questions()->sync($validated['question_ids']);
-        }
+            if (! empty($validated['question_ids'])) {
+                $set->questions()->sync($validated['question_ids']);
+            }
+
+            return $set;
+        });
 
         if ($request->wantsJson()) {
             return response()->json([
@@ -79,9 +85,7 @@ class SavedDrillSetController
      */
     public function update(UpdateSavedDrillSetRequest $request, SavedDrillSet $savedDrillSet): JsonResponse|RedirectResponse
     {
-        if ($savedDrillSet->user_id !== auth()->id()) {
-            abort(403);
-        }
+        Gate::authorize('update', $savedDrillSet);
 
         $validated = $request->validated();
 
@@ -106,9 +110,7 @@ class SavedDrillSetController
      */
     public function destroy(SavedDrillSet $savedDrillSet): JsonResponse|RedirectResponse
     {
-        if ($savedDrillSet->user_id !== auth()->id()) {
-            abort(403);
-        }
+        Gate::authorize('delete', $savedDrillSet);
 
         $savedDrillSet->delete();
 

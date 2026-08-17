@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Requests\Admin\BulkUpdateLearnModuleStatusRequest;
 use App\Http\Requests\BulkDestroyLearnModulesRequest;
 use App\Http\Requests\GenerateLearnModuleRequest;
 use App\Http\Requests\StoreLearnModuleRequest;
@@ -14,6 +15,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -262,8 +264,9 @@ class LearnController
      */
     public function update(UpdateLearnModuleRequest $request, string $id): RedirectResponse|JsonResponse
     {
-
         $module = LearnModule::findOrFail($id);
+
+        Gate::authorize('update', $module);
 
         $validated = $request->validated();
 
@@ -278,9 +281,24 @@ class LearnController
             $module->slug = $slug;
         }
 
+        $category = Category::firstOrCreate([
+            'name' => $validated['category'],
+        ], [
+            'slug' => Str::slug($validated['category']),
+            'sort_order' => 1,
+        ]);
+
+        $subcategory = Subcategory::firstOrCreate([
+            'category_id' => $category->id,
+            'name' => $validated['subcategory'],
+        ], [
+            'slug' => Str::slug($validated['subcategory']),
+            'language' => 'English',
+        ]);
+
         $module->update([
-            'category_id' => $validated['category_id'],
-            'subcategory_id' => $validated['subcategory_id'],
+            'category_id' => $category->id,
+            'subcategory_id' => $subcategory->id,
             'title' => $validated['title'],
             'topic' => $validated['topic'],
             'summary' => $validated['summary'],
@@ -310,8 +328,10 @@ class LearnController
      */
     public function destroy(string $id): RedirectResponse
     {
-
         $module = LearnModule::findOrFail($id);
+
+        Gate::authorize('delete', $module);
+
         $module->delete();
 
         $this->clearCache($module);
@@ -324,6 +344,7 @@ class LearnController
      */
     public function bulkDestroy(BulkDestroyLearnModulesRequest $request): RedirectResponse
     {
+        Gate::authorize('manageAny', LearnModule::class);
 
         $validated = $request->validated();
 
@@ -337,13 +358,9 @@ class LearnController
     /**
      * Bulk update learning module status.
      */
-    public function bulkUpdateStatus(Request $request): RedirectResponse
+    public function bulkUpdateStatus(BulkUpdateLearnModuleStatusRequest $request): RedirectResponse
     {
-        $validated = $request->validate([
-            'ids' => 'required|array',
-            'ids.*' => 'integer',
-            'is_published' => 'required|boolean',
-        ]);
+        $validated = $request->validated();
 
         LearnModule::whereIn('id', $validated['ids'])->update([
             'is_published' => $validated['is_published'],

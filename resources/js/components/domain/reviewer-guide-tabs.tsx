@@ -11,6 +11,11 @@ import {
     CheckCircle2,
     Lightbulb,
     Info,
+    LayoutDashboard,
+    Calendar as CalendarIcon,
+    TrendingUp,
+    Sparkles,
+    Check,
 } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
@@ -25,11 +30,140 @@ interface ReviewerGuideTabsProps {
 export function ReviewerGuideTabs({
     showActions = false,
     className = 'space-y-8',
-    tabsClassName = 'flex border-b border-border',
+    tabsClassName = 'flex border-b border-border overflow-x-auto',
 }: ReviewerGuideTabsProps) {
-    const [activeTab, setActiveTab] = useState<'flow' | 'structure' | 'tips'>(
-        'flow',
-    );
+    const [activeTab, setActiveTab] = useState<
+        'features' | 'flow' | 'structure' | 'tips'
+    >('features');
+
+    const appFeatures = [
+        {
+            id: 'dashboard',
+            title: 'Dashboard & Readiness Tracker',
+            badge: 'Home Base',
+            icon: LayoutDashboard,
+            color: 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/40 border-blue-200 dark:border-blue-900/40',
+            summary:
+                'Your central command center for daily exam preparation metrics, streak monitoring, and smart topic suggestions.',
+            steps: [
+                'Check your Overall Exam Readiness Gauge to see your probability of reaching the 80% passing mark.',
+                'Review your Next Recommended Practice Focus Area to immediately study your highest-yield weak spot.',
+                'Monitor your Daily Study Streak to build consistent long-term habit retention.',
+            ],
+            proTip:
+                'Spend 2 minutes on the dashboard at the start of every study session to decide whether to read concepts or run drills.',
+            actionLabel: 'Go to Dashboard',
+            actionUrl: '/dashboard',
+        },
+        {
+            id: 'study-plan',
+            title: 'Study Plan & Calendar',
+            badge: 'Time Management',
+            icon: CalendarIcon,
+            color: 'text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/40 border-indigo-200 dark:border-indigo-900/40',
+            summary:
+                'Set your target civil service examination date and schedule manageable daily study blocks.',
+            steps: [
+                'Set your Official Target Exam Date to trigger automatic day-by-day countdowns.',
+                'Schedule specific focus categories for individual dates (e.g., Numerical on Mondays, Verbal on Tuesdays).',
+                'Mark daily study milestones as complete to maintain study momentum.',
+            ],
+            proTip:
+                'Aim for 30–45 focused minutes daily instead of 5-hour weekend cram sessions for superior factual recall.',
+            actionLabel: 'Open Study Plan',
+            actionUrl: '/study-schedules',
+        },
+        {
+            id: 'study-hub',
+            title: 'Study Hub (Learn Modules)',
+            badge: 'Concept Mastery',
+            icon: BookOpen,
+            color: 'text-violet-600 dark:text-violet-400 bg-violet-50 dark:bg-violet-950/40 border-violet-200 dark:border-violet-900/40',
+            summary:
+                'Concise, high-yield syllabus reading guides covering essential definitions, formulas, and legal frameworks.',
+            steps: [
+                'Browse modules categorized by subject (General Information, Verbal, Analytical, Numerical, Clerical).',
+                'Read bite-sized lessons with estimated reading times (typically 3–8 minutes each).',
+                'Study interactive summaries and formula cheatsheets before attempting practice drills.',
+            ],
+            proTip:
+                'Pay extra attention to Republic Act 6713 (Code of Conduct) and the Philippine Constitution — these are guaranteed points in General Information.',
+            actionLabel: 'Browse Study Hub',
+            actionUrl: '/learn',
+        },
+        {
+            id: 'drills',
+            title: 'Custom Practice Drills',
+            badge: 'Targeted Practice',
+            icon: Target,
+            color: 'text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-900/40',
+            summary:
+                'Untimed or rapid-fire practice sets with instant answer checking and detailed step-by-step solutions.',
+            steps: [
+                'Select exact categories or fine-grained subcategories you want to strengthen (e.g., Word Analogy or Number Sequence).',
+                'Choose your question count and difficulty level.',
+                'Receive immediate answer keys and full explanations right after submitting each item.',
+            ],
+            proTip:
+                'Always read the explanation even when you guess correctly — this solidifies the core logic for similar questions.',
+            actionLabel: 'Start Practice Drill',
+            actionUrl: '/drills',
+        },
+        {
+            id: 'mock-exams',
+            title: 'Full Timed Mock Exams',
+            badge: 'Exam Simulation',
+            icon: ClipboardList,
+            color: 'text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 border-rose-200 dark:border-rose-900/40',
+            summary:
+                'Realistic exam simulations matching the exact question count, subtest distribution, and strict time limits.',
+            steps: [
+                'Select Professional (170 items, 3h 10m) or Subprofessional (165 items, 2h 40m).',
+                'Use the interactive Question Palette on the right to track answered, skipped, and flagged items.',
+                'Use the "Flag for Review" feature to mark difficult items and revisit them before final submission.',
+            ],
+            proTip:
+                'Train under strict timer discipline: you have roughly 67 seconds per question on the Professional exam.',
+            actionLabel: 'Take Mock Exam',
+            actionUrl: '/exams',
+        },
+        {
+            id: 'history',
+            title: 'Attempt History & Review',
+            badge: 'Error Analysis',
+            icon: History,
+            color: 'text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 border-amber-200 dark:border-amber-900/40',
+            summary:
+                'A complete chronological log of all your completed drills and mock exams with comprehensive answer keys.',
+            steps: [
+                'View scores, time spent, and subtest breakdown for past attempts.',
+                'Click "Review Answers" on any attempt to inspect every stem, your chosen answer, the correct option, and full explanation.',
+                'Identify patterns in your wrong answers to prevent repeating the same mistakes.',
+            ],
+            proTip:
+                'Keep an error log of questions you missed twice and re-test those specific subcategories using Practice Drills.',
+            actionLabel: 'View Attempt History',
+            actionUrl: '/history',
+        },
+        {
+            id: 'analytics',
+            title: 'Performance Analytics',
+            badge: 'Readiness Diagnostics',
+            icon: TrendingUp,
+            color: 'text-cyan-600 dark:text-cyan-400 bg-cyan-50 dark:bg-cyan-950/40 border-cyan-200 dark:border-cyan-900/40',
+            summary:
+                'In-depth breakdown of your score progression, category mastery percentages, and subtest cutoff compliance.',
+            steps: [
+                'Check the Subtest Cutoff Compliance grid to verify every single subtest is meeting the 70% threshold.',
+                'Inspect Category Mastery percentages to spot low-performing subjects.',
+                'Review your Average Answer Speed per question to optimize exam pacing.',
+            ],
+            proTip:
+                'To pass the actual exam, you need BOTH an overall score of at least 80% AND no subtest score below 70%. Focus on your lowest subtest first.',
+            actionLabel: 'Check Analytics',
+            actionUrl: '/analytics',
+        },
+    ];
 
     const studySteps = [
         {
@@ -227,8 +361,18 @@ export function ReviewerGuideTabs({
             {/* Navigation Tabs */}
             <div className={tabsClassName}>
                 <button
+                    onClick={() => setActiveTab('features')}
+                    className={`shrink-0 border-b-2 px-5 py-3 text-sm font-semibold transition-all ${
+                        activeTab === 'features'
+                            ? 'border-primary font-bold text-primary'
+                            : 'border-transparent text-muted-foreground hover:text-foreground'
+                    }`}
+                >
+                    App Features & How-To
+                </button>
+                <button
                     onClick={() => setActiveTab('flow')}
-                    className={`border-b-2 px-5 py-3 text-sm font-semibold transition-all ${
+                    className={`shrink-0 border-b-2 px-5 py-3 text-sm font-semibold transition-all ${
                         activeTab === 'flow'
                             ? 'border-primary font-bold text-primary'
                             : 'border-transparent text-muted-foreground hover:text-foreground'
@@ -238,7 +382,7 @@ export function ReviewerGuideTabs({
                 </button>
                 <button
                     onClick={() => setActiveTab('structure')}
-                    className={`border-b-2 px-5 py-3 text-sm font-semibold transition-all ${
+                    className={`shrink-0 border-b-2 px-5 py-3 text-sm font-semibold transition-all ${
                         activeTab === 'structure'
                             ? 'border-primary font-bold text-primary'
                             : 'border-transparent text-muted-foreground hover:text-foreground'
@@ -248,7 +392,7 @@ export function ReviewerGuideTabs({
                 </button>
                 <button
                     onClick={() => setActiveTab('tips')}
-                    className={`border-b-2 px-5 py-3 text-sm font-semibold transition-all ${
+                    className={`shrink-0 border-b-2 px-5 py-3 text-sm font-semibold transition-all ${
                         activeTab === 'tips'
                             ? 'border-primary font-bold text-primary'
                             : 'border-transparent text-muted-foreground hover:text-foreground'
@@ -257,6 +401,107 @@ export function ReviewerGuideTabs({
                     Smart Study Tips
                 </button>
             </div>
+
+            {/* Tab: App Features & How-To */}
+            {activeTab === 'features' && (
+                <div className="space-y-8">
+                    <div className="flex items-start gap-3.5 rounded-2xl border border-blue-100 bg-blue-50/80 p-5 dark:border-blue-900/30 dark:bg-blue-950/20">
+                        <Sparkles className="mt-0.5 size-5 shrink-0 text-blue-600 dark:text-blue-400" />
+                        <div className="space-y-1">
+                            <h3 className="text-sm font-bold text-blue-950 dark:text-blue-200">
+                                Feature-by-Feature User Manual
+                            </h3>
+                            <p className="text-sm leading-relaxed text-blue-800/90 dark:text-blue-300/80">
+                                Don't feel overwhelmed! Hiraya Review is designed with modular tools so you can practice at your own pace. Here is how each tool works and when to use it during your preparation journey.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+                        {appFeatures.map((feature, idx) => {
+                            const IconComponent = feature.icon;
+
+                            return (
+                                <Card
+                                    key={feature.id}
+                                    className="flex flex-col justify-between overflow-hidden border border-border bg-card p-6 shadow-xs transition duration-200 hover:shadow-md"
+                                >
+                                    <div className="space-y-5">
+                                        {/* Header */}
+                                        <div className="flex items-start justify-between gap-3">
+                                            <div className="flex items-center gap-3">
+                                                <div
+                                                    className={`flex size-11 shrink-0 items-center justify-center rounded-xl border ${feature.color}`}
+                                                >
+                                                    <IconComponent className="size-5.5" />
+                                                </div>
+                                                <div>
+                                                    <span className="text-[10px] font-black tracking-widest text-muted-foreground uppercase">
+                                                        Feature {idx + 1}
+                                                    </span>
+                                                    <h3 className="font-heading text-lg font-black text-foreground">
+                                                        {feature.title}
+                                                    </h3>
+                                                </div>
+                                            </div>
+                                            <span className="rounded-full border border-border bg-muted px-2.5 py-0.5 text-[10px] font-bold text-muted-foreground uppercase">
+                                                {feature.badge}
+                                            </span>
+                                        </div>
+
+                                        {/* Summary */}
+                                        <p className="text-sm leading-relaxed text-muted-foreground">
+                                            {feature.summary}
+                                        </p>
+
+                                        {/* Steps to Use */}
+                                        <div className="space-y-2.5 rounded-xl border border-border/80 bg-muted/40 p-4">
+                                            <span className="block text-xs font-bold tracking-wide text-foreground uppercase">
+                                                How to Use:
+                                            </span>
+                                            <ul className="space-y-2 text-xs leading-relaxed text-muted-foreground">
+                                                {feature.steps.map((step, sIdx) => (
+                                                    <li
+                                                        key={sIdx}
+                                                        className="flex items-start gap-2"
+                                                    >
+                                                        <span className="mt-0.5 flex size-4 shrink-0 items-center justify-center rounded-full bg-primary/10 text-[10px] font-black text-primary">
+                                                            {sIdx + 1}
+                                                        </span>
+                                                        <span>{step}</span>
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        </div>
+
+                                        {/* Pro Tip */}
+                                        <div className="flex items-start gap-2.5 rounded-xl border border-amber-200/80 bg-amber-50/70 p-3.5 text-xs text-amber-900 dark:border-amber-900/40 dark:bg-amber-950/20 dark:text-amber-300">
+                                            <Lightbulb className="mt-0.5 size-4 shrink-0 text-amber-600 dark:text-amber-400" />
+                                            <div>
+                                                <strong className="font-bold">Pro-Tip: </strong>
+                                                <span className="leading-relaxed">{feature.proTip}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Action Link */}
+                                    {showActions && (
+                                        <div className="mt-6 border-t border-border pt-4">
+                                            <Link
+                                                href={feature.actionUrl}
+                                                className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-xs font-bold text-primary-foreground shadow-xs transition hover:bg-primary/90"
+                                            >
+                                                <span>{feature.actionLabel}</span>
+                                                <ArrowRight className="size-3.5" />
+                                            </Link>
+                                        </div>
+                                    )}
+                                </Card>
+                            );
+                        })}
+                    </div>
+                </div>
+            )}
 
             {/* Tab: Reviewer Study Flow */}
             {activeTab === 'flow' && (
@@ -531,9 +776,8 @@ export function ReviewerGuideTabs({
                                     All dynamic lessons and test questions are
                                     fully vetted by a dual-stage filtering
                                     system in the reviewer curation pipeline.
-                                    They conform strictly to the Philippine
-                                    Civil Service Commission (CSC) scope
-                                    guidelines.
+                                    They align with Philippine Civil Service Exam
+                                    competency guidelines.
                                 </span>
                             </div>
                             <div className="space-y-1.5 pt-4">

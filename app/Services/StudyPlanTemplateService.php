@@ -6,6 +6,7 @@ use App\Models\StudySchedule;
 use App\Models\Subcategory;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class StudyPlanTemplateService
 {
@@ -170,45 +171,47 @@ class StudyPlanTemplateService
         $startDate = Carbon::parse($startDateStr)->startOfDay();
         $timeStr = $preferredTime ? (strlen($preferredTime) === 5 ? $preferredTime.':00' : $preferredTime) : '19:00:00';
 
-        if ($replaceExisting) {
-            StudySchedule::where('user_id', $userId)
-                ->where('study_date', '>=', $startDate)
-                ->delete();
-        }
-
-        $items = $this->getTemplateItems($templateId);
-        $subcategories = Subcategory::all()->keyBy('name');
-        $createdCount = 0;
-
-        foreach ($items as $index => $item) {
-            $studyDate = $startDate->copy()->addDays($index)->toDateString();
-
-            // Find matching subcategory if available
-            $subcatId = null;
-            if (! empty($item['subcat_name']) && isset($subcategories[$item['subcat_name']])) {
-                $subcatId = $subcategories[$item['subcat_name']]->id;
+        return DB::transaction(function () use ($templateId, $startDate, $timeStr, $replaceExisting, $userId) {
+            if ($replaceExisting) {
+                StudySchedule::where('user_id', $userId)
+                    ->where('study_date', '>=', $startDate)
+                    ->delete();
             }
 
-            $schedule = StudySchedule::updateOrCreate(
-                [
-                    'user_id' => $userId,
-                    'study_date' => $studyDate,
-                    'title' => $item['title'],
-                ],
-                [
-                    'description' => $item['description'],
-                    'study_time' => $timeStr,
-                    'subcategory_id' => $subcatId,
-                    'is_done' => false,
-                ]
-            );
+            $items = $this->getTemplateItems($templateId);
+            $subcategories = Subcategory::all()->keyBy('name');
+            $createdCount = 0;
 
-            if ($schedule->wasRecentlyCreated || $schedule->wasChanged()) {
-                $createdCount++;
+            foreach ($items as $index => $item) {
+                $studyDate = $startDate->copy()->addDays($index)->toDateString();
+
+                // Find matching subcategory if available
+                $subcatId = null;
+                if (! empty($item['subcat_name']) && isset($subcategories[$item['subcat_name']])) {
+                    $subcatId = $subcategories[$item['subcat_name']]->id;
+                }
+
+                $schedule = StudySchedule::updateOrCreate(
+                    [
+                        'user_id' => $userId,
+                        'study_date' => $studyDate,
+                        'title' => $item['title'],
+                    ],
+                    [
+                        'description' => $item['description'],
+                        'study_time' => $timeStr,
+                        'subcategory_id' => $subcatId,
+                        'is_done' => false,
+                    ]
+                );
+
+                if ($schedule->wasRecentlyCreated || $schedule->wasChanged()) {
+                    $createdCount++;
+                }
             }
-        }
 
-        return $createdCount;
+            return $createdCount;
+        });
     }
 
     /**

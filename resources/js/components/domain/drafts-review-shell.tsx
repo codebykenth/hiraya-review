@@ -43,6 +43,22 @@ export interface CategoryItem {
     }[];
 }
 
+export interface PaginationData {
+    current_page: number;
+    per_page: number;
+    total: number;
+    last_page: number;
+}
+
+export interface DraftFilters {
+    search?: string;
+    category?: string;
+    subcategory?: string;
+    language?: string;
+    status?: 'all' | 'approved' | 'pending';
+    per_page?: number;
+}
+
 interface DraftsReviewShellProps<T extends BaseDraftItem> {
     title: string;
     subtitle: string;
@@ -64,6 +80,9 @@ interface DraftsReviewShellProps<T extends BaseDraftItem> {
     renderItem: (item: T) => React.ReactNode;
     renderTableView?: (items: T[]) => React.ReactNode;
     customActions?: React.ReactNode;
+    pagination?: PaginationData;
+    filters?: DraftFilters;
+    onFilterChange?: (filters: DraftFilters & { page?: number }) => void;
 }
 
 export function DraftsReviewShell<T extends BaseDraftItem>({
@@ -87,7 +106,12 @@ export function DraftsReviewShell<T extends BaseDraftItem>({
     renderItem,
     renderTableView,
     customActions,
+    pagination,
+    filters = {},
+    onFilterChange,
 }: DraftsReviewShellProps<T>) {
+    const isServerDriven = !!pagination && !!onFilterChange;
+
     // Build categories tree dynamically with robust static CSC fallback
     const cseCategoriesTree: Record<string, string[]> = {};
 
@@ -128,20 +152,42 @@ export function DraftsReviewShell<T extends BaseDraftItem>({
 
     // Filtering & Pagination States
     const [viewMode, setViewMode] = useState<'cards' | 'table'>('table');
-    const [filterSearch, setFilterSearch] = useState('');
-    const [debouncedFilterSearch, setDebouncedFilterSearch] = useState('');
+    const [filterSearch, setFilterSearch] = useState(filters.search || '');
+    const [debouncedFilterSearch, setDebouncedFilterSearch] = useState(filters.search || '');
     const [filterStatus, setFilterStatus] = useState<
         'all' | 'approved' | 'pending'
-    >('all');
-    const [filterCategory, setFilterCategory] = useState<string>('all');
-    const [filterSubcategory, setFilterSubcategory] = useState<string>('all');
-    const [filterLanguage, setFilterLanguage] = useState<string>('all');
-    const [currentPage, setCurrentPage] = useState(1);
-    const pageSize = 10;
+    >(filters.status || 'all');
+    const [filterCategory, setFilterCategory] = useState<string>(filters.category || 'all');
+    const [filterSubcategory, setFilterSubcategory] = useState<string>(filters.subcategory || 'all');
+    const [filterLanguage, setFilterLanguage] = useState<string>(filters.language || 'all');
+    const [perPage, setPerPage] = useState<number>(pagination?.per_page || filters.per_page || 10);
+    const [clientPage, setClientPage] = useState(1);
     const tableRef = React.useRef<HTMLDivElement>(null);
 
+    // Sync state when props change
+    useEffect(() => {
+        if (filters.search !== undefined) setFilterSearch(filters.search);
+        if (filters.category !== undefined) setFilterCategory(filters.category);
+        if (filters.subcategory !== undefined) setFilterSubcategory(filters.subcategory);
+        if (filters.language !== undefined) setFilterLanguage(filters.language);
+        if (filters.status !== undefined) setFilterStatus(filters.status);
+        if (pagination?.per_page !== undefined) setPerPage(pagination.per_page);
+    }, [filters.search, filters.category, filters.subcategory, filters.language, filters.status, pagination?.per_page]);
+
     const handlePageChange = (page: number) => {
-        setCurrentPage(page);
+        if (isServerDriven) {
+            onFilterChange?.({
+                search: filterSearch,
+                category: filterCategory,
+                subcategory: filterSubcategory,
+                language: filterLanguage,
+                status: filterStatus,
+                per_page: perPage,
+                page,
+            });
+        } else {
+            setClientPage(page);
+        }
         setTimeout(() => {
             if (tableRef.current) {
                 tableRef.current.scrollIntoView({
@@ -152,52 +198,82 @@ export function DraftsReviewShell<T extends BaseDraftItem>({
         }, 50);
     };
 
+    const triggerServerFilter = (newFilters: {
+        search?: string;
+        category?: string;
+        subcategory?: string;
+        language?: string;
+        status?: 'all' | 'approved' | 'pending';
+        per_page?: number;
+    }) => {
+        if (isServerDriven) {
+            onFilterChange?.({
+                search: newFilters.search !== undefined ? newFilters.search : filterSearch,
+                category: newFilters.category !== undefined ? newFilters.category : filterCategory,
+                subcategory: newFilters.subcategory !== undefined ? newFilters.subcategory : filterSubcategory,
+                language: newFilters.language !== undefined ? newFilters.language : filterLanguage,
+                status: newFilters.status !== undefined ? newFilters.status : filterStatus,
+                per_page: newFilters.per_page !== undefined ? newFilters.per_page : perPage,
+                page: 1,
+            });
+        }
+    };
+
     useEffect(() => {
         const handler = setTimeout(() => {
             setDebouncedFilterSearch(filterSearch);
-        }, 300);
+            if (isServerDriven && filterSearch !== (filters.search || '')) {
+                triggerServerFilter({ search: filterSearch });
+            }
+        }, 400);
 
         return () => clearTimeout(handler);
     }, [filterSearch]);
 
-    const filteredDrafts = items.filter((item) => {
-        const matchesSearch = searchMatcher(item, debouncedFilterSearch);
+    const filteredDrafts = isServerDriven
+        ? items
+        : items.filter((item) => {
+              const matchesSearch = searchMatcher(item, debouncedFilterSearch);
 
-        const matchesStatus =
-            filterStatus === 'all' ||
-            (filterStatus === 'approved' && item.approved) ||
-            (filterStatus === 'pending' && !item.approved);
+              const matchesStatus =
+                  filterStatus === 'all' ||
+                  (filterStatus === 'approved' && item.approved) ||
+                  (filterStatus === 'pending' && !item.approved);
 
-        const matchesCategory =
-            filterCategory === 'all' || item.category === filterCategory;
+              const matchesCategory =
+                  filterCategory === 'all' || item.category === filterCategory;
 
-        const matchesSubcategory =
-            filterSubcategory === 'all' ||
-            item.subcategory === filterSubcategory;
+              const matchesSubcategory =
+                  filterSubcategory === 'all' ||
+                  item.subcategory === filterSubcategory;
 
-        const matchesLanguage =
-            !(
-                filterCategory === 'Verbal Ability' ||
-                filterSubcategory === 'Word analogy' ||
-                (item as any).subcategory === 'Word analogy'
-            ) ||
-            filterLanguage === 'all' ||
-            (item as any).language === filterLanguage;
+              const matchesLanguage =
+                  !(
+                      filterCategory === 'Verbal Ability' ||
+                      filterSubcategory === 'Word analogy' ||
+                      (item as any).subcategory === 'Word analogy'
+                  ) ||
+                  filterLanguage === 'all' ||
+                  (item as any).language === filterLanguage;
 
-        return (
-            matchesSearch &&
-            matchesStatus &&
-            matchesCategory &&
-            matchesSubcategory &&
-            matchesLanguage
-        );
-    });
+              return (
+                  matchesSearch &&
+                  matchesStatus &&
+                  matchesCategory &&
+                  matchesSubcategory &&
+                  matchesLanguage
+              );
+          });
 
-    const totalPages = Math.ceil(filteredDrafts.length / pageSize);
-    const paginatedDrafts = filteredDrafts.slice(
-        (currentPage - 1) * pageSize,
-        currentPage * pageSize,
-    );
+    const currentPage = isServerDriven ? (pagination?.current_page || 1) : clientPage;
+    const totalPages = isServerDriven
+        ? (pagination?.last_page || 1)
+        : Math.ceil(filteredDrafts.length / perPage);
+    const totalResults = isServerDriven ? (pagination?.total || 0) : filteredDrafts.length;
+
+    const displayDrafts = isServerDriven
+        ? filteredDrafts
+        : filteredDrafts.slice((currentPage - 1) * perPage, currentPage * perPage);
 
     const approvedCount = items.filter((item) => item.approved).length;
 
@@ -285,9 +361,17 @@ export function DraftsReviewShell<T extends BaseDraftItem>({
                             <select
                                 value={filterCategory}
                                 onChange={(e) => {
-                                    setFilterCategory(e.target.value);
+                                    const val = e.target.value;
+                                    setFilterCategory(val);
                                     setFilterSubcategory('all');
-                                    setCurrentPage(1);
+                                    if (isServerDriven) {
+                                        triggerServerFilter({
+                                            category: val,
+                                            subcategory: 'all',
+                                        });
+                                    } else {
+                                        setClientPage(1);
+                                    }
                                 }}
                                 className="w-full appearance-none rounded-lg border border-border bg-background py-1.5 pr-8 pl-2.5 text-xs font-bold text-foreground transition focus:border-blue-500 focus:outline-none"
                             >
@@ -316,6 +400,7 @@ export function DraftsReviewShell<T extends BaseDraftItem>({
                                 value={filterSubcategory}
                                 onChange={(e) => {
                                     const val = e.target.value;
+                                    let newCat = filterCategory;
                                     setFilterSubcategory(val);
 
                                     if (val !== 'all') {
@@ -328,11 +413,19 @@ export function DraftsReviewShell<T extends BaseDraftItem>({
                                         );
 
                                         if (parentCat) {
+                                            newCat = parentCat;
                                             setFilterCategory(parentCat);
                                         }
                                     }
 
-                                    setCurrentPage(1);
+                                    if (isServerDriven) {
+                                        triggerServerFilter({
+                                            subcategory: val,
+                                            category: newCat,
+                                        });
+                                    } else {
+                                        setClientPage(1);
+                                    }
                                 }}
                                 className="w-full appearance-none rounded-lg border border-border bg-background py-1.5 pr-8 pl-2.5 text-xs font-bold text-foreground transition focus:border-blue-500 focus:outline-none"
                             >
@@ -375,8 +468,13 @@ export function DraftsReviewShell<T extends BaseDraftItem>({
                             <select
                                 value={filterStatus}
                                 onChange={(e) => {
-                                    setFilterStatus(e.target.value as any);
-                                    setCurrentPage(1);
+                                    const val = e.target.value as 'all' | 'approved' | 'pending';
+                                    setFilterStatus(val);
+                                    if (isServerDriven) {
+                                        triggerServerFilter({ status: val });
+                                    } else {
+                                        setClientPage(1);
+                                    }
                                 }}
                                 className="w-full appearance-none rounded-lg border border-border bg-background py-1.5 pr-8 pl-2.5 text-xs font-bold text-foreground transition focus:border-blue-500 focus:outline-none"
                             >
@@ -409,8 +507,13 @@ export function DraftsReviewShell<T extends BaseDraftItem>({
                                 <select
                                     value={filterLanguage}
                                     onChange={(e) => {
-                                        setFilterLanguage(e.target.value);
-                                        setCurrentPage(1);
+                                        const val = e.target.value;
+                                        setFilterLanguage(val);
+                                        if (isServerDriven) {
+                                            triggerServerFilter({ language: val });
+                                        } else {
+                                            setClientPage(1);
+                                        }
                                     }}
                                     className="w-full appearance-none rounded-lg border border-border bg-background py-1.5 pr-8 pl-2.5 text-xs font-bold text-foreground transition focus:border-blue-500 focus:outline-none"
                                 >
@@ -451,7 +554,18 @@ export function DraftsReviewShell<T extends BaseDraftItem>({
                                     setFilterSubcategory('all');
                                     setFilterStatus('all');
                                     setFilterLanguage('all');
-                                    setCurrentPage(1);
+                                    if (isServerDriven) {
+                                        onFilterChange?.({
+                                            search: '',
+                                            category: 'all',
+                                            subcategory: 'all',
+                                            status: 'all',
+                                            language: 'all',
+                                            page: 1,
+                                        });
+                                    } else {
+                                        setClientPage(1);
+                                    }
                                 }}
                                 className="flex cursor-pointer items-center gap-1 rounded-lg border border-red-200 bg-red-50 px-2.5 py-1 text-xs font-bold text-red-700 transition hover:bg-red-100 dark:border-red-900/30 dark:bg-red-950/30 dark:text-red-400"
                             >
@@ -497,7 +611,7 @@ export function DraftsReviewShell<T extends BaseDraftItem>({
                         )}
 
                         <span className="shrink-0 pl-1 text-xs font-bold text-muted-foreground">
-                            {filteredDrafts.length} found
+                            {totalResults} found
                         </span>
                     </div>
                 </div>
@@ -547,7 +661,7 @@ export function DraftsReviewShell<T extends BaseDraftItem>({
                 ref={tableRef}
                 className="mt-6 flex scroll-m-24 flex-col gap-3 sm:gap-6"
             >
-                {items.length === 0 ? (
+                {items.length === 0 && (!filters.search && (!filters.category || filters.category === 'all') && (!filters.subcategory || filters.subcategory === 'all')) ? (
                     /* COMPLETELY EMPTY SYSTEM-WIDE DRAFTS STATE */
                     <div className="flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-border bg-card p-16 text-center">
                         <div className="mx-auto mb-4 flex size-16 items-center justify-center rounded-2xl bg-muted text-muted-foreground">
@@ -567,7 +681,7 @@ export function DraftsReviewShell<T extends BaseDraftItem>({
                             {emptyStateActionLabel}
                         </Link>
                     </div>
-                ) : filteredDrafts.length === 0 ? (
+                ) : displayDrafts.length === 0 ? (
                     /* FILTER EMPTY STATE */
                     <div className="flex flex-col items-center justify-center rounded-2xl border border-border bg-card p-12 text-center">
                         <div className="mx-auto mb-4 flex size-14 items-center justify-center rounded-2xl bg-muted text-muted-foreground">
@@ -588,6 +702,19 @@ export function DraftsReviewShell<T extends BaseDraftItem>({
                                 setFilterStatus('all');
                                 setFilterCategory('all');
                                 setFilterSubcategory('all');
+                                setFilterLanguage('all');
+                                if (isServerDriven) {
+                                    onFilterChange?.({
+                                        search: '',
+                                        category: 'all',
+                                        subcategory: 'all',
+                                        status: 'all',
+                                        language: 'all',
+                                        page: 1,
+                                    });
+                                } else {
+                                    setClientPage(1);
+                                }
                             }}
                         >
                             Reset Filters
@@ -598,32 +725,32 @@ export function DraftsReviewShell<T extends BaseDraftItem>({
                     <div className="flex flex-col gap-3 sm:gap-6">
                         {viewMode === 'cards' || !renderTableView ? (
                             <div className="flex flex-col gap-3 sm:gap-6">
-                                {paginatedDrafts.map((item) =>
+                                {displayDrafts.map((item) =>
                                     renderItem(item),
                                 )}
                             </div>
                         ) : (
-                            renderTableView(paginatedDrafts)
+                            renderTableView(displayDrafts)
                         )}
 
                         {/* Pagination bar */}
-                        {filteredDrafts.length > 0 && (
+                        {totalResults > 0 && (
                             <div className="mt-4 flex flex-col items-center justify-between gap-3 rounded-b-xl border-t border-border bg-muted px-4 py-4 sm:flex-row sm:px-6">
                                 <span className="text-xs font-bold text-muted-foreground">
                                     Showing{' '}
                                     <strong className="text-foreground">
-                                        {(currentPage - 1) * pageSize + 1}
+                                        {totalResults === 0 ? 0 : (currentPage - 1) * perPage + 1}
                                     </strong>{' '}
                                     to{' '}
                                     <strong className="text-foreground">
                                         {Math.min(
-                                            currentPage * pageSize,
-                                            filteredDrafts.length,
+                                            currentPage * perPage,
+                                            totalResults,
                                         )}
                                     </strong>{' '}
                                     of{' '}
                                     <strong className="text-foreground">
-                                        {filteredDrafts.length}
+                                        {totalResults}
                                     </strong>{' '}
                                     results
                                 </span>

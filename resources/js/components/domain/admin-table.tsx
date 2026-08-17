@@ -1,6 +1,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Skeleton } from '@/components/ui/skeleton';
 import { generatePaginationLinks } from '@/lib/utils';
 
 export interface TableColumn<T> {
@@ -37,6 +38,7 @@ export interface AdminTableProps<T> {
     onSelectOne?: (id: number, checked: boolean) => void;
     bulkActionRender?: (selectedIds: number[]) => React.ReactNode;
     getItemId?: (item: T) => number;
+    isLoading?: boolean;
 }
 
 export function AdminTable<T>({
@@ -54,6 +56,7 @@ export function AdminTable<T>({
     onSelectOne,
     bulkActionRender,
     getItemId,
+    isLoading = false,
 }: AdminTableProps<T>) {
     const tableRef = React.useRef<HTMLDivElement>(null);
     const totalPages = Math.ceil(totalItems / pageSize);
@@ -195,7 +198,22 @@ export function AdminTable<T>({
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-50 font-semibold text-slate-700 dark:divide-slate-900 dark:text-slate-300">
-                        {data.length === 0 ? (
+                        {isLoading ? (
+                            Array.from({ length: pageSize }).map((_, rIdx) => (
+                                <tr key={`skeleton-${rIdx}`} className="animate-pulse">
+                                    {getItemId && (
+                                        <td className="px-4 py-4.5 sm:px-6">
+                                            <Skeleton className="size-4 rounded" />
+                                        </td>
+                                    )}
+                                    {columns.map((col, cIdx) => (
+                                        <td key={`skeleton-col-${cIdx}`} className={`px-6 py-4.5 ${col.className || ''}`}>
+                                            <Skeleton className="h-4 w-3/4 rounded" />
+                                        </td>
+                                    ))}
+                                </tr>
+                            ))
+                        ) : data.length === 0 ? (
                             <tr>
                                 <td
                                     colSpan={

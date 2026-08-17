@@ -113,7 +113,7 @@ export default function Welcome() {
         },
         {
             question: 'Where do the questions come from?',
-            answer: 'Our questions are AI-assisted, generated and curated using advanced AI models specifically tailored to official Philippine Civil Service Commission (CSC) competencies, coverage patterns, and standard review topics.',
+            answer: 'Our questions are AI-assisted, generated and curated using advanced AI models tailored to Philippine Civil Service Exam competencies, coverage patterns, and standard review topics.',
         },
     ];
 
