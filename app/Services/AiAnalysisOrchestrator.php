@@ -63,7 +63,7 @@ class AiAnalysisOrchestrator
         if ($analysis->last_exam_attempt_id !== $targetAttemptId) {
             $isCooldownActive = $analysis->updated_at && $analysis->updated_at->gt(now()->subHours(24));
             if ($isCooldownActive) {
-                $analysisData = $analysis->analysis_json;
+                $analysisData = is_array($analysis->analysis_json) ? $analysis->analysis_json : [];
                 if ($latestAttemptId !== $latestMockAttemptId) {
                     $freshDrillAnalysis = $this->deterministicService->generate($userId, $latestAttemptId);
                     $analysisData['subject_breakdowns'] = $freshDrillAnalysis['subject_breakdowns'] ?? ($analysisData['subject_breakdowns'] ?? []);
@@ -94,13 +94,13 @@ class AiAnalysisOrchestrator
         }
 
         // Merge latest drill evaluations so existing analysis stays dynamically refreshed
-        $analysisData = $analysis->analysis_json;
+        $analysisData = is_array($analysis->analysis_json) ? $analysis->analysis_json : [];
         if ($latestAttemptId !== $latestMockAttemptId) {
             $freshDrillAnalysis = $this->deterministicService->generate($userId, $latestAttemptId);
-            $analysisData['subject_breakdowns'] = $freshDrillAnalysis['subject_breakdowns'] ?? $analysisData['subject_breakdowns'];
-            $analysisData['critical_weaknesses'] = $freshDrillAnalysis['critical_weaknesses'] ?? $analysisData['critical_weaknesses'];
-            $analysisData['top_strengths'] = $freshDrillAnalysis['top_strengths'] ?? $analysisData['top_strengths'];
-            $analysisData['readiness_index'] = $freshDrillAnalysis['readiness_index'] ?? $analysisData['readiness_index'];
+            $analysisData['subject_breakdowns'] = $freshDrillAnalysis['subject_breakdowns'] ?? ($analysisData['subject_breakdowns'] ?? []);
+            $analysisData['critical_weaknesses'] = $freshDrillAnalysis['critical_weaknesses'] ?? ($analysisData['critical_weaknesses'] ?? []);
+            $analysisData['top_strengths'] = $freshDrillAnalysis['top_strengths'] ?? ($analysisData['top_strengths'] ?? []);
+            $analysisData['readiness_index'] = $freshDrillAnalysis['readiness_index'] ?? ($analysisData['readiness_index'] ?? 0);
         }
 
         return [
