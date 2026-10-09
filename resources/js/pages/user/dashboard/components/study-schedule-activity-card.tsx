@@ -204,6 +204,8 @@ export function StudyScheduleActivityCard({
                         </span>
                         <Link
                             href={historyIndex()}
+                            prefetch="hover"
+                            cacheFor="30s"
                             className="inline-flex items-center gap-1 text-[11px] font-bold text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
                         >
                             <span>Full History</span>
@@ -217,6 +219,8 @@ export function StudyScheduleActivityCard({
                                 <Link
                                     key={attempt.id}
                                     href={historyIndex()}
+                                    prefetch="hover"
+                                    cacheFor="30s"
                                     className="flex items-center justify-between rounded-xl border border-slate-100 bg-slate-50/60 p-2.5 transition-colors hover:bg-slate-100/70 dark:border-slate-800/60 dark:bg-slate-950/40 dark:hover:bg-slate-800/40"
                                 >
                                     <div className="flex items-center gap-2.5">
@@ -271,6 +275,8 @@ export function StudyScheduleActivityCard({
             <div className="flex shrink-0 items-center justify-between border-t border-slate-100 pt-3 dark:border-slate-800/80">
                 <Link
                     href={historyIndex()}
+                    prefetch="hover"
+                    cacheFor="30s"
                     className="inline-flex items-center gap-1 text-xs font-bold text-purple-600 transition-colors hover:text-purple-700 dark:text-purple-400 dark:hover:text-purple-300"
                 >
                     <span>Review Past Question Mistakes</span>

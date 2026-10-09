@@ -52,6 +52,8 @@ export function SmartStudyLaunchers({
                             ? '/drills/smart-weakness?from=/dashboard'
                             : drillsIndex({ query: { from: '/dashboard' } })
                     }
+                    prefetch="hover"
+                    cacheFor="30s"
                     className="group relative flex flex-col justify-between rounded-xl border border-indigo-100 bg-linear-to-br from-indigo-50/60 to-white p-3.5 transition-all duration-300 hover:-translate-y-0.5 hover:border-indigo-300 hover:shadow-md dark:border-indigo-950/60 dark:from-indigo-950/30 dark:to-slate-900/60 dark:hover:border-indigo-800"
                 >
                     <div>
@@ -82,6 +84,8 @@ export function SmartStudyLaunchers({
                 {/* Tile 2: Custom Drill Builder */}
                 <Link
                     href="/drills?tab=custom&from=/dashboard"
+                    prefetch="hover"
+                    cacheFor="30s"
                     className="group relative flex flex-col justify-between rounded-xl border border-violet-100 bg-linear-to-br from-violet-50/60 to-white p-3.5 transition-all duration-300 hover:-translate-y-0.5 hover:border-violet-300 hover:shadow-md dark:border-violet-950/60 dark:from-violet-950/30 dark:to-slate-900/60 dark:hover:border-violet-800"
                 >
                     <div>
@@ -111,6 +115,8 @@ export function SmartStudyLaunchers({
                     href={
                         nextModule ? `/learn/${nextModule.slug}` : learnIndex()
                     }
+                    prefetch="hover"
+                    cacheFor="30s"
                     className="group relative flex flex-col justify-between rounded-xl border border-sky-100 bg-linear-to-br from-sky-50/60 to-white p-3.5 transition-all duration-300 hover:-translate-y-0.5 hover:border-sky-300 hover:shadow-md dark:border-sky-950/60 dark:from-sky-950/30 dark:to-slate-900/60 dark:hover:border-sky-800"
                 >
                     <div>
@@ -143,6 +149,8 @@ export function SmartStudyLaunchers({
                 {/* Tile 4: Mock Exams */}
                 <Link
                     href={examsIndex({ query: { from: '/dashboard' } })}
+                    prefetch="hover"
+                    cacheFor="30s"
                     className="group relative flex flex-col justify-between rounded-xl border border-emerald-100 bg-linear-to-br from-emerald-50/60 to-white p-3.5 transition-all duration-300 hover:-translate-y-0.5 hover:border-emerald-300 hover:shadow-md dark:border-emerald-950/60 dark:from-emerald-950/30 dark:to-slate-900/60 dark:hover:border-emerald-800"
                 >
                     <div>

@@ -1,4 +1,4 @@
-import { Link } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 import { ArrowRight, CheckCircle2, CreditCard, Crown, Sparkles } from 'lucide-react';
 import React from 'react';
 import { Badge } from '@/components/ui/badge';
@@ -22,6 +22,8 @@ interface SubscriptionStatusCardProps {
 }
 
 export function SubscriptionStatusCard({ billing }: SubscriptionStatusCardProps) {
+    const { xendit } = usePage<{ xendit?: { enabled: boolean; is_sandbox?: boolean } }>().props;
+
     if (!billing.is_premium) {
         return null;
     }
@@ -82,20 +84,22 @@ export function SubscriptionStatusCard({ billing }: SubscriptionStatusCardProps)
                         </div>
                     </div>
 
-                    <div className="flex items-center gap-2 self-start sm:self-auto shrink-0">
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            className="h-8 text-xs gap-1.5 border-emerald-500/30 hover:bg-emerald-500/10 text-foreground"
-                            asChild
-                        >
-                            <Link href="/billing">
-                                <CreditCard className="size-3.5 text-emerald-500" />
-                                <span>Billing & Receipts</span>
-                                <ArrowRight className="size-3 text-muted-foreground" />
-                            </Link>
-                        </Button>
-                    </div>
+                    {!xendit?.is_sandbox && (
+                        <div className="flex items-center gap-2 self-start sm:self-auto shrink-0">
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                className="h-8 text-xs gap-1.5 border-emerald-500/30 hover:bg-emerald-500/10 text-foreground"
+                                asChild
+                            >
+                                <Link href="/billing">
+                                    <CreditCard className="size-3.5 text-emerald-500" />
+                                    <span>Billing & Receipts</span>
+                                    <ArrowRight className="size-3 text-muted-foreground" />
+                                </Link>
+                            </Button>
+                        </div>
+                    )}
                 </div>
             </CardContent>
         </Card>

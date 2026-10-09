@@ -193,12 +193,20 @@ export function ExamCountdown({
                     </div>
 
                     <div className="hidden max-w-[200px] border-l border-slate-200 py-1 pl-4 md:block dark:border-slate-800">
-                        <p className="text-sm leading-relaxed leading-snug font-bold text-slate-600 dark:text-slate-400">
-                            {motivationText ||
-                                (isUrgent
-                                    ? '🚨 Time is running short! Focus on your weakest topics now.'
-                                    : 'Master your study recommendations to boost your passing probability.')}
-                        </p>
+                        {motivationText ? (
+                            <p className="text-sm leading-snug font-bold text-slate-600 dark:text-slate-400">
+                                {motivationText}
+                            </p>
+                        ) : isUrgent ? (
+                            <p className="flex items-start gap-1.5 text-sm leading-snug font-bold text-amber-600 dark:text-amber-400">
+                                <AlertTriangle className="size-4 shrink-0 mt-0.5 text-amber-500" />
+                                <span>Time is running short! Focus on your weakest topics now.</span>
+                            </p>
+                        ) : (
+                            <p className="text-sm leading-snug font-bold text-slate-600 dark:text-slate-400">
+                                Master your study recommendations to boost your passing probability.
+                            </p>
+                        )}
                     </div>
                 </div>
             </div>
