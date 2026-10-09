@@ -70,6 +70,9 @@ class HandleInertiaRequests extends Middleware
                 'siteKey' => app(TurnstileService::class)->getSiteKey(),
                 'enabled' => app(TurnstileService::class)->isConfigured(),
             ],
+            'xendit' => [
+                'enabled' => ! empty(config('xendit.secret_key')),
+            ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
             'global_announcements' => app(AnnouncementRepositoryInterface::class)->getActiveAnnouncements(),
             'pending_feedback_count' => app(FeedbackRepositoryInterface::class)->getPendingCount(),

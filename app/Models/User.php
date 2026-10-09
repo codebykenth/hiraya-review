@@ -16,7 +16,7 @@ use Laravel\Fortify\Contracts\PasskeyUser;
 use Laravel\Fortify\PasskeyAuthenticatable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 
-#[Fillable(['name', 'email', 'password', 'role', 'provider', 'provider_id', 'terms_accepted_at', 'is_active', 'last_login_at', 'pdf_downloads_count', 'can_download_pdf'])]
+#[Fillable(['name', 'email', 'password', 'role', 'provider', 'provider_id', 'terms_accepted_at', 'is_active', 'last_login_at', 'pdf_downloads_count', 'can_download_pdf', 'is_premium', 'premium_until'])]
 #[Hidden(['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token'])]
 class User extends Authenticatable implements MustVerifyEmail, PasskeyUser
 {
@@ -39,6 +39,8 @@ class User extends Authenticatable implements MustVerifyEmail, PasskeyUser
             'last_login_at' => 'datetime',
             'is_active' => 'boolean',
             'can_download_pdf' => 'boolean',
+            'is_premium' => 'boolean',
+            'premium_until' => 'datetime',
         ];
     }
 
@@ -74,5 +76,23 @@ class User extends Authenticatable implements MustVerifyEmail, PasskeyUser
     public function aiAnalyses(): HasMany
     {
         return $this->hasMany(UserAiAnalysis::class);
+    }
+
+    public function payments(): HasMany
+    {
+        return $this->hasMany(Payment::class);
+    }
+
+    public function isPremium(): bool
+    {
+        if (! $this->is_premium) {
+            return false;
+        }
+
+        if ($this->premium_until !== null && $this->premium_until->isPast()) {
+            return false;
+        }
+
+        return true;
     }
 }

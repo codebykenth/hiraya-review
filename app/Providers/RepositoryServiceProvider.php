@@ -16,6 +16,8 @@ use App\Repositories\LearnModuleRepository;
 use App\Repositories\LearnModuleRepositoryInterface;
 use App\Repositories\LegalContentRepository;
 use App\Repositories\LegalContentRepositoryInterface;
+use App\Repositories\PaymentRepository;
+use App\Repositories\PaymentRepositoryInterface;
 use App\Repositories\QuestionRepository;
 use App\Repositories\QuestionRepositoryInterface;
 use App\Repositories\SavedDrillSetRepository;
@@ -81,6 +83,11 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->singleton(
             LegalContentRepositoryInterface::class,
             LegalContentRepository::class
+        );
+
+        $this->app->singleton(
+            PaymentRepositoryInterface::class,
+            PaymentRepository::class
         );
     }
 }

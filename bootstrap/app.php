@@ -47,6 +47,10 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->encryptCookies(except: ['appearance', 'sidebar_state']);
 
+        $middleware->validateCsrfTokens(except: [
+            'webhooks/xendit',
+        ]);
+
         $middleware->web(append: [
             HandleAppearance::class,
             CheckUserActive::class,

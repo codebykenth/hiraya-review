@@ -39,6 +39,10 @@ class UserFactory extends Factory
             'provider' => null,
             'provider_id' => null,
             'last_login_at' => null,
+            'can_download_pdf' => true,
+            'pdf_downloads_count' => 0,
+            'is_premium' => false,
+            'premium_until' => null,
         ];
     }
 

@@ -21,7 +21,7 @@ class TransactionMiddleware
             try {
                 $response = $next($request);
 
-                if ($response->getStatusCode() >= 400) {
+                if ($response->getStatusCode() >= 400 && ! $response->headers->has('X-Inertia-Location')) {
                     DB::rollBack();
                 } else {
                     DB::commit();
