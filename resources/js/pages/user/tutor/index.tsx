@@ -65,6 +65,16 @@ interface TutorPageProps {
 
 const SUGGESTED_TOPICS: SuggestedTopic[] = [
     {
+        title: 'Subject-Verb Agreement Traps',
+        prompt: 'What are the most common subject-verb agreement traps in the Civil Service Exam?',
+        category: 'Verbal Ability',
+    },
+    {
+        title: 'Logical Reasoning & Syllogisms',
+        prompt: 'How do I solve syllogisms and logical deduction questions accurately in the exam?',
+        category: 'Analytical Ability',
+    },
+    {
         title: 'Work & Rate Problems',
         prompt: 'How do I solve work and rate word problems fast with shortcuts?',
         category: 'Numerical Ability',
@@ -73,16 +83,6 @@ const SUGGESTED_TOPICS: SuggestedTopic[] = [
         title: 'RA 6713 Ethical Standards',
         prompt: 'What are the 8 norms of conduct under RA 6713 with memory mnemonics?',
         category: 'General Information',
-    },
-    {
-        title: 'Subject-Verb Agreement Traps',
-        prompt: 'What are the most common subject-verb agreement traps in the Civil Service Exam?',
-        category: 'Verbal Ability',
-    },
-    {
-        title: '1987 Philippine Constitution',
-        prompt: 'Explain the doctrine of state immunity and constitutional commissions under the 1987 Constitution.',
-        category: 'Constitution & Laws',
     },
 ];
 
@@ -676,7 +676,7 @@ export default function TutorPage({ modules: propModules = [] }: TutorPageProps)
                 <div className="shrink-0 border-b border-border/70 bg-card/60 px-4 py-3 backdrop-blur-md sm:px-6">
                     <div className="mx-auto flex max-w-5xl items-center justify-between gap-3">
                         <div className="flex items-center gap-3">
-                            <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-tr from-indigo-600 to-purple-600 text-white shadow-sm shadow-indigo-500/20">
+                            <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-linear-to-tr from-indigo-600 to-purple-600 text-white shadow-sm shadow-indigo-500/20">
                                 <Bot className="size-5" />
                             </div>
                             <div>
@@ -784,8 +784,8 @@ export default function TutorPage({ modules: propModules = [] }: TutorPageProps)
                                     Mabuhay! How can I assist your review?
                                 </h2>
                                 <p className="mt-2 max-w-2xl text-xs leading-relaxed text-muted-foreground sm:text-sm">
-                                    Ask any concept from General Information, Clerical Ability,
-                                    Verbal, Math, or Philippine Constitution. I provide step-by-step
+                                    Ask any concept from Verbal Ability, Analytical Ability,
+                                    Numerical Ability, or General Information. I provide step-by-step
                                     methods and exam shortcuts.
                                 </p>
 
@@ -994,7 +994,7 @@ export default function TutorPage({ modules: propModules = [] }: TutorPageProps)
 
             {/* Floating Scroll to Top */}
             {showScrollTop && (
-                <div className="pointer-events-none fixed bottom-[5.5rem] right-8 z-50 animate-in fade-in duration-200">
+                <div className="pointer-events-none fixed bottom-22 right-8 z-50 animate-in fade-in duration-200">
                     <button
                         type="button"
                         onClick={scrollToTop}
@@ -1023,7 +1023,7 @@ export default function TutorPage({ modules: propModules = [] }: TutorPageProps)
                                 onChange={handleTextareaInput}
                                 onKeyDown={handleKeyDown}
                                 rows={2}
-                                placeholder="Ask a CSE syllabus question (e.g. RA 6713 norms, work & rate shortcuts, grammar rules, constitution)..."
+                                placeholder="Ask a CSE syllabus question (e.g. grammar rules, logic syllogisms, work & rate shortcuts, RA 6713)..."
                                 className="min-h-16 max-h-45 w-full resize-none bg-transparent px-4 py-3.5 text-xs sm:text-sm leading-relaxed text-foreground placeholder:text-muted-foreground focus:outline-hidden"
                             />
 

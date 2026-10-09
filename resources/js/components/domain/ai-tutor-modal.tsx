@@ -27,10 +27,10 @@ interface ChatMessage {
 }
 
 const SUGGESTED_PROMPTS = [
-    'What are the 8 norms of conduct under RA 6713?',
-    'How do I solve work and rate word problems fast?',
     'What are common subject-verb agreement traps in CSE?',
-    'Explain the doctrine of state immunity in the 1987 Constitution.',
+    'How do I solve syllogisms and logical deduction questions?',
+    'How do I solve work and rate word problems fast?',
+    'What are the 8 norms of conduct under RA 6713?',
 ];
 
 export function AiTutorModal() {
@@ -124,9 +124,6 @@ export function AiTutorModal() {
             const reader = response.body.getReader();
             const decoder = new TextDecoder();
             let done = false;
-            const fullContent = '';
-            const citations: string[] = [];
-
             let buffer = '';
 
             while (!done) {
@@ -292,8 +289,8 @@ export function AiTutorModal() {
                                     What would you like to review today?
                                 </h3>
                                 <p className="mt-1 max-w-2xl text-xs text-muted-foreground">
-                                    Ask any concept from General Information, Clerical Ability,
-                                    Verbal, Math, or Philippine Constitution.
+                                    Ask any concept from Verbal Ability, Analytical Ability,
+                                    Numerical Ability, or General Information.
                                 </p>
 
                                 <div className="mt-6 flex w-full max-w-2xl flex-col gap-2">
@@ -395,7 +392,7 @@ export function AiTutorModal() {
                                 onChange={(e) => setInput(e.target.value)}
                                 onKeyDown={handleKeyDown}
                                 rows={2}
-                                placeholder="Ask a CSE syllabus question (e.g. RA 6713, word problems, grammar rules)..."
+                                placeholder="Ask a CSE syllabus question (e.g. grammar rules, logic syllogisms, word problems, RA 6713)..."
                                 className="flex-1 resize-none rounded-xl border border-border bg-muted/20 px-3.5 py-2.5 text-xs text-foreground placeholder:text-muted-foreground focus:border-indigo-500 focus:outline-hidden"
                             />
                             <Button
