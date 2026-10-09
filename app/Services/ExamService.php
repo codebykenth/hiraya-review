@@ -9,6 +9,7 @@ use App\Http\Resources\ExamQuestionResource;
 use App\Http\Resources\ExamScorecardResource;
 use App\Repositories\QuestionRepositoryInterface;
 use App\Repositories\UserRepositoryInterface;
+use Illuminate\Support\Facades\Cache;
 
 class ExamService
 {
@@ -36,8 +37,11 @@ class ExamService
      */
     public function getExamSessionData(ExamSessionQueryData $query, ?int $userId): array
     {
-        $activeQuestions = $this->questionRepository->getActivePool();
-        $formattedQuestions = ExamQuestionResource::collection($activeQuestions)->resolve();
+        $formattedQuestions = Cache::rememberForever('questions.active.exam_resources', function () {
+            $activeQuestions = $this->questionRepository->getActivePool();
+
+            return ExamQuestionResource::collection($activeQuestions)->resolve();
+        });
         $questions = collect($formattedQuestions);
 
         $savedAttempt = null;

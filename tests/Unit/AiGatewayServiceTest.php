@@ -48,7 +48,7 @@ test('AiGatewayService attaches cf-aig-gateway-id header when gateway id is conf
 test('AiGatewayService always resolves Gemini and Groq direct endpoints', function () {
     $service = new AiGatewayService;
 
-    expect($service->resolveGeminiUrl('gemini-3.7-flash'))
+    expect($service->resolveGeminiUrl('gemini-3.7-flash', false, true))
         ->toBe('https://generativelanguage.googleapis.com/v1beta/models/gemini-3.7-flash:generateContent');
 
     expect($service->resolveGroqUrl())

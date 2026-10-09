@@ -37,7 +37,9 @@ class DrillService
     public function getDrillsIndexData(?int $userId): array
     {
         $activePool = $this->questionRepository->getActivePool();
-        $questions = DrillQuestionResource::collection($activePool)->resolve();
+        $questions = Cache::rememberForever('questions.active.drill_resources', function () use ($activePool) {
+            return DrillQuestionResource::collection($activePool)->resolve();
+        });
 
         $categories = Cache::rememberForever('categories.tree', function () {
             return Category::with(['subcategory' => function ($query) {

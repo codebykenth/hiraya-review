@@ -38,6 +38,8 @@ class QuestionObserver
     {
         Cache::forget('questions.all');
         Cache::forget('questions.active');
+        Cache::forget('questions.active.exam_resources');
+        Cache::forget('questions.active.drill_resources');
         Cache::forget('categories.tree');
     }
 }
