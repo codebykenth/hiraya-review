@@ -9,6 +9,7 @@ import {
     Zap,
     Target,
     ArrowRight,
+    AlertTriangle,
 } from 'lucide-react';
 import { useState, useMemo } from 'react';
 import {
@@ -833,10 +834,13 @@ export function ScorecardView({
                                 Great job on finishing the exam! Your score and
                                 category breakdown are ready.
                             </p>
-                            <p className="mt-3 text-xs font-bold text-amber-600 dark:text-amber-400">
-                                ⚠️ Create a free account to save this attempt
-                                permanently in your progress history and review
-                                your mistake rationales anytime.
+                            <p className="mt-3 flex items-center justify-center gap-1.5 text-[11px] font-bold text-amber-600 dark:text-amber-400">
+                                <AlertTriangle className="size-3.5" />
+                                <span>
+                                    Create a free account to save this attempt
+                                    permanently in your progress history and review
+                                    your mistake rationales anytime.
+                                </span>
                             </p>
                         </div>
                         <div className="mt-6 flex flex-col gap-2.5">

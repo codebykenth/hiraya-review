@@ -8,6 +8,7 @@ import {
     LayoutDashboard,
     Gauge,
     Sparkles,
+    Bot,
     Target,
     ListChecks,
     Users,
@@ -19,6 +20,7 @@ import {
     Eye,
     Megaphone,
     MessageSquareWarning,
+    CreditCard,
 } from 'lucide-react';
 import React from 'react';
 import AppLogo from '@/components/layout/app-logo';
@@ -52,6 +54,7 @@ import {
     drafts as questionsDrafts,
 } from '@/routes/questions';
 import { index as calendarIndex } from '@/routes/study-schedules/index';
+import { index as tutorIndex } from '@/routes/tutor';
 
 import type { NavItem } from '@/types';
 
@@ -77,6 +80,11 @@ const generalNavItems: NavItem[] = [
         icon: BookOpen,
     },
     {
+        title: 'AI Tutor',
+        href: tutorIndex(),
+        icon: Bot,
+    },
+    {
         title: 'Practice Drills',
         href: drillsIndex(),
         icon: Target,
@@ -96,6 +104,11 @@ const generalNavItems: NavItem[] = [
         href: analyticsIndex(),
         icon: TrendingUp,
     },
+    {
+        title: 'Billing & Plans',
+        href: '/billing',
+        icon: CreditCard,
+    },
 ];
 
 const adminCoreItems: NavItem[] = [
@@ -108,6 +121,11 @@ const adminCoreItems: NavItem[] = [
         title: 'Users',
         href: adminUsersIndex(),
         icon: Users,
+    },
+    {
+        title: 'Payments',
+        href: '/admin/payments',
+        icon: CreditCard,
     },
     {
         title: 'Announcements',

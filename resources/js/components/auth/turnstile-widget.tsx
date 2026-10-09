@@ -110,5 +110,9 @@ export default function TurnstileWidget({
         };
     }, [siteKey, theme, size]); // Callbacks removed from dependency array!
 
-    return <div ref={containerRef} className="my-4" />;
+    return (
+        <div className="my-3 flex w-full overflow-x-auto overflow-y-hidden py-0.5">
+            <div ref={containerRef} className="shrink-0" />
+        </div>
+    );
 }

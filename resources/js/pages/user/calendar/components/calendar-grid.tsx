@@ -283,7 +283,7 @@ export function CalendarGrid({
 
     return (
         <div className="[scrollbar-width:thin] overflow-x-auto pb-4">
-            <div className="min-w-[720px] md:min-w-full">
+            <div className="min-w-[1050px] md:min-w-full">
                 {/* Sticky Day headers */}
                 <div className="sticky top-0 z-20 mb-2 grid grid-cols-7 gap-2 rounded-lg bg-slate-50/95 py-2 backdrop-blur-sm dark:bg-slate-900/95">
                     {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(
@@ -327,7 +327,7 @@ export function CalendarGrid({
                                                 openModal(calendarDay.date);
                                             }
                                         }}
-                                        className={`group relative flex h-44 min-w-0 flex-col rounded-xl border p-2 transition-all sm:h-52 sm:p-2.5 ${
+                                        className={`group relative flex h-48 min-w-0 flex-col rounded-xl border p-1 transition-all sm:h-52 sm:p-2.5 ${
                                             calendarDay.isCurrentMonth &&
                                             calendarDay.date >= todayStr
                                                 ? 'cursor-pointer hover:border-blue-300 hover:shadow-sm'
@@ -485,7 +485,7 @@ export function CalendarGrid({
                                                                     );
                                                                 }
                                                             }}
-                                                            className={`group relative cursor-pointer rounded-xl border p-2.5 shadow-sm transition-all duration-200 hover:shadow-md ${
+                                                            className={`group relative cursor-pointer rounded-xl border p-1.5 sm:p-2.5 shadow-sm transition-all duration-200 hover:shadow-md ${
                                                                 schedule.is_done
                                                                     ? 'border-emerald-300/70 bg-emerald-50/50 dark:border-emerald-900/40 dark:bg-emerald-950/20'
                                                                     : isOverdue
@@ -493,8 +493,64 @@ export function CalendarGrid({
                                                                       : `${colorClasses.border} ${colorClasses.bg}`
                                                             }`}
                                                         >
-                                                            {/* Top Line: Checkbox, Title, Action Buttons */}
-                                                            <div className="flex items-start gap-2">
+                                                            {/* Action Buttons (Inline on Mobile, Top Right on Desktop Hover) */}
+                                                            <div className="mb-1.5 flex items-center justify-end gap-1 opacity-100 lg:absolute lg:right-1.5 lg:top-1.5 lg:z-10 lg:mb-0 lg:gap-0.5 lg:rounded-md lg:bg-white/90 lg:p-0.5 lg:opacity-0 lg:backdrop-blur-sm lg:transition-opacity lg:group-hover:opacity-100 dark:lg:bg-slate-900/90">
+                                                                {onOpenStudyDrawer && (
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={(
+                                                                            e,
+                                                                        ) => {
+                                                                            e.stopPropagation();
+                                                                            onOpenStudyDrawer(
+                                                                                schedule,
+                                                                                calendarDay.date,
+                                                                            );
+                                                                        }}
+                                                                        className="rounded p-1 text-indigo-600 hover:bg-indigo-100 dark:text-indigo-400 dark:hover:bg-indigo-900/40"
+                                                                        title="Study & Drill"
+                                                                    >
+                                                                        <Sparkles className="size-3.5" />
+                                                                    </button>
+                                                                )}
+                                                                {isOverdue &&
+                                                                    handleRescheduleToToday && (
+                                                                        <button
+                                                                            type="button"
+                                                                            onClick={(
+                                                                                e,
+                                                                            ) => {
+                                                                                e.stopPropagation();
+                                                                                handleRescheduleToToday(
+                                                                                    schedule,
+                                                                                );
+                                                                            }}
+                                                                            className="rounded p-1 text-blue-600 hover:bg-blue-100 dark:text-blue-400 dark:hover:bg-blue-900/40"
+                                                                            title="Reschedule to Today"
+                                                                        >
+                                                                            <CalendarDays className="size-3.5" />
+                                                                        </button>
+                                                                    )}
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={(
+                                                                        e,
+                                                                    ) => {
+                                                                        e.stopPropagation();
+                                                                        handleDeleteSchedule(
+                                                                            schedule.id,
+                                                                            calendarDay.date,
+                                                                        );
+                                                                    }}
+                                                                    className="rounded p-1 text-slate-400 hover:bg-red-100 hover:text-red-600 dark:hover:bg-red-950/40 dark:hover:text-red-400"
+                                                                    title="Delete"
+                                                                >
+                                                                    <Trash2 className="size-3.5" />
+                                                                </button>
+                                                            </div>
+
+                                                            {/* Checkbox and Title */}
+                                                            <div className="flex items-start gap-1 sm:gap-1.5 pr-0.5 sm:pr-1">
                                                                 <button
                                                                     type="button"
                                                                     onClick={async (
@@ -522,7 +578,7 @@ export function CalendarGrid({
                                                                 </button>
                                                                 <div className="min-w-0 flex-1">
                                                                     <span
-                                                                        className={`block text-xs leading-snug font-bold break-words ${
+                                                                        className={`block text-[11px] sm:text-xs leading-tight sm:leading-snug font-bold break-words ${
                                                                             schedule.is_done
                                                                                 ? 'text-slate-400 line-through dark:text-slate-500'
                                                                                 : 'text-slate-900 dark:text-white'
@@ -533,66 +589,9 @@ export function CalendarGrid({
                                                                         }
                                                                     </span>
                                                                 </div>
-
-                                                                {/* Action Buttons (visible on mobile / hover on desktop) */}
-                                                                <div className="flex shrink-0 items-center gap-0.5 opacity-80 transition-opacity lg:opacity-0 lg:group-hover:opacity-100">
-                                                                    {onOpenStudyDrawer && (
-                                                                        <button
-                                                                            type="button"
-                                                                            onClick={(
-                                                                                e,
-                                                                            ) => {
-                                                                                e.stopPropagation();
-                                                                                onOpenStudyDrawer(
-                                                                                    schedule,
-                                                                                    calendarDay.date,
-                                                                                );
-                                                                            }}
-                                                                            className="rounded p-1 text-indigo-600 hover:bg-indigo-100 dark:text-indigo-400 dark:hover:bg-indigo-900/40"
-                                                                            title="Study & Drill"
-                                                                        >
-                                                                            <Sparkles className="size-3.5" />
-                                                                        </button>
-                                                                    )}
-                                                                    {isOverdue &&
-                                                                        handleRescheduleToToday && (
-                                                                            <button
-                                                                                type="button"
-                                                                                onClick={(
-                                                                                    e,
-                                                                                ) => {
-                                                                                    e.stopPropagation();
-                                                                                    handleRescheduleToToday(
-                                                                                        schedule,
-                                                                                    );
-                                                                                }}
-                                                                                className="rounded p-1 text-blue-600 hover:bg-blue-100 dark:text-blue-400 dark:hover:bg-blue-900/40"
-                                                                                title="Reschedule to Today"
-                                                                            >
-                                                                                <CalendarDays className="size-3.5" />
-                                                                            </button>
-                                                                        )}
-                                                                    <button
-                                                                        type="button"
-                                                                        onClick={(
-                                                                            e,
-                                                                        ) => {
-                                                                            e.stopPropagation();
-                                                                            handleDeleteSchedule(
-                                                                                schedule.id,
-                                                                                calendarDay.date,
-                                                                            );
-                                                                        }}
-                                                                        className="rounded p-1 text-slate-400 hover:bg-red-100 hover:text-red-600 dark:hover:bg-red-950/40 dark:hover:text-red-400"
-                                                                        title="Delete"
-                                                                    >
-                                                                        <Trash2 className="size-3.5" />
-                                                                    </button>
-                                                                </div>
                                                             </div>
-
                                                             {/* Category & Time meta */}
-                                                            <div className="mt-1.5 flex flex-wrap items-center gap-1">
+                                                            <div className="mt-1.5 flex flex-wrap items-center gap-0.5 sm:gap-1">
                                                                 <Badge
                                                                     variant="outline"
                                                                     className={`px-1 py-0 text-[9px] font-bold ${colorClasses.badge}`}
@@ -618,7 +617,7 @@ export function CalendarGrid({
 
                                                             {cleanDesc && (
                                                                 <p
-                                                                    className={`mt-1 line-clamp-2 text-[11px] leading-tight ${
+                                                                    className={`mt-1 line-clamp-2 text-[10px] sm:text-[11px] leading-tight ${
                                                                         schedule.is_done
                                                                             ? 'text-slate-400 line-through dark:text-slate-500'
                                                                             : 'text-slate-600 dark:text-slate-300'
@@ -629,7 +628,7 @@ export function CalendarGrid({
                                                             )}
 
                                                             {/* Practice Drill & Learn Launchers */}
-                                                            <div className="mt-2 flex flex-wrap items-center gap-1">
+                                                            <div className="mt-1.5 sm:mt-2 flex flex-wrap items-center gap-1">
                                                                 <Link
                                                                     href={buildDrillUrl()}
                                                                     onClick={(

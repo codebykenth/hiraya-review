@@ -12,6 +12,7 @@ import type { Auth } from '@/types';
 // Declare expected page props to satisfy TypeScript strict compiler checks
 type PageProps = {
     auth: Auth;
+    xendit?: { enabled: boolean };
 };
 
 interface SiteHeaderProps {
@@ -23,7 +24,7 @@ export default function SiteHeader({
     activeNav = 'home',
     onNavClick,
 }: SiteHeaderProps) {
-    const { auth } = usePage<PageProps>().props;
+    const { auth, xendit } = usePage<PageProps>().props;
     const { url } = usePage();
     const [scrollProgress, setScrollProgress] = useState(0);
     const [showHeader, setShowHeader] = useState(true);
@@ -66,6 +67,7 @@ export default function SiteHeader({
         { id: 'about', label: 'About', href: '/about' },
         { id: 'features', label: 'Features', href: '#features' },
         { id: 'path', label: 'Process', href: '#path' },
+        ...(xendit?.enabled ? [{ id: 'pricing', label: 'Pricing', href: '#pricing' }] : []),
         { id: 'learn', label: 'Study Hub', href: '/learn' },
         { id: 'guide', label: 'Reviewer Guide', href: '#guide' },
         { id: 'faq', label: 'FAQ', href: '#faq' },

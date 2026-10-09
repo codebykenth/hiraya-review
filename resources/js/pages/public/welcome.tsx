@@ -11,6 +11,9 @@ import {
     Target,
     Award,
     ClipboardList,
+    Check,
+    Crown,
+    Zap,
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { ReviewerGuideTabs } from '@/components/domain/reviewer-guide-tabs';
@@ -30,12 +33,17 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
+import type { PricingPlan } from '@/pages/user/billing/types';
 import { register } from '@/routes';
 import type { Auth } from '@/types';
 import FeatureGrid from './components/feature-grid';
 
-export default function Welcome() {
-    const { auth } = usePage<{ auth: Auth }>().props;
+interface WelcomeProps {
+    plans?: PricingPlan[];
+}
+
+export default function Welcome({ plans = [] }: WelcomeProps) {
+    const { auth, xendit } = usePage<{ auth: Auth; xendit?: { enabled: boolean } }>().props;
     const [isFreeExamModalOpen, setIsFreeExamModalOpen] = useState(false);
     const [hoveredStep, setHoveredStep] = useState<number | null>(null);
 
@@ -53,7 +61,7 @@ export default function Welcome() {
 
     // Track visible section on scroll to update navigation state
     useEffect(() => {
-        const sections = ['home', 'features', 'path', 'guide', 'faq'];
+        const sections = ['home', 'features', 'path', 'pricing', 'guide', 'faq'];
 
         const observerOptions = {
             root: null,
@@ -563,6 +571,162 @@ export default function Welcome() {
                             </div>
                         </div>
                     </Section>
+
+                    {xendit?.enabled && (
+                        <Section
+                            id="pricing"
+                            className="border-t border-slate-100 bg-slate-50/50 dark:border-slate-800/50 dark:bg-slate-900/10"
+                        >
+                            <SectionHeader
+                                title="Simple, Transparent Pricing"
+                                subtitle="Choose the preparation package that fits your study timeline. One-time payments with zero recurring surprise charges."
+                                align="center"
+                            />
+
+                            <div className="mx-auto grid max-w-5xl gap-6 md:grid-cols-2">
+                            {(plans.length > 0
+                                ? plans
+                                : [
+                                      {
+                                          name: 'Pro Reviewer Pass',
+                                          code: 'pro_pass',
+                                          price: 299,
+                                          currency: 'PHP',
+                                          billing_period: '90 Days Access',
+                                          duration_days: 90,
+                                          description: 'Comprehensive exam prep package for the upcoming Civil Service Examination batch.',
+                                          features: [
+                                              'Unlimited full-length mock exams (Professional & Subprofessional)',
+                                              'Full access to all 5 Core Subject Drills & Smart Weakness Drills',
+                                              'AI-powered Exam Readiness & post-mortem diagnostics',
+                                              'Priority question generation & full explanation breakdowns',
+                                              'PDF scorecards & offline summary downloads',
+                                          ],
+                                          badge: 'Most Popular',
+                                          is_featured: true,
+                                      },
+                                      {
+                                          name: 'Lifetime Reviewer Pass',
+                                          code: 'lifetime_access',
+                                          price: 499,
+                                          currency: 'PHP',
+                                          billing_period: 'One-time Payment',
+                                          duration_days: null,
+                                          description: 'Unrestricted lifetime access to all current and future CSE reviewer content.',
+                                          features: [
+                                              'Everything in Pro Reviewer Pass',
+                                              'Lifetime access with zero renewal or expiration',
+                                              'Free access to future question bank expansions & syllabus updates',
+                                              'Unlimited PDF test kit exports with full answer keys',
+                                              'Verified Pro Reviewer badge on profile',
+                                          ],
+                                          badge: 'Best Value',
+                                          is_featured: false,
+                                      },
+                                  ]
+                            ).map((plan) => {
+                                const isLifetime = plan.duration_days === null;
+
+                                return (
+                                    <Card
+                                        key={plan.code}
+                                        className={`relative flex flex-col justify-between overflow-hidden border p-6 transition-all duration-300 hover:shadow-xl sm:p-8 ${
+                                            plan.is_featured
+                                                ? 'border-primary/50 shadow-md shadow-primary/5 ring-1 ring-primary/20'
+                                                : 'border-slate-200/80 bg-card dark:border-slate-800'
+                                        }`}
+                                    >
+                                        {plan.badge && (
+                                            <div className="absolute top-4 right-4">
+                                                <Badge
+                                                    variant={plan.is_featured ? 'default' : 'secondary'}
+                                                    className="px-2.5 py-0.5 text-xs font-semibold uppercase tracking-wider"
+                                                >
+                                                    {plan.badge}
+                                                </Badge>
+                                            </div>
+                                        )}
+
+                                        <div>
+                                            <div className="mb-2 flex items-center gap-2">
+                                                {isLifetime ? (
+                                                    <div className="rounded-lg bg-amber-500/10 p-2 text-amber-500">
+                                                        <Crown className="size-5" />
+                                                    </div>
+                                                ) : (
+                                                    <div className="rounded-lg bg-primary/10 p-2 text-primary">
+                                                        <Zap className="size-5" />
+                                                    </div>
+                                                )}
+                                                <div>
+                                                    <h3 className="text-xl font-bold tracking-tight text-foreground">
+                                                        {plan.name}
+                                                    </h3>
+                                                    <p className="text-xs text-muted-foreground">
+                                                        {plan.billing_period}
+                                                    </p>
+                                                </div>
+                                            </div>
+
+                                            <div className="mt-4 flex items-baseline gap-1">
+                                                <span className="text-4xl font-extrabold tracking-tight text-foreground">
+                                                    ₱{plan.price.toLocaleString('en-PH', { minimumFractionDigits: 0 })}
+                                                </span>
+                                                <span className="text-xs font-medium text-muted-foreground">
+                                                    {plan.currency}
+                                                </span>
+                                            </div>
+
+                                            <p className="mt-2 text-xs leading-normal text-muted-foreground">
+                                                {plan.description}
+                                            </p>
+
+                                            <div className="mt-6 space-y-2.5">
+                                                <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                                                    Package features:
+                                                </span>
+                                                <ul className="space-y-2">
+                                                    {plan.features.map((feature, idx) => (
+                                                        <li key={idx} className="flex items-start gap-2.5 text-xs text-foreground/90">
+                                                            <div className="mt-0.5 shrink-0 rounded-full bg-emerald-500/10 p-0.5 text-emerald-500">
+                                                                <Check className="size-3 stroke-[2.5]" />
+                                                            </div>
+                                                            <span>{feature}</span>
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            </div>
+                                        </div>
+
+                                        <div className="mt-8 border-t border-border/50 pt-4">
+                                            {auth?.user ? (
+                                                <Button
+                                                    variant={plan.is_featured ? 'default' : 'secondary'}
+                                                    className="w-full text-xs font-bold"
+                                                    asChild
+                                                >
+                                                    <Link href="/billing">
+                                                        Upgrade Account
+                                                    </Link>
+                                                </Button>
+                                            ) : (
+                                                <Button
+                                                    variant={plan.is_featured ? 'default' : 'secondary'}
+                                                    className="w-full text-xs font-bold"
+                                                    asChild
+                                                >
+                                                    <Link href="/register">
+                                                        Get Started Now
+                                                    </Link>
+                                                </Button>
+                                            )}
+                                        </div>
+                                    </Card>
+                                );
+                            })}
+                        </div>
+                    </Section>
+                    )}
 
                     <Section id="guide" className="mx-auto max-w-6xl space-y-8">
                         <div className="flex items-start gap-4 border-b border-border pb-6 md:items-center">

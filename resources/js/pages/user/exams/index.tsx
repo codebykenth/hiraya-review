@@ -191,6 +191,7 @@ export default function ExamIndex(props: ExamIndexProps) {
                     isMobilePaletteOpen={isMobilePaletteOpen}
                     setIsMobilePaletteOpen={setIsMobilePaletteOpen}
                     setReviewScreenActive={setReviewScreenActive}
+                    savedAttempt={savedAttempt ?? null}
                 />
             );
         }

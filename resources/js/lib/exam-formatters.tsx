@@ -1,5 +1,5 @@
 import DOMPurify from 'dompurify';
-import { ZoomIn } from 'lucide-react';
+import { ZoomIn, Zap } from 'lucide-react';
 import React from 'react';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { parseLatexString } from '@/lib/latex-parser';
@@ -403,6 +403,15 @@ export const renderFormattedText = (
     text = text.replace(/&rarr;/gi, ' → ');
     text = text.replace(/<span[^>]*>/gi, '').replace(/<\/span>/gi, '');
 
+    // Clean up table formatting to remove empty lines between table rows
+    text = text.replace(/\r\n/g, '\n');
+    let prevText;
+
+    do {
+        prevText = text;
+        text = text.replace(/(\|\s*[ \t]*)\n[ \t]*\n(?=[ \t]*\|)/g, '$1\n');
+    } while (text !== prevText);
+
     // Strict 1-liner comment: Dynamically strip parenthesized logical variable markers if requested
     const processedText = stripLogicSymbols
         ? text.replace(/\s*\(\s*[~¬]?\s*[A-Z]\s*\)/g, '')
@@ -412,7 +421,7 @@ export const renderFormattedText = (
     const svgRegex = /(<svg[\s\S]*?<\/svg>)/g;
     const svgParts = processedText.split(svgRegex);
 
-    const tableRegex = /((?:^|\n)\|[^\n]+\|[^\n]*(?:\n\|[^\n]+\|[^\n]*)+)/g;
+    const tableRegex = /((?:^|\n)\s*\|[^\n]+\|[^\n]*(?:\n\s*\|[^\n]+\|[^\n]*)+)/g;
 
     const formatNumberedLists = (inputText: string) => {
         if (!inputText) {
@@ -692,8 +701,8 @@ export const renderFormattedText = (
 
                 return (
                     <div className="shadow-3xs dark:bg-rose-950/30/40 my-4 flex items-start gap-3 rounded-r-xl border-l-4 border-rose-500 bg-rose-50 p-4 dark:border-rose-500/80 dark:bg-rose-950/20">
-                        <span className="shadow-3xs mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full bg-rose-500 text-[12px] text-white select-none">
-                            🧠
+                        <span className="shadow-3xs mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full bg-rose-500 text-white select-none">
+                            <Zap className="size-3.5" />
                         </span>
                         <div className="flex-1">
                             <strong className="mb-1.5 block font-heading text-[13px] font-black tracking-widest text-rose-900 uppercase dark:text-rose-300">
@@ -792,8 +801,8 @@ export const renderFormattedText = (
                                 key={bIdx}
                                 className="shadow-3xs dark:bg-rose-950/30/40 my-4 flex items-start gap-3 rounded-r-xl border-l-4 border-rose-500 bg-rose-50 p-4 dark:border-rose-500/80 dark:bg-rose-950/20"
                             >
-                                <span className="shadow-3xs mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full bg-rose-500 text-[12px] text-white select-none">
-                                    🧠
+                                <span className="shadow-3xs mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full bg-rose-500 text-white select-none">
+                                    <Zap className="size-3.5" />
                                 </span>
                                 <div className="flex-1">
                                     <strong className="mb-1.5 block font-heading text-[13px] font-black tracking-widest text-rose-900 uppercase dark:text-rose-300">

@@ -148,7 +148,7 @@ export function useExamSubmission({
 
             // Save active session cleanup
             if (typeof window !== 'undefined') {
-                localStorage.removeItem('active_exam_session');
+                localStorage.removeItem('active_exam_session_v1');
             }
 
             // Post attempt payload with full cat_scores structure
@@ -257,7 +257,7 @@ export function useExamSubmission({
             let message = `You have answered ${answeredCount} of ${scoredTotal} graded questions.`;
 
             if (unansweredCount > 0) {
-                message += ` ⚠️ ${unansweredCount} question${unansweredCount > 1 ? 's are' : ' is'} left unanswered.`;
+                message += ` ${unansweredCount} question${unansweredCount > 1 ? 's are' : ' is'} left unanswered.`;
             }
 
             if (flaggedCount > 0) {

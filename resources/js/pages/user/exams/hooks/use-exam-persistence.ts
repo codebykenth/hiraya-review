@@ -1,4 +1,4 @@
-import { useEffect, useCallback } from 'react';
+import { useEffect, useCallback, useRef } from 'react';
 import type { Question } from '../types';
 
 const PERSISTENCE_KEY = 'active_exam_session_v1';
@@ -51,8 +51,10 @@ export function useExamPersistence({
     isTimed,
     onRestoreSession,
 }: UseExamPersistenceProps) {
+    const isClearingRef = useRef(false);
+
     const saveSession = useCallback(() => {
-        if (!isExamActive || isExamSubmitted || activeQuestions.length === 0) {
+        if (isClearingRef.current || !isExamActive || isExamSubmitted || activeQuestions.length === 0) {
             return;
         }
 
@@ -93,6 +95,7 @@ export function useExamPersistence({
     ]);
 
     const clearSession = useCallback(() => {
+        isClearingRef.current = true;
         try {
             localStorage.removeItem(PERSISTENCE_KEY);
         } catch {
@@ -127,7 +130,7 @@ export function useExamPersistence({
         }
     }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-    // Auto-save on answer change or interval
+    // Auto-save on answer change
     useEffect(() => {
         if (isExamActive && !isExamSubmitted) {
             saveSession();
@@ -138,7 +141,7 @@ export function useExamPersistence({
         flagged,
         isExamActive,
         isExamSubmitted,
-        saveSession,
+        // intentionally omit saveSession so it only triggers on above changes
     ]);
 
     // Interval save every 30s

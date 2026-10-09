@@ -103,6 +103,18 @@ export interface AiAnalysisData {
     }>;
 }
 
+export interface UserBillingSummary {
+    is_premium: boolean;
+    plan_name: string;
+    plan_code: string;
+    amount: number | null;
+    paid_at: string | null;
+    reference_id: string | null;
+    payment_method: string | null;
+    premium_until: string | null;
+    is_lifetime: boolean;
+}
+
 export interface DashboardProps {
     stats?: DashboardStats | null;
     aiAnalysis?: {
@@ -114,4 +126,5 @@ export interface DashboardProps {
     overdueTasksCount?: number;
     recentAttempts?: RecentAttemptItem[];
     nextModule?: NextModuleItem | null;
+    billing?: UserBillingSummary | null;
 }

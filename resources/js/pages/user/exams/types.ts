@@ -58,6 +58,7 @@ export interface SavedAttempt {
         flagged?: Record<number, boolean>;
         metadata?: AttemptMetadata;
     };
+    ai_explanations?: Record<string, { explanation: string; source: string }>;
     created_at?: string;
 }
 

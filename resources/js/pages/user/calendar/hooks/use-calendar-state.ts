@@ -7,6 +7,13 @@ import type {
     AttachedModule,
 } from '../types';
 
+if (typeof window !== 'undefined' && (window as any).__hasInertiaNavigated === undefined) {
+    (window as any).__hasInertiaNavigated = false;
+    document.addEventListener('inertia:start', () => {
+        (window as any).__hasInertiaNavigated = true;
+    });
+}
+
 export interface CalendarPageProps {
     schedules: Record<string, StudySchedule[]>;
     examDates: string[];
@@ -77,7 +84,7 @@ export function useCalendarState(initialProps: CalendarPageProps) {
         message: '',
         confirmLabel: '',
         variant: 'danger',
-        onConfirm: () => {},
+        onConfirm: () => { },
     });
     const [selectedDate, setSelectedDate] = useState<string | null>(null);
     const [formData, setFormData] = useState({
@@ -145,12 +152,28 @@ export function useCalendarState(initialProps: CalendarPageProps) {
     const [pastPending, setPastPending] = useState<StudySchedule[]>(
         initialProps.pastPending ?? [],
     );
-    const [isReminderOpen, setIsReminderOpen] = useState(
-        (initialProps.pastPending ?? []).length > 0 && !isSnoozed(),
-    );
-    const [hasShownReminder, setHasShownReminder] = useState(
-        (initialProps.pastPending ?? []).length > 0 && !isSnoozed(),
-    );
+    const [isReminderOpen, setIsReminderOpen] = useState(false);
+    const hasShownReminder = useRef(false);
+
+    useEffect(() => {
+        let timeoutId: NodeJS.Timeout;
+
+        if (!hasShownReminder.current && (initialProps.pastPending ?? []).length > 0 && !isSnoozed()) {
+            if (typeof window !== 'undefined' && (window as any).__hasInertiaNavigated) {
+                // Delay slightly to prevent Radix UI Dialog double-portal bug in Strict Mode
+                timeoutId = setTimeout(() => {
+                    hasShownReminder.current = true;
+                    setIsReminderOpen(true);
+                }, 100);
+            } else {
+                hasShownReminder.current = true;
+            }
+        }
+
+        return () => {
+            if (timeoutId) clearTimeout(timeoutId);
+        };
+    }, [initialProps.pastPending, isSnoozed]);
 
     const today = new Date();
     const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
@@ -205,9 +228,15 @@ export function useCalendarState(initialProps: CalendarPageProps) {
                 if (data.pastPending && data.pastPending.length > 0) {
                     setPastPending(data.pastPending);
 
-                    if (!hasShownReminder && !isSnoozed()) {
-                        setIsReminderOpen(true);
-                        setHasShownReminder(true);
+                    if (!hasShownReminder.current && !isSnoozed()) {
+                        if (typeof window !== 'undefined' && (window as any).__hasInertiaNavigated) {
+                            setTimeout(() => {
+                                hasShownReminder.current = true;
+                                setIsReminderOpen(true);
+                            }, 100);
+                        } else {
+                            hasShownReminder.current = true;
+                        }
                     }
                 }
             } catch {
@@ -216,7 +245,7 @@ export function useCalendarState(initialProps: CalendarPageProps) {
                 );
             }
         },
-        [currentDate, hasShownReminder, isSnoozed],
+        [currentDate, isSnoozed],
     );
 
     useEffect(() => {
@@ -781,16 +810,16 @@ export function useCalendarState(initialProps: CalendarPageProps) {
                     newDoneState
                         ? prev.filter((s) => s.id !== schedule.id)
                         : prev.map((s) =>
-                              s.id === schedule.id
-                                  ? { ...s, is_done: newDoneState }
-                                  : s,
-                          ),
+                            s.id === schedule.id
+                                ? { ...s, is_done: newDoneState }
+                                : s,
+                        ),
                 );
             } else {
                 const data = await response.json().catch(() => ({}));
                 setErrorMessage(
                     data.message ||
-                        'Failed to update study item. Please try again.',
+                    'Failed to update study item. Please try again.',
                 );
             }
         } catch {
@@ -989,8 +1018,8 @@ export function useCalendarState(initialProps: CalendarPageProps) {
             const count = ids
                 ? ids.length
                 : scope === 'overdue'
-                  ? pastPending.length
-                  : 0;
+                    ? pastPending.length
+                    : 0;
             const countText =
                 count > 0
                     ? `${count} study session${count > 1 ? 's' : ''}`
@@ -1044,7 +1073,7 @@ export function useCalendarState(initialProps: CalendarPageProps) {
                             const data = await response.json();
                             setErrorMessage(
                                 data.message ||
-                                    'Failed to delete study sessions.',
+                                'Failed to delete study sessions.',
                             );
                         }
                     } catch {

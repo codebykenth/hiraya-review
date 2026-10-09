@@ -403,12 +403,12 @@ export function useDrillsState({
 
         queryParams.set(
             'from',
-            originInfo ? originInfo.href : '/drills?tab=categories',
+            `/drills?category=${encodeURIComponent(selectedCategory.name)}${originInfo ? `&from=${encodeURIComponent(originInfo.href)}` : ''}`
         );
 
         // Clear any existing exam session before starting a fresh drill
         if (typeof window !== 'undefined') {
-            localStorage.removeItem('active_exam_session');
+            localStorage.removeItem('active_exam_session_v1');
         }
 
         router.visit(`/exams?${queryParams.toString()}`);

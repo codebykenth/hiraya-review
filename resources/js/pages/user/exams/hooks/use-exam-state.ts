@@ -327,7 +327,7 @@ export function useExamState(props: ExamIndexProps) {
     });
 
     // Sub-hook 5: Session Persistence (Crash Recovery)
-    useExamPersistence({
+    const { clearSession } = useExamPersistence({
         isExamActive,
         isExamSubmitted,
         selectedExamId,
@@ -538,7 +538,8 @@ export function useExamState(props: ExamIndexProps) {
                 setReviewScreenActive(false);
 
                 if (typeof window !== 'undefined') {
-                    localStorage.removeItem('active_exam_session_v1');
+                    clearSession();
+                    localStorage.removeItem('active_exam_session_v1'); // Just to be extra safe
                 }
 
                 const origin = getSessionOrigin();

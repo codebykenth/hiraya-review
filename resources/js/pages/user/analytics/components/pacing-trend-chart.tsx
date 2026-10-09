@@ -1,4 +1,4 @@
-import { Clock, AlertCircle, CheckCircle2, Zap } from 'lucide-react';
+import { Clock, AlertCircle, CheckCircle2, Zap, Lightbulb } from 'lucide-react';
 import React, { useMemo } from 'react';
 import {
     ComposedChart,
@@ -227,9 +227,12 @@ export function PacingTrendChart({ data }: PacingTrendChartProps) {
 
             {/* Pacing Tip Footer */}
             <div className="mt-3 border-t border-border pt-2.5">
-                <p className="text-[11px] font-medium text-muted-foreground">
-                    💡 <span className="font-bold">Strategy:</span>{' '}
-                    {pacingAssessment.tip}
+                <p className="flex items-center gap-1.5 text-[11px] font-medium text-muted-foreground">
+                    <Lightbulb className="size-3.5 text-amber-500" />
+                    <span>
+                        <span className="font-bold">Strategy:</span>{' '}
+                        {pacingAssessment.tip}
+                    </span>
                 </p>
             </div>
         </Card>

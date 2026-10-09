@@ -513,8 +513,46 @@ export function WeekView({
                                                                       : `${colorClasses.border} ${colorClasses.bg}`
                                                             }`}
                                                         >
-                                                            {/* Top Line: Checkbox, Title, Badges */}
-                                                            <div className="flex items-start gap-2">
+                                                            {/* Action Buttons (Inline on Mobile, Top Right on Desktop Hover) */}
+                                                            <div className="mb-1.5 flex items-center justify-end gap-1 opacity-100 lg:absolute lg:right-1.5 lg:top-1.5 lg:z-10 lg:mb-0 lg:gap-0.5 lg:rounded-md lg:bg-white/90 lg:p-0.5 lg:opacity-0 lg:backdrop-blur-sm lg:transition-opacity lg:group-hover:opacity-100 dark:lg:bg-slate-900/90">
+                                                                {isOverdue &&
+                                                                    handleRescheduleToToday && (
+                                                                        <button
+                                                                            type="button"
+                                                                            onClick={(
+                                                                                e,
+                                                                            ) => {
+                                                                                e.stopPropagation();
+                                                                                handleRescheduleToToday(
+                                                                                    schedule,
+                                                                                );
+                                                                            }}
+                                                                            className="rounded p-1 text-blue-600 hover:bg-blue-100 dark:text-blue-400 dark:hover:bg-blue-900/40"
+                                                                            title="Reschedule to Today"
+                                                                        >
+                                                                            <CalendarDays className="size-3.5" />
+                                                                        </button>
+                                                                    )}
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={(
+                                                                        e,
+                                                                    ) => {
+                                                                        e.stopPropagation();
+                                                                        handleDeleteSchedule(
+                                                                            schedule.id,
+                                                                            calendarDay.date,
+                                                                        );
+                                                                    }}
+                                                                    className="rounded p-1 text-slate-400 hover:bg-red-100 hover:text-red-600 dark:hover:bg-red-950/40 dark:hover:text-red-400"
+                                                                    title="Delete"
+                                                                >
+                                                                    <Trash2 className="size-3.5" />
+                                                                </button>
+                                                            </div>
+
+                                                            {/* Checkbox and Title */}
+                                                            <div className="flex items-start gap-1.5 pr-1">
                                                                 <button
                                                                     type="button"
                                                                     onClick={async (
@@ -552,44 +590,6 @@ export function WeekView({
                                                                             schedule.title
                                                                         }
                                                                     </span>
-                                                                </div>
-
-                                                                {/* Action Buttons (visible on mobile / hover on desktop) */}
-                                                                <div className="flex shrink-0 items-center gap-0.5 opacity-80 transition-opacity lg:opacity-0 lg:group-hover:opacity-100">
-                                                                    {isOverdue &&
-                                                                        handleRescheduleToToday && (
-                                                                            <button
-                                                                                type="button"
-                                                                                onClick={(
-                                                                                    e,
-                                                                                ) => {
-                                                                                    e.stopPropagation();
-                                                                                    handleRescheduleToToday(
-                                                                                        schedule,
-                                                                                    );
-                                                                                }}
-                                                                                className="rounded p-1 text-blue-600 hover:bg-blue-100 dark:text-blue-400 dark:hover:bg-blue-900/40"
-                                                                                title="Reschedule to Today"
-                                                                            >
-                                                                                <CalendarDays className="size-3.5" />
-                                                                            </button>
-                                                                        )}
-                                                                    <button
-                                                                        type="button"
-                                                                        onClick={(
-                                                                            e,
-                                                                        ) => {
-                                                                            e.stopPropagation();
-                                                                            handleDeleteSchedule(
-                                                                                schedule.id,
-                                                                                calendarDay.date,
-                                                                            );
-                                                                        }}
-                                                                        className="rounded p-1 text-slate-400 hover:bg-red-100 hover:text-red-600 dark:hover:bg-red-950/40 dark:hover:text-red-400"
-                                                                        title="Delete"
-                                                                    >
-                                                                        <Trash2 className="size-3.5" />
-                                                                    </button>
                                                                 </div>
                                                             </div>
 

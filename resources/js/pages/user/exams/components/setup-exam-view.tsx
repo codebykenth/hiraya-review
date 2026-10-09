@@ -8,8 +8,9 @@ import {
     Timer,
     ArrowRight,
     BarChart,
-    Target,
     Download,
+    Lightbulb,
+    Target,
 } from 'lucide-react';
 import React from 'react';
 import { PageContainer } from '@/components/layout/page-container';
@@ -249,13 +250,15 @@ export function SetupExamView({
                                 )}
                             </div>
 
-                            <p className="mt-2 text-center text-[11px] leading-relaxed text-slate-500 dark:text-slate-400">
-                                💡{' '}
-                                <span className="font-semibold text-slate-700 dark:text-slate-300">
-                                    PDF Booklet:
-                                </span>{' '}
-                                Automatically generates a high-resolution, A4
-                                PDF exam booklet with answer key.
+                            <p className="mt-2 text-center flex items-center justify-center gap-1.5 text-[11px] leading-relaxed text-slate-500 dark:text-slate-400">
+                                <Lightbulb className="size-3.5 text-amber-500" />
+                                <span>
+                                    <span className="font-semibold text-slate-700 dark:text-slate-300">
+                                        PDF Booklet:
+                                    </span>{' '}
+                                    Automatically generates a high-resolution, A4
+                                    PDF exam booklet with answer key.
+                                </span>
                             </p>
                         </div>
                     </div>

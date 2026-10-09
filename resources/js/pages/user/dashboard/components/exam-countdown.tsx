@@ -1,4 +1,4 @@
-import { Clock } from 'lucide-react';
+import { Clock, Target, AlertTriangle } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
 
 interface ExamCountdownProps {
@@ -80,8 +80,9 @@ export function ExamCountdown({
                             </h3>
                         </div>
                     </div>
-                    <div className="rounded-lg border border-rose-100 bg-white/60 px-4 py-2 text-sm font-bold text-rose-700 backdrop-blur-sm dark:border-rose-800/50 dark:bg-rose-900/40 dark:text-rose-300">
-                        Best of luck! 🎯
+                    <div className="flex items-center gap-1.5 rounded-lg border border-rose-100 bg-white/60 px-4 py-2 text-sm font-bold text-rose-700 backdrop-blur-sm dark:border-rose-800/50 dark:bg-rose-900/40 dark:text-rose-300">
+                        <span>Best of luck!</span>
+                        <Target className="size-4" />
                     </div>
                 </div>
             </div>
@@ -114,10 +115,11 @@ export function ExamCountdown({
                     </div>
                     <div>
                         <span
-                            className={`text-[10px] font-bold tracking-widest uppercase ${isUrgent ? 'text-amber-600 dark:text-amber-400' : 'text-blue-600 dark:text-blue-400'}`}
+                            className={`flex items-center gap-1.5 text-[10px] font-bold tracking-widest uppercase ${isUrgent ? 'text-amber-600 dark:text-amber-400' : 'text-blue-600 dark:text-blue-400'}`}
                         >
+                            {isUrgent && <AlertTriangle className="size-3" />}
                             {isUrgent
-                                ? '⚠️ EXAM Nearing COUNTDOWN'
+                                ? 'EXAM NEARING COUNTDOWN'
                                 : 'Exam Countdown'}
                         </span>
                         <h3 className="mt-0.5 font-heading text-lg font-black tracking-tight text-slate-900 dark:text-white">

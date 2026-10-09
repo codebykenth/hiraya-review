@@ -37,7 +37,9 @@ import type {
     SimulationDetails,
     ExamResults,
     ReviewStatusFilter,
+    SavedAttempt,
 } from '../types';
+import { AiExplanationCard } from './ai-explanation-card';
 import { BookmarkToDrillSetDialog } from './bookmark-to-drill-set-dialog';
 import QuestionPalettePanel from './question-palette-panel';
 
@@ -62,6 +64,7 @@ interface ReviewExamViewProps {
     isMobilePaletteOpen: boolean;
     setIsMobilePaletteOpen: (val: boolean) => void;
     setReviewScreenActive: (val: boolean) => void;
+    savedAttempt?: SavedAttempt | null;
 }
 
 export function ReviewExamView({
@@ -85,6 +88,7 @@ export function ReviewExamView({
     isMobilePaletteOpen,
     setIsMobilePaletteOpen,
     setReviewScreenActive,
+    savedAttempt,
 }: ReviewExamViewProps) {
     const isCurrentMatch = useCallback(
         (q: Question | undefined, idx: number) => {
@@ -1527,6 +1531,18 @@ export function ReviewExamView({
                                                         )}
                                                     </div>
                                                 )}
+
+                                                <AiExplanationCard
+                                                    questionId={currentQuestion.id}
+                                                    selectedOption={chosenOption ?? -1}
+                                                    correctOption={currentQuestion.correct_option}
+                                                    isCorrect={chosenOption === currentQuestion.correct_option}
+                                                    initialExplanation={
+                                                        savedAttempt?.ai_explanations?.[
+                                                            `${currentQuestion.id}-${chosenOption ?? -1}`
+                                                        ]
+                                                    }
+                                                />
                                             </>
                                         );
                                     })()}

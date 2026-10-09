@@ -37,7 +37,7 @@ export default function Login({
             <Form
                 {...store.form()}
                 resetOnSuccess={['password']}
-                className="flex flex-col gap-3 sm:gap-6"
+                className="flex flex-col gap-3 sm:gap-6 w-full max-w-full min-w-0"
                 transform={(data) => ({
                     ...data,
                     cf_turnstile_response: turnstileToken,
@@ -45,7 +45,7 @@ export default function Login({
             >
                 {({ processing, errors }) => (
                     <>
-                        <div className="grid gap-3 sm:gap-6">
+                        <div className="grid gap-3 sm:gap-6 w-full min-w-0">
                             {/* Email field */}
                             <div className="grid gap-2">
                                 <Label htmlFor="email">Email</Label>
@@ -65,12 +65,12 @@ export default function Login({
 
                             {/* Password field */}
                             <div className="grid gap-2">
-                                <div className="flex items-center">
+                                <div className="flex items-center justify-between gap-2">
                                     <Label htmlFor="password">Password</Label>
                                     {canResetPassword && (
                                         <TextLink
                                             href={request()}
-                                            className="ml-auto text-sm font-semibold text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300"
+                                            className="shrink-0 text-xs sm:text-sm font-semibold text-blue-600 hover:text-blue-500 dark:text-blue-400 dark:hover:text-blue-300"
                                             tabIndex={5}
                                         >
                                             Forgot password?
@@ -119,7 +119,7 @@ export default function Login({
 
                             <Button
                                 type="submit"
-                                className="mt-2 h-12 w-full rounded-xl bg-blue-600 text-base font-semibold text-white shadow-md transition-all duration-200 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-500"
+                                className="mt-2 h-11 sm:h-12 w-full rounded-xl bg-blue-600 text-sm sm:text-base font-semibold text-white shadow-md transition-all duration-200 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-500"
                                 tabIndex={4}
                                 disabled={
                                     processing ||
@@ -135,17 +135,17 @@ export default function Login({
                         {/* Social login buttons */}
                         <div className="relative flex items-center py-2">
                             <div className="flex-grow border-t border-slate-200 dark:border-slate-800"></div>
-                            <span className="mx-4 flex-shrink text-xs font-medium tracking-wider text-slate-400 uppercase dark:text-slate-500">
+                            <span className="mx-2 sm:mx-4 shrink-0 text-xs font-medium tracking-wider text-slate-400 uppercase dark:text-slate-500">
                                 Or continue with
                             </span>
                             <div className="flex-grow border-t border-slate-200 dark:border-slate-800"></div>
                         </div>
 
-                        <div className="">
+                        <div>
                             <Button
                                 type="button"
                                 variant="outline"
-                                className="h-11 w-full rounded-xl border-slate-200 font-medium transition-colors hover:bg-slate-50 disabled:opacity-50 dark:border-slate-800 dark:hover:bg-slate-900"
+                                className="h-11 w-full rounded-xl border-slate-200 text-xs sm:text-sm font-medium transition-colors hover:bg-slate-50 disabled:opacity-50 dark:border-slate-800 dark:hover:bg-slate-900"
                                 disabled={
                                     !!(turnstileSiteKey && !turnstileToken)
                                 }

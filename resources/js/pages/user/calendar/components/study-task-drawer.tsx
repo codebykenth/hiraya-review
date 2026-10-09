@@ -16,12 +16,12 @@ import React from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
-    Sheet,
-    SheetContent,
-    SheetHeader,
-    SheetTitle,
-    SheetDescription,
-} from '@/components/ui/sheet';
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogDescription,
+} from '@/components/ui/dialog';
 import { categoryNames } from '../hooks/use-calendar-state';
 import type { StudySchedule, LearnModule } from '../types';
 
@@ -103,143 +103,151 @@ export function StudyTaskDrawer({
         .trim();
 
     // Construct drill link
-    const drillUrl = subcat
-        ? `/exam/drills?subcategory_id=${subcat.id}&count=15`
-        : '/exam/drills';
+    const drillUrl = React.useMemo(() => {
+        const params = new URLSearchParams({
+            drill: 'true',
+            category_id: String(subcat?.category_id || 1),
+            category_name: catName,
+            question_count: '15',
+            language: 'English',
+            timed: 'true',
+        });
+
+        if (subcat?.name) {
+            params.append('subcategories', JSON.stringify([subcat.name]));
+        }
+
+        return `/exams?${params.toString()}`;
+    }, [subcat, catName]);
 
     return (
-        <Sheet open={isOpen} onOpenChange={onOpenChange}>
-            <SheetContent
-                side="right"
-                className="flex w-full flex-col justify-between overflow-y-auto p-0 sm:max-w-md md:max-w-lg"
-            >
-                <div>
-                    {/* Header */}
-                    <SheetHeader className="border-b border-slate-200/80 bg-slate-50/50 p-6 dark:border-slate-800/80 dark:bg-slate-900/50">
-                        <div className="flex items-center justify-between gap-2">
-                            <Badge
-                                variant="outline"
-                                className="border-blue-200 bg-blue-50 text-xs font-bold text-blue-700 dark:border-blue-900 dark:bg-blue-950/40 dark:text-blue-300"
-                            >
-                                <Tag className="mr-1 size-3" />
-                                {catName}
-                            </Badge>
+        <Dialog open={isOpen} onOpenChange={onOpenChange}>
+            <DialogContent className="flex max-h-[88dvh] flex-col gap-0 overflow-hidden p-0">
+                {/* Header */}
+                <DialogHeader className="border-b border-slate-200/80 bg-slate-50/50 p-6 dark:border-slate-800/80 dark:bg-slate-900/50 relative">
+                    <div className="flex items-center justify-between gap-2 pr-8">
+                        <Badge
+                            variant="outline"
+                            className="border-blue-200 bg-blue-50 text-xs font-bold text-blue-700 dark:border-blue-900 dark:bg-blue-950/40 dark:text-blue-300"
+                        >
+                            <Tag className="mr-1 size-3" />
+                            {catName}
+                        </Badge>
 
-                            <button
-                                type="button"
-                                onClick={() => onToggleDone(task, dateStr)}
-                                className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-xs font-bold text-slate-700 shadow-2xs transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300"
-                            >
-                                {task.is_done ? (
-                                    <>
-                                        <CheckCircle2 className="size-4 text-emerald-600 dark:text-emerald-400" />
-                                        <span className="text-emerald-700 dark:text-emerald-300">
-                                            Completed
-                                        </span>
-                                    </>
-                                ) : (
-                                    <>
-                                        <Circle className="size-4 text-slate-400" />
-                                        <span>Mark as Done</span>
-                                    </>
-                                )}
-                            </button>
-                        </div>
-
-                        <SheetTitle className="mt-3 text-lg font-black text-slate-900 dark:text-white">
-                            {task.title}
-                        </SheetTitle>
-
-                        <SheetDescription className="mt-1 flex items-center gap-3 text-xs text-slate-500 dark:text-slate-400">
-                            <span className="flex items-center gap-1">
-                                <Calendar className="size-3.5" />
-                                {dateStr}
-                            </span>
-                            {task.study_time && (
-                                <span className="flex items-center gap-1">
-                                    <Clock className="size-3.5" />
-                                    {task.study_time.slice(0, 5)}
-                                </span>
+                        <button
+                            type="button"
+                            onClick={() => onToggleDone(task, dateStr)}
+                            className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-xs font-bold text-slate-700 shadow-2xs transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300"
+                        >
+                            {task.is_done ? (
+                                <>
+                                    <CheckCircle2 className="size-4 text-emerald-600 dark:text-emerald-400" />
+                                    <span className="text-emerald-700 dark:text-emerald-300">
+                                        Completed
+                                    </span>
+                                </>
+                            ) : (
+                                <>
+                                    <Circle className="size-4 text-slate-400" />
+                                    <span>Mark as Done</span>
+                                </>
                             )}
-                        </SheetDescription>
-                    </SheetHeader>
+                        </button>
+                    </div>
 
-                    {/* Body */}
-                    <div className="space-y-5 p-6">
-                        {/* 1-Click Drill Launcher Card */}
-                        <div className="rounded-2xl border border-indigo-200/80 bg-linear-to-br from-indigo-50/80 via-blue-50/40 to-indigo-50/80 p-4.5 shadow-2xs dark:border-indigo-900/50 dark:from-indigo-950/40 dark:via-blue-950/20 dark:to-indigo-950/40">
-                            <div className="flex items-center justify-between gap-2">
-                                <div className="flex items-center gap-2">
-                                    <div className="flex size-8 items-center justify-center rounded-xl bg-indigo-600 text-white shadow-2xs">
-                                        <Sparkles className="size-4" />
-                                    </div>
-                                    <div>
-                                        <h4 className="text-xs font-black text-slate-900 dark:text-white">
-                                            Targeted Practice Drill
-                                        </h4>
-                                        <p className="text-[11px] text-slate-600 dark:text-slate-400">
-                                            15 High-Yield Questions with
-                                            Rationales
-                                        </p>
-                                    </div>
+                    <DialogTitle className="mt-3 text-lg font-black text-slate-900 dark:text-white">
+                        {task.title}
+                    </DialogTitle>
+
+                    <DialogDescription className="mt-1 flex items-center gap-3 text-xs text-slate-500 dark:text-slate-400">
+                        <span className="flex items-center gap-1">
+                            <Calendar className="size-3.5" />
+                            {dateStr}
+                        </span>
+                        {task.study_time && (
+                            <span className="flex items-center gap-1">
+                                <Clock className="size-3.5" />
+                                {task.study_time.slice(0, 5)}
+                            </span>
+                        )}
+                    </DialogDescription>
+                </DialogHeader>
+
+                {/* Body */}
+                <div className="flex-1 space-y-5 overflow-y-auto p-6">
+                    {/* 1-Click Drill Launcher Card */}
+                    <div className="rounded-2xl border border-indigo-200/80 bg-linear-to-br from-indigo-50/80 via-blue-50/40 to-indigo-50/80 p-4.5 shadow-2xs dark:border-indigo-900/50 dark:from-indigo-950/40 dark:via-blue-950/20 dark:to-indigo-950/40">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-2">
+                            <div className="flex items-center gap-2">
+                                <div className="flex size-8 shrink-0 items-center justify-center rounded-xl bg-indigo-600 text-white shadow-2xs">
+                                    <Sparkles className="size-4" />
                                 </div>
+                                <div>
+                                    <h4 className="text-xs font-black text-slate-900 dark:text-white">
+                                        Targeted {subcat?.name || catName} Drill
+                                    </h4>
+                                    <p className="text-[11px] text-slate-600 dark:text-slate-400">
+                                        15 High-Yield Questions with
+                                        Rationales
+                                    </p>
+                                </div>
+                            </div>
 
-                                <Button
-                                    asChild
-                                    size="sm"
-                                    className="h-8.5 shrink-0 gap-1.5 bg-indigo-600 text-xs font-bold text-white shadow-2xs hover:bg-indigo-700"
-                                >
-                                    <Link href={drillUrl}>
-                                        <Play className="size-3.5 fill-current" />
-                                        <span>Start Drill</span>
-                                    </Link>
-                                </Button>
+                            <Button
+                                asChild
+                                size="sm"
+                                className="w-full sm:w-auto h-8.5 shrink-0 gap-1.5 bg-indigo-600 text-xs font-bold text-white shadow-2xs hover:bg-indigo-700"
+                            >
+                                <Link href={drillUrl}>
+                                    <Play className="size-3.5 fill-current" />
+                                    <span>Start Drill</span>
+                                </Link>
+                            </Button>
+                        </div>
+                    </div>
+
+                    {/* Description / Study Notes */}
+                    {cleanDescription && (
+                        <div className="space-y-2">
+                            <h4 className="text-xs font-bold tracking-wider text-slate-700 uppercase dark:text-slate-300">
+                                Study Notes & Objectives
+                            </h4>
+                            <div className="rounded-xl border border-slate-200/80 bg-white p-3.5 text-xs leading-relaxed text-slate-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300">
+                                {cleanDescription}
                             </div>
                         </div>
+                    )}
 
-                        {/* Description / Study Notes */}
-                        {cleanDescription && (
+                    {/* Attached Learning Modules */}
+                    {attachedModuleList.length > 0 && (
+                        <div className="space-y-2">
+                            <h4 className="flex items-center gap-1.5 text-xs font-bold tracking-wider text-slate-700 uppercase dark:text-slate-300">
+                                <BookOpen className="size-3.5 text-blue-500" />
+                                <span>Learning Modules & References</span>
+                            </h4>
                             <div className="space-y-2">
-                                <h4 className="text-xs font-bold tracking-wider text-slate-700 uppercase dark:text-slate-300">
-                                    Study Notes & Objectives
-                                </h4>
-                                <div className="rounded-xl border border-slate-200/80 bg-white p-3.5 text-xs leading-relaxed text-slate-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300">
-                                    {cleanDescription}
-                                </div>
+                                {attachedModuleList.map((mod, i) => (
+                                    <Link
+                                        key={i}
+                                        href={mod.url}
+                                        className="flex items-center justify-between rounded-xl border border-slate-200 bg-white p-3 text-xs font-semibold text-slate-800 shadow-2xs transition hover:border-blue-300 hover:bg-blue-50/50 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200 dark:hover:border-blue-700 dark:hover:bg-blue-950/30"
+                                    >
+                                        <div className="flex items-center gap-2 truncate pr-2">
+                                            <BookOpen className="size-4 shrink-0 text-blue-600 dark:text-blue-400" />
+                                            <span className="truncate">
+                                                {mod.title}
+                                            </span>
+                                        </div>
+                                        <ExternalLink className="size-3.5 shrink-0 text-slate-400" />
+                                    </Link>
+                                ))}
                             </div>
-                        )}
-
-                        {/* Attached Learning Modules */}
-                        {attachedModuleList.length > 0 && (
-                            <div className="space-y-2">
-                                <h4 className="flex items-center gap-1.5 text-xs font-bold tracking-wider text-slate-700 uppercase dark:text-slate-300">
-                                    <BookOpen className="size-3.5 text-blue-500" />
-                                    <span>Learning Modules & References</span>
-                                </h4>
-                                <div className="space-y-2">
-                                    {attachedModuleList.map((mod, i) => (
-                                        <Link
-                                            key={i}
-                                            href={mod.url}
-                                            className="flex items-center justify-between rounded-xl border border-slate-200 bg-white p-3 text-xs font-semibold text-slate-800 shadow-2xs transition hover:border-blue-300 hover:bg-blue-50/50 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200 dark:hover:border-blue-700 dark:hover:bg-blue-950/30"
-                                        >
-                                            <div className="flex items-center gap-2 truncate pr-2">
-                                                <BookOpen className="size-4 shrink-0 text-blue-600 dark:text-blue-400" />
-                                                <span className="truncate">
-                                                    {mod.title}
-                                                </span>
-                                            </div>
-                                            <ExternalLink className="size-3.5 shrink-0 text-slate-400" />
-                                        </Link>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-                    </div>
+                        </div>
+                    )}
                 </div>
 
                 {/* Footer Controls */}
-                <div className="flex items-center justify-between gap-2 border-t border-slate-200 bg-slate-50/60 p-4 dark:border-slate-800 dark:bg-slate-900/60">
+                <div className="flex flex-wrap items-center justify-between gap-2 border-t border-slate-200 bg-slate-50/60 p-4 dark:border-slate-800 dark:bg-slate-900/60">
                     <Button
                         type="button"
                         variant="outline"
@@ -278,7 +286,7 @@ export function StudyTaskDrawer({
                         </Button>
                     </div>
                 </div>
-            </SheetContent>
-        </Sheet>
+            </DialogContent>
+        </Dialog>
     );
 }

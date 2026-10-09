@@ -120,7 +120,7 @@ export default function Drills(props: DrillsProps) {
         sessionTitle: string,
     ) => {
         if (typeof window !== 'undefined') {
-            localStorage.removeItem('active_exam_session');
+            localStorage.removeItem('active_exam_session_v1');
         }
 
         const queryParams = new URLSearchParams({
@@ -151,7 +151,7 @@ export default function Drills(props: DrillsProps) {
             }
 
             if (typeof window !== 'undefined') {
-                localStorage.removeItem('active_exam_session');
+                localStorage.removeItem('active_exam_session_v1');
             }
 
             const queryParams = new URLSearchParams({

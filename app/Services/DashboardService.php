@@ -7,7 +7,9 @@ namespace App\Services;
 use App\Models\ExamAttempt;
 use App\Models\ExamDate;
 use App\Models\LearnModule;
+use App\Models\Payment;
 use App\Models\StudySchedule;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Schema;
@@ -47,6 +49,7 @@ class DashboardService
             'overdueTasksCount' => $this->getOverdueTasksCount($userId),
             'recentAttempts' => $this->getRecentAttempts($userId),
             'nextModule' => $this->getNextModule($userId),
+            'billing' => $this->getBillingSummary($userId),
         ];
     }
 
@@ -206,5 +209,39 @@ class DashboardService
             ->where('study_date', '<', Carbon::today())
             ->where('is_done', false)
             ->count();
+    }
+
+    /**
+     * @return array<string, mixed>|null
+     */
+    protected function getBillingSummary(int $userId): ?array
+    {
+        $user = User::find($userId);
+        if (! $user) {
+            return null;
+        }
+
+        $latestPayment = Payment::where('user_id', $userId)
+            ->where('status', 'paid')
+            ->orderBy('id', 'desc')
+            ->first();
+
+        if (! $user->isPremium() && ! $latestPayment) {
+            return null;
+        }
+
+        $plan = $latestPayment ? config("pricing.plans.{$latestPayment->plan_code}") : null;
+
+        return [
+            'is_premium' => $user->isPremium(),
+            'plan_name' => $plan['name'] ?? ($user->premium_until ? 'Pro Reviewer Pass' : 'Lifetime Reviewer Pass'),
+            'plan_code' => $latestPayment?->plan_code ?? ($user->premium_until ? 'pro_pass' : 'lifetime_access'),
+            'amount' => $latestPayment ? (float) $latestPayment->amount : null,
+            'paid_at' => $latestPayment?->paid_at?->toIso8601String(),
+            'reference_id' => $latestPayment?->reference_id,
+            'payment_method' => $latestPayment?->payment_method,
+            'premium_until' => $user->premium_until?->toIso8601String(),
+            'is_lifetime' => $user->is_premium && $user->premium_until === null,
+        ];
     }
 }

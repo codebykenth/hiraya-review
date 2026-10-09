@@ -7,25 +7,31 @@ use App\Http\Controllers\Admin\ExamDateController;
 use App\Http\Controllers\Admin\FeedbackController;
 use App\Http\Controllers\Admin\LearnController as AdminLearnController;
 use App\Http\Controllers\Admin\LegalContentController;
+use App\Http\Controllers\Admin\PaymentController as AdminPaymentController;
 use App\Http\Controllers\Admin\QuestionController;
 use App\Http\Controllers\Admin\SyllabusController;
 use App\Http\Controllers\Admin\SystemController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\ViewManagementController;
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\Dev\DevPaymentSimulatorController;
 use App\Http\Controllers\Public\PublicController;
 use App\Http\Controllers\Public\SitemapController;
 use App\Http\Controllers\Public\SupportController;
 use App\Http\Controllers\Settings\AcceptTermsController;
+use App\Http\Controllers\User\AiTutorController;
 use App\Http\Controllers\User\AnalyticsController;
+use App\Http\Controllers\User\BillingController;
 use App\Http\Controllers\User\DashboardController as UserDashboardController;
 use App\Http\Controllers\User\DrillController;
 use App\Http\Controllers\User\ExamController;
 use App\Http\Controllers\User\ExamHistoryController;
 use App\Http\Controllers\User\LearnController as UserLearnController;
+use App\Http\Controllers\User\QuestionExplanationController;
 use App\Http\Controllers\User\SavedDrillSetController;
 use App\Http\Controllers\User\StudyScheduleController;
 use App\Http\Controllers\User\StudySuggestionController;
+use App\Http\Controllers\Webhook\XenditWebhookController;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -79,6 +85,11 @@ Route::middleware('throttle:10,1')->controller(AuthController::class)->prefix('a
     Route::get('{provider}/callback', 'handleProviderCallback');
 });
 
+// Xendit Webhook Endpoint
+Route::post('webhooks/xendit', [XenditWebhookController::class, 'handle'])
+    ->name('webhooks.xendit')
+    ->middleware('throttle:60,1');
+
 // ============================================================================
 // AUTHENTICATED ROUTES
 // ============================================================================
@@ -91,6 +102,21 @@ Route::inertia('dev-docs', 'dev-docs')
     ->middleware(['auth.or.fail', 'verified', 'can:access-dev-docs']);
 
 Route::middleware(['auth.or.fail', 'verified'])->group(function () {
+
+    // --- USER BILLING & PAYMENTS ---
+    Route::controller(BillingController::class)->prefix('billing')->name('billing.')->group(function () {
+        Route::get('/', 'index')->name('index')->middleware('throttle:global-views');
+        Route::post('checkout', 'checkout')->name('checkout')->middleware('throttle:global-mutations');
+        Route::get('success', 'success')->name('success')->middleware('throttle:global-views');
+        Route::get('failed', 'failed')->name('failed')->middleware('throttle:global-views');
+        Route::post('sync/{payment}', 'sync')->name('sync')->middleware('throttle:global-mutations');
+    });
+
+    if (! app()->isProduction()) {
+        Route::post('dev/payments/{payment}/simulate', [DevPaymentSimulatorController::class, 'simulate'])
+            ->name('dev.payments.simulate')
+            ->middleware('throttle:global-mutations');
+    }
 
     // --- USER DASHBOARD & ANALYTICS ---
     Route::middleware('throttle:global-views')->group(function () {
@@ -128,6 +154,16 @@ Route::middleware(['auth.or.fail', 'verified'])->group(function () {
         Route::get('history', 'index')->name('history.index')->middleware('throttle:global-views');
         Route::post('exams/attempts/bulk-delete', 'bulkDestroy')->name('exams.attempts.bulkDestroy')->middleware('throttle:global-mutations');
         Route::delete('exams/attempts/{attempt}', 'destroy')->name('exams.attempts.destroy')->middleware('throttle:global-mutations');
+    });
+
+    Route::post('exams/questions/{question}/ai-explain', [QuestionExplanationController::class, 'explain'])
+        ->name('exams.questions.aiExplain')
+        ->middleware('throttle:60,1');
+
+    Route::controller(AiTutorController::class)->group(function () {
+        Route::get('tutor', 'index')->name('tutor.index')->middleware('throttle:global-views');
+        Route::post('tutor/ask', 'ask')->name('tutor.ask')->middleware('throttle:30,1');
+        Route::post('ai-tutor/ask', 'ask')->name('ai-tutor.ask')->middleware('throttle:30,1');
     });
 
     Route::post('learn/{slug}/complete', [UserLearnController::class, 'toggleComplete'])
@@ -178,6 +214,10 @@ Route::middleware(['auth.or.fail', 'verified'])->group(function () {
             Route::get('syllabus', [SyllabusController::class, 'index'])->name('syllabus.index');
 
             Route::controller(UserController::class)->prefix('users')->name('users.')->group(function () {
+                Route::get('/', 'index')->name('index');
+            });
+
+            Route::controller(AdminPaymentController::class)->prefix('payments')->name('payments.')->group(function () {
                 Route::get('/', 'index')->name('index');
             });
 

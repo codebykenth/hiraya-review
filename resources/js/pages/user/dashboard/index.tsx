@@ -7,6 +7,7 @@ import { DailyGoalStreakCard } from '@/pages/user/dashboard/components/daily-goa
 import { DashboardHero } from '@/pages/user/dashboard/components/dashboard-hero';
 import { SmartStudyLaunchers } from '@/pages/user/dashboard/components/smart-study-launchers';
 import { StudyScheduleActivityCard } from '@/pages/user/dashboard/components/study-schedule-activity-card';
+import { SubscriptionStatusCard } from '@/pages/user/dashboard/components/subscription-status-card';
 import type { Auth } from '@/types';
 import type { DashboardProps } from './types';
 
@@ -18,6 +19,7 @@ export default function Dashboard({
     overdueTasksCount = 0,
     recentAttempts = [],
     nextModule,
+    billing,
 }: DashboardProps) {
     const { auth } = usePage<{ auth: Auth }>().props;
     const firstName = auth?.user?.name ? auth.user.name.split(' ')[0] : 'User';
@@ -46,6 +48,9 @@ export default function Dashboard({
                 motivationText={aiAnalysis?.data?.encouragement}
                 streak={dailyGoal?.streak}
             />
+
+            {/* Active Paid Membership & Billing Indicator */}
+            {billing && <SubscriptionStatusCard billing={billing} />}
 
             {/* Bento Grid: 4 Core Modules */}
             <div className="grid grid-cols-1 gap-5 sm:gap-6 md:grid-cols-2">

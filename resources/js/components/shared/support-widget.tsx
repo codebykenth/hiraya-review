@@ -21,7 +21,7 @@ export function SupportWidget() {
     const [isReviewExamActive, setIsReviewExamActive] = useState(false);
     const [isLiveExamActive, setIsLiveExamActive] = useState(() => {
         if (typeof window !== 'undefined') {
-            return localStorage.getItem('active_exam_session') !== null;
+            return localStorage.getItem('active_exam_session_v1') !== null;
         }
 
         return false;

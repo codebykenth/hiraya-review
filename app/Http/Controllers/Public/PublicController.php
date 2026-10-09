@@ -16,7 +16,9 @@ class PublicController extends Controller
     {
         session()->forget('is_free_attempt_active');
 
-        return $this->render('public/welcome');
+        return $this->render('public/welcome', [
+            'plans' => array_values(config('pricing.plans', [])),
+        ]);
     }
 
     public function about()
