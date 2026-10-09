@@ -47,7 +47,7 @@ class HandleInertiaRequests extends Middleware
             'name' => config('app.name'),
             'auth' => [
                 'user' => $request->user() ? array_merge(
-                    $request->user()->only(['id', 'name', 'email', 'email_verified_at', 'role', 'created_at', 'updated_at', 'terms_accepted_at', 'is_active']),
+                    $request->user()->only(['id', 'name', 'email', 'email_verified_at', 'role', 'created_at', 'updated_at', 'terms_accepted_at', 'is_active', 'can_download_pdf', 'pdf_downloads_count']),
                     [
                         'two_factor_enabled' => ! is_null($request->user()->two_factor_secret),
                         'analysis_mode' => app(UserPreferenceService::class)->getAnalysisMode($request->user()->id),

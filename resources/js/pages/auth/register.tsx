@@ -41,7 +41,7 @@ export default function Register({ passwordRules, turnstileSiteKey }: Props) {
                 {...store.form()}
                 resetOnSuccess={['password', 'password_confirmation']}
                 disableWhileProcessing
-                className="flex flex-col gap-3 sm:gap-6"
+                className="flex flex-col gap-3 sm:gap-6 w-full max-w-full min-w-0"
                 transform={(data) => ({
                     ...data,
                     cf_turnstile_response: turnstileToken,
@@ -50,7 +50,7 @@ export default function Register({ passwordRules, turnstileSiteKey }: Props) {
             >
                 {({ processing, errors }) => (
                     <>
-                        <div className="grid gap-3 sm:gap-6">
+                        <div className="grid gap-3 sm:gap-6 w-full min-w-0">
                             <div className="grid gap-2">
                                 <Label htmlFor="name">Name</Label>
                                 <Input

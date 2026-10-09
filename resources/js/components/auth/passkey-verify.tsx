@@ -1,4 +1,4 @@
-﻿import type { UrlMethodPair } from '@inertiajs/core';
+import type { UrlMethodPair } from '@inertiajs/core';
 import { router } from '@inertiajs/react';
 import { usePasskeyVerify } from '@laravel/passkeys/react';
 import { KeyRound } from 'lucide-react';
@@ -59,7 +59,7 @@ export default function PasskeyVerify({
                 )}
             </div>
 
-            <div className="relative my-6">
+            <div className="relative my-4 sm:my-6">
                 <div className="absolute inset-0 flex items-center">
                     <Separator className="w-full" />
                 </div>

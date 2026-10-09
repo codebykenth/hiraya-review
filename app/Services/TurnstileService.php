@@ -7,6 +7,10 @@ use Illuminate\Support\Facades\Log;
 
 class TurnstileService
 {
+    public const TEST_SITE_KEY = '1x00000000000000000000AA';
+
+    public const TEST_SECRET_KEY = '1x0000000000000000000000000000000AA';
+
     protected string $siteKey;
 
     protected string $secretKey;
@@ -16,8 +20,15 @@ class TurnstileService
      */
     public function __construct()
     {
-        $this->siteKey = config('services.turnstile.site_key');
-        $this->secretKey = config('services.turnstile.secret_key');
+        $isDev = app()->environment('local', 'development', 'testing');
+
+        if ($isDev && ! config('services.turnstile.force_live_in_dev', false)) {
+            $this->siteKey = self::TEST_SITE_KEY;
+            $this->secretKey = self::TEST_SECRET_KEY;
+        } else {
+            $this->siteKey = (string) config('services.turnstile.site_key', '');
+            $this->secretKey = (string) config('services.turnstile.secret_key', '');
+        }
     }
 
     /**
@@ -34,6 +45,11 @@ class TurnstileService
         $result = $response->json();
 
         if ($result['success'] ?? false) {
+            return true;
+        }
+
+        // Allow test tokens in local/testing environment if offline or mock token passed
+        if (app()->environment('local', 'development', 'testing') && $this->secretKey === self::TEST_SECRET_KEY) {
             return true;
         }
 
