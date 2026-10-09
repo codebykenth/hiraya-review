@@ -101,6 +101,10 @@ export interface AiAnalysisData {
         reason_for_struggle: string;
         coaching_tip: string;
     }>;
+    is_past_cycle?: boolean;
+    target_exam_date?: string;
+    target_exam_description?: string;
+    days_until_target_exam?: number;
 }
 
 export interface UserBillingSummary {

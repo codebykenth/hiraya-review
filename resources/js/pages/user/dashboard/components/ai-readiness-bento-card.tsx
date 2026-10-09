@@ -8,12 +8,14 @@ import {
     Loader2,
     AlertCircle,
     Target,
+    History,
 } from 'lucide-react';
 import Pusher from 'pusher-js';
 import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
+import { cn } from '@/lib/utils';
 import { index as examsIndex } from '@/routes/exams';
 import type { Auth } from '@/types';
 import type { AiAnalysisData } from '../types';
@@ -33,6 +35,7 @@ export function AiReadinessBentoCard({
     const [localStatus, setLocalStatus] = useState(initialStatus);
     const [prevInitialStatus, setPrevInitialStatus] = useState(initialStatus);
     const [progress, setProgress] = useState(25);
+    const [showArchived, setShowArchived] = useState(false);
     const data = aiAnalysis?.data;
 
     if (initialStatus !== prevInitialStatus) {
@@ -164,109 +167,275 @@ export function AiReadinessBentoCard({
                 </div>
 
                 {localStatus === 'ready' && data && (
-                    <span className="inline-flex items-center gap-1 rounded-full border border-indigo-200 bg-indigo-50 px-2.5 py-0.5 text-[11px] font-bold text-indigo-700 dark:border-indigo-800 dark:bg-indigo-950/40 dark:text-indigo-300">
+                    <span
+                        className={cn(
+                            'inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-[11px] font-bold',
+                            data.is_past_cycle
+                                ? 'border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-900/60 dark:bg-amber-950/40 dark:text-amber-300'
+                                : 'border-indigo-200 bg-indigo-50 text-indigo-700 dark:border-indigo-800 dark:bg-indigo-950/40 dark:text-indigo-300',
+                        )}
+                    >
                         <Sparkles className="size-3 fill-current" />
-                        AI Synced
+                        {data.is_past_cycle
+                            ? `New Cycle • ${data.target_exam_description || data.target_exam_date || 'Upcoming'}`
+                            : 'AI Synced'}
                     </span>
                 )}
             </div>
 
             {/* Content Body */}
             <div className="my-4">
-                {localStatus === 'ready' && data && (
-                    <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
-                        {/* Circular Progress Gauge with Generous Inner Spacing */}
-                        <div className="relative flex size-28 shrink-0 items-center justify-center self-start p-1 sm:size-32">
-                            <svg
-                                className="size-full -rotate-90"
-                                viewBox="0 0 112 112"
-                            >
-                                <circle
-                                    cx="56"
-                                    cy="56"
-                                    r={radius}
-                                    className="stroke-slate-100 dark:stroke-slate-800"
-                                    strokeWidth="7"
-                                    fill="transparent"
-                                />
-                                <circle
-                                    cx="56"
-                                    cy="56"
-                                    r={radius}
-                                    className={`${colors.stroke} transition-all duration-1000 ease-out`}
-                                    strokeWidth="7"
-                                    strokeDasharray={circumference}
-                                    strokeDashoffset={strokeDashoffset}
-                                    strokeLinecap="round"
-                                    fill="transparent"
-                                />
-                            </svg>
-                            <div className="absolute inset-0 flex flex-col items-center justify-center p-3 text-center">
-                                <span
-                                    className={`font-black tracking-tight ${colors.text} ${
-                                        isDrillOnly
-                                            ? 'text-lg sm:text-xl'
-                                            : 'text-2xl sm:text-3xl'
-                                    }`}
-                                >
-                                    {isDrillOnly ? 'Drill' : `${prob}%`}
-                                </span>
-                                <span className="mt-0.5 text-[9px] leading-none font-bold tracking-wider whitespace-nowrap text-slate-400 uppercase sm:text-[10px] dark:text-slate-500">
-                                    {isDrillOnly
-                                        ? 'Mock Needed'
-                                        : 'Pass Chance'}
-                                </span>
-                            </div>
-                        </div>
-
-                        {/* Verdict & Recommendation with Priority Focus underneath */}
-                        <div className="min-w-0 flex-1 space-y-2.5">
-                            <div>
-                                <span
-                                    className={`inline-block rounded-xl border px-3 py-2 text-xs leading-relaxed font-bold sm:text-sm ${colors.badge}`}
-                                >
-                                    {isDrillOnly
-                                        ? 'Drill Diagnostics Active'
-                                        : data.verdict || 'Ready for Testing'}
-                                </span>
-                            </div>
-
-                            <p className="text-xs leading-relaxed font-medium text-slate-600 sm:text-sm dark:text-slate-300">
-                                {isDrillOnly
-                                    ? 'Complete a Full Mock Exam to calculate your official CSE passing probability.'
-                                    : data.priority_action ||
-                                      'Focus on targeted practice drills to raise your score.'}
-                            </p>
-
-                            {/* Top Weakness / Quick Fix Pill placed underneath */}
-                            {primaryWeakness && !isDrillOnly && (
-                                <div className="mt-2 flex flex-col justify-between gap-2.5 rounded-xl border border-rose-200/80 bg-rose-50/60 p-2.5 sm:flex-row sm:items-center sm:px-3 sm:py-2 dark:border-rose-900/40 dark:bg-rose-950/30">
-                                    <div className="flex min-w-0 items-center gap-2">
-                                        <div className="flex size-6 shrink-0 items-center justify-center rounded-md bg-rose-500/10 text-rose-600 dark:text-rose-400">
-                                            <Target className="size-3.5" />
-                                        </div>
-                                        <div className="flex min-w-0 flex-wrap items-center gap-1.5">
-                                            <span className="shrink-0 text-[11px] font-black tracking-wide text-rose-700 uppercase dark:text-rose-300">
-                                                Priority Focus:
-                                            </span>
-                                            <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
-                                                {primaryWeakness}
-                                            </span>
-                                        </div>
-                                    </div>
-                                    <Link
-                                        href={`/drills?category=${encodeURIComponent(primaryWeakness)}&from=/dashboard`}
-                                        className="inline-flex shrink-0 items-center justify-center gap-1.5 self-start rounded-lg bg-rose-600 px-3 py-1.5 text-xs font-bold text-white shadow-2xs transition hover:bg-rose-700 active:scale-95 sm:self-auto"
+                {localStatus === 'ready' &&
+                    data &&
+                    (data.is_past_cycle ? (
+                        <div className="space-y-4">
+                            <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
+                                {/* Circular Countdown Widget matching Progress Gauge proportions */}
+                                <div className="relative flex size-28 shrink-0 items-center justify-center self-start p-1 sm:size-32">
+                                    <svg
+                                        className="size-full -rotate-90"
+                                        viewBox="0 0 112 112"
                                     >
-                                        <Zap className="size-3 fill-current" />
-                                        <span>Fix in Drill</span>
-                                        <ChevronRight className="size-3.5" />
-                                    </Link>
+                                        <circle
+                                            cx="56"
+                                            cy="56"
+                                            r={radius}
+                                            className="stroke-indigo-100 dark:stroke-indigo-950/60"
+                                            strokeWidth="7"
+                                            strokeDasharray="4 4"
+                                            fill="transparent"
+                                        />
+                                        <circle
+                                            cx="56"
+                                            cy="56"
+                                            r={radius}
+                                            className="stroke-indigo-500 transition-all duration-1000 ease-out dark:stroke-indigo-400"
+                                            strokeWidth="7"
+                                            strokeDasharray={circumference}
+                                            strokeDashoffset={
+                                                circumference * 0.3
+                                            }
+                                            strokeLinecap="round"
+                                            fill="transparent"
+                                        />
+                                    </svg>
+                                    <div className="absolute inset-0 flex flex-col items-center justify-center p-3 text-center">
+                                        <span className="text-xl font-black tracking-tight text-indigo-600 sm:text-2xl dark:text-indigo-400">
+                                            {data.days_until_target_exam ?? 0}
+                                        </span>
+                                        <span className="mt-0.5 text-[9px] font-bold tracking-wider text-slate-400 uppercase sm:text-[10px] dark:text-slate-500">
+                                            Days Left
+                                        </span>
+                                    </div>
                                 </div>
-                            )}
+
+                                {/* Cycle Information & Inline CTAs */}
+                                <div className="min-w-0 flex-1 space-y-2.5">
+                                    <div>
+                                        <span className="inline-block rounded-xl border border-indigo-200 bg-indigo-50 px-3 py-1.5 text-xs font-bold text-indigo-700 sm:text-sm dark:border-indigo-800 dark:bg-indigo-950/40 dark:text-indigo-300">
+                                            New Exam Cycle Active •{' '}
+                                            {data.target_exam_description ||
+                                                data.target_exam_date ||
+                                                'Upcoming Exam'}
+                                        </span>
+                                    </div>
+
+                                    <p className="text-xs leading-relaxed font-medium text-slate-600 sm:text-sm dark:text-slate-300">
+                                        Your previous review cycle is complete.
+                                        Complete a full-length mock exam or
+                                        diagnostic drill to establish your live
+                                        baseline and unlock your passing
+                                        probability.
+                                    </p>
+
+                                    <div className="flex flex-wrap items-center gap-2 pt-1">
+                                        <Button
+                                            asChild
+                                            size="sm"
+                                            className="gap-1.5 bg-indigo-600 text-xs font-bold text-white shadow-xs transition hover:bg-indigo-700 active:scale-95 dark:bg-indigo-500 dark:hover:bg-indigo-600"
+                                        >
+                                            <Link
+                                                href={
+                                                    examsIndex({
+                                                        query: {
+                                                            start: 'professional',
+                                                            from: '/dashboard',
+                                                        },
+                                                    }).url
+                                                }
+                                            >
+                                                <Zap className="size-3.5 fill-current" />
+                                                <span>Take Mock Exam</span>
+                                            </Link>
+                                        </Button>
+                                        <Button
+                                            asChild
+                                            variant="outline"
+                                            size="sm"
+                                            className="gap-1 text-xs font-bold text-slate-700 dark:text-slate-300"
+                                        >
+                                            <Link href="/drills?from=/dashboard">
+                                                <span>Practice Drills</span>
+                                            </Link>
+                                        </Button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Collapsible toggle for archived past cycle score */}
+                            <div className="rounded-xl border border-slate-200/80 bg-white/70 p-3 text-xs transition-colors dark:border-slate-800 dark:bg-slate-900/70">
+                                <button
+                                    type="button"
+                                    onClick={() =>
+                                        setShowArchived((prev) => !prev)
+                                    }
+                                    className="flex w-full items-center justify-between text-left font-bold text-slate-700 transition hover:text-slate-900 dark:text-slate-300 dark:hover:text-white"
+                                >
+                                    <div className="flex items-center gap-2">
+                                        <History className="size-4 text-slate-400" />
+                                        <span className="text-[11px] sm:text-xs">
+                                            {showArchived
+                                                ? 'Hide Past Cycle Summary'
+                                                : 'View Past Cycle Summary'}{' '}
+                                            <span className="font-semibold text-slate-500 dark:text-slate-400">
+                                                ({prob}% Pass Chance)
+                                            </span>
+                                        </span>
+                                    </div>
+                                    <ChevronRight
+                                        className={cn(
+                                            'size-4 text-slate-400 transition-transform duration-200',
+                                            showArchived && 'rotate-90',
+                                        )}
+                                    />
+                                </button>
+
+                                {showArchived && (
+                                    <div className="mt-3 space-y-2 border-t border-slate-100 pt-3 dark:border-slate-800">
+                                        <div className="flex items-center gap-2">
+                                            <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">
+                                                Archived Score:
+                                            </span>
+                                            <span className="font-bold text-slate-800 dark:text-slate-200">
+                                                {prob}% Pass Probability
+                                            </span>
+                                        </div>
+                                        {data.verdict && (
+                                            <p className="text-[11px] leading-relaxed text-slate-600 dark:text-slate-300">
+                                                {data.verdict}
+                                            </p>
+                                        )}
+                                        {primaryWeakness && (
+                                            <p className="text-[11px] font-semibold text-rose-600 dark:text-rose-400">
+                                                Previous Priority Focus:{' '}
+                                                {primaryWeakness}
+                                            </p>
+                                        )}
+                                        <p className="text-[10px] text-slate-400 italic dark:text-slate-500">
+                                            * Recorded during previous exam
+                                            cycle. Your active score will
+                                            automatically recalibrate once you
+                                            complete a new exam.
+                                        </p>
+                                    </div>
+                                )}
+                            </div>
                         </div>
-                    </div>
-                )}
+                    ) : (
+                        <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
+                            {/* Circular Progress Gauge with Generous Inner Spacing */}
+                            <div className="relative flex size-28 shrink-0 items-center justify-center self-start p-1 sm:size-32">
+                                <svg
+                                    className="size-full -rotate-90"
+                                    viewBox="0 0 112 112"
+                                >
+                                    <circle
+                                        cx="56"
+                                        cy="56"
+                                        r={radius}
+                                        className="stroke-slate-100 dark:stroke-slate-800"
+                                        strokeWidth="7"
+                                        fill="transparent"
+                                    />
+                                    <circle
+                                        cx="56"
+                                        cy="56"
+                                        r={radius}
+                                        className={`${colors.stroke} transition-all duration-1000 ease-out`}
+                                        strokeWidth="7"
+                                        strokeDasharray={circumference}
+                                        strokeDashoffset={strokeDashoffset}
+                                        strokeLinecap="round"
+                                        fill="transparent"
+                                    />
+                                </svg>
+                                <div className="absolute inset-0 flex flex-col items-center justify-center p-3 text-center">
+                                    <span
+                                        className={`font-black tracking-tight ${colors.text} ${
+                                            isDrillOnly
+                                                ? 'text-lg sm:text-xl'
+                                                : 'text-2xl sm:text-3xl'
+                                        }`}
+                                    >
+                                        {isDrillOnly ? 'Drill' : `${prob}%`}
+                                    </span>
+                                    <span className="mt-0.5 text-[9px] leading-none font-bold tracking-wider whitespace-nowrap text-slate-400 uppercase sm:text-[10px] dark:text-slate-500">
+                                        {isDrillOnly
+                                            ? 'Mock Needed'
+                                            : 'Pass Chance'}
+                                    </span>
+                                </div>
+                            </div>
+
+                            {/* Verdict & Recommendation with Priority Focus underneath */}
+                            <div className="min-w-0 flex-1 space-y-2.5">
+                                <div>
+                                    <span
+                                        className={`inline-block rounded-xl border px-3 py-2 text-xs leading-relaxed font-bold sm:text-sm ${colors.badge}`}
+                                    >
+                                        {isDrillOnly
+                                            ? 'Drill Diagnostics Active'
+                                            : data.verdict ||
+                                              'Ready for Testing'}
+                                    </span>
+                                </div>
+
+                                <p className="text-xs leading-relaxed font-medium text-slate-600 sm:text-sm dark:text-slate-300">
+                                    {isDrillOnly
+                                        ? 'Complete a Full Mock Exam to calculate your official CSE passing probability.'
+                                        : data.priority_action ||
+                                          'Focus on targeted practice drills to raise your score.'}
+                                </p>
+
+                                {/* Top Weakness / Quick Fix Pill placed underneath */}
+                                {primaryWeakness && !isDrillOnly && (
+                                    <div className="mt-2 flex flex-col justify-between gap-2.5 rounded-xl border border-rose-200/80 bg-rose-50/60 p-2.5 sm:flex-row sm:items-center sm:px-3 sm:py-2 dark:border-rose-900/40 dark:bg-rose-950/30">
+                                        <div className="flex min-w-0 items-center gap-2">
+                                            <div className="flex size-6 shrink-0 items-center justify-center rounded-md bg-rose-500/10 text-rose-600 dark:text-rose-400">
+                                                <Target className="size-3.5" />
+                                            </div>
+                                            <div className="flex min-w-0 flex-wrap items-center gap-1.5">
+                                                <span className="shrink-0 text-[11px] font-black tracking-wide text-rose-700 uppercase dark:text-rose-300">
+                                                    Priority Focus:
+                                                </span>
+                                                <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
+                                                    {primaryWeakness}
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <Link
+                                            href={`/drills?category=${encodeURIComponent(primaryWeakness)}&from=/dashboard`}
+                                            className="inline-flex shrink-0 items-center justify-center gap-1.5 self-start rounded-lg bg-rose-600 px-3 py-1.5 text-xs font-bold text-white shadow-2xs transition hover:bg-rose-700 active:scale-95 sm:self-auto"
+                                        >
+                                            <Zap className="size-3 fill-current" />
+                                            <span>Fix in Drill</span>
+                                            <ChevronRight className="size-3.5" />
+                                        </Link>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    ))}
 
                 {localStatus === 'generating' && (
                     <div className="space-y-3 rounded-xl border border-blue-200/60 bg-blue-50/40 p-4 text-center dark:border-blue-900/40 dark:bg-blue-950/20">
@@ -352,7 +521,11 @@ export function AiReadinessBentoCard({
                     href="/analytics/ai-analysis?from=/dashboard"
                     className="inline-flex items-center gap-1 text-xs font-bold text-indigo-600 transition-colors hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300"
                 >
-                    <span>View In-Depth AI Analysis</span>
+                    <span>
+                        {data?.is_past_cycle
+                            ? 'View Archived AI Analysis'
+                            : 'View In-Depth AI Analysis'}
+                    </span>
                     <ChevronRight className="size-3.5" />
                 </Link>
                 <span className="text-[10px] font-semibold text-slate-400 dark:text-slate-500">

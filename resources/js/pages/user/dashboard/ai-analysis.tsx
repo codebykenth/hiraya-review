@@ -129,6 +129,10 @@ interface AiAnalysisProps {
         priority_action: string;
         recommended_modules: string[];
         encouragement: string;
+        is_past_cycle?: boolean;
+        target_exam_date?: string;
+        target_exam_description?: string;
+        days_until_target_exam?: number;
         predictive_metrics?: {
             estimated_exam_score: string;
             days_to_readiness: string;
@@ -746,6 +750,40 @@ export default function AiAnalysisReport({
                                 </div>
                             </div>
                         </div>
+
+                        {/* Concluded Exam Cycle Archive Banner */}
+                        {data.is_past_cycle && (
+                            <div className="flex flex-col gap-4 rounded-2xl border border-amber-200/80 bg-amber-50/70 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5 dark:border-amber-900/60 dark:bg-amber-950/30">
+                                <div className="flex items-start gap-3">
+                                    <Sparkles className="mt-0.5 size-5 shrink-0 text-amber-600 dark:text-amber-400" />
+                                    <div>
+                                        <h4 className="text-sm font-bold text-amber-900 dark:text-amber-200">
+                                            Concluded Exam Cycle Archive
+                                        </h4>
+                                        <p className="mt-0.5 text-xs text-amber-800/90 dark:text-amber-300/90">
+                                            This analysis reflects your
+                                            performance from the previous exam
+                                            cycle. Complete a fresh Mock Exam to
+                                            calibrate your live readiness and
+                                            study plan for{' '}
+                                            <span className="font-bold">
+                                                {data.target_exam_description ||
+                                                    data.target_exam_date ||
+                                                    'the upcoming exam'}
+                                            </span>
+                                            .
+                                        </p>
+                                    </div>
+                                </div>
+                                <Link
+                                    href="/exams?start=professional&from=/analytics/ai-analysis"
+                                    className="inline-flex shrink-0 items-center gap-1.5 rounded-xl bg-amber-600 px-4 py-2 text-xs font-bold text-white shadow-xs transition hover:bg-amber-700 active:scale-95"
+                                >
+                                    <Zap className="size-3.5 fill-current" />
+                                    <span>Take New Mock Exam</span>
+                                </Link>
+                            </div>
+                        )}
 
                         {/* Top Predictive Grid */}
                         <div className="grid grid-cols-1 gap-4 sm:gap-8 lg:grid-cols-12">
