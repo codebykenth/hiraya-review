@@ -12,7 +12,6 @@ use App\Models\StudySchedule;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Schema;
 
 class DashboardService
 {
@@ -58,30 +57,13 @@ class DashboardService
      */
     protected function getExamDateStats(): array
     {
-        $examDate = null;
-        $examDateRaw = null;
-        $examDescription = null;
-        $daysUntilExam = null;
-
-        if (Schema::hasTable('exam_dates')) {
-            $examDateObj = ExamDate::where('is_active', true)
-                ->where('date', '>', now())
-                ->orderBy('date')
-                ->first();
-
-            if ($examDateObj) {
-                $examDate = $examDateObj->date->format('F j, Y');
-                $examDateRaw = $examDateObj->date->toDateString();
-                $examDescription = $examDateObj->description;
-                $daysUntilExam = (int) ceil(now()->diffInDays($examDateObj->date, false));
-            }
-        }
+        $targetExam = ExamDate::getNextActiveOrEstimated();
 
         return [
-            'daysUntilExam' => $daysUntilExam,
-            'examDate' => $examDate,
-            'examDateRaw' => $examDateRaw,
-            'examDescription' => $examDescription,
+            'daysUntilExam' => $targetExam['days_until'],
+            'examDate' => $targetExam['date_string'],
+            'examDateRaw' => $targetExam['raw'],
+            'examDescription' => $targetExam['description'],
         ];
     }
 

@@ -7,8 +7,6 @@ use App\Http\Resources\AnalyticsMetricsResource;
 use App\Models\ExamAttempt;
 use App\Models\ExamDate;
 use App\Models\Subcategory;
-use Carbon\Carbon;
-use Illuminate\Support\Facades\Schema;
 
 class AnalyticsService
 {
@@ -253,27 +251,10 @@ class AnalyticsService
             }
         }
 
-        $examDate = null;
-        $examDateRaw = null;
-        $daysUntilExam = null;
-        if (Schema::hasTable('exam_dates')) {
-            $examDateObj = ExamDate::where('is_active', true)
-                ->where('date', '>', now())
-                ->orderBy('date')
-                ->first();
-            if ($examDateObj) {
-                $examDate = $examDateObj->date->format('F j, Y');
-                $examDateRaw = $examDateObj->date->toDateString();
-                $daysUntilExam = (int) ceil(now()->diffInDays($examDateObj->date, false));
-            }
-        }
-
-        if (! $examDate) {
-            $defaultDate = Carbon::parse('2026-08-09');
-            $examDate = $defaultDate->format('F j, Y');
-            $examDateRaw = $defaultDate->toDateString();
-            $daysUntilExam = (int) ceil(now()->diffInDays($defaultDate, false));
-        }
+        $targetExam = ExamDate::getNextActiveOrEstimated();
+        $examDate = $targetExam['date_string'];
+        $examDateRaw = $targetExam['raw'];
+        $daysUntilExam = $targetExam['days_until'];
 
         $subtestThresholds = [];
         $hasSubtestRisk = false;

@@ -7,9 +7,7 @@ use App\Models\ExamAttempt;
 use App\Models\ExamDate;
 use App\Models\Question;
 use App\Models\Subcategory;
-use Carbon\Carbon;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Schema;
 
 class DeterministicAnalysisService
 {
@@ -446,33 +444,16 @@ class DeterministicAnalysisService
     /**
      * Resolve days until exam and formatted exam date string.
      *
-     * @return array{daysUntilExam: int, examDateStr: string}
+     * @return array{daysUntilExam: int, examDateStr: string, description: string}
      */
     protected function resolveExamDate(): array
     {
-        $daysUntilExam = null;
-        $examDateStr = 'Not set';
-
-        if (Schema::hasTable('exam_dates')) {
-            $examDate = ExamDate::where('is_active', true)
-                ->where('date', '>', now())
-                ->orderBy('date')
-                ->first();
-            if ($examDate) {
-                $examDateCarbon = Carbon::parse($examDate->date);
-                $daysUntilExam = (int) ceil(now()->diffInDays($examDateCarbon, false));
-                $examDateStr = $examDateCarbon->format('F j, Y');
-            }
-        }
-
-        if ($daysUntilExam === null) {
-            $daysUntilExam = (int) ceil(now()->diffInDays(Carbon::parse('2026-08-09'), false));
-            $examDateStr = 'August 9, 2026';
-        }
+        $targetExam = ExamDate::getNextActiveOrEstimated();
 
         return [
-            'daysUntilExam' => $daysUntilExam,
-            'examDateStr' => $examDateStr,
+            'daysUntilExam' => $targetExam['days_until'],
+            'examDateStr' => $targetExam['date_string'],
+            'description' => $targetExam['description'],
         ];
     }
 
@@ -516,7 +497,7 @@ class DeterministicAnalysisService
         $estimatedMax = min(100, $mockAvg + 4);
         $estimatedExamScore = "{$estimatedMin}% - {$estimatedMax}% predicted actual score";
 
-        if ($daysUntilExam <= 7) {
+        if ($daysUntilExam > 0 && $daysUntilExam <= 7) {
             if ($daysUntilExam <= 1) {
                 $daysToReadiness = "Final 24-hour crunch review before exam day ({$examDateStr}).";
             } else {

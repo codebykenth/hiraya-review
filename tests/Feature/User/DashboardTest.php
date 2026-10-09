@@ -146,11 +146,77 @@ test('dashboard serves cached analysis if generated today', function () {
         ->component('user/dashboard/index')
         ->has('aiAnalysis', fn (Assert $page) => $page
             ->where('status', fn ($status) => $status === 'ready')
-            ->where('data', $analysisData)
+            ->where('data.pass_probability', 85)
+            ->where('data.verdict', 'Looking strong!')
+            ->where('data.is_past_cycle', false)
+            ->where('data.days_until_target_exam', 30)
         )
         ->has('dailyGoal')
         ->has('todayTasks')
         ->has('recentAttempts')
+    );
+});
+
+test('dashboard automatically rolls over stale exam date references in cached analysis', function () {
+    config(['services.gemini.key' => 'fake-gemini-key']);
+    $user = User::factory()->create();
+    $targetDate = now()->addDays(60);
+    ExamDate::create([
+        'date' => $targetDate,
+        'description' => 'Upcoming CSE',
+        'is_active' => true,
+    ]);
+    Cache::put("user-analysis-mode-{$user->id}", 'ai');
+    $this->actingAs($user);
+
+    $attempt = ExamAttempt::create([
+        'user_id' => $user->id,
+        'category_id' => null,
+        'question_ids' => [1],
+        'answers' => [1 => 0],
+        'cat_scores' => [
+            'categoryScoreMap' => [],
+            'metadata' => [
+                'track' => 'Drill',
+                'category_name' => 'Verbal Ability',
+                'correct_count' => 1,
+                'total_questions' => 1,
+                'skipped_count' => 0,
+                'duration_secs' => 30,
+                'is_timed' => false,
+            ],
+        ],
+    ]);
+
+    UserAiAnalysis::create([
+        'user_id' => $user->id,
+        'last_exam_attempt_id' => $attempt->id,
+        'analysis_json' => [
+            'pass_probability' => 65,
+            'verdict' => 'Focused sprint before August 9, 2026 will make the difference.',
+            'priority_action' => 'Drill before August 9, 2026.',
+            'trend' => 'steady',
+            'strengths' => ['Verbal'],
+            'critical_weaknesses' => ['Math'],
+            'recommended_modules' => ['Math'],
+            'encouragement' => 'Keep pushing!',
+        ],
+    ]);
+
+    $response = $this->get(route('dashboard.index'));
+    $response->assertOk();
+
+    $expectedDateFormatted = $targetDate->format('F j, Y');
+
+    $response->assertInertia(fn (Assert $page) => $page
+        ->component('user/dashboard/index')
+        ->has('aiAnalysis', fn (Assert $page) => $page
+            ->where('status', 'ready')
+            ->where('data.is_past_cycle', true)
+            ->where('data.target_exam_date', $expectedDateFormatted)
+            ->where('data.verdict', "Focused sprint before {$expectedDateFormatted} will make the difference.")
+            ->where('data.priority_action', "Drill before {$expectedDateFormatted}.")
+        )
     );
 });
 

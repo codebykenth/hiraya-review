@@ -12,8 +12,6 @@ use Illuminate\Support\Facades\Schema;
 
 class StudyPlanAnalyzer
 {
-    private const EXAM_DATE = '2026-08-09';
-
     public function generateSuggestions(User $user, ?string $track = null, ?string $timeOfDay = 'Evening', int $topicsPerDay = 1): array
     {
         $attempts = ExamAttempt::where('user_id', $user->id)
@@ -441,22 +439,12 @@ class StudyPlanAnalyzer
 
     private function getNextExamDate(): Carbon
     {
-        if (Schema::hasTable('exam_dates')) {
-            $examDate = ExamDate::where('is_active', true)
-                ->where('date', '>', now())
-                ->orderBy('date')
-                ->first();
-            if ($examDate) {
-                return Carbon::parse($examDate->date);
-            }
-        }
-
-        return Carbon::parse(self::EXAM_DATE);
+        return ExamDate::getNextActiveOrEstimated()['date'];
     }
 
     private function daysUntilExam(): int
     {
-        return now()->diffInDays($this->getNextExamDate(), false);
+        return ExamDate::getNextActiveOrEstimated()['days_until'];
     }
 
     /**
