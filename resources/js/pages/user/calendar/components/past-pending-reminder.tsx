@@ -104,16 +104,16 @@ export function PastPendingReminder({
                 </DialogHeader>
 
                 {/* Bulk Quick Actions Toolbar */}
-                <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-amber-200/60 bg-amber-50/60 p-3 dark:border-amber-900/30 dark:bg-amber-950/20">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 rounded-xl border border-amber-200/60 bg-amber-50/60 p-3 dark:border-amber-900/30 dark:bg-amber-950/20">
                     <span className="text-xs font-bold text-amber-900 dark:text-amber-300">
                         Bulk Resolution:
                     </span>
-                    <div className="flex flex-wrap items-center gap-2">
+                    <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
                         <Button
                             size="sm"
                             variant="outline"
                             disabled={isProcessingBulk}
-                            className="h-7 border-blue-200 bg-blue-50/70 text-xs font-bold text-blue-700 hover:bg-blue-100 dark:border-blue-900/50 dark:bg-blue-950/40 dark:text-blue-300 dark:hover:bg-blue-900/60"
+                            className="h-7.5 sm:h-7 flex-1 sm:flex-initial border-blue-200 bg-blue-50/70 text-xs font-bold text-blue-700 hover:bg-blue-100 dark:border-blue-900/50 dark:bg-blue-950/40 dark:text-blue-300 dark:hover:bg-blue-900/60"
                             onClick={handleBulkReschedule}
                         >
                             <CalendarDays className="mr-1 size-3.5" />
@@ -123,7 +123,7 @@ export function PastPendingReminder({
                             size="sm"
                             variant="outline"
                             disabled={isProcessingBulk}
-                            className="h-7 border-emerald-200 bg-emerald-50/70 text-xs font-bold text-emerald-700 hover:bg-emerald-100 dark:border-emerald-900/50 dark:bg-emerald-950/40 dark:text-emerald-300 dark:hover:bg-emerald-900/60"
+                            className="h-7.5 sm:h-7 flex-1 sm:flex-initial border-emerald-200 bg-emerald-50/70 text-xs font-bold text-emerald-700 hover:bg-emerald-100 dark:border-emerald-900/50 dark:bg-emerald-950/40 dark:text-emerald-300 dark:hover:bg-emerald-900/60"
                             onClick={handleBulkDone}
                         >
                             <CheckCheck className="mr-1 size-3.5" />
@@ -137,11 +137,11 @@ export function PastPendingReminder({
                     {pastPending.map((task) => (
                         <div
                             key={task.id}
-                            className="flex flex-col gap-2 rounded-xl border border-slate-200/80 bg-slate-50/70 p-3 transition-colors hover:border-slate-300 dark:border-slate-800 dark:bg-slate-900/60 dark:hover:border-slate-700"
+                            className="flex flex-col gap-2.5 rounded-xl border border-slate-200/80 bg-slate-50/70 p-3 transition-colors hover:border-slate-300 dark:border-slate-800 dark:bg-slate-900/60 dark:hover:border-slate-700"
                         >
-                            <div className="flex items-start justify-between gap-3">
-                                <div>
-                                    <div className="flex items-center gap-2">
+                            <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+                                <div className="min-w-0 flex-1">
+                                    <div className="flex flex-wrap items-center gap-2">
                                         <span className="text-xs font-semibold text-rose-600 dark:text-rose-400">
                                             Overdue:{' '}
                                             {parseScheduleDate(
@@ -162,7 +162,7 @@ export function PastPendingReminder({
                                             </span>
                                         )}
                                     </div>
-                                    <p className="mt-0.5 text-sm font-bold text-slate-900 dark:text-white">
+                                    <p className="mt-0.5 text-sm font-bold text-slate-900 break-words dark:text-white">
                                         {task.title}
                                     </p>
                                     {task.subcategory && (
@@ -171,11 +171,11 @@ export function PastPendingReminder({
                                         </span>
                                     )}
                                 </div>
-                                <div className="flex shrink-0 items-center gap-1.5">
+                                <div className="flex items-center gap-2 pt-2 border-t border-slate-200/50 sm:border-t-0 sm:pt-0 sm:shrink-0 justify-end">
                                     <Button
                                         size="sm"
                                         variant="outline"
-                                        className="h-7 border-emerald-300 bg-white text-xs font-bold text-emerald-700 hover:bg-emerald-50 dark:border-emerald-800 dark:bg-slate-800 dark:text-emerald-300 dark:hover:bg-slate-700"
+                                        className="h-7.5 sm:h-7 flex-1 sm:flex-initial border-emerald-300 bg-white text-xs font-bold text-emerald-700 hover:bg-emerald-50 dark:border-emerald-800 dark:bg-slate-800 dark:text-emerald-300 dark:hover:bg-slate-700"
                                         onClick={async () => {
                                             await toggleScheduleDone(
                                                 task,
@@ -193,7 +193,7 @@ export function PastPendingReminder({
                                     </Button>
                                     <Button
                                         size="sm"
-                                        className="h-7 bg-blue-600 px-2.5 text-xs font-bold text-white hover:bg-blue-700"
+                                        className="h-7.5 sm:h-7 flex-1 sm:flex-initial bg-blue-600 px-3 text-xs font-bold text-white hover:bg-blue-700"
                                         onClick={async () => {
                                             await handleRescheduleToToday(task);
                                             setPastPending((prev) =>

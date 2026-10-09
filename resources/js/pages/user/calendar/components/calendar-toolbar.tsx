@@ -1,6 +1,7 @@
 import {
     ChevronLeft,
     ChevronRight,
+    ChevronDown,
     Plus,
     Calendar as CalendarGridIcon,
     CalendarRange,
@@ -22,6 +23,7 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { mainCategories } from '../hooks/use-calendar-state';
+import { MonthYearPickerPopover } from './month-year-picker-popover';
 
 interface CalendarToolbarProps {
     activeView: 'month' | 'week' | 'agenda';
@@ -41,6 +43,7 @@ interface CalendarToolbarProps {
     onOpenBulkTimeModal: () => void;
     onOpenShiftModal: () => void;
     onResetAll: () => void;
+    onSelectMonthYear?: (year: number, monthIndex: number) => void;
 }
 
 export function CalendarToolbar({
@@ -61,6 +64,7 @@ export function CalendarToolbar({
     onOpenBulkTimeModal,
     onOpenShiftModal,
     onResetAll,
+    onSelectMonthYear,
 }: CalendarToolbarProps) {
     const monthNames = [
         'January',
@@ -105,6 +109,15 @@ export function CalendarToolbar({
             jumpToTodayWeek();
         } else {
             setCurrentDate(new Date());
+        }
+    };
+
+    const handleSelectMonthYear = (year: number, monthIndex: number) => {
+        const nextDate = new Date(year, monthIndex, 1);
+        setCurrentDate(nextDate);
+
+        if (onSelectMonthYear) {
+            onSelectMonthYear(year, monthIndex);
         }
     };
 
@@ -219,12 +232,25 @@ export function CalendarToolbar({
                         <ChevronLeft className="size-4" />
                     </Button>
 
-                    <div className="flex items-center gap-2 px-1">
-                        <span className="min-w-35 text-center text-sm font-black text-slate-900 sm:min-w-42.5 sm:text-base dark:text-white">
-                            {activeView === 'week'
-                                ? weekRangeLabel
-                                : `${currentMonthName} ${currentYear}`}
-                        </span>
+                    <div className="flex items-center gap-1.5 px-1 sm:gap-2">
+                        <MonthYearPickerPopover
+                            currentDate={currentDate}
+                            onSelect={handleSelectMonthYear}
+                        >
+                            <button
+                                type="button"
+                                className="group flex items-center gap-1.5 rounded-xl px-2 py-1 text-sm font-black text-slate-900 transition-all hover:bg-slate-100 sm:min-w-40 sm:justify-center sm:text-base dark:text-white dark:hover:bg-slate-800"
+                                title="Click to choose Month and Year"
+                                aria-label="Filter calendar by month and year"
+                            >
+                                <span className="text-center">
+                                    {activeView === 'week'
+                                        ? weekRangeLabel
+                                        : `${currentMonthName} ${currentYear}`}
+                                </span>
+                                <ChevronDown className="size-3.5 text-slate-400 transition-transform duration-200 group-hover:text-slate-600 group-data-[state=open]:rotate-180 dark:text-slate-500 dark:group-hover:text-slate-300" />
+                            </button>
+                        </MonthYearPickerPopover>
 
                         <Button
                             variant="ghost"

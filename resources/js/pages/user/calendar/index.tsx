@@ -115,6 +115,7 @@ export default function Calendar() {
         rawWeeks,
         currentWeekDays,
         weekRangeLabel,
+        setSelectedWeekDate,
         previousWeek,
         nextWeek,
         jumpToTodayWeek,
@@ -252,6 +253,11 @@ export default function Calendar() {
                         nextWeek={nextWeek}
                         jumpToTodayWeek={jumpToTodayWeek}
                         weekRangeLabel={weekRangeLabel}
+                        onSelectMonthYear={(year, month) => {
+                            const target = new Date(year, month, 1);
+                            setCurrentDate(target);
+                            setSelectedWeekDate(target);
+                        }}
                         onOpenAddModal={() => openModal(todayStr)}
                         onOpenTemplatesModal={() =>
                             setIsTemplatesModalOpen(true)
