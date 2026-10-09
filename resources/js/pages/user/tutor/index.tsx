@@ -15,6 +15,7 @@ import {
     Zap,
     Target,
     Pin,
+    Milestone,
 } from 'lucide-react';
 import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { toast } from 'sonner';
@@ -27,6 +28,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { cn } from '@/lib/utils';
 import type { TutorQuestionCheckpoint } from './components/tutor-checkpoints-rail';
 import { TutorCheckpointsRail } from './components/tutor-checkpoints-rail';
 import { TutorMessageContent } from './components/tutor-message-content';
@@ -250,6 +252,7 @@ export default function TutorPage({ modules: propModules = [] }: TutorPageProps)
     const [copiedId, setCopiedId] = useState<string | null>(null);
     const [showScrollTop, setShowScrollTop] = useState(false);
     const [highlightedMsgId, setHighlightedMsgId] = useState<string | null>(null);
+    const [isMobileCheckpointsOpen, setIsMobileCheckpointsOpen] = useState(false);
     const [activeQuestionId, setActiveQuestionId] = useState<string | null>(() => {
         if (typeof window === 'undefined') {
             return null;
@@ -327,6 +330,14 @@ export default function TutorPage({ modules: propModules = [] }: TutorPageProps)
             timestamp: q.timestamp,
         }));
     }, [userQuestions]);
+
+    const activeCheckpointIndex = useMemo(() => {
+        const found = checkpointQuestions.find(
+            (q) => q.id === (highlightedMsgId || activeQuestionId),
+        );
+
+        return found ? found.index : checkpointQuestions.length;
+    }, [checkpointQuestions, activeQuestionId, highlightedMsgId]);
 
     const handleContainerScroll = useCallback(() => {
         const el = scrollContainerRef.current;
@@ -675,80 +686,89 @@ export default function TutorPage({ modules: propModules = [] }: TutorPageProps)
                 {/* Header Bar */}
                 <div className="shrink-0 border-b border-border/70 bg-card/60 px-4 py-3 backdrop-blur-md sm:px-6">
                     <div className="mx-auto flex max-w-5xl items-center justify-between gap-3">
-                        <div className="flex items-center gap-3">
-                            <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-linear-to-tr from-indigo-600 to-purple-600 text-white shadow-sm shadow-indigo-500/20">
-                                <Bot className="size-5" />
+                        <div className="flex min-w-0 items-center gap-2.5 sm:gap-3">
+                            <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-linear-to-tr from-indigo-600 to-purple-600 text-white shadow-sm shadow-indigo-500/20 sm:size-10">
+                                <Bot className="size-4 sm:size-5" />
                             </div>
-                            <div>
-                                <div className="flex items-center gap-2">
-                                    <h1 className="font-heading text-base font-bold text-foreground sm:text-lg">
-                                        Hiraya AI Tutor
-                                    </h1>
-                                    {/* <span className="inline-flex items-center gap-1 rounded-full bg-indigo-500/10 px-2 py-0.5 text-[11px] font-semibold text-indigo-600 dark:text-indigo-400">
-                                        <Sparkles className="size-3 text-indigo-500" />
-                                        RAG Grounded
-                                    </span> */}
-                                </div>
-                                {/* <p className="line-clamp-1 text-xs text-muted-foreground">
-                                    Philippine Civil Service Exam syllabus, RA 6713, and Constitution mentor
-                                </p> */}
+                            <div className="min-w-0">
+                                <h1 className="font-heading truncate text-sm font-bold text-foreground sm:text-lg">
+                                    Hiraya AI Tutor
+                                </h1>
                             </div>
                         </div>
 
                         {messages.length > 0 && (
-                            <div className="flex items-center gap-2">
-                                {userQuestions.length >= 2 && (
-                                    <DropdownMenu>
-                                        <DropdownMenuTrigger asChild>
-                                            <Button
-                                                variant="outline"
-                                                size="sm"
-                                                className="h-8 gap-1.5 rounded-lg border-border/80 px-2.5 text-xs text-muted-foreground hover:bg-muted hover:text-foreground"
-                                            >
-                                                <ListFilter className="size-3.5 text-indigo-500" />
-                                                <span className="hidden md:inline">
-                                                    Questions ({userQuestions.length})
-                                                </span>
-                                                <ChevronDown className="size-3 opacity-60" />
-                                            </Button>
-                                        </DropdownMenuTrigger>
-                                        <DropdownMenuContent
-                                            align="end"
-                                            className="w-72 max-w-[90vw]"
-                                        >
-                                            <DropdownMenuLabel className="text-xs">
-                                                Questions in this Session
-                                            </DropdownMenuLabel>
-                                            <DropdownMenuSeparator />
-                                            <div className="max-h-60 overflow-y-auto">
-                                                {userQuestions.map((q, idx) => (
-                                                    <DropdownMenuItem
-                                                        key={q.id}
-                                                        onClick={() => jumpToMessage(q.id)}
-                                                        className="cursor-pointer gap-2 py-2 text-xs"
-                                                    >
-                                                        <span className="flex size-5 shrink-0 items-center justify-center rounded-md bg-indigo-50 font-mono text-[10px] font-bold text-indigo-600 dark:bg-indigo-950/60 dark:text-indigo-400">
-                                                            Q{idx + 1}
-                                                        </span>
-                                                        <span className="truncate">
-                                                            {q.content}
-                                                        </span>
-                                                    </DropdownMenuItem>
-                                                ))}
-                                            </div>
-                                        </DropdownMenuContent>
-                                    </DropdownMenu>
+                            <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
+                                {checkpointQuestions.length > 0 && (
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => setIsMobileCheckpointsOpen(true)}
+                                        className="h-8 gap-1 rounded-lg border-border/80 px-2 text-xs text-muted-foreground hover:bg-muted hover:text-foreground md:hidden"
+                                        aria-label={`Session checkpoints (${checkpointQuestions.length})`}
+                                    >
+                                        <Milestone className="size-3.5 shrink-0 text-indigo-500" />
+                                        <span className="font-semibold text-foreground">
+                                            Q{activeCheckpointIndex}/{checkpointQuestions.length}
+                                        </span>
+                                    </Button>
                                 )}
 
+                                {userQuestions.length >= 1 && (
+                                    <div className="hidden md:block">
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
+                                                <Button
+                                                    variant="outline"
+                                                    size="sm"
+                                                    className="h-8 gap-1.5 rounded-lg border-border/80 px-2.5 text-xs text-muted-foreground hover:bg-muted hover:text-foreground"
+                                                    aria-label={`Questions list (${userQuestions.length})`}
+                                                >
+                                                    <ListFilter className="size-3.5 text-indigo-500" />
+                                                    <span className="text-xs">
+                                                        Questions ({userQuestions.length})
+                                                    </span>
+                                                    <ChevronDown className="size-3 opacity-60" />
+                                                </Button>
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent
+                                                align="end"
+                                                className="w-72 max-w-[90vw]"
+                                            >
+                                                <DropdownMenuLabel className="text-xs">
+                                                    Questions in this Session
+                                                </DropdownMenuLabel>
+                                                <DropdownMenuSeparator />
+                                                <div className="max-h-60 overflow-y-auto">
+                                                    {userQuestions.map((q, idx) => (
+                                                        <DropdownMenuItem
+                                                            key={q.id}
+                                                            onClick={() => jumpToMessage(q.id)}
+                                                            className="cursor-pointer gap-2 py-2 text-xs"
+                                                        >
+                                                            <span className="flex size-5 shrink-0 items-center justify-center rounded-md bg-indigo-50 font-mono text-[10px] font-bold text-indigo-600 dark:bg-indigo-950/60 dark:text-indigo-400">
+                                                                Q{idx + 1}
+                                                            </span>
+                                                            <span className="truncate">
+                                                                {q.content}
+                                                            </span>
+                                                        </DropdownMenuItem>
+                                                    ))}
+                                                </div>
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
+                                    </div>
+                                )}
 
                                 <Button
                                     variant="outline"
                                     size="sm"
                                     onClick={handleCopySessionNotes}
                                     title="Copy entire study session notes to clipboard"
-                                    className="h-8 gap-1.5 rounded-lg border-border/80 px-2.5 text-xs text-muted-foreground hover:bg-muted hover:text-foreground"
+                                    className="h-8 gap-1.5 rounded-lg border-border/80 px-2 text-xs text-muted-foreground hover:bg-muted hover:text-foreground sm:px-2.5"
+                                    aria-label="Copy session notes"
                                 >
-                                    <FileText className="size-3.5 text-indigo-500" />
+                                    <FileText className="size-3.5 shrink-0 text-indigo-500" />
                                     <span className="hidden sm:inline">Copy Notes</span>
                                 </Button>
 
@@ -756,9 +776,11 @@ export default function TutorPage({ modules: propModules = [] }: TutorPageProps)
                                     variant="outline"
                                     size="sm"
                                     onClick={handleClear}
-                                    className="h-8 gap-1.5 rounded-lg border-border/80 px-2.5 text-xs text-muted-foreground hover:bg-muted hover:text-foreground"
+                                    className="h-8 gap-1.5 rounded-lg border-border/80 px-2 text-xs text-muted-foreground hover:bg-muted hover:text-foreground sm:px-2.5"
+                                    title="Clear Chat"
+                                    aria-label="Clear chat"
                                 >
-                                    <RotateCcw className="size-3.5" />
+                                    <RotateCcw className="size-3.5 shrink-0" />
                                     <span className="hidden sm:inline">Clear Chat</span>
                                 </Button>
                             </div>
@@ -768,12 +790,13 @@ export default function TutorPage({ modules: propModules = [] }: TutorPageProps)
 
                 {/* Main Middle Split: Messages Stream + Side Checkpoints Rail */}
                 <div className="relative flex flex-1 min-h-0 w-full overflow-hidden">
-                    {/* Messages Body */}
-                    <div
-                        ref={scrollContainerRef}
-                        onScroll={handleContainerScroll}
-                        className="flex-1 min-w-0 overflow-y-auto px-4 py-6 sm:px-6"
-                    >
+                    {/* Messages Column */}
+                    <div className="relative flex flex-1 min-w-0 flex-col overflow-hidden">
+                        <div
+                            ref={scrollContainerRef}
+                            onScroll={handleContainerScroll}
+                            className="flex-1 min-w-0 overflow-y-auto px-4 py-6 sm:px-6"
+                        >
                         <div className="mx-auto flex max-w-4xl flex-col gap-6">
                         {messages.length === 0 ? (
                             <div className="my-auto flex flex-col items-center justify-center py-8 text-center">
@@ -979,36 +1002,44 @@ export default function TutorPage({ modules: propModules = [] }: TutorPageProps)
                         </div>
                     </div>
 
-                    {/* Side Checkpoints Rail */}
-                    {checkpointQuestions.length > 0 && (
-                        <TutorCheckpointsRail
-                            questions={checkpointQuestions}
-                            activeQuestionId={activeQuestionId}
-                            highlightedMsgId={highlightedMsgId}
-                            onSelectQuestion={jumpToMessage}
-                            onScrollToTop={scrollToTop}
-                            onScrollToBottom={() => scrollToBottom(false)}
-                        />
+                    {/* Floating Scroll to Top - anchored within messages column, hidden on desktop when rail has controls */}
+                    {showScrollTop && (
+                        <div
+                            className={cn(
+                                'pointer-events-none absolute bottom-3 right-3 z-30 animate-in fade-in duration-200 sm:bottom-4 sm:right-6',
+                                checkpointQuestions.length > 0 && 'lg:hidden',
+                            )}
+                        >
+                            <button
+                                type="button"
+                                onClick={scrollToTop}
+                                className="pointer-events-auto flex size-9 items-center justify-center rounded-full border border-border/80 bg-background/95 text-foreground shadow-md backdrop-blur-md transition-all hover:border-indigo-500/50 hover:bg-muted active:scale-95 sm:size-10"
+                                aria-label="Scroll to top of chat"
+                                title="Scroll to top of chat"
+                            >
+                                <ArrowUp className="size-4 text-indigo-600 dark:text-indigo-400" />
+                            </button>
+                        </div>
                     )}
                 </div>
 
-            {/* Floating Scroll to Top */}
-            {showScrollTop && (
-                <div className="pointer-events-none fixed bottom-22 right-8 z-50 animate-in fade-in duration-200">
-                    <button
-                        type="button"
-                        onClick={scrollToTop}
-                        className="pointer-events-auto flex size-10 items-center justify-center rounded-full border border-border/80 bg-background/95 text-foreground shadow-lg backdrop-blur-md transition-all hover:border-indigo-500/50 hover:bg-muted active:scale-95"
-                        aria-label="Scroll to top of chat"
-                        title="Scroll to top of chat"
-                    >
-                        <ArrowUp className="size-4 text-indigo-600 dark:text-indigo-400" />
-                    </button>
-                </div>
-            )}
+                {/* Side Checkpoints Rail */}
+                {checkpointQuestions.length > 0 && (
+                    <TutorCheckpointsRail
+                        questions={checkpointQuestions}
+                        activeQuestionId={activeQuestionId}
+                        highlightedMsgId={highlightedMsgId}
+                        onSelectQuestion={jumpToMessage}
+                        onScrollToTop={scrollToTop}
+                        onScrollToBottom={() => scrollToBottom(false)}
+                        isMobileSheetOpen={isMobileCheckpointsOpen}
+                        onMobileSheetOpenChange={setIsMobileCheckpointsOpen}
+                    />
+                )}
+            </div>
 
                 {/* Footer Input Area */}
-                <div className="shrink-0 border-t border-border/70 bg-card/60 p-4 pr-24 backdrop-blur-md sm:p-5 sm:pr-24 lg:pr-5">
+                <div className="shrink-0 border-t border-border/70 bg-card/60 p-3 backdrop-blur-md sm:p-5">
                     <div className="mx-auto max-w-4xl">
                         <form
                             onSubmit={(e) => {

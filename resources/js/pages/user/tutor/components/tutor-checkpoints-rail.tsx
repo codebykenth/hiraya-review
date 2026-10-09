@@ -5,7 +5,7 @@ import {
     ArrowUp,
     ArrowDown,
 } from 'lucide-react';
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import {
     Sheet,
@@ -35,6 +35,8 @@ export interface TutorCheckpointsRailProps {
     onSelectQuestion: (id: string) => void;
     onScrollToTop?: () => void;
     onScrollToBottom?: () => void;
+    isMobileSheetOpen?: boolean;
+    onMobileSheetOpenChange?: (open: boolean) => void;
 }
 
 const STORAGE_KEY = 'hiraya_tutor_checkpoints_collapsed';
@@ -46,6 +48,8 @@ export function TutorCheckpointsRail({
     onSelectQuestion,
     onScrollToTop,
     onScrollToBottom,
+    isMobileSheetOpen: isMobileSheetOpenProp,
+    onMobileSheetOpenChange: onMobileSheetOpenChangeProp,
 }: TutorCheckpointsRailProps) {
     const [isCollapsed, setIsCollapsed] = useState<boolean>(() => {
         if (typeof window !== 'undefined') {
@@ -61,7 +65,18 @@ export function TutorCheckpointsRail({
         return false;
     });
 
-    const [isMobileSheetOpen, setIsMobileSheetOpen] = useState(false);
+    const [internalMobileSheetOpen, setInternalMobileSheetOpen] = useState(false);
+    const isSheetOpen = isMobileSheetOpenProp !== undefined ? isMobileSheetOpenProp : internalMobileSheetOpen;
+    const handleSheetOpenChange = useCallback(
+        (open: boolean) => {
+            if (onMobileSheetOpenChangeProp) {
+                onMobileSheetOpenChangeProp(open);
+            } else {
+                setInternalMobileSheetOpen(open);
+            }
+        },
+        [onMobileSheetOpenChangeProp],
+    );
 
     const toggleCollapse = useCallback(() => {
         setIsCollapsed((prev) => {
@@ -75,12 +90,6 @@ export function TutorCheckpointsRail({
         });
     }, []);
 
-    // Current active question index
-    const activeIndex = useMemo(() => {
-        const found = questions.find((q) => q.id === (highlightedMsgId || activeQuestionId));
-
-        return found ? found.index : questions.length;
-    }, [questions, activeQuestionId, highlightedMsgId]);
 
     if (questions.length === 0) {
         return null;
@@ -343,27 +352,8 @@ export function TutorCheckpointsRail({
                 </div>
             </aside>
 
-            {/* Mobile Floating Pill Button */}
-            {questions.length >= 2 && (
-                <div className="md:hidden fixed bottom-36 right-4 z-40">
-                    <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setIsMobileSheetOpen(true)}
-                        className="h-9 gap-1.5 rounded-full border-border/80 bg-background/95 px-3.5 text-xs font-semibold text-foreground shadow-lg backdrop-blur-md hover:bg-muted active:scale-95"
-                        aria-label="View Question Checkpoints"
-                    >
-                        <Milestone className="size-3.5 text-indigo-600 dark:text-indigo-400" />
-                        <span>
-                            Q{activeIndex}/{questions.length} Checkpoints
-                        </span>
-                    </Button>
-                </div>
-            )}
-
             {/* Mobile Checkpoint Sheet */}
-            <Sheet open={isMobileSheetOpen} onOpenChange={setIsMobileSheetOpen}>
+            <Sheet open={isSheetOpen} onOpenChange={handleSheetOpenChange}>
                 <SheetContent side="right" className="w-[85vw] max-w-sm p-4 sm:p-6">
                     <SheetHeader>
                         <SheetTitle className="flex items-center gap-2 text-base">
@@ -384,7 +374,7 @@ export function TutorCheckpointsRail({
                                     key={q.id}
                                     type="button"
                                     onClick={() => {
-                                        setIsMobileSheetOpen(false);
+                                        handleSheetOpenChange(false);
                                         onSelectQuestion(q.id);
                                     }}
                                     className={cn(

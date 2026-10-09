@@ -10,6 +10,7 @@ import {
     DialogTitle,
     DialogTrigger,
 } from '@/components/ui/dialog';
+import { cn } from '@/lib/utils';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Hiraya Review';
 const SUPPORT_BUBBLE_KEY = 'support_bubble_dismissal';
@@ -19,6 +20,9 @@ export function SupportWidget() {
     const [isMounted, setIsMounted] = useState(false);
     const [showBubble, setShowBubble] = useState(false);
     const [isReviewExamActive, setIsReviewExamActive] = useState(false);
+    const [currentPath, setCurrentPath] = useState(() =>
+        typeof window !== 'undefined' ? window.location.pathname : '',
+    );
     const [isLiveExamActive, setIsLiveExamActive] = useState(() => {
         if (typeof window !== 'undefined') {
             return localStorage.getItem('active_exam_session_v1') !== null;
@@ -69,9 +73,12 @@ export function SupportWidget() {
     };
 
     useEffect(() => {
-        const handleNavigate = () => {
-            // Remove the hardcoded URL check so it can show on Setup and Scorecard views
-            // We'll rely on the isLiveExamActive state instead for exams/drills.
+        const handleNavigate = (event: any) => {
+            const path =
+                event?.detail?.page?.url ||
+                (typeof window !== 'undefined' ? window.location.pathname : '');
+
+            setCurrentPath(path);
         };
 
         const handleExamStatus = (e: any) => {
@@ -139,12 +146,19 @@ export function SupportWidget() {
         }
     };
 
+    const isTutorPage = currentPath.includes('/tutor');
+
     if (!isMounted || isLiveExamActive || isReviewExamActive) {
         return null;
     }
 
     return (
-        <div className="fixed right-6 bottom-6 z-50 flex items-end gap-4">
+        <div
+            className={cn(
+                'fixed right-6 bottom-6 z-50 items-end gap-4',
+                isTutorPage ? 'hidden md:flex' : 'flex',
+            )}
+        >
             {showBubble && (
                 <div className="relative mb-1 flex max-w-55 animate-in items-start gap-2 rounded-2xl border border-border bg-card p-3 shadow-xl duration-500 fade-in slide-in-from-bottom-4">
                     <div className="flex-1">
