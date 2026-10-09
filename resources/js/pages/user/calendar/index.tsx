@@ -7,7 +7,7 @@ import {
     ArrowRight,
     Sparkles,
 } from 'lucide-react';
-import React from 'react';
+import React, { lazy, Suspense } from 'react';
 import { PageContainer } from '@/components/layout/page-container';
 import { PageHeader } from '@/components/layout/page-header';
 import { ConfirmModal } from '@/components/shared/confirm-modal';
@@ -22,21 +22,38 @@ import {
     DialogFooter,
 } from '@/components/ui/dialog';
 import { AgendaView } from './components/agenda-view';
-import { BulkUpdateModal } from './components/bulk-update-modal';
 import { CalendarBulkActionsBar } from './components/calendar-bulk-actions-bar';
 import { CalendarGrid } from './components/calendar-grid';
 import { CalendarStatsBanner } from './components/calendar-stats-banner';
 import { CalendarToolbar } from './components/calendar-toolbar';
 import { DayDetailsSheet } from './components/day-details-sheet';
 import { ExamCountdown } from './components/exam-countdown';
-import { PastPendingReminder } from './components/past-pending-reminder';
 import { ScheduleModal } from './components/schedule-modal';
-import { ShiftScheduleModal } from './components/shift-schedule-modal';
-import { StudyPlanTemplatesModal } from './components/study-plan-templates-modal';
 import { StudyTaskDrawer } from './components/study-task-drawer';
 import { WeekView } from './components/week-view';
 import { useCalendarState } from './hooks/use-calendar-state';
 import type { CalendarPageProps } from './hooks/use-calendar-state';
+
+const BulkUpdateModal = lazy(() =>
+    import('./components/bulk-update-modal').then((m) => ({
+        default: m.BulkUpdateModal,
+    })),
+);
+const PastPendingReminder = lazy(() =>
+    import('./components/past-pending-reminder').then((m) => ({
+        default: m.PastPendingReminder,
+    })),
+);
+const ShiftScheduleModal = lazy(() =>
+    import('./components/shift-schedule-modal').then((m) => ({
+        default: m.ShiftScheduleModal,
+    })),
+);
+const StudyPlanTemplatesModal = lazy(() =>
+    import('./components/study-plan-templates-modal').then((m) => ({
+        default: m.StudyPlanTemplatesModal,
+    })),
+);
 
 export default function Calendar() {
     const { schedules, examDates, pastPending, nextExam } =
@@ -351,19 +368,27 @@ export default function Calendar() {
                 />
 
                 {/* Smart Schedule Shift & Catch-Up Modal */}
-                <ShiftScheduleModal
-                    isOpen={isShiftModalOpen}
-                    onOpenChange={setIsShiftModalOpen}
-                    onShiftApplied={handleShiftApplied}
-                />
+                {isShiftModalOpen && (
+                    <Suspense fallback={null}>
+                        <ShiftScheduleModal
+                            isOpen={isShiftModalOpen}
+                            onOpenChange={setIsShiftModalOpen}
+                            onShiftApplied={handleShiftApplied}
+                        />
+                    </Suspense>
+                )}
 
                 {/* Study Plan Templates Modal */}
-                <StudyPlanTemplatesModal
-                    isOpen={isTemplatesModalOpen}
-                    onOpenChange={setIsTemplatesModalOpen}
-                    todayStr={todayStr}
-                    onTemplateApplied={handleTemplateApplied}
-                />
+                {isTemplatesModalOpen && (
+                    <Suspense fallback={null}>
+                        <StudyPlanTemplatesModal
+                            isOpen={isTemplatesModalOpen}
+                            onOpenChange={setIsTemplatesModalOpen}
+                            todayStr={todayStr}
+                            onTemplateApplied={handleTemplateApplied}
+                        />
+                    </Suspense>
+                )}
 
                 {/* Add/Edit Study Modal */}
                 <ScheduleModal
@@ -425,31 +450,39 @@ export default function Calendar() {
                 </Dialog>
 
                 {/* Bulk Update Time Modal */}
-                <BulkUpdateModal
-                    isOpen={isBulkModalOpen}
-                    onOpenChange={setIsBulkModalOpen}
-                    bulkFormData={bulkFormData}
-                    setBulkFormData={setBulkFormData}
-                    handleBulkUpdateTime={handleBulkUpdateTime}
-                    isLoading={isLoading}
-                />
+                {isBulkModalOpen && (
+                    <Suspense fallback={null}>
+                        <BulkUpdateModal
+                            isOpen={isBulkModalOpen}
+                            onOpenChange={setIsBulkModalOpen}
+                            bulkFormData={bulkFormData}
+                            setBulkFormData={setBulkFormData}
+                            handleBulkUpdateTime={handleBulkUpdateTime}
+                            isLoading={isLoading}
+                        />
+                    </Suspense>
+                )}
 
                 {/* Past Pending Tasks Reminder Modal */}
-                <PastPendingReminder
-                    isOpen={isReminderOpen && calendarPastPending.length > 0}
-                    onOpenChange={setIsReminderOpen}
-                    pastPending={calendarPastPending}
-                    toggleScheduleDone={toggleScheduleDone}
-                    handleRescheduleToToday={handleRescheduleToToday}
-                    handleBulkRescheduleAllToToday={
-                        handleBulkRescheduleAllToToday
-                    }
-                    handleBulkMarkAllDone={handleBulkMarkAllDone}
-                    handleDismissReminderWithSnooze={
-                        handleDismissReminderWithSnooze
-                    }
-                    setPastPending={setPastPending}
-                />
+                {isReminderOpen && calendarPastPending.length > 0 && (
+                    <Suspense fallback={null}>
+                        <PastPendingReminder
+                            isOpen={isReminderOpen && calendarPastPending.length > 0}
+                            onOpenChange={setIsReminderOpen}
+                            pastPending={calendarPastPending}
+                            toggleScheduleDone={toggleScheduleDone}
+                            handleRescheduleToToday={handleRescheduleToToday}
+                            handleBulkRescheduleAllToToday={
+                                handleBulkRescheduleAllToToday
+                            }
+                            handleBulkMarkAllDone={handleBulkMarkAllDone}
+                            handleDismissReminderWithSnooze={
+                                handleDismissReminderWithSnooze
+                            }
+                            setPastPending={setPastPending}
+                        />
+                    </Suspense>
+                )}
 
                 {/* Floating Multi-Select Bulk Actions Bar */}
                 <CalendarBulkActionsBar

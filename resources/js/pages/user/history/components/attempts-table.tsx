@@ -59,7 +59,7 @@ export function AttemptsTable({
     );
 
     return (
-        <Card className="flex min-h-[420px] flex-col justify-between gap-0 overflow-hidden p-0 shadow-2xs">
+        <Card className="flex min-h-105 flex-col justify-between gap-0 overflow-hidden p-0 shadow-2xs">
             {/* Card Header with Counter and Legend */}
             <div className="flex flex-col gap-3 border-b border-border p-4 sm:flex-row sm:items-center sm:justify-between">
                 <div className="flex items-center gap-2">
@@ -235,7 +235,7 @@ export function AttemptsTable({
                                                     onClick={() =>
                                                         toggleExpandRow(att.id)
                                                     }
-                                                    className="block max-w-[240px] text-left text-xs font-bold text-foreground hover:text-blue-600 hover:underline dark:hover:text-blue-400"
+                                                    className="block max-w-60 text-left text-xs font-bold text-foreground hover:text-blue-600 hover:underline dark:hover:text-blue-400"
                                                     title={att.category}
                                                 >
                                                     {att.category}
@@ -273,6 +273,8 @@ export function AttemptsTable({
                                                         <TooltipTrigger asChild>
                                                             <Link
                                                                 href={`/exams?attempt_id=${att.id}&from=history`}
+                                                                prefetch="hover"
+                                                                cacheFor="30s"
                                                                 className="flex size-7 items-center justify-center rounded-lg border border-blue-200 bg-blue-50 text-blue-700 transition hover:bg-blue-100 hover:text-blue-800 dark:border-blue-900/40 dark:bg-blue-950/30 dark:text-blue-400 dark:hover:bg-blue-900/40"
                                                             >
                                                                 <BookOpen className="size-3.5" />

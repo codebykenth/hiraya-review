@@ -1,6 +1,6 @@
 import { Head } from '@inertiajs/react';
 import { BarChart, TrendingUp, Target, Printer } from 'lucide-react';
-import React from 'react';
+import React, { lazy, Suspense } from 'react';
 import { PageContainer } from '@/components/layout/page-container';
 import { PageHeader } from '@/components/layout/page-header';
 import { HowItWorksModal } from '@/components/shared/how-it-works-modal';
@@ -9,14 +9,35 @@ import { AiDiagnosticBanner } from './components/ai-diagnostic-banner';
 import { AnalyticsFilters } from './components/analytics-filters';
 import { CseReadinessCard } from './components/cse-readiness-card';
 import { MetricsGrid } from './components/metrics-grid';
-import { PacingTrendChart } from './components/pacing-trend-chart';
-import { QuestionVolumeChart } from './components/question-volume-chart';
-import { ScoreHistoryChart } from './components/score-history-chart';
-import { SubcategoryRadarChart } from './components/subcategory-radar-chart';
 import { SubjectBreakdownAccordion } from './components/subject-breakdown-accordion';
-import { SubjectMasteryChart } from './components/subject-mastery-chart';
 import { useAnalyticsState } from './hooks/use-analytics-state';
 import type { AnalyticsProps } from './types';
+
+const ScoreHistoryChart = lazy(() =>
+    import('./components/score-history-chart').then((m) => ({
+        default: m.ScoreHistoryChart,
+    })),
+);
+const SubjectMasteryChart = lazy(() =>
+    import('./components/subject-mastery-chart').then((m) => ({
+        default: m.SubjectMasteryChart,
+    })),
+);
+const QuestionVolumeChart = lazy(() =>
+    import('./components/question-volume-chart').then((m) => ({
+        default: m.QuestionVolumeChart,
+    })),
+);
+const SubcategoryRadarChart = lazy(() =>
+    import('./components/subcategory-radar-chart').then((m) => ({
+        default: m.SubcategoryRadarChart,
+    })),
+);
+const PacingTrendChart = lazy(() =>
+    import('./components/pacing-trend-chart').then((m) => ({
+        default: m.PacingTrendChart,
+    })),
+);
 
 export default function AnalyticsIndex({ stats, aiAnalysis }: AnalyticsProps) {
     const {
@@ -92,23 +113,35 @@ export default function AnalyticsIndex({ stats, aiAnalysis }: AnalyticsProps) {
 
             {/* Charts Section */}
             <div className="flex flex-col gap-4 sm:gap-6">
-                {/* Row 1: Score History (Full Width) */}
-                <ScoreHistoryChart
-                    chartData={filteredChartData}
-                    isDemoMode={isDemoMode}
-                />
+                <Suspense
+                    fallback={
+                        <div className="grid grid-cols-1 gap-4 sm:gap-6">
+                            <div className="h-72 w-full animate-pulse rounded-2xl bg-slate-100 dark:bg-slate-800/50" />
+                            <div className="grid grid-cols-1 gap-4 sm:gap-6 md:grid-cols-2">
+                                <div className="h-64 w-full animate-pulse rounded-2xl bg-slate-100 dark:bg-slate-800/50" />
+                                <div className="h-64 w-full animate-pulse rounded-2xl bg-slate-100 dark:bg-slate-800/50" />
+                            </div>
+                        </div>
+                    }
+                >
+                    {/* Row 1: Score History (Full Width) */}
+                    <ScoreHistoryChart
+                        chartData={filteredChartData}
+                        isDemoMode={isDemoMode}
+                    />
 
-                {/* Row 2: Subject Mastery (Radial) + Question Volume (Donut) */}
-                <div className="grid grid-cols-1 gap-4 sm:gap-6 md:grid-cols-2">
-                    <SubjectMasteryChart categories={categories} />
-                    <QuestionVolumeChart categories={categories} />
-                </div>
+                    {/* Row 2: Subject Mastery (Radial) + Question Volume (Donut) */}
+                    <div className="grid grid-cols-1 gap-4 sm:gap-6 md:grid-cols-2">
+                        <SubjectMasteryChart categories={categories} />
+                        <QuestionVolumeChart categories={categories} />
+                    </div>
 
-                {/* Row 3: Weakest Subcategories (with inline drills) + Pacing Trend (with 54s benchmark) */}
-                <div className="grid grid-cols-1 gap-4 sm:gap-6 md:grid-cols-2">
-                    <SubcategoryRadarChart categories={categories} />
-                    <PacingTrendChart data={activeStats.pacingTrend || []} />
-                </div>
+                    {/* Row 3: Weakest Subcategories (with inline drills) + Pacing Trend (with 54s benchmark) */}
+                    <div className="grid grid-cols-1 gap-4 sm:gap-6 md:grid-cols-2">
+                        <SubcategoryRadarChart categories={categories} />
+                        <PacingTrendChart data={activeStats.pacingTrend || []} />
+                    </div>
+                </Suspense>
 
                 {/* Row 4: Detailed Subject & Subcategory Breakdown Accordion */}
                 <SubjectBreakdownAccordion categories={categories} />
