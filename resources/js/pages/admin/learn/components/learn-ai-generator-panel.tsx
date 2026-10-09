@@ -20,9 +20,9 @@ import {
     DialogDescription,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
+import { SelectField } from '@/components/ui/select';
 import { drafts as adminLearnDrafts } from '@/routes/admin/learn';
 import type { Category, Subcategory } from '../types';
-import { SelectField } from '@/components/ui/select';
 
 interface LearnAIGeneratorPanelProps {
     categories: Category[];

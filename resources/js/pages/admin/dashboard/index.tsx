@@ -8,12 +8,14 @@ import {
 } from '@/routes/questions';
 import type { Auth } from '@/types';
 import { DashboardAttemptsPanel } from './components/dashboard-attempts-panel';
+import { DashboardFinanceBanner } from './components/dashboard-finance-banner';
 import { DashboardStatsGrid } from './components/dashboard-stats-grid';
 import { DashboardSyllabusPanel } from './components/dashboard-syllabus-panel';
 import type { AdminDashboardProps } from './types';
 
 export default function AdminDashboard({
     metrics,
+    financials,
     recentAttempts = [],
     categoriesStats = [],
 }: AdminDashboardProps) {
@@ -68,6 +70,9 @@ export default function AdminDashboard({
                         </Link>
                     </div>
                 </div>
+
+                {/* Financial Balance & Net Revenue Highlight */}
+                <DashboardFinanceBanner financials={financials} />
 
                 {/* Stats Grid */}
                 <DashboardStatsGrid metrics={metrics} />

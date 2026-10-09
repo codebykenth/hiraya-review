@@ -36,8 +36,19 @@ export interface TrackItem {
     time_limit: string;
 }
 
+export interface FinancialMetrics {
+    real_balance: number | null;
+    total_net_revenue: number;
+    total_gross_revenue: number;
+    total_fees: number;
+    total_vat: number;
+    total_deductions: number;
+    paid_count: number;
+}
+
 export interface AdminDashboardProps {
     metrics: Metrics;
+    financials?: FinancialMetrics;
     recentAttempts: RecentAttempt[];
     categoriesStats: CategoryStat[];
     tracks: TrackItem[];

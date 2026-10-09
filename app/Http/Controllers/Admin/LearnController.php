@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Actions\Learn\BulkUpdateLearnModulesAction;
 use App\DTOs\Learn\LearnFilterData;
 use App\DTOs\Learn\UpsertLearnModuleData;
+use App\Enums\AiModel;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\Learn\BulkDestroyLearnModulesRequest;
 use App\Http\Requests\Admin\Learn\BulkUpdateLearnModuleStatusRequest;
@@ -14,7 +15,6 @@ use App\Http\Requests\Admin\Learn\UpdateLearnModuleRequest;
 use App\Http\Resources\AdminLearnModuleResource;
 use App\Jobs\GenerateLearnModuleJob;
 use App\Models\LearnModule;
-use App\Services\Ai\AiGatewayService;
 use App\Services\CategoryService;
 use App\Services\LearnModuleService;
 use Illuminate\Http\JsonResponse;
@@ -181,7 +181,7 @@ class LearnController extends Controller
         GenerateLearnModuleJob::dispatchAfterResponse(
             $validated,
             (int) (auth()->id() ?: 1),
-            $validated['primary_model'] ?? AiGatewayService::DEFAULT_GEMINI_MODEL,
+            $validated['primary_model'] ?? AiModel::GEMINI_3_8_FLASH->value,
             $lock->owner()
         );
 

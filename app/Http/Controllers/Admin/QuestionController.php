@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Actions\Question\BulkUpdateQuestionsAction;
 use App\DTOs\Question\UpsertQuestionData;
+use App\Enums\AiModel;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\Question\BulkDestroyQuestionsRequest;
 use App\Http\Requests\Admin\Question\BulkUpdateQuestionsRequest;
@@ -23,7 +24,6 @@ use App\Models\Category;
 use App\Models\Question;
 use App\Models\Subcategory;
 use App\Models\User;
-use App\Services\Ai\AiGatewayService;
 use App\Services\QuestionService;
 use Database\Seeders\DatabaseSeeder;
 use Illuminate\Http\Request;
@@ -163,7 +163,7 @@ class QuestionController extends Controller
         GenerateQuestionsJob::dispatchAfterResponse(
             $validated,
             auth()->id() ?: (User::first()?->id ?: 1),
-            $validated['primary_model'] ?? AiGatewayService::DEFAULT_GEMINI_MODEL,
+            $validated['primary_model'] ?? AiModel::GEMINI_3_8_FLASH->value,
             $lock->owner()
         );
 

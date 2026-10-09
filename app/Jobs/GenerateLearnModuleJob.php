@@ -33,7 +33,7 @@ class GenerateLearnModuleJob implements ShouldQueue
 
     protected ?string $lockOwner;
 
-    public function __construct(array $validated, int $userId, string $primaryModel = AiGatewayService::DEFAULT_GEMINI_MODEL, ?string $lockOwner = null)
+    public function __construct(array $validated, int $userId, string $primaryModel = 'gemini-3.8-flash', ?string $lockOwner = null)
     {
         $this->validated = $validated;
         $this->userId = $userId;

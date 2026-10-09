@@ -9,17 +9,22 @@ use App\Models\Question;
 use App\Models\Subcategory;
 use App\Models\TrackConfig;
 use App\Models\User;
+use App\Repositories\PaymentRepositoryInterface;
+use App\Services\Payment\XenditService;
 
 class AdminDashboardService
 {
     public function __construct(
         protected CategoryService $categoryService,
-        protected ExamAttemptFormatter $formatter
+        protected ExamAttemptFormatter $formatter,
+        protected PaymentRepositoryInterface $paymentRepository,
+        protected XenditService $xenditService,
     ) {}
 
     /**
      * @return array{
      *     metrics: array<string, int>,
+     *     financials: array<string, mixed>,
      *     categoriesStats: array<int, array{id: int, name: string, question_count: int}>,
      *     recentAttempts: array<int, mixed>,
      *     tracks: array<int, mixed>
@@ -27,8 +32,19 @@ class AdminDashboardService
      */
     public function getOverview(): array
     {
+        $paymentStats = $this->paymentRepository->getPaymentStats();
+
         return [
             'metrics' => $this->getMetrics(),
+            'financials' => [
+                'real_balance' => $this->xenditService->getBalance('CASH'),
+                'total_net_revenue' => $paymentStats['total_net_revenue'],
+                'total_gross_revenue' => $paymentStats['total_revenue'],
+                'total_fees' => $paymentStats['total_fees'],
+                'total_vat' => $paymentStats['total_vat'],
+                'total_deductions' => $paymentStats['total_deductions'],
+                'paid_count' => $paymentStats['paid_count'],
+            ],
             'categoriesStats' => $this->categoryService->getCategoryDistributionStats(),
             'recentAttempts' => $this->getRecentAttempts(),
             'tracks' => $this->getTrackConfigs(),
