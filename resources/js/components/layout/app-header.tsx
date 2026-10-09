@@ -157,6 +157,8 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                     >
                                         <Link
                                             href={item.href}
+                                            prefetch="hover"
+                                            cacheFor="30s"
                                             className={cn(
                                                 navigationMenuTriggerStyle(),
                                                 item.href

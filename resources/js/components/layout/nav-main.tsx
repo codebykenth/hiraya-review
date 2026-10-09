@@ -188,7 +188,11 @@ export function NavMain({
                                                                 'text-blue-750 shadow-3xs bg-blue-100/50 font-normal dark:bg-blue-950/40 dark:text-blue-300',
                                                         )}
                                                     >
-                                                        <Link href={sub.href}>
+                                                        <Link
+                                                            href={sub.href}
+                                                            prefetch="hover"
+                                                            cacheFor="30s"
+                                                        >
                                                             {sub.icon && (
                                                                 <sub.icon className="size-3.5 shrink-0" />
                                                             )}
@@ -251,7 +255,11 @@ export function NavMain({
                                         'rounded-l-none border-l-3 border-blue-600 bg-blue-100/70 pl-1.5 font-bold text-blue-700 shadow-xs dark:bg-blue-950/60 dark:text-blue-300',
                                 )}
                             >
-                                <Link href={item.href || '#'}>
+                                <Link
+                                    href={item.href || '#'}
+                                    prefetch="hover"
+                                    cacheFor="30s"
+                                >
                                     {item.icon && (
                                         <item.icon
                                             className={cn(
