@@ -533,6 +533,7 @@ export function useExamState(props: ExamIndexProps) {
             confirmLabel: 'Exit Session',
             variant: 'danger',
             onConfirm: () => {
+                setConfirmModal((prev) => ({ ...prev, isOpen: false }));
                 setIsExamActive(false);
                 setIsExamSubmitted(false);
                 setReviewScreenActive(false);
@@ -555,7 +556,7 @@ export function useExamState(props: ExamIndexProps) {
                 }
             },
         });
-    }, [isDrillSession, setConfirmModal]);
+    }, [isDrillSession, setConfirmModal, clearSession]);
 
     const handlePrintExam = useCallback(async () => {
         const pool = buildFreshExamPool(selectedExamId);

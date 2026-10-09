@@ -1,14 +1,27 @@
 import { Head, router } from '@inertiajs/react';
 import { Target, SlidersHorizontal, Bookmark } from 'lucide-react';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { PageContainer } from '@/components/layout/page-container';
 import { index as drillsIndex } from '@/routes/drills';
-import { ConfigView } from './components/config-view';
-import { CustomBuilderView } from './components/custom-builder-view';
 import { HubView } from './components/hub-view';
-import { SavedSetsView } from './components/saved-sets-view';
 import { useDrillsState } from './hooks/use-drills-state';
 import type { DrillsProps, Question } from './types';
+
+const CustomBuilderView = lazy(() =>
+    import('./components/custom-builder-view').then((m) => ({
+        default: m.CustomBuilderView,
+    })),
+);
+const SavedSetsView = lazy(() =>
+    import('./components/saved-sets-view').then((m) => ({
+        default: m.SavedSetsView,
+    })),
+);
+const ConfigView = lazy(() =>
+    import('./components/config-view').then((m) => ({
+        default: m.ConfigView,
+    })),
+);
 
 export default function Drills(props: DrillsProps) {
     const {
@@ -234,43 +247,67 @@ export default function Drills(props: DrillsProps) {
                 )}
 
                 {viewState === 'hub' && activeTab === 'custom' && (
-                    <CustomBuilderView
-                        categories={categories}
-                        questions={questions}
-                        wrongQuestionIds={wrongQuestionIds}
-                        seenQuestionIds={seenQuestionIds}
-                        onLaunchCustomDrill={handleLaunchCustomDrill}
-                    />
+                    <Suspense
+                        fallback={
+                            <div className="flex h-64 items-center justify-center">
+                                <div className="size-7 animate-spin rounded-full border-2 border-blue-600 border-t-transparent" />
+                            </div>
+                        }
+                    >
+                        <CustomBuilderView
+                            categories={categories}
+                            questions={questions}
+                            wrongQuestionIds={wrongQuestionIds}
+                            seenQuestionIds={seenQuestionIds}
+                            onLaunchCustomDrill={handleLaunchCustomDrill}
+                        />
+                    </Suspense>
                 )}
 
                 {viewState === 'hub' && activeTab === 'saved' && (
-                    <SavedSetsView
-                        savedDrillSets={savedDrillSets}
-                        allQuestions={questions}
-                        categories={categories}
-                        onLaunchSavedSetDrill={handleLaunchSavedSetDrill}
-                    />
+                    <Suspense
+                        fallback={
+                            <div className="flex h-64 items-center justify-center">
+                                <div className="size-7 animate-spin rounded-full border-2 border-blue-600 border-t-transparent" />
+                            </div>
+                        }
+                    >
+                        <SavedSetsView
+                            savedDrillSets={savedDrillSets}
+                            allQuestions={questions}
+                            categories={categories}
+                            onLaunchSavedSetDrill={handleLaunchSavedSetDrill}
+                        />
+                    </Suspense>
                 )}
 
                 {viewState === 'config' && selectedCategory && (
-                    <ConfigView
-                        selectedCategory={selectedCategory}
-                        selectedSubcats={selectedSubcats}
-                        questionCount={questionCount}
-                        language={language}
-                        isTimed={isTimed}
-                        isRetakeConfig={isRetakeConfig}
-                        filteredQCount={filteredQCount}
-                        hasFilipinoQuestions={hasFilipinoQuestions}
-                        originInfo={originInfo}
-                        setViewState={setViewState}
-                        setIsRetakeConfig={setIsRetakeConfig}
-                        toggleSubcat={toggleSubcat}
-                        setQuestionCount={setQuestionCount}
-                        setLanguage={setLanguage}
-                        setIsTimed={setIsTimed}
-                        startDrill={startDrill}
-                    />
+                    <Suspense
+                        fallback={
+                            <div className="flex h-64 items-center justify-center">
+                                <div className="size-7 animate-spin rounded-full border-2 border-blue-600 border-t-transparent" />
+                            </div>
+                        }
+                    >
+                        <ConfigView
+                            selectedCategory={selectedCategory}
+                            selectedSubcats={selectedSubcats}
+                            questionCount={questionCount}
+                            language={language}
+                            isTimed={isTimed}
+                            isRetakeConfig={isRetakeConfig}
+                            filteredQCount={filteredQCount}
+                            hasFilipinoQuestions={hasFilipinoQuestions}
+                            originInfo={originInfo}
+                            setViewState={setViewState}
+                            setIsRetakeConfig={setIsRetakeConfig}
+                            toggleSubcat={toggleSubcat}
+                            setQuestionCount={setQuestionCount}
+                            setLanguage={setLanguage}
+                            setIsTimed={setIsTimed}
+                            startDrill={startDrill}
+                        />
+                    </Suspense>
                 )}
             </PageContainer>
         </>

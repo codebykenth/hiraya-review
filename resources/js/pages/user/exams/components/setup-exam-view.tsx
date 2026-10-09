@@ -26,7 +26,6 @@ interface SetupExamViewProps {
     handleBeginExam: () => void;
     handlePrintExam: () => void;
     isPrinting?: boolean;
-    customConfirmModal: React.ReactNode;
 }
 
 export function SetupExamView({
@@ -36,7 +35,6 @@ export function SetupExamView({
     handleBeginExam,
     handlePrintExam,
     isPrinting = false,
-    customConfirmModal,
 }: SetupExamViewProps) {
     const { auth } = usePage<{ auth: Auth }>().props;
 
@@ -264,7 +262,6 @@ export function SetupExamView({
                     </div>
                 </div>
             </PageContainer>
-            {customConfirmModal}
         </>
     );
 }
