@@ -209,10 +209,12 @@ const viewMap: Record<string, string> = {
     'Study Plan': 'study-plan',
     'Study Hub': 'learn',
     Learn: 'learn',
+    'AI Tutor': 'ai-tutor',
     'Practice Drills': 'practice-drills',
     'Mock Exams': 'mock-exams',
     History: 'history',
     Analytics: 'analytics',
+    'Billing & Plans': 'billing',
 };
 
 interface AppSidebarProps {
@@ -220,9 +222,10 @@ interface AppSidebarProps {
 }
 
 export function AppSidebar({ feedbackCount }: AppSidebarProps) {
-    const { auth, pending_feedback_count } = usePage<{
+    const { auth, pending_feedback_count, xendit } = usePage<{
         auth: any;
         pending_feedback_count?: number;
+        xendit?: { enabled: boolean; is_sandbox?: boolean };
     }>().props;
     const isAdmin = auth.user?.role === 'admin';
     const rolePermissions = auth.permissions?.[auth.user?.role || 'user'] || {};
@@ -244,6 +247,10 @@ export function AppSidebar({ feedbackCount }: AppSidebarProps) {
     }, [count]);
 
     const visibleGeneralItems = generalNavItems.filter((item) => {
+        if (item.href === '/billing' && xendit?.is_sandbox) {
+            return false;
+        }
+
         const viewId = viewMap[item.title];
 
         if (viewId && rolePermissions[viewId] !== undefined) {

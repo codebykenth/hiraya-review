@@ -25,6 +25,8 @@ export function DashboardAttemptsPanel({
 
                 <Link
                     href="/admin/attempts"
+                    prefetch="hover"
+                    cacheFor="30s"
                     className="flex items-center gap-1 text-xs font-bold text-blue-600 transition hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
                 >
                     View All Attempts

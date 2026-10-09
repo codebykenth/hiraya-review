@@ -1,6 +1,6 @@
 import { Head, router } from '@inertiajs/react';
 import { Edit3, ListChecks, FileImage, Trash2, HelpCircle } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, lazy, Suspense } from 'react';
 import { DraftsReviewShell } from '@/components/domain/drafts-review-shell';
 import type { CategoryItem } from '@/components/domain/drafts-review-shell';
 import type {
@@ -36,7 +36,12 @@ import {
     bulkDestroy as questionsBulkDestroy,
     bulkEdit as questionsBulkEdit,
 } from '@/routes/questions';
-import { QuickEditModal } from './components/quick-edit-modal';
+
+const QuickEditModal = lazy(() =>
+    import('./components/quick-edit-modal').then((module) => ({
+        default: module.QuickEditModal,
+    })),
+);
 
 interface DraftQuestion {
     id: number;
@@ -942,15 +947,19 @@ export default function DraftsQuestionList({
                 variant="danger"
             />
 
-            <QuickEditModal
-                isOpen={!!editModalQuestion}
-                question={editModalQuestion as any}
-                categories={categories}
-                onClose={() => setEditModalQuestion(null)}
-                onSaveSuccess={() => {
-                    setEditModalQuestion(null);
-                }}
-            />
+            <Suspense fallback={null}>
+                {editModalQuestion && (
+                    <QuickEditModal
+                        isOpen={!!editModalQuestion}
+                        question={editModalQuestion as any}
+                        categories={categories}
+                        onClose={() => setEditModalQuestion(null)}
+                        onSaveSuccess={() => {
+                            setEditModalQuestion(null);
+                        }}
+                    />
+                )}
+            </Suspense>
         </>
     );
 }

@@ -56,6 +56,8 @@ export default function AdminDashboard({
                     <div className="flex items-center gap-3">
                         <Link
                             href={questionsIndex()}
+                            prefetch="hover"
+                            cacheFor="30s"
                             className="group flex items-center justify-center gap-1.5 rounded-lg bg-blue-600 px-4 py-2.5 text-xs font-semibold text-white shadow-xs transition transition-all duration-300 hover:bg-blue-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95"
                         >
                             <FileQuestion className="size-3.5" />
@@ -63,6 +65,8 @@ export default function AdminDashboard({
                         </Link>
                         <Link
                             href={questionsDrafts()}
+                            prefetch="hover"
+                            cacheFor="30s"
                             className="group dark:text-slate-350 flex items-center justify-center gap-1.5 rounded-lg border border-slate-200 px-4 py-2.5 text-xs font-semibold shadow-xs transition transition-all duration-300 hover:bg-slate-50 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95 dark:border-slate-800 dark:bg-slate-950 dark:hover:bg-slate-900"
                         >
                             <ListChecks className="size-3.5" />

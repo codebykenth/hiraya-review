@@ -17,11 +17,17 @@ class ViewManagementController extends Controller
             'reviewer-guide' => 'Reviewer Guide',
             'study-plan' => 'Study Plan',
             'learn' => 'Learn Modules',
+            'ai-tutor' => 'AI Tutor',
             'practice-drills' => 'Practice Drills',
             'mock-exams' => 'Mock Exams',
             'history' => 'History & Results',
             'analytics' => 'Analytics',
         ];
+
+        // Only include billing/payments in view management if Xendit is configured
+        if (! empty(config('xendit.secret_key'))) {
+            $availableViews['billing'] = 'Billing & Payments';
+        }
 
         // Ensure defaults exist for both roles
         $roles = ['admin', 'user'];

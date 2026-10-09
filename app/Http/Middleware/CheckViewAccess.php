@@ -19,10 +19,13 @@ class CheckViewAccess
         'guide' => 'reviewer-guide',
         'study-schedules.*' => 'study-plan',
         'learn.*' => 'learn',
+        'tutor.*' => 'ai-tutor',
+        'ai-tutor.*' => 'ai-tutor',
         'drills.*' => 'practice-drills',
         'exams.*' => 'mock-exams',
         'history.*' => 'history',
         'analytics.*' => 'analytics',
+        'billing.*' => 'billing',
     ];
 
     public function handle(Request $request, Closure $next): Response

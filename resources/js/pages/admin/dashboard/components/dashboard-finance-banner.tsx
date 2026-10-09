@@ -82,6 +82,8 @@ export function DashboardFinanceBanner({ financials }: DashboardFinanceBannerPro
                         {/* Link to full payments management */}
                         <Link
                             href="/admin/payments"
+                            prefetch="hover"
+                            cacheFor="30s"
                             className="group ml-auto flex items-center gap-1.5 rounded-lg border border-border bg-background px-3 py-2 text-xs font-medium text-foreground transition-all duration-200 hover:border-primary/50 hover:bg-primary/5 hover:text-primary active:scale-95 shadow-xs"
                         >
                             <span>Payments & Ledger</span>

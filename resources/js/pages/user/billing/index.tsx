@@ -1,9 +1,8 @@
 import { Head } from '@inertiajs/react';
-import { Award, CheckCircle, Crown, ShieldCheck, Sparkles } from 'lucide-react';
+import { Award, CheckCircle, Crown, ShieldCheck } from 'lucide-react';
 import React from 'react';
 import { PageContainer } from '@/components/layout/page-container';
 import { PageHeader } from '@/components/layout/page-header';
-import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { DevSandboxBanner } from './components/dev-sandbox-banner';
 import { PaymentHistoryTable } from './components/payment-history-table';
@@ -40,23 +39,23 @@ export default function BillingPage({ plans, subscription, recent_payments, sand
                     )}
                 </div>
 
-                {/* 2. DEV SANDBOX BANNER */}
-                {sandbox.is_active && (
+                {/* 2. DEV SANDBOX BANNER / NOTICE */}
+                {sandbox.is_active ? (
                     <div className="mb-8">
                         <DevSandboxBanner
                             sandbox={sandbox}
                             pendingPayments={pendingPayments}
                         />
                     </div>
+                ) : (
+                    /* 3. PRICING CARDS (Live Production Only) */
+                    <div className="mb-10">
+                        <PricingCards
+                            plans={plans}
+                            subscription={subscription}
+                        />
+                    </div>
                 )}
-
-                {/* 3. PRICING CARDS */}
-                <div className="mb-10">
-                    <PricingCards
-                        plans={plans}
-                        subscription={subscription}
-                    />
-                </div>
 
                 {/* 4. TRUST & GUARANTEE BANNER */}
                 <div className="mb-10 grid gap-4 sm:grid-cols-3 max-w-5xl mx-auto">

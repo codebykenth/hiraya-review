@@ -286,6 +286,8 @@ export default function AdminLearnIndex({
                     </div>
                     <Link
                         href={adminLearnCreate().url}
+                        prefetch="hover"
+                        cacheFor="30s"
                         className="group inline-flex cursor-pointer items-center gap-1.5 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-bold text-white shadow-md transition transition-all duration-300 hover:bg-blue-700 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95"
                     >
                         <ChevronRight className="size-4 transition-transform group-hover:scale-110" />

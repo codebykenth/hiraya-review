@@ -72,6 +72,7 @@ class HandleInertiaRequests extends Middleware
             ],
             'xendit' => [
                 'enabled' => ! empty(config('xendit.secret_key')),
+                'is_sandbox' => (bool) config('xendit.is_sandbox', true),
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
             'global_announcements' => app(AnnouncementRepositoryInterface::class)->getActiveAnnouncements(),
