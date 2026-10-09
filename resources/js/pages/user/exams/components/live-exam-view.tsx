@@ -184,8 +184,9 @@ export function LiveExamView({
         });
     };
 
-    const { user_reports_map = {} } = usePage<{
+    const { user_reports_map = {}, auth } = usePage<{
         user_reports_map?: Record<string, 'pending' | 'resolved' | 'dismissed'>;
+        auth?: { user?: { is_dev?: boolean } };
     }>().props;
 
     const [localReportsMap, setLocalReportsMap] =
@@ -422,7 +423,7 @@ export function LiveExamView({
         <>
             <Head title={`Live Simulation: ${details.title}`} />
             <style>{styleBlock}</style>
-            {isShielded && (
+            {!import.meta.env.DEV && !auth?.user?.is_dev && isShielded && (
                 <div className="fixed inset-0 z-[99999] flex flex-col items-center justify-center bg-card p-6 text-center opacity-100 select-none">
                     <div className="mx-auto flex max-w-2xl flex-col items-center gap-4 rounded-2xl border border-border/80 bg-background p-8 shadow-2xl">
                         <div className="flex size-14 items-center justify-center rounded-full bg-amber-500/10 text-amber-600 dark:bg-amber-500/20 dark:text-amber-400">

@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use App\Models\Feedback;
 use App\Models\RolePermission;
+use App\Models\User;
 use App\Repositories\AnnouncementRepositoryInterface;
 use App\Repositories\FeedbackRepositoryInterface;
 use App\Services\TurnstileService;
@@ -51,6 +52,7 @@ class HandleInertiaRequests extends Middleware
                     [
                         'two_factor_enabled' => ! is_null($request->user()->two_factor_secret),
                         'analysis_mode' => app(UserPreferenceService::class)->getAnalysisMode($request->user()->id),
+                        'is_dev' => $this->isDevUser($request->user()),
                     ]
                 ) : null,
                 'permissions' => Cache::remember('role_permissions', 3600, function () {
@@ -89,5 +91,24 @@ class HandleInertiaRequests extends Middleware
                 ->mapWithKeys(fn ($item) => [$item->flaggable_type.':'.$item->flaggable_id => $item->status])
                 ->toArray() : (object) [],
         ];
+    }
+
+    /**
+     * Determine if the given user matches the configured developer email.
+     */
+    protected function isDevUser(?User $user): bool
+    {
+        if (! $user || empty($user->email)) {
+            return false;
+        }
+
+        $devEmail = config('app.dev_email', env('DEV_EMAIL'));
+        if (empty($devEmail)) {
+            return false;
+        }
+
+        $devEmails = array_map('trim', explode(',', (string) $devEmail));
+
+        return in_array(mb_strtolower($user->email), array_map('mb_strtolower', $devEmails), true);
     }
 }

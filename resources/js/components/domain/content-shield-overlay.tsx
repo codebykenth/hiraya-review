@@ -1,3 +1,4 @@
+import { usePage } from '@inertiajs/react';
 import { Lock } from 'lucide-react';
 import React from 'react';
 
@@ -16,7 +17,16 @@ export function ContentShieldOverlay({
     resumeButtonText = 'Resume Practice Builder',
     descriptionText = 'Exam content was hidden because window focus was lost or external screen tools were detected.',
 }: ContentShieldOverlayProps) {
-    if (!isShielded) {
+    let isDevUser = false;
+
+    try {
+        const page = usePage<{ auth?: { user?: { is_dev?: boolean } } }>();
+        isDevUser = Boolean(page?.props?.auth?.user?.is_dev);
+    } catch {
+        isDevUser = false;
+    }
+
+    if (!isShielded || isDevUser || import.meta.env.DEV) {
         return null;
     }
 

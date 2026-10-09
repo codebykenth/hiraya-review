@@ -1,3 +1,4 @@
+import { usePage } from '@inertiajs/react';
 import type React from 'react';
 import { useEffect, useRef, useCallback, useState } from 'react';
 import { flushSync } from 'react-dom';
@@ -105,6 +106,16 @@ export function useContentShield(
     options: UseContentShieldOptions = {},
 ): UseContentShieldReturn {
     const { onCopyAttempt, onShieldActivate, contentLabel = 'Exam' } = options;
+    let isDevUser = false;
+
+    try {
+        const page = usePage<{ auth?: { user?: { is_dev?: boolean } } }>();
+        isDevUser = Boolean(page?.props?.auth?.user?.is_dev);
+    } catch {
+        isDevUser = false;
+    }
+
+    const isDev = isDevUser || Boolean(import.meta.env.DEV);
 
     // Keep latest callbacks in refs so listener effects never re-run on every
     // parent render (the exam view re-renders every second for the timer).
@@ -134,6 +145,10 @@ export function useContentShield(
 
     // ── INSTANT DOM blur — runs synchronously, bypasses React render cycle ──
     const instantBlurContent = useCallback(() => {
+        if (isDev) {
+            return;
+        }
+
         const el = contentRef.current;
 
         if (el) {
@@ -141,7 +156,7 @@ export function useContentShield(
             el.style.opacity = '0';
             el.style.transition = 'none';
         }
-    }, []);
+    }, [isDev]);
 
     const clearInstantBlur = useCallback(() => {
         const el = contentRef.current;
@@ -155,6 +170,10 @@ export function useContentShield(
 
     // Wipe clipboard contents after shield activates
     const wipeClipboard = useCallback(() => {
+        if (isDev) {
+            return;
+        }
+
         try {
             if (origWriteTextRef.current) {
                 origWriteTextRef.current
@@ -166,9 +185,13 @@ export function useContentShield(
         } catch {
             // Clipboard API may not be available in all contexts
         }
-    }, []);
+    }, [isDev]);
 
     const activateShield = useCallback(() => {
+        if (isDev) {
+            return;
+        }
+
         // 1. Instant DOM manipulation (synchronous — before next paint)
         instantBlurContent();
         // 2. Wipe clipboard so any copied screenshot data is cleared
@@ -192,9 +215,13 @@ export function useContentShield(
         );
 
         onShieldActivateRef.current?.();
-    }, [instantBlurContent, wipeClipboard]);
+    }, [instantBlurContent, isDev, wipeClipboard]);
 
     const dismissShield = useCallback(() => {
+        if (isDev) {
+            return;
+        }
+
         // Refuse to uncover content during the cooldown lock or if window is not focused
         if (
             Date.now() < lockUntilRef.current ||
@@ -211,10 +238,14 @@ export function useContentShield(
         setIsResumeLocked(false);
         clearInstantBlur();
         setIsShielded(false);
-    }, [clearInstantBlur, instantBlurContent]);
+    }, [clearInstantBlur, instantBlurContent, isDev]);
 
     // ── Core event listeners ────────────────────────────────────
     useEffect(() => {
+        if (isDev) {
+            return;
+        }
+
         // 1. Visibility API (tab switch, minimize, snipping tool)
         const handleVisibility = () => {
             if (document.hidden) {
@@ -401,10 +432,14 @@ export function useContentShield(
             );
             window.removeEventListener('beforeprint', handleBeforePrint);
         };
-    }, [activateShield, instantBlurContent]);
+    }, [activateShield, instantBlurContent, isDev]);
 
     // ── Keyboard security ────────────────────────────────────────
     useEffect(() => {
+        if (isDev) {
+            return;
+        }
+
         const handleKeyDown = (e: KeyboardEvent) => {
             const isInput =
                 isInputElement(e.target) ||
@@ -537,11 +572,15 @@ export function useContentShield(
                 capture: true,
             });
         };
-    }, [activateShield, instantBlurContent, wipeClipboard]);
+    }, [activateShield, instantBlurContent, isDev, wipeClipboard]);
 
     // ── Wrapper props ────────────────────────────────────────────
     const wrapperProps = {
         onCopy: (e: React.ClipboardEvent) => {
+            if (isDev) {
+                return;
+            }
+
             if (!isInputElement(e.target)) {
                 e.preventDefault();
                 onCopyAttempt?.(
@@ -550,16 +589,28 @@ export function useContentShield(
             }
         },
         onContextMenu: (e: React.MouseEvent) => {
+            if (isDev) {
+                return;
+            }
+
             if (!isInputElement(e.target)) {
                 e.preventDefault();
             }
         },
         onMouseDown: (e: React.MouseEvent) => {
+            if (isDev) {
+                return;
+            }
+
             if (!isInteractiveElement(e.target)) {
                 e.preventDefault();
             }
         },
         onDragStart: (e: React.DragEvent) => {
+            if (isDev) {
+                return;
+            }
+
             e.preventDefault();
         },
     };
@@ -568,7 +619,7 @@ export function useContentShield(
         isShielded,
         isResumeLocked,
         dismissShield,
-        styleBlock: SHIELD_STYLE,
+        styleBlock: isDev ? '' : SHIELD_STYLE,
         contentRef,
         wrapperProps,
     };

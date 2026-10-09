@@ -130,9 +130,14 @@ class AppServiceProvider extends ServiceProvider
         });
 
         Gate::define('access-dev-docs', function (User $user) {
-            return in_array($user->email, [
-                env('DEV_EMAIL'),
-            ]);
+            $devEmail = config('app.dev_email', env('DEV_EMAIL'));
+            if (empty($devEmail)) {
+                return false;
+            }
+
+            $devEmails = array_map('trim', explode(',', (string) $devEmail));
+
+            return in_array(mb_strtolower($user->email), array_map('mb_strtolower', $devEmails), true);
         });
     }
 

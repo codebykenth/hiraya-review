@@ -6,6 +6,7 @@ export type User = {
     email_verified_at: string | null;
     two_factor_enabled?: boolean;
     analysis_mode?: 'ai' | 'instant';
+    is_dev?: boolean;
     role: 'admin' | 'user';
     pdf_downloads_count: number;
     can_download_pdf: boolean;
