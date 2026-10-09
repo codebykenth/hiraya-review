@@ -75,7 +75,7 @@ class RagExplanationService
 
         $generatedText = '';
         if ($aiResponse['success'] && ! empty($aiResponse['text'])) {
-            $generatedText = trim((string) $aiResponse['text']);
+            $generatedText = html_entity_decode(trim((string) $aiResponse['text']), ENT_QUOTES | ENT_HTML5, 'UTF-8');
         } elseif (! empty($question->explanation)) {
             $generatedText = $question->explanation;
         } else {
@@ -289,6 +289,7 @@ Correct Answer: Option {$correctLetter} ({$correctText})
 3. Reference the relevant rule (e.g. grammar rule, math step, Republic Act / Constitution article, or logical reasoning principle).
 4. Provide a 1-sentence "Exam Takeaway" or mental shortcut for the real exam.
 5. Format with clean, compact Markdown (bolding key terms, no fluff, no pleasantries).
+6. NEVER use HTML entities (such as &rarr;, &times;, &le;, &ge;). Use unicode symbols (→, ×, ≤, ≥) or standard characters (->, *), and wrap formulas in backticks.
 EOT;
     }
 
