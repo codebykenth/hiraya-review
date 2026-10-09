@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services\Ai;
 
+use App\Enums\AiModel;
 use App\Models\DocumentEmbedding;
 use App\Models\LearnModule;
 use App\Models\Question;
@@ -59,7 +60,7 @@ class RagExplanationService
         );
 
         $aiResponse = $this->aiGateway->runGemini(
-            AiGatewayService::DEFAULT_GEMINI_MODEL,
+            AiModel::GEMINI_3_8_FLASH,
             [
                 'contents' => [
                     ['parts' => [['text' => $prompt]]],

@@ -1,4 +1,4 @@
-﻿import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Zap } from 'lucide-react';
 import React from 'react';
 import { parseLatexString } from '@/lib/latex-parser';
 
@@ -75,8 +75,9 @@ export function ExplanationPreview({ text }: ExplanationPreviewProps) {
                     key={`shortcut-${idx}`}
                     className="dark:bg-rose-950/30/40 my-4 rounded-xl border border-rose-200 bg-rose-50 p-4 dark:border-rose-900/40 dark:border-rose-900/50 dark:bg-rose-950/20"
                 >
-                    <span className="mb-1 block text-[11px] font-black tracking-wider text-rose-800 uppercase dark:text-rose-300">
-                        🧠 Mental Math Shortcut
+                    <span className="mb-1 flex items-center gap-1.5 text-[11px] font-black tracking-wider text-rose-800 uppercase dark:text-rose-300">
+                        <Zap className="size-3.5" />
+                        Mental Math Shortcut
                     </span>
                     <p className="text-base leading-relaxed font-bold text-foreground">
                         {parseInlineBold(content)}
