@@ -1,6 +1,6 @@
 import { Head, usePage, router } from '@inertiajs/react';
 import Echo from 'laravel-echo';
-import { BookOpen, CheckCircle, BarChart } from 'lucide-react';
+import { BookOpen, CheckCircle, BarChart, ChevronDown, ChevronUp, Eye, EyeOff } from 'lucide-react';
 import Pusher from 'pusher-js';
 import React from 'react';
 import { toast } from 'sonner';
@@ -94,6 +94,30 @@ export default function LearnIndex(props: LearnIndexProps) {
         return stats;
     }, [modules]);
 
+    const [isProgressVisible, setIsProgressVisible] = React.useState<boolean>(() => {
+        try {
+            const stored = localStorage.getItem('study_hub_progress_visible');
+
+            return stored !== null ? stored === 'true' : true;
+        } catch {
+            return true;
+        }
+    });
+
+    const toggleProgressVisibility = () => {
+        setIsProgressVisible((prev) => {
+            const next = !prev;
+
+            try {
+                localStorage.setItem('study_hub_progress_visible', String(next));
+            } catch {
+                // Ignore localStorage errors
+            }
+
+            return next;
+        });
+    };
+
     const {
         searchQuery,
         setSearchQuery,
@@ -160,9 +184,9 @@ export default function LearnIndex(props: LearnIndexProps) {
 
                 {/* Overall Progress Card */}
                 {isLoggedIn && totalCount > 0 && (
-                    <div className="mb-6 rounded-xl border border-border bg-card p-5 shadow-2xs">
-                        <div className="mb-3 flex items-center justify-between">
-                            <div className="flex items-center gap-2">
+                    <div className="mb-6 rounded-xl border border-border bg-card p-4 sm:p-5 shadow-2xs transition-all duration-200">
+                        <div className="flex items-center justify-between">
+                            <div className="flex flex-wrap items-center gap-2">
                                 <span className="font-heading text-base font-bold text-foreground">
                                     Overall Study Progress
                                 </span>
@@ -170,82 +194,116 @@ export default function LearnIndex(props: LearnIndexProps) {
                                     {completedCount} / {totalCount} Completed
                                 </span>
                             </div>
-                            <span className="text-base font-black text-blue-600 dark:text-blue-400">
-                                {progressPercent}%
-                            </span>
-                        </div>
-                        <div className="h-2.5 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
-                            <div
-                                className="h-full rounded-full bg-blue-600 transition-all duration-500 dark:bg-blue-500"
-                                style={{ width: `${progressPercent}%` }}
-                            />
-                        </div>
-
-                        {/* Category Progress Grid */}
-                        {(() => {
-                            const visibleCategories = activeCategories.filter(
-                                (cat) =>
-                                    cat.name !== 'Clerical Ability' ||
-                                    (categoryStats[cat.name]?.total ?? 0) > 0,
-                            );
-
-                            return (
-                                <div
-                                    className={`mt-5 grid grid-cols-1 gap-3 border-t border-border pt-4 sm:grid-cols-2 ${visibleCategories.length >= 5 ? 'lg:grid-cols-5' : 'lg:grid-cols-4'}`}
+                            <div className="flex items-center gap-3">
+                                <span className="text-base font-black text-blue-600 dark:text-blue-400">
+                                    {progressPercent}%
+                                </span>
+                                <button
+                                    type="button"
+                                    onClick={toggleProgressVisibility}
+                                    aria-label={
+                                        isProgressVisible
+                                            ? 'Hide study progress analytics'
+                                            : 'Show study progress analytics'
+                                    }
+                                    className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-border/80 bg-muted/40 px-2.5 py-1 text-xs font-semibold text-muted-foreground transition-all hover:bg-muted hover:text-foreground active:scale-95"
                                 >
-                                    {visibleCategories.map((cat) => {
-                                        const stats = categoryStats[
-                                            cat.name
-                                        ] || {
-                                            completed: 0,
-                                            total: 0,
-                                        };
-                                        const pct =
-                                            stats.total > 0
-                                                ? Math.round(
-                                                      (stats.completed /
-                                                          stats.total) *
-                                                          100,
-                                                  )
-                                                : 0;
-                                        const barColor =
-                                            progressBarColors[cat.name] ||
-                                            'bg-slate-500 dark:bg-slate-400';
+                                    {isProgressVisible ? (
+                                        <>
+                                            <EyeOff className="size-3.5" />
+                                            <span className="hidden sm:inline">Hide</span>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Eye className="size-3.5" />
+                                            <span className="hidden sm:inline">Show</span>
+                                        </>
+                                    )}
+                                    {isProgressVisible ? (
+                                        <ChevronUp className="size-3 sm:hidden" />
+                                    ) : (
+                                        <ChevronDown className="size-3 sm:hidden" />
+                                    )}
+                                </button>
+                            </div>
+                        </div>
 
-                                        return (
-                                            <div
-                                                key={cat.id}
-                                                className="flex flex-col gap-1.5 rounded-lg border border-border/40 bg-slate-50/20 p-3.5 dark:bg-slate-900/10"
-                                            >
-                                                <div className="flex items-center justify-between text-sm font-bold">
-                                                    <span
-                                                        className="truncate text-muted-foreground"
-                                                        title={cat.name}
-                                                    >
-                                                        {cat.name}
-                                                    </span>
-                                                    <span className="ml-1 shrink-0 font-extrabold text-foreground">
-                                                        {pct}%
-                                                    </span>
-                                                </div>
-                                                <div className="mt-1 h-2 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800/80">
-                                                    <div
-                                                        className={`${barColor} h-full rounded-full transition-all duration-500`}
-                                                        style={{
-                                                            width: `${pct}%`,
-                                                        }}
-                                                    />
-                                                </div>
-                                                <span className="mt-0.5 text-xs font-semibold text-muted-foreground/80">
-                                                    {stats.completed} of{' '}
-                                                    {stats.total} modules
-                                                </span>
-                                            </div>
-                                        );
-                                    })}
+                        {isProgressVisible && (
+                            <div className="mt-3.5 animate-in fade-in-50 duration-200">
+                                <div className="h-2.5 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
+                                    <div
+                                        className="h-full rounded-full bg-blue-600 transition-all duration-500 dark:bg-blue-500"
+                                        style={{ width: `${progressPercent}%` }}
+                                    />
                                 </div>
-                            );
-                        })()}
+
+                                {/* Category Progress Grid */}
+                                {(() => {
+                                    const visibleCategories = activeCategories.filter(
+                                        (cat) =>
+                                            cat.name !== 'Clerical Ability' ||
+                                            (categoryStats[cat.name]?.total ?? 0) > 0,
+                                    );
+
+                                    return (
+                                        <div
+                                            className={`mt-5 grid grid-cols-1 gap-3 border-t border-border pt-4 sm:grid-cols-2 ${visibleCategories.length >= 5 ? 'lg:grid-cols-5' : 'lg:grid-cols-4'}`}
+                                        >
+                                            {visibleCategories.map((cat) => {
+                                                const stats = categoryStats[
+                                                    cat.name
+                                                ] || {
+                                                    completed: 0,
+                                                    total: 0,
+                                                };
+                                                const pct =
+                                                    stats.total > 0
+                                                        ? Math.round(
+                                                              (stats.completed /
+                                                                  stats.total) *
+                                                                  100,
+                                                          )
+                                                        : 0;
+                                                const barColor =
+                                                    progressBarColors[cat.name] ||
+                                                    'bg-slate-500 dark:bg-slate-400';
+
+                                                return (
+                                                    <div
+                                                        key={cat.id}
+                                                        className="flex flex-col gap-1.5 rounded-lg border border-border/40 bg-slate-50/20 p-3.5 dark:bg-slate-900/10"
+                                                    >
+                                                        <div className="flex items-center justify-between text-sm font-bold">
+                                                            <span
+                                                                className="truncate text-muted-foreground"
+                                                                title={cat.name}
+                                                            >
+                                                                {cat.name}
+                                                            </span>
+                                                            <span className="ml-1 shrink-0 font-extrabold text-foreground">
+                                                                {pct}%
+                                                            </span>
+                                                        </div>
+                                                        <div className="mt-1 h-2 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800/80">
+                                                            <div
+                                                                className={`${barColor} h-full rounded-full transition-all duration-500`}
+                                                                style={{
+                                                                    width: `${pct}%`,
+                                                                }}
+                                                            />
+                                                        </div>
+                                                        <span className="mt-0.5 text-xs font-semibold text-muted-foreground/80">
+                                                            {stats.completed} of{' '}
+                                                            {stats.total} modules
+                                                        </span>
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                    );
+                                })()}
+                            </div>
+                        )}
                     </div>
                 )}
 

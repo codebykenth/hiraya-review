@@ -44,6 +44,8 @@ export function ModulesGrid({
                                     <Link
                                         key={mod.id}
                                         href={`/learn/${mod.slug}`}
+                                        prefetch="hover"
+                                        cacheFor="30s"
                                         className="group group block transition-all duration-300 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95"
                                     >
                                         <Card className="flex h-full flex-col justify-between overflow-hidden p-4 transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-xl hover:-translate-y-1 hover:shadow-primary/5 sm:p-6">
@@ -116,7 +118,7 @@ export function ModulesGrid({
                 <div className="mx-auto mb-5 flex size-14 items-center justify-center rounded-xl bg-slate-100 text-muted-foreground ring-8 dark:bg-slate-900">
                     <BookOpen className="size-6 text-blue-600 dark:text-blue-400" />
                 </div>
-                <span className="mb-3.5 inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-3.5 py-1 text-[10px] font-extrabold tracking-wider text-amber-700 uppercase dark:bg-amber-950/30 dark:bg-amber-950/40 dark:text-amber-400">
+                <span className="mb-3.5 inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-3.5 py-1 text-[10px] font-extrabold tracking-wider text-amber-700 uppercase dark:bg-amber-950/40 dark:text-amber-400">
                     <span className="size-1.5 rounded-full bg-amber-500" />
                     Coming Soon
                 </span>
@@ -137,7 +139,7 @@ export function ModulesGrid({
             <h3 className="mt-4 text-sm font-black text-foreground">
                 No learning modules match your search
             </h3>
-            <p className="mt-1 max-w-2xl text-center text-sm leading-normal leading-relaxed text-muted-foreground">
+            <p className="mt-1 max-w-2xl text-center text-sm leading-relaxed text-muted-foreground">
                 Try checking other categories or adjust your keyword search.
                 Admins will curate more review topics shortly!
             </p>

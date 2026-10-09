@@ -43,7 +43,7 @@ interface WelcomeProps {
 }
 
 export default function Welcome({ plans = [] }: WelcomeProps) {
-    const { auth, xendit } = usePage<{ auth: Auth; xendit?: { enabled: boolean } }>().props;
+    const { auth, xendit } = usePage<{ auth: Auth; xendit?: { enabled: boolean; is_sandbox?: boolean } }>().props;
     const [isFreeExamModalOpen, setIsFreeExamModalOpen] = useState(false);
     const [hoveredStep, setHoveredStep] = useState<number | null>(null);
 
@@ -572,7 +572,7 @@ export default function Welcome({ plans = [] }: WelcomeProps) {
                         </div>
                     </Section>
 
-                    {xendit?.enabled && (
+                    {xendit?.enabled && !xendit?.is_sandbox && (
                         <Section
                             id="pricing"
                             className="border-t border-slate-100 bg-slate-50/50 dark:border-slate-800/50 dark:bg-slate-900/10"

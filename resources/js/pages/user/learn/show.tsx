@@ -146,7 +146,7 @@ export default function LearnShow({ module, recommended }: LearnShowProps) {
                         <Link
                             href={backUrl}
                             onClick={makeBackOnClick()}
-                            className="group flex w-fit items-center gap-1 text-sm font-black text-foreground transition transition-all duration-300 hover:text-blue-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95 dark:text-blue-400 dark:hover:text-blue-400"
+                            className="group flex w-fit items-center gap-1 text-sm font-black text-foreground transition duration-300 hover:text-blue-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95 dark:text-blue-400 dark:hover:text-blue-400"
                         >
                             <ChevronLeft className="size-4" />
                             {label}
@@ -272,16 +272,16 @@ export default function LearnShow({ module, recommended }: LearnShowProps) {
                                         </div>
                                     </>
                                 ) : (
-                                    <div className="pointer-events-none relative max-h-[320px] overflow-hidden select-none">
+                                    <div className="pointer-events-none relative max-h-80 overflow-hidden select-none">
                                         <LessonMarkdown
                                             content={module.content}
                                         />
-                                        <div className="absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-white via-white/80 to-transparent dark:from-slate-900 dark:via-slate-900/80" />
+                                        <div className="absolute inset-x-0 bottom-0 h-48 bg-linear-to-t from-white via-white/80 to-transparent dark:from-slate-900 dark:via-slate-900/80" />
                                     </div>
                                 )}
 
                                 {!isLoggedIn && (
-                                    <div className="absolute inset-x-0 bottom-0 z-10 flex flex-col items-center justify-center bg-gradient-to-t from-white/95 via-white/90 to-transparent p-4 pt-32 text-center sm:p-6 dark:from-slate-950/95 dark:via-slate-950/90">
+                                    <div className="absolute inset-x-0 bottom-0 z-10 flex flex-col items-center justify-center bg-linear-to-t from-white/95 via-white/90 to-transparent p-4 pt-32 text-center sm:p-6 dark:from-slate-950/95 dark:via-slate-950/90">
                                         <div className="max-w-2xl rounded-2xl border border-primary/20 bg-background/80 p-4 shadow-xl backdrop-blur-md sm:p-6 lg:p-8">
                                             <h3 className="font-heading text-xl font-black text-foreground">
                                                 Unlock Full Lesson for Free
