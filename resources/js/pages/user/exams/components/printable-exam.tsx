@@ -668,6 +668,21 @@ export function PrintableExam({
                                     cancelled = true;
                                     toast.dismiss('pdf-export-toast');
                                     toast.error('PDF Generation Cancelled.');
+
+                                    if (typeof window !== 'undefined') {
+                                        window.sessionStorage.removeItem(
+                                            'isPdfExporting',
+                                        );
+                                        window.dispatchEvent(
+                                            new CustomEvent(
+                                                'hiraya:export-pdf-done',
+                                            ),
+                                        );
+                                    }
+
+                                    if (onComplete) {
+                                        onComplete();
+                                    }
                                 },
                             },
                         },
@@ -768,17 +783,26 @@ export function PrintableExam({
                     },
                 );
             } catch (err) {
-                console.error('PDF export error:', err);
-                toast.error(
-                    'Unable to export PDF. Opening browser print fallback.',
-                    {
-                        id: 'pdf-export-toast',
-                    },
-                );
-                window.print();
+                if (!cancelled) {
+                    console.error('PDF export error:', err);
+                    toast.error(
+                        'Unable to export PDF. Opening browser print fallback.',
+                        {
+                            id: 'pdf-export-toast',
+                        },
+                    );
+                    window.print();
+                }
             } finally {
                 if (originalTitle) {
                     document.title = originalTitle;
+                }
+
+                if (typeof window !== 'undefined') {
+                    window.sessionStorage.removeItem('isPdfExporting');
+                    window.dispatchEvent(
+                        new CustomEvent('hiraya:export-pdf-done'),
+                    );
                 }
 
                 if (onComplete) {
@@ -793,6 +817,13 @@ export function PrintableExam({
             cancelled = true;
             toast.dismiss('pdf-export-toast');
             clearTimeout(timer);
+
+            if (typeof window !== 'undefined') {
+                window.sessionStorage.removeItem('isPdfExporting');
+                window.dispatchEvent(
+                    new CustomEvent('hiraya:export-pdf-done'),
+                );
+            }
         };
     }, [mounted, questions, title, onComplete, questionPages]);
 

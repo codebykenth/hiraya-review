@@ -8,7 +8,11 @@ import {
     useSyncExternalStore,
 } from 'react';
 import { toast } from 'sonner';
-import { triggerPdfExport } from '@/components/shared/global-pdf-exporter';
+import {
+    triggerPdfExport,
+    cancelPdfExport,
+    isPdfExporting,
+} from '@/components/shared/global-pdf-exporter';
 import { getSessionOrigin, clearSessionOrigin } from '@/lib/smart-back';
 import type { Auth } from '@/types';
 import type {
@@ -93,13 +97,30 @@ export function useExamState(props: ExamIndexProps) {
         useState('All Categories');
 
     const [printPool, setPrintPool] = useState<Question[] | null>(null);
-    const [isPrinting, setIsPrinting] = useState(() => {
-        if (typeof window !== 'undefined') {
-            return window.sessionStorage.getItem('isPdfExporting') === 'true';
+    const [isPrinting, setIsPrinting] = useState(() => isPdfExporting());
+
+    useEffect(() => {
+        // Clean up any stale sessionStorage from past sessions when no export is active
+        if (typeof window !== 'undefined' && !isPdfExporting()) {
+            window.sessionStorage.removeItem('isPdfExporting');
         }
 
-        return false;
-    });
+        const handleExportDone = () => {
+            setIsPrinting(false);
+
+            if (typeof window !== 'undefined') {
+                window.sessionStorage.removeItem('isPdfExporting');
+            }
+        };
+
+        window.addEventListener('hiraya:export-pdf-done', handleExportDone);
+        window.addEventListener('hiraya:export-pdf-cancel', handleExportDone);
+
+        return () => {
+            window.removeEventListener('hiraya:export-pdf-done', handleExportDone);
+            window.removeEventListener('hiraya:export-pdf-cancel', handleExportDone);
+        };
+    }, []);
 
     const isDrillSession = selectedExamId === null || selectedExamId > 2;
 
@@ -600,6 +621,14 @@ export function useExamState(props: ExamIndexProps) {
 
             toast.loading('Preparing PDF Examination Booklet...', {
                 id: 'pdf-export-toast',
+                action: {
+                    label: 'Cancel',
+                    onClick: () => {
+                        toast.dismiss('pdf-export-toast');
+                        toast.error('PDF Generation Cancelled.');
+                        cancelPdfExport();
+                    },
+                },
             });
             triggerPdfExport({
                 questions: pool,

@@ -69,10 +69,11 @@ export default function AnalyticsIndex({ stats, aiAnalysis }: AnalyticsProps) {
                         variant="outline"
                         size="sm"
                         onClick={handlePrint}
+                        title="Download or Print PDF Analytics Report"
                         className="h-9 gap-1.5 rounded-xl border-slate-200 bg-white px-3 text-xs font-bold text-slate-700 shadow-2xs hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800"
                     >
                         <Printer className="size-3.5 text-slate-500" />
-                        <span>Print Report</span>
+                        <span>Print / Save PDF</span>
                     </Button>
                     <HowItWorksModal
                         title="How Analytics Works"

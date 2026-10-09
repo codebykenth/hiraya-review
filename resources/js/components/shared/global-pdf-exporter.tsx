@@ -9,11 +9,29 @@ export interface PdfExportPayload {
     exportToken: string;
 }
 
+let isGlobalExportActive = false;
+
+export function isPdfExporting(): boolean {
+    return isGlobalExportActive;
+}
+
 export function triggerPdfExport(payload: PdfExportPayload) {
+    isGlobalExportActive = true;
+
     if (typeof window !== 'undefined') {
         window.dispatchEvent(
             new CustomEvent('hiraya:export-pdf', { detail: payload }),
         );
+    }
+}
+
+export function cancelPdfExport() {
+    isGlobalExportActive = false;
+
+    if (typeof window !== 'undefined') {
+        window.sessionStorage.removeItem('isPdfExporting');
+        window.dispatchEvent(new CustomEvent('hiraya:export-pdf-cancel'));
+        window.dispatchEvent(new CustomEvent('hiraya:export-pdf-done'));
     }
 }
 
@@ -30,6 +48,7 @@ export function GlobalPdfExporter() {
                 toast.error('Unauthorized PDF export attempt.');
 
                 if (typeof window !== 'undefined') {
+                    window.sessionStorage.removeItem('isPdfExporting');
                     window.dispatchEvent(
                         new CustomEvent('hiraya:export-pdf-done'),
                     );
@@ -48,10 +67,19 @@ export function GlobalPdfExporter() {
             setPayload(detail);
         };
 
-        window.addEventListener('hiraya:export-pdf', handleExport);
+        const handleCancel = () => {
+            isGlobalExportActive = false;
+            setPayload(null);
+            lastTokenRef.current = null;
+        };
 
-        return () =>
+        window.addEventListener('hiraya:export-pdf', handleExport);
+        window.addEventListener('hiraya:export-pdf-cancel', handleCancel);
+
+        return () => {
             window.removeEventListener('hiraya:export-pdf', handleExport);
+            window.removeEventListener('hiraya:export-pdf-cancel', handleCancel);
+        };
     }, []);
 
     if (!payload) {
@@ -63,9 +91,12 @@ export function GlobalPdfExporter() {
             questions={payload.questions}
             title={payload.title}
             onComplete={() => {
+                isGlobalExportActive = false;
                 setPayload(null);
+                lastTokenRef.current = null;
 
                 if (typeof window !== 'undefined') {
+                    window.sessionStorage.removeItem('isPdfExporting');
                     window.dispatchEvent(
                         new CustomEvent('hiraya:export-pdf-done'),
                     );
