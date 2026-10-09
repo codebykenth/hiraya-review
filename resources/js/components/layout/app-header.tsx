@@ -12,12 +12,7 @@ import {
     DropdownMenuContent,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import {
-    NavigationMenu,
-    NavigationMenuItem,
-    NavigationMenuList,
-    navigationMenuTriggerStyle,
-} from '@/components/ui/navigation-menu';
+import { navigationMenuTriggerStyle } from '@/components/ui/navigation-menu';
 import {
     Sheet,
     SheetContent,
@@ -147,43 +142,41 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                     </Link>
 
                     {/* Desktop Navigation */}
-                    <div className="ml-6 hidden h-full items-center space-x-6 lg:flex">
-                        <NavigationMenu className="flex h-full items-stretch">
-                            <NavigationMenuList className="flex h-full items-stretch space-x-2">
-                                {mainNavItems.map((item, index) => (
-                                    <NavigationMenuItem
-                                        key={index}
-                                        className="relative flex h-full items-center"
-                                    >
-                                        <Link
-                                            href={item.href}
-                                            prefetch="hover"
-                                            cacheFor="30s"
-                                            className={cn(
-                                                navigationMenuTriggerStyle(),
-                                                item.href
-                                                    ? whenCurrentUrl(
-                                                          item.href,
-                                                          activeItemStyles,
-                                                      )
-                                                    : null,
-                                                'h-9 cursor-pointer px-3',
-                                            )}
-                                        >
-                                            {item.icon && (
-                                                <item.icon className="mr-2 h-4 w-4" />
-                                            )}
-                                            {item.title}
-                                        </Link>
-                                        {item.href &&
-                                            isCurrentUrl(item.href) && (
-                                                <div className="absolute bottom-0 left-0 h-0.5 w-full translate-y-px bg-black dark:bg-slate-950 dark:bg-white"></div>
-                                            )}
-                                    </NavigationMenuItem>
-                                ))}
-                            </NavigationMenuList>
-                        </NavigationMenu>
-                    </div>
+                    <nav
+                        className="ml-6 hidden h-full items-center space-x-2 lg:flex"
+                        aria-label="Main Navigation"
+                    >
+                        {mainNavItems.map((item, index) => (
+                            <div
+                                key={index}
+                                className="relative flex h-full items-center"
+                            >
+                                <Link
+                                    href={item.href}
+                                    prefetch
+                                    className={cn(
+                                        navigationMenuTriggerStyle(),
+                                        item.href
+                                            ? whenCurrentUrl(
+                                                  item.href,
+                                                  activeItemStyles,
+                                              )
+                                            : null,
+                                        'h-9 cursor-pointer px-3',
+                                    )}
+                                >
+                                    {item.icon && (
+                                        <item.icon className="mr-2 h-4 w-4" />
+                                    )}
+                                    {item.title}
+                                </Link>
+                                {item.href &&
+                                    isCurrentUrl(item.href) && (
+                                        <div className="absolute bottom-0 left-0 h-0.5 w-full translate-y-px bg-black dark:bg-slate-950 dark:bg-white" />
+                                    )}
+                            </div>
+                        ))}
+                    </nav>
 
                     <div className="ml-auto flex items-center space-x-2">
                         <div className="relative flex items-center space-x-1">

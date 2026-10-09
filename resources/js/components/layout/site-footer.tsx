@@ -119,7 +119,7 @@ export default function Footer() {
                         <span>by</span>
 
                         <a
-                            href="https://kenthalexisosila.dev"
+                            href="https://kenthalexisosila.site"
                             target="_blank"
                             rel="noopener noreferrer"
                             className="group inline-flex items-center gap-1 font-bold underline transition transition-all duration-300 hover:text-blue-600 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95 dark:text-blue-400"

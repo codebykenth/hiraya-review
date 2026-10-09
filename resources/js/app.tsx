@@ -1,4 +1,4 @@
-import { createInertiaApp, router, usePage } from '@inertiajs/react';
+import { createInertiaApp, router, usePage, config } from '@inertiajs/react';
 import { toast } from 'sonner';
 import { GlobalPdfExporter } from '@/components/shared/global-pdf-exporter';
 import { SupportWidget } from '@/components/shared/support-widget';
@@ -51,6 +51,26 @@ router.on('httpException', (event) => {
             'The server returned an error while processing your request.',
     });
 });
+
+// Extend prefetch cache lifetime to persist throughout the user session (24h).
+// Cache invalidation is event-driven: automatically purged on backend mutations or UI asset updates.
+config.set('prefetch.cacheFor', '24h');
+
+// Dynamically invalidate client-side prefetch cache when backend mutations occur
+router.on('finish', (event) => {
+    const method = event.detail.visit?.method?.toLowerCase() || 'get';
+
+    if (['post', 'put', 'patch', 'delete'].includes(method)) {
+        router.flushAll();
+    }
+});
+
+// Allow imperative cache flushing across the app on asynchronous actions
+if (typeof window !== 'undefined') {
+    window.addEventListener('hiraya:flush-cache', () => {
+        router.flushAll();
+    });
+}
 
 const PageLayoutWrapper = ({
     name,

@@ -35,6 +35,7 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
     SidebarSeparator,
+    useSidebar,
 } from '@/components/ui/sidebar';
 import { guide } from '@/routes';
 import { dashboard as adminDashboard } from '@/routes/admin';
@@ -227,6 +228,7 @@ export function AppSidebar({ feedbackCount }: AppSidebarProps) {
         pending_feedback_count?: number;
         xendit?: { enabled: boolean; is_sandbox?: boolean };
     }>().props;
+    const { isMobile, setOpenMobile } = useSidebar();
     const isAdmin = auth.user?.role === 'admin';
     const rolePermissions = auth.permissions?.[auth.user?.role || 'user'] || {};
 
@@ -270,7 +272,15 @@ export function AppSidebar({ feedbackCount }: AppSidebarProps) {
                 <SidebarMenu>
                     <SidebarMenuItem>
                         <SidebarMenuButton size="xl" asChild>
-                            <Link href={dashboardIndex()} prefetch>
+                            <Link
+                                href={dashboardIndex()}
+                                prefetch
+                                onClick={() => {
+                                    if (isMobile) {
+                                        setOpenMobile(false);
+                                    }
+                                }}
+                            >
                                 <AppLogo />
                             </Link>
                         </SidebarMenuButton>

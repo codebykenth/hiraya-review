@@ -1,4 +1,4 @@
-﻿import { usePage } from '@inertiajs/react';
+import { usePage } from '@inertiajs/react';
 import { ChevronsUpDown } from 'lucide-react';
 import { UserInfo } from '@/components/layout/user-info';
 import { UserMenuContent } from '@/components/layout/user-menu-content';
@@ -40,15 +40,16 @@ export function NavUser() {
                         </SidebarMenuButton>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent
-                        className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
+                        className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg z-[10000]"
                         align="end"
                         side={
                             isMobile
-                                ? 'bottom'
+                                ? 'top'
                                 : state === 'collapsed'
-                                  ? 'left'
-                                  : 'bottom'
+                                  ? 'right'
+                                  : 'top'
                         }
+                        sideOffset={8}
                     >
                         <UserMenuContent user={auth.user} />
                     </DropdownMenuContent>

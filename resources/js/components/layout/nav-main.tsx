@@ -10,6 +10,7 @@ import {
     SidebarMenuSub,
     SidebarMenuSubItem,
     SidebarMenuSubButton,
+    useSidebar,
 } from '@/components/ui/sidebar';
 import { useCurrentUrl } from '@/hooks/use-current-url';
 import { cn, toUrl } from '@/lib/utils';
@@ -24,6 +25,13 @@ export function NavMain({
 }) {
     const { isCurrentUrl } = useCurrentUrl();
     const { url } = usePage();
+    const { isMobile, setOpenMobile } = useSidebar();
+
+    const handleNavClick = useCallback(() => {
+        if (isMobile) {
+            setOpenMobile(false);
+        }
+    }, [isMobile, setOpenMobile]);
 
     const isSubActive = useCallback(
         (sub: NavItem, siblingItems: NavItem[]) => {
@@ -190,8 +198,8 @@ export function NavMain({
                                                     >
                                                         <Link
                                                             href={sub.href}
-                                                            prefetch="hover"
-                                                            cacheFor="30s"
+                                                            prefetch
+                                                            onClick={handleNavClick}
                                                         >
                                                             {sub.icon && (
                                                                 <sub.icon className="size-3.5 shrink-0" />
@@ -257,8 +265,8 @@ export function NavMain({
                             >
                                 <Link
                                     href={item.href || '#'}
-                                    prefetch="hover"
-                                    cacheFor="30s"
+                                    prefetch={Boolean(item.href && item.href !== '#')}
+                                    onClick={handleNavClick}
                                 >
                                     {item.icon && (
                                         <item.icon
