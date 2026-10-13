@@ -274,7 +274,6 @@ export function AttemptsTable({
                                                             <Link
                                                                 href={`/exams?attempt_id=${att.id}&from=history`}
                                                                 prefetch="hover"
-                                                                cacheFor="30s"
                                                                 className="flex size-7 items-center justify-center rounded-lg border border-blue-200 bg-blue-50 text-blue-700 transition hover:bg-blue-100 hover:text-blue-800 dark:border-blue-900/40 dark:bg-blue-950/30 dark:text-blue-400 dark:hover:bg-blue-900/40"
                                                             >
                                                                 <BookOpen className="size-3.5" />

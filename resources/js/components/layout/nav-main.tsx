@@ -198,8 +198,13 @@ export function NavMain({
                                                     >
                                                         <Link
                                                             href={sub.href}
-                                                            prefetch
-                                                            onClick={handleNavClick}
+                                                            prefetch={[
+                                                                'mount',
+                                                                'hover',
+                                                            ]}
+                                                            onClick={
+                                                                handleNavClick
+                                                            }
                                                         >
                                                             {sub.icon && (
                                                                 <sub.icon className="size-3.5 shrink-0" />
@@ -265,7 +270,11 @@ export function NavMain({
                             >
                                 <Link
                                     href={item.href || '#'}
-                                    prefetch={Boolean(item.href && item.href !== '#')}
+                                    prefetch={
+                                        Boolean(item.href && item.href !== '#')
+                                            ? ['mount', 'hover']
+                                            : false
+                                    }
                                     onClick={handleNavClick}
                                 >
                                     {item.icon && (

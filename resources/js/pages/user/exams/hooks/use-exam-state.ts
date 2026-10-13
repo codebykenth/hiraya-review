@@ -117,8 +117,14 @@ export function useExamState(props: ExamIndexProps) {
         window.addEventListener('hiraya:export-pdf-cancel', handleExportDone);
 
         return () => {
-            window.removeEventListener('hiraya:export-pdf-done', handleExportDone);
-            window.removeEventListener('hiraya:export-pdf-cancel', handleExportDone);
+            window.removeEventListener(
+                'hiraya:export-pdf-done',
+                handleExportDone,
+            );
+            window.removeEventListener(
+                'hiraya:export-pdf-cancel',
+                handleExportDone,
+            );
         };
     }, []);
 
@@ -571,7 +577,16 @@ export function useExamState(props: ExamIndexProps) {
                     const dest = origin.startsWith('/') ? origin : `/${origin}`;
                     router.visit(dest);
                 } else if (isDrillSession) {
-                    router.visit('/drills');
+                    const searchParams =
+                        typeof window !== 'undefined'
+                            ? new URLSearchParams(window.location.search)
+                            : null;
+                    const isCustomDrill = searchParams?.has(
+                        'custom_question_ids',
+                    );
+                    router.visit(
+                        isCustomDrill ? '/drills?tab=custom' : '/drills',
+                    );
                 } else {
                     router.visit('/exams');
                 }

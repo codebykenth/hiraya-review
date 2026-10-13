@@ -298,6 +298,7 @@ export function ScorecardView({
                 return (
                     <Link
                         href={originHref}
+                        prefetch={['mount', 'hover']}
                         onClick={makeBackOnClick({
                             onFallback: () => router.visit(originHref),
                         })}
@@ -838,8 +839,8 @@ export function ScorecardView({
                                 <AlertTriangle className="size-3.5" />
                                 <span>
                                     Create a free account to save this attempt
-                                    permanently in your progress history and review
-                                    your mistake rationales anytime.
+                                    permanently in your progress history and
+                                    review your mistake rationales anytime.
                                 </span>
                             </p>
                         </div>

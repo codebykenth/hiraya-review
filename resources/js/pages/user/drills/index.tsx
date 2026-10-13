@@ -2,6 +2,7 @@ import { Head, router } from '@inertiajs/react';
 import { Target, SlidersHorizontal, Bookmark } from 'lucide-react';
 import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { PageContainer } from '@/components/layout/page-container';
+import { setSessionOrigin } from '@/lib/smart-back';
 import { index as drillsIndex } from '@/routes/drills';
 import { HubView } from './components/hub-view';
 import { useDrillsState } from './hooks/use-drills-state';
@@ -136,6 +137,9 @@ export default function Drills(props: DrillsProps) {
             localStorage.removeItem('active_exam_session_v1');
         }
 
+        const returnUrl = `/drills?tab=custom${originInfo && !originInfo.href.startsWith('/drills') ? `&from=${encodeURIComponent(originInfo.href)}` : ''}`;
+        setSessionOrigin(returnUrl);
+
         const queryParams = new URLSearchParams({
             drill: 'true',
             category_name: sessionTitle,
@@ -144,7 +148,7 @@ export default function Drills(props: DrillsProps) {
             custom_question_ids: JSON.stringify(
                 customQuestions.map((q) => q.id),
             ),
-            from: originInfo ? originInfo.href : '/drills?tab=custom',
+            from: returnUrl,
         });
 
         router.visit(`/exams?${queryParams.toString()}`);
@@ -167,6 +171,9 @@ export default function Drills(props: DrillsProps) {
                 localStorage.removeItem('active_exam_session_v1');
             }
 
+            const returnUrl = `/drills?tab=saved${originInfo && !originInfo.href.startsWith('/drills') ? `&from=${encodeURIComponent(originInfo.href)}` : ''}`;
+            setSessionOrigin(returnUrl);
+
             const queryParams = new URLSearchParams({
                 drill: 'true',
                 category_name: data.set?.name || 'Saved Practice Set',
@@ -175,7 +182,7 @@ export default function Drills(props: DrillsProps) {
                 custom_question_ids: JSON.stringify(
                     setQuestions.map((q: Question) => q.id),
                 ),
-                from: originInfo ? originInfo.href : '/drills?tab=saved',
+                from: returnUrl,
             });
 
             router.visit(`/exams?${queryParams.toString()}`);

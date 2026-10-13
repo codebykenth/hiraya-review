@@ -91,11 +91,7 @@ export function AttemptExpandableRow({ attempt }: AttemptExpandableRowProps) {
                                 variant="outline"
                                 className="h-8 gap-1.5 text-xs font-bold"
                             >
-                                <Link
-                                    href={retakeUrl}
-                                    prefetch="hover"
-                                    cacheFor="30s"
-                                >
+                                <Link href={retakeUrl} prefetch="hover">
                                     <RotateCcw className="size-3.5 text-blue-600 dark:text-blue-400" />
                                     Retake {isDrill ? 'Drill' : 'Exam'}
                                 </Link>
@@ -108,7 +104,6 @@ export function AttemptExpandableRow({ attempt }: AttemptExpandableRowProps) {
                                 <Link
                                     href={`/exams?attempt_id=${attempt.id}&from=history`}
                                     prefetch="hover"
-                                    cacheFor="30s"
                                 >
                                     <BookOpen className="size-3.5" />
                                     Review Answers

@@ -45,7 +45,6 @@ export function ModulesGrid({
                                         key={mod.id}
                                         href={`/learn/${mod.slug}`}
                                         prefetch="hover"
-                                        cacheFor="30s"
                                         className="group group block transition-all duration-300 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95"
                                     >
                                         <Card className="flex h-full flex-col justify-between overflow-hidden p-4 transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-xl hover:-translate-y-1 hover:shadow-primary/5 sm:p-6">

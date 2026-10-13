@@ -91,16 +91,75 @@ export function useExamHydration({
         }
 
         let loadedQuestions: Question[] = [];
+        const mappedAnswers: Record<number, number> = {};
+        const mappedTimes: Record<number, number> = {};
+        const mappedChanges: Record<number, number> = {};
+        const mappedFlagged: Record<number, boolean> = {};
 
-        if (savedAttempt.question_ids && savedAttempt.question_ids.length > 0) {
-            loadedQuestions = savedAttempt.question_ids
-                .map((id) => questions.find((q) => q.id === id))
-                .filter(Boolean) as Question[];
-        }
-
+        const rawAnswers = savedAttempt.answers || {};
         const catScores = savedAttempt.cat_scores ?? {};
         const meta: AttemptMetadata = (catScores.metadata ??
             {}) as AttemptMetadata;
+        const rawTimes = meta.question_times || [];
+        const rawChanges = meta.answer_changes || {};
+        const rawFlagged =
+            (catScores as any).flagged || (meta as any).flagged || [];
+
+        if (savedAttempt.question_ids && savedAttempt.question_ids.length > 0) {
+            savedAttempt.question_ids.forEach((id, origIdx) => {
+                const q = questions.find((item) => item.id === id);
+                if (!q) {
+                    return;
+                }
+                const newIdx = loadedQuestions.length;
+                loadedQuestions.push(q);
+
+                const chosen =
+                    rawAnswers[origIdx] !== undefined
+                        ? rawAnswers[origIdx]
+                        : rawAnswers[q.id] !== undefined
+                          ? rawAnswers[q.id]
+                          : rawAnswers[newIdx];
+
+                if (chosen !== undefined && chosen !== null) {
+                    mappedAnswers[newIdx] = Number(chosen);
+                }
+
+                if (rawTimes[origIdx] !== undefined) {
+                    mappedTimes[newIdx] = Number(rawTimes[origIdx]);
+                } else if (rawTimes[newIdx] !== undefined) {
+                    mappedTimes[newIdx] = Number(rawTimes[newIdx]);
+                }
+
+                if (rawChanges[origIdx] !== undefined) {
+                    mappedChanges[newIdx] = Number(rawChanges[origIdx]);
+                } else if (rawChanges[q.id] !== undefined) {
+                    mappedChanges[newIdx] = Number(rawChanges[q.id]);
+                } else if (rawChanges[newIdx] !== undefined) {
+                    mappedChanges[newIdx] = Number(rawChanges[newIdx]);
+                }
+
+                if (Array.isArray(rawFlagged)) {
+                    if (rawFlagged[origIdx] || rawFlagged.includes(q.id)) {
+                        mappedFlagged[newIdx] = true;
+                    }
+                } else if (
+                    rawFlagged[origIdx] ||
+                    rawFlagged[q.id] ||
+                    rawFlagged[newIdx]
+                ) {
+                    mappedFlagged[newIdx] = true;
+                }
+            });
+        } else if (questions.length > 0) {
+            loadedQuestions = [...questions];
+            loadedQuestions.forEach((q, idx) => {
+                if (rawAnswers[idx] !== undefined) {
+                    mappedAnswers[idx] = Number(rawAnswers[idx]);
+                }
+            });
+        }
+
         const correctCount = meta.correct_count || 0;
         const total = meta.total_questions || loadedQuestions.length;
         const percentage =
@@ -125,8 +184,11 @@ export function useExamHydration({
         const computedCatMap: Record<string, CategoryScore> = {};
 
         loadedQuestions.forEach((q, idx) => {
-            const chosen = savedAttempt.answers[idx];
-            const isCorrect = chosen === q.correct_option;
+            const chosen = mappedAnswers[idx];
+            const isCorrect =
+                chosen !== undefined &&
+                chosen !== null &&
+                Number(chosen) === Number(q.correct_option);
 
             if (isDemographicQuestion(q)) {
                 return;
@@ -177,7 +239,10 @@ export function useExamHydration({
 
         setSelectedExamId(resolvedTrackId);
         setActiveQuestions(loadedQuestions);
-        setAnswers(savedAttempt.answers || {});
+        setAnswers(mappedAnswers);
+        setQuestionTimes(mappedTimes);
+        setAnswerChanges(mappedChanges);
+        setFlagged(mappedFlagged);
         setIsExamActive(false);
         setIsExamSubmitted(true);
         setResults(restoredResults);
@@ -210,6 +275,9 @@ export function useExamHydration({
         setSelectedExamId,
         setActiveQuestions,
         setAnswers,
+        setQuestionTimes,
+        setAnswerChanges,
+        setFlagged,
         setIsExamActive,
         setIsExamSubmitted,
         setResults,

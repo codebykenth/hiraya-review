@@ -9,7 +9,11 @@ import { initializeTheme } from '@/hooks/use-appearance';
 import AppLayout from '@/layouts/app-layout';
 import AuthLayout from '@/layouts/auth-layout';
 import SettingsLayout from '@/layouts/settings/layout';
-import { initSmartBackTracking, getOriginTitle } from '@/lib/smart-back';
+import {
+    initSmartBackTracking,
+    getOriginTitle,
+    getBackLocation,
+} from '@/lib/smart-back';
 import type { Auth } from './types/auth';
 // Echo initialization moved to specific components to save connections
 
@@ -52,9 +56,23 @@ router.on('httpException', (event) => {
     });
 });
 
-// Extend prefetch cache lifetime to persist throughout the user session (24h).
-// Cache invalidation is event-driven: automatically purged on backend mutations or UI asset updates.
-config.set('prefetch.cacheFor', '24h');
+// Extend prefetch cache lifetime to persist throughout the user session with stale-while-revalidate.
+// Fresh for 10 minutes (zero network requests), served immediately from cache up to 24 hours while revalidating in background.
+config.set('prefetch.cacheFor', ['10m', '24h']);
+
+// Re-cache previously seen views when navigating between pages so returning back is instant from cache
+router.on('navigate', (event) => {
+    const previous = getBackLocation();
+    if (
+        previous &&
+        !previous.startsWith('/exams') &&
+        !previous.includes('/login') &&
+        !previous.includes('/register') &&
+        previous !== event.detail.page.url
+    ) {
+        router.prefetch(previous, {}, { cacheFor: ['10m', '24h'] });
+    }
+});
 
 // Dynamically invalidate client-side prefetch cache when backend mutations occur
 router.on('finish', (event) => {
