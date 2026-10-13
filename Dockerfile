@@ -29,6 +29,9 @@ RUN rm -rf node_modules && apt-get purge -y nodejs npm && apt-get autoremove -y
 # Copy the startup script to ServerSideUp's entrypoint directory
 COPY --chmod=755 scripts/00-laravel-deploy.sh /etc/entrypoint.d/00-laravel-deploy.sh
 
+# Copy custom Nginx site security configuration into ServerSideUp's site-opts.d directory
+COPY conf/nginx/security.conf /etc/nginx/site-opts.d/security.conf
+
 # Expose port 8080 (ServerSideUp default)
 EXPOSE 8080
 
