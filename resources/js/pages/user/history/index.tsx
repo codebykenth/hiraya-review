@@ -77,7 +77,7 @@ export default function HistoryPage(props: HistoryPageProps) {
 
                     <Link
                         href="/analytics"
-                        prefetch="hover"
+                        prefetch="click"
                         className="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-xl border border-border bg-card px-3 text-xs font-bold text-muted-foreground shadow-2xs transition hover:bg-accent hover:text-foreground"
                     >
                         <span>View Full Analytics</span>

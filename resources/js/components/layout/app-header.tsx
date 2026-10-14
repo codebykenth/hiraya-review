@@ -135,7 +135,7 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
 
                     <Link
                         href={dashboardIndex()}
-                        prefetch
+                        prefetch="click"
                         className="group flex items-center space-x-2 transition-all duration-300 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95"
                     >
                         <AppLogo />
@@ -153,7 +153,7 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                             >
                                 <Link
                                     href={item.href}
-                                    prefetch
+                                    prefetch="click"
                                     className={cn(
                                         navigationMenuTriggerStyle(),
                                         item.href
@@ -170,10 +170,9 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                                     )}
                                     {item.title}
                                 </Link>
-                                {item.href &&
-                                    isCurrentUrl(item.href) && (
-                                        <div className="absolute bottom-0 left-0 h-0.5 w-full translate-y-px bg-black dark:bg-slate-950 dark:bg-white" />
-                                    )}
+                                {item.href && isCurrentUrl(item.href) && (
+                                    <div className="absolute bottom-0 left-0 h-0.5 w-full translate-y-px bg-black dark:bg-slate-950 dark:bg-white" />
+                                )}
                             </div>
                         ))}
                     </nav>
