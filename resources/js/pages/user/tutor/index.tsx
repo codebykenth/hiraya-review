@@ -17,7 +17,13 @@ import {
     Pin,
     Milestone,
 } from 'lucide-react';
-import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
+import React, {
+    useState,
+    useRef,
+    useEffect,
+    useCallback,
+    useMemo,
+} from 'react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import {
@@ -32,27 +38,17 @@ import { cn } from '@/lib/utils';
 import type { TutorQuestionCheckpoint } from './components/tutor-checkpoints-rail';
 import { TutorCheckpointsRail } from './components/tutor-checkpoints-rail';
 import { TutorMessageContent } from './components/tutor-message-content';
+import {
+    tutorChatService,
+    useTutorChat,
+} from './services/tutor-chat-service';
+import type { ChatMessage, Citation } from './services/tutor-chat-service';
 
 interface ModuleItem {
     id?: number;
     title: string;
     slug: string;
     url: string;
-}
-
-interface Citation {
-    title: string;
-    slug?: string;
-    url?: string;
-}
-
-interface ChatMessage {
-    id: string;
-    role: 'user' | 'assistant';
-    content: string;
-    citations?: (string | Citation)[];
-    timestamp: string;
-    isError?: boolean;
 }
 
 interface SuggestedTopic {
@@ -177,7 +173,8 @@ function getCitationsForMessage(
 
     const msgIdx = allMessages.findIndex((m) => m.id === msg.id);
     const precedingUserMsg = msgIdx > 0 ? allMessages[msgIdx - 1] : null;
-    const combined = `${precedingUserMsg?.content ?? ''} ${msg.content}`.toLowerCase();
+    const combined =
+        `${precedingUserMsg?.content ?? ''} ${msg.content}`.toLowerCase();
 
     const matched = modules.find((m) => {
         const title = m.title.toLowerCase();
@@ -189,28 +186,41 @@ function getCitationsForMessage(
 
         if (
             (title.includes('agreement') || title.includes('grammar')) &&
-            (combined.includes('agreement') || combined.includes('subject-verb') || combined.includes('grammar') || combined.includes('sva'))
+            (combined.includes('agreement') ||
+                combined.includes('subject-verb') ||
+                combined.includes('grammar') ||
+                combined.includes('sva'))
         ) {
             return true;
         }
 
         if (
             (title.includes('6713') || title.includes('conduct')) &&
-            (combined.includes('6713') || combined.includes('conduct') || combined.includes('ethical') || combined.includes('saln'))
+            (combined.includes('6713') ||
+                combined.includes('conduct') ||
+                combined.includes('ethical') ||
+                combined.includes('saln'))
         ) {
             return true;
         }
 
         if (
             title.includes('constitution') &&
-            (combined.includes('constitution') || combined.includes('immunity') || combined.includes('commission'))
+            (combined.includes('constitution') ||
+                combined.includes('immunity') ||
+                combined.includes('commission'))
         ) {
             return true;
         }
 
         if (
-            (title.includes('work') || title.includes('rate') || title.includes('problem')) &&
-            (combined.includes('rate') || combined.includes('work') || combined.includes('cistern') || combined.includes('word problem'))
+            (title.includes('work') ||
+                title.includes('rate') ||
+                title.includes('problem')) &&
+            (combined.includes('rate') ||
+                combined.includes('work') ||
+                combined.includes('cistern') ||
+                combined.includes('word problem'))
         ) {
             return true;
         }
@@ -225,83 +235,38 @@ function getCitationsForMessage(
     return [modules[0]];
 }
 
-export default function TutorPage({ modules: propModules = [] }: TutorPageProps) {
+export default function TutorPage({
+    modules: propModules = [],
+}: TutorPageProps) {
     const pageProps = usePage().props as {
         auth?: { user?: { id?: number } };
         modules?: ModuleItem[];
     };
-    const modules = propModules.length > 0 ? propModules : (pageProps.modules ?? []);
+    const modules =
+        propModules.length > 0 ? propModules : (pageProps.modules ?? []);
     const userId = pageProps.auth?.user?.id ?? 'guest';
-    const storageKey = `hiraya_tutor_chat_${userId}`;
-
+    const {
+        messages,
+        isLoading,
+        activeQuestionId: serviceActiveId,
+    } = useTutorChat(userId);
     const [input, setInput] = useState('');
-    const [isLoading, setIsLoading] = useState(false);
-    const [messages, setMessages] = useState<ChatMessage[]>(() => {
-        if (typeof window === 'undefined') {
-            return [];
-        }
-
-        try {
-            const saved = localStorage.getItem(storageKey);
-
-            return saved ? JSON.parse(saved) : [];
-        } catch {
-            return [];
-        }
-    });
     const [copiedId, setCopiedId] = useState<string | null>(null);
     const [showScrollTop, setShowScrollTop] = useState(false);
-    const [highlightedMsgId, setHighlightedMsgId] = useState<string | null>(null);
-    const [isMobileCheckpointsOpen, setIsMobileCheckpointsOpen] = useState(false);
-    const [activeQuestionId, setActiveQuestionId] = useState<string | null>(() => {
-        if (typeof window === 'undefined') {
-            return null;
-        }
-
-        try {
-            const saved = localStorage.getItem(storageKey);
-
-            if (saved) {
-                const parsed: ChatMessage[] = JSON.parse(saved);
-                const userMsgs = parsed.filter((m) => m.role === 'user');
-
-                return userMsgs.length > 0 ? userMsgs[userMsgs.length - 1].id : null;
-            }
-        } catch {
-            return null;
-        }
-
-        return null;
-    });
+    const [highlightedMsgId, setHighlightedMsgId] = useState<string | null>(
+        null,
+    );
+    const [isMobileCheckpointsOpen, setIsMobileCheckpointsOpen] =
+        useState(false);
+    const [userActiveQuestionId, setUserActiveQuestionId] = useState<
+        string | null
+    >(null);
+    const activeQuestionId = userActiveQuestionId ?? serviceActiveId;
+    const setActiveQuestionId = setUserActiveQuestionId;
 
     const scrollContainerRef = useRef<HTMLDivElement>(null);
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const textareaRef = useRef<HTMLTextAreaElement>(null);
-    const messageCounter = useRef(0);
-
-    // Sync message counter with loaded messages
-    useEffect(() => {
-        if (messages.length > messageCounter.current) {
-            messageCounter.current = messages.length;
-        }
-    }, [messages]);
-
-    // Persist messages across page reloads
-    useEffect(() => {
-        if (typeof window === 'undefined') {
-            return;
-        }
-
-        try {
-            if (messages.length > 0) {
-                localStorage.setItem(storageKey, JSON.stringify(messages));
-            } else {
-                localStorage.removeItem(storageKey);
-            }
-        } catch {
-            // Ignore storage quota limits
-        }
-    }, [messages, storageKey]);
 
     const scrollToTop = useCallback(() => {
         scrollContainerRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
@@ -367,7 +332,7 @@ export default function TutorPage({ modules: propModules = [] }: TutorPageProps)
 
             setActiveQuestionId(currentActiveId);
         }
-    }, [userQuestions]);
+    }, [userQuestions, setActiveQuestionId]);
 
     const jumpToMessage = useCallback((msgId: string) => {
         const element = document.getElementById(`msg-${msgId}`);
@@ -377,9 +342,14 @@ export default function TutorPage({ modules: propModules = [] }: TutorPageProps)
             const containerRect = container.getBoundingClientRect();
             const elementRect = element.getBoundingClientRect();
             const targetScrollTop =
-                container.scrollTop + (elementRect.top - containerRect.top) - 20;
+                container.scrollTop +
+                (elementRect.top - containerRect.top) -
+                20;
 
-            container.scrollTo({ top: Math.max(0, targetScrollTop), behavior: 'smooth' });
+            container.scrollTo({
+                top: Math.max(0, targetScrollTop),
+                behavior: 'smooth',
+            });
             setHighlightedMsgId(msgId);
             setActiveQuestionId(msgId);
             setTimeout(() => setHighlightedMsgId(null), 2500);
@@ -389,7 +359,7 @@ export default function TutorPage({ modules: propModules = [] }: TutorPageProps)
             setActiveQuestionId(msgId);
             setTimeout(() => setHighlightedMsgId(null), 2500);
         }
-    }, []);
+    }, [setActiveQuestionId]);
 
     useEffect(() => {
         scrollToBottom(isLoading);
@@ -416,182 +386,13 @@ export default function TutorPage({ modules: propModules = [] }: TutorPageProps)
             return;
         }
 
-        messageCounter.current += 1;
-        const now = new Date().toLocaleTimeString([], {
-            hour: '2-digit',
-            minute: '2-digit',
-        });
-
-        const userMsg: ChatMessage = {
-            id: `user-${messageCounter.current}`,
-            role: 'user',
-            content: text,
-            timestamp: now,
-        };
-
-        setMessages((prev) => [...prev, userMsg]);
-        setActiveQuestionId(userMsg.id);
         setInput('');
 
         if (textareaRef.current) {
             textareaRef.current.style.height = 'auto';
         }
 
-        setIsLoading(true);
-
-        const abortController = new AbortController();
-        const timeoutId = setTimeout(() => {
-            abortController.abort(new Error("The AI tutor took too long to respond."));
-        }, 90000);
-
-        try {
-            const csrfToken =
-                (document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement)?.content ||
-                '';
-
-            const historyPayload = messages.slice(-6).map((m) => ({
-                role: m.role,
-                content: m.content,
-            }));
-
-            const response = await fetch('/tutor/ask', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'text/event-stream',
-                    'X-CSRF-TOKEN': csrfToken,
-                    'X-Requested-With': 'XMLHttpRequest',
-                },
-                body: JSON.stringify({
-                    question: text,
-                    history: historyPayload,
-                }),
-                signal: abortController.signal,
-            });
-
-            if (!response.ok) {
-                throw new Error(`Unable to get response from AI tutor. HTTP ${response.status}`);
-            }
-
-            if (!response.body) {
-                clearTimeout(timeoutId);
-
-                throw new Error('ReadableStream not supported by the browser.');
-            }
-
-            clearTimeout(timeoutId);
-
-            messageCounter.current += 1;
-            const assistantMsgId = `ai-${messageCounter.current}`;
-            const timestamp = new Date().toLocaleTimeString([], {
-                hour: '2-digit',
-                minute: '2-digit',
-            });
-
-            setMessages((prev) => [
-                ...prev,
-                {
-                    id: assistantMsgId,
-                    role: 'assistant',
-                    content: '',
-                    citations: [],
-                    timestamp: timestamp,
-                },
-            ]);
-
-            setIsLoading(false); // Can stop loading spinner once stream starts
-
-            const reader = response.body.getReader();
-            const decoder = new TextDecoder();
-            let done = false;
-
-            let buffer = '';
-
-            while (!done) {
-                const { value, done: readerDone } = await reader.read();
-                done = readerDone;
-
-                if (value) {
-                    buffer += decoder.decode(value, { stream: true });
-                    const lines = buffer.split('\n\n');
-                    buffer = lines.pop() || '';
-
-                    for (const event of lines) {
-                        if (event.startsWith('data: ')) {
-                            const dataStr = event.substring(6);
-
-                            if (dataStr === '[DONE]') {
-                                done = true;
-                                break;
-                            }
-
-                            try {
-                                const data = JSON.parse(dataStr);
-
-                                if (data.chunk) {
-                                    const chunkText = data.chunk;
-                                    setMessages((prev) =>
-                                        prev.map((m) => {
-                                            if (m.id === assistantMsgId) {
-                                                const newContent = (m.content + chunkText).replace(/CITATIONS:\s*(.+)$/im, '');
-
-                                                return { ...m, content: newContent };
-                                            }
-
-                                            return m;
-                                        })
-                                    );
-                                }
-
-                                if (data.citations) {
-                                    const incomingCitations = data.citations;
-                                    setMessages((prev) =>
-                                        prev.map((m) =>
-                                            m.id === assistantMsgId
-                                                ? { ...m, citations: incomingCitations }
-                                                : m
-                                        )
-                                    );
-                                }
-                            } catch {
-                                // Ignore JSON parse errors for chunks
-                            }
-                        }
-                    }
-                }
-            }
-        } catch (err: unknown) {
-            let errorMsg =
-                err instanceof Error
-                    ? err.message
-                    : 'An error occurred while communicating with the AI tutor.';
-            
-            if (err instanceof DOMException && err.name === 'AbortError') {
-                errorMsg = 'The request timed out because it took too long to get a response.';
-            }
-
-            const isDev = import.meta.env.DEV;
-            const displayError = isDev 
-                ? errorMsg 
-                : 'Our AI tutor is currently taking a short break or the server is busy.';
-
-            messageCounter.current += 1;
-            const errorResponse: ChatMessage = {
-                id: `err-${messageCounter.current}`,
-                role: 'assistant',
-                content: `**Unable to complete request:** ${displayError}\n\nPlease verify your connection and try again in a moment.`,
-                timestamp: new Date().toLocaleTimeString([], {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                }),
-                isError: true,
-            };
-
-            setMessages((prev) => [...prev, errorResponse]);
-        } finally {
-            clearTimeout(timeoutId);
-            setIsLoading(false);
-        }
+        await tutorChatService.sendMessage(text);
     };
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -611,16 +412,8 @@ export default function TutorPage({ modules: propModules = [] }: TutorPageProps)
     };
 
     const handleClear = () => {
-        setMessages([]);
+        tutorChatService.clearChat();
         setInput('');
-
-        if (typeof window !== 'undefined') {
-            try {
-                localStorage.removeItem(storageKey);
-            } catch {
-                // Ignore
-            }
-        }
 
         if (textareaRef.current) {
             textareaRef.current.style.height = 'auto';
@@ -691,7 +484,7 @@ export default function TutorPage({ modules: propModules = [] }: TutorPageProps)
                                 <Bot className="size-4 sm:size-5" />
                             </div>
                             <div className="min-w-0">
-                                <h1 className="font-heading truncate text-sm font-bold text-foreground sm:text-lg">
+                                <h1 className="truncate font-heading text-sm font-bold text-foreground sm:text-lg">
                                     Hiraya AI Tutor
                                 </h1>
                             </div>
@@ -703,13 +496,16 @@ export default function TutorPage({ modules: propModules = [] }: TutorPageProps)
                                     <Button
                                         variant="outline"
                                         size="sm"
-                                        onClick={() => setIsMobileCheckpointsOpen(true)}
+                                        onClick={() =>
+                                            setIsMobileCheckpointsOpen(true)
+                                        }
                                         className="h-8 gap-1 rounded-lg border-border/80 px-2 text-xs text-muted-foreground hover:bg-muted hover:text-foreground md:hidden"
                                         aria-label={`Session checkpoints (${checkpointQuestions.length})`}
                                     >
                                         <Milestone className="size-3.5 shrink-0 text-indigo-500" />
                                         <span className="font-semibold text-foreground">
-                                            Q{activeCheckpointIndex}/{checkpointQuestions.length}
+                                            Q{activeCheckpointIndex}/
+                                            {checkpointQuestions.length}
                                         </span>
                                     </Button>
                                 )}
@@ -726,7 +522,8 @@ export default function TutorPage({ modules: propModules = [] }: TutorPageProps)
                                                 >
                                                     <ListFilter className="size-3.5 text-indigo-500" />
                                                     <span className="text-xs">
-                                                        Questions ({userQuestions.length})
+                                                        Questions (
+                                                        {userQuestions.length})
                                                     </span>
                                                     <ChevronDown className="size-3 opacity-60" />
                                                 </Button>
@@ -740,20 +537,26 @@ export default function TutorPage({ modules: propModules = [] }: TutorPageProps)
                                                 </DropdownMenuLabel>
                                                 <DropdownMenuSeparator />
                                                 <div className="max-h-60 overflow-y-auto">
-                                                    {userQuestions.map((q, idx) => (
-                                                        <DropdownMenuItem
-                                                            key={q.id}
-                                                            onClick={() => jumpToMessage(q.id)}
-                                                            className="cursor-pointer gap-2 py-2 text-xs"
-                                                        >
-                                                            <span className="flex size-5 shrink-0 items-center justify-center rounded-md bg-indigo-50 font-mono text-[10px] font-bold text-indigo-600 dark:bg-indigo-950/60 dark:text-indigo-400">
-                                                                Q{idx + 1}
-                                                            </span>
-                                                            <span className="truncate">
-                                                                {q.content}
-                                                            </span>
-                                                        </DropdownMenuItem>
-                                                    ))}
+                                                    {userQuestions.map(
+                                                        (q, idx) => (
+                                                            <DropdownMenuItem
+                                                                key={q.id}
+                                                                onClick={() =>
+                                                                    jumpToMessage(
+                                                                        q.id,
+                                                                    )
+                                                                }
+                                                                className="cursor-pointer gap-2 py-2 text-xs"
+                                                            >
+                                                                <span className="flex size-5 shrink-0 items-center justify-center rounded-md bg-indigo-50 font-mono text-[10px] font-bold text-indigo-600 dark:bg-indigo-950/60 dark:text-indigo-400">
+                                                                    Q{idx + 1}
+                                                                </span>
+                                                                <span className="truncate">
+                                                                    {q.content}
+                                                                </span>
+                                                            </DropdownMenuItem>
+                                                        ),
+                                                    )}
                                                 </div>
                                             </DropdownMenuContent>
                                         </DropdownMenu>
@@ -769,7 +572,9 @@ export default function TutorPage({ modules: propModules = [] }: TutorPageProps)
                                     aria-label="Copy session notes"
                                 >
                                     <FileText className="size-3.5 shrink-0 text-indigo-500" />
-                                    <span className="hidden sm:inline">Copy Notes</span>
+                                    <span className="hidden sm:inline">
+                                        Copy Notes
+                                    </span>
                                 </Button>
 
                                 <Button
@@ -781,7 +586,9 @@ export default function TutorPage({ modules: propModules = [] }: TutorPageProps)
                                     aria-label="Clear chat"
                                 >
                                     <RotateCcw className="size-3.5 shrink-0" />
-                                    <span className="hidden sm:inline">Clear Chat</span>
+                                    <span className="hidden sm:inline">
+                                        Clear Chat
+                                    </span>
                                 </Button>
                             </div>
                         )}
@@ -789,254 +596,353 @@ export default function TutorPage({ modules: propModules = [] }: TutorPageProps)
                 </div>
 
                 {/* Main Middle Split: Messages Stream + Side Checkpoints Rail */}
-                <div className="relative flex flex-1 min-h-0 w-full overflow-hidden">
+                <div className="relative flex min-h-0 w-full flex-1 overflow-hidden">
                     {/* Messages Column */}
-                    <div className="relative flex flex-1 min-w-0 flex-col overflow-hidden">
+                    <div className="relative flex min-w-0 flex-1 flex-col overflow-hidden">
                         <div
                             ref={scrollContainerRef}
                             onScroll={handleContainerScroll}
-                            className="flex-1 min-w-0 overflow-y-auto px-4 py-6 sm:px-6"
+                            className="min-w-0 flex-1 overflow-y-auto px-4 py-6 sm:px-6"
                         >
-                        <div className="mx-auto flex max-w-4xl flex-col gap-6">
-                        {messages.length === 0 ? (
-                            <div className="my-auto flex flex-col items-center justify-center py-8 text-center">
-                                <div className="mb-4 flex size-16 items-center justify-center rounded-2xl bg-indigo-500/10 text-indigo-600 shadow-inner dark:text-indigo-400">
-                                    <BookOpen className="size-8" />
-                                </div>
-                                <h2 className="font-heading text-xl font-bold text-foreground sm:text-2xl">
-                                    Mabuhay! How can I assist your review?
-                                </h2>
-                                <p className="mt-2 max-w-2xl text-xs leading-relaxed text-muted-foreground sm:text-sm">
-                                    Ask any concept from Verbal Ability, Analytical Ability,
-                                    Numerical Ability, or General Information. I provide step-by-step
-                                    methods and exam shortcuts.
-                                </p>
+                            <div className="mx-auto flex max-w-4xl flex-col gap-6">
+                                {messages.length === 0 ? (
+                                    <div className="my-auto flex flex-col items-center justify-center py-8 text-center">
+                                        <div className="mb-4 flex size-16 items-center justify-center rounded-2xl bg-indigo-500/10 text-indigo-600 shadow-inner dark:text-indigo-400">
+                                            <BookOpen className="size-8" />
+                                        </div>
+                                        <h2 className="font-heading text-xl font-bold text-foreground sm:text-2xl">
+                                            Mabuhay! How can I assist your
+                                            review?
+                                        </h2>
+                                        <p className="mt-2 max-w-2xl text-xs leading-relaxed text-muted-foreground sm:text-sm">
+                                            Ask any concept from Verbal Ability,
+                                            Analytical Ability, Numerical
+                                            Ability, or General Information. I
+                                            provide step-by-step methods and
+                                            exam shortcuts.
+                                        </p>
 
-                                <div className="mt-8 w-full max-w-2xl text-left">
-                                    <span className="mb-3 block text-xs font-semibold tracking-wider text-muted-foreground uppercase">
-                                        Suggested Review Topics
-                                    </span>
-                                    <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
-                                        {SUGGESTED_TOPICS.map((topic, idx) => (
-                                            <button
-                                                key={idx}
-                                                type="button"
-                                                onClick={() => handleSend(topic.prompt)}
-                                                className="group flex flex-col items-start gap-1 rounded-xl border border-border/80 bg-card p-3.5 text-left transition-all duration-200 hover:-translate-y-0.5 hover:border-indigo-400/60 hover:bg-indigo-50/40 hover:shadow-xs dark:hover:border-indigo-800 dark:hover:bg-indigo-950/20"
-                                            >
-                                                <span className="rounded-md bg-muted px-2 py-0.5 text-[10px] font-semibold text-indigo-600 dark:text-indigo-400">
-                                                    {topic.category}
-                                                </span>
-                                                <span className="text-xs font-medium text-foreground group-hover:text-indigo-600 dark:group-hover:text-indigo-400">
-                                                    {topic.title}
-                                                </span>
-                                                <span className="line-clamp-2 text-[11px] text-muted-foreground">
-                                                    &ldquo;{topic.prompt}&rdquo;
-                                                </span>
-                                            </button>
-                                        ))}
+                                        <div className="mt-8 w-full max-w-2xl text-left">
+                                            <span className="mb-3 block text-xs font-semibold tracking-wider text-muted-foreground uppercase">
+                                                Suggested Review Topics
+                                            </span>
+                                            <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
+                                                {SUGGESTED_TOPICS.map(
+                                                    (topic, idx) => (
+                                                        <button
+                                                            key={idx}
+                                                            type="button"
+                                                            onClick={() =>
+                                                                handleSend(
+                                                                    topic.prompt,
+                                                                )
+                                                            }
+                                                            className="group flex flex-col items-start gap-1 rounded-xl border border-border/80 bg-card p-3.5 text-left transition-all duration-200 hover:-translate-y-0.5 hover:border-indigo-400/60 hover:bg-indigo-50/40 hover:shadow-xs dark:hover:border-indigo-800 dark:hover:bg-indigo-950/20"
+                                                        >
+                                                            <span className="rounded-md bg-muted px-2 py-0.5 text-[10px] font-semibold text-indigo-600 dark:text-indigo-400">
+                                                                {topic.category}
+                                                            </span>
+                                                            <span className="text-xs font-medium text-foreground group-hover:text-indigo-600 dark:group-hover:text-indigo-400">
+                                                                {topic.title}
+                                                            </span>
+                                                            <span className="line-clamp-2 text-[11px] text-muted-foreground">
+                                                                &ldquo;
+                                                                {topic.prompt}
+                                                                &rdquo;
+                                                            </span>
+                                                        </button>
+                                                    ),
+                                                )}
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>
-                            </div>
-                        ) : (
-                            <div className="space-y-6">
-                                {messages.map((msg, index) => {
-                                    const isHighlighted = highlightedMsgId === msg.id;
-                                    const isLastAssistantMessage =
-                                        msg.role === 'assistant' &&
-                                        index === messages.length - 1 &&
-                                        !isLoading;
-                                    const questionNumber = userQuestionMap.get(msg.id);
+                                ) : (
+                                    <div className="space-y-6">
+                                        {messages.map((msg, index) => {
+                                            const isHighlighted =
+                                                highlightedMsgId === msg.id;
+                                            const isLastAssistantMessage =
+                                                msg.role === 'assistant' &&
+                                                index === messages.length - 1 &&
+                                                !isLoading;
+                                            const questionNumber =
+                                                userQuestionMap.get(msg.id);
 
-                                    return (
-                                        <div
-                                            key={msg.id}
-                                            id={`msg-${msg.id}`}
-                                            className={`scroll-mt-6 flex gap-3 transition-all duration-300 sm:gap-4 ${msg.role === 'user'
-                                                    ? 'justify-end'
-                                                    : 'justify-start'
-                                                } ${isHighlighted ? 'rounded-2xl ring-3 ring-indigo-500 ring-offset-2 ring-offset-background shadow-lg shadow-indigo-500/20' : ''}`}
-                                        >
-                                            {msg.role === 'assistant' && (
-                                                <div className="flex size-8 shrink-0 items-center justify-center rounded-xl bg-indigo-600/10 text-indigo-600 shadow-xs dark:bg-indigo-400/10 dark:text-indigo-400">
-                                                    <Bot className="size-4.5" />
-                                                </div>
-                                            )}
-
-                                            <div
-                                                className={`relative max-w-2xl sm:max-w-3xl rounded-2xl p-4 sm:p-5 text-sm sm:text-[15px] leading-relaxed ${msg.role === 'user'
-                                                        ? 'rounded-tr-xs bg-indigo-600 text-white shadow-sm dark:bg-indigo-500'
-                                                        : 'rounded-tl-xs border border-border/80 bg-card text-foreground shadow-xs'
-                                                    }`}
-                                            >
-                                                {msg.role === 'user' ? (
-                                                    <div>
-                                                        <div className="mb-1 flex items-center justify-between gap-3 text-[10px] font-semibold tracking-wider text-indigo-200">
-                                                            <span>QUESTION {questionNumber}</span>
-                                                            <span>{msg.timestamp}</span>
+                                            return (
+                                                <div
+                                                    key={msg.id}
+                                                    id={`msg-${msg.id}`}
+                                                    className={`flex scroll-mt-6 gap-3 transition-all duration-300 sm:gap-4 ${
+                                                        msg.role === 'user'
+                                                            ? 'justify-end'
+                                                            : 'justify-start'
+                                                    } ${isHighlighted ? 'rounded-2xl shadow-lg ring-3 shadow-indigo-500/20 ring-indigo-500 ring-offset-2 ring-offset-background' : ''}`}
+                                                >
+                                                    {msg.role ===
+                                                        'assistant' && (
+                                                        <div className="flex size-8 shrink-0 items-center justify-center rounded-xl bg-indigo-600/10 text-indigo-600 shadow-xs dark:bg-indigo-400/10 dark:text-indigo-400">
+                                                            <Bot className="size-4.5" />
                                                         </div>
-                                                        <p className="whitespace-pre-wrap">{msg.content}</p>
-                                                    </div>
-                                                ) : (
-                                                    <div className="space-y-3">
-                                                        <TutorMessageContent content={msg.content} />
+                                                    )}
 
-                                                        {(() => {
-                                                            if (msg.isError) {
-                                                                return null;
-                                                            }
-
-                                                            const messageCitations = getCitationsForMessage(msg, messages, modules);
-
-                                                            if (messageCitations.length === 0) {
-                                                                return null;
-                                                            }
-
-                                                            return (
-                                                                <div className="mt-3 flex flex-wrap items-center gap-1.5 border-t border-border/60 pt-2.5 text-[11px] text-muted-foreground">
-                                                                    <span className="font-semibold text-indigo-600 dark:text-indigo-400">
-                                                                        Syllabus Sources:
+                                                    <div
+                                                        className={`relative max-w-2xl rounded-2xl p-4 text-sm leading-relaxed sm:max-w-3xl sm:p-5 sm:text-[15px] ${
+                                                            msg.role === 'user'
+                                                                ? 'rounded-tr-xs bg-indigo-600 text-white shadow-sm dark:bg-indigo-500'
+                                                                : 'rounded-tl-xs border border-border/80 bg-card text-foreground shadow-xs'
+                                                        }`}
+                                                    >
+                                                        {msg.role === 'user' ? (
+                                                            <div>
+                                                                <div className="mb-1 flex items-center justify-between gap-3 text-[10px] font-semibold tracking-wider text-indigo-200">
+                                                                    <span>
+                                                                        QUESTION{' '}
+                                                                        {
+                                                                            questionNumber
+                                                                        }
                                                                     </span>
-                                                                    {messageCitations.map((cite, cIdx) => {
-                                                                        const resolved = resolveCitation(cite, modules);
-
-                                                                        return (
-                                                                            <a
-                                                                                key={cIdx}
-                                                                                href={resolved.url}
-                                                                                target="_blank"
-                                                                                rel="noopener noreferrer"
-                                                                                className="group inline-flex items-center gap-1.5 rounded-md border border-border/70 bg-muted/60 px-2 py-0.5 font-medium text-foreground transition-all hover:border-indigo-400 hover:bg-indigo-50/50 hover:text-indigo-600 dark:hover:border-indigo-700 dark:hover:bg-indigo-950/40 dark:hover:text-indigo-300"
-                                                                                title={`Open syllabus lesson: ${resolved.title}`}
-                                                                            >
-                                                                                <BookOpen className="size-2.5 text-indigo-500" />
-                                                                                <span className="underline-offset-2 group-hover:underline">
-                                                                                    {resolved.title}
-                                                                                </span>
-                                                                                <ExternalLink className="size-2.5 opacity-60 group-hover:opacity-100" />
-                                                                            </a>
-                                                                        );
-                                                                    })}
+                                                                    <span>
+                                                                        {
+                                                                            msg.timestamp
+                                                                        }
+                                                                    </span>
                                                                 </div>
-                                                            );
-                                                        })()}
+                                                                <p className="whitespace-pre-wrap">
+                                                                    {
+                                                                        msg.content
+                                                                    }
+                                                                </p>
+                                                            </div>
+                                                        ) : (
+                                                            <div className="space-y-3">
+                                                                <TutorMessageContent
+                                                                    content={
+                                                                        msg.content
+                                                                    }
+                                                                />
 
-                                                        {/* Follow-up Quick Drill Chips on the latest response */}
-                                                        {isLastAssistantMessage && (
-                                                            <div className="mt-4 rounded-xl border border-indigo-500/20 bg-indigo-500/5 p-3">
-                                                                <span className="mb-2 block text-[10px] font-bold tracking-wider text-indigo-600 uppercase dark:text-indigo-400">
-                                                                    Continue Practice (1-Tap Follow Up)
-                                                                </span>
-                                                                <div className="flex flex-wrap gap-2">
-                                                                    {FOLLOW_UP_SUGGESTIONS.map((item, idx) => (
-                                                                        <button
-                                                                            key={idx}
-                                                                            type="button"
-                                                                            onClick={() => handleSend(item.prompt)}
-                                                                            className="group flex items-center gap-1.5 rounded-lg border border-border/70 bg-background/80 px-2.5 py-1 text-xs font-medium text-foreground transition-all duration-150 hover:-translate-y-0.5 hover:border-indigo-400 hover:bg-card hover:text-indigo-600 hover:shadow-xs dark:hover:border-indigo-700 dark:hover:text-indigo-300"
-                                                                        >
-                                                                            <span className="opacity-80">{item.icon}</span>
-                                                                            <span>{item.label}</span>
-                                                                        </button>
-                                                                    ))}
+                                                                {(() => {
+                                                                    if (
+                                                                        msg.isError
+                                                                    ) {
+                                                                        return null;
+                                                                    }
+
+                                                                    const messageCitations =
+                                                                        getCitationsForMessage(
+                                                                            msg,
+                                                                            messages,
+                                                                            modules,
+                                                                        );
+
+                                                                    if (
+                                                                        messageCitations.length ===
+                                                                        0
+                                                                    ) {
+                                                                        return null;
+                                                                    }
+
+                                                                    return (
+                                                                        <div className="mt-3 flex flex-wrap items-center gap-1.5 border-t border-border/60 pt-2.5 text-[11px] text-muted-foreground">
+                                                                            <span className="font-semibold text-indigo-600 dark:text-indigo-400">
+                                                                                Syllabus
+                                                                                Sources:
+                                                                            </span>
+                                                                            {messageCitations.map(
+                                                                                (
+                                                                                    cite,
+                                                                                    cIdx,
+                                                                                ) => {
+                                                                                    const resolved =
+                                                                                        resolveCitation(
+                                                                                            cite,
+                                                                                            modules,
+                                                                                        );
+
+                                                                                    return (
+                                                                                        <a
+                                                                                            key={
+                                                                                                cIdx
+                                                                                            }
+                                                                                            href={
+                                                                                                resolved.url
+                                                                                            }
+                                                                                            target="_blank"
+                                                                                            rel="noopener noreferrer"
+                                                                                            className="group inline-flex items-center gap-1.5 rounded-md border border-border/70 bg-muted/60 px-2 py-0.5 font-medium text-foreground transition-all hover:border-indigo-400 hover:bg-indigo-50/50 hover:text-indigo-600 dark:hover:border-indigo-700 dark:hover:bg-indigo-950/40 dark:hover:text-indigo-300"
+                                                                                            title={`Open syllabus lesson: ${resolved.title}`}
+                                                                                        >
+                                                                                            <BookOpen className="size-2.5 text-indigo-500" />
+                                                                                            <span className="underline-offset-2 group-hover:underline">
+                                                                                                {
+                                                                                                    resolved.title
+                                                                                                }
+                                                                                            </span>
+                                                                                            <ExternalLink className="size-2.5 opacity-60 group-hover:opacity-100" />
+                                                                                        </a>
+                                                                                    );
+                                                                                },
+                                                                            )}
+                                                                        </div>
+                                                                    );
+                                                                })()}
+
+                                                                {/* Follow-up Quick Drill Chips on the latest response */}
+                                                                {isLastAssistantMessage && (
+                                                                    <div className="mt-4 rounded-xl border border-indigo-500/20 bg-indigo-500/5 p-3">
+                                                                        <span className="mb-2 block text-[10px] font-bold tracking-wider text-indigo-600 uppercase dark:text-indigo-400">
+                                                                            Continue
+                                                                            Practice
+                                                                            (1-Tap
+                                                                            Follow
+                                                                            Up)
+                                                                        </span>
+                                                                        <div className="flex flex-wrap gap-2">
+                                                                            {FOLLOW_UP_SUGGESTIONS.map(
+                                                                                (
+                                                                                    item,
+                                                                                    idx,
+                                                                                ) => (
+                                                                                    <button
+                                                                                        key={
+                                                                                            idx
+                                                                                        }
+                                                                                        type="button"
+                                                                                        onClick={() =>
+                                                                                            handleSend(
+                                                                                                item.prompt,
+                                                                                            )
+                                                                                        }
+                                                                                        className="group flex items-center gap-1.5 rounded-lg border border-border/70 bg-background/80 px-2.5 py-1 text-xs font-medium text-foreground transition-all duration-150 hover:-translate-y-0.5 hover:border-indigo-400 hover:bg-card hover:text-indigo-600 hover:shadow-xs dark:hover:border-indigo-700 dark:hover:text-indigo-300"
+                                                                                    >
+                                                                                        <span className="opacity-80">
+                                                                                            {
+                                                                                                item.icon
+                                                                                            }
+                                                                                        </span>
+                                                                                        <span>
+                                                                                            {
+                                                                                                item.label
+                                                                                            }
+                                                                                        </span>
+                                                                                    </button>
+                                                                                ),
+                                                                            )}
+                                                                        </div>
+                                                                    </div>
+                                                                )}
+
+                                                                <div className="flex items-center justify-between border-t border-border/40 pt-2 text-[11px] text-muted-foreground">
+                                                                    <span>
+                                                                        {
+                                                                            msg.timestamp
+                                                                        }
+                                                                    </span>
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={() =>
+                                                                            handleCopy(
+                                                                                msg.id,
+                                                                                msg.content,
+                                                                            )
+                                                                        }
+                                                                        className="flex items-center gap-1 rounded-md px-2 py-0.5 text-[11px] font-medium transition-colors hover:bg-muted hover:text-foreground"
+                                                                    >
+                                                                        {copiedId ===
+                                                                        msg.id ? (
+                                                                            <>
+                                                                                <Check className="size-3 text-emerald-500" />
+                                                                                <span className="text-emerald-500">
+                                                                                    Copied
+                                                                                </span>
+                                                                            </>
+                                                                        ) : (
+                                                                            <>
+                                                                                <Copy className="size-3" />
+                                                                                <span>
+                                                                                    Copy
+                                                                                </span>
+                                                                            </>
+                                                                        )}
+                                                                    </button>
                                                                 </div>
                                                             </div>
                                                         )}
-
-                                                        <div className="flex items-center justify-between border-t border-border/40 pt-2 text-[11px] text-muted-foreground">
-                                                            <span>{msg.timestamp}</span>
-                                                            <button
-                                                                type="button"
-                                                                onClick={() => handleCopy(msg.id, msg.content)}
-                                                                className="flex items-center gap-1 rounded-md px-2 py-0.5 text-[11px] font-medium transition-colors hover:bg-muted hover:text-foreground"
-                                                            >
-                                                                {copiedId === msg.id ? (
-                                                                    <>
-                                                                        <Check className="size-3 text-emerald-500" />
-                                                                        <span className="text-emerald-500">Copied</span>
-                                                                    </>
-                                                                ) : (
-                                                                    <>
-                                                                        <Copy className="size-3" />
-                                                                        <span>Copy</span>
-                                                                    </>
-                                                                )}
-                                                            </button>
-                                                        </div>
                                                     </div>
-                                                )}
-                                            </div>
 
-                                            {msg.role === 'user' && (
-                                                <div className="flex size-8 shrink-0 flex-col items-center justify-center rounded-xl bg-indigo-600/10 font-mono text-[10px] font-bold text-indigo-600 shadow-xs dark:bg-indigo-400/10 dark:text-indigo-400">
-                                                    Q{questionNumber}
+                                                    {msg.role === 'user' && (
+                                                        <div className="flex size-8 shrink-0 flex-col items-center justify-center rounded-xl bg-indigo-600/10 font-mono text-[10px] font-bold text-indigo-600 shadow-xs dark:bg-indigo-400/10 dark:text-indigo-400">
+                                                            Q{questionNumber}
+                                                        </div>
+                                                    )}
                                                 </div>
-                                            )}
-                                        </div>
-                                    );
-                                })}
+                                            );
+                                        })}
 
-                                {isLoading && (
-                                    <div className="flex items-start gap-3 sm:gap-4">
-                                        <div className="flex size-8 shrink-0 items-center justify-center rounded-xl bg-indigo-600/10 text-indigo-600 shadow-xs dark:bg-indigo-400/10 dark:text-indigo-400">
-                                            <Bot className="size-4.5" />
-                                        </div>
-                                        <div className="rounded-2xl rounded-tl-xs border border-border/80 bg-card px-4 py-3.5 shadow-xs">
-                                            <div className="flex items-center gap-2">
-                                                <div className="flex items-center gap-1.5 py-1">
-                                                    <span className="size-2 animate-bounce rounded-full bg-indigo-500 [animation-delay:-0.3s]" />
-                                                    <span className="size-2 animate-bounce rounded-full bg-indigo-500 [animation-delay:-0.15s]" />
-                                                    <span className="size-2 animate-bounce rounded-full bg-indigo-500" />
+                                        {isLoading && (
+                                            <div className="flex items-start gap-3 sm:gap-4">
+                                                <div className="flex size-8 shrink-0 items-center justify-center rounded-xl bg-indigo-600/10 text-indigo-600 shadow-xs dark:bg-indigo-400/10 dark:text-indigo-400">
+                                                    <Bot className="size-4.5" />
                                                 </div>
-                                                <span className="text-xs font-medium text-muted-foreground">
-                                                    Consulting syllabus notes &amp; legal rules...
-                                                </span>
+                                                <div className="rounded-2xl rounded-tl-xs border border-border/80 bg-card px-4 py-3.5 shadow-xs">
+                                                    <div className="flex items-center gap-2">
+                                                        <div className="flex items-center gap-1.5 py-1">
+                                                            <span className="size-2 animate-bounce rounded-full bg-indigo-500 [animation-delay:-0.3s]" />
+                                                            <span className="size-2 animate-bounce rounded-full bg-indigo-500 [animation-delay:-0.15s]" />
+                                                            <span className="size-2 animate-bounce rounded-full bg-indigo-500" />
+                                                        </div>
+                                                        <span className="text-xs font-medium text-muted-foreground">
+                                                            Consulting syllabus
+                                                            notes &amp; legal
+                                                            rules...
+                                                        </span>
+                                                    </div>
+                                                </div>
                                             </div>
-                                        </div>
+                                        )}
+
+                                        <div ref={messagesEndRef} />
                                     </div>
                                 )}
+                            </div>
+                        </div>
 
-                                <div ref={messagesEndRef} />
+                        {/* Floating Scroll to Top - anchored within messages column, hidden on desktop when rail has controls */}
+                        {showScrollTop && (
+                            <div
+                                className={cn(
+                                    'pointer-events-none absolute right-3 bottom-3 z-30 animate-in duration-200 fade-in sm:right-6 sm:bottom-4',
+                                    checkpointQuestions.length > 0 &&
+                                        'lg:hidden',
+                                )}
+                            >
+                                <button
+                                    type="button"
+                                    onClick={scrollToTop}
+                                    className="pointer-events-auto flex size-9 items-center justify-center rounded-full border border-border/80 bg-background/95 text-foreground shadow-md backdrop-blur-md transition-all hover:border-indigo-500/50 hover:bg-muted active:scale-95 sm:size-10"
+                                    aria-label="Scroll to top of chat"
+                                    title="Scroll to top of chat"
+                                >
+                                    <ArrowUp className="size-4 text-indigo-600 dark:text-indigo-400" />
+                                </button>
                             </div>
                         )}
-                        </div>
                     </div>
 
-                    {/* Floating Scroll to Top - anchored within messages column, hidden on desktop when rail has controls */}
-                    {showScrollTop && (
-                        <div
-                            className={cn(
-                                'pointer-events-none absolute bottom-3 right-3 z-30 animate-in fade-in duration-200 sm:bottom-4 sm:right-6',
-                                checkpointQuestions.length > 0 && 'lg:hidden',
-                            )}
-                        >
-                            <button
-                                type="button"
-                                onClick={scrollToTop}
-                                className="pointer-events-auto flex size-9 items-center justify-center rounded-full border border-border/80 bg-background/95 text-foreground shadow-md backdrop-blur-md transition-all hover:border-indigo-500/50 hover:bg-muted active:scale-95 sm:size-10"
-                                aria-label="Scroll to top of chat"
-                                title="Scroll to top of chat"
-                            >
-                                <ArrowUp className="size-4 text-indigo-600 dark:text-indigo-400" />
-                            </button>
-                        </div>
+                    {/* Side Checkpoints Rail */}
+                    {checkpointQuestions.length > 0 && (
+                        <TutorCheckpointsRail
+                            questions={checkpointQuestions}
+                            activeQuestionId={activeQuestionId}
+                            highlightedMsgId={highlightedMsgId}
+                            onSelectQuestion={jumpToMessage}
+                            onScrollToTop={scrollToTop}
+                            onScrollToBottom={() => scrollToBottom(false)}
+                            isMobileSheetOpen={isMobileCheckpointsOpen}
+                            onMobileSheetOpenChange={setIsMobileCheckpointsOpen}
+                        />
                     )}
                 </div>
-
-                {/* Side Checkpoints Rail */}
-                {checkpointQuestions.length > 0 && (
-                    <TutorCheckpointsRail
-                        questions={checkpointQuestions}
-                        activeQuestionId={activeQuestionId}
-                        highlightedMsgId={highlightedMsgId}
-                        onSelectQuestion={jumpToMessage}
-                        onScrollToTop={scrollToTop}
-                        onScrollToBottom={() => scrollToBottom(false)}
-                        isMobileSheetOpen={isMobileCheckpointsOpen}
-                        onMobileSheetOpenChange={setIsMobileCheckpointsOpen}
-                    />
-                )}
-            </div>
 
                 {/* Footer Input Area */}
                 <div className="shrink-0 border-t border-border/70 bg-card/60 p-3 backdrop-blur-md sm:p-5">
@@ -1055,12 +961,20 @@ export default function TutorPage({ modules: propModules = [] }: TutorPageProps)
                                 onKeyDown={handleKeyDown}
                                 rows={2}
                                 placeholder="Ask a CSE syllabus question (e.g. grammar rules, logic syllogisms, work & rate shortcuts, RA 6713)..."
-                                className="min-h-16 max-h-45 w-full resize-none bg-transparent px-4 py-3.5 text-xs sm:text-sm leading-relaxed text-foreground placeholder:text-muted-foreground focus:outline-hidden"
+                                className="max-h-45 min-h-16 w-full resize-none bg-transparent px-4 py-3.5 text-xs leading-relaxed text-foreground placeholder:text-muted-foreground focus:outline-hidden sm:text-sm"
                             />
 
                             <div className="flex items-center justify-between border-t border-border/40 px-3 py-2">
                                 <span className="hidden text-[11px] text-muted-foreground sm:inline">
-                                    Press <kbd className="rounded bg-muted px-1.5 py-0.5 text-[10px] font-mono">Enter</kbd> to send, <kbd className="rounded bg-muted px-1.5 py-0.5 text-[10px] font-mono">Shift + Enter</kbd> for newline
+                                    Press{' '}
+                                    <kbd className="rounded bg-muted px-1.5 py-0.5 font-mono text-[10px]">
+                                        Enter
+                                    </kbd>{' '}
+                                    to send,{' '}
+                                    <kbd className="rounded bg-muted px-1.5 py-0.5 font-mono text-[10px]">
+                                        Shift + Enter
+                                    </kbd>{' '}
+                                    for newline
                                 </span>
                                 <span className="text-[11px] text-muted-foreground sm:hidden">
                                     Tap send or Enter
@@ -1092,4 +1006,3 @@ TutorPage.layout = {
         },
     ],
 };
-

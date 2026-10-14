@@ -1,5 +1,5 @@
 import { Link, usePage } from '@inertiajs/react';
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, Sparkles } from 'lucide-react';
 import { useState, useEffect, useCallback } from 'react';
 import {
     SidebarGroup,
@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/sidebar';
 import { useCurrentUrl } from '@/hooks/use-current-url';
 import { cn, toUrl } from '@/lib/utils';
+import { useIsTutorThinking } from '@/pages/user/tutor/services/tutor-chat-service';
 import type { NavItem } from '@/types';
 
 export function NavMain({
@@ -26,6 +27,7 @@ export function NavMain({
     const { isCurrentUrl } = useCurrentUrl();
     const { url } = usePage();
     const { isMobile, setOpenMobile } = useSidebar();
+    const isTutorThinking = useIsTutorThinking();
 
     const handleNavClick = useCallback(() => {
         if (isMobile) {
@@ -271,7 +273,7 @@ export function NavMain({
                                 <Link
                                     href={item.href || '#'}
                                     prefetch={
-                                        Boolean(item.href && item.href !== '#')
+                                        item.href && item.href !== '#'
                                             ? ['mount', 'hover']
                                             : false
                                     }
@@ -286,11 +288,22 @@ export function NavMain({
                                         />
                                     )}
                                     <span>{item.title}</span>
-                                    {item.badge && item.badge > 0 && (
-                                        <span className="ml-auto flex size-5 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
-                                            {item.badge}
-                                        </span>
-                                    )}
+                                    {item.title === 'AI Tutor' &&
+                                        isTutorThinking && (
+                                            <span className="shadow-3xs ml-auto flex items-center gap-1 rounded-full bg-blue-100/90 px-1.5 py-0.5 text-[9px] font-semibold text-blue-700 dark:bg-blue-900/40 dark:text-blue-300">
+                                                <Sparkles className="size-2.5 animate-spin" />
+                                                <span className="animate-pulse">
+                                                    Thinking...
+                                                </span>
+                                            </span>
+                                        )}
+                                    {item.badge &&
+                                        item.badge > 0 &&
+                                        !isTutorThinking && (
+                                            <span className="ml-auto flex size-5 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
+                                                {item.badge}
+                                            </span>
+                                        )}
                                 </Link>
                             </SidebarMenuButton>
                         </SidebarMenuItem>

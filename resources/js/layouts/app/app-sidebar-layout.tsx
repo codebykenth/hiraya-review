@@ -8,6 +8,7 @@ import { AppContent } from '@/components/layout/app-content';
 import { AppShell } from '@/components/layout/app-shell';
 import { AppSidebar } from '@/components/layout/app-sidebar';
 import { AppSidebarHeader } from '@/components/layout/app-sidebar-header';
+import { NavSkeletonBoundary } from '@/components/layout/nav-skeleton-boundary';
 import SiteFooter from '@/components/layout/site-footer';
 import SiteHeader from '@/components/layout/site-header';
 import { CookieConsentBanner } from '@/components/shared/cookie-consent-banner';
@@ -232,7 +233,9 @@ export default function AppSidebarLayout({
         return (
             <div className="flex min-h-screen flex-col bg-slate-50/30 dark:bg-slate-950/20">
                 <SiteHeader activeNav={activeNav} />
-                <main className="flex-1 px-4 py-12 sm:px-6">{children}</main>
+                <main className="flex-1 px-4 py-12 sm:px-6">
+                    <NavSkeletonBoundary>{children}</NavSkeletonBoundary>
+                </main>
                 <SiteFooter />
                 <CookieConsentBanner />
             </div>
@@ -246,7 +249,7 @@ export default function AppSidebarLayout({
                 <AppContent variant="sidebar" className="overflow-x-hidden">
                     <AppSidebarHeader breadcrumbs={breadcrumbs} />
                     <AnnouncementsBanner />
-                    {children}
+                    <NavSkeletonBoundary>{children}</NavSkeletonBoundary>
                 </AppContent>
             </AppShell>
             <CookieConsentBanner />
