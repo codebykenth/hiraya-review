@@ -58,13 +58,42 @@ export default function AnalyticsIndex({ stats, aiAnalysis }: AnalyticsProps) {
     return (
         <PageContainer className="gap-5 sm:gap-6">
             <Head title="Performance Analytics" />
-            {/* Header section */}
+            {/* Header section (Screen Only) */}
             <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between print:hidden">
-                <PageHeader
-                    title="Performance Analytics"
-                    description={`Hi ${firstName}, track your learning path, mock exam results, and subject mastery.`}
-                />
-                <div className="flex flex-wrap items-center gap-2">
+                <div className="flex items-start gap-3">
+                    <PageHeader
+                        title="Performance Analytics"
+                        description={`Hi ${firstName}, track your learning path, mock exam results, and subject mastery.`}
+                    />
+                    <div className="mt-1 print:hidden">
+                        <HowItWorksModal
+                            title="How Analytics Works"
+                            tips={[
+                                {
+                                    icon: <BarChart className="size-4" />,
+                                    title: 'CSC Readiness Index',
+                                    text: 'Monitors your 80% General Weighted Average requirement alongside the strict 70% subtest cutoff rule.',
+                                },
+                                {
+                                    icon: <TrendingUp className="size-4" />,
+                                    title: 'Score & Pacing Trends',
+                                    text: 'Tracks score improvements and average seconds per question against the official ~54s CSE time target.',
+                                },
+                                {
+                                    icon: <Target className="size-4" />,
+                                    title: 'Diagnostic Gaps & Drills',
+                                    text: 'Identifies specific subcategory weaknesses with one-click direct remediation drill launchers.',
+                                },
+                            ]}
+                        />
+                    </div>
+                </div>
+                <div className="flex flex-wrap items-center gap-2 print:hidden">
+                    <AnalyticsFilters
+                        currentTrack={currentTrack}
+                        currentRuns={currentRuns}
+                        updateFilter={updateFilter}
+                    />
                     <Button
                         variant="outline"
                         size="sm"
@@ -75,31 +104,49 @@ export default function AnalyticsIndex({ stats, aiAnalysis }: AnalyticsProps) {
                         <Printer className="size-3.5 text-slate-500" />
                         <span>Print / Save PDF</span>
                     </Button>
-                    <HowItWorksModal
-                        title="How Analytics Works"
-                        tips={[
-                            {
-                                icon: <BarChart className="size-4" />,
-                                title: 'CSC Readiness Index',
-                                text: 'Monitors your 80% General Weighted Average requirement alongside the strict 70% subtest cutoff rule.',
-                            },
-                            {
-                                icon: <TrendingUp className="size-4" />,
-                                title: 'Score & Pacing Trends',
-                                text: 'Tracks score improvements and average seconds per question against the official ~54s CSE time target.',
-                            },
-                            {
-                                icon: <Target className="size-4" />,
-                                title: 'Diagnostic Gaps & Drills',
-                                text: 'Identifies specific subcategory weaknesses with one-click direct remediation drill launchers.',
-                            },
-                        ]}
-                    />
-                    <AnalyticsFilters
-                        currentTrack={currentTrack}
-                        currentRuns={currentRuns}
-                        updateFilter={updateFilter}
-                    />
+                </div>
+            </div>
+
+            {/* Printable Report Header (Visible Only on Print / Saved PDF) */}
+            <div className="hidden border-b-2 border-slate-900 pb-3 print:block">
+                <div className="flex items-start justify-between">
+                    <div>
+                        <div className="flex items-center gap-2">
+                            <span className="font-heading text-lg font-black tracking-tight text-blue-600">
+                                Hiraya Review
+                            </span>
+                            <span className="rounded bg-slate-100 px-2 py-0.5 text-[9px] font-black tracking-wider text-slate-700 uppercase">
+                                Official CSE Diagnostic Report
+                            </span>
+                        </div>
+                        <h1 className="mt-1 font-heading text-xl font-black text-slate-900">
+                            Performance Analytics
+                        </h1>
+                        <p className="mt-0.5 text-[11px] text-slate-600">
+                            Candidate:{' '}
+                            <strong className="text-slate-900">
+                                {firstName}
+                            </strong>{' '}
+                            · Exam Track:{' '}
+                            <strong className="text-slate-900 capitalize">
+                                {currentTrack}
+                            </strong>{' '}
+                            · Generated:{' '}
+                            {new Date().toLocaleDateString(undefined, {
+                                year: 'numeric',
+                                month: 'long',
+                                day: 'numeric',
+                            })}
+                        </p>
+                    </div>
+                    <div className="text-right text-[10px] text-slate-500">
+                        <p className="font-bold text-slate-800">
+                            Civil Service Commission (CSC)
+                        </p>
+                        <p>
+                            Passing Threshold: 80% GWA with 70% Subtest Cutoff
+                        </p>
+                    </div>
                 </div>
             </div>
 
@@ -132,15 +179,17 @@ export default function AnalyticsIndex({ stats, aiAnalysis }: AnalyticsProps) {
                     />
 
                     {/* Row 2: Subject Mastery (Radial) + Question Volume (Donut) */}
-                    <div className="grid grid-cols-1 gap-4 sm:gap-6 md:grid-cols-2">
+                    <div className="grid grid-cols-1 gap-4 sm:gap-6 md:grid-cols-2 print:grid-cols-2">
                         <SubjectMasteryChart categories={categories} />
                         <QuestionVolumeChart categories={categories} />
                     </div>
 
                     {/* Row 3: Weakest Subcategories (with inline drills) + Pacing Trend (with 54s benchmark) */}
-                    <div className="grid grid-cols-1 gap-4 sm:gap-6 md:grid-cols-2">
+                    <div className="grid grid-cols-1 gap-4 sm:gap-6 md:grid-cols-2 print:grid-cols-2">
                         <SubcategoryRadarChart categories={categories} />
-                        <PacingTrendChart data={activeStats.pacingTrend || []} />
+                        <PacingTrendChart
+                            data={activeStats.pacingTrend || []}
+                        />
                     </div>
                 </Suspense>
 

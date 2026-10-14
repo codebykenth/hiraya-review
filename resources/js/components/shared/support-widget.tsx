@@ -155,7 +155,7 @@ export function SupportWidget() {
     return (
         <div
             className={cn(
-                'fixed right-6 bottom-6 z-50 items-end gap-4',
+                'fixed right-6 bottom-6 z-50 items-end gap-4 print:hidden',
                 isTutorPage ? 'hidden md:flex' : 'flex',
             )}
         >

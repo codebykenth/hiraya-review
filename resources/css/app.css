@@ -45,7 +45,6 @@
     --radius-xl: 1.5rem;
     --radius-full: 9999px;
 
-
     --color-background: var(--background);
     --color-foreground: var(--foreground);
 
@@ -258,4 +257,126 @@ html {
 
 ::-webkit-scrollbar-corner {
     background: transparent;
+}
+
+/* ==========================================================================
+   Global Print Styles for High-Fidelity PDF & Paper Export
+   ========================================================================== */
+@media print {
+    @page {
+        margin: 12mm 10mm;
+        size: A4 portrait;
+    }
+
+    *,
+    *::before,
+    *::after {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        box-shadow: none !important;
+        text-shadow: none !important;
+    }
+
+    /* Force clean white background and dark text for paper */
+    html,
+    body {
+        background: #ffffff !important;
+        color: #0f172a !important;
+        font-size: 11pt !important;
+        height: auto !important;
+        min-height: auto !important;
+        overflow: visible !important;
+    }
+
+    /* Remove container height & overflow locks so multi-page printing flows completely */
+    #app,
+    main,
+    [data-slot='sidebar-inset'],
+    [data-slot='sidebar-wrapper'],
+    .app-content,
+    div {
+        overflow: visible !important;
+        height: auto !important;
+        max-height: none !important;
+    }
+
+    /* Hide app chrome: sidebar, top header, banners, floating widgets, toaster, and interactive controls */
+    [data-slot='sidebar'],
+    [data-sidebar='sidebar'],
+    header,
+    nav,
+    aside,
+    [data-slot='sidebar-header'],
+    .support-widget,
+    .cookie-consent-banner,
+    .sonner-toaster,
+    .print\:hidden,
+    [data-slot='tooltip-content'] {
+        display: none !important;
+    }
+
+    /* Expand content area to 100% paper width */
+    [data-slot='sidebar-inset'],
+    main {
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+
+    /* Avoid breaking cards and charts across pages */
+    .avoid-break,
+    [data-slot='card'],
+    .card,
+    svg {
+        break-inside: avoid !important;
+        page-break-inside: avoid !important;
+    }
+
+    /* Force grid layouts to remain clean side-by-side in print */
+    .print\:grid-cols-2 {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+
+    .print\:grid-cols-3 {
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    }
+
+    .print\:grid-cols-6 {
+        grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
+    }
+
+    /* Invert dark mode classes in print so charts and cards render with crisp white backgrounds and dark text */
+    .dark {
+        --background: #ffffff !important;
+        --foreground: #0b1c30 !important;
+        --card: #ffffff !important;
+        --card-foreground: #0b1c30 !important;
+        --muted: #f1f5f9 !important;
+        --muted-foreground: #64748b !important;
+        --border: #e2e8f0 !important;
+    }
+
+    .dark [data-slot='card'],
+    .dark .bg-slate-900,
+    .dark .bg-slate-950,
+    .dark .bg-slate-900\/60,
+    .dark .bg-slate-950\/40,
+    .dark .bg-slate-950\/20,
+    .dark .bg-slate-900\/70 {
+        background-color: #ffffff !important;
+        border-color: #e2e8f0 !important;
+        color: #0f172a !important;
+    }
+
+    .dark .text-white,
+    .dark .text-slate-100,
+    .dark .text-slate-200 {
+        color: #0f172a !important;
+    }
+
+    .dark .text-slate-400,
+    .dark .text-slate-500 {
+        color: #475569 !important;
+    }
 }
