@@ -200,7 +200,7 @@ export function NavMain({
                                                     >
                                                         <Link
                                                             href={sub.href}
-                                                            prefetch="click"
+                                                            prefetch="hover"
                                                             onClick={
                                                                 handleNavClick
                                                             }
@@ -271,7 +271,7 @@ export function NavMain({
                                     href={item.href || '#'}
                                     prefetch={
                                         item.href && item.href !== '#'
-                                            ? 'click'
+                                            ? 'hover'
                                             : false
                                     }
                                     onClick={handleNavClick}

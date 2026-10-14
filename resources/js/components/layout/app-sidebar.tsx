@@ -274,7 +274,7 @@ export function AppSidebar({ feedbackCount }: AppSidebarProps) {
                         <SidebarMenuButton size="xl" asChild>
                             <Link
                                 href={dashboardIndex()}
-                                prefetch="click"
+                                prefetch
                                 onClick={() => {
                                     if (isMobile) {
                                         setOpenMobile(false);

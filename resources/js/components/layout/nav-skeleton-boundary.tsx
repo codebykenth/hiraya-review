@@ -68,10 +68,13 @@ export function NavSkeletonBoundary({
     const [navigatingTo, setNavigatingTo] = useState<string | null>(null);
 
     useEffect(() => {
-        const removeStart = router.on('start', (event) => {
-            const visit = event.detail.visit as any;
+        const handleNavigationStart = (event: any) => {
+            const visit = event?.detail?.visit as any;
+            if (!visit) {
+                return;
+            }
 
-            // Never show navigation skeleton on prefetch (hover, mount, or background)
+            // Never show navigation skeleton on background prefetch (mount, hover, or background fetch)
             if (
                 visit.prefetch ||
                 visit.headers?.['Purpose'] === 'prefetch' ||
@@ -80,23 +83,71 @@ export function NavSkeletonBoundary({
                 return;
             }
 
-            // Only trigger for full page GET navigation visits, ignoring background pollings or partial mutations
+            // Only trigger for full page GET navigation visits to a different page
+            const method = visit.method
+                ? String(visit.method).toLowerCase()
+                : 'get';
+
             if (
-                visit.method === 'get' &&
+                method === 'get' &&
                 !visit.preserveState &&
                 !visit.only?.length
             ) {
-                setNavigatingTo(visit.url.pathname);
-            }
-        });
+                let targetPath = '';
+                if (visit.url) {
+                    if (typeof visit.url === 'string') {
+                        try {
+                            targetPath = new URL(
+                                visit.url,
+                                window.location.origin,
+                            ).pathname;
+                        } catch {
+                            targetPath = visit.url;
+                        }
+                    } else if (
+                        visit.url instanceof URL ||
+                        typeof visit.url.pathname === 'string'
+                    ) {
+                        targetPath = visit.url.pathname;
+                    }
+                }
 
-        const removeFinish = router.on('finish', () => {
+                const cleanTarget = targetPath
+                    ? targetPath.split('?')[0].replace(/\/$/, '') || '/'
+                    : null;
+                const cleanCurrent =
+                    window.location.pathname.replace(/\/$/, '') || '/';
+
+                if (cleanTarget && cleanTarget !== cleanCurrent) {
+                    setNavigatingTo(cleanTarget);
+                }
+            }
+        };
+
+        const handleNavigationEnd = (event?: any) => {
+            const visit = event?.detail?.visit;
+            // Ignore background prefetch finishes so they don't dismiss the skeleton prematurely
+            if (visit?.prefetch) {
+                return;
+            }
+
             setNavigatingTo(null);
-        });
+        };
+
+        const removeBefore = router.on('before', handleNavigationStart);
+        const removeStart = router.on('start', handleNavigationStart);
+        const removeNavigate = router.on('navigate', () => setNavigatingTo(null));
+        const removeFinish = router.on('finish', handleNavigationEnd);
+        const removeError = router.on('error', () => setNavigatingTo(null));
+        const removeCancel = router.on('cancel', () => setNavigatingTo(null));
 
         return () => {
+            removeBefore();
             removeStart();
+            removeNavigate();
             removeFinish();
+            removeError();
+            removeCancel();
         };
     }, []);
 

@@ -37,7 +37,7 @@ export function UserMenuContent({ user }: Props) {
                     <Link
                         className="group block w-full cursor-pointer transition-all duration-300 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none active:scale-95"
                         href={edit()}
-                        prefetch="click"
+                        prefetch="hover"
                         onClick={cleanup}
                     >
                         <Settings className="mr-2" />

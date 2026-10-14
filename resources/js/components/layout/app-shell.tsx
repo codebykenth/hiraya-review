@@ -9,7 +9,19 @@ type Props = {
 };
 
 export function AppShell({ children, variant = 'sidebar' }: Props) {
-    const isOpen = (usePage().props as { sidebarOpen?: boolean }).sidebarOpen;
+    const pageProps = usePage().props as { sidebarOpen?: boolean };
+
+    const isOpen =
+        typeof document !== 'undefined'
+            ? (() => {
+                  const match = document.cookie.match(
+                      /(?:^|; )sidebar_state=([^;]*)/,
+                  );
+                  return match
+                      ? match[1] === 'true'
+                      : (pageProps.sidebarOpen ?? true);
+              })()
+            : (pageProps.sidebarOpen ?? true);
 
     if (variant === 'header') {
         return (
