@@ -73,6 +73,15 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->respond(function (Response $response, Throwable $exception, Request $request) {
             $status = $response->getStatusCode();
             if (in_array($status, [500, 503, 404, 403])) {
+                $hasExtension = pathinfo($request->path(), PATHINFO_EXTENSION) !== '';
+                $isScannerTarget = in_array(strtolower(basename($request->path())), ['id_rsa', 'id_ed25519', 'jenkinsfile', 'kubeconfig', 'wp-config'], true);
+
+                if ($request->expectsJson() || $request->is('api/*') || $hasExtension || $isScannerTarget) {
+                    return response()->json([
+                        'message' => $status === 404 ? 'Not Found' : ($status === 403 ? 'Forbidden' : 'Server Error'),
+                    ], $status);
+                }
+
                 Inertia::setRootView('app');
 
                 return Inertia::render('error', [

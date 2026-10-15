@@ -29,8 +29,12 @@ RUN rm -rf node_modules && apt-get purge -y nodejs npm && apt-get autoremove -y
 # Copy the startup script to ServerSideUp's entrypoint directory
 COPY --chmod=755 scripts/00-laravel-deploy.sh /etc/entrypoint.d/00-laravel-deploy.sh
 
-# Copy custom Nginx site security configuration into ServerSideUp's site-opts.d directory
-COPY conf/nginx/security.conf /etc/nginx/site-opts.d/security.conf
+# Copy custom Nginx security rules into ServerSideUp's server-opts.d directory (included inside server { ... })
+COPY conf/nginx/security.conf /etc/nginx/server-opts.d/security.conf
+
+# Limit PHP-FPM workers and script memory to prevent OOM on Render 512MB instances
+ENV PHP_FPM_PM_MAX_CHILDREN=5 \
+    PHP_MEMORY_LIMIT=128M
 
 # Expose port 8080 (ServerSideUp default)
 EXPOSE 8080

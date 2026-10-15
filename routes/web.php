@@ -32,6 +32,7 @@ use App\Http\Controllers\User\SavedDrillSetController;
 use App\Http\Controllers\User\StudyScheduleController;
 use App\Http\Controllers\User\StudySuggestionController;
 use App\Http\Controllers\Webhook\XenditWebhookController;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -349,8 +350,15 @@ Route::middleware(['auth.or.fail', 'verified'])->group(function () {
 
 require __DIR__.'/settings.php';
 
-Route::fallback(function () {
+Route::fallback(function (Request $request) {
+    $hasExtension = pathinfo($request->path(), PATHINFO_EXTENSION) !== '';
+    $isScannerTarget = in_array(strtolower(basename($request->path())), ['id_rsa', 'id_ed25519', 'jenkinsfile', 'kubeconfig', 'wp-config'], true);
+
+    if ($request->expectsJson() || $request->is('api/*') || $hasExtension || $isScannerTarget) {
+        return response()->json(['message' => 'Not Found'], 404);
+    }
+
     return Inertia::render('error', ['status' => 404])
-        ->toResponse(request())
+        ->toResponse($request)
         ->setStatusCode(404);
 })->middleware('web');
