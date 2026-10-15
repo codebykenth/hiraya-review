@@ -70,7 +70,7 @@ export function ScoreHistoryChart({
                             margin={{
                                 top: 10,
                                 right: 10,
-                                left: -20,
+                                left: 0,
                                 bottom: 0,
                             }}
                         >
@@ -113,7 +113,8 @@ export function ScoreHistoryChart({
                             <YAxis
                                 tickLine={false}
                                 axisLine={false}
-                                tickMargin={12}
+                                tickMargin={8}
+                                width={42}
                                 tick={{
                                     fontSize: 11,
                                     fill: 'var(--muted-foreground)',

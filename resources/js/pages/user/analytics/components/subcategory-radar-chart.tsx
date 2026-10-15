@@ -61,10 +61,7 @@ export function SubcategoryRadarChart({
                             id: sub.id,
                             categoryName: cat.name,
                             fullName: sub.name,
-                            name:
-                                sub.name.length > 18
-                                    ? sub.name.substring(0, 18) + '…'
-                                    : sub.name,
+                            name: sub.name,
                             percentage: sub.percentage,
                             correct: sub.correct,
                             total: sub.total,
@@ -132,7 +129,7 @@ export function SubcategoryRadarChart({
                     )}
                 </div>
 
-                <div className="h-[210px] w-full">
+                <div className="h-[250px] w-full">
                     <ChartContainer config={config} className="h-full w-full">
                         <ResponsiveContainer width="100%" height="100%">
                             <BarChart
@@ -140,8 +137,8 @@ export function SubcategoryRadarChart({
                                 data={rawSubs}
                                 margin={{
                                     top: 0,
-                                    right: 30,
-                                    left: 10,
+                                    right: 25,
+                                    left: 0,
                                     bottom: 0,
                                 }}
                             >
@@ -169,7 +166,7 @@ export function SubcategoryRadarChart({
                                     tickLine={false}
                                     axisLine={false}
                                     tickMargin={8}
-                                    width={120}
+                                    width={150}
                                     tick={{
                                         fontSize: 10,
                                         fill: 'var(--foreground)',
@@ -183,7 +180,7 @@ export function SubcategoryRadarChart({
                                     }}
                                     content={
                                         <ChartTooltipContent
-                                            hideLabel
+                                            hideLabel={false}
                                             formatter={(value, _name, item) => {
                                                 const payload = item?.payload;
 

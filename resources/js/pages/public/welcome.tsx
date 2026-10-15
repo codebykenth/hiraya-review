@@ -172,7 +172,7 @@ export default function Welcome({ plans = [] }: WelcomeProps) {
                 <title>{`Civil Service Exam Reviewer ${new Date().getFullYear()}`}</title>
                 <meta
                     name="description"
-                    content="Ace the Philippine Civil Service Exam with confidence. Hiraya Review offers realistic Professional & Subprofessional mock exams, smart study plans, high-yield learning modules, and targeted drills. Free forever base access!"
+                    content="Ace the Philippine Civil Service Exam with confidence. Hiraya Review offers realistic Professional & Subprofessional mock exams, smart study plans, high-yield learning modules, and targeted drills. Free base access!"
                 />
                 <meta
                     property="og:title"
@@ -378,7 +378,7 @@ export default function Welcome({ plans = [] }: WelcomeProps) {
                                     Free
                                 </p>
                                 <p className="mt-1 text-sm leading-relaxed font-bold tracking-wider text-muted-foreground uppercase">
-                                    Forever Base Access
+                                    Base Access
                                 </p>
                             </div>
                         </div>

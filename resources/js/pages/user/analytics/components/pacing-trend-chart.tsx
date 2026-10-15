@@ -130,8 +130,8 @@ export function PacingTrendChart({ data }: PacingTrendChartProps) {
                                 data={data}
                                 margin={{
                                     top: 10,
-                                    right: 10,
-                                    left: -20,
+                                    right: 0,
+                                    left: 0,
                                     bottom: 0,
                                 }}
                             >
@@ -155,7 +155,8 @@ export function PacingTrendChart({ data }: PacingTrendChartProps) {
                                     yAxisId="left"
                                     tickLine={false}
                                     axisLine={false}
-                                    tickMargin={10}
+                                    tickMargin={8}
+                                    width={36}
                                     domain={[0, 'auto']}
                                     tick={{
                                         fontSize: 10,
@@ -168,7 +169,8 @@ export function PacingTrendChart({ data }: PacingTrendChartProps) {
                                     orientation="right"
                                     tickLine={false}
                                     axisLine={false}
-                                    tickMargin={10}
+                                    tickMargin={8}
+                                    width={42}
                                     tick={{
                                         fontSize: 10,
                                         fill: 'var(--muted-foreground)',

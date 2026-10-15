@@ -45,7 +45,7 @@
     <link rel="canonical" href="{{ request()->url() }}">
 
     <!-- Global SEO & Social Sharing Fallbacks -->
-    <meta name="description" content="Ace the Philippine Civil Service Exam with confidence. Hiraya Review offers realistic Professional & Subprofessional mock exams, smart study plans, high-yield learning modules, and targeted drills. Free forever base access!">
+    <meta name="description" content="Ace the Philippine Civil Service Exam with confidence. Hiraya Review offers realistic Professional & Subprofessional mock exams, smart study plans, high-yield learning modules, and targeted drills. Free base access!">
     <meta name="keywords" content="civil service exam reviewer, civil service exam reviewer {{ date('Y') }}, free civil service exam reviewer, cse reviewer professional, cse reviewer subprofessional, csc reviewer, civil service reviewer, hiraya review, hiraya cse reviewer, civil service mock exam">
     <meta name="author" content="Hiraya Review">
     <meta name="robots" content="index, follow">
