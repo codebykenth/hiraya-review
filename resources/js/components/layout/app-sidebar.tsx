@@ -37,6 +37,8 @@ import {
     SidebarSeparator,
     useSidebar,
 } from '@/components/ui/sidebar';
+import { setOptimisticUrl } from '@/hooks/use-current-url';
+import { toUrl } from '@/lib/utils';
 import { guide } from '@/routes';
 import { dashboard as adminDashboard } from '@/routes/admin';
 import {
@@ -276,6 +278,7 @@ export function AppSidebar({ feedbackCount }: AppSidebarProps) {
                                 href={dashboardIndex()}
                                 prefetch
                                 onClick={() => {
+                                    setOptimisticUrl(toUrl(dashboardIndex()));
                                     if (isMobile) {
                                         setOpenMobile(false);
                                     }

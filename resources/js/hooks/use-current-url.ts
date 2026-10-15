@@ -1,6 +1,75 @@
 import type { InertiaLinkProps } from '@inertiajs/react';
-import { usePage } from '@inertiajs/react';
+import { router, usePage } from '@inertiajs/react';
+import { useSyncExternalStore } from 'react';
 import { toUrl } from '@/lib/utils';
+
+// Global optimistic URL store so all navigation elements react instantly on click
+let optimisticUrl: string | null = null;
+const listeners = new Set<() => void>();
+
+function subscribe(callback: () => void) {
+    listeners.add(callback);
+    return () => listeners.delete(callback);
+}
+
+function getSnapshot(): string | null {
+    return optimisticUrl;
+}
+
+export function setOptimisticUrl(url: string | null) {
+    if (optimisticUrl !== url) {
+        optimisticUrl = url;
+        listeners.forEach((listener) => listener());
+    }
+}
+
+// Automatically sync with Inertia visit lifecycle
+if (typeof window !== 'undefined') {
+    const handleNavigationStart = (event: any) => {
+        const visit = event?.detail?.visit;
+        if (
+            !visit ||
+            visit.prefetch ||
+            visit.headers?.['Purpose'] === 'prefetch' ||
+            visit.headers?.['X-Inertia-Prefetch']
+        ) {
+            return;
+        }
+
+        const method = visit.method
+            ? String(visit.method).toLowerCase()
+            : 'get';
+        if (method === 'get') {
+            let target = '';
+            if (typeof visit.url === 'string') {
+                target = visit.url;
+            } else if (visit.url instanceof URL) {
+                target = visit.url.pathname + visit.url.search;
+            } else if (visit.url?.pathname) {
+                target = visit.url.pathname;
+            }
+
+            if (target) {
+                setOptimisticUrl(target);
+            }
+        }
+    };
+
+    const handleNavigationEnd = (event?: any) => {
+        const visit = event?.detail?.visit;
+        if (visit?.prefetch) {
+            return;
+        }
+        setOptimisticUrl(null);
+    };
+
+    router.on('before', handleNavigationStart);
+    router.on('start', handleNavigationStart);
+    router.on('navigate', handleNavigationEnd);
+    router.on('finish', handleNavigationEnd);
+    router.on('error', handleNavigationEnd);
+    router.on('cancel', handleNavigationEnd);
+}
 
 export type IsCurrentUrlFn = (
     urlToCheck: NonNullable<InertiaLinkProps['href'] | { url: string }>,
@@ -24,16 +93,29 @@ export type UseCurrentUrlReturn = {
     isCurrentUrl: IsCurrentUrlFn;
     isCurrentOrParentUrl: IsCurrentOrParentUrlFn;
     whenCurrentUrl: WhenCurrentUrlFn;
+    setOptimisticUrl: (url: string | null) => void;
 };
 
 export function useCurrentUrl(): UseCurrentUrlReturn {
     const page = usePage();
-    const currentUrlPath = new URL(
+    const activeOptimistic = useSyncExternalStore(
+        subscribe,
+        getSnapshot,
+        () => null,
+    );
+
+    const actualUrlPath = new URL(
         page.url,
         typeof window !== 'undefined'
             ? window.location.origin
             : 'http://localhost',
     ).pathname;
+
+    const currentUrlPath = activeOptimistic
+        ? activeOptimistic.startsWith('http')
+            ? new URL(activeOptimistic).pathname
+            : activeOptimistic.split('?')[0]
+        : actualUrlPath;
 
     const isCurrentUrl: IsCurrentUrlFn = (
         urlToCheck: NonNullable<InertiaLinkProps['href'] | { url: string }>,
@@ -47,7 +129,8 @@ export function useCurrentUrl(): UseCurrentUrlReturn {
             startsWith ? urlToCompare.startsWith(path) : path === urlToCompare;
 
         if (!urlString.startsWith('http')) {
-            return comparePath(urlString);
+            const cleanUrl = urlString.split('?')[0];
+            return comparePath(cleanUrl);
         }
 
         try {
@@ -79,5 +162,6 @@ export function useCurrentUrl(): UseCurrentUrlReturn {
         isCurrentUrl,
         isCurrentOrParentUrl,
         whenCurrentUrl,
+        setOptimisticUrl,
     };
 }

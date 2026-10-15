@@ -9,6 +9,11 @@ import {
     DrillsHubSkeleton,
     LearnIndexSkeleton,
     CalendarSkeleton,
+    TutorSkeleton,
+    AiDiagnosticSkeleton,
+    GuideSkeleton,
+    BillingSkeleton,
+    SettingsSkeleton,
 } from '@/components/shared/page-skeletons';
 
 function getSkeletonForUrl(pathname: string) {
@@ -21,6 +26,29 @@ function getSkeletonForUrl(pathname: string) {
     }
 
     if (
+        pathname.startsWith('/analytics/ai-analysis') ||
+        pathname.startsWith('/ai-analysis')
+    ) {
+        return <AiDiagnosticSkeleton />;
+    }
+
+    if (pathname.startsWith('/analytics')) {
+        return <AnalyticsSkeleton />;
+    }
+
+    if (pathname.startsWith('/guide')) {
+        return <GuideSkeleton />;
+    }
+
+    if (pathname.startsWith('/billing')) {
+        return <BillingSkeleton />;
+    }
+
+    if (pathname.startsWith('/settings')) {
+        return <SettingsSkeleton />;
+    }
+
+    if (
         pathname.startsWith('/history') ||
         pathname.startsWith('/admin/users') ||
         pathname.startsWith('/admin/feedbacks') ||
@@ -29,13 +57,14 @@ function getSkeletonForUrl(pathname: string) {
         pathname.startsWith('/admin/audit-logs') ||
         pathname.startsWith('/admin/questions') ||
         pathname.startsWith('/admin/legal-content') ||
-        pathname.startsWith('/admin/settings')
+        pathname.startsWith('/admin/settings') ||
+        pathname.startsWith('/admin/syllabus') ||
+        pathname.startsWith('/admin/exam-dates') ||
+        pathname.startsWith('/admin/attempts') ||
+        pathname.startsWith('/admin/view-management') ||
+        pathname.startsWith('/admin/system')
     ) {
         return <TableSkeleton rows={8} cols={5} />;
-    }
-
-    if (pathname.startsWith('/analytics')) {
-        return <AnalyticsSkeleton />;
     }
 
     if (pathname.startsWith('/exams')) {
@@ -55,6 +84,10 @@ function getSkeletonForUrl(pathname: string) {
         pathname.startsWith('/study-schedules')
     ) {
         return <CalendarSkeleton />;
+    }
+
+    if (pathname.startsWith('/tutor')) {
+        return <TutorSkeleton />;
     }
 
     return <DashboardSkeleton />;
@@ -136,7 +169,9 @@ export function NavSkeletonBoundary({
 
         const removeBefore = router.on('before', handleNavigationStart);
         const removeStart = router.on('start', handleNavigationStart);
-        const removeNavigate = router.on('navigate', () => setNavigatingTo(null));
+        const removeNavigate = router.on('navigate', () =>
+            setNavigatingTo(null),
+        );
         const removeFinish = router.on('finish', handleNavigationEnd);
         const removeError = router.on('error', () => setNavigatingTo(null));
         const removeCancel = router.on('cancel', () => setNavigatingTo(null));

@@ -1,3 +1,4 @@
+import type { InertiaLinkProps } from '@inertiajs/react';
 import { Link, usePage } from '@inertiajs/react';
 import { ChevronRight, Sparkles } from 'lucide-react';
 import { useState, useEffect, useCallback } from 'react';
@@ -24,35 +25,43 @@ export function NavMain({
     items: NavItem[];
     label?: string;
 }) {
-    const { isCurrentUrl } = useCurrentUrl();
+    const { isCurrentUrl, currentUrl, setOptimisticUrl } = useCurrentUrl();
     const { url } = usePage();
     const { isMobile, setOpenMobile } = useSidebar();
     const isTutorThinking = useIsTutorThinking();
 
-    const handleNavClick = useCallback(() => {
-        if (isMobile) {
-            setOpenMobile(false);
-        }
-    }, [isMobile, setOpenMobile]);
+    // effectivePath updates immediately on click / navigation start
+    const effectivePath = currentUrl;
+
+    const handleNavClick = useCallback(
+        (href?: string | NonNullable<InertiaLinkProps['href']>) => {
+            if (href && href !== '#') {
+                setOptimisticUrl(toUrl(href));
+            }
+            if (isMobile) {
+                setOpenMobile(false);
+            }
+        },
+        [isMobile, setOpenMobile, setOptimisticUrl],
+    );
 
     const isSubActive = useCallback(
         (sub: NavItem, siblingItems: NavItem[]) => {
-            const currentPath = url.split('?')[0];
             const cleanSubHref = sub.href ? toUrl(sub.href).split('?')[0] : '';
 
-            if (currentPath === cleanSubHref) {
+            if (effectivePath === cleanSubHref) {
                 return true;
             }
 
             const isParentOfCurrent =
-                cleanSubHref && currentPath.startsWith(cleanSubHref + '/');
+                cleanSubHref && effectivePath.startsWith(cleanSubHref + '/');
 
             if (isParentOfCurrent) {
                 const hasBetterExactMatch = siblingItems.some(
                     (sibling) =>
                         sibling.href !== sub.href &&
                         sibling.href &&
-                        currentPath === toUrl(sibling.href).split('?')[0],
+                        effectivePath === toUrl(sibling.href).split('?')[0],
                 );
 
                 return !hasBetterExactMatch;
@@ -60,7 +69,7 @@ export function NavMain({
 
             return false;
         },
-        [url],
+        [effectivePath],
     );
 
     // Smart auto-expansion state: automatically expand sections where a sub-item is active
@@ -83,10 +92,8 @@ export function NavMain({
         return initial;
     });
 
-    // Sync auto-expansion if the URL shifts externally
+    // Sync auto-expansion if the URL shifts externally or optimistically
     useEffect(() => {
-        const next: Record<string, boolean> = {};
-
         for (const item of items) {
             if (item.items) {
                 const hasActiveChild = item.items.some((sub) =>
@@ -94,18 +101,16 @@ export function NavMain({
                 );
 
                 if (hasActiveChild) {
-                    next[item.title] = true;
+                    setOpenItems((prev) =>
+                        prev[item.title]
+                            ? prev
+                            : { ...prev, [item.title]: true },
+                    );
                     break;
                 }
             }
         }
-
-        const timer = setTimeout(() => {
-            setOpenItems(next);
-        }, 0);
-
-        return () => clearTimeout(timer);
-    }, [url, items, isSubActive]);
+    }, [effectivePath, items, isSubActive]);
 
     const toggleItem = (title: string) => {
         setOpenItems((prev) => {
@@ -201,8 +206,10 @@ export function NavMain({
                                                         <Link
                                                             href={sub.href}
                                                             prefetch="hover"
-                                                            onClick={
-                                                                handleNavClick
+                                                            onClick={() =>
+                                                                handleNavClick(
+                                                                    sub.href,
+                                                                )
                                                             }
                                                         >
                                                             {sub.icon && (
@@ -226,7 +233,9 @@ export function NavMain({
                     let active = item.href ? isCurrentUrl(item.href) : false;
 
                     // Support highlighting History when drilling attempts are active
-                    const hasAttemptId = url.includes('attempt_id=');
+                    const hasAttemptId = (effectivePath || url).includes(
+                        'attempt_id=',
+                    );
 
                     if (hasAttemptId) {
                         if (item.title === 'History') {
@@ -237,11 +246,9 @@ export function NavMain({
                     }
 
                     // Support highlighting Learn when on Study Tutorial page
-                    const currentPath = url.split('?')[0];
-
                     if (
                         item.title === 'Learn' &&
-                        currentPath.startsWith('/learn/')
+                        effectivePath.startsWith('/learn/')
                     ) {
                         active = true;
                     }
@@ -250,7 +257,7 @@ export function NavMain({
                     if (
                         item.title === 'Dashboard' &&
                         item.href === '/dashboard' &&
-                        currentPath === '/ai-analysis'
+                        effectivePath === '/ai-analysis'
                     ) {
                         active = true;
                     }
@@ -274,7 +281,7 @@ export function NavMain({
                                             ? 'hover'
                                             : false
                                     }
-                                    onClick={handleNavClick}
+                                    onClick={() => handleNavClick(item.href)}
                                 >
                                     {item.icon && (
                                         <item.icon
