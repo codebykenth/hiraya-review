@@ -124,8 +124,13 @@ export default function HistoryPage(props: HistoryPageProps) {
                 message={confirmModal.message}
                 confirmLabel={confirmModal.confirmLabel}
                 variant={confirmModal.variant}
+                isLoading={confirmModal.isLoading}
                 onClose={() =>
-                    setConfirmModal((prev) => ({ ...prev, isOpen: false }))
+                    setConfirmModal((prev) => ({
+                        ...prev,
+                        isOpen: false,
+                        isLoading: false,
+                    }))
                 }
                 onConfirm={confirmModal.onConfirm}
             />

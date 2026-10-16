@@ -20,6 +20,7 @@ export function useHistoryState({ attempts = [], filters }: HistoryPageProps) {
         message: string;
         confirmLabel: string;
         variant: 'danger' | 'success' | 'info';
+        isLoading?: boolean;
         onConfirm: () => void;
     }>({
         isOpen: false,
@@ -27,6 +28,7 @@ export function useHistoryState({ attempts = [], filters }: HistoryPageProps) {
         message: '',
         confirmLabel: '',
         variant: 'success',
+        isLoading: false,
         onConfirm: () => {},
     });
 
@@ -46,12 +48,25 @@ export function useHistoryState({ attempts = [], filters }: HistoryPageProps) {
                 'Are you sure you want to delete this attempt record? This action cannot be undone and will permanently remove it from your history metrics.',
             confirmLabel: 'Delete',
             variant: 'danger',
+            isLoading: false,
             onConfirm: () => {
+                setConfirmModal((prev) => ({ ...prev, isLoading: true }));
                 router.delete(`/exams/attempts/${id}`, {
                     preserveScroll: true,
                     onSuccess: () => {
                         setSelectedIds((prev) => prev.filter((i) => i !== id));
                         setExpandedIds((prev) => prev.filter((i) => i !== id));
+                        setConfirmModal((prev) => ({
+                            ...prev,
+                            isOpen: false,
+                            isLoading: false,
+                        }));
+                    },
+                    onError: () => {
+                        setConfirmModal((prev) => ({
+                            ...prev,
+                            isLoading: false,
+                        }));
                     },
                 });
             },
@@ -85,7 +100,9 @@ export function useHistoryState({ attempts = [], filters }: HistoryPageProps) {
             message: `Are you sure you want to delete ${selectedIds.length} attempt records? This action cannot be undone.`,
             confirmLabel: 'Delete All',
             variant: 'danger',
+            isLoading: false,
             onConfirm: () => {
+                setConfirmModal((prev) => ({ ...prev, isLoading: true }));
                 router.post(
                     '/exams/attempts/bulk-delete',
                     { ids: selectedIds },
@@ -94,6 +111,17 @@ export function useHistoryState({ attempts = [], filters }: HistoryPageProps) {
                         onSuccess: () => {
                             setSelectedIds([]);
                             setExpandedIds([]);
+                            setConfirmModal((prev) => ({
+                                ...prev,
+                                isOpen: false,
+                                isLoading: false,
+                            }));
+                        },
+                        onError: () => {
+                            setConfirmModal((prev) => ({
+                                ...prev,
+                                isLoading: false,
+                            }));
                         },
                     },
                 );
