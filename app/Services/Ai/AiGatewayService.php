@@ -13,6 +13,8 @@ class AiGatewayService
 {
     public const string DEFAULT_WORKERS_AI_MODEL = '@cf/meta/llama-3.2-3b-instruct';
 
+    public const string FAST_WORKERS_AI_MODEL = '@cf/meta/llama-3.2-1b-instruct';
+
     public const string FALLBACK_GEMINI_MODEL = 'gemini-3.7-flash';
 
     /**
@@ -102,7 +104,7 @@ class AiGatewayService
      * @param  array<string, mixed>  $payload
      * @return array{success: bool, text?: string, error?: string, status?: int}
      */
-    public function runWorkersAi(AiModel|string $model, array $payload, int $timeout = 180): array
+    public function runWorkersAi(AiModel|string $model, array $payload, int $timeout = 180, bool $isFallback = false): array
     {
         $model = $model instanceof AiModel ? $model->value : $model;
         $token = (string) config('services.cloudflare.api_token');
@@ -142,6 +144,38 @@ class AiGatewayService
                 ];
             }
 
+            if (! $isFallback && $this->isGeminiConfigured()) {
+                Log::warning("Workers AI failed [{$response->status()}]. Falling back to Gemini.");
+
+                $systemPrompt = '';
+                $userPrompt = '';
+                foreach ($payload['messages'] ?? [] as $msg) {
+                    if (($msg['role'] ?? '') === 'system') {
+                        $systemPrompt = $msg['content'] ?? '';
+                    } elseif (($msg['role'] ?? '') === 'user') {
+                        $userPrompt = $msg['content'] ?? '';
+                    }
+                }
+
+                $geminiPayload = [
+                    'contents' => [
+                        ['parts' => [['text' => $userPrompt !== '' ? $userPrompt : ($payload['messages'][0]['content'] ?? '')]]],
+                    ],
+                    'generationConfig' => [
+                        'temperature' => 0.4,
+                        'topP' => 0.85,
+                    ],
+                ];
+
+                if ($systemPrompt !== '') {
+                    $geminiPayload['system_instruction'] = [
+                        'parts' => [['text' => $systemPrompt]],
+                    ];
+                }
+
+                return $this->runGemini(AiModel::GEMINI_2_5_FLASH, $geminiPayload, $timeout);
+            }
+
             $errorBody = $response->json();
             $errorMessage = $errorBody['errors'][0]['message'] ?? $response->body();
 
@@ -151,6 +185,38 @@ class AiGatewayService
                 'status' => $response->status(),
             ];
         } catch (\Throwable $e) {
+            if (! $isFallback && $this->isGeminiConfigured()) {
+                Log::warning("Workers AI threw exception [{$e->getMessage()}]. Falling back to Gemini.");
+
+                $systemPrompt = '';
+                $userPrompt = '';
+                foreach ($payload['messages'] ?? [] as $msg) {
+                    if (($msg['role'] ?? '') === 'system') {
+                        $systemPrompt = $msg['content'] ?? '';
+                    } elseif (($msg['role'] ?? '') === 'user') {
+                        $userPrompt = $msg['content'] ?? '';
+                    }
+                }
+
+                $geminiPayload = [
+                    'contents' => [
+                        ['parts' => [['text' => $userPrompt !== '' ? $userPrompt : ($payload['messages'][0]['content'] ?? '')]]],
+                    ],
+                    'generationConfig' => [
+                        'temperature' => 0.4,
+                        'topP' => 0.85,
+                    ],
+                ];
+
+                if ($systemPrompt !== '') {
+                    $geminiPayload['system_instruction'] = [
+                        'parts' => [['text' => $systemPrompt]],
+                    ];
+                }
+
+                return $this->runGemini(AiModel::GEMINI_2_5_FLASH, $geminiPayload, $timeout);
+            }
+
             return [
                 'success' => false,
                 'error' => "Workers AI Exception: {$e->getMessage()}",
@@ -177,6 +243,8 @@ class AiGatewayService
         if (! isset($payload['max_tokens'])) {
             $payload['max_tokens'] = 4096;
         }
+
+        $payload['stream'] = true;
 
         $url = $this->resolveWorkersAiUrl($model);
         $headers = [
@@ -499,7 +567,7 @@ class AiGatewayService
                     'max_tokens' => 4096,
                 ];
 
-                yield from $this->runWorkersAiStream(AiModel::WORKERS_AI_LLAMA_3_1_8B, $workersPayload, $timeout);
+                yield from $this->runWorkersAiStream(AiModel::WORKERS_AI_LLAMA_3_2_3B, $workersPayload, $timeout);
 
                 return;
             }
@@ -584,7 +652,7 @@ class AiGatewayService
                     'max_tokens' => 4096,
                 ];
 
-                yield from $this->runWorkersAiStream(AiModel::WORKERS_AI_LLAMA_3_1_8B, $workersPayload, $timeout, true);
+                yield from $this->runWorkersAiStream(AiModel::WORKERS_AI_LLAMA_3_2_3B, $workersPayload, $timeout, true);
 
                 return;
             }
@@ -697,51 +765,77 @@ class AiGatewayService
      */
     public function createEmbedding(string $text, int $timeout = 60): array
     {
-        $geminiKey = (string) config('services.gemini.key');
-        if ($geminiKey !== '') {
-            try {
-                $response = Http::withHeaders([
-                    'x-goog-api-key' => $geminiKey,
-                    'Content-Type' => 'application/json',
-                ])->timeout($timeout)->post('https://generativelanguage.googleapis.com/v1beta/models/text-embedding-004:embedContent', [
-                    'model' => 'models/text-embedding-004',
-                    'content' => [
-                        'parts' => [
-                            ['text' => $text],
+        $cacheKey = 'embed:'.md5(trim(strtolower($text)));
+
+        return cache()->remember($cacheKey, now()->addDays(7), function () use ($text, $timeout) {
+            $geminiKey = (string) config('services.gemini.key');
+            if ($geminiKey !== '') {
+                try {
+                    $url = 'https://generativelanguage.googleapis.com/v1beta/models/text-embedding-004:embedContent';
+                    $headers = [
+                        'x-goog-api-key' => $geminiKey,
+                        'Content-Type' => 'application/json',
+                    ];
+
+                    if ($this->isAiGatewayConfigured()) {
+                        $accountId = config('services.cloudflare.account_id');
+                        $gatewayId = config('services.cloudflare.ai_gateway_id') ?: config('services.cloudflare.ai_gateway.id');
+                        $url = "https://gateway.ai.cloudflare.com/v1/{$accountId}/{$gatewayId}/google-ai-studio/v1beta/models/text-embedding-004:embedContent";
+                        $headers['cf-aig-cache'] = 'true';
+                        $cfToken = (string) config('services.cloudflare.api_token');
+                        if ($cfToken !== '') {
+                            $headers['cf-aig-authorization'] = "Bearer {$cfToken}";
+                        }
+                    }
+
+                    $response = Http::withHeaders($headers)->timeout($timeout)->post($url, [
+                        'model' => 'models/text-embedding-004',
+                        'content' => [
+                            'parts' => [
+                                ['text' => $text],
+                            ],
                         ],
-                    ],
-                ]);
+                    ]);
 
-                if ($response->successful()) {
-                    $values = $response->json('embedding.values');
-                    if (is_array($values)) {
-                        return array_map('floatval', $values);
+                    if ($response->successful()) {
+                        $values = $response->json('embedding.values');
+                        if (is_array($values)) {
+                            return array_map('floatval', $values);
+                        }
                     }
+                } catch (\Throwable) {
+                    // Fallback to Cloudflare if Gemini fails
                 }
-            } catch (\Throwable) {
-                // Fallback to Cloudflare if Gemini fails
             }
-        }
 
-        $token = (string) config('services.cloudflare.api_token');
-        if ($token !== '' && config('services.cloudflare.account_id')) {
-            try {
-                $url = $this->resolveWorkersAiUrl('@cf/baai/bge-base-en-v1.5');
-                $response = Http::withToken($token)
-                    ->timeout($timeout)
-                    ->post($url, ['text' => [$text]]);
-
-                if ($response->successful()) {
-                    $values = $response->json('result.data.0');
-                    if (is_array($values)) {
-                        return array_map('floatval', $values);
+            $token = (string) config('services.cloudflare.api_token');
+            if ($token !== '' && config('services.cloudflare.account_id')) {
+                try {
+                    $url = $this->resolveWorkersAiUrl('@cf/baai/bge-base-en-v1.5');
+                    $headers = [
+                        'Authorization' => "Bearer {$token}",
+                        'Content-Type' => 'application/json',
+                    ];
+                    if ($this->isAiGatewayConfigured()) {
+                        $headers['cf-aig-cache'] = 'true';
                     }
-                }
-            } catch (\Throwable) {
-                // Fall through
-            }
-        }
 
-        return [];
+                    $response = Http::withHeaders($headers)
+                        ->timeout($timeout)
+                        ->post($url, ['text' => [$text]]);
+
+                    if ($response->successful()) {
+                        $values = $response->json('result.data.0');
+                        if (is_array($values)) {
+                            return array_map('floatval', $values);
+                        }
+                    }
+                } catch (\Throwable) {
+                    // Fall through
+                }
+            }
+
+            return [];
+        });
     }
 }

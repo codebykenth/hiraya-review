@@ -12,6 +12,7 @@ export interface ChatMessage {
     id: string;
     role: 'user' | 'assistant';
     content: string;
+    rawContent?: string;
     citations?: (string | Citation)[];
     timestamp: string;
     isError?: boolean;
@@ -54,7 +55,13 @@ class TutorChatService {
 
         try {
             const saved = localStorage.getItem(this.getStorageKey(userId));
-            const messages: ChatMessage[] = saved ? JSON.parse(saved) : [];
+            const rawMessages: ChatMessage[] = saved ? JSON.parse(saved) : [];
+            const messages = rawMessages.filter(
+                (m) =>
+                    m.role === 'user' ||
+                    m.content.trim().length > 0 ||
+                    m.isError,
+            );
             const userMsgs = messages.filter((m) => m.role === 'user');
             const lastUserMsgId =
                 userMsgs.length > 0 ? userMsgs[userMsgs.length - 1].id : null;
@@ -105,9 +112,15 @@ class TutorChatService {
 
         try {
             const key = this.getStorageKey(this.activeUserId);
+            const messagesToSave = this.state.messages.filter(
+                (m) =>
+                    m.role === 'user' ||
+                    m.content.trim().length > 0 ||
+                    m.isError,
+            );
 
-            if (this.state.messages.length > 0) {
-                localStorage.setItem(key, JSON.stringify(this.state.messages));
+            if (messagesToSave.length > 0) {
+                localStorage.setItem(key, JSON.stringify(messagesToSave));
             } else {
                 localStorage.removeItem(key);
             }
@@ -246,15 +259,15 @@ class TutorChatService {
                                         messages: this.state.messages.map(
                                             (m) => {
                                                 if (m.id === assistantMsgId) {
-                                                    const newContent = (
-                                                        m.content + chunkText
-                                                    ).replace(
-                                                        /CITATIONS:\s*(.+)$/im,
+                                                    const raw = (m.rawContent ?? m.content) + chunkText;
+                                                    const newContent = raw.replace(
+                                                        /(?:\r?\n|\s*)CITATIONS:\s*[\s\S]*$/im,
                                                         '',
                                                     );
 
                                                     return {
                                                         ...m,
+                                                        rawContent: raw,
                                                         content: newContent,
                                                     };
                                                 }

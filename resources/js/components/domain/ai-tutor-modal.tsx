@@ -22,6 +22,7 @@ interface ChatMessage {
     id: string;
     role: 'user' | 'assistant';
     content: string;
+    rawContent?: string;
     citations?: string[];
     timestamp: Date;
 }
@@ -152,9 +153,13 @@ export function AiTutorModal() {
                                     setMessages((prev) =>
                                         prev.map((m) => {
                                             if (m.id === assistantMsgId) {
-                                                const newContent = (m.content + chunkText).replace(/CITATIONS:\s*(.+)$/im, '');
+                                                const raw = (m.rawContent ?? m.content) + chunkText;
+                                                const newContent = raw.replace(
+                                                    /(?:\r?\n|\s*)CITATIONS:\s*[\s\S]*$/im,
+                                                    ''
+                                                );
 
-                                                return { ...m, content: newContent };
+                                                return { ...m, rawContent: raw, content: newContent };
                                             }
 
                                             return m;

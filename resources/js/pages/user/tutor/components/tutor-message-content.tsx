@@ -5,8 +5,10 @@ import {
     Lightbulb,
     AlertTriangle,
     ListOrdered,
+    Sparkles,
 } from 'lucide-react';
 import React from 'react';
+import { SvgDiagramViewer } from '@/components/domain/svg-diagram-viewer';
 
 interface TutorMessageContentProps {
     content: string;
@@ -168,30 +170,63 @@ function isSubContentLine(
         return true;
     }
 
-    // If previous item was a Step (e.g. Step 1: Parentheses)
-    if (lastItem.isStep) {
-        // A new step is NOT sub-content
-        if (/^(\*{0,2})Step\s+\d+/i.test(content)) {
-            return false;
-        }
+    // A new step or heading is NEVER sub-content
+    if (
+        /^(\*{0,2})Step\s+\d+/i.test(content) ||
+        /^#{1,6}\s+/i.test(content) ||
+        /^(?:-{3,}|\*{3,}|_{3,})\s*$/.test(content)
+    ) {
+        return false;
+    }
 
-        // Sub-step calculations, expressions, or intermediate details
-        if (
-            /^(Inside|Expression|Evaluate|Multiply|Divide|Calculate|Subtract|Add|Substitute|Simplify|Result|Where|Note|Reason|Why|Formula|Because|Then|Next|Step\s*becomes|Solving|Check|Therefore)/i.test(
-                content,
-            )
-        ) {
-            return true;
-        }
+    // Sub-step calculations, logic premises, deductions, or intermediate details
+    if (
+        /^(Inside|Expression|Evaluate|Multiply|Divide|Calculate|Subtract|Add|Substitute|Simplify|Result|Where|Note|Reason|Why|Formula|Because|Then|Next|Step\s*becomes|Solving|Check|Therefore|Premise|Conclusion|Statement|Observation|Analysis|Deduction|Explanation|Rule|Condition|Case|Let|Since|Given|Hence|Thus|Validity)/i.test(
+            content,
+        )
+    ) {
+        return true;
+    }
 
-        if (/^[`\d+\-*/=^()√]/.test(content)) {
-            return true;
-        }
+    if (/^[`\d+\-*/=^()√]/.test(content)) {
+        return true;
+    }
 
-        // Action labels like "Multiply first:", "Divide next:", etc.
-        if (/^[A-Za-z\s]+:\s*.+/i.test(content)) {
-            return true;
-        }
+    // Action labels or key-value labels like "Multiply first:", "Premise 1:", "Validity: TRUE", etc.
+    if (/^[A-Za-z0-9\s*_()[\]'-]+:\s*.+/i.test(content)) {
+        return true;
+    }
+
+    return false;
+}
+
+function isMarkdownBlock(code: string): boolean {
+    // 1. Contains markdown headings (e.g. ## Heading)
+    if (/(?:^|\n)#{1,6}\s+\S+/m.test(code)) {
+        return true;
+    }
+
+    // 2. Contains ordered steps with bold (e.g. 1. **Step 1...)
+    if (/(?:^|\n)\s*(?:\d+[.)]|\*|-)\s*(\*{0,2})Step\s+\d+/im.test(code)) {
+        return true;
+    }
+
+    if (/\*\*Step\s+\d+[:.-]/i.test(code)) {
+        return true;
+    }
+
+    if (/(?:^|\n)\s*\d+\.\s+\*\*[^*]+\*\*/m.test(code)) {
+        return true;
+    }
+
+    // 3. Horizontal rule followed by headings or steps
+    if (/(?:^|\n)(?:---|\*\*\*|___)\s*\n+\s*#{1,6}\s+/m.test(code)) {
+        return true;
+    }
+
+    // 4. Starts with horizontal rule and has bold text
+    if (/^(?:---|\*\*\*|___)\s*\n/m.test(code) && /\*\*[^*]+\*\*/.test(code)) {
+        return true;
     }
 
     return false;
@@ -202,13 +237,21 @@ export function TutorMessageContent({ content }: TutorMessageContentProps) {
         return null;
     }
 
-    const cleanContent = content.replace(/CITATIONS:\s*(.+)$/im, '').trim();
+    const cleanContent = content.replace(/(?:\r?\n|\s*)CITATIONS:\s*[\s\S]*$/im, '').trim();
 
     if (!cleanContent) {
         return null;
     }
 
-    const lines = cleanContent.split('\n');
+    // Normalize unclosed SVG code blocks: if an SVG starts inside a code block
+    // (```xml or ```svg) and contains </svg>, but has subsequent text without a closing ``` fence,
+    // ensure the fence is closed right after </svg> so subsequent markdown renders as rich pedagogical content.
+    const normalizedContent = cleanContent.replace(
+        /(```[a-z]*\s*<svg[\s\S]*?<\/svg>)(\s*)(?!\s*```)/gi,
+        '$1\n```\n$2',
+    );
+
+    const lines = normalizedContent.split('\n');
     const elements: React.ReactNode[] = [];
     let currentList: {
         type: 'bullet' | 'number';
@@ -220,6 +263,37 @@ export function TutorMessageContent({ content }: TutorMessageContentProps) {
     let codeBlockLines: string[] = [];
     let inLatexBlock = false;
     let latexBlockLines: string[] = [];
+    let inSvgBlock = false;
+    let svgBlockLines: string[] = [];
+
+    const flushSvgBlock = () => {
+        if (!inSvgBlock && svgBlockLines.length === 0) {
+            return;
+        }
+
+        const rawSvg = svgBlockLines.join('\n').trim();
+        if (/<svg[\s\S]*?<\/svg>/i.test(rawSvg)) {
+            elements.push(
+                <SvgDiagramViewer
+                    key={`raw-svg-${elements.length}`}
+                    svgContent={rawSvg}
+                />,
+            );
+        } else if (/<svg/i.test(rawSvg)) {
+            elements.push(
+                <div
+                    key={`svg-loading-${elements.length}`}
+                    className="my-3.5 flex items-center justify-center gap-2.5 rounded-2xl border border-indigo-200/60 bg-indigo-50/40 p-6 text-xs font-semibold text-indigo-600 dark:border-indigo-900/50 dark:bg-indigo-950/30 dark:text-indigo-300"
+                >
+                    <Sparkles className="size-4 animate-spin text-indigo-500" />
+                    <span>Rendering visual diagram...</span>
+                </div>,
+            );
+        }
+
+        inSvgBlock = false;
+        svgBlockLines = [];
+    };
 
     const flushCodeBlock = () => {
         if (!inCodeBlock && codeBlockLines.length === 0) {
@@ -228,6 +302,80 @@ export function TutorMessageContent({ content }: TutorMessageContentProps) {
 
         const rawCode = codeBlockLines.join('\n');
         const trimmedCode = rawCode.replace(/^\n+|\n+$/g, '');
+
+        if (!trimmedCode) {
+            inCodeBlock = false;
+            codeBlockLines = [];
+            return;
+        }
+
+        // If code block contains SVG markup, render as an interactive diagram
+        const svgMatch = trimmedCode.match(/<svg[\s\S]*?<\/svg>/i);
+        if (svgMatch) {
+            const beforeSvg = trimmedCode.slice(0, svgMatch.index).trim();
+            const afterSvg = trimmedCode.slice((svgMatch.index ?? 0) + svgMatch[0].length).trim();
+
+            if (beforeSvg) {
+                elements.push(
+                    <TutorMessageContent
+                        key={`before-svg-${elements.length}`}
+                        content={beforeSvg}
+                    />,
+                );
+            }
+
+            elements.push(
+                <SvgDiagramViewer
+                    key={`svg-${elements.length}`}
+                    svgContent={svgMatch[0]}
+                />,
+            );
+
+            if (afterSvg) {
+                elements.push(
+                    <TutorMessageContent
+                        key={`after-svg-${elements.length}`}
+                        content={afterSvg}
+                    />,
+                );
+            }
+
+            inCodeBlock = false;
+            codeBlockLines = [];
+            return;
+        }
+
+        // If block contains partial SVG actively streaming
+        if (/<svg/i.test(trimmedCode) && !/<\/svg>/i.test(trimmedCode)) {
+            elements.push(
+                <div
+                    key={`svg-loading-${elements.length}`}
+                    className="my-3.5 flex items-center justify-center gap-2.5 rounded-2xl border border-indigo-200/60 bg-indigo-50/40 p-6 text-xs font-semibold text-indigo-600 dark:border-indigo-900/50 dark:bg-indigo-950/30 dark:text-indigo-300"
+                >
+                    <Sparkles className="size-4 animate-spin text-indigo-500" />
+                    <span>Rendering visual diagram...</span>
+                </div>,
+            );
+
+            inCodeBlock = false;
+            codeBlockLines = [];
+            return;
+        }
+
+        // If the code block contains Markdown content (headings, numbered steps, premises)
+        // mistakenly wrapped in triple backticks by the AI, render it as rich pedagogical Markdown
+        if (isMarkdownBlock(trimmedCode)) {
+            elements.push(
+                <TutorMessageContent
+                    key={`markdown-block-${elements.length}`}
+                    content={trimmedCode}
+                />,
+            );
+
+            inCodeBlock = false;
+            codeBlockLines = [];
+            return;
+        }
 
         elements.push(
             <div
@@ -446,13 +594,46 @@ export function TutorMessageContent({ content }: TutorMessageContentProps) {
         flushList();
         flushCodeBlock();
         flushLatexBlock();
+        flushSvgBlock();
     };
 
     for (let i = 0; i < lines.length; i++) {
         const rawLine = lines[i];
         const trimmed = rawLine.trim();
 
-        // 1. Inside fenced code block
+        // 1. Inside raw un-fenced SVG block
+        if (inSvgBlock) {
+            svgBlockLines.push(rawLine);
+            if (trimmed.includes('</svg>')) {
+                flushSvgBlock();
+            }
+            continue;
+        }
+
+        // 2. Starting raw un-fenced SVG block
+        if (trimmed.startsWith('<svg') || (trimmed.includes('<svg') && !trimmed.includes('</svg>'))) {
+            flushAll();
+            inSvgBlock = true;
+            svgBlockLines = [rawLine];
+            if (trimmed.includes('</svg>')) {
+                flushSvgBlock();
+            }
+            continue;
+        }
+
+        // 3. Single-line complete raw SVG
+        if (trimmed.includes('<svg') && trimmed.includes('</svg>')) {
+            flushAll();
+            elements.push(
+                <SvgDiagramViewer
+                    key={`inline-svg-${elements.length}`}
+                    svgContent={trimmed}
+                />,
+            );
+            continue;
+        }
+
+        // 4. Inside fenced code block
         if (inCodeBlock) {
             if (trimmed.startsWith('```')) {
                 flushCodeBlock();
@@ -460,10 +641,26 @@ export function TutorMessageContent({ content }: TutorMessageContentProps) {
             }
 
             codeBlockLines.push(rawLine);
+
+            // If the code block contains an SVG and this line closes the </svg> tag,
+            // immediately flush the code block and exit inCodeBlock.
+            // This prevents subsequent explanation markdown (steps, headers, text)
+            // from being mistakenly absorbed into the code block if the AI omits the closing ``` fence.
+            if (trimmed.includes('</svg>') && codeBlockLines.some((l) => l.includes('<svg'))) {
+                flushCodeBlock();
+
+                // If the very next line is the closing ``` fence, peek and advance so it
+                // doesn't accidentally trigger a new code block.
+                if (i + 1 < lines.length && lines[i + 1].trim().startsWith('```')) {
+                    i++;
+                }
+                continue;
+            }
+
             continue;
         }
 
-        // 2. Starting fenced code block
+        // 5. Starting fenced code block
         if (trimmed.startsWith('```')) {
             flushAll();
             inCodeBlock = true;

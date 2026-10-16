@@ -51,6 +51,7 @@ test('answers student question grounded in syllabus context', function () {
 
     $this->mock(AiGatewayService::class, function ($mock) {
         $mock->shouldReceive('isAiConfigured')->andReturn(true);
+        $mock->shouldReceive('isWorkersAiConfigured')->andReturn(false);
         $mock->shouldReceive('createEmbedding')->andReturn([0.1, 0.2, 0.3]);
         $mock->shouldReceive('runGemini')->andReturn([
             'success' => true,
@@ -92,6 +93,7 @@ test('answers student question considering conversation history and provides cli
 
     $this->mock(AiGatewayService::class, function ($mock) {
         $mock->shouldReceive('isAiConfigured')->andReturn(true);
+        $mock->shouldReceive('isWorkersAiConfigured')->andReturn(false);
         $mock->shouldReceive('createEmbedding')->andReturn([0.1, 0.2, 0.3]);
         $mock->shouldReceive('runGemini')->andReturn([
             'success' => true,
@@ -129,6 +131,7 @@ test('streams student question response when event-stream requested', function (
 
     $this->mock(AiGatewayService::class, function ($mock) {
         $mock->shouldReceive('isAiConfigured')->andReturn(true);
+        $mock->shouldReceive('isWorkersAiConfigured')->andReturn(false);
         $mock->shouldReceive('createEmbedding')->andReturn([0.1, 0.2, 0.3]);
         $mock->shouldReceive('runGeminiStream')->andReturnUsing(function () {
             yield 'Here is ';
@@ -155,6 +158,8 @@ test('intercepts prompt injection attempt and refuses safely without calling AI 
         $mock->shouldReceive('isAiConfigured')->andReturn(true);
         $mock->shouldNotReceive('runGemini');
         $mock->shouldNotReceive('runGeminiStream');
+        $mock->shouldNotReceive('runWorkersAi');
+        $mock->shouldNotReceive('runWorkersAiStream');
     });
 
     $response = $this->actingAs($user)->postJson(route('tutor.ask'), [
@@ -188,6 +193,7 @@ test('intercepts prompt injection in streaming mode without calling AI model', f
     $this->mock(AiGatewayService::class, function ($mock) {
         $mock->shouldReceive('isAiConfigured')->andReturn(true);
         $mock->shouldNotReceive('runGeminiStream');
+        $mock->shouldNotReceive('runWorkersAiStream');
     });
 
     $response = $this->actingAs($user)->post(route('tutor.ask'), [
@@ -199,4 +205,123 @@ test('intercepts prompt injection in streaming mode without calling AI model', f
     $response->assertOk();
     expect($response->headers->get('Content-Type'))->toContain('text/event-stream');
     expect($response->streamedContent())->toContain('Hiraya AI Tutor');
+});
+
+test('uses cloudflare workers ai when configured as tutor provider', function () {
+    $user = User::factory()->create();
+
+    config(['services.ai.tutor_provider' => 'workers_ai']);
+
+    $this->mock(AiGatewayService::class, function ($mock) {
+        $mock->shouldReceive('isAiConfigured')->andReturn(true);
+        $mock->shouldReceive('isWorkersAiConfigured')->andReturn(true);
+        $mock->shouldReceive('createEmbedding')->andReturn([0.1, 0.2, 0.3]);
+        $mock->shouldReceive('runWorkersAi')
+            ->once()
+            ->andReturn([
+                'success' => true,
+                'text' => 'Cloudflare Workers AI Llama 3.3 answered accurately with AI Gateway caching enabled.',
+            ]);
+    });
+
+    $response = $this->actingAs($user)->postJson(route('tutor.ask'), [
+        'question' => 'What are the qualification requirements for the Career Service Examination?',
+    ]);
+
+    $response->assertOk();
+    $response->assertJson([
+        'success' => true,
+        'data' => [
+            'success' => true,
+            'answer' => 'Cloudflare Workers AI Llama 3.3 answered accurately with AI Gateway caching enabled.',
+        ],
+    ]);
+});
+
+test('streams via cloudflare workers ai when configured as tutor provider', function () {
+    $user = User::factory()->create();
+
+    config(['services.ai.tutor_provider' => 'workers_ai']);
+
+    $this->mock(AiGatewayService::class, function ($mock) {
+        $mock->shouldReceive('isAiConfigured')->andReturn(true);
+        $mock->shouldReceive('isWorkersAiConfigured')->andReturn(true);
+        $mock->shouldReceive('createEmbedding')->andReturn([0.1, 0.2, 0.3]);
+        $mock->shouldReceive('runWorkersAiStream')
+            ->once()
+            ->andReturnUsing(function () {
+                yield 'Fast ';
+                yield 'streaming ';
+                yield 'from Cloudflare AI Gateway.';
+            });
+    });
+
+    $response = $this->actingAs($user)->post(route('tutor.ask'), [
+        'question' => 'Explain numerical reasoning strategies',
+    ], [
+        'Accept' => 'text/event-stream',
+    ]);
+
+    $response->assertOk();
+    expect($response->headers->get('Content-Type'))->toContain('text/event-stream');
+    expect($response->streamedContent())->toContain('from Cloudflare AI Gateway.');
+});
+
+test('opts out of syllabus sources when topic is not related', function () {
+    $user = User::factory()->create();
+
+    LearnModule::factory()->create([
+        'title' => 'Mastering PEMDAS and Fraction Arithmetic',
+        'slug' => 'mastering-pemdas-and-fraction-arithmetic',
+        'is_published' => true,
+    ]);
+
+    $this->mock(AiGatewayService::class, function ($mock) {
+        $mock->shouldReceive('isAiConfigured')->andReturn(true);
+        $mock->shouldReceive('isWorkersAiConfigured')->andReturn(false);
+        $mock->shouldReceive('createEmbedding')->andReturn([0.9, 0.9, 0.9]);
+        $mock->shouldReceive('runGemini')->andReturn([
+            'success' => true,
+            'text' => "Here is a step-by-step worked example on categorical syllogisms.\n\nCITATIONS: None",
+        ]);
+    });
+
+    $response = $this->actingAs($user)->postJson(route('tutor.ask'), [
+        'question' => 'Can you provide another worked example step-by-step for syllogisms?',
+    ]);
+
+    $response->assertOk();
+    $response->assertJson([
+        'success' => true,
+        'data' => [
+            'success' => true,
+            'answer' => 'Here is a step-by-step worked example on categorical syllogisms.',
+            'citations' => [],
+        ],
+    ]);
+});
+
+test('delivers responses with svg diagrams for visual illustrations', function () {
+    $user = User::factory()->create();
+
+    $svg = '<svg viewBox="0 0 500 220" xmlns="http://www.w3.org/2000/svg"><circle cx="150" cy="110" r="60" fill="rgba(99,102,241,0.2)" stroke="#4f46e5"/></svg>';
+    $markdownWithSvg = "### Syllogism Solution\n\n```xml\n{$svg}\n```\n\nCITATIONS: None";
+
+    $this->mock(AiGatewayService::class, function ($mock) use ($markdownWithSvg) {
+        $mock->shouldReceive('isAiConfigured')->andReturn(true);
+        $mock->shouldReceive('isWorkersAiConfigured')->andReturn(false);
+        $mock->shouldReceive('createEmbedding')->andReturn([0.5, 0.5, 0.5]);
+        $mock->shouldReceive('runGemini')->andReturn([
+            'success' => true,
+            'text' => $markdownWithSvg,
+        ]);
+    });
+
+    $response = $this->actingAs($user)->postJson(route('tutor.ask'), [
+        'question' => 'Illustrate this syllogism with a Venn diagram',
+    ]);
+
+    $response->assertOk();
+    $data = $response->json('data');
+    expect($data['answer'])->toContain('<svg viewBox="0 0 500 220"');
 });

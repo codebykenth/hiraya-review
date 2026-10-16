@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Public;
 use App\Enums\LegalContentType;
 use App\Http\Controllers\Controller;
 use App\Repositories\LegalContentRepositoryInterface;
+use Illuminate\Http\RedirectResponse;
+use Inertia\Response as InertiaResponse;
 
 class PublicController extends Controller
 {
@@ -12,8 +14,14 @@ class PublicController extends Controller
         protected LegalContentRepositoryInterface $legalContentRepository
     ) {}
 
-    public function welcome()
+    public function welcome(): InertiaResponse|RedirectResponse
     {
+        if ($user = $this->user()) {
+            return $user->isAdmin()
+                ? redirect()->route('admin.dashboard')
+                : redirect()->route('dashboard.index');
+        }
+
         session()->forget('is_free_attempt_active');
 
         return $this->render('public/welcome', [

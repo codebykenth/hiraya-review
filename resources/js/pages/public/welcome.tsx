@@ -366,7 +366,7 @@ export default function Welcome({ plans = [] }: WelcomeProps) {
                             <div className="hidden h-12 w-full max-w-px bg-slate-300/60 md:block dark:bg-slate-800" />
                             <div className="flex flex-1 flex-col items-center">
                                 <p className="text-2xl font-black text-primary sm:text-4xl">
-                                    6
+                                    5
                                 </p>
                                 <p className="mt-1 text-sm leading-relaxed font-bold tracking-wider text-muted-foreground uppercase">
                                     Categories

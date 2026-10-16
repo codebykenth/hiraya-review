@@ -49,7 +49,7 @@ export function SmartStudyLaunchers({
                 <Link
                     href={
                         primaryWeakness
-                            ? '/drills/smart-weakness?from=/dashboard'
+                            ? `/drills?category=${encodeURIComponent(primaryWeakness)}&from=/dashboard`
                             : drillsIndex({ query: { from: '/dashboard' } })
                     }
                     prefetch="hover"

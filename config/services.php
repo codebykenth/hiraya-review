@@ -71,4 +71,8 @@ return [
         'ai_gateway_id' => env('CLOUDFLARE_AI_GATEWAY_ID'),
     ],
 
+    'ai' => [
+        'tutor_provider' => env('AI_TUTOR_PROVIDER', 'gemini'),
+    ],
+
 ];

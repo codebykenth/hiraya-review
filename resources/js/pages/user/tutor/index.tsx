@@ -96,7 +96,7 @@ const FOLLOW_UP_SUGGESTIONS = [
         prompt: 'What are the most common exam traps or mistakes on this topic?',
     },
     {
-        label: 'Practice Drill',
+        label: 'AI Practice Question',
         icon: <Target className="size-3.5" />,
         prompt: 'Give me 1 multiple-choice drill question with 4 options to test my understanding.',
     },
@@ -167,7 +167,7 @@ function getCitationsForMessage(
         return msg.citations;
     }
 
-    if (modules.length === 0) {
+    if (modules.length === 0 || !msg.content || !msg.content.trim()) {
         return [];
     }
 
@@ -232,7 +232,7 @@ function getCitationsForMessage(
         return [matched];
     }
 
-    return [modules[0]];
+    return [];
 }
 
 export default function TutorPage({
@@ -282,6 +282,29 @@ export default function TutorPage({
             });
         }
     }, []);
+
+    const visibleMessages = useMemo(() => {
+        return messages.filter(
+            (m) =>
+                m.role === 'user' ||
+                m.content.trim().length > 0 ||
+                m.isError,
+        );
+    }, [messages]);
+
+    const isWaitingForResponse = useMemo(() => {
+        if (!isLoading) {
+            return false;
+        }
+
+        const lastMsg = messages[messages.length - 1];
+
+        return (
+            !lastMsg ||
+            lastMsg.role === 'user' ||
+            (lastMsg.role === 'assistant' && !lastMsg.content.trim())
+        );
+    }, [isLoading, messages]);
 
     const userQuestions = useMemo(() => {
         return messages.filter((m) => m.role === 'user');
@@ -605,7 +628,7 @@ export default function TutorPage({
                             className="min-w-0 flex-1 overflow-y-auto px-4 py-6 sm:px-6"
                         >
                             <div className="mx-auto flex max-w-4xl flex-col gap-6">
-                                {messages.length === 0 ? (
+                                {visibleMessages.length === 0 && !isWaitingForResponse ? (
                                     <div className="my-auto flex flex-col items-center justify-center py-8 text-center">
                                         <div className="mb-4 flex size-16 items-center justify-center rounded-2xl bg-indigo-500/10 text-indigo-600 shadow-inner dark:text-indigo-400">
                                             <BookOpen className="size-8" />
@@ -658,13 +681,17 @@ export default function TutorPage({
                                     </div>
                                 ) : (
                                     <div className="space-y-6">
-                                        {messages.map((msg, index) => {
+                                        {visibleMessages.map((msg, index) => {
                                             const isHighlighted =
                                                 highlightedMsgId === msg.id;
                                             const isLastAssistantMessage =
                                                 msg.role === 'assistant' &&
-                                                index === messages.length - 1 &&
+                                                index === visibleMessages.length - 1 &&
                                                 !isLoading;
+                                            const isStreaming =
+                                                isLoading &&
+                                                msg.role === 'assistant' &&
+                                                index === visibleMessages.length - 1;
                                             const questionNumber =
                                                 userQuestionMap.get(msg.id);
 
@@ -721,9 +748,18 @@ export default function TutorPage({
                                                                     }
                                                                 />
 
+                                                                {isStreaming && (
+                                                                    <div className="flex items-center gap-1.5 pt-1 text-xs text-indigo-600 dark:text-indigo-400">
+                                                                        <span className="size-1.5 animate-bounce rounded-full bg-indigo-500 [animation-delay:-0.3s]" />
+                                                                        <span className="size-1.5 animate-bounce rounded-full bg-indigo-500 [animation-delay:-0.15s]" />
+                                                                        <span className="size-1.5 animate-bounce rounded-full bg-indigo-500" />
+                                                                    </div>
+                                                                )}
+
                                                                 {(() => {
                                                                     if (
-                                                                        msg.isError
+                                                                        msg.isError ||
+                                                                        isStreaming
                                                                     ) {
                                                                         return null;
                                                                     }
@@ -832,40 +868,42 @@ export default function TutorPage({
                                                                     </div>
                                                                 )}
 
-                                                                <div className="flex items-center justify-between border-t border-border/40 pt-2 text-[11px] text-muted-foreground">
-                                                                    <span>
-                                                                        {
-                                                                            msg.timestamp
-                                                                        }
-                                                                    </span>
-                                                                    <button
-                                                                        type="button"
-                                                                        onClick={() =>
-                                                                            handleCopy(
-                                                                                msg.id,
-                                                                                msg.content,
-                                                                            )
-                                                                        }
-                                                                        className="flex items-center gap-1 rounded-md px-2 py-0.5 text-[11px] font-medium transition-colors hover:bg-muted hover:text-foreground"
-                                                                    >
-                                                                        {copiedId ===
-                                                                        msg.id ? (
-                                                                            <>
-                                                                                <Check className="size-3 text-emerald-500" />
-                                                                                <span className="text-emerald-500">
-                                                                                    Copied
-                                                                                </span>
-                                                                            </>
-                                                                        ) : (
-                                                                            <>
-                                                                                <Copy className="size-3" />
-                                                                                <span>
-                                                                                    Copy
-                                                                                </span>
-                                                                            </>
-                                                                        )}
-                                                                    </button>
-                                                                </div>
+                                                                {!isStreaming && (
+                                                                    <div className="flex items-center justify-between border-t border-border/40 pt-2 text-[11px] text-muted-foreground">
+                                                                        <span>
+                                                                            {
+                                                                                msg.timestamp
+                                                                            }
+                                                                        </span>
+                                                                        <button
+                                                                            type="button"
+                                                                            onClick={() =>
+                                                                                handleCopy(
+                                                                                    msg.id,
+                                                                                    msg.content,
+                                                                                )
+                                                                            }
+                                                                            className="flex items-center gap-1 rounded-md px-2 py-0.5 text-[11px] font-medium transition-colors hover:bg-muted hover:text-foreground"
+                                                                        >
+                                                                            {copiedId ===
+                                                                            msg.id ? (
+                                                                                <>
+                                                                                    <Check className="size-3 text-emerald-500" />
+                                                                                    <span className="text-emerald-500">
+                                                                                        Copied
+                                                                                    </span>
+                                                                                </>
+                                                                            ) : (
+                                                                                <>
+                                                                                    <Copy className="size-3" />
+                                                                                    <span>
+                                                                                        Copy
+                                                                                    </span>
+                                                                                </>
+                                                                            )}
+                                                                        </button>
+                                                                    </div>
+                                                                )}
                                                             </div>
                                                         )}
                                                     </div>
@@ -879,7 +917,7 @@ export default function TutorPage({
                                             );
                                         })}
 
-                                        {isLoading && (
+                                        {isWaitingForResponse && (
                                             <div className="flex items-start gap-3 sm:gap-4">
                                                 <div className="flex size-8 shrink-0 items-center justify-center rounded-xl bg-indigo-600/10 text-indigo-600 shadow-xs dark:bg-indigo-400/10 dark:text-indigo-400">
                                                     <Bot className="size-4.5" />
