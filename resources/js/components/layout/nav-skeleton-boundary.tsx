@@ -1,5 +1,5 @@
 import { router, usePage } from '@inertiajs/react';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
     DashboardSkeleton,
     AdminDashboardSkeleton,
@@ -81,10 +81,7 @@ function getSkeletonForUrl(pathname: string) {
         return <LearnIndexSkeleton />;
     }
 
-    if (
-        clean.startsWith('/calendar') ||
-        clean.startsWith('/study-schedules')
-    ) {
+    if (clean.startsWith('/calendar') || clean.startsWith('/study-schedules')) {
         return <CalendarSkeleton />;
     }
 
@@ -102,17 +99,25 @@ export function NavSkeletonBoundary({
 }) {
     const page = usePage();
     const [navigatingTo, setNavigatingTo] = useState<string | null>(null);
+    const startPathRef = useRef<string | null>(null);
 
     const currentPath =
         (page.url ? page.url.split('?')[0].replace(/\/$/, '') : '') || '/';
 
-    // Automatically dismiss skeleton when destination URL matches currently mounted page
+    // Automatically dismiss skeleton when destination URL matches currently mounted page or when mounted page has navigated away from the starting URL
     useEffect(() => {
-        if (
-            navigatingTo &&
-            (navigatingTo === currentPath || currentPath.startsWith(navigatingTo))
-        ) {
-            setNavigatingTo(null);
+        if (navigatingTo) {
+            const hasReachedTarget =
+                navigatingTo === currentPath ||
+                currentPath.startsWith(navigatingTo);
+            const hasChangedFromStart =
+                startPathRef.current !== null &&
+                currentPath !== startPathRef.current;
+
+            if (hasReachedTarget || hasChangedFromStart) {
+                setNavigatingTo(null);
+                startPathRef.current = null;
+            }
         }
     }, [currentPath, navigatingTo]);
 
@@ -125,6 +130,7 @@ export function NavSkeletonBoundary({
                 safetyTimer = null;
             }
             setNavigatingTo(null);
+            startPathRef.current = null;
         };
 
         const handleNavigationStart = (event: any) => {
@@ -176,9 +182,10 @@ export function NavSkeletonBoundary({
                     ? targetPath.split('?')[0].replace(/\/$/, '') || '/'
                     : null;
                 const cleanCurrent =
-                    (window.location.pathname.replace(/\/$/, '') || '/');
+                    window.location.pathname.replace(/\/$/, '') || '/';
 
                 if (cleanTarget && cleanTarget !== cleanCurrent) {
+                    startPathRef.current = cleanCurrent;
                     setNavigatingTo(cleanTarget);
 
                     // Safety timeout: Never leave skeleton stuck for more than 6 seconds
@@ -186,7 +193,7 @@ export function NavSkeletonBoundary({
                         clearTimeout(safetyTimer);
                     }
                     safetyTimer = setTimeout(() => {
-                        setNavigatingTo(null);
+                        clearNavigation();
                     }, 6000);
                 }
             }
@@ -199,13 +206,14 @@ export function NavSkeletonBoundary({
                 return;
             }
 
-            clearNavigation();
+            // Fallback: clear skeleton only after React has had a chance to render the new page
+            setTimeout(() => {
+                clearNavigation();
+            }, 100);
         };
 
         const removeBefore = router.on('before', handleNavigationStart);
         const removeStart = router.on('start', handleNavigationStart);
-        const removeNavigate = router.on('navigate', clearNavigation);
-        const removeSuccess = router.on('success', clearNavigation);
         const removeFinish = router.on('finish', handleNavigationEnd);
         const removeError = router.on('error', clearNavigation);
         const removeCancel = router.on('cancel', clearNavigation);
@@ -216,15 +224,18 @@ export function NavSkeletonBoundary({
             }
             removeBefore();
             removeStart();
-            removeNavigate();
-            removeSuccess();
             removeFinish();
             removeError();
             removeCancel();
         };
     }, []);
 
-    if (navigatingTo && navigatingTo !== currentPath) {
+    const isNavigating =
+        navigatingTo !== null &&
+        navigatingTo !== currentPath &&
+        (startPathRef.current === null || currentPath === startPathRef.current);
+
+    if (isNavigating) {
         return (
             <div className="relative animate-in duration-150 fade-in">
                 {getSkeletonForUrl(navigatingTo)}

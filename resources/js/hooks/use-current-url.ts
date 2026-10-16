@@ -1,6 +1,6 @@
 import type { InertiaLinkProps } from '@inertiajs/react';
 import { router, usePage } from '@inertiajs/react';
-import { useSyncExternalStore } from 'react';
+import { useEffect, useSyncExternalStore } from 'react';
 import { toUrl } from '@/lib/utils';
 
 // Global optimistic URL store so all navigation elements react instantly on click
@@ -55,7 +55,7 @@ if (typeof window !== 'undefined') {
         }
     };
 
-    const handleNavigationEnd = (event?: any) => {
+    const handleNavigationError = (event?: any) => {
         const visit = event?.detail?.visit;
         if (visit?.prefetch) {
             return;
@@ -63,12 +63,22 @@ if (typeof window !== 'undefined') {
         setOptimisticUrl(null);
     };
 
+    const handleNavigationFinish = (event?: any) => {
+        const visit = event?.detail?.visit;
+        if (visit?.prefetch) {
+            return;
+        }
+        // Fallback: clear optimistic state after React has committed the new page
+        setTimeout(() => {
+            setOptimisticUrl(null);
+        }, 100);
+    };
+
     router.on('before', handleNavigationStart);
     router.on('start', handleNavigationStart);
-    router.on('navigate', handleNavigationEnd);
-    router.on('finish', handleNavigationEnd);
-    router.on('error', handleNavigationEnd);
-    router.on('cancel', handleNavigationEnd);
+    router.on('finish', handleNavigationFinish);
+    router.on('error', handleNavigationError);
+    router.on('cancel', handleNavigationError);
 }
 
 export type IsCurrentUrlFn = (
@@ -110,6 +120,27 @@ export function useCurrentUrl(): UseCurrentUrlReturn {
             ? window.location.origin
             : 'http://localhost',
     ).pathname;
+
+    useEffect(() => {
+        if (activeOptimistic) {
+            const cleanOptimistic =
+                (activeOptimistic.startsWith('http')
+                    ? new URL(activeOptimistic).pathname
+                    : activeOptimistic.split('?')[0]
+                )
+                    .replace(/\/$/, '')
+                    .trim() || '/';
+
+            const cleanActual = actualUrlPath.replace(/\/$/, '').trim() || '/';
+
+            if (
+                cleanActual === cleanOptimistic ||
+                cleanActual.startsWith(cleanOptimistic + '/')
+            ) {
+                setOptimisticUrl(null);
+            }
+        }
+    }, [actualUrlPath, activeOptimistic]);
 
     const currentUrlPath = activeOptimistic
         ? activeOptimistic.startsWith('http')
