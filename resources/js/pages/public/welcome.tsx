@@ -59,6 +59,20 @@ export default function Welcome({ plans = [] }: WelcomeProps) {
     const [activeNav, setActiveNav] = useState('home');
     const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
 
+    // Respect users who have asked the OS to reduce motion: don't autoplay.
+    const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+
+    useEffect(() => {
+        const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+        setPrefersReducedMotion(mq.matches);
+
+        const onChange = (e: MediaQueryListEvent) =>
+            setPrefersReducedMotion(e.matches);
+        mq.addEventListener('change', onChange);
+
+        return () => mq.removeEventListener('change', onChange);
+    }, []);
+
     // Track visible section on scroll to update navigation state
     useEffect(() => {
         const sections = ['home', 'features', 'path', 'pricing', 'guide', 'faq'];
@@ -383,6 +397,57 @@ export default function Welcome({ plans = [] }: WelcomeProps) {
                             </div>
                         </div>
                     </div>
+
+                    {/* Platform showcase video — full-width feature view */}
+                    <Section
+                        id="showcase"
+                        className="py-12 sm:py-16 lg:py-20"
+                    >
+                        <SectionHeader
+                            title="See It In Action"
+                            subtitle="A quick tour of the smart study plan, targeted drills, and realistic mock exam experience."
+                            align="center"
+                            className="mb-10"
+                        />
+
+                        <div className="group relative mx-auto w-full max-w-5xl">
+                            {/* Layered depth: soft glow ring behind the frame */}
+                            <div className="pointer-events-none absolute -inset-4 rounded-[2.5rem] bg-primary/10 blur-3xl transition-opacity duration-500 md:opacity-70 group-hover:opacity-100"></div>
+
+                            <div className="relative overflow-hidden rounded-2xl border border-border/60 bg-card shadow-[0_25px_60px_rgba(0,0,0,0.18)] ring-1 ring-foreground/5 transition-all duration-500 ease-out group-hover:-translate-y-2 group-hover:shadow-[0_35px_80px_rgba(0,0,0,0.25)] sm:rounded-3xl dark:border-white/10 dark:ring-white/10">
+                                <video
+                                    className="aspect-video w-full bg-slate-950 object-cover"
+                                    src="/promo-showcase.mp4"
+                                    poster="/videos/promo-showcase-poster.jpg"
+                                    autoPlay={!prefersReducedMotion}
+                                    muted
+                                    loop
+                                    playsInline
+                                    controls
+                                    preload="metadata"
+                                    aria-label="Hiraya Review platform showcase: smart study plan, practice drills, and mock exam results"
+                                >
+                                    <source
+                                        src="/promo-showcase.mp4"
+                                        type="video/mp4"
+                                    />
+                                    Your browser does not support the video
+                                    tag.
+                                </video>
+
+                                {/* Glass corner tag */}
+                                <div className="pointer-events-none absolute top-3 left-3 flex items-center gap-1.5 rounded-full border border-white/15 bg-black/35 px-2.5 py-1 text-[11px] font-bold tracking-wide text-white uppercase backdrop-blur-md sm:top-4 sm:left-4">
+                                    {!prefersReducedMotion && (
+                                        <span className="relative flex size-1.5">
+                                            <span className="absolute inline-flex size-full animate-ping rounded-full bg-primary opacity-75"></span>
+                                            <span className="relative inline-flex size-1.5 rounded-full bg-primary"></span>
+                                        </span>
+                                    )}
+                                    Platform Tour
+                                </div>
+                            </div>
+                        </div>
+                    </Section>
                     <Section id="features">
                         <SectionHeader
                             title="Tools Built for Success"
