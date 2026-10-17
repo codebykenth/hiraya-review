@@ -1,4 +1,4 @@
-import { BarChart2 } from 'lucide-react';
+import { BarChart2, Play } from 'lucide-react';
 import React from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Label } from 'recharts';
 import { Card } from '@/components/ui/card';
@@ -7,7 +7,9 @@ import {
     ChartTooltip,
     ChartTooltipContent,
 } from '@/components/ui/chart';
+import { index as drillsIndex } from '@/routes/drills';
 import type { AnalyticsCategory } from '../types';
+import { EmptyChartState } from './empty-chart-state';
 
 interface QuestionVolumeChartProps {
     categories: AnalyticsCategory[];
@@ -22,7 +24,12 @@ const DONUT_COLORS = [
 ];
 
 export function QuestionVolumeChart({ categories }: QuestionVolumeChartProps) {
-    const data = categories.map((cat, idx) => ({
+    const hasData =
+        categories &&
+        categories.length > 0 &&
+        categories.some((c) => (c.total ?? 0) > 0);
+
+    const data = (categories || []).map((cat, idx) => ({
         name: cat.name.replace(' Ability', '').replace(' Information', ''),
         value: cat.total,
         correct: cat.correct,
@@ -54,7 +61,18 @@ export function QuestionVolumeChart({ categories }: QuestionVolumeChartProps) {
                 </div>
             </div>
 
-            <div className="flex flex-col items-center gap-4 sm:flex-row">
+            {!hasData ? (
+                <EmptyChartState
+                    icon={BarChart2}
+                    title="No practice volume recorded"
+                    description="Your question distribution by subject will appear as you take practice drills and mock tests."
+                    actionLabel="Start Practice"
+                    actionHref={drillsIndex()}
+                    actionIcon={Play}
+                    className="h-[220px] w-full"
+                />
+            ) : (
+                <div className="flex flex-col items-center gap-4 sm:flex-row">
                 <div className="h-[220px] w-full max-w-[220px] shrink-0">
                     <ChartContainer config={config} className="h-full w-full">
                         <ResponsiveContainer width="100%" height="100%">
@@ -181,6 +199,7 @@ export function QuestionVolumeChart({ categories }: QuestionVolumeChartProps) {
                     })}
                 </div>
             </div>
+            )}
         </Card>
     );
 }

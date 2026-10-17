@@ -1,4 +1,4 @@
-import { Clock, AlertCircle, CheckCircle2, Zap, Lightbulb } from 'lucide-react';
+import { Clock, AlertCircle, CheckCircle2, Zap, Lightbulb, Play } from 'lucide-react';
 import React, { useMemo } from 'react';
 import {
     ComposedChart,
@@ -18,7 +18,9 @@ import {
     ChartLegend,
     ChartLegendContent,
 } from '@/components/ui/chart';
+import { index as examsIndex } from '@/routes/exams';
 import type { PacingTrend } from '../types';
+import { EmptyChartState } from './empty-chart-state';
 
 interface PacingTrendChartProps {
     data: PacingTrend[];
@@ -98,6 +100,11 @@ export function PacingTrendChart({ data }: PacingTrendChartProps) {
         };
     }, [latestPacing]);
 
+    const hasData =
+        data &&
+        data.length > 0 &&
+        data.some((d) => (d.secondsPerQuestion ?? 0) > 0);
+
     return (
         <Card className="flex flex-col justify-between border border-slate-200/80 bg-slate-50/50 p-5 dark:border-slate-800 dark:bg-slate-950/40">
             <div>
@@ -115,15 +122,28 @@ export function PacingTrendChart({ data }: PacingTrendChartProps) {
                         </div>
                     </div>
 
-                    <span
-                        className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-[10px] font-bold ${pacingAssessment.color}`}
-                    >
-                        {pacingAssessment.icon}
-                        {pacingAssessment.label}
-                    </span>
+                    {hasData && (
+                        <span
+                            className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-[10px] font-bold ${pacingAssessment.color}`}
+                        >
+                            {pacingAssessment.icon}
+                            {pacingAssessment.label}
+                        </span>
+                    )}
                 </div>
 
-                <div className="h-52.5 w-full">
+                {!hasData ? (
+                    <EmptyChartState
+                        icon={Clock}
+                        title="No pacing records yet"
+                        description="Track your speed against the ~54s CSE time target as you complete timed attempts."
+                        actionLabel="Take Timed Exam"
+                        actionHref={examsIndex()}
+                        actionIcon={Play}
+                        className="h-52.5 w-full"
+                    />
+                ) : (
+                    <div className="h-52.5 w-full">
                     <ChartContainer config={config} className="h-full w-full">
                         <ResponsiveContainer width="100%" height="100%">
                             <ComposedChart
@@ -225,18 +245,21 @@ export function PacingTrendChart({ data }: PacingTrendChartProps) {
                         </ResponsiveContainer>
                     </ChartContainer>
                 </div>
+            )}
             </div>
 
             {/* Pacing Tip Footer */}
-            <div className="mt-3 border-t border-border pt-2.5">
-                <p className="flex items-center gap-1.5 text-[11px] font-medium text-muted-foreground">
-                    <Lightbulb className="size-3.5 text-amber-500" />
-                    <span>
-                        <span className="font-bold">Strategy:</span>{' '}
-                        {pacingAssessment.tip}
-                    </span>
-                </p>
-            </div>
+            {hasData && (
+                <div className="mt-3 border-t border-border pt-2.5">
+                    <p className="flex items-center gap-1.5 text-[11px] font-medium text-muted-foreground">
+                        <Lightbulb className="size-3.5 text-amber-500" />
+                        <span>
+                            <span className="font-bold">Strategy:</span>{' '}
+                            {pacingAssessment.tip}
+                        </span>
+                    </p>
+                </div>
+            )}
         </Card>
     );
 }

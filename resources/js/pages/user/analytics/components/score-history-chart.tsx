@@ -1,4 +1,4 @@
-import { TrendingUp } from 'lucide-react';
+import { Play, TrendingUp } from 'lucide-react';
 import React from 'react';
 import {
     AreaChart,
@@ -14,16 +14,17 @@ import {
     ChartTooltip,
     ChartTooltipContent,
 } from '@/components/ui/chart';
+import { index as examsIndex } from '@/routes/exams';
 import type { ChartDataPoint } from '../types';
+import { EmptyChartState } from './empty-chart-state';
 
 interface ScoreHistoryChartProps {
     chartData: ChartDataPoint[];
-    isDemoMode: boolean;
+    isDemoMode?: boolean;
 }
 
 export function ScoreHistoryChart({
     chartData,
-    isDemoMode,
 }: ScoreHistoryChartProps) {
     const config = {
         score: {
@@ -32,21 +33,10 @@ export function ScoreHistoryChart({
         },
     };
 
+    const hasData = chartData && chartData.length > 0;
+
     return (
         <Card className="relative w-full overflow-hidden border border-slate-200/80 bg-slate-50/50 p-5 dark:border-slate-800 dark:bg-slate-950/40">
-            {isDemoMode && (
-                <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/60 backdrop-blur-[2px] dark:bg-slate-950/60">
-                    <div className="rounded-2xl border border-slate-200 bg-white/90 px-4 py-4 text-center shadow-lg sm:px-6 dark:border-slate-700 dark:bg-slate-800/90">
-                        <h4 className="text-lg font-black text-slate-900 dark:text-white">
-                            Sample Data Displayed
-                        </h4>
-                        <p className="mt-1 text-base leading-relaxed font-semibold text-slate-500 dark:text-slate-400">
-                            Complete an exam to see your real performance.
-                        </p>
-                    </div>
-                </div>
-            )}
-
             <div className="mb-6 flex items-center justify-between">
                 <div className="flex items-center gap-2">
                     <TrendingUp className="size-5 text-primary" />
@@ -62,7 +52,18 @@ export function ScoreHistoryChart({
                 </div>
             </div>
 
-            <div className="h-[280px] w-full">
+            {!hasData ? (
+                <EmptyChartState
+                    icon={TrendingUp}
+                    title="No exam attempts yet"
+                    description="Complete a full mock exam or diagnostic drill to start tracking your score progression over time."
+                    actionLabel="Take Mock Exam"
+                    actionHref={examsIndex()}
+                    actionIcon={Play}
+                    className="h-[280px] w-full"
+                />
+            ) : (
+                <div className="h-[280px] w-full">
                 <ChartContainer config={config} className="h-full w-full">
                     <ResponsiveContainer width="100%" height="100%">
                         <AreaChart
@@ -149,6 +150,7 @@ export function ScoreHistoryChart({
                     </ResponsiveContainer>
                 </ChartContainer>
             </div>
+            )}
         </Card>
     );
 }

@@ -10,6 +10,7 @@ import {
     CheckCircle2,
     AlertTriangle,
     Target,
+    Layers,
 } from 'lucide-react';
 import React, { useState } from 'react';
 import { Card } from '@/components/ui/card';
@@ -17,6 +18,7 @@ import { Progress } from '@/components/ui/progress';
 import { cn } from '@/lib/utils';
 import { index as drillsIndex } from '@/routes/drills';
 import type { AnalyticsCategory, SubcategoryAnalytics } from '../types';
+import { EmptyChartState } from './empty-chart-state';
 
 interface SubjectBreakdownAccordionProps {
     categories: AnalyticsCategory[];
@@ -107,6 +109,11 @@ export function SubjectBreakdownAccordion({
         setExpandedCategories({});
     };
 
+    const hasData =
+        categories &&
+        categories.length > 0 &&
+        categories.some((c) => (c.total ?? 0) > 0 || (c.percentage ?? 0) > 0);
+
     return (
         <Card className="avoid-break border border-slate-200/80 bg-slate-50/50 p-5 sm:p-6 dark:border-slate-800 dark:bg-slate-950/40">
             <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
@@ -119,25 +126,38 @@ export function SubjectBreakdownAccordion({
                         links for every subcategory.
                     </p>
                 </div>
-                <div className="flex items-center gap-2 print:hidden">
-                    <button
-                        type="button"
-                        onClick={expandAll}
-                        className="rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-xs font-bold text-slate-600 shadow-2xs transition hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300"
-                    >
-                        Expand All
-                    </button>
-                    <button
-                        type="button"
-                        onClick={collapseAll}
-                        className="rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-xs font-bold text-slate-600 shadow-2xs transition hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300"
-                    >
-                        Collapse All
-                    </button>
-                </div>
+                {hasData && (
+                    <div className="flex items-center gap-2 print:hidden">
+                        <button
+                            type="button"
+                            onClick={expandAll}
+                            className="rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-xs font-bold text-slate-600 shadow-2xs transition hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300"
+                        >
+                            Expand All
+                        </button>
+                        <button
+                            type="button"
+                            onClick={collapseAll}
+                            className="rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-xs font-bold text-slate-600 shadow-2xs transition hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300"
+                        >
+                            Collapse All
+                        </button>
+                    </div>
+                )}
             </div>
 
-            <div className="flex flex-col gap-3">
+            {!hasData ? (
+                <EmptyChartState
+                    icon={Layers}
+                    title="No syllabus breakdown available yet"
+                    description="Complete your first practice to unlock detailed subject and subcategory insights."
+                    actionLabel="Start Practice"
+                    actionHref={drillsIndex()}
+                    actionIcon={Play}
+                    className="py-10"
+                />
+            ) : (
+                <div className="flex flex-col gap-3">
                 {categories.map((category) => {
                     const isExpanded = !!expandedCategories[category.name];
                     const subcats = category.subcategories || [];
@@ -280,6 +300,7 @@ export function SubjectBreakdownAccordion({
                     );
                 })}
             </div>
+            )}
         </Card>
     );
 }

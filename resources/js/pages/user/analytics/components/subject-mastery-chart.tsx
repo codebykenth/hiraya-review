@@ -1,4 +1,4 @@
-import { Award } from 'lucide-react';
+import { Award, Play } from 'lucide-react';
 import React from 'react';
 import {
     RadialBarChart,
@@ -12,7 +12,9 @@ import {
     ChartTooltip,
     ChartTooltipContent,
 } from '@/components/ui/chart';
+import { index as drillsIndex } from '@/routes/drills';
 import type { AnalyticsCategory } from '../types';
+import { EmptyChartState } from './empty-chart-state';
 
 interface SubjectMasteryChartProps {
     categories: AnalyticsCategory[];
@@ -27,7 +29,12 @@ const RING_COLORS = [
 ];
 
 export function SubjectMasteryChart({ categories }: SubjectMasteryChartProps) {
-    const data = categories.map((cat, idx) => ({
+    const hasData =
+        categories &&
+        categories.length > 0 &&
+        categories.some((c) => (c.total ?? 0) > 0 || (c.percentage ?? 0) > 0);
+
+    const data = (categories || []).map((cat, idx) => ({
         name: cat.name.replace(' Ability', '').replace(' Information', ''),
         percentage: cat.percentage,
         fill: RING_COLORS[idx % RING_COLORS.length],
@@ -56,7 +63,18 @@ export function SubjectMasteryChart({ categories }: SubjectMasteryChartProps) {
                 </div>
             </div>
 
-            <div className="flex flex-col items-center gap-4 sm:flex-row">
+            {!hasData ? (
+                <EmptyChartState
+                    icon={Award}
+                    title="No subject accuracy data"
+                    description="Answer practice questions across exam subjects to evaluate your category mastery."
+                    actionLabel="Practice by Subject"
+                    actionHref={drillsIndex()}
+                    actionIcon={Play}
+                    className="h-[220px] w-full"
+                />
+            ) : (
+                <div className="flex flex-col items-center gap-4 sm:flex-row">
                 <div className="h-[220px] w-full max-w-[220px] shrink-0">
                     <ChartContainer config={config} className="h-full w-full">
                         <ResponsiveContainer width="100%" height="100%">
@@ -121,6 +139,7 @@ export function SubjectMasteryChart({ categories }: SubjectMasteryChartProps) {
                     ))}
                 </div>
             </div>
+            )}
         </Card>
     );
 }

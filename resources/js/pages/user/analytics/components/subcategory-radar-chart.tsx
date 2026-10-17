@@ -18,6 +18,7 @@ import {
 } from '@/components/ui/chart';
 import { index as drillsIndex } from '@/routes/drills';
 import type { AnalyticsCategory } from '../types';
+import { EmptyChartState } from './empty-chart-state';
 
 interface SubcategoryBreakdownChartProps {
     categories: AnalyticsCategory[];
@@ -84,10 +85,32 @@ export function SubcategoryRadarChart({
 
     if (rawSubs.length === 0) {
         return (
-            <Card className="flex min-h-[300px] items-center justify-center border border-slate-200/80 bg-slate-50/50 p-5 dark:border-slate-800 dark:bg-slate-950/40">
-                <p className="text-sm font-semibold text-muted-foreground">
-                    Complete more exams to see subcategory insights.
-                </p>
+            <Card className="flex flex-col justify-between border border-slate-200/80 bg-slate-50/50 p-5 dark:border-slate-800 dark:bg-slate-950/40">
+                <div>
+                    <div className="mb-4 flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                            <Target className="size-4.5 text-rose-500" />
+                            <div>
+                                <h3 className="text-sm font-black text-slate-900 dark:text-white">
+                                    Weakest Subcategories
+                                </h3>
+                                <p className="text-[10px] font-semibold text-slate-500 dark:text-slate-400">
+                                    Focus areas ranked by lowest accuracy
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <EmptyChartState
+                        icon={Target}
+                        title="No subcategory diagnostic data"
+                        description="We'll pinpoint your focus areas and generate custom drills once you answer questions."
+                        actionLabel="Explore Drills"
+                        actionHref={drillsIndex()}
+                        actionIcon={Play}
+                        className="h-[250px] w-full"
+                    />
+                </div>
             </Card>
         );
     }
