@@ -1,4 +1,5 @@
-FROM serversideup/php:8.4-fpm-nginx
+# PHP2Shell patch: pinned to 8.4.27 (fixes CVE-2026-109618 & CVE-2026-109619)
+FROM serversideup/php:8.4.27-fpm-nginx
 
 # Set working directory
 WORKDIR /var/www/html
@@ -33,8 +34,10 @@ COPY --chmod=755 scripts/00-laravel-deploy.sh /etc/entrypoint.d/00-laravel-deplo
 COPY conf/nginx/security.conf /etc/nginx/server-opts.d/security.conf
 
 # Limit PHP-FPM workers and script memory to prevent OOM on Render 512MB instances
+# PHP2Shell mitigation: disable session upload progress (CVE-2026-109618 attack surface)
 ENV PHP_FPM_PM_MAX_CHILDREN=5 \
-    PHP_MEMORY_LIMIT=128M
+    PHP_MEMORY_LIMIT=128M \
+    PHP_INI_SESSION__UPLOAD_PROGRESS__ENABLED=0
 
 # Expose port 8080 (ServerSideUp default)
 EXPOSE 8080
