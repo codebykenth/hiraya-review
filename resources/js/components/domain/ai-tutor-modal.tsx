@@ -43,7 +43,9 @@ export function AiTutorModal() {
     const messageCounter = useRef(0);
 
     const scrollToBottom = useCallback((instant = false) => {
-        messagesEndRef.current?.scrollIntoView({ behavior: instant ? 'auto' : 'smooth' });
+        messagesEndRef.current?.scrollIntoView({
+            behavior: instant ? 'auto' : 'smooth',
+        });
     }, []);
 
     useEffect(() => {
@@ -76,8 +78,11 @@ export function AiTutorModal() {
 
         try {
             const csrfToken =
-                (document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement)?.content ||
-                '';
+                (
+                    document.querySelector(
+                        'meta[name="csrf-token"]',
+                    ) as HTMLMetaElement
+                )?.content || '';
 
             const history = messages.map((m) => ({
                 role: m.role,
@@ -88,7 +93,7 @@ export function AiTutorModal() {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Accept': 'text/event-stream',
+                    Accept: 'text/event-stream',
                     'X-CSRF-TOKEN': csrfToken,
                     'X-Requested-With': 'XMLHttpRequest',
                 },
@@ -99,7 +104,9 @@ export function AiTutorModal() {
             clearTimeout(timeoutId);
 
             if (!response.ok) {
-                throw new Error(`Unable to get response from AI tutor. HTTP ${response.status}`);
+                throw new Error(
+                    `Unable to get response from AI tutor. HTTP ${response.status}`,
+                );
             }
 
             if (!response.body) {
@@ -153,17 +160,23 @@ export function AiTutorModal() {
                                     setMessages((prev) =>
                                         prev.map((m) => {
                                             if (m.id === assistantMsgId) {
-                                                const raw = (m.rawContent ?? m.content) + chunkText;
+                                                const raw =
+                                                    (m.rawContent ??
+                                                        m.content) + chunkText;
                                                 const newContent = raw.replace(
                                                     /(?:\r?\n|\s*)CITATIONS:\s*[\s\S]*$/im,
-                                                    ''
+                                                    '',
                                                 );
 
-                                                return { ...m, rawContent: raw, content: newContent };
+                                                return {
+                                                    ...m,
+                                                    rawContent: raw,
+                                                    content: newContent,
+                                                };
                                             }
 
                                             return m;
-                                        })
+                                        }),
                                     );
                                 }
 
@@ -172,9 +185,13 @@ export function AiTutorModal() {
                                     setMessages((prev) =>
                                         prev.map((m) =>
                                             m.id === assistantMsgId
-                                                ? { ...m, citations: incomingCitations }
-                                                : m
-                                        )
+                                                ? {
+                                                      ...m,
+                                                      citations:
+                                                          incomingCitations,
+                                                  }
+                                                : m,
+                                        ),
                                     );
                                 }
                             } catch {
@@ -189,7 +206,8 @@ export function AiTutorModal() {
 
             if (err instanceof Error) {
                 if (err.name === 'AbortError') {
-                    errorMsg = 'Request timed out because it took too long to load. Please try again.';
+                    errorMsg =
+                        'Request timed out because it took too long to load. Please try again.';
                 } else {
                     errorMsg = err.message;
                 }
@@ -234,7 +252,7 @@ export function AiTutorModal() {
                     <div className="flex size-7 items-center justify-center rounded-full bg-white/20 backdrop-blur-xs">
                         <Sparkles className="size-4 animate-pulse text-amber-300" />
                     </div>
-                    <span className="font-heading hidden text-sm font-bold tracking-wide sm:inline">
+                    <span className="hidden font-heading text-sm font-bold tracking-wide sm:inline">
                         Ask AI Tutor
                     </span>
                     <span className="absolute -top-1 -right-1 flex size-3">
@@ -264,7 +282,8 @@ export function AiTutorModal() {
                                         </span> */}
                                     </div>
                                     <DialogDescription className="text-xs text-muted-foreground">
-                                        Verified Philippine Civil Service syllabus notes &amp; laws
+                                        Verified Philippine Civil Service
+                                        syllabus notes &amp; laws
                                     </DialogDescription>
                                 </div>
                             </div>
@@ -294,8 +313,9 @@ export function AiTutorModal() {
                                     What would you like to review today?
                                 </h3>
                                 <p className="mt-1 max-w-2xl text-xs text-muted-foreground">
-                                    Ask any concept from Verbal Ability, Analytical Ability,
-                                    Numerical Ability, or General Information.
+                                    Ask any concept from Verbal Ability,
+                                    Analytical Ability, Numerical Ability, or
+                                    General Information.
                                 </p>
 
                                 <div className="mt-6 flex w-full max-w-2xl flex-col gap-2">
@@ -328,32 +348,49 @@ export function AiTutorModal() {
                                         )}
 
                                         <div
-                                            className={`max-w-2xl rounded-2xl p-4 text-sm leading-relaxed ${msg.role === 'user'
+                                            className={`max-w-2xl rounded-2xl p-4 text-sm leading-relaxed ${
+                                                msg.role === 'user'
                                                     ? 'bg-indigo-600 text-white dark:bg-indigo-500'
                                                     : 'border border-border/80 bg-card text-foreground shadow-xs'
-                                                }`}
+                                            }`}
                                         >
                                             {msg.role === 'user' ? (
-                                                <p className="whitespace-pre-wrap">{msg.content}</p>
+                                                <p className="whitespace-pre-wrap">
+                                                    {msg.content}
+                                                </p>
                                             ) : (
                                                 <div className="space-y-2">
-                                                    <TutorMessageContent content={msg.content} />
+                                                    <TutorMessageContent
+                                                        content={msg.content}
+                                                    />
 
-                                                    {msg.citations && msg.citations.length > 0 && (
-                                                        <div className="mt-3 flex flex-wrap items-center gap-1.5 border-t border-border/40 pt-2 text-[10px] text-muted-foreground">
-                                                            <span className="font-semibold text-indigo-600 dark:text-indigo-400">
-                                                                Syllabus Sources:
-                                                            </span>
-                                                            {msg.citations.map((cite, cIdx) => (
-                                                                <span
-                                                                    key={cIdx}
-                                                                    className="rounded bg-muted px-1.5 py-0.5 font-medium"
-                                                                >
-                                                                    {cite}
+                                                    {msg.citations &&
+                                                        msg.citations.length >
+                                                            0 && (
+                                                            <div className="mt-3 flex flex-wrap items-center gap-1.5 border-t border-border/40 pt-2 text-[10px] text-muted-foreground">
+                                                                <span className="font-semibold text-indigo-600 dark:text-indigo-400">
+                                                                    Syllabus
+                                                                    Sources:
                                                                 </span>
-                                                            ))}
-                                                        </div>
-                                                    )}
+                                                                {msg.citations.map(
+                                                                    (
+                                                                        cite,
+                                                                        cIdx,
+                                                                    ) => (
+                                                                        <span
+                                                                            key={
+                                                                                cIdx
+                                                                            }
+                                                                            className="rounded bg-muted px-1.5 py-0.5 font-medium"
+                                                                        >
+                                                                            {
+                                                                                cite
+                                                                            }
+                                                                        </span>
+                                                                    ),
+                                                                )}
+                                                            </div>
+                                                        )}
                                                 </div>
                                             )}
                                         </div>

@@ -3796,7 +3796,9 @@ export default function DevDocs() {
                                         <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">
                                             CategorySeeder
                                         </code>
-                                        : 5 core subject categories (plus optional Demographic survey section with is_demographic flag).
+                                        : 5 core subject categories (plus
+                                        optional Demographic survey section with
+                                        is_demographic flag).
                                     </li>
                                     <li>
                                         <code className="rounded bg-slate-200 px-1.5 py-0.5 font-mono text-[0.9em] font-medium text-blue-600 dark:text-blue-400">

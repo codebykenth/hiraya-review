@@ -17,6 +17,7 @@ export function AppShell({ children, variant = 'sidebar' }: Props) {
                   const match = document.cookie.match(
                       /(?:^|; )sidebar_state=([^;]*)/,
                   );
+
                   return match
                       ? match[1] === 'true'
                       : (pageProps.sidebarOpen ?? true);

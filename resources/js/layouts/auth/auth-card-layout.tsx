@@ -29,7 +29,7 @@ export default function AuthCardLayout({
                         <div className="absolute top-0 right-0 left-0 h-[4.5px] rounded-t-2xl bg-gradient-to-r from-blue-600 to-emerald-500" />
 
                         {/* Card Header */}
-                        <div className="flex flex-col items-center gap-2 px-4 pt-6 pb-0 sm:gap-3 sm:px-8 sm:pt-8 text-center">
+                        <div className="flex flex-col items-center gap-2 px-4 pt-6 pb-0 text-center sm:gap-3 sm:px-8 sm:pt-8">
                             {/* School icon */}
                             <div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-2xl border border-slate-200/50 bg-white/70 p-1 shadow-sm backdrop-blur-xl dark:border-slate-800 dark:border-slate-800/50 dark:bg-slate-900 dark:bg-slate-950/50">
                                 <AppLogoIcon className="size-10 object-contain transition-transform group-hover:scale-110" />
@@ -40,14 +40,16 @@ export default function AuthCardLayout({
                             </span>
 
                             {description && (
-                                <p className="mt-0.5 text-sm sm:text-base leading-relaxed font-medium text-slate-500 dark:text-slate-400">
+                                <p className="mt-0.5 text-sm leading-relaxed font-medium text-slate-500 sm:text-base dark:text-slate-400">
                                     {description}
                                 </p>
                             )}
                         </div>
 
                         {/* Card Content */}
-                        <div className="px-4 pt-4 pb-6 sm:px-8 sm:pt-6 sm:pb-8">{children}</div>
+                        <div className="px-4 pt-4 pb-6 sm:px-8 sm:pt-6 sm:pb-8">
+                            {children}
+                        </div>
                     </div>
                 </div>
             </main>

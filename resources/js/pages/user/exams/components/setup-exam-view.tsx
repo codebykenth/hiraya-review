@@ -248,14 +248,14 @@ export function SetupExamView({
                                 )}
                             </div>
 
-                            <p className="mt-2 text-center flex items-center justify-center gap-1.5 text-[11px] leading-relaxed text-slate-500 dark:text-slate-400">
+                            <p className="mt-2 flex items-center justify-center gap-1.5 text-center text-[11px] leading-relaxed text-slate-500 dark:text-slate-400">
                                 <Lightbulb className="size-3.5 text-amber-500" />
                                 <span>
                                     <span className="font-semibold text-slate-700 dark:text-slate-300">
                                         PDF Booklet:
                                     </span>{' '}
-                                    Automatically generates a high-resolution, A4
-                                    PDF exam booklet with answer key.
+                                    Automatically generates a high-resolution,
+                                    A4 PDF exam booklet with answer key.
                                 </span>
                             </p>
                         </div>

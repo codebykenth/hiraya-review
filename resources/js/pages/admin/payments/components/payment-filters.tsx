@@ -31,14 +31,14 @@ export function PaymentFilters({
         filters.plan !== 'all';
 
     return (
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-            <div className="relative flex-1 max-w-sm">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+        <div className="flex flex-col items-stretch justify-between gap-3 sm:flex-row sm:items-center">
+            <div className="relative max-w-sm flex-1">
+                <Search className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
                 <Input
                     placeholder="Search by ref, email, or student name..."
                     value={filters.search}
                     onChange={(e) => onFilterChange('search', e.target.value)}
-                    className="pl-9 h-9 text-xs"
+                    className="h-9 pl-9 text-xs"
                 />
             </div>
 
@@ -81,7 +81,7 @@ export function PaymentFilters({
                         variant="ghost"
                         size="sm"
                         onClick={onReset}
-                        className="h-9 text-xs gap-1 px-2.5 text-muted-foreground hover:text-foreground"
+                        className="h-9 gap-1 px-2.5 text-xs text-muted-foreground hover:text-foreground"
                     >
                         <X className="size-3.5" />
                         Reset

@@ -9,6 +9,7 @@ const listeners = new Set<() => void>();
 
 function subscribe(callback: () => void) {
     listeners.add(callback);
+
     return () => listeners.delete(callback);
 }
 
@@ -27,6 +28,7 @@ export function setOptimisticUrl(url: string | null) {
 if (typeof window !== 'undefined') {
     const handleNavigationStart = (event: any) => {
         const visit = event?.detail?.visit;
+
         if (
             !visit ||
             visit.prefetch ||
@@ -39,8 +41,10 @@ if (typeof window !== 'undefined') {
         const method = visit.method
             ? String(visit.method).toLowerCase()
             : 'get';
+
         if (method === 'get') {
             let target = '';
+
             if (typeof visit.url === 'string') {
                 target = visit.url;
             } else if (visit.url instanceof URL) {
@@ -57,17 +61,21 @@ if (typeof window !== 'undefined') {
 
     const handleNavigationError = (event?: any) => {
         const visit = event?.detail?.visit;
+
         if (visit?.prefetch) {
             return;
         }
+
         setOptimisticUrl(null);
     };
 
     const handleNavigationFinish = (event?: any) => {
         const visit = event?.detail?.visit;
+
         if (visit?.prefetch) {
             return;
         }
+
         // Fallback: clear optimistic state after React has committed the new page
         setTimeout(() => {
             setOptimisticUrl(null);
@@ -161,6 +169,7 @@ export function useCurrentUrl(): UseCurrentUrlReturn {
 
         if (!urlString.startsWith('http')) {
             const cleanUrl = urlString.split('?')[0];
+
             return comparePath(cleanUrl);
         }
 

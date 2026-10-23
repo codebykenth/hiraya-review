@@ -1,6 +1,14 @@
 import { Head, usePage, router } from '@inertiajs/react';
 import Echo from 'laravel-echo';
-import { BookOpen, CheckCircle, BarChart, ChevronDown, ChevronUp, Eye, EyeOff } from 'lucide-react';
+import {
+    BookOpen,
+    CheckCircle,
+    BarChart,
+    ChevronDown,
+    ChevronUp,
+    Eye,
+    EyeOff,
+} from 'lucide-react';
 import Pusher from 'pusher-js';
 import React from 'react';
 import { toast } from 'sonner';
@@ -94,22 +102,29 @@ export default function LearnIndex(props: LearnIndexProps) {
         return stats;
     }, [modules]);
 
-    const [isProgressVisible, setIsProgressVisible] = React.useState<boolean>(() => {
-        try {
-            const stored = localStorage.getItem('study_hub_progress_visible');
+    const [isProgressVisible, setIsProgressVisible] = React.useState<boolean>(
+        () => {
+            try {
+                const stored = localStorage.getItem(
+                    'study_hub_progress_visible',
+                );
 
-            return stored !== null ? stored === 'true' : true;
-        } catch {
-            return true;
-        }
-    });
+                return stored !== null ? stored === 'true' : true;
+            } catch {
+                return true;
+            }
+        },
+    );
 
     const toggleProgressVisibility = () => {
         setIsProgressVisible((prev) => {
             const next = !prev;
 
             try {
-                localStorage.setItem('study_hub_progress_visible', String(next));
+                localStorage.setItem(
+                    'study_hub_progress_visible',
+                    String(next),
+                );
             } catch {
                 // Ignore localStorage errors
             }
@@ -184,7 +199,7 @@ export default function LearnIndex(props: LearnIndexProps) {
 
                 {/* Overall Progress Card */}
                 {isLoggedIn && totalCount > 0 && (
-                    <div className="mb-6 rounded-xl border border-border bg-card p-4 sm:p-5 shadow-2xs transition-all duration-200">
+                    <div className="mb-6 rounded-xl border border-border bg-card p-4 shadow-2xs transition-all duration-200 sm:p-5">
                         <div className="flex items-center justify-between">
                             <div className="flex flex-wrap items-center gap-2">
                                 <span className="font-heading text-base font-bold text-foreground">
@@ -211,12 +226,16 @@ export default function LearnIndex(props: LearnIndexProps) {
                                     {isProgressVisible ? (
                                         <>
                                             <EyeOff className="size-3.5" />
-                                            <span className="hidden sm:inline">Hide</span>
+                                            <span className="hidden sm:inline">
+                                                Hide
+                                            </span>
                                         </>
                                     ) : (
                                         <>
                                             <Eye className="size-3.5" />
-                                            <span className="hidden sm:inline">Show</span>
+                                            <span className="hidden sm:inline">
+                                                Show
+                                            </span>
                                         </>
                                     )}
                                     {isProgressVisible ? (
@@ -229,7 +248,7 @@ export default function LearnIndex(props: LearnIndexProps) {
                         </div>
 
                         {isProgressVisible && (
-                            <div className="mt-3.5 animate-in fade-in-50 duration-200">
+                            <div className="mt-3.5 animate-in duration-200 fade-in-50">
                                 <div className="h-2.5 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
                                     <div
                                         className="h-full rounded-full bg-blue-600 transition-all duration-500 dark:bg-blue-500"
@@ -239,11 +258,14 @@ export default function LearnIndex(props: LearnIndexProps) {
 
                                 {/* Category Progress Grid */}
                                 {(() => {
-                                    const visibleCategories = activeCategories.filter(
-                                        (cat) =>
-                                            cat.name !== 'Clerical Ability' ||
-                                            (categoryStats[cat.name]?.total ?? 0) > 0,
-                                    );
+                                    const visibleCategories =
+                                        activeCategories.filter(
+                                            (cat) =>
+                                                cat.name !==
+                                                    'Clerical Ability' ||
+                                                (categoryStats[cat.name]
+                                                    ?.total ?? 0) > 0,
+                                        );
 
                                     return (
                                         <div
@@ -265,7 +287,9 @@ export default function LearnIndex(props: LearnIndexProps) {
                                                           )
                                                         : 0;
                                                 const barColor =
-                                                    progressBarColors[cat.name] ||
+                                                    progressBarColors[
+                                                        cat.name
+                                                    ] ||
                                                     'bg-slate-500 dark:bg-slate-400';
 
                                                 return (
@@ -294,7 +318,8 @@ export default function LearnIndex(props: LearnIndexProps) {
                                                         </div>
                                                         <span className="mt-0.5 text-xs font-semibold text-muted-foreground/80">
                                                             {stats.completed} of{' '}
-                                                            {stats.total} modules
+                                                            {stats.total}{' '}
+                                                            modules
                                                         </span>
                                                     </div>
                                                 );

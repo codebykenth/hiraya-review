@@ -35,7 +35,7 @@ export function EmptyChartState({
             <h4 className="text-sm font-black text-slate-800 dark:text-slate-100">
                 {title}
             </h4>
-            <p className="mt-1 max-w-xs text-xs font-medium leading-relaxed text-slate-500 dark:text-slate-400">
+            <p className="mt-1 max-w-xs text-xs leading-relaxed font-medium text-slate-500 dark:text-slate-400">
                 {description}
             </p>
             {actionLabel && actionHref && (

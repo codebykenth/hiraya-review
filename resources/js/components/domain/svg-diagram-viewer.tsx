@@ -165,6 +165,7 @@ export function SvgDiagramViewer({
             // If missing viewBox, infer from width/height if available
             const wMatch = clean.match(/width=["'](\d+)["']/i);
             const hMatch = clean.match(/height=["'](\d+)["']/i);
+
             if (wMatch && hMatch) {
                 clean = clean.replace(
                     /^<svg/i,
@@ -213,11 +214,13 @@ export function SvgDiagramViewer({
                             className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-border/60 bg-background/80 px-2.5 py-1 text-xs font-semibold text-muted-foreground shadow-2xs backdrop-blur-xs transition hover:border-indigo-300 hover:bg-indigo-50 hover:text-indigo-600 active:scale-95 dark:hover:border-indigo-800 dark:hover:bg-indigo-950/50 dark:hover:text-indigo-300"
                         >
                             <ZoomIn className="size-3.5" />
-                            <span className="hidden sm:inline">Inspect / Zoom</span>
+                            <span className="hidden sm:inline">
+                                Inspect / Zoom
+                            </span>
                             <span className="sm:hidden">Zoom</span>
                         </button>
                     </DialogTrigger>
-                    <DialogContent className="max-w-4xl border border-border bg-card p-4 sm:p-6 sm:rounded-2xl">
+                    <DialogContent className="max-w-4xl border border-border bg-card p-4 sm:rounded-2xl sm:p-6">
                         <DialogHeader className="mb-3">
                             <DialogTitle className="flex items-center gap-2 font-heading text-base font-bold text-foreground">
                                 <Shapes className="size-4 text-indigo-600 dark:text-indigo-400" />
@@ -225,7 +228,7 @@ export function SvgDiagramViewer({
                             </DialogTitle>
                         </DialogHeader>
                         <div
-                            className="flex max-h-[80vh] w-full items-center justify-center overflow-auto rounded-xl bg-background/50 p-2 sm:p-4 [&_text]:font-sans [&_text]:select-none dark:[&_text[fill='#000']]:fill-slate-100 dark:[&_text[fill='#000000']]:fill-slate-100 dark:[&_text[fill='#1e293b']]:fill-slate-200 dark:[&_text[fill='#0f172a']]:fill-slate-100 dark:[&_text[fill='#334155']]:fill-slate-200 dark:[&_line[stroke='#000']]:stroke-slate-400 dark:[&_line[stroke='#000000']]:stroke-slate-400"
+                            className="flex max-h-[80vh] w-full items-center justify-center overflow-auto rounded-xl bg-background/50 p-2 sm:p-4 dark:[&_line[stroke='#000']]:stroke-slate-400 dark:[&_line[stroke='#000000']]:stroke-slate-400 [&_text]:font-sans [&_text]:select-none dark:[&_text[fill='#000']]:fill-slate-100 dark:[&_text[fill='#000000']]:fill-slate-100 dark:[&_text[fill='#0f172a']]:fill-slate-100 dark:[&_text[fill='#1e293b']]:fill-slate-200 dark:[&_text[fill='#334155']]:fill-slate-200"
                             dangerouslySetInnerHTML={{ __html: modalSvg }}
                         />
                     </DialogContent>
@@ -233,7 +236,7 @@ export function SvgDiagramViewer({
             </div>
 
             <div
-                className="group relative flex w-full items-center justify-center overflow-x-auto rounded-xl bg-background/60 p-2 select-none sm:p-4 [&_text]:font-sans dark:[&_text[fill='#000']]:fill-slate-100 dark:[&_text[fill='#000000']]:fill-slate-100 dark:[&_text[fill='#1e293b']]:fill-slate-200 dark:[&_text[fill='#0f172a']]:fill-slate-100 dark:[&_text[fill='#334155']]:fill-slate-200 dark:[&_line[stroke='#000']]:stroke-slate-400 dark:[&_line[stroke='#000000']]:stroke-slate-400"
+                className="group relative flex w-full items-center justify-center overflow-x-auto rounded-xl bg-background/60 p-2 select-none sm:p-4 dark:[&_line[stroke='#000']]:stroke-slate-400 dark:[&_line[stroke='#000000']]:stroke-slate-400 [&_text]:font-sans dark:[&_text[fill='#000']]:fill-slate-100 dark:[&_text[fill='#000000']]:fill-slate-100 dark:[&_text[fill='#0f172a']]:fill-slate-100 dark:[&_text[fill='#1e293b']]:fill-slate-200 dark:[&_text[fill='#334155']]:fill-slate-200"
                 dangerouslySetInnerHTML={{ __html: sanitizedSvg }}
             />
         </div>

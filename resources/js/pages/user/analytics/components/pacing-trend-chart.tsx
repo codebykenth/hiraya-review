@@ -1,4 +1,11 @@
-import { Clock, AlertCircle, CheckCircle2, Zap, Lightbulb, Play } from 'lucide-react';
+import {
+    Clock,
+    AlertCircle,
+    CheckCircle2,
+    Zap,
+    Lightbulb,
+    Play,
+} from 'lucide-react';
 import React, { useMemo } from 'react';
 import {
     ComposedChart,
@@ -144,108 +151,111 @@ export function PacingTrendChart({ data }: PacingTrendChartProps) {
                     />
                 ) : (
                     <div className="h-52.5 w-full">
-                    <ChartContainer config={config} className="h-full w-full">
-                        <ResponsiveContainer width="100%" height="100%">
-                            <ComposedChart
-                                data={data}
-                                margin={{
-                                    top: 10,
-                                    right: 0,
-                                    left: 0,
-                                    bottom: 0,
-                                }}
-                            >
-                                <CartesianGrid
-                                    strokeDasharray="3 3"
-                                    vertical={false}
-                                    stroke="var(--border)"
-                                    opacity={0.5}
-                                />
-                                <XAxis
-                                    dataKey="name"
-                                    tickLine={false}
-                                    axisLine={false}
-                                    tickMargin={10}
-                                    tick={{
-                                        fontSize: 10,
-                                        fill: 'var(--muted-foreground)',
+                        <ChartContainer
+                            config={config}
+                            className="h-full w-full"
+                        >
+                            <ResponsiveContainer width="100%" height="100%">
+                                <ComposedChart
+                                    data={data}
+                                    margin={{
+                                        top: 10,
+                                        right: 0,
+                                        left: 0,
+                                        bottom: 0,
                                     }}
-                                />
-                                <YAxis
-                                    yAxisId="left"
-                                    tickLine={false}
-                                    axisLine={false}
-                                    tickMargin={8}
-                                    width={36}
-                                    domain={[0, 'auto']}
-                                    tick={{
-                                        fontSize: 10,
-                                        fill: 'var(--muted-foreground)',
-                                    }}
-                                    tickFormatter={(val) => `${val}s`}
-                                />
-                                <YAxis
-                                    yAxisId="right"
-                                    orientation="right"
-                                    tickLine={false}
-                                    axisLine={false}
-                                    tickMargin={8}
-                                    width={42}
-                                    tick={{
-                                        fontSize: 10,
-                                        fill: 'var(--muted-foreground)',
-                                    }}
-                                    tickFormatter={(val) => `${val}%`}
-                                    domain={[0, 100]}
-                                />
-                                <ReferenceLine
-                                    yAxisId="left"
-                                    y={54}
-                                    stroke="hsl(var(--destructive))"
-                                    strokeDasharray="3 3"
-                                    label={{
-                                        value: '54s Target',
-                                        position: 'insideTopRight',
-                                        fill: 'hsl(var(--destructive))',
-                                        fontSize: 10,
-                                        fontWeight: 700,
-                                    }}
-                                />
-                                <ChartTooltip
-                                    content={
-                                        <ChartTooltipContent indicator="line" />
-                                    }
-                                />
-                                <ChartLegend
-                                    content={<ChartLegendContent />}
-                                    className="-translate-y-2 flex-wrap gap-2 text-xs *:justify-center"
-                                />
+                                >
+                                    <CartesianGrid
+                                        strokeDasharray="3 3"
+                                        vertical={false}
+                                        stroke="var(--border)"
+                                        opacity={0.5}
+                                    />
+                                    <XAxis
+                                        dataKey="name"
+                                        tickLine={false}
+                                        axisLine={false}
+                                        tickMargin={10}
+                                        tick={{
+                                            fontSize: 10,
+                                            fill: 'var(--muted-foreground)',
+                                        }}
+                                    />
+                                    <YAxis
+                                        yAxisId="left"
+                                        tickLine={false}
+                                        axisLine={false}
+                                        tickMargin={8}
+                                        width={36}
+                                        domain={[0, 'auto']}
+                                        tick={{
+                                            fontSize: 10,
+                                            fill: 'var(--muted-foreground)',
+                                        }}
+                                        tickFormatter={(val) => `${val}s`}
+                                    />
+                                    <YAxis
+                                        yAxisId="right"
+                                        orientation="right"
+                                        tickLine={false}
+                                        axisLine={false}
+                                        tickMargin={8}
+                                        width={42}
+                                        tick={{
+                                            fontSize: 10,
+                                            fill: 'var(--muted-foreground)',
+                                        }}
+                                        tickFormatter={(val) => `${val}%`}
+                                        domain={[0, 100]}
+                                    />
+                                    <ReferenceLine
+                                        yAxisId="left"
+                                        y={54}
+                                        stroke="hsl(var(--destructive))"
+                                        strokeDasharray="3 3"
+                                        label={{
+                                            value: '54s Target',
+                                            position: 'insideTopRight',
+                                            fill: 'hsl(var(--destructive))',
+                                            fontSize: 10,
+                                            fontWeight: 700,
+                                        }}
+                                    />
+                                    <ChartTooltip
+                                        content={
+                                            <ChartTooltipContent indicator="line" />
+                                        }
+                                    />
+                                    <ChartLegend
+                                        content={<ChartLegendContent />}
+                                        className="-translate-y-2 flex-wrap gap-2 text-xs *:justify-center"
+                                    />
 
-                                {/* Bar for Time, Line for Accuracy */}
-                                <Bar
-                                    yAxisId="left"
-                                    dataKey="secondsPerQuestion"
-                                    fill="var(--color-secondsPerQuestion)"
-                                    radius={[4, 4, 0, 0]}
-                                    maxBarSize={28}
-                                    opacity={0.85}
-                                />
-                                <Line
-                                    yAxisId="right"
-                                    type="monotone"
-                                    dataKey="accuracy"
-                                    stroke="var(--color-accuracy)"
-                                    strokeWidth={3}
-                                    dot={{
-                                        r: 3.5,
-                                        fill: 'var(--color-accuracy)',
-                                    }}
-                                />
-                            </ComposedChart>
-                        </ResponsiveContainer>
-                    </ChartContainer>
-                </div>
-            )}
+                                    {/* Bar for Time, Line for Accuracy */}
+                                    <Bar
+                                        yAxisId="left"
+                                        dataKey="secondsPerQuestion"
+                                        fill="var(--color-secondsPerQuestion)"
+                                        radius={[4, 4, 0, 0]}
+                                        maxBarSize={28}
+                                        opacity={0.85}
+                                    />
+                                    <Line
+                                        yAxisId="right"
+                                        type="monotone"
+                                        dataKey="accuracy"
+                                        stroke="var(--color-accuracy)"
+                                        strokeWidth={3}
+                                        dot={{
+                                            r: 3.5,
+                                            fill: 'var(--color-accuracy)',
+                                        }}
+                                    />
+                                </ComposedChart>
+                            </ResponsiveContainer>
+                        </ChartContainer>
+                    </div>
+                )}
             </div>
 
             {/* Pacing Tip Footer */}

@@ -1,6 +1,6 @@
 import { router } from '@inertiajs/react';
-import { AlertCircle, CheckCircle2, FlaskConical, Play, Sparkles, Terminal } from 'lucide-react';
-import React, { useState } from 'react';
+import { AlertCircle, FlaskConical, Play, Terminal } from 'lucide-react';
+import { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -11,7 +11,10 @@ interface DevSandboxBannerProps {
     pendingPayments: PaymentItem[];
 }
 
-export function DevSandboxBanner({ sandbox, pendingPayments }: DevSandboxBannerProps) {
+export function DevSandboxBanner({
+    sandbox,
+    pendingPayments,
+}: DevSandboxBannerProps) {
     const [simulatingId, setSimulatingId] = useState<number | null>(null);
 
     const handleSimulate = (paymentId: number, status: 'paid' | 'failed') => {
@@ -22,7 +25,7 @@ export function DevSandboxBanner({ sandbox, pendingPayments }: DevSandboxBannerP
             {
                 preserveScroll: true,
                 onFinish: () => setSimulatingId(null),
-            }
+            },
         );
     };
 
@@ -39,24 +42,32 @@ export function DevSandboxBanner({ sandbox, pendingPayments }: DevSandboxBannerP
                                 <h3 className="text-sm font-semibold tracking-tight text-foreground">
                                     Xendit Development Sandbox Mode Active
                                 </h3>
-                                <Badge variant="outline" className="border-amber-500/40 text-amber-600 dark:text-amber-400 text-xs">
+                                <Badge
+                                    variant="outline"
+                                    className="border-amber-500/40 text-xs text-amber-600 dark:text-amber-400"
+                                >
                                     Dev Only
                                 </Badge>
                                 {!sandbox.is_configured && (
-                                    <Badge variant="destructive" className="text-xs">
+                                    <Badge
+                                        variant="destructive"
+                                        className="text-xs"
+                                    >
                                         Mock Mode (No Secret Key)
                                     </Badge>
                                 )}
                             </div>
-                            <p className="text-xs text-muted-foreground leading-relaxed">
-                                Payments in this environment run through Xendit's simulated test flow. No actual charges are made.
-                                You can test using simulated GCash, Maya, or test card numbers.
+                            <p className="text-xs leading-relaxed text-muted-foreground">
+                                Payments in this environment run through
+                                Xendit's simulated test flow. No actual charges
+                                are made. You can test using simulated GCash,
+                                Maya, or test card numbers.
                             </p>
                         </div>
                     </div>
 
                     <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-                        <span className="flex items-center gap-1 font-mono text-[11px] bg-background/80 px-2.5 py-1 rounded border border-border">
+                        <span className="flex items-center gap-1 rounded border border-border bg-background/80 px-2.5 py-1 font-mono text-[11px]">
                             <Terminal className="size-3 text-muted-foreground" />
                             GCash / Maya Simulation Enabled
                         </span>
@@ -66,22 +77,30 @@ export function DevSandboxBanner({ sandbox, pendingPayments }: DevSandboxBannerP
                 {/* Quick Simulation Trigger for local dev */}
                 {pendingPayments.length > 0 && (
                     <div className="mt-4 border-t border-amber-500/20 pt-3">
-                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                            <span className="text-xs font-medium text-foreground flex items-center gap-1.5">
+                        <div className="flex flex-col justify-between gap-2 sm:flex-row sm:items-center">
+                            <span className="flex items-center gap-1.5 text-xs font-medium text-foreground">
                                 <AlertCircle className="size-3.5 text-amber-500" />
-                                {pendingPayments.length} pending dev payment(s) awaiting webhook:
+                                {pendingPayments.length} pending dev payment(s)
+                                awaiting webhook:
                             </span>
 
                             <div className="flex flex-wrap items-center gap-2">
                                 {pendingPayments.map((p) => (
-                                    <div key={p.id} className="flex items-center gap-1.5 bg-background/90 px-2 py-1 rounded-md border text-xs">
-                                        <span className="font-mono text-[11px] text-muted-foreground">{p.reference_id}</span>
+                                    <div
+                                        key={p.id}
+                                        className="flex items-center gap-1.5 rounded-md border bg-background/90 px-2 py-1 text-xs"
+                                    >
+                                        <span className="font-mono text-[11px] text-muted-foreground">
+                                            {p.reference_id}
+                                        </span>
                                         <Button
                                             size="sm"
                                             variant="secondary"
-                                            className="h-6 text-[11px] px-2 gap-1"
+                                            className="h-6 gap-1 px-2 text-[11px]"
                                             disabled={simulatingId === p.id}
-                                            onClick={() => handleSimulate(p.id, 'paid')}
+                                            onClick={() =>
+                                                handleSimulate(p.id, 'paid')
+                                            }
                                         >
                                             <Play className="size-2.5 text-emerald-500" />
                                             Simulate Paid

@@ -485,7 +485,7 @@ export function CalendarGrid({
                                                                     );
                                                                 }
                                                             }}
-                                                            className={`group relative cursor-pointer rounded-xl border p-1.5 sm:p-2.5 shadow-sm transition-all duration-200 hover:shadow-md ${
+                                                            className={`group relative cursor-pointer rounded-xl border p-1.5 shadow-sm transition-all duration-200 hover:shadow-md sm:p-2.5 ${
                                                                 schedule.is_done
                                                                     ? 'border-emerald-300/70 bg-emerald-50/50 dark:border-emerald-900/40 dark:bg-emerald-950/20'
                                                                     : isOverdue
@@ -494,7 +494,7 @@ export function CalendarGrid({
                                                             }`}
                                                         >
                                                             {/* Action Buttons (Inline on Mobile, Top Right on Desktop Hover) */}
-                                                            <div className="mb-1.5 flex items-center justify-end gap-1 opacity-100 lg:absolute lg:right-1.5 lg:top-1.5 lg:z-10 lg:mb-0 lg:gap-0.5 lg:rounded-md lg:bg-white/90 lg:p-0.5 lg:opacity-0 lg:backdrop-blur-sm lg:transition-opacity lg:group-hover:opacity-100 dark:lg:bg-slate-900/90">
+                                                            <div className="mb-1.5 flex items-center justify-end gap-1 opacity-100 lg:absolute lg:top-1.5 lg:right-1.5 lg:z-10 lg:mb-0 lg:gap-0.5 lg:rounded-md lg:bg-white/90 lg:p-0.5 lg:opacity-0 lg:backdrop-blur-sm lg:transition-opacity lg:group-hover:opacity-100 dark:lg:bg-slate-900/90">
                                                                 {onOpenStudyDrawer && (
                                                                     <button
                                                                         type="button"
@@ -550,7 +550,7 @@ export function CalendarGrid({
                                                             </div>
 
                                                             {/* Checkbox and Title */}
-                                                            <div className="flex items-start gap-1 sm:gap-1.5 pr-0.5 sm:pr-1">
+                                                            <div className="flex items-start gap-1 pr-0.5 sm:gap-1.5 sm:pr-1">
                                                                 <button
                                                                     type="button"
                                                                     onClick={async (
@@ -578,7 +578,7 @@ export function CalendarGrid({
                                                                 </button>
                                                                 <div className="min-w-0 flex-1">
                                                                     <span
-                                                                        className={`block text-[11px] sm:text-xs leading-tight sm:leading-snug font-bold break-words ${
+                                                                        className={`block text-[11px] leading-tight font-bold break-words sm:text-xs sm:leading-snug ${
                                                                             schedule.is_done
                                                                                 ? 'text-slate-400 line-through dark:text-slate-500'
                                                                                 : 'text-slate-900 dark:text-white'
@@ -617,7 +617,7 @@ export function CalendarGrid({
 
                                                             {cleanDesc && (
                                                                 <p
-                                                                    className={`mt-1 line-clamp-2 text-[10px] sm:text-[11px] leading-tight ${
+                                                                    className={`mt-1 line-clamp-2 text-[10px] leading-tight sm:text-[11px] ${
                                                                         schedule.is_done
                                                                             ? 'text-slate-400 line-through dark:text-slate-500'
                                                                             : 'text-slate-600 dark:text-slate-300'
@@ -628,7 +628,7 @@ export function CalendarGrid({
                                                             )}
 
                                                             {/* Practice Drill & Learn Launchers */}
-                                                            <div className="mt-1.5 sm:mt-2 flex flex-wrap items-center gap-1">
+                                                            <div className="mt-1.5 flex flex-wrap items-center gap-1 sm:mt-2">
                                                                 <Link
                                                                     href={buildDrillUrl()}
                                                                     onClick={(

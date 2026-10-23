@@ -759,7 +759,8 @@ export default function DraftsLearnList({
                                                         setPreviewMode(
                                                             (prev) => ({
                                                                 ...prev,
-                                                                [m.id]: 'preview',
+                                                                [m.id]:
+                                                                    'preview',
                                                             }),
                                                         )
                                                     }

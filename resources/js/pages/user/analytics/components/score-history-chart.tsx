@@ -23,9 +23,7 @@ interface ScoreHistoryChartProps {
     isDemoMode?: boolean;
 }
 
-export function ScoreHistoryChart({
-    chartData,
-}: ScoreHistoryChartProps) {
+export function ScoreHistoryChart({ chartData }: ScoreHistoryChartProps) {
     const config = {
         score: {
             label: 'Overall Score',
@@ -64,92 +62,92 @@ export function ScoreHistoryChart({
                 />
             ) : (
                 <div className="h-[280px] w-full">
-                <ChartContainer config={config} className="h-full w-full">
-                    <ResponsiveContainer width="100%" height="100%">
-                        <AreaChart
-                            data={chartData}
-                            margin={{
-                                top: 10,
-                                right: 10,
-                                left: 0,
-                                bottom: 0,
-                            }}
-                        >
-                            <defs>
-                                <linearGradient
-                                    id="fillScore"
-                                    x1="0"
-                                    y1="0"
-                                    x2="0"
-                                    y2="1"
-                                >
-                                    <stop
-                                        offset="5%"
-                                        stopColor="var(--color-score)"
-                                        stopOpacity={0.3}
-                                    />
-                                    <stop
-                                        offset="95%"
-                                        stopColor="var(--color-score)"
-                                        stopOpacity={0.0}
-                                    />
-                                </linearGradient>
-                            </defs>
-                            <CartesianGrid
-                                strokeDasharray="3 3"
-                                vertical={false}
-                                stroke="var(--border)"
-                                opacity={0.5}
-                            />
-                            <XAxis
-                                dataKey="name"
-                                tickLine={false}
-                                axisLine={false}
-                                tickMargin={12}
-                                tick={{
-                                    fontSize: 11,
-                                    fill: 'var(--muted-foreground)',
+                    <ChartContainer config={config} className="h-full w-full">
+                        <ResponsiveContainer width="100%" height="100%">
+                            <AreaChart
+                                data={chartData}
+                                margin={{
+                                    top: 10,
+                                    right: 10,
+                                    left: 0,
+                                    bottom: 0,
                                 }}
-                            />
-                            <YAxis
-                                tickLine={false}
-                                axisLine={false}
-                                tickMargin={8}
-                                width={42}
-                                tick={{
-                                    fontSize: 11,
-                                    fill: 'var(--muted-foreground)',
-                                }}
-                                tickFormatter={(value) => `${value}%`}
-                                domain={[0, 100]}
-                            />
-                            <ChartTooltip
-                                cursor={{
-                                    stroke: 'var(--border)',
-                                    strokeWidth: 2,
-                                    strokeDasharray: '4 4',
-                                }}
-                                content={
-                                    <ChartTooltipContent indicator="line" />
-                                }
-                            />
-                            <Area
-                                type="monotone"
-                                dataKey="score"
-                                stroke="var(--color-score)"
-                                strokeWidth={3}
-                                fill="url(#fillScore)"
-                                activeDot={{
-                                    r: 6,
-                                    fill: 'var(--color-score)',
-                                    stroke: 'var(--background)',
-                                    strokeWidth: 2,
-                                }}
-                            />
-                        </AreaChart>
-                    </ResponsiveContainer>
-                </ChartContainer>
-            </div>
+                            >
+                                <defs>
+                                    <linearGradient
+                                        id="fillScore"
+                                        x1="0"
+                                        y1="0"
+                                        x2="0"
+                                        y2="1"
+                                    >
+                                        <stop
+                                            offset="5%"
+                                            stopColor="var(--color-score)"
+                                            stopOpacity={0.3}
+                                        />
+                                        <stop
+                                            offset="95%"
+                                            stopColor="var(--color-score)"
+                                            stopOpacity={0.0}
+                                        />
+                                    </linearGradient>
+                                </defs>
+                                <CartesianGrid
+                                    strokeDasharray="3 3"
+                                    vertical={false}
+                                    stroke="var(--border)"
+                                    opacity={0.5}
+                                />
+                                <XAxis
+                                    dataKey="name"
+                                    tickLine={false}
+                                    axisLine={false}
+                                    tickMargin={12}
+                                    tick={{
+                                        fontSize: 11,
+                                        fill: 'var(--muted-foreground)',
+                                    }}
+                                />
+                                <YAxis
+                                    tickLine={false}
+                                    axisLine={false}
+                                    tickMargin={8}
+                                    width={42}
+                                    tick={{
+                                        fontSize: 11,
+                                        fill: 'var(--muted-foreground)',
+                                    }}
+                                    tickFormatter={(value) => `${value}%`}
+                                    domain={[0, 100]}
+                                />
+                                <ChartTooltip
+                                    cursor={{
+                                        stroke: 'var(--border)',
+                                        strokeWidth: 2,
+                                        strokeDasharray: '4 4',
+                                    }}
+                                    content={
+                                        <ChartTooltipContent indicator="line" />
+                                    }
+                                />
+                                <Area
+                                    type="monotone"
+                                    dataKey="score"
+                                    stroke="var(--color-score)"
+                                    strokeWidth={3}
+                                    fill="url(#fillScore)"
+                                    activeDot={{
+                                        r: 6,
+                                        fill: 'var(--color-score)',
+                                        stroke: 'var(--background)',
+                                        strokeWidth: 2,
+                                    }}
+                                />
+                            </AreaChart>
+                        </ResponsiveContainer>
+                    </ChartContainer>
+                </div>
             )}
         </Card>
     );

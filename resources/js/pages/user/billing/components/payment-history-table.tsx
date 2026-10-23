@@ -1,9 +1,21 @@
 import { router } from '@inertiajs/react';
-import { ArrowUpRight, CheckCircle2, Clock, ExternalLink, RotateCw, XCircle } from 'lucide-react';
-import React, { useState } from 'react';
+import {
+    CheckCircle2,
+    Clock,
+    ExternalLink,
+    RotateCw,
+    XCircle,
+} from 'lucide-react';
+import { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from '@/components/ui/card';
 import type { PaymentItem } from '../types';
 
 interface PaymentHistoryTableProps {
@@ -21,7 +33,7 @@ export function PaymentHistoryTable({ payments }: PaymentHistoryTableProps) {
             {
                 preserveScroll: true,
                 onFinish: () => setSyncingId(null),
-            }
+            },
         );
     };
 
@@ -29,13 +41,17 @@ export function PaymentHistoryTable({ payments }: PaymentHistoryTableProps) {
         return (
             <Card className="border-border/60">
                 <CardHeader>
-                    <CardTitle className="text-base font-semibold">Payment History</CardTitle>
+                    <CardTitle className="text-base font-semibold">
+                        Payment History
+                    </CardTitle>
                     <CardDescription className="text-xs">
-                        Records of past transactions, receipts, and membership upgrades.
+                        Records of past transactions, receipts, and membership
+                        upgrades.
                     </CardDescription>
                 </CardHeader>
                 <CardContent className="py-8 text-center text-xs text-muted-foreground">
-                    No transactions recorded yet. When you upgrade, your payment details will appear here.
+                    No transactions recorded yet. When you upgrade, your payment
+                    details will appear here.
                 </CardContent>
             </Card>
         );
@@ -45,14 +61,20 @@ export function PaymentHistoryTable({ payments }: PaymentHistoryTableProps) {
         switch (status) {
             case 'paid':
                 return (
-                    <Badge variant="outline" className="border-emerald-500/40 text-emerald-600 dark:text-emerald-400 bg-emerald-500/5 text-xs gap-1">
+                    <Badge
+                        variant="outline"
+                        className="gap-1 border-emerald-500/40 bg-emerald-500/5 text-xs text-emerald-600 dark:text-emerald-400"
+                    >
                         <CheckCircle2 className="size-3" />
                         Paid
                     </Badge>
                 );
             case 'pending':
                 return (
-                    <Badge variant="outline" className="border-amber-500/40 text-amber-600 dark:text-amber-400 bg-amber-500/5 text-xs gap-1">
+                    <Badge
+                        variant="outline"
+                        className="gap-1 border-amber-500/40 bg-amber-500/5 text-xs text-amber-600 dark:text-amber-400"
+                    >
                         <Clock className="size-3" />
                         Pending
                     </Badge>
@@ -60,7 +82,10 @@ export function PaymentHistoryTable({ payments }: PaymentHistoryTableProps) {
             case 'failed':
             case 'expired':
                 return (
-                    <Badge variant="outline" className="border-destructive/40 text-destructive bg-destructive/5 text-xs gap-1">
+                    <Badge
+                        variant="outline"
+                        className="gap-1 border-destructive/40 bg-destructive/5 text-xs text-destructive"
+                    >
                         <XCircle className="size-3" />
                         {status === 'expired' ? 'Expired' : 'Failed'}
                     </Badge>
@@ -71,17 +96,20 @@ export function PaymentHistoryTable({ payments }: PaymentHistoryTableProps) {
     };
 
     return (
-        <Card className="border-border/60 overflow-hidden">
+        <Card className="overflow-hidden border-border/60">
             <CardHeader className="pb-3">
-                <CardTitle className="text-base font-semibold">Payment History</CardTitle>
+                <CardTitle className="text-base font-semibold">
+                    Payment History
+                </CardTitle>
                 <CardDescription className="text-xs">
-                    Review past transaction receipts, references, and billing statuses.
+                    Review past transaction receipts, references, and billing
+                    statuses.
                 </CardDescription>
             </CardHeader>
             <CardContent className="p-0">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left text-xs">
-                        <thead className="bg-muted/50 border-y border-border/60 text-muted-foreground font-medium">
+                        <thead className="border-y border-border/60 bg-muted/50 font-medium text-muted-foreground">
                             <tr>
                                 <th className="px-4 py-2.5">Reference</th>
                                 <th className="px-4 py-2.5">Plan</th>
@@ -89,39 +117,53 @@ export function PaymentHistoryTable({ payments }: PaymentHistoryTableProps) {
                                 <th className="px-4 py-2.5">Method</th>
                                 <th className="px-4 py-2.5">Status</th>
                                 <th className="px-4 py-2.5">Date</th>
-                                <th className="px-4 py-2.5 text-right">Action</th>
+                                <th className="px-4 py-2.5 text-right">
+                                    Action
+                                </th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-border/40">
                             {payments.map((p) => (
-                                <tr key={p.id} className="hover:bg-muted/30 transition-colors">
+                                <tr
+                                    key={p.id}
+                                    className="transition-colors hover:bg-muted/30"
+                                >
                                     <td className="px-4 py-3 font-mono font-medium text-foreground">
                                         {p.reference_id}
                                     </td>
-                                    <td className="px-4 py-3 text-foreground font-medium">
+                                    <td className="px-4 py-3 font-medium text-foreground">
                                         {p.plan_name}
                                     </td>
                                     <td className="px-4 py-3 font-semibold text-foreground">
-                                        ₱{p.amount.toLocaleString('en-PH', { minimumFractionDigits: 2 })}
+                                        ₱
+                                        {p.amount.toLocaleString('en-PH', {
+                                            minimumFractionDigits: 2,
+                                        })}
                                     </td>
                                     <td className="px-4 py-3 text-muted-foreground">
                                         {p.payment_method ? (
-                                            <span className="font-mono uppercase text-[11px] bg-muted px-1.5 py-0.5 rounded">
+                                            <span className="rounded bg-muted px-1.5 py-0.5 font-mono text-[11px] uppercase">
                                                 {p.payment_method}
                                             </span>
                                         ) : (
-                                            <span className="text-muted-foreground/60">—</span>
+                                            <span className="text-muted-foreground/60">
+                                                —
+                                            </span>
                                         )}
                                     </td>
                                     <td className="px-4 py-3">
                                         {getStatusBadge(p.status)}
                                     </td>
-                                    <td className="px-4 py-3 text-muted-foreground whitespace-nowrap">
-                                        {p.created_at ? new Date(p.created_at).toLocaleDateString('en-PH', {
-                                            month: 'short',
-                                            day: 'numeric',
-                                            year: 'numeric',
-                                        }) : '—'}
+                                    <td className="px-4 py-3 whitespace-nowrap text-muted-foreground">
+                                        {p.created_at
+                                            ? new Date(
+                                                  p.created_at,
+                                              ).toLocaleDateString('en-PH', {
+                                                  month: 'short',
+                                                  day: 'numeric',
+                                                  year: 'numeric',
+                                              })
+                                            : '—'}
                                     </td>
                                     <td className="px-4 py-3 text-right">
                                         {p.status === 'pending' ? (
@@ -129,12 +171,18 @@ export function PaymentHistoryTable({ payments }: PaymentHistoryTableProps) {
                                                 <Button
                                                     variant="ghost"
                                                     size="sm"
-                                                    className="h-6 px-1.5 text-[11px] gap-1 text-muted-foreground hover:text-foreground"
-                                                    disabled={syncingId === p.id}
-                                                    onClick={() => handleSync(p.id)}
+                                                    className="h-6 gap-1 px-1.5 text-[11px] text-muted-foreground hover:text-foreground"
+                                                    disabled={
+                                                        syncingId === p.id
+                                                    }
+                                                    onClick={() =>
+                                                        handleSync(p.id)
+                                                    }
                                                     title="Query Xendit for latest status"
                                                 >
-                                                    <RotateCw className={`size-3 ${syncingId === p.id ? 'animate-spin' : ''}`} />
+                                                    <RotateCw
+                                                        className={`size-3 ${syncingId === p.id ? 'animate-spin' : ''}`}
+                                                    />
                                                     <span>Sync</span>
                                                 </Button>
                                                 {p.checkout_url && (
@@ -144,12 +192,15 @@ export function PaymentHistoryTable({ payments }: PaymentHistoryTableProps) {
                                                         rel="noreferrer"
                                                         className="inline-flex items-center gap-1 text-[11px] font-medium text-primary hover:underline"
                                                     >
-                                                        Pay <ExternalLink className="size-3" />
+                                                        Pay{' '}
+                                                        <ExternalLink className="size-3" />
                                                     </a>
                                                 )}
                                             </div>
                                         ) : (
-                                            <span className="text-muted-foreground/40 text-[11px]">—</span>
+                                            <span className="text-[11px] text-muted-foreground/40">
+                                                —
+                                            </span>
                                         )}
                                     </td>
                                 </tr>

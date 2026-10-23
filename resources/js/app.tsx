@@ -63,6 +63,7 @@ config.set('prefetch.cacheFor', ['10m', '24h']);
 // Re-cache previously seen views when navigating between pages so returning back is instant from cache
 router.on('navigate', (event) => {
     const previous = getBackLocation();
+
     if (
         previous &&
         !previous.startsWith('/exams') &&

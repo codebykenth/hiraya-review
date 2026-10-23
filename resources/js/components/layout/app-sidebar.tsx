@@ -279,6 +279,7 @@ export function AppSidebar({ feedbackCount }: AppSidebarProps) {
                                 prefetch
                                 onClick={() => {
                                     setOptimisticUrl(toUrl(dashboardIndex()));
+
                                     if (isMobile) {
                                         setOpenMobile(false);
                                     }

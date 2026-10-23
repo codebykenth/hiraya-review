@@ -7,7 +7,10 @@ import type {
     AttachedModule,
 } from '../types';
 
-if (typeof window !== 'undefined' && (window as any).__hasInertiaNavigated === undefined) {
+if (
+    typeof window !== 'undefined' &&
+    (window as any).__hasInertiaNavigated === undefined
+) {
     (window as any).__hasInertiaNavigated = false;
     document.addEventListener('inertia:start', () => {
         (window as any).__hasInertiaNavigated = true;
@@ -84,7 +87,7 @@ export function useCalendarState(initialProps: CalendarPageProps) {
         message: '',
         confirmLabel: '',
         variant: 'danger',
-        onConfirm: () => { },
+        onConfirm: () => {},
     });
     const [selectedDate, setSelectedDate] = useState<string | null>(null);
     const [formData, setFormData] = useState({
@@ -158,8 +161,15 @@ export function useCalendarState(initialProps: CalendarPageProps) {
     useEffect(() => {
         let timeoutId: NodeJS.Timeout;
 
-        if (!hasShownReminder.current && (initialProps.pastPending ?? []).length > 0 && !isSnoozed()) {
-            if (typeof window !== 'undefined' && (window as any).__hasInertiaNavigated) {
+        if (
+            !hasShownReminder.current &&
+            (initialProps.pastPending ?? []).length > 0 &&
+            !isSnoozed()
+        ) {
+            if (
+                typeof window !== 'undefined' &&
+                (window as any).__hasInertiaNavigated
+            ) {
                 // Delay slightly to prevent Radix UI Dialog double-portal bug in Strict Mode
                 timeoutId = setTimeout(() => {
                     hasShownReminder.current = true;
@@ -171,7 +181,9 @@ export function useCalendarState(initialProps: CalendarPageProps) {
         }
 
         return () => {
-            if (timeoutId) clearTimeout(timeoutId);
+            if (timeoutId) {
+                clearTimeout(timeoutId);
+            }
         };
     }, [initialProps.pastPending, isSnoozed]);
 
@@ -229,7 +241,10 @@ export function useCalendarState(initialProps: CalendarPageProps) {
                     setPastPending(data.pastPending);
 
                     if (!hasShownReminder.current && !isSnoozed()) {
-                        if (typeof window !== 'undefined' && (window as any).__hasInertiaNavigated) {
+                        if (
+                            typeof window !== 'undefined' &&
+                            (window as any).__hasInertiaNavigated
+                        ) {
                             setTimeout(() => {
                                 hasShownReminder.current = true;
                                 setIsReminderOpen(true);
@@ -810,16 +825,16 @@ export function useCalendarState(initialProps: CalendarPageProps) {
                     newDoneState
                         ? prev.filter((s) => s.id !== schedule.id)
                         : prev.map((s) =>
-                            s.id === schedule.id
-                                ? { ...s, is_done: newDoneState }
-                                : s,
-                        ),
+                              s.id === schedule.id
+                                  ? { ...s, is_done: newDoneState }
+                                  : s,
+                          ),
                 );
             } else {
                 const data = await response.json().catch(() => ({}));
                 setErrorMessage(
                     data.message ||
-                    'Failed to update study item. Please try again.',
+                        'Failed to update study item. Please try again.',
                 );
             }
         } catch {
@@ -1018,8 +1033,8 @@ export function useCalendarState(initialProps: CalendarPageProps) {
             const count = ids
                 ? ids.length
                 : scope === 'overdue'
-                    ? pastPending.length
-                    : 0;
+                  ? pastPending.length
+                  : 0;
             const countText =
                 count > 0
                     ? `${count} study session${count > 1 ? 's' : ''}`
@@ -1073,7 +1088,7 @@ export function useCalendarState(initialProps: CalendarPageProps) {
                             const data = await response.json();
                             setErrorMessage(
                                 data.message ||
-                                'Failed to delete study sessions.',
+                                    'Failed to delete study sessions.',
                             );
                         }
                     } catch {

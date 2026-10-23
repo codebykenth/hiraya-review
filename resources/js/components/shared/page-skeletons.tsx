@@ -779,7 +779,7 @@ export function GuideSkeleton() {
             </div>
 
             {/* Tab Bar: 4 tabs */}
-            <div className="flex border-b border-border/80 gap-6 pb-2">
+            <div className="flex gap-6 border-b border-border/80 pb-2">
                 <Skeleton className="h-6 w-32 rounded-md" />
                 <Skeleton className="h-6 w-44 rounded-md" />
                 <Skeleton className="h-6 w-40 rounded-md" />
@@ -836,7 +836,7 @@ export function BillingSkeleton() {
                         key={i}
                         className={`flex flex-col justify-between rounded-2xl border p-6 shadow-xs ${
                             i === 1
-                                ? 'border-primary ring-2 ring-primary/20 bg-white dark:bg-slate-900'
+                                ? 'border-primary bg-white ring-2 ring-primary/20 dark:bg-slate-900'
                                 : 'border-slate-200/80 bg-white dark:border-slate-800/80 dark:bg-slate-900'
                         }`}
                     >
@@ -849,9 +849,12 @@ export function BillingSkeleton() {
                             </div>
                             <Skeleton className="h-8 w-32 rounded-md" />
                             <Skeleton className="h-3 w-48 rounded-md" />
-                            <div className="space-y-2 pt-4 border-t border-slate-100 dark:border-slate-800">
+                            <div className="space-y-2 border-t border-slate-100 pt-4 dark:border-slate-800">
                                 {Array.from({ length: 5 }).map((_, j) => (
-                                    <div key={j} className="flex items-center gap-2">
+                                    <div
+                                        key={j}
+                                        className="flex items-center gap-2"
+                                    >
                                         <Skeleton className="size-4 shrink-0 rounded-full" />
                                         <Skeleton className="h-3 w-full rounded-md" />
                                     </div>
@@ -898,8 +901,8 @@ export function SettingsSkeleton() {
                 </div>
 
                 {/* Right Form Card */}
-                <div className="mt-6 flex-1 lg:mt-0 max-w-2xl">
-                    <div className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-xs dark:border-slate-800/80 dark:bg-slate-900 space-y-5">
+                <div className="mt-6 max-w-2xl flex-1 lg:mt-0">
+                    <div className="space-y-5 rounded-2xl border border-slate-200/80 bg-white p-6 shadow-xs dark:border-slate-800/80 dark:bg-slate-900">
                         <div className="space-y-2">
                             <Skeleton className="h-6 w-48 rounded-md" />
                             <Skeleton className="h-3 w-72 rounded-md" />
@@ -921,4 +924,3 @@ export function SettingsSkeleton() {
         </div>
     );
 }
-

@@ -272,9 +272,7 @@ export default function AdminUsersIndex({
                                     setSelectedRole(val);
 
                                     let roleFilter:
-                                        | 'all'
-                                        | 'admin'
-                                        | 'student' = 'all';
+                                        'all' | 'admin' | 'student' = 'all';
 
                                     if (val === 'Admins') {
                                         roleFilter = 'admin';

@@ -12,8 +12,12 @@ export function PaymentKpiCards({ stats }: PaymentKpiCardsProps) {
         {
             title: 'Real Cash Balance',
             value: `₱${(stats.real_balance ?? stats.total_net_revenue).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
-            description: stats.real_balance != null ? 'Live Xendit Cash Account' : 'Net available balance',
-            badge: stats.real_balance != null ? 'Live Xendit' : 'Calculated Net',
+            description:
+                stats.real_balance != null
+                    ? 'Live Xendit Cash Account'
+                    : 'Net available balance',
+            badge:
+                stats.real_balance != null ? 'Live Xendit' : 'Calculated Net',
             icon: Landmark,
             color: 'text-emerald-500',
             bg: 'bg-emerald-500/10',
@@ -48,15 +52,15 @@ export function PaymentKpiCards({ stats }: PaymentKpiCardsProps) {
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {cards.map((c, i) => (
                 <Card key={i} className="border-border/60 bg-card/60 shadow-sm">
-                    <CardContent className="p-4 sm:p-5 flex items-center justify-between">
+                    <CardContent className="flex items-center justify-between p-4 sm:p-5">
                         <div className="space-y-1">
                             <div className="flex items-center gap-1.5">
-                                <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                                <span className="text-xs font-medium tracking-wider text-muted-foreground uppercase">
                                     {c.title}
                                 </span>
                                 {c.badge && (
                                     <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-1.5 py-0.5 text-[9px] font-semibold text-emerald-600 dark:text-emerald-400">
-                                        <span className="size-1 rounded-full bg-emerald-500 animate-pulse" />
+                                        <span className="size-1 animate-pulse rounded-full bg-emerald-500" />
                                         {c.badge}
                                     </span>
                                 )}
@@ -68,7 +72,9 @@ export function PaymentKpiCards({ stats }: PaymentKpiCardsProps) {
                                 {c.description}
                             </span>
                         </div>
-                        <div className={`p-2.5 rounded-xl ${c.bg} ${c.color} shrink-0`}>
+                        <div
+                            className={`rounded-xl p-2.5 ${c.bg} ${c.color} shrink-0`}
+                        >
                             <c.icon className="size-5" />
                         </div>
                     </CardContent>

@@ -473,7 +473,9 @@ export default function Calendar() {
                 {isReminderOpen && calendarPastPending.length > 0 && (
                     <Suspense fallback={null}>
                         <PastPendingReminder
-                            isOpen={isReminderOpen && calendarPastPending.length > 0}
+                            isOpen={
+                                isReminderOpen && calendarPastPending.length > 0
+                            }
                             onOpenChange={setIsReminderOpen}
                             pastPending={calendarPastPending}
                             toggleScheduleDone={toggleScheduleDone}

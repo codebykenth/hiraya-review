@@ -421,7 +421,8 @@ export const renderFormattedText = (
     const svgRegex = /(<svg[\s\S]*?<\/svg>)/g;
     const svgParts = processedText.split(svgRegex);
 
-    const tableRegex = /((?:^|\n)\s*\|[^\n]+\|[^\n]*(?:\n\s*\|[^\n]+\|[^\n]*)+)/g;
+    const tableRegex =
+        /((?:^|\n)\s*\|[^\n]+\|[^\n]*(?:\n\s*\|[^\n]+\|[^\n]*)+)/g;
 
     const formatNumberedLists = (inputText: string) => {
         if (!inputText) {

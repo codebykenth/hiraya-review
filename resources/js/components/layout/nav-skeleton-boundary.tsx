@@ -1,5 +1,5 @@
 import { router, usePage } from '@inertiajs/react';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     DashboardSkeleton,
     AdminDashboardSkeleton,
@@ -99,27 +99,18 @@ export function NavSkeletonBoundary({
 }) {
     const page = usePage();
     const [navigatingTo, setNavigatingTo] = useState<string | null>(null);
-    const startPathRef = useRef<string | null>(null);
+    const [startPath, setStartPath] = useState<string | null>(null);
 
     const currentPath =
         (page.url ? page.url.split('?')[0].replace(/\/$/, '') : '') || '/';
 
-    // Automatically dismiss skeleton when destination URL matches currently mounted page or when mounted page has navigated away from the starting URL
-    useEffect(() => {
-        if (navigatingTo) {
-            const hasReachedTarget =
-                navigatingTo === currentPath ||
-                currentPath.startsWith(navigatingTo);
-            const hasChangedFromStart =
-                startPathRef.current !== null &&
-                currentPath !== startPathRef.current;
-
-            if (hasReachedTarget || hasChangedFromStart) {
-                setNavigatingTo(null);
-                startPathRef.current = null;
-            }
-        }
-    }, [currentPath, navigatingTo]);
+    // Automatically dismiss the skeleton when the destination URL matches the
+    // mounted page or when the mounted page has navigated away from the start.
+    const isNavigating =
+        navigatingTo !== null &&
+        navigatingTo !== currentPath &&
+        !currentPath.startsWith(navigatingTo) &&
+        (startPath === null || currentPath === startPath);
 
     useEffect(() => {
         let safetyTimer: ReturnType<typeof setTimeout> | null = null;
@@ -129,12 +120,14 @@ export function NavSkeletonBoundary({
                 clearTimeout(safetyTimer);
                 safetyTimer = null;
             }
+
             setNavigatingTo(null);
-            startPathRef.current = null;
+            setStartPath(null);
         };
 
         const handleNavigationStart = (event: any) => {
             const visit = event?.detail?.visit;
+
             if (!visit) {
                 return;
             }
@@ -160,6 +153,7 @@ export function NavSkeletonBoundary({
                 !visit.only?.length
             ) {
                 let targetPath = '';
+
                 if (visit.url) {
                     if (typeof visit.url === 'string') {
                         try {
@@ -185,13 +179,14 @@ export function NavSkeletonBoundary({
                     window.location.pathname.replace(/\/$/, '') || '/';
 
                 if (cleanTarget && cleanTarget !== cleanCurrent) {
-                    startPathRef.current = cleanCurrent;
+                    setStartPath(cleanCurrent);
                     setNavigatingTo(cleanTarget);
 
                     // Safety timeout: Never leave skeleton stuck for more than 6 seconds
                     if (safetyTimer) {
                         clearTimeout(safetyTimer);
                     }
+
                     safetyTimer = setTimeout(() => {
                         clearNavigation();
                     }, 6000);
@@ -201,6 +196,7 @@ export function NavSkeletonBoundary({
 
         const handleNavigationEnd = (event?: any) => {
             const visit = event?.detail?.visit;
+
             // Ignore background prefetch finishes so they don't dismiss the skeleton prematurely
             if (visit?.prefetch) {
                 return;
@@ -222,6 +218,7 @@ export function NavSkeletonBoundary({
             if (safetyTimer) {
                 clearTimeout(safetyTimer);
             }
+
             removeBefore();
             removeStart();
             removeFinish();
@@ -229,11 +226,6 @@ export function NavSkeletonBoundary({
             removeCancel();
         };
     }, []);
-
-    const isNavigating =
-        navigatingTo !== null &&
-        navigatingTo !== currentPath &&
-        (startPathRef.current === null || currentPath === startPathRef.current);
 
     if (isNavigating) {
         return (

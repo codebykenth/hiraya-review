@@ -108,9 +108,11 @@ export function useExamHydration({
         if (savedAttempt.question_ids && savedAttempt.question_ids.length > 0) {
             savedAttempt.question_ids.forEach((id, origIdx) => {
                 const q = questions.find((item) => item.id === id);
+
                 if (!q) {
                     return;
                 }
+
                 const newIdx = loadedQuestions.length;
                 loadedQuestions.push(q);
 

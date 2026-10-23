@@ -75,70 +75,75 @@ export function SubjectMasteryChart({ categories }: SubjectMasteryChartProps) {
                 />
             ) : (
                 <div className="flex flex-col items-center gap-4 sm:flex-row">
-                <div className="h-[220px] w-full max-w-[220px] shrink-0">
-                    <ChartContainer config={config} className="h-full w-full">
-                        <ResponsiveContainer width="100%" height="100%">
-                            <RadialBarChart
-                                cx="50%"
-                                cy="50%"
-                                innerRadius="20%"
-                                outerRadius="100%"
-                                barSize={14}
-                                data={data}
-                                startAngle={90}
-                                endAngle={-270}
-                            >
-                                <PolarAngleAxis
-                                    type="number"
-                                    domain={[0, 100]}
-                                    angleAxisId={0}
-                                    tick={false}
-                                />
-                                <RadialBar
-                                    background={{
-                                        fill: 'var(--muted)',
-                                        opacity: 0.3,
-                                    }}
-                                    dataKey="percentage"
-                                    cornerRadius={8}
-                                    angleAxisId={0}
-                                />
-                                <ChartTooltip
-                                    content={
-                                        <ChartTooltipContent
-                                            nameKey="name"
-                                            formatter={(value) => `${value}%`}
-                                        />
-                                    }
-                                />
-                            </RadialBarChart>
-                        </ResponsiveContainer>
-                    </ChartContainer>
-                </div>
-
-                {/* Legend */}
-                <div className="flex flex-1 flex-col gap-2">
-                    {data.map((item) => (
-                        <div
-                            key={item.name}
-                            className="flex items-center justify-between gap-3 rounded-lg border border-border/40 bg-white/60 px-3 py-2 dark:bg-slate-900/40"
+                    <div className="h-[220px] w-full max-w-[220px] shrink-0">
+                        <ChartContainer
+                            config={config}
+                            className="h-full w-full"
                         >
-                            <div className="flex items-center gap-2">
-                                <div
-                                    className="size-2.5 shrink-0 rounded-full"
-                                    style={{ backgroundColor: item.fill }}
-                                />
-                                <span className="text-xs font-bold text-slate-700 dark:text-slate-300">
-                                    {item.name}
+                            <ResponsiveContainer width="100%" height="100%">
+                                <RadialBarChart
+                                    cx="50%"
+                                    cy="50%"
+                                    innerRadius="20%"
+                                    outerRadius="100%"
+                                    barSize={14}
+                                    data={data}
+                                    startAngle={90}
+                                    endAngle={-270}
+                                >
+                                    <PolarAngleAxis
+                                        type="number"
+                                        domain={[0, 100]}
+                                        angleAxisId={0}
+                                        tick={false}
+                                    />
+                                    <RadialBar
+                                        background={{
+                                            fill: 'var(--muted)',
+                                            opacity: 0.3,
+                                        }}
+                                        dataKey="percentage"
+                                        cornerRadius={8}
+                                        angleAxisId={0}
+                                    />
+                                    <ChartTooltip
+                                        content={
+                                            <ChartTooltipContent
+                                                nameKey="name"
+                                                formatter={(value) =>
+                                                    `${value}%`
+                                                }
+                                            />
+                                        }
+                                    />
+                                </RadialBarChart>
+                            </ResponsiveContainer>
+                        </ChartContainer>
+                    </div>
+
+                    {/* Legend */}
+                    <div className="flex flex-1 flex-col gap-2">
+                        {data.map((item) => (
+                            <div
+                                key={item.name}
+                                className="flex items-center justify-between gap-3 rounded-lg border border-border/40 bg-white/60 px-3 py-2 dark:bg-slate-900/40"
+                            >
+                                <div className="flex items-center gap-2">
+                                    <div
+                                        className="size-2.5 shrink-0 rounded-full"
+                                        style={{ backgroundColor: item.fill }}
+                                    />
+                                    <span className="text-xs font-bold text-slate-700 dark:text-slate-300">
+                                        {item.name}
+                                    </span>
+                                </div>
+                                <span className="text-sm font-extrabold text-slate-900 dark:text-white">
+                                    {item.percentage}%
                                 </span>
                             </div>
-                            <span className="text-sm font-extrabold text-slate-900 dark:text-white">
-                                {item.percentage}%
-                            </span>
-                        </div>
-                    ))}
+                        ))}
+                    </div>
                 </div>
-            </div>
             )}
         </Card>
     );

@@ -1,16 +1,8 @@
 import { Head, router } from '@inertiajs/react';
-import {
-    Banknote,
-    CheckCircle2,
-    Clock,
-    CreditCard,
-    Eye,
-    Receipt,
-    XCircle,
-} from 'lucide-react';
+import { CheckCircle2, Clock, Eye, Receipt, XCircle } from 'lucide-react';
 import React, { useState } from 'react';
-import { AdminTable  } from '@/components/domain/admin-table';
-import type {TableColumn} from '@/components/domain/admin-table';
+import { AdminTable } from '@/components/domain/admin-table';
+import type { TableColumn } from '@/components/domain/admin-table';
 import { PageContainer } from '@/components/layout/page-container';
 import { PageHeader } from '@/components/layout/page-header';
 import { Badge } from '@/components/ui/badge';
@@ -18,7 +10,11 @@ import { Button } from '@/components/ui/button';
 import { PaymentDetailModal } from './components/payment-detail-modal';
 import { PaymentFilters } from './components/payment-filters';
 import { PaymentKpiCards } from './components/payment-kpi-cards';
-import type { AdminPaymentItem, AdminPaymentsPageProps, PaymentFilters as FiltersType } from './types';
+import type {
+    AdminPaymentItem,
+    AdminPaymentsPageProps,
+    PaymentFilters as FiltersType,
+} from './types';
 
 export default function PaymentsIndex({
     payments,
@@ -26,7 +22,8 @@ export default function PaymentsIndex({
     filters: initialFilters,
     plans,
 }: AdminPaymentsPageProps) {
-    const [selectedPayment, setSelectedPayment] = useState<AdminPaymentItem | null>(null);
+    const [selectedPayment, setSelectedPayment] =
+        useState<AdminPaymentItem | null>(null);
     const [isDetailOpen, setIsDetailOpen] = useState(false);
     const [filters, setFilters] = useState<FiltersType>(initialFilters);
 
@@ -45,14 +42,18 @@ export default function PaymentsIndex({
                 preserveState: true,
                 preserveScroll: true,
                 replace: true,
-            }
+            },
         );
     };
 
     const handleReset = () => {
         const resetFilters = { search: '', status: 'all', plan: 'all' };
         setFilters(resetFilters);
-        router.get('/admin/payments', {}, { preserveState: true, preserveScroll: true });
+        router.get(
+            '/admin/payments',
+            {},
+            { preserveState: true, preserveScroll: true },
+        );
     };
 
     const handlePageChange = (page: number) => {
@@ -64,7 +65,7 @@ export default function PaymentsIndex({
                 plan: filters.plan !== 'all' ? filters.plan : undefined,
                 page,
             },
-            { preserveState: true, preserveScroll: true }
+            { preserveState: true, preserveScroll: true },
         );
     };
 
@@ -72,14 +73,20 @@ export default function PaymentsIndex({
         switch (status) {
             case 'paid':
                 return (
-                    <Badge variant="outline" className="border-emerald-500/40 text-emerald-600 dark:text-emerald-400 bg-emerald-500/5 text-[11px] gap-1">
+                    <Badge
+                        variant="outline"
+                        className="gap-1 border-emerald-500/40 bg-emerald-500/5 text-[11px] text-emerald-600 dark:text-emerald-400"
+                    >
                         <CheckCircle2 className="size-3" />
                         Paid
                     </Badge>
                 );
             case 'pending':
                 return (
-                    <Badge variant="outline" className="border-amber-500/40 text-amber-600 dark:text-amber-400 bg-amber-500/5 text-[11px] gap-1">
+                    <Badge
+                        variant="outline"
+                        className="gap-1 border-amber-500/40 bg-amber-500/5 text-[11px] text-amber-600 dark:text-amber-400"
+                    >
                         <Clock className="size-3" />
                         Pending
                     </Badge>
@@ -87,7 +94,10 @@ export default function PaymentsIndex({
             case 'failed':
             case 'expired':
                 return (
-                    <Badge variant="outline" className="border-destructive/40 text-destructive bg-destructive/5 text-[11px] gap-1">
+                    <Badge
+                        variant="outline"
+                        className="gap-1 border-destructive/40 bg-destructive/5 text-[11px] text-destructive"
+                    >
                         <XCircle className="size-3" />
                         {status === 'expired' ? 'Expired' : 'Failed'}
                     </Badge>
@@ -138,15 +148,27 @@ export default function PaymentsIndex({
             header: 'Amount / Net',
             render: (item) => (
                 <div className="space-y-0.5">
-                    <div className="font-semibold text-xs text-foreground">
-                        ₱{item.amount.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    <div className="text-xs font-semibold text-foreground">
+                        ₱
+                        {item.amount.toLocaleString('en-PH', {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                        })}
                     </div>
                     {item.status === 'paid' && (
-                        <div className="text-[10px] text-emerald-600 dark:text-emerald-400 font-medium">
-                            Net: ₱{item.net_amount.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        <div className="text-[10px] font-medium text-emerald-600 dark:text-emerald-400">
+                            Net: ₱
+                            {item.net_amount.toLocaleString('en-PH', {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2,
+                            })}
                             {item.fee_amount > 0 && (
-                                <span className="text-muted-foreground ml-1">
-                                    (-₱{(item.fee_amount + item.vat_amount).toFixed(2)})
+                                <span className="ml-1 text-muted-foreground">
+                                    (-₱
+                                    {(
+                                        item.fee_amount + item.vat_amount
+                                    ).toFixed(2)}
+                                    )
                                 </span>
                             )}
                         </div>
@@ -169,12 +191,17 @@ export default function PaymentsIndex({
         {
             header: 'Date',
             render: (item) => (
-                <span className="text-[11px] text-muted-foreground whitespace-nowrap">
-                    {item.created_at ? new Date(item.created_at).toLocaleDateString('en-PH', {
-                        month: 'short',
-                        day: 'numeric',
-                        year: 'numeric',
-                    }) : '—'}
+                <span className="text-[11px] whitespace-nowrap text-muted-foreground">
+                    {item.created_at
+                        ? new Date(item.created_at).toLocaleDateString(
+                              'en-PH',
+                              {
+                                  month: 'short',
+                                  day: 'numeric',
+                                  year: 'numeric',
+                              },
+                          )
+                        : '—'}
                 </span>
             ),
         },
@@ -185,7 +212,7 @@ export default function PaymentsIndex({
                 <Button
                     variant="ghost"
                     size="sm"
-                    className="h-7 text-xs gap-1 px-2"
+                    className="h-7 gap-1 px-2 text-xs"
                     onClick={() => {
                         setSelectedPayment(item);
                         setIsDetailOpen(true);
@@ -230,7 +257,8 @@ export default function PaymentsIndex({
                     emptyState={{
                         icon: Receipt,
                         title: 'No Payments Found',
-                        description: 'No transactions match the selected filters or search keywords.',
+                        description:
+                            'No transactions match the selected filters or search keywords.',
                     }}
                 />
 

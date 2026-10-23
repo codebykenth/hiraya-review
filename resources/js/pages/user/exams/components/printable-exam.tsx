@@ -820,9 +820,7 @@ export function PrintableExam({
 
             if (typeof window !== 'undefined') {
                 window.sessionStorage.removeItem('isPdfExporting');
-                window.dispatchEvent(
-                    new CustomEvent('hiraya:export-pdf-done'),
-                );
+                window.dispatchEvent(new CustomEvent('hiraya:export-pdf-done'));
             }
         };
     }, [mounted, questions, title, onComplete, questionPages]);

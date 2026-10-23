@@ -259,11 +259,15 @@ class TutorChatService {
                                         messages: this.state.messages.map(
                                             (m) => {
                                                 if (m.id === assistantMsgId) {
-                                                    const raw = (m.rawContent ?? m.content) + chunkText;
-                                                    const newContent = raw.replace(
-                                                        /(?:\r?\n|\s*)CITATIONS:\s*[\s\S]*$/im,
-                                                        '',
-                                                    );
+                                                    const raw =
+                                                        (m.rawContent ??
+                                                            m.content) +
+                                                        chunkText;
+                                                    const newContent =
+                                                        raw.replace(
+                                                            /(?:\r?\n|\s*)CITATIONS:\s*[\s\S]*$/im,
+                                                            '',
+                                                        );
 
                                                     return {
                                                         ...m,

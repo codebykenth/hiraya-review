@@ -163,9 +163,7 @@ export function useDrillsState({
                     langParam === 'Both'
                 ) {
                     targetLanguage = langParam as
-                        | 'English'
-                        | 'Filipino'
-                        | 'Both';
+                        'English' | 'Filipino' | 'Both';
                 }
             }
 
@@ -403,7 +401,7 @@ export function useDrillsState({
 
         queryParams.set(
             'from',
-            `/drills?category=${encodeURIComponent(selectedCategory.name)}${originInfo ? `&from=${encodeURIComponent(originInfo.href)}` : ''}`
+            `/drills?category=${encodeURIComponent(selectedCategory.name)}${originInfo ? `&from=${encodeURIComponent(originInfo.href)}` : ''}`,
         );
 
         // Clear any existing exam session before starting a fresh drill

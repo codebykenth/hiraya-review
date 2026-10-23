@@ -68,7 +68,9 @@ export default function SiteHeader({
         { id: 'about', label: 'About', href: '/about' },
         { id: 'features', label: 'Features', href: '#features' },
         { id: 'path', label: 'Process', href: '#path' },
-        ...(xendit?.enabled ? [{ id: 'pricing', label: 'Pricing', href: '#pricing' }] : []),
+        ...(xendit?.enabled
+            ? [{ id: 'pricing', label: 'Pricing', href: '#pricing' }]
+            : []),
         { id: 'learn', label: 'Study Hub', href: '/learn' },
         { id: 'guide', label: 'Reviewer Guide', href: '#guide' },
         { id: 'faq', label: 'FAQ', href: '#faq' },

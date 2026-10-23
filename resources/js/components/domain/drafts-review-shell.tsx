@@ -521,9 +521,7 @@ export function DraftsReviewShell<T extends BaseDraftItem>({
                                 value={activeFilterStatus}
                                 onChange={(e) => {
                                     const val = e.target.value as
-                                        | 'all'
-                                        | 'approved'
-                                        | 'pending';
+                                        'all' | 'approved' | 'pending';
                                     setFilterStatus(val);
 
                                     if (isServerDriven) {

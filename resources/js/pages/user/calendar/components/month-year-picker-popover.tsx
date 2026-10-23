@@ -1,4 +1,8 @@
-import { ChevronLeft, ChevronRight, Calendar as CalendarIcon } from 'lucide-react';
+import {
+    ChevronLeft,
+    ChevronRight,
+    Calendar as CalendarIcon,
+} from 'lucide-react';
 import React, { useState, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import {
@@ -38,7 +42,9 @@ export function MonthYearPickerPopover({
 }: MonthYearPickerPopoverProps) {
     const [isOpen, setIsOpen] = useState(false);
     const [viewMode, setViewMode] = useState<'months' | 'years'>('months');
-    const [pickerYear, setPickerYear] = useState<number>(() => currentDate.getFullYear());
+    const [pickerYear, setPickerYear] = useState<number>(() =>
+        currentDate.getFullYear(),
+    );
 
     const realToday = useMemo(() => new Date(), []);
     const isCurrentRealYear = realToday.getFullYear() === pickerYear;
@@ -106,7 +112,11 @@ export function MonthYearPickerPopover({
                         size="icon"
                         onClick={handlePrevYear}
                         className="size-7 rounded-lg text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white"
-                        aria-label={viewMode === 'years' ? 'Previous 12 years' : 'Previous year'}
+                        aria-label={
+                            viewMode === 'years'
+                                ? 'Previous 12 years'
+                                : 'Previous year'
+                        }
                     >
                         <ChevronLeft className="size-4" />
                     </Button>
@@ -114,7 +124,9 @@ export function MonthYearPickerPopover({
                     <button
                         type="button"
                         onClick={() =>
-                            setViewMode((prev) => (prev === 'months' ? 'years' : 'months'))
+                            setViewMode((prev) =>
+                                prev === 'months' ? 'years' : 'months',
+                            )
                         }
                         className="group flex items-center gap-1.5 rounded-md px-2 py-1 text-xs font-bold text-slate-800 transition-colors hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800"
                     >
@@ -134,7 +146,9 @@ export function MonthYearPickerPopover({
                         size="icon"
                         onClick={handleNextYear}
                         className="size-7 rounded-lg text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white"
-                        aria-label={viewMode === 'years' ? 'Next 12 years' : 'Next year'}
+                        aria-label={
+                            viewMode === 'years' ? 'Next 12 years' : 'Next year'
+                        }
                     >
                         <ChevronRight className="size-4" />
                     </Button>
@@ -148,7 +162,8 @@ export function MonthYearPickerPopover({
                                 pickerYear === currentDate.getFullYear() &&
                                 idx === currentDate.getMonth();
                             const isThisMonth =
-                                isCurrentRealYear && idx === realToday.getMonth();
+                                isCurrentRealYear &&
+                                idx === realToday.getMonth();
 
                             return (
                                 <button
@@ -156,7 +171,7 @@ export function MonthYearPickerPopover({
                                     type="button"
                                     onClick={() => handleSelectMonth(idx)}
                                     className={cn(
-                                        'relative flex flex-col items-center justify-center rounded-xl py-2 px-1 text-xs font-semibold transition-all active:scale-95',
+                                        'relative flex flex-col items-center justify-center rounded-xl px-1 py-2 text-xs font-semibold transition-all active:scale-95',
                                         isSelected
                                             ? 'bg-blue-600 font-bold text-white shadow-xs hover:bg-blue-700 dark:bg-blue-600'
                                             : isThisMonth
@@ -181,7 +196,8 @@ export function MonthYearPickerPopover({
                 {viewMode === 'years' && (
                     <div className="grid grid-cols-3 gap-1.5">
                         {yearList.map((year) => {
-                            const isSelected = year === currentDate.getFullYear();
+                            const isSelected =
+                                year === currentDate.getFullYear();
                             const isThisYear = year === realToday.getFullYear();
 
                             return (

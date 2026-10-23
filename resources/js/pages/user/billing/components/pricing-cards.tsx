@@ -3,7 +3,14 @@ import { Check, Crown, Loader2, Sparkles, Zap } from 'lucide-react';
 import React, { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardFooter,
+    CardHeader,
+    CardTitle,
+} from '@/components/ui/card';
 import type { PricingPlan, UserSubscriptionStatus } from '../types';
 
 interface PricingCardsProps {
@@ -22,12 +29,12 @@ export function PricingCards({ plans, subscription }: PricingCardsProps) {
             {
                 onError: () => setSubmittingPlan(null),
                 onFinish: () => setSubmittingPlan(null),
-            }
+            },
         );
     };
 
     return (
-        <div className="grid gap-6 md:grid-cols-2 max-w-5xl mx-auto">
+        <div className="mx-auto grid max-w-5xl gap-6 md:grid-cols-2">
             {plans.map((plan) => {
                 const isLifetime = plan.duration_days === null;
                 const isSubmitting = submittingPlan === plan.code;
@@ -37,15 +44,19 @@ export function PricingCards({ plans, subscription }: PricingCardsProps) {
                         key={plan.code}
                         className={`relative flex flex-col justify-between overflow-hidden transition-all duration-300 hover:shadow-lg ${
                             plan.is_featured
-                                ? 'border-primary/50 shadow-md shadow-primary/5 ring-1 ring-primary/20'
+                                ? 'border-primary/50 shadow-md ring-1 shadow-primary/5 ring-primary/20'
                                 : 'border-border/80'
                         }`}
                     >
                         {plan.badge && (
                             <div className="absolute top-4 right-4">
                                 <Badge
-                                    variant={plan.is_featured ? 'default' : 'secondary'}
-                                    className="px-2.5 py-0.5 text-xs font-semibold uppercase tracking-wider"
+                                    variant={
+                                        plan.is_featured
+                                            ? 'default'
+                                            : 'secondary'
+                                    }
+                                    className="px-2.5 py-0.5 text-xs font-semibold tracking-wider uppercase"
                                 >
                                     {plan.badge}
                                 </Badge>
@@ -54,7 +65,7 @@ export function PricingCards({ plans, subscription }: PricingCardsProps) {
 
                         <div>
                             <CardHeader className="pb-4">
-                                <div className="flex items-center gap-2 mb-1">
+                                <div className="mb-1 flex items-center gap-2">
                                     {isLifetime ? (
                                         <div className="rounded-lg bg-amber-500/10 p-2 text-amber-500">
                                             <Crown className="size-5" />
@@ -76,26 +87,32 @@ export function PricingCards({ plans, subscription }: PricingCardsProps) {
 
                                 <div className="mt-4 flex items-baseline gap-1">
                                     <span className="text-4xl font-extrabold tracking-tight text-foreground">
-                                        ₱{plan.price.toLocaleString('en-PH', { minimumFractionDigits: 0 })}
+                                        ₱
+                                        {plan.price.toLocaleString('en-PH', {
+                                            minimumFractionDigits: 0,
+                                        })}
                                     </span>
-                                    <span className="text-xs text-muted-foreground font-medium">
+                                    <span className="text-xs font-medium text-muted-foreground">
                                         {plan.currency}
                                     </span>
                                 </div>
-                                <p className="mt-2 text-xs text-muted-foreground leading-normal">
+                                <p className="mt-2 text-xs leading-normal text-muted-foreground">
                                     {plan.description}
                                 </p>
                             </CardHeader>
 
                             <CardContent className="pt-2">
                                 <div className="space-y-2.5">
-                                    <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                                    <span className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
                                         What's included:
                                     </span>
                                     <ul className="space-y-2">
                                         {plan.features.map((feature, idx) => (
-                                            <li key={idx} className="flex items-start gap-2.5 text-xs text-foreground/90 leading-tight">
-                                                <div className="mt-0.5 rounded-full bg-emerald-500/10 p-0.5 text-emerald-500 shrink-0">
+                                            <li
+                                                key={idx}
+                                                className="flex items-start gap-2.5 text-xs leading-tight text-foreground/90"
+                                            >
+                                                <div className="mt-0.5 shrink-0 rounded-full bg-emerald-500/10 p-0.5 text-emerald-500">
                                                     <Check className="size-3 stroke-[2.5]" />
                                                 </div>
                                                 <span>{feature}</span>
@@ -106,11 +123,11 @@ export function PricingCards({ plans, subscription }: PricingCardsProps) {
                             </CardContent>
                         </div>
 
-                        <CardFooter className="pt-4 border-t border-border/50">
+                        <CardFooter className="border-t border-border/50 pt-4">
                             {subscription.is_premium ? (
                                 <Button
                                     variant="outline"
-                                    className="w-full text-xs font-semibold gap-2 border-emerald-500/30 text-emerald-600 dark:text-emerald-400 bg-emerald-500/5 hover:bg-emerald-500/10"
+                                    className="w-full gap-2 border-emerald-500/30 bg-emerald-500/5 text-xs font-semibold text-emerald-600 hover:bg-emerald-500/10 dark:text-emerald-400"
                                     onClick={() => handleCheckout(plan.code)}
                                     disabled={isSubmitting}
                                 >
@@ -119,12 +136,18 @@ export function PricingCards({ plans, subscription }: PricingCardsProps) {
                                     ) : (
                                         <Sparkles className="size-3.5" />
                                     )}
-                                    {isLifetime ? 'Upgrade to Lifetime' : 'Extend Pro Pass'}
+                                    {isLifetime
+                                        ? 'Upgrade to Lifetime'
+                                        : 'Extend Pro Pass'}
                                 </Button>
                             ) : (
                                 <Button
-                                    variant={plan.is_featured ? 'default' : 'secondary'}
-                                    className="w-full text-xs font-semibold gap-2"
+                                    variant={
+                                        plan.is_featured
+                                            ? 'default'
+                                            : 'secondary'
+                                    }
+                                    className="w-full gap-2 text-xs font-semibold"
                                     onClick={() => handleCheckout(plan.code)}
                                     disabled={isSubmitting}
                                 >

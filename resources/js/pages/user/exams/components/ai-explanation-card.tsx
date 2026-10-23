@@ -1,6 +1,13 @@
-import { Sparkles, Bot, AlertCircle, RefreshCw, ChevronDown, ChevronUp, Zap } from 'lucide-react';
-import React, { useState, useCallback } from 'react';
-import { renderFormattedText } from '@/lib/exam-formatters';
+import {
+    Sparkles,
+    Bot,
+    AlertCircle,
+    RefreshCw,
+    ChevronDown,
+    ChevronUp,
+    Zap,
+} from 'lucide-react';
+import { useState, useCallback } from 'react';
 import { TutorMessageContent } from '@/pages/user/tutor/components/tutor-message-content';
 
 interface AiExplanationCardProps {
@@ -24,10 +31,12 @@ export function AiExplanationCard({
     initialExplanation,
 }: AiExplanationCardProps) {
     const itemKey = `${questionId}-${selectedOption}`;
-    const [explanationCache, setExplanationCache] = useState<Record<string, ExplanationRecord>>(
-        initialExplanation ? { [itemKey]: initialExplanation } : {}
+    const [explanationCache, setExplanationCache] = useState<
+        Record<string, ExplanationRecord>
+    >(initialExplanation ? { [itemKey]: initialExplanation } : {});
+    const [openKey, setOpenKey] = useState<string | null>(
+        initialExplanation ? itemKey : null,
     );
-    const [openKey, setOpenKey] = useState<string | null>(initialExplanation ? itemKey : null);
     const [loadingKey, setLoadingKey] = useState<string | null>(null);
     const [errorMap, setErrorMap] = useState<Record<string, string>>({});
 
@@ -49,26 +58,38 @@ export function AiExplanationCard({
 
         try {
             const csrfToken =
-                (document.querySelector('meta[name="csrf-token"]') as HTMLMetaElement)?.content ||
-                '';
+                (
+                    document.querySelector(
+                        'meta[name="csrf-token"]',
+                    ) as HTMLMetaElement
+                )?.content || '';
 
-            const response = await fetch(`/exams/questions/${questionId}/ai-explain`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                    'X-CSRF-TOKEN': csrfToken,
-                    'X-Requested-With': 'XMLHttpRequest',
+            const response = await fetch(
+                `/exams/questions/${questionId}/ai-explain`,
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Accept: 'application/json',
+                        'X-CSRF-TOKEN': csrfToken,
+                        'X-Requested-With': 'XMLHttpRequest',
+                    },
+                    body: JSON.stringify({
+                        selected_option:
+                            selectedOption >= 0
+                                ? selectedOption
+                                : correctOption,
+                    }),
                 },
-                body: JSON.stringify({
-                    selected_option: selectedOption >= 0 ? selectedOption : correctOption,
-                }),
-            });
+            );
 
             if (!response.ok) {
                 const errData = await response.json().catch(() => ({}));
 
-                throw new Error(errData.message || `Request failed with status ${response.status}`);
+                throw new Error(
+                    errData.message ||
+                        `Request failed with status ${response.status}`,
+                );
             }
 
             const json = await response.json();
@@ -78,14 +99,21 @@ export function AiExplanationCard({
                     ...prev,
                     [itemKey]: {
                         explanation: json.data.explanation,
-                        source: json.data.source || (json.data.cached ? 'cache' : 'ai'),
+                        source:
+                            json.data.source ||
+                            (json.data.cached ? 'cache' : 'ai'),
                     },
                 }));
             } else {
-                throw new Error(json.message || 'Unable to load AI explanation.');
+                throw new Error(
+                    json.message || 'Unable to load AI explanation.',
+                );
             }
         } catch (err: unknown) {
-            const msg = err instanceof Error ? err.message : 'Failed to fetch AI explanation.';
+            const msg =
+                err instanceof Error
+                    ? err.message
+                    : 'Failed to fetch AI explanation.';
 
             setErrorMap((prev) => ({ ...prev, [itemKey]: msg }));
         } finally {
@@ -143,7 +171,9 @@ export function AiExplanationCard({
                         <div className="space-y-3 py-2">
                             <div className="flex items-center gap-2 text-xs font-medium text-indigo-600 dark:text-indigo-400">
                                 <Bot className="size-4 animate-spin" />
-                                <span>Analyzing question & syllabus notes...</span>
+                                <span>
+                                    Analyzing question & syllabus notes...
+                                </span>
                             </div>
                             <div className="space-y-2">
                                 <div className="h-4 w-5/6 animate-pulse rounded bg-indigo-200/50 dark:bg-indigo-900/30" />
@@ -186,7 +216,9 @@ export function AiExplanationCard({
                             </div>
 
                             <div className="prose prose-sm dark:prose-invert max-w-none text-xs leading-relaxed text-foreground">
-                                <TutorMessageContent content={currentRecord.explanation} />
+                                <TutorMessageContent
+                                    content={currentRecord.explanation}
+                                />
                             </div>
                         </div>
                     )}

@@ -237,7 +237,9 @@ export function TutorMessageContent({ content }: TutorMessageContentProps) {
         return null;
     }
 
-    const cleanContent = content.replace(/(?:\r?\n|\s*)CITATIONS:\s*[\s\S]*$/im, '').trim();
+    const cleanContent = content
+        .replace(/(?:\r?\n|\s*)CITATIONS:\s*[\s\S]*$/im, '')
+        .trim();
 
     if (!cleanContent) {
         return null;
@@ -272,6 +274,7 @@ export function TutorMessageContent({ content }: TutorMessageContentProps) {
         }
 
         const rawSvg = svgBlockLines.join('\n').trim();
+
         if (/<svg[\s\S]*?<\/svg>/i.test(rawSvg)) {
             elements.push(
                 <SvgDiagramViewer
@@ -306,14 +309,18 @@ export function TutorMessageContent({ content }: TutorMessageContentProps) {
         if (!trimmedCode) {
             inCodeBlock = false;
             codeBlockLines = [];
+
             return;
         }
 
         // If code block contains SVG markup, render as an interactive diagram
         const svgMatch = trimmedCode.match(/<svg[\s\S]*?<\/svg>/i);
+
         if (svgMatch) {
             const beforeSvg = trimmedCode.slice(0, svgMatch.index).trim();
-            const afterSvg = trimmedCode.slice((svgMatch.index ?? 0) + svgMatch[0].length).trim();
+            const afterSvg = trimmedCode
+                .slice((svgMatch.index ?? 0) + svgMatch[0].length)
+                .trim();
 
             if (beforeSvg) {
                 elements.push(
@@ -342,6 +349,7 @@ export function TutorMessageContent({ content }: TutorMessageContentProps) {
 
             inCodeBlock = false;
             codeBlockLines = [];
+
             return;
         }
 
@@ -359,6 +367,7 @@ export function TutorMessageContent({ content }: TutorMessageContentProps) {
 
             inCodeBlock = false;
             codeBlockLines = [];
+
             return;
         }
 
@@ -374,6 +383,7 @@ export function TutorMessageContent({ content }: TutorMessageContentProps) {
 
             inCodeBlock = false;
             codeBlockLines = [];
+
             return;
         }
 
@@ -604,20 +614,27 @@ export function TutorMessageContent({ content }: TutorMessageContentProps) {
         // 1. Inside raw un-fenced SVG block
         if (inSvgBlock) {
             svgBlockLines.push(rawLine);
+
             if (trimmed.includes('</svg>')) {
                 flushSvgBlock();
             }
+
             continue;
         }
 
         // 2. Starting raw un-fenced SVG block
-        if (trimmed.startsWith('<svg') || (trimmed.includes('<svg') && !trimmed.includes('</svg>'))) {
+        if (
+            trimmed.startsWith('<svg') ||
+            (trimmed.includes('<svg') && !trimmed.includes('</svg>'))
+        ) {
             flushAll();
             inSvgBlock = true;
             svgBlockLines = [rawLine];
+
             if (trimmed.includes('</svg>')) {
                 flushSvgBlock();
             }
+
             continue;
         }
 
@@ -646,14 +663,21 @@ export function TutorMessageContent({ content }: TutorMessageContentProps) {
             // immediately flush the code block and exit inCodeBlock.
             // This prevents subsequent explanation markdown (steps, headers, text)
             // from being mistakenly absorbed into the code block if the AI omits the closing ``` fence.
-            if (trimmed.includes('</svg>') && codeBlockLines.some((l) => l.includes('<svg'))) {
+            if (
+                trimmed.includes('</svg>') &&
+                codeBlockLines.some((l) => l.includes('<svg'))
+            ) {
                 flushCodeBlock();
 
                 // If the very next line is the closing ``` fence, peek and advance so it
                 // doesn't accidentally trigger a new code block.
-                if (i + 1 < lines.length && lines[i + 1].trim().startsWith('```')) {
+                if (
+                    i + 1 < lines.length &&
+                    lines[i + 1].trim().startsWith('```')
+                ) {
                     i++;
                 }
+
                 continue;
             }
 

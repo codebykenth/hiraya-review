@@ -54,7 +54,12 @@ export function useExamPersistence({
     const isClearingRef = useRef(false);
 
     const saveSession = useCallback(() => {
-        if (isClearingRef.current || !isExamActive || isExamSubmitted || activeQuestions.length === 0) {
+        if (
+            isClearingRef.current ||
+            !isExamActive ||
+            isExamSubmitted ||
+            activeQuestions.length === 0
+        ) {
             return;
         }
 
@@ -96,6 +101,7 @@ export function useExamPersistence({
 
     const clearSession = useCallback(() => {
         isClearingRef.current = true;
+
         try {
             localStorage.removeItem(PERSISTENCE_KEY);
         } catch {
@@ -135,6 +141,7 @@ export function useExamPersistence({
         if (isExamActive && !isExamSubmitted) {
             saveSession();
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [
         answers,
         currentIdx,

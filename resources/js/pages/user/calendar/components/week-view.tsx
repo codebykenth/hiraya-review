@@ -514,7 +514,7 @@ export function WeekView({
                                                             }`}
                                                         >
                                                             {/* Action Buttons (Inline on Mobile, Top Right on Desktop Hover) */}
-                                                            <div className="mb-1.5 flex items-center justify-end gap-1 opacity-100 lg:absolute lg:right-1.5 lg:top-1.5 lg:z-10 lg:mb-0 lg:gap-0.5 lg:rounded-md lg:bg-white/90 lg:p-0.5 lg:opacity-0 lg:backdrop-blur-sm lg:transition-opacity lg:group-hover:opacity-100 dark:lg:bg-slate-900/90">
+                                                            <div className="mb-1.5 flex items-center justify-end gap-1 opacity-100 lg:absolute lg:top-1.5 lg:right-1.5 lg:z-10 lg:mb-0 lg:gap-0.5 lg:rounded-md lg:bg-white/90 lg:p-0.5 lg:opacity-0 lg:backdrop-blur-sm lg:transition-opacity lg:group-hover:opacity-100 dark:lg:bg-slate-900/90">
                                                                 {isOverdue &&
                                                                     handleRescheduleToToday && (
                                                                         <button

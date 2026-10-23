@@ -65,8 +65,12 @@ export function TutorCheckpointsRail({
         return false;
     });
 
-    const [internalMobileSheetOpen, setInternalMobileSheetOpen] = useState(false);
-    const isSheetOpen = isMobileSheetOpenProp !== undefined ? isMobileSheetOpenProp : internalMobileSheetOpen;
+    const [internalMobileSheetOpen, setInternalMobileSheetOpen] =
+        useState(false);
+    const isSheetOpen =
+        isMobileSheetOpenProp !== undefined
+            ? isMobileSheetOpenProp
+            : internalMobileSheetOpen;
     const handleSheetOpenChange = useCallback(
         (open: boolean) => {
             if (onMobileSheetOpenChangeProp) {
@@ -90,7 +94,6 @@ export function TutorCheckpointsRail({
         });
     }, []);
 
-
     if (questions.length === 0) {
         return null;
     }
@@ -100,16 +103,18 @@ export function TutorCheckpointsRail({
             {/* Desktop / Tablet Side Rail */}
             <aside
                 className={cn(
-                    'hidden md:flex flex-col shrink-0 h-full border-l border-border/70 bg-card/60 backdrop-blur-xs transition-[width] duration-300 ease-in-out select-none overflow-hidden',
-                    isCollapsed ? 'w-14' : 'w-72'
+                    'hidden h-full shrink-0 flex-col overflow-hidden border-l border-border/70 bg-card/60 backdrop-blur-xs transition-[width] duration-300 ease-in-out select-none md:flex',
+                    isCollapsed ? 'w-14' : 'w-72',
                 )}
                 aria-label="Question checkpoints navigation rail"
             >
                 {/* Header */}
                 <div
                     className={cn(
-                        'flex h-12 shrink-0 items-center border-b border-border/60 px-2.5 bg-muted/20',
-                        isCollapsed ? 'justify-center' : 'justify-between px-3.5'
+                        'flex h-12 shrink-0 items-center border-b border-border/60 bg-muted/20 px-2.5',
+                        isCollapsed
+                            ? 'justify-center'
+                            : 'justify-between px-3.5',
                     )}
                 >
                     {isCollapsed ? (
@@ -131,14 +136,14 @@ export function TutorCheckpointsRail({
                         </Tooltip>
                     ) : (
                         <>
-                            <div className="flex items-center gap-2 min-w-0">
+                            <div className="flex min-w-0 items-center gap-2">
                                 <div className="flex size-6 shrink-0 items-center justify-center rounded-md bg-indigo-500/10 text-indigo-600 dark:text-indigo-400">
                                     <Milestone className="size-3.5" />
                                 </div>
-                                <span className="font-heading text-xs font-bold text-foreground truncate">
+                                <span className="truncate font-heading text-xs font-bold text-foreground">
                                     Checkpoints
                                 </span>
-                                <span className="rounded-full bg-indigo-500/10 px-1.5 py-0.2 text-[10px] font-bold text-indigo-600 dark:text-indigo-400">
+                                <span className="py-0.2 rounded-full bg-indigo-500/10 px-1.5 text-[10px] font-bold text-indigo-600 dark:text-indigo-400">
                                     {questions.length}
                                 </span>
                             </div>
@@ -158,18 +163,27 @@ export function TutorCheckpointsRail({
                 </div>
 
                 {/* Checkpoints Body List */}
-                <div className="relative flex-1 min-h-0 overflow-y-auto px-2 py-3 overscroll-contain">
+                <div className="relative min-h-0 flex-1 overflow-y-auto overscroll-contain px-2 py-3">
                     {/* Vertical guideline connector */}
                     <div
                         className={cn(
                             'pointer-events-none absolute top-6 bottom-6 w-0.5 bg-border/60 transition-all',
-                            isCollapsed ? 'left-1/2 -translate-x-1/2' : 'left-5'
+                            isCollapsed
+                                ? 'left-1/2 -translate-x-1/2'
+                                : 'left-5',
                         )}
                     />
 
-                    <div className={cn('space-y-2', isCollapsed && 'flex flex-col items-center')}>
+                    <div
+                        className={cn(
+                            'space-y-2',
+                            isCollapsed && 'flex flex-col items-center',
+                        )}
+                    >
                         {questions.map((q) => {
-                            const isCurrent = activeQuestionId === q.id || highlightedMsgId === q.id;
+                            const isCurrent =
+                                activeQuestionId === q.id ||
+                                highlightedMsgId === q.id;
 
                             if (isCollapsed) {
                                 return (
@@ -186,10 +200,10 @@ export function TutorCheckpointsRail({
                                                     onSelectQuestion(q.id);
                                                 }}
                                                 className={cn(
-                                                    'relative z-10 flex size-8 items-center justify-center rounded-xl font-mono text-[11px] font-bold transition-all duration-200 active:scale-95 cursor-pointer',
+                                                    'relative z-10 flex size-8 cursor-pointer items-center justify-center rounded-xl font-mono text-[11px] font-bold transition-all duration-200 active:scale-95',
                                                     isCurrent
-                                                        ? 'bg-indigo-600 text-white shadow-sm shadow-indigo-500/40 ring-2 ring-indigo-400 scale-105'
-                                                        : 'bg-card border border-border/80 text-muted-foreground hover:border-indigo-400/80 hover:text-indigo-600 hover:bg-indigo-50/50 dark:hover:bg-indigo-950/40 dark:hover:text-indigo-400'
+                                                        ? 'scale-105 bg-indigo-600 text-white shadow-sm ring-2 shadow-indigo-500/40 ring-indigo-400'
+                                                        : 'border border-border/80 bg-card text-muted-foreground hover:border-indigo-400/80 hover:bg-indigo-50/50 hover:text-indigo-600 dark:hover:bg-indigo-950/40 dark:hover:text-indigo-400',
                                                 )}
                                                 aria-label={`Jump to Question ${q.index}`}
                                             >
@@ -207,22 +221,26 @@ export function TutorCheckpointsRail({
                                                 e.stopPropagation();
                                                 onSelectQuestion(q.id);
                                             }}
-                                            className="max-w-2xl p-3 shadow-xl cursor-pointer pointer-events-auto select-none transition-transform active:scale-[0.98]"
+                                            className="pointer-events-auto max-w-2xl cursor-pointer p-3 shadow-xl transition-transform select-none active:scale-[0.98]"
                                         >
                                             <div className="flex items-center justify-between gap-3 border-b border-white/20 pb-1.5 text-[11px]">
-                                                <span className="font-bold text-white tracking-wide">
+                                                <span className="font-bold tracking-wide text-white">
                                                     Question {q.index}
                                                 </span>
-                                                <span className="text-[10px] text-white/80 font-medium">
+                                                <span className="text-[10px] font-medium text-white/80">
                                                     {q.timestamp}
                                                 </span>
                                             </div>
-                                            <p className="mt-1.5 text-xs text-white/95 line-clamp-3 leading-relaxed font-normal">
+                                            <p className="mt-1.5 line-clamp-3 text-xs leading-relaxed font-normal text-white/95">
                                                 {q.questionText}
                                             </p>
                                             <div className="mt-2.5 flex items-center justify-between rounded-md bg-white/15 px-2 py-1 text-[10px] font-semibold text-white transition-colors hover:bg-white/25">
-                                                <span>Click to jump to question</span>
-                                                <span aria-hidden="true">&rarr;</span>
+                                                <span>
+                                                    Click to jump to question
+                                                </span>
+                                                <span aria-hidden="true">
+                                                    &rarr;
+                                                </span>
                                             </div>
                                         </TooltipContent>
                                     </Tooltip>
@@ -235,10 +253,10 @@ export function TutorCheckpointsRail({
                                     type="button"
                                     onClick={() => onSelectQuestion(q.id)}
                                     className={cn(
-                                        'group relative flex w-full items-start gap-2.5 rounded-xl p-2 text-left transition-all duration-200 cursor-pointer',
+                                        'group relative flex w-full cursor-pointer items-start gap-2.5 rounded-xl p-2 text-left transition-all duration-200',
                                         isCurrent
-                                            ? 'bg-indigo-50/80 dark:bg-indigo-950/40 border border-indigo-300/80 dark:border-indigo-800/80 shadow-2xs'
-                                            : 'hover:bg-muted/70 border border-transparent'
+                                            ? 'border border-indigo-300/80 bg-indigo-50/80 shadow-2xs dark:border-indigo-800/80 dark:bg-indigo-950/40'
+                                            : 'border border-transparent hover:bg-muted/70',
                                     )}
                                     aria-label={`Jump to Question ${q.index}`}
                                 >
@@ -247,8 +265,8 @@ export function TutorCheckpointsRail({
                                         className={cn(
                                             'relative z-10 flex size-6 shrink-0 items-center justify-center rounded-lg font-mono text-[10px] font-bold transition-all duration-200',
                                             isCurrent
-                                                ? 'bg-indigo-600 text-white shadow-xs shadow-indigo-500/40 ring-2 ring-indigo-400/40 scale-105'
-                                                : 'bg-muted text-muted-foreground group-hover:bg-indigo-100 group-hover:text-indigo-700 dark:group-hover:bg-indigo-900/50 dark:group-hover:text-indigo-300'
+                                                ? 'scale-105 bg-indigo-600 text-white shadow-xs ring-2 shadow-indigo-500/40 ring-indigo-400/40'
+                                                : 'bg-muted text-muted-foreground group-hover:bg-indigo-100 group-hover:text-indigo-700 dark:group-hover:bg-indigo-900/50 dark:group-hover:text-indigo-300',
                                         )}
                                     >
                                         Q{q.index}
@@ -262,12 +280,12 @@ export function TutorCheckpointsRail({
                                                     'font-bold',
                                                     isCurrent
                                                         ? 'text-indigo-600 dark:text-indigo-400'
-                                                        : 'text-foreground/90'
+                                                        : 'text-foreground/90',
                                                 )}
                                             >
                                                 Question {q.index}
                                             </span>
-                                            <span className="text-[10px] text-muted-foreground/70 shrink-0">
+                                            <span className="shrink-0 text-[10px] text-muted-foreground/70">
                                                 {q.timestamp}
                                             </span>
                                         </div>
@@ -284,8 +302,10 @@ export function TutorCheckpointsRail({
                 {/* Footer Quick Nav Buttons */}
                 <div
                     className={cn(
-                        'shrink-0 border-t border-border/60 p-2 bg-muted/10',
-                        isCollapsed ? 'flex flex-col items-center gap-1.5' : 'flex items-center justify-between gap-1'
+                        'shrink-0 border-t border-border/60 bg-muted/10 p-2',
+                        isCollapsed
+                            ? 'flex flex-col items-center gap-1.5'
+                            : 'flex items-center justify-between gap-1',
                     )}
                 >
                     {isCollapsed ? (
@@ -303,7 +323,9 @@ export function TutorCheckpointsRail({
                                             <ArrowUp className="size-3.5" />
                                         </Button>
                                     </TooltipTrigger>
-                                    <TooltipContent side="left">Scroll to top</TooltipContent>
+                                    <TooltipContent side="left">
+                                        Scroll to top
+                                    </TooltipContent>
                                 </Tooltip>
                             )}
                             {onScrollToBottom && (
@@ -319,7 +341,9 @@ export function TutorCheckpointsRail({
                                             <ArrowDown className="size-3.5" />
                                         </Button>
                                     </TooltipTrigger>
-                                    <TooltipContent side="left">Scroll to latest</TooltipContent>
+                                    <TooltipContent side="left">
+                                        Scroll to latest
+                                    </TooltipContent>
                                 </Tooltip>
                             )}
                         </>
@@ -354,7 +378,10 @@ export function TutorCheckpointsRail({
 
             {/* Mobile Checkpoint Sheet */}
             <Sheet open={isSheetOpen} onOpenChange={handleSheetOpenChange}>
-                <SheetContent side="right" className="w-[85vw] max-w-sm p-4 sm:p-6">
+                <SheetContent
+                    side="right"
+                    className="w-[85vw] max-w-sm p-4 sm:p-6"
+                >
                     <SheetHeader>
                         <SheetTitle className="flex items-center gap-2 text-base">
                             <Milestone className="size-4 text-indigo-500" />
@@ -365,9 +392,11 @@ export function TutorCheckpointsRail({
                         </SheetDescription>
                     </SheetHeader>
 
-                    <div className="mt-4 flex-1 overflow-y-auto space-y-2 pr-1">
+                    <div className="mt-4 flex-1 space-y-2 overflow-y-auto pr-1">
                         {questions.map((q) => {
-                            const isCurrent = activeQuestionId === q.id || highlightedMsgId === q.id;
+                            const isCurrent =
+                                activeQuestionId === q.id ||
+                                highlightedMsgId === q.id;
 
                             return (
                                 <button
@@ -380,8 +409,8 @@ export function TutorCheckpointsRail({
                                     className={cn(
                                         'flex w-full items-start gap-3 rounded-xl border p-3 text-left transition-all active:scale-[0.98]',
                                         isCurrent
-                                            ? 'border-indigo-400 bg-indigo-50/60 dark:bg-indigo-950/40 text-foreground shadow-xs'
-                                            : 'border-border/70 bg-card text-foreground hover:bg-muted/60'
+                                            ? 'border-indigo-400 bg-indigo-50/60 text-foreground shadow-xs dark:bg-indigo-950/40'
+                                            : 'border-border/70 bg-card text-foreground hover:bg-muted/60',
                                     )}
                                 >
                                     <span
@@ -389,7 +418,7 @@ export function TutorCheckpointsRail({
                                             'flex size-7 shrink-0 items-center justify-center rounded-lg font-mono text-xs font-bold',
                                             isCurrent
                                                 ? 'bg-indigo-600 text-white'
-                                                : 'bg-muted text-muted-foreground'
+                                                : 'bg-muted text-muted-foreground',
                                         )}
                                     >
                                         Q{q.index}

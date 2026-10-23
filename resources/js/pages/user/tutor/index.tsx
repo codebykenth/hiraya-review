@@ -38,10 +38,7 @@ import { cn } from '@/lib/utils';
 import type { TutorQuestionCheckpoint } from './components/tutor-checkpoints-rail';
 import { TutorCheckpointsRail } from './components/tutor-checkpoints-rail';
 import { TutorMessageContent } from './components/tutor-message-content';
-import {
-    tutorChatService,
-    useTutorChat,
-} from './services/tutor-chat-service';
+import { tutorChatService, useTutorChat } from './services/tutor-chat-service';
 import type { ChatMessage, Citation } from './services/tutor-chat-service';
 
 interface ModuleItem {
@@ -286,9 +283,7 @@ export default function TutorPage({
     const visibleMessages = useMemo(() => {
         return messages.filter(
             (m) =>
-                m.role === 'user' ||
-                m.content.trim().length > 0 ||
-                m.isError,
+                m.role === 'user' || m.content.trim().length > 0 || m.isError,
         );
     }, [messages]);
 
@@ -357,32 +352,35 @@ export default function TutorPage({
         }
     }, [userQuestions, setActiveQuestionId]);
 
-    const jumpToMessage = useCallback((msgId: string) => {
-        const element = document.getElementById(`msg-${msgId}`);
-        const container = scrollContainerRef.current;
+    const jumpToMessage = useCallback(
+        (msgId: string) => {
+            const element = document.getElementById(`msg-${msgId}`);
+            const container = scrollContainerRef.current;
 
-        if (element && container) {
-            const containerRect = container.getBoundingClientRect();
-            const elementRect = element.getBoundingClientRect();
-            const targetScrollTop =
-                container.scrollTop +
-                (elementRect.top - containerRect.top) -
-                20;
+            if (element && container) {
+                const containerRect = container.getBoundingClientRect();
+                const elementRect = element.getBoundingClientRect();
+                const targetScrollTop =
+                    container.scrollTop +
+                    (elementRect.top - containerRect.top) -
+                    20;
 
-            container.scrollTo({
-                top: Math.max(0, targetScrollTop),
-                behavior: 'smooth',
-            });
-            setHighlightedMsgId(msgId);
-            setActiveQuestionId(msgId);
-            setTimeout(() => setHighlightedMsgId(null), 2500);
-        } else if (element) {
-            element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            setHighlightedMsgId(msgId);
-            setActiveQuestionId(msgId);
-            setTimeout(() => setHighlightedMsgId(null), 2500);
-        }
-    }, [setActiveQuestionId]);
+                container.scrollTo({
+                    top: Math.max(0, targetScrollTop),
+                    behavior: 'smooth',
+                });
+                setHighlightedMsgId(msgId);
+                setActiveQuestionId(msgId);
+                setTimeout(() => setHighlightedMsgId(null), 2500);
+            } else if (element) {
+                element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                setHighlightedMsgId(msgId);
+                setActiveQuestionId(msgId);
+                setTimeout(() => setHighlightedMsgId(null), 2500);
+            }
+        },
+        [setActiveQuestionId],
+    );
 
     useEffect(() => {
         scrollToBottom(isLoading);
@@ -628,7 +626,8 @@ export default function TutorPage({
                             className="min-w-0 flex-1 overflow-y-auto px-4 py-6 sm:px-6"
                         >
                             <div className="mx-auto flex max-w-4xl flex-col gap-6">
-                                {visibleMessages.length === 0 && !isWaitingForResponse ? (
+                                {visibleMessages.length === 0 &&
+                                !isWaitingForResponse ? (
                                     <div className="my-auto flex flex-col items-center justify-center py-8 text-center">
                                         <div className="mb-4 flex size-16 items-center justify-center rounded-2xl bg-indigo-500/10 text-indigo-600 shadow-inner dark:text-indigo-400">
                                             <BookOpen className="size-8" />
@@ -686,12 +685,15 @@ export default function TutorPage({
                                                 highlightedMsgId === msg.id;
                                             const isLastAssistantMessage =
                                                 msg.role === 'assistant' &&
-                                                index === visibleMessages.length - 1 &&
+                                                index ===
+                                                    visibleMessages.length -
+                                                        1 &&
                                                 !isLoading;
                                             const isStreaming =
                                                 isLoading &&
                                                 msg.role === 'assistant' &&
-                                                index === visibleMessages.length - 1;
+                                                index ===
+                                                    visibleMessages.length - 1;
                                             const questionNumber =
                                                 userQuestionMap.get(msg.id);
 

@@ -78,7 +78,10 @@ export function GlobalPdfExporter() {
 
         return () => {
             window.removeEventListener('hiraya:export-pdf', handleExport);
-            window.removeEventListener('hiraya:export-pdf-cancel', handleCancel);
+            window.removeEventListener(
+                'hiraya:export-pdf-cancel',
+                handleCancel,
+            );
         };
     }, []);
 

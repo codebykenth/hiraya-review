@@ -199,12 +199,16 @@ export function ExamCountdown({
                             </p>
                         ) : isUrgent ? (
                             <p className="flex items-start gap-1.5 text-sm leading-snug font-bold text-amber-600 dark:text-amber-400">
-                                <AlertTriangle className="size-4 shrink-0 mt-0.5 text-amber-500" />
-                                <span>Time is running short! Focus on your weakest topics now.</span>
+                                <AlertTriangle className="mt-0.5 size-4 shrink-0 text-amber-500" />
+                                <span>
+                                    Time is running short! Focus on your weakest
+                                    topics now.
+                                </span>
                             </p>
                         ) : (
                             <p className="text-sm leading-snug font-bold text-slate-600 dark:text-slate-400">
-                                Master your study recommendations to boost your passing probability.
+                                Master your study recommendations to boost your
+                                passing probability.
                             </p>
                         )}
                     </div>

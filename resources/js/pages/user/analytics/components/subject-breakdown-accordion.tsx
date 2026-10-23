@@ -158,148 +158,156 @@ export function SubjectBreakdownAccordion({
                 />
             ) : (
                 <div className="flex flex-col gap-3">
-                {categories.map((category) => {
-                    const isExpanded = !!expandedCategories[category.name];
-                    const subcats = category.subcategories || [];
-                    const mastery = getMasteryBadge(category.percentage);
+                    {categories.map((category) => {
+                        const isExpanded = !!expandedCategories[category.name];
+                        const subcats = category.subcategories || [];
+                        const mastery = getMasteryBadge(category.percentage);
 
-                    return (
-                        <div
-                            key={category.name}
-                            className="overflow-hidden rounded-xl border border-slate-200/80 bg-white shadow-2xs transition dark:border-slate-800 dark:bg-slate-900/60"
-                        >
-                            {/* Subject Header */}
-                            <button
-                                type="button"
-                                onClick={() => toggleCategory(category.name)}
-                                className="flex w-full items-center justify-between p-4 text-left transition hover:bg-slate-50/80 dark:hover:bg-slate-800/40"
+                        return (
+                            <div
+                                key={category.name}
+                                className="overflow-hidden rounded-xl border border-slate-200/80 bg-white shadow-2xs transition dark:border-slate-800 dark:bg-slate-900/60"
                             >
-                                <div className="flex items-center gap-3">
-                                    <div className="flex size-9 shrink-0 items-center justify-center rounded-lg border border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-800">
-                                        {getSubjectIcon(category.name)}
-                                    </div>
-                                    <div>
-                                        <div className="flex items-center gap-2">
-                                            <h4 className="text-sm font-black text-slate-900 dark:text-white">
-                                                {category.name}
-                                            </h4>
-                                            <span
-                                                className={`inline-flex items-center gap-1 rounded-md border px-2 py-0.5 text-[10px] font-bold ${mastery.className}`}
-                                            >
-                                                {mastery.icon}
-                                                {mastery.label}
-                                            </span>
+                                {/* Subject Header */}
+                                <button
+                                    type="button"
+                                    onClick={() =>
+                                        toggleCategory(category.name)
+                                    }
+                                    className="flex w-full items-center justify-between p-4 text-left transition hover:bg-slate-50/80 dark:hover:bg-slate-800/40"
+                                >
+                                    <div className="flex items-center gap-3">
+                                        <div className="flex size-9 shrink-0 items-center justify-center rounded-lg border border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-800">
+                                            {getSubjectIcon(category.name)}
                                         </div>
-                                        <p className="text-xs font-medium text-muted-foreground">
-                                            {category.correct} of{' '}
-                                            {category.total} questions correct ·{' '}
-                                            {subcats.length} subtopics
-                                        </p>
+                                        <div>
+                                            <div className="flex items-center gap-2">
+                                                <h4 className="text-sm font-black text-slate-900 dark:text-white">
+                                                    {category.name}
+                                                </h4>
+                                                <span
+                                                    className={`inline-flex items-center gap-1 rounded-md border px-2 py-0.5 text-[10px] font-bold ${mastery.className}`}
+                                                >
+                                                    {mastery.icon}
+                                                    {mastery.label}
+                                                </span>
+                                            </div>
+                                            <p className="text-xs font-medium text-muted-foreground">
+                                                {category.correct} of{' '}
+                                                {category.total} questions
+                                                correct · {subcats.length}{' '}
+                                                subtopics
+                                            </p>
+                                        </div>
                                     </div>
-                                </div>
 
-                                <div className="flex items-center gap-4">
-                                    <div className="hidden text-right sm:block">
-                                        <span className="font-heading text-base font-black text-slate-900 dark:text-white">
-                                            {category.percentage}%
-                                        </span>
-                                        <Progress
-                                            value={category.percentage}
-                                            className="mt-1 h-1.5 w-24"
+                                    <div className="flex items-center gap-4">
+                                        <div className="hidden text-right sm:block">
+                                            <span className="font-heading text-base font-black text-slate-900 dark:text-white">
+                                                {category.percentage}%
+                                            </span>
+                                            <Progress
+                                                value={category.percentage}
+                                                className="mt-1 h-1.5 w-24"
+                                            />
+                                        </div>
+
+                                        <ChevronDown
+                                            className={cn(
+                                                'size-4 text-muted-foreground transition-transform duration-200 print:hidden',
+                                                isExpanded ? 'rotate-180' : '',
+                                            )}
                                         />
                                     </div>
+                                </button>
 
-                                    <ChevronDown
-                                        className={cn(
-                                            'size-4 text-muted-foreground transition-transform duration-200 print:hidden',
-                                            isExpanded ? 'rotate-180' : '',
-                                        )}
-                                    />
-                                </div>
-                            </button>
+                                {/* Subcategories Table (Auto-expanded in print) */}
+                                <div
+                                    className={cn(
+                                        'border-t border-slate-100 bg-slate-50/40 px-4 py-3 dark:border-slate-800/80 dark:bg-slate-950/20',
+                                        !isExpanded && 'hidden print:block',
+                                    )}
+                                >
+                                    {subcats.length > 0 ? (
+                                        <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
+                                            {subcats.map(
+                                                (sub: SubcategoryAnalytics) => {
+                                                    const subMastery =
+                                                        getMasteryBadge(
+                                                            sub.percentage,
+                                                        );
 
-                            {/* Subcategories Table (Auto-expanded in print) */}
-                            <div
-                                className={cn(
-                                    'border-t border-slate-100 bg-slate-50/40 px-4 py-3 dark:border-slate-800/80 dark:bg-slate-950/20',
-                                    !isExpanded && 'hidden print:block',
-                                )}
-                            >
-                                {subcats.length > 0 ? (
-                                    <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
-                                        {subcats.map(
-                                            (sub: SubcategoryAnalytics) => {
-                                                const subMastery =
-                                                    getMasteryBadge(
-                                                        sub.percentage,
-                                                    );
-
-                                                return (
-                                                    <div
-                                                        key={sub.name}
-                                                        className="flex items-center justify-between rounded-lg border border-slate-200/70 bg-white p-3 shadow-2xs dark:border-slate-800 dark:bg-slate-900"
-                                                    >
-                                                        <div className="flex flex-col gap-1 overflow-hidden pr-2">
-                                                            <span className="truncate text-xs font-bold text-slate-800 dark:text-slate-200">
-                                                                {sub.name}
-                                                            </span>
-                                                            <div className="flex items-center gap-2">
-                                                                <span className="text-[11px] font-semibold text-muted-foreground">
-                                                                    {
-                                                                        sub.correct
-                                                                    }
-                                                                    /{sub.total}{' '}
-                                                                    (
-                                                                    {
-                                                                        sub.percentage
-                                                                    }
-                                                                    %)
-                                                                </span>
-                                                                <span
-                                                                    className={`py-0.2 inline-flex items-center rounded border px-1.5 text-[9px] font-bold ${subMastery.className}`}
-                                                                >
-                                                                    {
-                                                                        subMastery.label
-                                                                    }
-                                                                </span>
-                                                            </div>
-                                                        </div>
-
-                                                        <Link
-                                                            href={drillsIndex({
-                                                                query: {
-                                                                    category:
-                                                                        category.name,
-                                                                    subcategories:
-                                                                        JSON.stringify(
-                                                                            [
-                                                                                sub.name,
-                                                                            ],
-                                                                        ),
-                                                                    from: '/analytics',
-                                                                },
-                                                            })}
-                                                            className="inline-flex shrink-0 items-center gap-1 rounded-md border border-blue-200 bg-blue-50 px-2.5 py-1.5 text-xs font-bold text-blue-700 transition hover:bg-blue-100 dark:border-blue-900 dark:bg-blue-950/30 dark:text-blue-300 dark:hover:bg-blue-900/40 print:hidden"
+                                                    return (
+                                                        <div
+                                                            key={sub.name}
+                                                            className="flex items-center justify-between rounded-lg border border-slate-200/70 bg-white p-3 shadow-2xs dark:border-slate-800 dark:bg-slate-900"
                                                         >
-                                                            <Play className="size-3 fill-current" />
-                                                            Drill
-                                                        </Link>
-                                                    </div>
-                                                );
-                                            },
-                                        )}
-                                    </div>
-                                ) : (
-                                    <p className="py-2 text-center text-xs font-medium text-muted-foreground">
-                                        Complete practice exams or subject
-                                        drills to populate subtopic metrics.
-                                    </p>
-                                )}
+                                                            <div className="flex flex-col gap-1 overflow-hidden pr-2">
+                                                                <span className="truncate text-xs font-bold text-slate-800 dark:text-slate-200">
+                                                                    {sub.name}
+                                                                </span>
+                                                                <div className="flex items-center gap-2">
+                                                                    <span className="text-[11px] font-semibold text-muted-foreground">
+                                                                        {
+                                                                            sub.correct
+                                                                        }
+                                                                        /
+                                                                        {
+                                                                            sub.total
+                                                                        }{' '}
+                                                                        (
+                                                                        {
+                                                                            sub.percentage
+                                                                        }
+                                                                        %)
+                                                                    </span>
+                                                                    <span
+                                                                        className={`py-0.2 inline-flex items-center rounded border px-1.5 text-[9px] font-bold ${subMastery.className}`}
+                                                                    >
+                                                                        {
+                                                                            subMastery.label
+                                                                        }
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+
+                                                            <Link
+                                                                href={drillsIndex(
+                                                                    {
+                                                                        query: {
+                                                                            category:
+                                                                                category.name,
+                                                                            subcategories:
+                                                                                JSON.stringify(
+                                                                                    [
+                                                                                        sub.name,
+                                                                                    ],
+                                                                                ),
+                                                                            from: '/analytics',
+                                                                        },
+                                                                    },
+                                                                )}
+                                                                className="inline-flex shrink-0 items-center gap-1 rounded-md border border-blue-200 bg-blue-50 px-2.5 py-1.5 text-xs font-bold text-blue-700 transition hover:bg-blue-100 dark:border-blue-900 dark:bg-blue-950/30 dark:text-blue-300 dark:hover:bg-blue-900/40 print:hidden"
+                                                            >
+                                                                <Play className="size-3 fill-current" />
+                                                                Drill
+                                                            </Link>
+                                                        </div>
+                                                    );
+                                                },
+                                            )}
+                                        </div>
+                                    ) : (
+                                        <p className="py-2 text-center text-xs font-medium text-muted-foreground">
+                                            Complete practice exams or subject
+                                            drills to populate subtopic metrics.
+                                        </p>
+                                    )}
+                                </div>
                             </div>
-                        </div>
-                    );
-                })}
-            </div>
+                        );
+                    })}
+                </div>
             )}
         </Card>
     );

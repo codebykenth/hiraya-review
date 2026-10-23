@@ -1,7 +1,7 @@
 import type { InertiaLinkProps } from '@inertiajs/react';
 import { Link, usePage } from '@inertiajs/react';
 import { ChevronRight, Sparkles } from 'lucide-react';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import {
     SidebarGroup,
     SidebarGroupLabel,
@@ -38,6 +38,7 @@ export function NavMain({
             if (href && href !== '#') {
                 setOptimisticUrl(toUrl(href));
             }
+
             if (isMobile) {
                 setOpenMobile(false);
             }
@@ -72,56 +73,19 @@ export function NavMain({
         [effectivePath],
     );
 
-    // Smart auto-expansion state: automatically expand sections where a sub-item is active
-    const [openItems, setOpenItems] = useState<Record<string, boolean>>(() => {
-        const initial: Record<string, boolean> = {};
+    // Smart auto-expansion: sections with an active sub-item are expanded by
+    // default, while manual toggles are tracked in openItems.
+    const activeSectionTitle = items.find((item) =>
+        item.items?.some((sub) => isSubActive(sub, item.items || [])),
+    )?.title;
 
-        for (const item of items) {
-            if (item.items) {
-                const hasActiveChild = item.items.some((sub) =>
-                    isSubActive(sub, item.items || []),
-                );
+    const [openItems, setOpenItems] = useState<Record<string, boolean>>({});
 
-                if (hasActiveChild) {
-                    initial[item.title] = true;
-                    break;
-                }
-            }
-        }
-
-        return initial;
-    });
-
-    // Sync auto-expansion if the URL shifts externally or optimistically
-    useEffect(() => {
-        for (const item of items) {
-            if (item.items) {
-                const hasActiveChild = item.items.some((sub) =>
-                    isSubActive(sub, item.items || []),
-                );
-
-                if (hasActiveChild) {
-                    setOpenItems((prev) =>
-                        prev[item.title]
-                            ? prev
-                            : { ...prev, [item.title]: true },
-                    );
-                    break;
-                }
-            }
-        }
-    }, [effectivePath, items, isSubActive]);
+    const isItemOpen = (title: string) =>
+        openItems[title] ?? title === activeSectionTitle;
 
     const toggleItem = (title: string) => {
-        setOpenItems((prev) => {
-            const next: Record<string, boolean> = {};
-
-            if (!prev[title]) {
-                next[title] = true;
-            }
-
-            return next;
-        });
+        setOpenItems({ [title]: !isItemOpen(title) });
     };
 
     if (items.length === 0) {
@@ -144,7 +108,7 @@ export function NavMain({
                     const hasSubItems = item.items && item.items.length > 0;
 
                     if (hasSubItems) {
-                        const isOpen = !!openItems[item.title];
+                        const isOpen = isItemOpen(item.title);
                         const hasActiveChild = item.items!.some((sub) =>
                             isSubActive(sub, item.items || []),
                         );

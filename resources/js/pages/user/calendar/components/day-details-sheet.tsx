@@ -95,8 +95,8 @@ export function DayDetailsSheet({
 
                     <DialogDescription className="text-xs text-slate-500 dark:text-slate-400">
                         {schedules.length} session
-                        {schedules.length === 1 ? '' : 's'} scheduled for
-                        this date
+                        {schedules.length === 1 ? '' : 's'} scheduled for this
+                        date
                     </DialogDescription>
                 </DialogHeader>
 
@@ -135,8 +135,7 @@ export function DayDetailsSheet({
                                   )
                                 : null;
                             const catName = subcat?.category_id
-                                ? categoryNames[subcat.category_id] ||
-                                  'General'
+                                ? categoryNames[subcat.category_id] || 'General'
                                 : 'General';
 
                             return (
@@ -154,10 +153,7 @@ export function DayDetailsSheet({
                                             <button
                                                 type="button"
                                                 onClick={() =>
-                                                    onToggleDone(
-                                                        task,
-                                                        dateStr,
-                                                    )
+                                                    onToggleDone(task, dateStr)
                                                 }
                                                 className="mt-0.5 shrink-0 transition-transform active:scale-90"
                                                 aria-label={
@@ -217,9 +213,7 @@ export function DayDetailsSheet({
                                             className="h-7 gap-1 px-2 text-[11px] font-bold text-indigo-600 hover:bg-indigo-50 dark:text-indigo-400 dark:hover:bg-indigo-950/40"
                                         >
                                             <Sparkles className="size-3" />
-                                            <span>
-                                                Study & Practice Drill
-                                            </span>
+                                            <span>Study & Practice Drill</span>
                                         </Button>
 
                                         <div className="flex items-center gap-1">
@@ -227,10 +221,7 @@ export function DayDetailsSheet({
                                                 variant="ghost"
                                                 size="icon"
                                                 onClick={() => {
-                                                    onEditTask(
-                                                        task,
-                                                        dateStr,
-                                                    );
+                                                    onEditTask(task, dateStr);
                                                     onOpenChange(false);
                                                 }}
                                                 className="size-7 text-slate-500 hover:text-slate-900 dark:hover:text-white"

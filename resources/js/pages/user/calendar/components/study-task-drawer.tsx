@@ -92,16 +92,6 @@ export function StudyTaskDrawer({
         return [];
     }, [task, learnModules, subcat]);
 
-    if (!task) {
-        return null;
-    }
-
-    const cleanDescription = (task.description || '')
-        .replace(/(?:\r?\n)+Links:[\s\S]*$/, '')
-        .replace(/\[(.*?)\]\((.*?)\)/g, '')
-        .replace(/^Score:\s*[0-9.]+%?\s*-\s*/, '')
-        .trim();
-
     // Construct drill link
     const drillUrl = React.useMemo(() => {
         const params = new URLSearchParams({
@@ -120,11 +110,21 @@ export function StudyTaskDrawer({
         return `/exams?${params.toString()}`;
     }, [subcat, catName]);
 
+    if (!task) {
+        return null;
+    }
+
+    const cleanDescription = (task.description || '')
+        .replace(/(?:\r?\n)+Links:[\s\S]*$/, '')
+        .replace(/\[(.*?)\]\((.*?)\)/g, '')
+        .replace(/^Score:\s*[0-9.]+%?\s*-\s*/, '')
+        .trim();
+
     return (
         <Dialog open={isOpen} onOpenChange={onOpenChange}>
             <DialogContent className="flex max-h-[88dvh] flex-col gap-0 overflow-hidden p-0">
                 {/* Header */}
-                <DialogHeader className="border-b border-slate-200/80 bg-slate-50/50 p-6 dark:border-slate-800/80 dark:bg-slate-900/50 relative">
+                <DialogHeader className="relative border-b border-slate-200/80 bg-slate-50/50 p-6 dark:border-slate-800/80 dark:bg-slate-900/50">
                     <div className="flex items-center justify-between gap-2 pr-8">
                         <Badge
                             variant="outline"
@@ -177,7 +177,7 @@ export function StudyTaskDrawer({
                 <div className="flex-1 space-y-5 overflow-y-auto p-6">
                     {/* 1-Click Drill Launcher Card */}
                     <div className="rounded-2xl border border-indigo-200/80 bg-linear-to-br from-indigo-50/80 via-blue-50/40 to-indigo-50/80 p-4.5 shadow-2xs dark:border-indigo-900/50 dark:from-indigo-950/40 dark:via-blue-950/20 dark:to-indigo-950/40">
-                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-2">
+                        <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center sm:gap-2">
                             <div className="flex items-center gap-2">
                                 <div className="flex size-8 shrink-0 items-center justify-center rounded-xl bg-indigo-600 text-white shadow-2xs">
                                     <Sparkles className="size-4" />
@@ -187,8 +187,7 @@ export function StudyTaskDrawer({
                                         Targeted {subcat?.name || catName} Drill
                                     </h4>
                                     <p className="text-[11px] text-slate-600 dark:text-slate-400">
-                                        15 High-Yield Questions with
-                                        Rationales
+                                        15 High-Yield Questions with Rationales
                                     </p>
                                 </div>
                             </div>
@@ -196,7 +195,7 @@ export function StudyTaskDrawer({
                             <Button
                                 asChild
                                 size="sm"
-                                className="w-full sm:w-auto h-8.5 shrink-0 gap-1.5 bg-indigo-600 text-xs font-bold text-white shadow-2xs hover:bg-indigo-700"
+                                className="h-8.5 w-full shrink-0 gap-1.5 bg-indigo-600 text-xs font-bold text-white shadow-2xs hover:bg-indigo-700 sm:w-auto"
                             >
                                 <Link href={drillUrl}>
                                     <Play className="size-3.5 fill-current" />
