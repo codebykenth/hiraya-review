@@ -25,6 +25,7 @@ function PopoverContent({
     className,
     align = 'center',
     sideOffset = 4,
+    style,
     ...props
 }: React.ComponentProps<typeof PopoverPrimitive.Content>) {
     return (
@@ -33,8 +34,9 @@ function PopoverContent({
                 data-slot="popover-content"
                 align={align}
                 sideOffset={sideOffset}
+                style={{ zIndex: 10000, ...style }}
                 className={cn(
-                    'bg-popover text-popover-foreground data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 w-72 rounded-xl border border-slate-200/80 bg-white/95 p-4 shadow-lg backdrop-blur-xl outline-hidden dark:border-slate-800/80 dark:bg-slate-900/95',
+                    'bg-popover text-popover-foreground data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-[10000] w-72 rounded-xl border border-slate-200/80 bg-white/95 p-4 shadow-lg backdrop-blur-xl outline-hidden dark:border-slate-800/80 dark:bg-slate-900/95',
                     className,
                 )}
                 {...props}

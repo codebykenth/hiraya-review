@@ -44,6 +44,22 @@ export function ReportIssueModal({
     const [processing, setProcessing] = React.useState(false);
     const isSubmitting = React.useRef(false);
 
+    React.useEffect(() => {
+        if (isOpen) {
+            setData((prev) => ({
+                ...prev,
+                flaggable_id: flaggableId,
+                flaggable_type: flaggableType,
+            }));
+        }
+    }, [isOpen, flaggableId, flaggableType, setData]);
+
+    const handleClose = () => {
+        reset();
+        clearErrors();
+        onClose();
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
@@ -115,7 +131,7 @@ export function ReportIssueModal({
     };
 
     return (
-        <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+        <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
             <DialogContent className="sm:max-w-2xl">
                 <form onSubmit={handleSubmit}>
                     <DialogHeader>
@@ -136,10 +152,10 @@ export function ReportIssueModal({
                                 value={data.reason}
                                 onValueChange={(val) => setData('reason', val)}
                             >
-                                <SelectTrigger>
+                                <SelectTrigger id="reason">
                                     <SelectValue placeholder="Select an issue category" />
                                 </SelectTrigger>
-                                <SelectContent>
+                                <SelectContent className="z-[10000]">
                                     <SelectItem value="No question stated">
                                         No Question Stated
                                     </SelectItem>
@@ -193,11 +209,7 @@ export function ReportIssueModal({
                         <Button
                             type="button"
                             variant="outline"
-                            onClick={() => {
-                                reset();
-                                clearErrors();
-                                onClose();
-                            }}
+                            onClick={handleClose}
                             disabled={processing}
                         >
                             Cancel
